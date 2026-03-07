@@ -1,0 +1,38 @@
+# Dev-Log: 2026-03-07
+
+## 2026-03-07 - Session: Unerledigtes aus CLAUDE.md abarbeiten
+
+### Änderungen
+
+**2026-03-07 - Autor-Korrekturen**
+- Alle 5 src/-Dateien: Falschen Autor korrigiert zu "Kurt Ingwer"
+  - src/algebra.py (@author-Tag)
+  - src/analysis.py (@author-Tag)
+  - src/linear_algebra.py (@author-Tag)
+  - src/ode.py (Inline-Kommentar)
+  - src/statistics_math.py (Inline-Kommentar)
+
+**2026-03-07 - FEATURES.md bereinigt**
+- Doppelte Einträge entfernt: Bereits implementierte Features standen auch in "Geplante Features"
+- Geplante Features auf tatsächlich fehlende Themen reduziert
+- Prioritäten für geplante Features hinzugefügt (hoch/mittel/niedrig)
+
+**2026-03-07 - Debugging-Skripte angelegt**
+- debugging/debug_algebra.py: Polynome, Gleichungslöser, Zahlentheorie
+- debugging/debug_analysis.py: Ableitungen, Integration, Nullstellensuche
+- debugging/debug_run_all.sh: Führt alle Debug-Skripte nacheinander aus
+- Alle Debug-Skripte erfolgreich getestet
+
+**2026-03-07 - Git-Repository initialisiert**
+- Neues Repo erstellt (war bisher kein git-Repo)
+- Remote gesetzt: git@bitbucket.org:von-null/specialist-maths.git
+- Initialer Commit mit 22 Dateien (4369 Zeilen)
+- Erfolgreich zu Bitbucket gepusht
+
+### Test-Status
+- 134/134 Tests grün (python3 -m pytest tests/)
+
+### Nächste Schritte
+- Zahlentheorie-Modul (Sieb des Eratosthenes, CRT, Miller-Rabin)
+- Visualisierungs-Modul (matplotlib 2D/3D)
+- Komplexe Analysis / FFT

@@ -4,9 +4,9 @@ Statistik-Modul für das specialist-maths Projekt.
 Enthält deskriptive Statistik, Wahrscheinlichkeitsverteilungen,
 Hypothesentests, Bayes-Theorem und Monte-Carlo-Simulation.
 
-Autor: Reisen macht Spass... mit Pia und Dirk e.Kfm.
+Autor: Kurt Ingwer
 Erstellt: 2026-03-05
-Letzte Änderung: 2026-03-05
+Letzte Änderung: 2026-03-07
 """
 
 import math

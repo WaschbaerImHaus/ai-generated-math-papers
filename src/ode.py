@@ -4,9 +4,9 @@ ODE-Modul: Gewöhnliche Differentialgleichungen (Ordinary Differential Equations
 Enthält numerische Lösungsverfahren für ODE-Anfangswertprobleme,
 lineare ODE mit konstanten Koeffizienten sowie Laplace-Transformation.
 
-Autor: Reisen macht Spass... mit Pia und Dirk e.Kfm.
+Autor: Kurt Ingwer
 Erstellt: 2026-03-05
-Letzte Änderung: 2026-03-05
+Letzte Änderung: 2026-03-07
 """
 
 import math

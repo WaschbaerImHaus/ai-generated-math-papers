@@ -13,7 +13,7 @@
 
     Mathematische Grundlagen werden in jedem Docblock erklärt.
 
-@author Reisen macht Spass... mit Pia und Dirk e.Kfm.
+@author Kurt Ingwer
 @date 2026-03-05
 """
 
