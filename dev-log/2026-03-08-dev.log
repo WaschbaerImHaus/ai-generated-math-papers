@@ -57,3 +57,42 @@ die Millennium-Probleme des Clay Mathematics Institute).
 - Euler-Knopp: Muss auf UNSIGNED Folge angewendet werden (nicht signed!)
   Vorher: a[j] = (-1)^j/j^s → falsche Konvergenz
   Nachher: c[j] = 1/j^s, S = Σ (-1)^k Δ^k c_0 / 2^{k+1} → ~10^-15 Fehler
+
+## 2026-03-08 02:50 – Build 6: Fourier, Numerische Methoden, LU/QR/SVD
+
+### Neue Module
+- `src/fourier.py`:
+  - DFT/IDFT (O(N²), Lernzwecke)
+  - FFT/IFFT Cooley-Tukey (rekursiv, radix-2, O(N log N))
+  - fft_padded (Zero-Padding auf Zweierpotenz)
+  - Fourier-Reihen (fourier_coefficients, fourier_series_eval)
+  - Fensterfunktionen: Hanning, Hamming, Blackman
+  - Leistungsdichtespektrum (power_spectrum)
+  - dominant_frequency, STFT (Kurzzeit-FFT)
+
+- `src/numerical_methods.py`:
+  - Interpolation: Lagrange, Newton (dividierte Differenzen), kubische Splines (Tridiagonal-LGS)
+  - Optimierung: Gradient Descent, Goldener Schnitt, numerischer Gradient
+  - Lineare Programmierung: Simplex-Algorithmus (Dantzig)
+
+- `src/linear_algebra.py` (erweitert):
+  - LU-Zerlegung (Doolittle mit Teilpivotisierung)
+  - QR-Zerlegung (Householder-Reflexionen, numerisch stabil)
+  - SVD (Singulärwertzerlegung via numpy/LAPACK)
+  - matrix_rank (via SVD), condition_number (κ = σ_max/σ_min)
+
+### Bugfixes
+- `golden_section_search`: resphi = 2-phi war falsch (> 1, außerhalb des Intervalls)
+  Fix: phi = (1+√5)/2, inv_phi = 1/phi ≈ 0.618
+- `simplex`: obj_row = [-ci for ci in c] war falsch (Maximierungsformulierung statt Min)
+  Fix: obj_row = list(c) direkt (Minimierungsform)
+
+### Tests
+- test_fourier.py: 31 Tests (alle grün)
+- test_numerical_methods.py: 31 Tests (alle grün)
+- test_linear_algebra.py: 18 neue Tests (LU: 6, QR: 5, SVD: 7), alle grün
+
+### Statistiken
+- Neue Tests: 80 (80/80 grün)
+- Gesamt-Tests: 318 (318/318 grün)
+- Build-Nummer: 6

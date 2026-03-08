@@ -22,7 +22,12 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 import pytest
 from linear_algebra import (
     Matrix, Vector,
-    gram_schmidt
+    gram_schmidt,
+    lu_decomposition,
+    qr_decomposition,
+    svd,
+    matrix_rank,
+    condition_number
 )
 
 
@@ -201,6 +206,180 @@ class TestGramSchmidt:
         orthonormal = gram_schmidt(vectors, normalize=True)
         for v in orthonormal:
             assert abs(v.norm() - 1.0) < 1e-10
+
+
+class TestLUDecomposition:
+    """Tests für LU-Zerlegung mit Teilpivotisierung."""
+
+    def test_lu_2x2(self):
+        """LU-Zerlegung einer 2×2 Matrix."""
+        A = Matrix([[2, 1], [4, 3]])
+        L, U, P, _ = lu_decomposition(A)
+
+        # Prüfe L·U = P·A (Matrix-Multiplikation via @-Operator)
+        PA = P @ A
+        LU = L @ U
+        for i in range(2):
+            for j in range(2):
+                assert abs(LU._data[i][j] - PA._data[i][j]) < 1e-10
+
+    def test_lu_lower_triangular(self):
+        """L muss untere Dreiecksmatrix mit Einsen auf Diagonale sein."""
+        A = Matrix([[2, 1, 1], [4, 3, 3], [8, 7, 9]])
+        L, U, P, _ = lu_decomposition(A)
+
+        n = 3
+        for i in range(n):
+            assert abs(L._data[i][i] - 1.0) < 1e-10  # Diagonale = 1
+            for j in range(i + 1, n):
+                assert abs(L._data[i][j]) < 1e-10  # Obere Hälfte = 0
+
+    def test_lu_upper_triangular(self):
+        """U muss obere Dreiecksmatrix sein."""
+        A = Matrix([[2, 1, 1], [4, 3, 3], [8, 7, 9]])
+        L, U, P, _ = lu_decomposition(A)
+
+        n = 3
+        for i in range(n):
+            for j in range(i):
+                assert abs(U._data[i][j]) < 1e-10  # Untere Hälfte = 0
+
+    def test_lu_identity(self):
+        """LU der Einheitsmatrix: L=U=I."""
+        A = Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        L, U, P, n_swaps = lu_decomposition(A)
+
+        for i in range(3):
+            assert abs(L._data[i][i] - 1.0) < 1e-10
+            assert abs(U._data[i][i] - 1.0) < 1e-10
+
+    def test_lu_non_square_raises(self):
+        """Nicht-quadratische Matrix löst Fehler aus."""
+        with pytest.raises(ValueError):
+            lu_decomposition(Matrix([[1, 2, 3], [4, 5, 6]]))
+
+    def test_lu_determinant_from_u(self):
+        """det(A) = det(U) · (-1)^swaps = Π U[i,i] · (-1)^swaps."""
+        A = Matrix([[2, 1], [1, 3]])
+        L, U, P, n_swaps = lu_decomposition(A)
+
+        det_u = U._data[0][0] * U._data[1][1]
+        det_expected = A.determinant()
+        det_from_lu = det_u * ((-1) ** n_swaps)
+        assert abs(det_from_lu - det_expected) < 1e-8
+
+
+class TestQRDecomposition:
+    """Tests für QR-Zerlegung (Householder)."""
+
+    def test_qr_reconstruction(self):
+        """Q·R = A (Rekonstruktion)."""
+        A = Matrix([[1.0, 2.0], [3.0, 4.0]])
+        Q, R = qr_decomposition(A)
+
+        import numpy as np
+        Q_np = np.array([[Q._data[i][j] for j in range(Q.cols)] for i in range(Q.rows)])
+        R_np = np.array([[R._data[i][j] for j in range(R.cols)] for i in range(R.rows)])
+        A_np = np.array([[A._data[i][j] for j in range(A.cols)] for i in range(A.rows)])
+
+        QR = Q_np @ R_np
+        assert np.allclose(QR, A_np, atol=1e-10)
+
+    def test_qr_orthogonality(self):
+        """Q muss orthogonal sein: Q^T·Q = I."""
+        A = Matrix([[1.0, 2.0], [3.0, 4.0]])
+        Q, R = qr_decomposition(A)
+
+        import numpy as np
+        Q_np = np.array([[Q._data[i][j] for j in range(Q.cols)] for i in range(Q.rows)])
+        QtQ = Q_np.T @ Q_np
+        assert np.allclose(QtQ, np.eye(Q_np.shape[0]), atol=1e-10)
+
+    def test_qr_upper_triangular(self):
+        """R muss obere Dreiecksmatrix sein (unterhalb Diagonale ≈ 0)."""
+        A = Matrix([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 10.0]])
+        Q, R = qr_decomposition(A)
+
+        for i in range(R.rows):
+            for j in range(min(i, R.cols)):
+                assert abs(R._data[i][j]) < 1e-8
+
+    def test_qr_too_few_rows_raises(self):
+        """m < n löst Fehler aus."""
+        with pytest.raises(ValueError):
+            qr_decomposition(Matrix([[1.0, 2.0, 3.0]]))  # 1×3
+
+    def test_qr_identity(self):
+        """QR der Einheitsmatrix: Q=I, R=I."""
+        A = Matrix([[1.0, 0.0], [0.0, 1.0]])
+        Q, R = qr_decomposition(A)
+
+        import numpy as np
+        Q_np = np.array([[Q._data[i][j] for j in range(Q.cols)] for i in range(Q.rows)])
+        R_np = np.array([[R._data[i][j] for j in range(R.cols)] for i in range(R.rows)])
+
+        # |Q| = I oder -I (Vorzeichen egal bei Householder)
+        assert np.allclose(abs(Q_np), np.eye(2), atol=1e-10) or \
+               np.allclose(Q_np @ R_np, np.eye(2), atol=1e-10)
+
+
+class TestSVD:
+    """Tests für Singulärwertzerlegung."""
+
+    def test_svd_reconstruction(self):
+        """U·diag(sigma)·Vᵀ = A."""
+        import numpy as np
+        A = Matrix([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
+        U, sigma, Vt = svd(A)
+
+        U_np = np.array([[U._data[i][j] for j in range(U.cols)] for i in range(U.rows)])
+        Vt_np = np.array([[Vt._data[i][j] for j in range(Vt.cols)] for i in range(Vt.rows)])
+        A_np = np.array([[A._data[i][j] for j in range(A.cols)] for i in range(A.rows)])
+
+        Sigma = np.zeros(A_np.shape)
+        for i, s in enumerate(sigma):
+            Sigma[i, i] = s
+
+        reconstructed = U_np @ Sigma @ Vt_np
+        assert np.allclose(reconstructed, A_np, atol=1e-10)
+
+    def test_svd_singular_values_positive(self):
+        """Singulärwerte sind nicht-negativ."""
+        A = Matrix([[1.0, 2.0], [3.0, 4.0]])
+        _, sigma, _ = svd(A)
+        for s in sigma:
+            assert s >= -1e-14
+
+    def test_svd_singular_values_sorted(self):
+        """Singulärwerte sind absteigend sortiert."""
+        A = Matrix([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 10.0]])
+        _, sigma, _ = svd(A)
+        for i in range(len(sigma) - 1):
+            assert sigma[i] >= sigma[i + 1] - 1e-10
+
+    def test_matrix_rank_full(self):
+        """Rang einer Einheitsmatrix = n."""
+        A = Matrix([[1.0, 0.0], [0.0, 1.0]])
+        assert matrix_rank(A) == 2
+
+    def test_matrix_rank_singular(self):
+        """Rang einer singulären Matrix."""
+        # Zeile 2 = 2 * Zeile 1 → Rang = 1
+        A = Matrix([[1.0, 2.0], [2.0, 4.0]])
+        assert matrix_rank(A) == 1
+
+    def test_condition_number_identity(self):
+        """Konditionszahl der Einheitsmatrix = 1."""
+        A = Matrix([[1.0, 0.0], [0.0, 1.0]])
+        kappa = condition_number(A)
+        assert abs(kappa - 1.0) < 1e-10
+
+    def test_condition_number_large_for_ill_conditioned(self):
+        """Schlecht konditionierte Matrix hat große Konditionszahl."""
+        # Fast-singuläre Matrix
+        A = Matrix([[1.0, 1.0], [1.0, 1.0 + 1e-10]])
+        kappa = condition_number(A)
+        assert kappa > 1e5
 
 
 if __name__ == '__main__':

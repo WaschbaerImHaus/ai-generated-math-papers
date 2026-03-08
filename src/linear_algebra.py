@@ -21,6 +21,7 @@
 import math
 import copy
 from typing import List, Optional, Union
+import numpy as np
 
 
 # =============================================================================
@@ -539,3 +540,243 @@ def gram_schmidt(vectors: List[Vector], normalize: bool = False) -> List[Vector]
             orthogonal.append(u)
 
     return orthogonal
+
+
+# =============================================================================
+# LU-ZERLEGUNG (Doolittle mit Teilpivotisierung)
+# =============================================================================
+
+def lu_decomposition(matrix: 'Matrix') -> tuple:
+    """
+    LU-Zerlegung mit Teilpivotisierung (Doolittle-Algorithmus).
+
+    Jede reguläre Matrix A lässt sich zerlegen in:
+        P·A = L·U
+
+    Wobei:
+        P – Permutationsmatrix (Zeilenvertauschungen)
+        L – untere Dreiecksmatrix (lower triangular), Diagonale = 1
+        U – obere Dreiecksmatrix (upper triangular)
+
+    Teilpivotisierung: Pro Spalte wird das betragsmäßig größte Element
+    als Pivot gewählt → numerisch stabiler als ohne Pivotisierung.
+
+    Anwendung:
+        LGS lösen: Ax = b → LUx = Pb → Lz = Pb (Vorwärts), Ux = z (Rückwärts)
+        Determinante: det(A) = det(U) · sign(P) = Π U[i,i] · (-1)^swaps
+
+    @param matrix: Quadratische Matrix A (n×n)
+    @return: (L, U, P, n_swaps) – untere/obere Dreiecksmatrix, Permutation, Anzahl Tausche
+    @raises ValueError: Wenn Matrix nicht quadratisch oder singulär
+    @lastModified: 2026-03-08
+    """
+    n = matrix.rows
+    if n != matrix.cols:
+        raise ValueError(f"LU-Zerlegung erfordert quadratische Matrix, erhalten: {n}×{matrix.cols}")
+
+    # Arbeitskopieen der Matrix-Daten
+    A = [list(matrix._data[i]) for i in range(n)]
+    # Permutationsvektor: P[i] = j bedeutet Zeile i des Originals ist jetzt Zeile j
+    perm = list(range(n))
+    n_swaps = 0  # Anzahl Zeilenvertauschungen (für Vorzeichen der Determinante)
+
+    for k in range(n):
+        # Teilpivotisierung: größtes Element in Spalte k (ab Zeile k) finden
+        max_val = abs(A[k][k])
+        max_row = k
+        for i in range(k + 1, n):
+            if abs(A[i][k]) > max_val:
+                max_val = abs(A[i][k])
+                max_row = i
+
+        # Zeilen tauschen (Permutation)
+        if max_row != k:
+            A[k], A[max_row] = A[max_row], A[k]
+            perm[k], perm[max_row] = perm[max_row], perm[k]
+            n_swaps += 1
+
+        if abs(A[k][k]) < 1e-14:
+            raise ValueError("Matrix ist singulär (LU-Zerlegung nicht möglich)")
+
+        # Elimination: L[i,k] = A[i,k] / A[k,k], dann A[i,:] -= L[i,k] * A[k,:]
+        for i in range(k + 1, n):
+            factor = A[i][k] / A[k][k]
+            A[i][k] = factor  # L-Eintrag im unteren Teil speichern
+            for j in range(k + 1, n):
+                A[i][j] -= factor * A[k][j]
+
+    # L und U aus kombinierter Matrix extrahieren
+    L_data = [[0.0] * n for _ in range(n)]
+    U_data = [[0.0] * n for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            if i > j:
+                L_data[i][j] = A[i][j]  # Unterhalb der Diagonale
+            elif i == j:
+                L_data[i][j] = 1.0       # L-Diagonale ist 1 (Doolittle)
+                U_data[i][j] = A[i][j]  # U-Diagonale
+            else:
+                U_data[i][j] = A[i][j]  # Oberhalb der Diagonale
+
+    # Permutationsmatrix aus perm-Vektor aufbauen
+    P_data = [[0.0] * n for _ in range(n)]
+    for i in range(n):
+        P_data[i][perm[i]] = 1.0
+
+    return Matrix(L_data), Matrix(U_data), Matrix(P_data), n_swaps
+
+
+# =============================================================================
+# QR-ZERLEGUNG (Householder-Reflexionen)
+# =============================================================================
+
+def qr_decomposition(matrix: 'Matrix') -> tuple:
+    """
+    QR-Zerlegung via Householder-Reflexionen.
+
+    Jede Matrix A (m×n, m ≥ n) lässt sich zerlegen in:
+        A = Q·R
+
+    Wobei:
+        Q – unitäre/orthogonale Matrix (Q^T·Q = I), m×m
+        R – obere Dreiecksmatrix, m×n
+
+    Householder-Reflexion:
+        H(v) = I - 2·v·vᵀ / (vᵀ·v)
+
+    Jede Reflexion macht eine Spalte unterhalb der Diagonale null.
+    Numerisch stabiler als Gram-Schmidt-QR (kein Auslöschungsproblem).
+
+    Anwendung:
+        LGS (überbestimmt, Methode der kleinsten Quadrate)
+        Eigenwertberechnung (QR-Iteration)
+        Singulärwertzerlegung
+
+    @param matrix: Matrix A (m×n, m ≥ n)
+    @return: (Q, R) – orthogonale Matrix und obere Dreiecksmatrix
+    @raises ValueError: Wenn m < n (zu wenig Zeilen)
+    @lastModified: 2026-03-08
+    """
+    m = matrix.rows
+    n = matrix.cols
+
+    if m < n:
+        raise ValueError(f"QR erfordert m ≥ n, erhalten {m}×{n}")
+
+    # Numpy für numerische Effizienz verwenden
+    A = np.array([[matrix._data[i][j] for j in range(n)] for i in range(m)], dtype=float)
+    Q = np.eye(m)  # Startet als Einheitsmatrix, wird durch Reflexionen aufgebaut
+
+    for k in range(n):
+        # Spaltenvektor unterhalb (und auf) der Diagonale
+        x = A[k:, k].copy()
+        e1 = np.zeros(len(x))
+        e1[0] = 1.0
+
+        # Householder-Vektor: v = x ± ||x||·e₁ (+ für Stabilität wenn x[0] ≥ 0)
+        sign = 1.0 if x[0] >= 0 else -1.0
+        v = x + sign * np.linalg.norm(x) * e1
+
+        if np.linalg.norm(v) < 1e-14:
+            continue
+
+        # Householder-Matrix H = I - 2·v·vᵀ / (vᵀ·v) (nur implizit verwendet)
+        v_norm_sq = np.dot(v, v)
+
+        # A aktualisieren: A[k:, k:] = A[k:, k:] - 2·v·(vᵀ·A[k:, k:]) / (vᵀ·v)
+        A[k:, k:] -= 2 * np.outer(v, v @ A[k:, k:]) / v_norm_sq
+
+        # Q aktualisieren: Q[:, k:] = Q[:, k:] - 2·(Q[:, k:]·v)·vᵀ / (vᵀ·v)
+        Q[:, k:] -= 2 * np.outer(Q[:, k:] @ v, v) / v_norm_sq
+
+    # In Matrix-Objekte konvertieren
+    Q_matrix = Matrix(Q.tolist())
+    R_matrix = Matrix(A.tolist())
+
+    return Q_matrix, R_matrix
+
+
+# =============================================================================
+# SINGULÄRWERTZERLEGUNG (SVD) via numpy
+# =============================================================================
+
+def svd(matrix: 'Matrix') -> tuple:
+    """
+    Singulärwertzerlegung (Singular Value Decomposition, SVD).
+
+    Jede Matrix A (m×n) lässt sich zerlegen in:
+        A = U·Σ·Vᵀ
+
+    Wobei:
+        U   – unitäre Matrix (m×m), Spalten sind linke Singulärvektoren
+        Σ   – Diagonalmatrix (m×n) mit Singulärwerten σ₁ ≥ σ₂ ≥ ... ≥ 0
+        Vᵀ  – unitäre Matrix (n×n), Zeilen sind rechte Singulärvektoren
+
+    Eigenschaften:
+        - Singulärwerte σᵢ sind immer ≥ 0
+        - Für symmetrische positive Matrizen: σᵢ = |λᵢ|
+        - Matrixrang = Anzahl σᵢ > 0
+        - Pseudoinverse: A⁺ = V·Σ⁺·Uᵀ (Least-Squares-Lösung)
+        - Niedrigrangapproximation (PCA, Komprimierung): Aₖ = Σᵢ₌₁ᵏ σᵢ·uᵢ·vᵢᵀ
+
+    Anwendung:
+        - Hauptkomponentenanalyse (PCA)
+        - Dimensionsreduktion
+        - Matrixnorm: ||A||₂ = σ₁ (größter Singulärwert)
+        - Konditionszahl: κ = σ₁/σₙ
+
+    @param matrix: Beliebige Matrix A (m×n)
+    @return: (U, sigma, Vt) – linke Vektoren, Singulärwerte, rechte Vektoren transponiert
+    @lastModified: 2026-03-08
+    """
+    # Numpy-Array aus Matrix-Daten
+    A = np.array([[matrix._data[i][j] for j in range(matrix.cols)]
+                   for i in range(matrix.rows)], dtype=float)
+
+    # SVD via numpy (verwendet LAPACK-Routinen)
+    U_np, s_np, Vt_np = np.linalg.svd(A, full_matrices=True)
+
+    # Konvertierung zurück in Matrix-Objekte und Liste
+    U = Matrix(U_np.tolist())
+    Vt = Matrix(Vt_np.tolist())
+    sigma = list(s_np)  # Singulärwerte als Liste
+
+    return U, sigma, Vt
+
+
+def matrix_rank(matrix: 'Matrix', tol: float = 1e-10) -> int:
+    """
+    Berechnet den Rang einer Matrix via SVD.
+
+    Rang = Anzahl der Singulärwerte > tol.
+    Numerisch robuster als Gauss-Elimination bei fast-singulären Matrizen.
+
+    @param matrix: Eingangsmatrix A
+    @param tol: Toleranz für "Null" (Standard: 1e-10)
+    @return: Rang der Matrix
+    @lastModified: 2026-03-08
+    """
+    _, sigma, _ = svd(matrix)
+    return sum(1 for s in sigma if s > tol)
+
+
+def condition_number(matrix: 'Matrix') -> float:
+    """
+    Berechnet die Konditionszahl κ(A) = σ_max / σ_min.
+
+    Die Konditionszahl misst die Empfindlichkeit des LGS Ax=b
+    gegenüber Störungen in b oder A:
+        ||Δx|| / ||x|| ≤ κ(A) · ||Δb|| / ||b||
+
+    Kleine κ ≈ 1: gut konditioniert
+    Große κ: schlecht konditioniert (numerische Probleme)
+
+    @param matrix: Quadratische Matrix
+    @return: Konditionszahl κ ≥ 1
+    @raises ValueError: Wenn Matrix singulär (σ_min = 0)
+    @lastModified: 2026-03-08
+    """
+    _, sigma, _ = svd(matrix)
+    if len(sigma) == 0 or sigma[-1] < 1e-15:
+        raise ValueError("Matrix ist singulär (Konditionszahl = ∞)")
+    return sigma[0] / sigma[-1]

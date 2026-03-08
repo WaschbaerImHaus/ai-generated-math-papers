@@ -69,15 +69,58 @@
 - [x] ProofByInduction-Klasse (Basisfall, empirische Verifikation)
 - [x] Vermutungsstatus-Report (alle 7 Millennium-Probleme + weitere)
 
+### Komplexe Analysis (src/complex_analysis.py) - Build 5
+- [x] Gamma-Funktion Γ(z) via Lanczos-Approximation (15 Stellen Genauigkeit)
+- [x] log_gamma(z) via Stirling-Reihe (numerisch stabil für großes |z|)
+- [x] Vollständige Riemann-Zeta ζ(s) über analytische Fortsetzung (3-Bereich-Strategie)
+- [x] ξ-Funktion (symmetrisch: ξ(s)=ξ(1-s) auf ~10^-15 verifiziert)
+- [x] Riemann-Siegel-Z-Funktion (reellwertig auf kritischer Geraden)
+- [x] Nullstellensuche via find_zeta_zeros() mit Bisektionsverfeinerung
+- [x] N(T)-Formel (Riemann-von-Mangoldt: Anzahl Nullstellen bis |Im| ≤ T)
+- [x] Cauchy-Integralsatz (numerische Mittelwerteigenschaft)
+- [x] Residuensatz (numerisch)
+
+### Fourier-Analysis (src/fourier.py) - Build 6
+- [x] DFT/IDFT (diskrete Fourier-Transformation, O(N²))
+- [x] FFT/IFFT (Cooley-Tukey radix-2, O(N log N))
+- [x] fft_padded (Zero-Padding auf nächste Zweierpotenz)
+- [x] Fourier-Reihen: fourier_coefficients, fourier_series_eval
+- [x] Fensterfunktionen: Hanning, Hamming, Blackman, apply_window
+- [x] Leistungsdichtespektrum (PSD), dominant_frequency
+- [x] Kurzzeit-Fourier-Transformation (STFT)
+
+### Numerische Methoden (src/numerical_methods.py) - Build 6
+- [x] Lagrange-Interpolation
+- [x] Newton-Interpolation (dividierte Differenzen, inkrementell)
+- [x] Kubische Splines (natürlich, Tridiagonal-LGS, Thomas-Algorithmus)
+- [x] Gradient Descent (mit numerischem Gradient-Fallback)
+- [x] Goldener-Schnitt-Suche (unimodale Funktionen)
+- [x] Numerischer Gradient (zentrale Differenzen)
+- [x] Simplex-Algorithmus (lineare Programmierung, Minimierungsform)
+
+### Lineare Algebra Erweiterungen (src/linear_algebra.py) - Build 6
+- [x] LU-Zerlegung (Doolittle mit Teilpivotisierung, PA=LU)
+- [x] QR-Zerlegung (Householder-Reflexionen, numerisch stabil)
+- [x] Singulärwertzerlegung SVD (A = U·Σ·Vᵀ)
+- [x] Matrixrang (via SVD, robust gegen Fast-Singularität)
+- [x] Konditionszahl κ = σ_max/σ_min
+
+### Analytische Zahlentheorie (src/analytic_number_theory.py) - Build 5
+- [x] Primzahlzählfunktion π(x) (exakt via Sieb)
+- [x] Logarithmisches Integral Li(x) (Gauß/Riemann-Approximation)
+- [x] Vergleich π(x) vs Li(x) vs x/ln(x) (Primzahlsatz mit Fehlerterm)
+- [x] Von-Mangoldt-Funktion Λ(n)
+- [x] Tschebyschow-Funktionen θ(x), ψ(x)
+- [x] Dirichlet-Charaktere und L-Funktionen
+- [x] Primzahlen in arithmetischen Restklassen (Dirichlet-Theorem)
+- [x] Semiprime und Chen-Zerlegung (fast-Primzahlen)
+- [x] Primzahl-Lücken und Cramér-Vermutung
+- [x] Riemanns Explizite Formel π(x) ≈ Li(x) - Σ Li(x^ρ) (Nullstellen-Approximation)
+- [x] Sieb-Methoden: Brun-Sieb, Selberg-Sieb, Chen-Zerlegung
+
 ## Geplante Features
 
 ### Beweistheorie Erweiterungen (Priorität: HÖCHSTE – Fernziel: Millennium-Beweise)
-- [ ] Analytische Zahlentheorie (Primzahlsatz mit Fehlerterm, Dirichlet-L-Reihen)
-- [ ] Riemann-Zeta via Euler-Produkt und analytische Fortsetzung
-- [ ] Funktionalgleichung ζ(s) = χ(s)ζ(1-s) implementieren
-- [ ] Explizite Formel Riemann: π(x) = Li(x) - Σ Li(x^ρ) + ...
-- [ ] N(T)-Formel: Anzahl der Nullstellen mit |Im(ρ)| ≤ T
-- [ ] Sieb-Methoden: Brun-Sieb, Selberg-Sieb, Chen-Theorem
 - [ ] Kreismethode (Hardy-Littlewood) für Goldbach
 - [ ] Modulformen (Grundlagen)
 - [ ] p-adische Zahlen
@@ -94,15 +137,17 @@
 - [ ] Uneigentliche Integrale
 
 ### Lineare Algebra Erweiterungen (Priorität: mittel)
-- [ ] LU-Zerlegung (direkte Methode)
-- [ ] QR-Zerlegung (Householder/Givens)
-- [ ] Singulärwertzerlegung (SVD)
+- [x] LU-Zerlegung (Doolittle mit Teilpivotisierung) – Build 6
+- [x] QR-Zerlegung (Householder) – Build 6
+- [x] Singulärwertzerlegung (SVD) – Build 6
 - [ ] Eigenvektoren (zu vorhandenen Eigenwerten)
+- [ ] Givens-Rotationen für QR
 
 ### Numerische Methoden (Priorität: mittel)
-- [ ] Interpolation (Lagrange, Newton, kubische Splines)
-- [ ] Optimierung (Gradient Descent, BFGS)
-- [ ] Lineare Programmierung (Simplex-Algorithmus)
+- [x] Interpolation (Lagrange, Newton, kubische Splines) – Build 6
+- [x] Optimierung (Gradient Descent, Goldener Schnitt) – Build 6
+- [x] Lineare Programmierung (Simplex-Algorithmus) – Build 6
+- [ ] Optimierung: BFGS (quasi-Newton), Conjugate Gradient
 
 ### Visualisierung (Priorität: niedrig)
 - [ ] Funktionsplotter 2D (matplotlib)

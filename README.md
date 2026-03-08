@@ -87,27 +87,40 @@ python3 -m pytest tests/ -v
 ## Projektstruktur
 ```
 specialist-maths/
-├── src/                    # Quellcode
-│   ├── algebra.py          # Polynome, Gleichungen, Zahlentheorie
-│   ├── analysis.py         # Analysis, Numerik
-│   ├── linear_algebra.py   # Lineare Algebra
-│   └── build.txt           # Build-Nummer
-├── tests/                  # Tests (TDD)
-├── research/               # Mathematische Notizen
-├── dev-log/                # Entwicklungs-Tagebuch
-├── debugging/              # Debug-Skripte
-├── build/                  # Kompilate
-├── FEATURES.md             # Feature-Liste
-├── BUGS.md                 # Bug-Tracker
-└── OPTIMIZE.md             # Optimierungsideen
+├── src/                          # Quellcode
+│   ├── algebra.py                # Polynome, Gleichungen, Zahlentheorie
+│   ├── analysis.py               # Analysis, Differentiation, Integration
+│   ├── linear_algebra.py         # Lineare Algebra, LU/QR/SVD
+│   ├── statistics_math.py        # Statistik, Verteilungen, Tests
+│   ├── ode.py                    # Differentialgleichungen, Laplace
+│   ├── complex_analysis.py       # Komplexe Analysis, Riemann-Zeta
+│   ├── analytic_number_theory.py # Analytische Zahlentheorie
+│   ├── proof_theory.py           # Beweistheorie, Millennium-Probleme
+│   ├── fourier.py                # Fourier-Transformation (FFT)
+│   ├── numerical_methods.py      # Interpolation, Optimierung, Simplex
+│   └── build.txt                 # Build-Nummer (aktuell: 6)
+├── tests/                        # 318 Tests (100% grün)
+├── research/                     # Mathematische Notizen und Recherche
+├── dev-log/                      # Entwicklungs-Tagebuch
+├── debugging/                    # Debug-Skripte
+├── build/                        # Ausführbare Dateien
+├── FEATURES.md                   # Feature-Liste
+├── BUGS.md                       # Bug-Tracker
+└── OPTIMIZE.md                   # Optimierungsideen
 ```
 
 ## Mathematische Themengebiete
 1. **Algebra**: Polynomrechnung, lineare/quadratische Gleichungen, Zahlentheorie
 2. **Analysis**: Differentiation, Integration, Taylor-Reihen, Nullstellensuche
-3. **Lineare Algebra**: Matrizen, Vektoren, Eigenwerte, Gram-Schmidt
-4. _(geplant)_ Statistik, Differentialgleichungen, Komplexe Analysis, Geometrie
+3. **Lineare Algebra**: Matrizen, Vektoren, Eigenwerte, LU/QR/SVD
+4. **Statistik**: Verteilungen, Hypothesentests, Monte-Carlo
+5. **Differentialgleichungen**: Euler, RK4/RK45, Laplace-Transformation
+6. **Komplexe Analysis**: Riemann-Zeta, Gamma-Funktion, Nullstellen
+7. **Analytische Zahlentheorie**: π(x), Li(x), Primzahlsatz, Dirichlet-L-Reihen
+8. **Beweistheorie**: Collatz, Goldbach, Millennium-Probleme
+9. **Fourier-Analysis**: DFT/FFT, Fourier-Reihen, STFT, Fensterfunktionen
+10. **Numerische Methoden**: Interpolation (Lagrange/Newton/Splines), Simplex
 
 ---
-*Autor: Reisen macht Spass... mit Pia und Dirk e.Kfm.*
-*Build: 1 | Stand: 2026-03-05*
+*Autor: Kurt Ingwer*
+*Build: 6 | Stand: 2026-03-08 | Tests: 318/318 grün*

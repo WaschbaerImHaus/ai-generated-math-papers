@@ -1,5 +1,5 @@
 # OPTIMIZED_WORKER.md - Mathematik-Spezialist
-## Aktualisiert: 2026-03-08
+## Aktualisiert: 2026-03-08 (Build 6)
 
 ## Was ich über dieses Projekt weiß
 
@@ -47,6 +47,17 @@ sodass der Code auch als Lernmaterial dient.
 - `research/OPEN_CONJECTURES.md`: Alle Millennium-Probleme dokumentiert
 - `research/PROOF_STRATEGIES.md`: Beweis-Strategien und Lernpfad
 
+### Build 6 (2026-03-08): Fourier, Numerische Methoden, Matrix-Zerlegungen
+- `src/fourier.py`: DFT/FFT (Cooley-Tukey), IFFT, Fourier-Reihen, Fensterfunktionen, STFT
+- `src/numerical_methods.py`: Lagrange/Newton/Spline-Interpolation, Gradient Descent, Simplex
+- `src/linear_algebra.py` (Erweiterung): LU (Doolittle+Teilpivot), QR (Householder), SVD
+- 80 neue Tests → Gesamt 318/318 grün
+- **Kritische Bugfixes:** golden_section_search (resphi falsch), simplex (obj_row negiert)
+- **Erkenntnisse:**
+  - golden_section_search: φ = (1+√5)/2 ≈ 1.618, innere Punkte bei a+1/φ·(b-a) ≈ a+0.618·(b-a)
+  - Simplex Minimierungsform: obj_row = list(c), Pivot wenn c_bar < 0, f_opt = -tableau[-1]
+  - Householder-QR ist numerisch stabiler als Gram-Schmidt-QR (kein Auslöschungsproblem)
+
 ### FERNZIEL (ab Build 4)
 Das Projekt richtet sich auf das **Beweisen oder Widerlegen offener Vermutungen**:
 1. **Priorität 1:** Collatz (empirisch, Musteranalyse, Tao-Ansatz)
@@ -55,10 +66,11 @@ Das Projekt richtet sich auf das **Beweisen oder Widerlegen offener Vermutungen*
 4. **Langfristig:** P vs NP, Navier-Stokes
 
 ### Geplante Erweiterungen (Priorität)
-1. **Analytische Zahlentheorie** (L-Funktionen, Explizite Formeln, Siebmethoden)
-2. **Komplexe Analysis** (vollständige ζ-Funktion, Residuensatz)
-3. **Visualisierungs-Modul** (matplotlib 2D/3D, Riemann-Flächen)
-4. **Optimierung** (Gradient Descent, BFGS, Simplex-Algorithmus)
+1. **Kreismethode (Hardy-Littlewood)** für Goldbach-Vermutung
+2. **Modulformen** (Grundlagen, Verbindung zu Shimura-Taniyama)
+3. **p-adische Zahlen** (alternative Zahlensysteme)
+4. **Visualisierungs-Modul** (matplotlib 2D/3D, Riemann-Flächen)
+5. **Eigenvektoren** (zu bereits berechneten Eigenwerten)
 
 ## Brainstorming: Verbindungen
 
