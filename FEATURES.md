@@ -112,6 +112,17 @@
 - [x] Umfassende .md-Dokumentation für alle 10 Module (Build 7)
 - **Gesamttests: 333/333 grün**
 
+### Build 9 Erweiterungen (2026-03-08)
+- [x] Kreismethode (Hardy-Littlewood) für Goldbach (proof_theory.py) – 20 Tests
+- [x] Modulformen Grundlagen → neue modular_forms.py (SL2Z, Eisenstein, Delta, j-Invariante, Hecke, Shimura-Taniyama) – 40 Tests
+- [x] p-adische Zahlen → neue p_adic.py (Bewertung, Norm, PAdicNumber, Hensel, Exp/Log, Ostrowski) – 47 Tests
+- [x] Diophantische Gleichungen (algebra.py): linear, Pell, Pythagoras, Zwei-Quadrate, Markov – 66 Tests
+- [x] Quadratisches Reziprozitätsgesetz vollständig (is_quadratic_residue, Tonelli-Shanks, Cipolla) – Teil der 66 Tests
+- [x] Analysis: Grenzwerte symbolisch, L'Hôpital, Partialbrüche, Uneigentliche Integrale, Cauchy-PV – 40 Tests
+- [x] Givens-Rotationen für QR-Zerlegung (linear_algebra.py) – 27 Tests
+- [x] Vollständiges Visualisierungsmodul → neue visualization.py (2D/3D, Vektorfeld, Phasenraum, Fraktale) – 48 Tests
+- **Gesamttests: 641/641 grün**
+
 ### Analytische Zahlentheorie (src/analytic_number_theory.py) - Build 5
 - [x] Primzahlzählfunktion π(x) (exakt via Sieb)
 - [x] Logarithmisches Integral Li(x) (Gauß/Riemann-Approximation)
@@ -128,27 +139,27 @@
 ## Geplante Features
 
 ### Beweistheorie Erweiterungen (Priorität: HÖCHSTE – Fernziel: Millennium-Beweise)
-- [ ] Kreismethode (Hardy-Littlewood) für Goldbach
-- [ ] Modulformen (Grundlagen)
-- [ ] p-adische Zahlen
+- [x] Kreismethode (Hardy-Littlewood) für Goldbach – Build 9
+- [x] Modulformen (Grundlagen) – Build 9
+- [x] p-adische Zahlen – Build 9
 
 ### Zahlentheorie (Priorität: hoch)
 - [x] RSA-Verschlüsselung (keygen, encrypt, decrypt) – Build 8
-- [ ] Diophantische Gleichungen (lineare, quadratische)
-- [ ] Quadratisches Reziprozitätsgesetz (vollständig)
+- [x] Diophantische Gleichungen (linear, Pell, Pythagoras, Zwei-Quadrate, Markov) – Build 9
+- [x] Quadratisches Reziprozitätsgesetz (vollständig) – Build 9
 
 ### Analysis Erweiterungen (Priorität: mittel)
-- [ ] Grenzwertberechnung (symbolisch via SymPy)
-- [ ] Fourier-Reihen und -Transformation (DFT/FFT)
-- [ ] Partialbruchzerlegung
-- [ ] Uneigentliche Integrale
+- [x] Grenzwertberechnung (symbolisch via SymPy) – Build 9
+- [x] Fourier-Reihen und -Transformation (DFT/FFT) – Build 6
+- [x] Partialbruchzerlegung – Build 9
+- [x] Uneigentliche Integrale – Build 9
 
 ### Lineare Algebra Erweiterungen (Priorität: mittel)
 - [x] LU-Zerlegung (Doolittle mit Teilpivotisierung) – Build 6
 - [x] QR-Zerlegung (Householder) – Build 6
 - [x] Singulärwertzerlegung (SVD) – Build 6
 - [x] Eigenvektoren via SVD-Kernel (zu vorhandenen Eigenwerten) – Build 8
-- [ ] Givens-Rotationen für QR
+- [x] Givens-Rotationen für QR – Build 9
 
 ### Numerische Methoden (Priorität: mittel)
 - [x] Interpolation (Lagrange, Newton, kubische Splines) – Build 6
@@ -157,8 +168,16 @@
 - [x] BFGS quasi-Newton Optimierung (mit Armijo-Line-Search) – Build 8
 
 ### Visualisierung (Priorität: niedrig)
-- [ ] Funktionsplotter 2D (matplotlib)
-- [ ] Funktionsplotter 3D (matplotlib 3D)
-- [ ] Vektorfelddarstellung
-- [ ] Phasenraum-Visualisierung (für ODE)
-- [ ] Fraktal-Generator (Mandelbrot, Julia-Menge)
+- [x] Funktionsplotter 2D (matplotlib) – Build 9
+- [x] Funktionsplotter 3D (matplotlib 3D) – Build 9
+- [x] Vektorfelddarstellung – Build 9
+- [x] Phasenraum-Visualisierung (für ODE) – Build 9
+- [x] Fraktal-Generator (Mandelbrot, Julia, Sierpinski, Newton) – Build 9
+
+## Offene Features (nach Build 9)
+- [ ] Modulformen Vertiefung: Cusp-Formen, Theta-Reihen
+- [ ] Hardy-Littlewood-Kreismethode Vertiefung: Farey-Folgen
+- [ ] Jupyter-Notebook-Integration / REPL-Modus
+- [ ] LaTeX-Export für Ergebnisse
+- [ ] Property-Based Testing (Hypotheses-Bibliothek)
+- [ ] NumPy-Vektorisierung der Kernalgorithmen

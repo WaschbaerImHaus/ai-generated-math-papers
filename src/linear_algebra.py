@@ -829,3 +829,199 @@ def condition_number(matrix: 'Matrix') -> float:
     if len(sigma) == 0 or sigma[-1] < 1e-15:
         raise ValueError("Matrix ist singulär (Konditionszahl = ∞)")
     return sigma[0] / sigma[-1]
+
+
+# ===========================================================================
+# GIVENS-ROTATIONEN (QR-ZERLEGUNG ALTERNATIV)
+# ===========================================================================
+
+def givens_rotation_matrix(n: int, i: int, j: int, theta: float) -> 'Matrix':
+    """
+    @brief Erstellt eine n×n Givens-Rotationsmatrix G(i, j, θ).
+    @description
+        Eine Givens-Rotation rotiert einen Vektor in der (i,j)-Ebene
+        um den Winkel θ. Die Matrix ist eine modifizierte Einheitsmatrix:
+
+            G[i,i] = G[j,j] = cos(θ)
+            G[i,j] = -sin(θ)
+            G[j,i] =  sin(θ)
+            alle anderen Einträge: Einheitsmatrix-Werte
+
+        Anwendung: Um in einem Vektor das j-te Element auf 0 zu setzen,
+        wählt man θ so, dass die Rotation den (i,j)-Block anpasst.
+
+        Eigenschaften:
+        - G^T = G^{-1} (orthogonale Matrix)
+        - det(G) = 1 (eigentliche Rotation, keine Spiegelung)
+        - G^T @ G = I
+
+    @param n: Dimension der Rotationsmatrix (n×n)
+    @param i: Index der ersten Achse (0-basiert)
+    @param j: Index der zweiten Achse (0-basiert, j > i)
+    @param theta: Rotationswinkel in Radiant
+    @return: n×n Givens-Rotationsmatrix als Matrix-Objekt
+    @raises ValueError: Wenn i, j ungültig oder i == j
+    @author Kurt Ingwer
+    @lastModified: 2026-03-08
+    """
+    if i < 0 or j < 0 or i >= n or j >= n:
+        raise ValueError(f"Ungültige Indizes i={i}, j={j} für n={n}")
+    if i == j:
+        raise ValueError("i und j müssen verschieden sein")
+
+    # Startwert: Einheitsmatrix
+    data = [[1.0 if r == c else 0.0 for c in range(n)] for r in range(n)]
+
+    c = math.cos(theta)  # Cosinus des Winkels
+    s = math.sin(theta)  # Sinus des Winkels
+
+    # Rotationseinträge setzen (modifiziert nur den (i,j)-Block)
+    data[i][i] = c    # G[i,i] = cos(θ)
+    data[j][j] = c    # G[j,j] = cos(θ)
+    data[i][j] = -s   # G[i,j] = -sin(θ)
+    data[j][i] = s    # G[j,i] =  sin(θ)
+
+    return Matrix(data)
+
+
+def givens_qr_decomposition(A: 'Matrix') -> tuple:
+    """
+    @brief QR-Zerlegung via Givens-Rotationen (Alternative zu Householder).
+    @description
+        Zerlegt eine Matrix A (m×n) in:
+            A = Q · R
+
+        Wobei:
+            Q – orthogonale Matrix (Q^T @ Q = I), m×m
+            R – obere Dreiecksmatrix, m×n
+
+        Algorithmus:
+        - Iteriere über alle Spalten j = 0, ..., n-1
+          und alle Zeilen i = m-1, ..., j+1 (von unten nach oben)
+        - Für jeden Eintrag R[i,j] ungleich 0:
+          * a = R[j,j], b = R[i,j]
+          * r = sqrt(a² + b²)
+          * cos(θ) = a/r,  sin(θ) = -b/r
+          → Givens-Rotation G(j,i,θ) setzt R[i,j] auf 0
+        - Q = G_1^T · G_2^T · ... (Produkt der transponierten Rotationen)
+
+        Vorteil gegenüber Householder:
+        - Gut für dünn besetzte Matrizen (spärlich)
+        - Einfach parallelisierbar
+        - Jede Rotation löscht genau ein Element
+
+    @param A: Matrix (m×n, m ≥ n)
+    @return: Tupel (Q, R) als Matrix-Objekte
+    @raises ValueError: Wenn m < n
+    @author Kurt Ingwer
+    @lastModified: 2026-03-08
+    """
+    m = A.rows
+    n = A.cols
+
+    if m < n:
+        raise ValueError(f"Givens-QR erfordert m ≥ n, erhalten {m}×{n}")
+
+    # Arbeitskopie als numpy-Array für effiziente Berechnungen
+    R = np.array([[A._data[i][j] for j in range(n)] for i in range(m)], dtype=float)
+    # Q startet als Einheitsmatrix, wird durch transponierte Rotationen aufgebaut
+    Q = np.eye(m)
+
+    # Spalte für Spalte bearbeiten
+    for j in range(n):
+        # Von der untersten Zeile bis zur Zeile j+1 (von unten nach oben)
+        for i in range(m - 1, j, -1):
+            # Elemente auf die wir die Rotation anwenden
+            a = R[j, j]  # Diagonalelement (soll erhalten bleiben)
+            b = R[i, j]  # Element das auf 0 gesetzt werden soll
+
+            # Wenn b bereits (nahe) 0 ist, keine Rotation nötig
+            if abs(b) < 1e-15:
+                continue
+
+            # Rotationswinkel berechnen
+            r = math.sqrt(a * a + b * b)  # Hypotenuse
+            c = a / r    # cos(θ)
+            s = -b / r   # sin(θ) — negativ, damit R[i,j] zu 0 wird
+
+            # Givens-Rotation G auf die relevanten Zeilen von R anwenden
+            # Nur Zeilen j und i betroffen: [j-te Zeile, i-te Zeile] * G^T
+            row_j = R[j, :].copy()
+            row_i = R[i, :].copy()
+            R[j, :] = c * row_j - s * row_i   # Neue j-te Zeile
+            R[i, :] = s * row_j + c * row_i   # Neue i-te Zeile (wird zu 0 an Pos j)
+
+            # Q akkumulieren: Q = Q · G^T (transponierte Rotation)
+            # G^T hat c an (j,j),(i,i) und s an (j,i), -s an (i,j)
+            col_j = Q[:, j].copy()
+            col_i = Q[:, i].copy()
+            Q[:, j] = c * col_j - s * col_i
+            Q[:, i] = s * col_j + c * col_i
+
+    # Sehr kleine Werte unterhalb der Diagonalen auf 0 setzen (numerisches Rauschen)
+    for i in range(m):
+        for j in range(min(i, n)):
+            if abs(R[i, j]) < 1e-12:
+                R[i, j] = 0.0
+
+    # In Matrix-Objekte konvertieren
+    Q_matrix = Matrix(Q.tolist())
+    R_matrix = Matrix(R.tolist())
+
+    return Q_matrix, R_matrix
+
+
+def givens_solve_least_squares(A: 'Matrix', b: list) -> list:
+    """
+    @brief Löst das Kleinste-Quadrate-Problem min||Ax - b||₂ via Givens-QR.
+    @description
+        Für überbestimmte Systeme (m > n) gibt es i.A. keine exakte Lösung.
+        Gesucht ist x* = argmin ||Ax - b||₂.
+
+        Methode: QR-Zerlegung und Rücksubstitution
+        1. A = Q · R  via Givens-QR
+        2. ||Ax - b||₂ = ||Q·R·x - b||₂ = ||R·x - Q^T·b||₂  (Q orthogonal)
+        3. Rücksubstitution: Löse R₁·x = (Q^T·b)₁  (nur obere n×n-Teilmatrix)
+
+        Das System R₁·x = c₁ ist eindeutig lösbar wenn rang(A) = n (voller Spaltenrang).
+
+        Für quadratische Systeme (m = n) ist dies äquivalent zur exakten Lösung.
+
+    @param A: Koeffizientenmatrix (m×n, m ≥ n)
+    @param b: Rechte Seite als Liste der Länge m
+    @return: Lösungsvektor x als Liste der Länge n
+    @raises ValueError: Wenn Dimensionen nicht passen oder System singulär
+    @author Kurt Ingwer
+    @lastModified: 2026-03-08
+    """
+    m = A.rows
+    n = A.cols
+
+    if len(b) != m:
+        raise ValueError(f"Dimension von b ({len(b)}) passt nicht zu A ({m}×{n})")
+    if m < n:
+        raise ValueError(f"Unterbestimmtes System: m={m} < n={n}")
+
+    # QR-Zerlegung via Givens-Rotationen
+    Q, R = givens_qr_decomposition(A)
+
+    # c = Q^T · b berechnen
+    b_np = np.array(b, dtype=float)
+    Q_np = np.array([[Q._data[i][j] for j in range(Q.cols)] for i in range(Q.rows)], dtype=float)
+    c = Q_np.T @ b_np  # Q^T @ b, Länge m
+
+    # Rücksubstitution: Löse R₁ · x = c₁
+    # R₁ ist das n×n Oberdreiecks-Teilblock von R
+    R_np = np.array([[R._data[i][j] for j in range(R.cols)] for i in range(R.rows)], dtype=float)
+    R1 = R_np[:n, :n]  # Nur die obere quadratische n×n-Teilmatrix
+    c1 = c[:n]          # Entsprechende Einträge von c
+
+    # Rücksubstitution (von unten nach oben)
+    x = np.zeros(n)
+    for i in range(n - 1, -1, -1):
+        if abs(R1[i, i]) < 1e-14:
+            raise ValueError(f"Matrix A hat keinen vollen Spaltenrang (R[{i},{i}] ≈ 0)")
+        # x[i] = (c1[i] - Σ_{j>i} R1[i,j]·x[j]) / R1[i,i]
+        x[i] = (c1[i] - np.dot(R1[i, i+1:], x[i+1:])) / R1[i, i]
+
+    return x.tolist()

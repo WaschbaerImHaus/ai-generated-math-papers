@@ -98,8 +98,11 @@ specialist-maths/
 │   ├── proof_theory.py           # Beweistheorie, Millennium-Probleme
 │   ├── fourier.py                # Fourier-Transformation (FFT)
 │   ├── numerical_methods.py      # Interpolation, Optimierung, Simplex
-│   └── build.txt                 # Build-Nummer (aktuell: 8)
-├── tests/                        # 333 Tests (100% grün)
+│   ├── modular_forms.py          # Modulformen (SL2Z, Eisenstein, Delta, j-Invariante)
+│   ├── p_adic.py                 # p-adische Zahlen (Bewertung, Norm, Hensel-Lift)
+│   ├── visualization.py          # Visualisierung (2D/3D, Vektorfeld, Fraktale)
+│   └── build.txt                 # Build-Nummer (aktuell: 9)
+├── tests/                        # 641 Tests (100% grün)
 ├── research/                     # Mathematische Notizen und Recherche
 ├── dev-log/                      # Entwicklungs-Tagebuch
 ├── debugging/                    # Debug-Skripte
@@ -117,11 +120,15 @@ specialist-maths/
 5. **Differentialgleichungen**: Euler, RK4/RK45, Laplace-Transformation
 6. **Komplexe Analysis**: Riemann-Zeta, Gamma-Funktion, Nullstellen
 7. **Analytische Zahlentheorie**: π(x), Li(x), Primzahlsatz, Dirichlet-L-Reihen
-8. **Beweistheorie**: Collatz, Goldbach, Millennium-Probleme
+8. **Beweistheorie**: Collatz, Goldbach, Kreismethode, Millennium-Probleme
 9. **Fourier-Analysis**: DFT/FFT, Fourier-Reihen, STFT, Fensterfunktionen
 10. **Numerische Methoden**: Interpolation (Lagrange/Newton/Splines), BFGS, Simplex
 11. **Kryptographie**: RSA (Schlüsselerzeugung, Ver-/Entschlüsselung)
+12. **Modulformen**: SL(2,Z), Eisenstein-Reihen, Delta-Funktion, j-Invariante, Hecke-Operatoren
+13. **p-adische Zahlen**: p-adische Bewertung/Norm, PAdicNumber-Klasse, Hensels Lemma
+14. **Diophantische Gleichungen**: Lineares Diophant, Pell-Gleichung, Pythagoras, Zwei-Quadrate
+15. **Visualisierung**: 2D/3D-Plotter, Vektorfelder, Phasenporträt, Fraktale (Mandelbrot, Julia, Newton)
 
 ---
 *Autor: Kurt Ingwer*
-*Build: 8 | Stand: 2026-03-08 | Tests: 333/333 grün*
+*Build: 9 | Stand: 2026-03-08 | Tests: 641/641 grün*

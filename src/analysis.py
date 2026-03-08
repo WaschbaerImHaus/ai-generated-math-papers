@@ -316,3 +316,450 @@ def is_continuous(f: Callable, x: float, delta: float = 1e-6) -> bool:
         return abs(f_left - fx) < tolerance and abs(f_right - fx) < tolerance
     except (ValueError, ZeroDivisionError, OverflowError):
         return False
+
+
+# ===========================================================================
+# GRENZWERTBERECHNUNG (SYMBOLISCH)
+# ===========================================================================
+
+def symbolic_limit(expr_str: str, var: str, point, direction: str = '+-'):
+    """
+    @brief Berechnet den Grenzwert eines symbolischen Ausdrucks via SymPy.
+    @description
+        Berechnet lim_{var → point} expr_str.
+
+        SymPy unterstützt folgende Grenzwerte:
+        - Reelle Punkte: point als Zahl oder 'oo'/'-oo'
+        - Einseitige Grenzwerte: direction='+' (von rechts), '-' (von links)
+        - Beidseitig: direction='+-' (nur wenn beide Seiten gleich sind)
+
+        Bekannte Grenzwerte:
+        - lim_{x→0} sin(x)/x = 1  (L'Hôpital, Sandwichsatz)
+        - lim_{x→∞} (1+1/x)^x = e  (Definition der Eulerschen Zahl)
+        - lim_{x→0+} ln(x) = -∞
+
+    @param expr_str SymPy-Ausdruck als String (z.B. "sin(x)/x").
+    @param var Variable als String (z.B. "x").
+    @param point Grenzpunkt (Zahl, 'oo', '-oo').
+    @param direction Richtung: '+' (rechts), '-' (links), '+-' (beidseitig).
+    @return SymPy-Ergebnis des Grenzwerts.
+    @author Kurt Ingwer
+    @lastModified 2026-03-08
+    """
+    # SymPy-Variable erstellen
+    sym_var = sp.Symbol(var)
+
+    # Ausdruck parsen
+    expr = sp.sympify(expr_str)
+
+    # Grenzpunkt konvertieren
+    if point == 'oo' or point == float('inf'):
+        sym_point = sp.oo
+    elif point == '-oo' or point == float('-inf'):
+        sym_point = -sp.oo
+    else:
+        sym_point = sp.sympify(point)
+
+    # Grenzwert berechnen
+    result = sp.limit(expr, sym_var, sym_point, direction)
+    return result
+
+
+def lhopital_applicable(numerator_str: str, denominator_str: str, var: str, point) -> dict:
+    """
+    @brief Prüft ob L'Hôpital anwendbar ist und berechnet den Grenzwert.
+    @description
+        L'Hôpital's Regel (Johann Bernoulli/Marquis de L'Hôpital, 1696):
+        Wenn lim f(x)/g(x) die unbestimmte Form 0/0 oder ∞/∞ hat, dann gilt:
+
+            lim_{x→a} f(x)/g(x) = lim_{x→a} f'(x)/g'(x)
+
+        (sofern der rechte Grenzwert existiert oder ±∞ ist)
+
+        Unbestimmte Formen: 0/0, ∞/∞, 0·∞, ∞-∞, 0⁰, 1^∞, ∞⁰
+
+    @param numerator_str Zähler als SymPy-String.
+    @param denominator_str Nenner als SymPy-String.
+    @param var Variablenname.
+    @param point Grenzpunkt.
+    @return Dict mit 'applicable' (bool), 'form' (str), 'limit' (SymPy-Ergebnis).
+    @author Kurt Ingwer
+    @lastModified 2026-03-08
+    """
+    sym_var = sp.Symbol(var)
+    num_expr = sp.sympify(numerator_str)
+    den_expr = sp.sympify(denominator_str)
+
+    # Grenzpunkt konvertieren
+    if point == 'oo':
+        sym_point = sp.oo
+    elif point == '-oo':
+        sym_point = -sp.oo
+    else:
+        sym_point = sp.sympify(point)
+
+    # Grenzwerte von Zähler und Nenner berechnen
+    lim_num = sp.limit(num_expr, sym_var, sym_point)
+    lim_den = sp.limit(den_expr, sym_var, sym_point)
+
+    # Unbestimmte Form bestimmen
+    applicable = False
+    form = "bestimmt"
+
+    if lim_den == 0:
+        if lim_num == 0:
+            applicable = True
+            form = "0/0"
+        else:
+            form = "x/0 (Pol)"
+    elif lim_den == sp.oo or lim_den == -sp.oo:
+        if lim_num == sp.oo or lim_num == -sp.oo:
+            applicable = True
+            form = "∞/∞"
+        else:
+            form = "x/∞ → 0"
+
+    # Gesamtgrenzwert berechnen (direkt via SymPy)
+    total_limit = sp.limit(num_expr / den_expr, sym_var, sym_point)
+
+    return {
+        'applicable': applicable,
+        'form': form,
+        'limit': total_limit
+    }
+
+
+def limit_comparison(f_str: str, g_str: str, var: str, point) -> dict:
+    """
+    @brief Grenzwert-Vergleichssatz: berechnet lim f/g.
+    @description
+        Der Grenzwert-Vergleichssatz (limit comparison test):
+        Wenn lim_{x→a} f(x)/g(x) = c ≠ 0, dann verhalten sich f und g
+        an der Stelle a "gleich" (gleiche Ordnung des Wachstums).
+
+        Anwendungen:
+        - Konvergenzuntersuchung von Reihen
+        - Vergleich von Wachstumsraten (O-Notation)
+        - Asymptotische Äquivalenz: f ~ c·g bei x→a
+
+        Beispiele:
+        - lim_{x→∞} x²/(x²+1) = 1 (gleiche Ordnung)
+        - lim_{x→0} sin(x)/x = 1 (asymptotisch äquivalent)
+
+    @param f_str Erste Funktion als SymPy-String.
+    @param g_str Zweite Funktion als SymPy-String.
+    @param var Variablenname.
+    @param point Grenzpunkt.
+    @return Dict mit 'limit_ratio' (lim f/g) und 'same_behavior' (bool).
+    @author Kurt Ingwer
+    @lastModified 2026-03-08
+    """
+    sym_var = sp.Symbol(var)
+    f_expr = sp.sympify(f_str)
+    g_expr = sp.sympify(g_str)
+
+    # Grenzpunkt konvertieren
+    if point == 'oo':
+        sym_point = sp.oo
+    elif point == '-oo':
+        sym_point = -sp.oo
+    else:
+        sym_point = sp.sympify(point)
+
+    # Verhältnis-Grenzwert berechnen
+    try:
+        ratio_limit = sp.limit(f_expr / g_expr, sym_var, sym_point)
+    except Exception:
+        ratio_limit = sp.nan
+
+    # "Gleiche Ordnung" wenn Grenzwert eine endliche, positive Konstante ist
+    same_behavior = (
+        ratio_limit != sp.zoo and
+        ratio_limit != sp.oo and
+        ratio_limit != -sp.oo and
+        ratio_limit != sp.nan and
+        ratio_limit != 0
+    )
+
+    return {
+        'limit_ratio': ratio_limit,
+        'same_behavior': same_behavior
+    }
+
+
+# ===========================================================================
+# PARTIALBRUCHZERLEGUNG
+# ===========================================================================
+
+def partial_fraction_decomposition(numerator_coeffs: list, denominator_coeffs: list) -> str:
+    """
+    @brief Partialbruchzerlegung eines rationalen Ausdrucks N(x)/D(x).
+    @description
+        Die Partialbruchzerlegung zerlegt einen gebrochen-rationalen Ausdruck
+        in eine Summe einfacherer Brüche.
+
+        Beispiel: 1/(x²-1) = 1/((x-1)(x+1)) = (1/2)/(x-1) + (-1/2)/(x+1)
+
+        Algorithmus: SymPy's apart()-Funktion nutzt Polynomfaktorisierung
+        und löst ein lineares Gleichungssystem für die Koeffizienten.
+
+        Koeffizienten als Listen (höchster Grad zuerst):
+        - numerator_coeffs=[1] und denominator_coeffs=[1,0,-1]
+          entspricht 1/(x²-1)
+
+    @param numerator_coeffs Koeffizienten des Zählers (höchster Grad zuerst).
+    @param denominator_coeffs Koeffizienten des Nenners (höchster Grad zuerst).
+    @return String-Darstellung der Partialbruchzerlegung.
+    @author Kurt Ingwer
+    @lastModified 2026-03-08
+    """
+    x = sp.Symbol('x')
+
+    # Polynome aus Koeffizienten-Listen aufbauen
+    # Koeffizientenliste [a_n, ..., a_1, a_0] → a_n*x^n + ... + a_1*x + a_0
+    def coeffs_to_poly(coeffs: list) -> sp.Expr:
+        """Wandelt Koeffizientenliste in SymPy-Polynom um."""
+        degree = len(coeffs) - 1
+        poly = sp.Integer(0)
+        for i, c in enumerate(coeffs):
+            poly += c * x ** (degree - i)
+        return poly
+
+    num_poly = coeffs_to_poly(numerator_coeffs)
+    den_poly = coeffs_to_poly(denominator_coeffs)
+
+    # Rationaler Ausdruck
+    rational_expr = num_poly / den_poly
+
+    # Partialbruchzerlegung via SymPy
+    decomposed = sp.apart(rational_expr, x)
+
+    return str(decomposed)
+
+
+def partial_fraction_symbolic(expr_str: str, var: str = 'x') -> dict:
+    """
+    @brief Symbolische Partialbruchzerlegung eines SymPy-Ausdrucks.
+    @description
+        Führt die Partialbruchzerlegung für einen als String gegebenen
+        rationalen Ausdruck durch.
+
+        Gibt die Zerlegung als Dictionary zurück mit:
+        - 'original': Originalausdruck als String
+        - 'decomposed': Zerlegter Ausdruck als String
+        - 'terms': Liste der Einzelterme
+
+    @param expr_str SymPy-Ausdruck als String.
+    @param var Variablenname (Standard: 'x').
+    @return Dict mit 'original', 'decomposed', 'terms'.
+    @author Kurt Ingwer
+    @lastModified 2026-03-08
+    """
+    sym_var = sp.Symbol(var)
+    expr = sp.sympify(expr_str)
+
+    # Partialbruchzerlegung
+    decomposed = sp.apart(expr, sym_var)
+
+    # Einzelterme extrahieren (Summanden)
+    terms = sp.Add.make_args(decomposed)
+    terms_str = [str(t) for t in terms]
+
+    return {
+        'original': str(expr),
+        'decomposed': str(decomposed),
+        'terms': terms_str
+    }
+
+
+# ===========================================================================
+# UNEIGENTLICHE INTEGRALE
+# ===========================================================================
+
+def improper_integral_numerical(f: Callable, a: float, b: float,
+                                 singularities: list = None,
+                                 eps: float = 1e-6) -> float:
+    """
+    @brief Numerisches uneigentliches Integral mit möglichen Singularitäten.
+    @description
+        Behandelt uneigentliche Integrale ∫_a^b f(x) dx in folgenden Fällen:
+        1. Unendliche Grenzen (a=-∞ oder b=+∞): Substitution t=1/(1+x) oder
+           numerische Gauss-Laguerre-Quadratur
+        2. Singularitäten im Inneren: Aufteilung in Teilintegrale mit
+           Epsilon-Umgebung um die Singularität
+        3. Kombination beider Fälle
+
+        Methode für ∫_0^∞ f(x)dx: Substitution x = t/(1-t), dx = 1/(1-t)²dt
+        → transformiert [0,∞) auf [0,1)
+
+        Methode für ∫_-∞^∞: Aufteilen in zwei Hälften
+
+    @param f Die zu integrierende Funktion.
+    @param a Untere Grenze (float('-inf') möglich).
+    @param b Obere Grenze (float('inf') möglich).
+    @param singularities Liste von Singularitätspunkten im Inneren von (a,b).
+    @param eps Epsilon-Umgebung um Singularitäten und für Grenzen.
+    @return Näherungswert des uneigentlichen Integrals.
+    @author Kurt Ingwer
+    @lastModified 2026-03-08
+    """
+    from scipy import integrate as sci_integrate
+
+    if singularities is None:
+        singularities = []
+
+    # Hilfsfunktion: endliches Integral via scipy.integrate.quad
+    def finite_integral(func, lo, hi):
+        """Berechnet endliches Integral mit scipy quad (adaptiv)."""
+        result, _ = sci_integrate.quad(func, lo, hi, limit=200)
+        return result
+
+    # Fall 1: Beide Grenzen endlich, keine Singularitäten
+    if math.isfinite(a) and math.isfinite(b) and not singularities:
+        return finite_integral(f, a, b)
+
+    # Fall 2: Singularitäten im Inneren → Aufteilung
+    if singularities:
+        # Grenzen und Singularitäten zu einer sortierten Liste zusammenfassen
+        points = sorted([a] + list(singularities) + [b])
+        total = 0.0
+        for i in range(len(points) - 1):
+            lo = points[i]
+            hi = points[i + 1]
+
+            # Epsilon-Umgebung um Singularitäten
+            if lo in singularities:
+                lo = lo + eps
+            if hi in singularities:
+                hi = hi - eps
+
+            # Grenzen behandeln
+            if not math.isfinite(lo):
+                lo_int = -1e10
+            else:
+                lo_int = lo
+            if not math.isfinite(hi):
+                hi_int = 1e10
+            else:
+                hi_int = hi
+
+            if lo_int < hi_int:
+                total += finite_integral(f, lo_int, hi_int)
+        return total
+
+    # Fall 3: Unendliche Grenzen via scipy
+    if not math.isfinite(a) and not math.isfinite(b):
+        result, _ = sci_integrate.quad(f, -math.inf, math.inf, limit=200)
+        return result
+    elif not math.isfinite(b):
+        result, _ = sci_integrate.quad(f, a, math.inf, limit=200)
+        return result
+    else:
+        result, _ = sci_integrate.quad(f, -math.inf, b, limit=200)
+        return result
+
+
+def improper_integral_symbolic(expr_str: str, var: str, a, b) -> dict:
+    """
+    @brief Symbolisches uneigentliches Integral via SymPy.
+    @description
+        Berechnet ∫_a^b f(x) dx symbolisch, wobei a und b unendlich sein können.
+
+        Konvergenzuntersuchung:
+        - Das Integral konvergiert, wenn das Ergebnis endlich ist
+        - Bei Divergenz gibt SymPy sp.oo, -sp.oo oder sp.zoo zurück
+
+        Bekannte Ergebnisse:
+        - ∫_0^∞ e^(-x) dx = 1
+        - ∫_0^∞ x^(s-1) e^(-x) dx = Γ(s) (Gamma-Funktion)
+        - ∫_{-∞}^∞ e^(-x²) dx = √π (Gauß-Integral)
+
+    @param expr_str SymPy-Ausdruck als String.
+    @param var Variablenname.
+    @param a Untere Grenze (Zahl, 'oo', '-oo', oder sympy-Ausdruck).
+    @param b Obere Grenze (Zahl, 'oo', '-oo', oder sympy-Ausdruck).
+    @return Dict mit 'integral' (SymPy), 'converges' (bool), 'value' (float oder None).
+    @author Kurt Ingwer
+    @lastModified 2026-03-08
+    """
+    sym_var = sp.Symbol(var)
+    expr = sp.sympify(expr_str)
+
+    # Grenzen konvertieren
+    def convert_bound(bound):
+        """Konvertiert Grenzwert in SymPy-Ausdruck."""
+        if bound == 'oo' or bound == float('inf'):
+            return sp.oo
+        elif bound == '-oo' or bound == float('-inf'):
+            return -sp.oo
+        else:
+            return sp.sympify(bound)
+
+    sym_a = convert_bound(a)
+    sym_b = convert_bound(b)
+
+    # Symbolisches Integral berechnen
+    try:
+        integral_result = sp.integrate(expr, (sym_var, sym_a, sym_b))
+    except Exception as exc:
+        return {
+            'integral': None,
+            'converges': False,
+            'value': None
+        }
+
+    # Konvergenz prüfen: Ergebnis darf nicht unendlich oder komplex-unendlich sein
+    divergent_values = {sp.oo, -sp.oo, sp.zoo, sp.nan}
+    converges = integral_result not in divergent_values
+
+    # Numerischen Wert extrahieren
+    value = None
+    if converges:
+        try:
+            value = float(integral_result.evalf())
+        except Exception:
+            value = None
+
+    return {
+        'integral': integral_result,
+        'converges': converges,
+        'value': value
+    }
+
+
+def cauchy_principal_value(f: Callable, a: float, b: float,
+                            singularity: float, eps: float = 1e-8) -> float:
+    """
+    @brief Cauchyscher Hauptwert P.V. ∫_a^b f(x) dx bei einer Singularität.
+    @description
+        Der Cauchy-Hauptwert (Valeur principale, P.V.) ist definiert als:
+
+            P.V. ∫_a^b f(x) dx = lim_{ε→0} [∫_a^{c-ε} f(x) dx + ∫_{c+ε}^b f(x) dx]
+
+        wobei c ∈ (a,b) eine Singularität von f ist.
+
+        Beispiel: P.V. ∫_{-1}^{1} 1/x dx = 0
+        (Beide Hälften heben sich gegenseitig auf durch Symmetrie)
+
+        Wichtig: Der Hauptwert kann existieren, auch wenn das Integral im
+        gewöhnlichen Sinne nicht konvergiert.
+
+    @param f Die Funktion mit Singularität.
+    @param a Untere Integrationsgrenze.
+    @param b Obere Integrationsgrenze.
+    @param singularity Innere Singularitätsstelle c ∈ (a, b).
+    @param eps Epsilon-Parameter für die Näherung des Grenzwerts.
+    @return Cauchyscher Hauptwert des Integrals.
+    @author Kurt Ingwer
+    @lastModified 2026-03-08
+    """
+    from scipy import integrate as sci_integrate
+
+    # Linkes Teilintegral: ∫_a^{c-ε} f(x) dx
+    left_result, _ = sci_integrate.quad(f, a, singularity - eps, limit=200)
+
+    # Rechtes Teilintegral: ∫_{c+ε}^b f(x) dx
+    right_result, _ = sci_integrate.quad(f, singularity + eps, b, limit=200)
+
+    # Cauchy-Hauptwert = Summe beider Teile
+    return left_result + right_result

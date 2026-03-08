@@ -695,6 +695,143 @@ def chinese_remainder_theorem(remainders: list[int], moduli: list[int]) -> int:
 # BEWEISSTATISTIKEN UND -DOKUMENTATION
 # ===========================================================================
 
+# ===========================================================================
+# KREISMETHODE (HARDY-LITTLEWOOD) FÜR GOLDBACH-VERMUTUNG
+# ===========================================================================
+
+def hardy_littlewood_singular_series(n: int) -> float:
+    """
+    Berechnet die Singuläre Reihe S(n) aus der Hardy-Littlewood-Kreismethode.
+
+    Die singuläre Reihe entsteht als Eulerprodukt und codiert die lokalen
+    (p-adischen) Lösungsdichten der Goldbach-Gleichung p₁ + p₂ = n.
+
+    Für gerades n gilt:
+        S(n) = Π_{p | n, p > 2} [p(p-2)/(p-1)²]⁻¹ · p(p-2)/(p-1)²
+             · Π_{p ∤ n, p > 2} p(p-2)/(p-1)²  /  Π_{p > 2} p(p-2)/(p-1)²
+
+    Vereinfacht (Hardy-Littlewood, 1923):
+        S(n) = Π_{p | n, p prim > 2} (p-1)/(p-2)
+             · Π_{p ∤ n, p prim > 2} 1   (Beitrag = 1 für p ∤ n)
+
+    D.h. der Faktor ≠ 1 kommt nur von Primteilern p > 2 von n.
+
+    @param n: Gerade positive ganze Zahl ≥ 4
+    @return: Wert der Singulären Reihe S(n) ≥ 1
+    @raises ValueError: Wenn n ungerade oder n < 4
+    @lastModified: 2026-03-08
+    """
+    if n < 4 or n % 2 != 0:
+        raise ValueError(f"n muss gerade und ≥ 4 sein, erhalten: {n}")
+
+    # Ermittle alle Primteiler von n, die größer als 2 sind
+    # (p=2 trägt zum Eulerprodukt separat bei – für gerades n immer 2|n)
+    singular_series = 1.0
+    temp = n
+    # Entferne Faktoren 2 (die nicht zur Singulären Reihe beitragen für gerades n)
+    while temp % 2 == 0:
+        temp //= 2
+
+    # Sammle ungerade Primteiler von n
+    odd_prime_factors = set()
+    d = 3
+    t = temp
+    while d * d <= t:
+        if t % d == 0:
+            odd_prime_factors.add(d)
+            while t % d == 0:
+                t //= d
+        d += 2
+    if t > 1:
+        odd_prime_factors.add(t)
+
+    # Für jeden ungeraden Primteiler p von n: Faktor (p-1)/(p-2)
+    # Dieser Faktor ist > 1 und erhöht die Anzahl der Zerlegungen
+    # (mehr Möglichkeiten, weil p | n erlaubt p als direkten Summanden)
+    for p in odd_prime_factors:
+        if p > 2:
+            singular_series *= (p - 1) / (p - 2)
+
+    return singular_series
+
+
+def goldbach_circle_method_estimate(n: int) -> float:
+    """
+    Schätzt die Anzahl der Goldbach-Zerlegungen via Hardy-Littlewood-Kreismethode.
+
+    Die Kreismethode (Hardy & Littlewood, 1923) liefert eine asymptotische Formel:
+        r(n) ≈ 2 · C₂ · n / (ln n)² · S(n)
+
+    wobei:
+        C₂ = Π_{p prim, p > 2} p(p-2)/(p-1)² ≈ 0.6601618...
+             die Zwillingsprimzahlkonstante ist
+        S(n) = singuläre Reihe, die lokale Arithmetik codiert
+
+    Interpretation: Für großes gerades n gibt es asymptotisch
+    ca. r(n) Zerlegungen n = p + q mit p, q prim.
+
+    @param n: Gerade positive ganze Zahl ≥ 4
+    @return: Geschätzte Anzahl der Goldbach-Zerlegungen (ungeordnet, p ≤ q)
+    @raises ValueError: Wenn n ungerade oder n < 4
+    @lastModified: 2026-03-08
+    """
+    if n < 4 or n % 2 != 0:
+        raise ValueError(f"n muss gerade und ≥ 4 sein, erhalten: {n}")
+
+    # Zwillingsprimzahlkonstante C₂ (bekannter Wert)
+    twin_prime_constant_C2 = 0.6601618158468695
+
+    # Singuläre Reihe berechnen
+    S_n = hardy_littlewood_singular_series(n)
+
+    # Hardy-Littlewood-Asymptotik: r(n) ≈ 2 · C₂ · n / (ln n)² · S(n)
+    # Der Faktor 2 kommt davon, dass die Goldbach-Gleichung p+q=n symmetrisch ist
+    ln_n = math.log(n)
+    estimate = 2.0 * twin_prime_constant_C2 * n / (ln_n ** 2) * S_n
+
+    # Die Schätzung gilt für UNGEORDNETE Paare (p ≤ q), daher halbieren
+    return estimate / 2.0
+
+
+def goldbach_circle_method_accuracy(n_max: int) -> list[dict]:
+    """
+    Vergleicht die Hardy-Littlewood-Schätzung mit tatsächlichen Zerlegungszahlen.
+
+    Für jede gerade Zahl n von 4 bis n_max wird berechnet:
+        - Die tatsächliche Anzahl der Goldbach-Zerlegungen (exakt)
+        - Die Schätzung via Kreismethode
+        - Das Verhältnis actual / estimate (sollte → 1 für großes n)
+
+    @param n_max: Obere Grenze (wird auf nächste gerade Zahl abgerundet)
+    @return: Liste von Dictionaries mit Feldern:
+             'n': die gerade Zahl
+             'actual': tatsächliche Zerlegungsanzahl
+             'estimate': Schätzung via Kreismethode
+             'ratio': Verhältnis actual/estimate (Güte der Approximation)
+    @lastModified: 2026-03-08
+    """
+    results = []
+
+    for n in range(4, n_max + 1, 2):
+        # Tatsächliche Anzahl der Zerlegungen (exakt gezählt, p ≤ q)
+        actual_count = len(goldbach_all_decompositions(n))
+
+        # Schätzung via Kreismethode
+        estimate = goldbach_circle_method_estimate(n)
+
+        # Verhältnis (Güte der Approximation, → 1 für n → ∞)
+        ratio = actual_count / estimate if estimate > 0 else float('inf')
+
+        results.append({
+            'n': n,
+            'actual': actual_count,
+            'estimate': estimate,
+            'ratio': ratio
+        })
+
+    return results
+
+
 def conjecture_status_report() -> dict:
     """
     Gibt eine Übersicht über alle bekannten offenen Vermutungen zurück.
