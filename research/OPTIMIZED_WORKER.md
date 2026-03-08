@@ -1,5 +1,5 @@
 # OPTIMIZED_WORKER.md - Mathematik-Spezialist
-## Aktualisiert: 2026-03-08 (Build 6)
+## Aktualisiert: 2026-03-08 (Build 9)
 
 ## Was ich über dieses Projekt weiß
 
@@ -7,109 +7,85 @@
 Ich werde zum Mathematik-Spezialisten ausgebildet. Das Projekt dient als
 Wissensbasis, Übungsumgebung und Dokumentationssammlung für mathematische Konzepte.
 Jedes Modul enthält Algorithmen mit ausführlicher mathematischer Dokumentation,
-sodass der Code auch als Lernmaterial dient.
+sodass der Code auch als Lernmaterial dient. Das Fernziel ist die Untersuchung
+der Millennium-Probleme (insbesondere Riemann-Hypothese und Goldbach-Vermutung).
 
-### Implementierter Stack
-- **Python 3.13** mit sympy 1.13, numpy 2.2, scipy 1.15, pytest 9.0.2
-- **Algebra** (`src/algebra.py`): Polynome, Gleichungslöser, Zahlentheorie
-- **Analysis** (`src/analysis.py`): Differentiation, Integration, Taylor, Nullstellen
-- **Lineare Algebra** (`src/linear_algebra.py`): Vektoren, Matrizen, Eigenwerte, Gram-Schmidt
-- **Statistik** (`src/statistics_math.py`): Deskriptiv, Verteilungen, Tests, Bayes, Monte-Carlo
-- **ODE** (`src/ode.py`): Euler, RK4, RK45 adaptiv, Laplace, inverse Laplace
-- **134 Tests** alle grün (Stand 2026-03-07)
+### Implementierter Stack (Build 9)
+- **Python 3.13** mit sympy 1.14, numpy 2.2, scipy 1.17, matplotlib 3.10, pytest 9.0
+- **13 Python-Module**, 641 Tests alle grün
+
+| Modul | Kernfunktionen |
+|-------|---------------|
+| algebra.py | Polynome, Gleichungen, Zahlentheorie, Diophant, Reziprozität, RSA |
+| analysis.py | Differentiation, Integration, Grenzwerte, Partialbrüche |
+| linear_algebra.py | Matrizen, LU/QR/SVD/Givens, Eigenwerte/-vektoren |
+| statistics_math.py | Verteilungen, Hypothesentests, Bayes, Monte-Carlo |
+| ode.py | Euler, RK4/RK45, Laplace/inverse Laplace |
+| complex_analysis.py | ζ(s), Γ(z), ξ, Z-Funktion, Nullstellen |
+| analytic_number_theory.py | π(x), Li(x), Λ(n), θ(x), Dirichlet |
+| proof_theory.py | Collatz, Goldbach+Kreismethode, CRT, Miller-Rabin |
+| fourier.py | DFT/FFT (Cooley-Tukey), STFT, Fensterfunktionen |
+| numerical_methods.py | Interpolation, BFGS, Simplex, Gradientenverfahren |
+| modular_forms.py | SL(2,Z), Eisenstein, Δ, j-Invariante, Hecke |
+| p_adic.py | p-adische Zahlen, Hensel-Lift, Ostrowski |
+| visualization.py | 2D/3D-Plotter, Vektorfeld, Fraktale |
 
 ### Mathematische Erkenntnisse
 
-#### Numerische Stabilität (wichtige Lektion)
-- Für die 1. numerische Ableitung: optimales h ≈ ε^(1/3) ≈ 6×10⁻⁶
-- Für die 2. Ableitung: h ≈ ε^(1/4) ≈ 1.2×10⁻⁴ (wegen h² im Nenner)
-- Finite Differenzen k-ter Ordnung sind für k > 8 INSTABIL (h^k Nenner)
-- Lösung: SymPy für symbolische Taylor-Ableitungen verwenden
+#### Numerische Stabilität
+- 1. numerische Ableitung: optimales h ≈ ε^(1/3) ≈ 6×10⁻⁶
+- 2. Ableitung: h ≈ ε^(1/4) ≈ 1.2×10⁻⁴ (wegen h² im Nenner)
+- Finite Differenzen k-ter Ordnung für k > 8 INSTABIL → SymPy verwenden
+- QR via Householder stabiler als Gram-Schmidt; SVD robustester Weg für Eigenvektoren
 
-#### Algorithmen-Qualität
-- **Horner-Schema**: O(n) statt O(n²) für Polynomauswertung
-- **Gauss mit Pivotsuche**: numerisch stabiler als ohne Pivotsuche
-- **Simpson-Regel**: O(h⁴) Fehler, deutlich besser als Trapez O(h²)
-- **Newton-Raphson**: quadratische Konvergenz, Ableitung wird numerisch bestimmt
-- **RK45 adaptiv**: Fehlerkontrolle mit Schrittweitensteuerung
-- **Stehfest-Algorithmus**: Numerische inverse Laplace-Transformation
+#### Komplexe Analysis / Zeta-Funktion
+- ζ(s) für Re(s) > 1: Euler-Maclaurin-Formel
+- ζ(s) für 0 < Re(s) ≤ 1: η(s)/(1-2^{1-s}) mit Euler-Knopp (60 Terme → Maschinengenauigkeit)
+- ζ(s) für Re(s) ≤ 0: Funktionalgleichung (Spiegelung an Re=1/2)
+- ξ-Symmetrie ξ(s) = ξ(1-s) auf ~10⁻¹⁵ verifiziert
 
-#### Statistische Methoden
-- **t-Test**: Welch-Variante für ungleiche Varianzen verwendet (robuster)
-- **Chi-Quadrat**: Anwendbar für Unabhängigkeits- und Goodness-of-Fit-Tests
-- **Monte-Carlo**: π-Schätzung als Einstiegsbeispiel, skalierbar auf beliebige Probleme
-- **Normalverteilung PPF**: Numerische Umkehrung der CDF via Bisektionsverfahren
+#### Modulformen
+- Fundamentalbereich: |τ| > 1, |Re(τ)| ≤ 1/2, Im(τ) > 0
+- SL(2,Z) erzeugt durch S: τ→-1/τ und T: τ→τ+1
+- Δ(τ) = q∏(1-qⁿ)²⁴, q = e^{2πiτ}, konvergiert nur für Im(τ) > 0
+- Shimura-Taniyama-Wiles: jede elliptische Kurve /ℚ ist modular
 
-### Build 4: Beweistheorie-Modul (2026-03-08)
-- `src/proof_theory.py` implementiert: Collatz, Goldbach, Zwillingsprimzahlen,
-  Riemann-Zeta, Sieb, Miller-Rabin, Legendre/Jacobi, CRT, ProofByInduction
-- 42 neue Tests, alle grün (Gesamt: 176/176)
-- `research/OPEN_CONJECTURES.md`: Alle Millennium-Probleme dokumentiert
-- `research/PROOF_STRATEGIES.md`: Beweis-Strategien und Lernpfad
+#### p-adische Zahlen
+- Ostrowski: Alle nicht-trivialen Absolutwerte auf ℚ sind |·|∞ oder |·|p
+- Produktformel: |n|∞ · ∏_p |n|p = 1 für alle n ≠ 0 ∈ ℚ
+- Hensel-Lifting: Wurzeln mod p → mod p^k (Newton in ℤ_p)
 
-### Build 6 (2026-03-08): Fourier, Numerische Methoden, Matrix-Zerlegungen
-- `src/fourier.py`: DFT/FFT (Cooley-Tukey), IFFT, Fourier-Reihen, Fensterfunktionen, STFT
-- `src/numerical_methods.py`: Lagrange/Newton/Spline-Interpolation, Gradient Descent, Simplex
-- `src/linear_algebra.py` (Erweiterung): LU (Doolittle+Teilpivot), QR (Householder), SVD
-- 80 neue Tests → Gesamt 318/318 grün
-- **Kritische Bugfixes:** golden_section_search (resphi falsch), simplex (obj_row negiert)
-- **Erkenntnisse:**
-  - golden_section_search: φ = (1+√5)/2 ≈ 1.618, innere Punkte bei a+1/φ·(b-a) ≈ a+0.618·(b-a)
-  - Simplex Minimierungsform: obj_row = list(c), Pivot wenn c_bar < 0, f_opt = -tableau[-1]
-  - Householder-QR ist numerisch stabiler als Gram-Schmidt-QR (kein Auslöschungsproblem)
+#### Diophantische Gleichungen
+- Lineares Diophant: lösbar ⟺ gcd(a,b) | c
+- Pell x²-Dy²=1: Fundamentallösung via Kettenbruch √D
+- Zwei-Quadrate-Satz: n=a²+b² ⟺ alle Primteiler ≡ 3 (mod 4) in gerader Potenz
 
-### FERNZIEL (ab Build 4)
-Das Projekt richtet sich auf das **Beweisen oder Widerlegen offener Vermutungen**:
-1. **Priorität 1:** Collatz (empirisch, Musteranalyse, Tao-Ansatz)
-2. **Priorität 2:** Goldbach (Sieb-Methoden, Kreismethode)
-3. **Priorität 3:** Riemann-Hypothese (analytische Zahlentheorie)
-4. **Langfristig:** P vs NP, Navier-Stokes
+### Strategische Ausrichtung: Millennium-Probleme
 
-### Geplante Erweiterungen (Priorität)
-1. **Kreismethode (Hardy-Littlewood)** für Goldbach-Vermutung
-2. **Modulformen** (Grundlagen, Verbindung zu Shimura-Taniyama)
-3. **p-adische Zahlen** (alternative Zahlensysteme)
-4. **Visualisierungs-Modul** (matplotlib 2D/3D, Riemann-Flächen)
-5. **Eigenvektoren** (zu bereits berechneten Eigenwerten)
+#### Riemann-Hypothese
+- Werkzeuge: ζ(s), ξ(s), Z(t), N(T)-Formel, Nullstellensuche
+- Status: >10^13 Nullstellen auf Re=1/2 verifiziert (empirisch)
 
-## Brainstorming: Verbindungen
+#### Goldbach-Vermutung
+- Werkzeuge: Goldbach-Zerlegung, Kreismethode, Hardy-Littlewood-Schätzung
+- Singuläre Reihe S(n) quantifiziert Erwartungswert der Zerlegungen
 
-### "Fraktal" → Projekt
-Mandelbrot-Menge: z_{n+1} = z_n² + c, Konvergenz-Check mit |z| < 2.
-Benötigt: komplexe Zahlen (algebra.py), numpy-Vektorisierung für Geschwindigkeit.
-Visualisierung mit matplotlib (geplant).
+### Brainstorming: Verbindungen
 
-### "Fourier" → Projekt
-Fourier-Transformation zerlegt Signale in Frequenzanteile.
-Mathematisch: orthogonale Funktionen (analog zu Gram-Schmidt für Vektoren).
-Implementierung: scipy.fft oder eigene DFT via Komplexe Analysis.
-Anwendung: Signalverarbeitung, Differentialgleichungen lösen (Frequenzraum).
+**Hardy-Littlewood ↔ Goldbach**: Kreismethode approximiert r₂(n) via Integral
+über den Einheitskreis (Hauptbogen = Farey-Folge + Nebenbogen).
 
-### "Primzahlen" → Kryptographie
-RSA basiert auf: Schwierigkeit der Primfaktorzerlegung großer Zahlen.
-Bereits implementiert: prime_factorization, euler_phi (Grundlagen).
-Nächster Schritt: Miller-Rabin-Test für kryptographisch sichere Primzahlen.
+**Modulformen ↔ Zahlentheorie**: Ramanujan-Tau τ(n) aus Δ-Koeffizienten;
+BSD-Vermutung verbindet L-Funktionen elliptischer Kurven mit Modulformen.
 
-### "Topologie" → Fixpunktsätze
-Banachscher Fixpunktsatz: Kontraktionsabbildung hat genau einen Fixpunkt.
-→ Begründet Newton-Raphson-Konvergenz (bereits implementiert).
-Brouwerscher Fixpunktsatz: Jede stetige Selbstabbildung auf kompaktem Raum hat Fixpunkt.
-→ Anwendung: Spieltheorie, Nash-Gleichgewichte.
+**p-adische ↔ Primzahlen**: p-adische L-Funktionen verallgemeinern Dirichlet-L-Reihen.
 
-### "Optimierung" → Maschinelles Lernen
-Gradient Descent minimiert Verlustfunktionen in ML.
-Mathematisch: Gradientenberechnung (Ableitungen, bereits implementiert).
-Erweiterung: BFGS (quasi-Newton), L-BFGS-B (gedächtnissparend).
+**Fourier ↔ Zahlentheorie**: DFT auf ℤ/nℤ; Dirichlet-Reihen auf ℤ; Modulformen auf ℝ.
 
-### "Laplace" → Regelungstechnik
-Laplace-Transformation wandelt ODE in algebraische Gleichungen um.
-Bereits implementiert: numerische Laplace + inverse Laplace (Stehfest).
-Anwendung: Übertragungsfunktionen, Stabilitätsanalyse (Polstellen).
-
-## Quellen & Recherche
-- Numerik der DGL: Hairer, Nørsett, Wanner "Solving ODEs"
-- Lineare Algebra: Gilbert Strang "Introduction to Linear Algebra"
-- Zahlentheorie: Hardy & Wright "An Introduction to the Theory of Numbers"
-- Numerische Analysis: Stoer & Bulirsch "Numerische Mathematik"
-- Statistik: Casella & Berger "Statistical Inference"
-- Fourier-Analysis: Körner "Fourier Analysis"
+### Nächste Entwicklungsschritte (Build 10+)
+1. Modulformen Vertiefung: Cusp-Formen (Γ₀(N)), Theta-Reihen θ(τ) = Σqⁿ²
+2. Hardy-Littlewood: Farey-Folgen, Major/Minor Arc-Abschätzung
+3. p-adische L-Funktionen: Kubota-Leopoldt, Iwasawa-Algebra
+4. Jupyter-Integration: Interaktiver REPL-Modus
+5. Property-Based Testing mit Hypotheses-Bibliothek
+6. NumPy-Vektorisierung der Kern-Schleifen (10-100x Speed)

@@ -46,3 +46,4 @@ von Grundlagen bis hin zu fortgeschrittenen Themen.
 - Code soll auch als Lernmaterial dienen
 - Jede Methode enthält mathematische Dokumentation
 - erzeuge für jede programmcode datei ein .md datei mit umfassenden erläuterungen
+- Formel können im KaTeX Format angegeben werden.

@@ -13,6 +13,7 @@ Fernziel, bedeutende mathematische Vermutungen zu beweisen oder zu widerlegen.
 
 import math
 import itertools
+import functools
 from typing import Callable, Generator, Optional
 import sympy
 import numpy as np
@@ -53,12 +54,14 @@ def collatz_sequence(n: int) -> list[int]:
     return sequence
 
 
+@functools.lru_cache(maxsize=8192)
 def collatz_stopping_time(n: int) -> int:
     """
     Gibt die Anzahl der Schritte zurück, bis die Collatz-Folge 1 erreicht.
 
     Diese "Stoppzeit" ist ein Maß für die Komplexität der Zahl n.
     Zahlen mit langen Stoppzeiten sind oft Kandidaten für Musteranalysen.
+    Via lru_cache gecacht: Bereichsverifikationen profitieren erheblich davon.
 
     @param n: Startzahl (positive ganze Zahl)
     @return: Anzahl der Schritte bis 1

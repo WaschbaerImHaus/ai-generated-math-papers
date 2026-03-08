@@ -18,6 +18,7 @@
 
 import math
 import cmath
+import functools
 from typing import Union, Optional
 
 
@@ -383,6 +384,7 @@ def mod_inverse(a: int, m: int) -> int:
     return x % m
 
 
+@functools.lru_cache(maxsize=4096)
 def is_prime(n: int) -> bool:
     """
     @brief Prüft, ob eine natürliche Zahl eine Primzahl ist.
@@ -393,11 +395,13 @@ def is_prime(n: int) -> bool:
         3. Nur bis sqrt(n) testen (wenn n einen Teiler > sqrt(n) hat,
            hat es auch einen < sqrt(n))
 
-        Laufzeit: O(sqrt(n))
+        Laufzeit: O(sqrt(n)) – Ergebnis wird via lru_cache gecacht (bis 4096 Einträge).
+        Deutlicher Geschwindigkeitsvorteil bei wiederholten Aufrufen (z.B. in proof_theory).
 
     @param n Die zu prüfende natürliche Zahl.
     @return True wenn n eine Primzahl ist, sonst False.
     @date 2026-03-05
+    @lastModified 2026-03-08
     """
     if n < 2:
         return False

@@ -60,7 +60,7 @@ cd "$PROJECT_DIR" || exit 1
 "$CLAUDE_BIN" \
     --dangerously-skip-permissions \
     --continue \
-    -p "Handle nach der [home]/.claude/CLAUDE.md. erledige unerledigtes für das Projekt specialist-maths." \
+    -p "Handle nach der [home]/.claude/CLAUDE.md. Erledige alles unerledigtes für das Projekt specialist-maths." \
     >> "$LOGFILE" 2>&1
 
 EXIT_CODE=$?
