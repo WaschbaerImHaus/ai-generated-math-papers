@@ -26,3 +26,34 @@ die Millennium-Probleme des Clay Mathematics Institute).
 - Neue Tests: 42 (42/42 grün)
 - Gesamt-Tests: 176 (176/176 grün)
 - Build-Nummer: 4
+
+## 2026-03-08 – Build 5: Komplexe Analysis, Analytische Zahlentheorie
+
+### Neue Module
+- `src/complex_analysis.py`:
+  - Gamma-Funktion: Lanczos-Approximation (15 Stellen), Stirling log_gamma
+  - Vollständige Riemann-Zeta: 3-Bereich-Strategie:
+    * Re(s) > 1: Euler-Maclaurin
+    * 0 < Re(s) ≤ 1: Euler-Knopp-E₁-beschleunigte Eta-Funktion (~10^-15 Fehler!)
+    * Re(s) ≤ 0: Funktionalgleichung → Euler-Maclaurin
+  - ξ-Funktion (symmetrische Form, ξ(s)=ξ(1-s) ✓ auf ~10^-15)
+  - Riemann-Siegel-Z-Funktion (reellwertig, Nullstellen via Vorzeichenwechsel)
+  - Nullstellen-Suche: find_zeta_zeros() mit Bisektionsverfeinerung
+  - N(T)-Formel (Riemann-von-Mangoldt)
+  - Cauchy-Integralsatz (Mittelwerteigenschaft, numerisch)
+  - Residuensatz
+
+- `src/analytic_number_theory.py`:
+  - π(x), Li(x), Vergleich π vs Li vs x/ln(x)
+  - von-Mangoldt-Funktion Λ(n), Tschebyschow θ(x), ψ(x)
+  - Dirichlet-Charaktere, L-Funktionen, Primzahlen in Restklassen
+  - Semiprime, Chen-Zerlegung, k-fast-Prim (almost_prime)
+  - Primzahl-Lücken, Cramér-Vermutung
+  - Riemanns Explizite Formel (Approximation via Nullstellen)
+
+### Tests: 62 neue Tests, alle grün (Gesamt: 238/238)
+
+### Kritische Bugfixes
+- Euler-Knopp: Muss auf UNSIGNED Folge angewendet werden (nicht signed!)
+  Vorher: a[j] = (-1)^j/j^s → falsche Konvergenz
+  Nachher: c[j] = 1/j^s, S = Σ (-1)^k Δ^k c_0 / 2^{k+1} → ~10^-15 Fehler
