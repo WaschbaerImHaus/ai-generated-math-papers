@@ -1,0 +1,28 @@
+
+## 2026-03-08 – Build 4: Beweistheorie-Modul und Vermutungsforschung
+
+### Neuausrichtung: Mathematische Beweise als Fernziel
+Auf Wunsch des Nutzers: Spezialisierung auf mathematische Beweise,
+Fernziel das Beweisen oder Widerlegen offener Vermutungen (insbesondere
+die Millennium-Probleme des Clay Mathematics Institute).
+
+### Neue Dateien
+- `src/proof_theory.py`: Beweistheorie-Modul mit
+  - Collatz-Vermutung (Folge, Stoppzeit, Verifikation)
+  - Goldbach-Vermutung (Zerlegungen, Verifikation)
+  - Zwillingsprimzahlen (Suche, Hardy-Littlewood-Konstante)
+  - Riemann-Zeta-Funktion (Partialsumme, Euler-Maclaurin, Nullstellensuche)
+  - Sieb des Eratosthenes O(n log log n)
+  - Miller-Rabin deterministisch bis 3.3×10^24
+  - Legendre-Symbol, Jacobi-Symbol
+  - Chinesischer Restsatz (CRT)
+  - ProofByInduction-Klasse
+  - Vermutungsstatus-Report
+- `tests/test_proof_theory.py`: 42 Tests, alle grün
+- `research/OPEN_CONJECTURES.md`: Alle 7 Millennium-Probleme + weitere Vermutungen
+- `research/PROOF_STRATEGIES.md`: Beweis-Techniken und strategischer Lernpfad
+
+### Statistiken
+- Neue Tests: 42 (42/42 grün)
+- Gesamt-Tests: 176 (176/176 grün)
+- Build-Nummer: 4

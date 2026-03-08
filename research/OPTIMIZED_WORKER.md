@@ -1,5 +1,5 @@
 # OPTIMIZED_WORKER.md - Mathematik-Spezialist
-## Aktualisiert: 2026-03-07
+## Aktualisiert: 2026-03-08
 
 ## Was ich über dieses Projekt weiß
 
@@ -40,10 +40,24 @@ sodass der Code auch als Lernmaterial dient.
 - **Monte-Carlo**: π-Schätzung als Einstiegsbeispiel, skalierbar auf beliebige Probleme
 - **Normalverteilung PPF**: Numerische Umkehrung der CDF via Bisektionsverfahren
 
+### Build 4: Beweistheorie-Modul (2026-03-08)
+- `src/proof_theory.py` implementiert: Collatz, Goldbach, Zwillingsprimzahlen,
+  Riemann-Zeta, Sieb, Miller-Rabin, Legendre/Jacobi, CRT, ProofByInduction
+- 42 neue Tests, alle grün (Gesamt: 176/176)
+- `research/OPEN_CONJECTURES.md`: Alle Millennium-Probleme dokumentiert
+- `research/PROOF_STRATEGIES.md`: Beweis-Strategien und Lernpfad
+
+### FERNZIEL (ab Build 4)
+Das Projekt richtet sich auf das **Beweisen oder Widerlegen offener Vermutungen**:
+1. **Priorität 1:** Collatz (empirisch, Musteranalyse, Tao-Ansatz)
+2. **Priorität 2:** Goldbach (Sieb-Methoden, Kreismethode)
+3. **Priorität 3:** Riemann-Hypothese (analytische Zahlentheorie)
+4. **Langfristig:** P vs NP, Navier-Stokes
+
 ### Geplante Erweiterungen (Priorität)
-1. **Zahlentheorie-Modul** (Sieb des Eratosthenes, Miller-Rabin, Chinesischer Restsatz, RSA)
-2. **Visualisierungs-Modul** (matplotlib 2D/3D Plotter, Vektorfelder, Phasenportrait)
-3. **Komplexe Analysis** (FFT via scipy.fft, Fourier-Reihen, Laurent-Reihen)
+1. **Analytische Zahlentheorie** (L-Funktionen, Explizite Formeln, Siebmethoden)
+2. **Komplexe Analysis** (vollständige ζ-Funktion, Residuensatz)
+3. **Visualisierungs-Modul** (matplotlib 2D/3D, Riemann-Flächen)
 4. **Optimierung** (Gradient Descent, BFGS, Simplex-Algorithmus)
 
 ## Brainstorming: Verbindungen

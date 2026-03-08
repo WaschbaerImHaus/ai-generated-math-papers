@@ -54,14 +54,38 @@
 - [x] Numerische Laplace-Transformation (Simpson-Regel)
 - [x] Numerische inverse Laplace-Transformation (Stehfest-Algorithmus)
 
+## Implementierte Features (Fortsetzung)
+
+### Beweistheorie & Offene Vermutungen (src/proof_theory.py) - Build 4
+- [x] Collatz-Vermutung: Folge, Stoppzeit, Maximalwert, Bereichs-Verifikation
+- [x] Goldbach-Vermutung: Zerlegung, alle Zerlegungen, Bereichs-Verifikation
+- [x] Zwillingsprimzahlen: Suche, Zählung, Hardy-Littlewood-Konstante
+- [x] Riemann-Zeta-Funktion: Partialsumme, Euler-Maclaurin, numerische Nullstellensuche
+- [x] Sieb des Eratosthenes (O(n log log n))
+- [x] Miller-Rabin-Primzahltest (deterministisch bis 3.3×10^24)
+- [x] Legendre-Symbol (quadratische Reste)
+- [x] Jacobi-Symbol (verallgemeinertes Legendre)
+- [x] Chinesischer Restsatz (CRT)
+- [x] ProofByInduction-Klasse (Basisfall, empirische Verifikation)
+- [x] Vermutungsstatus-Report (alle 7 Millennium-Probleme + weitere)
+
 ## Geplante Features
 
+### Beweistheorie Erweiterungen (Priorität: HÖCHSTE – Fernziel: Millennium-Beweise)
+- [ ] Analytische Zahlentheorie (Primzahlsatz mit Fehlerterm, Dirichlet-L-Reihen)
+- [ ] Riemann-Zeta via Euler-Produkt und analytische Fortsetzung
+- [ ] Funktionalgleichung ζ(s) = χ(s)ζ(1-s) implementieren
+- [ ] Explizite Formel Riemann: π(x) = Li(x) - Σ Li(x^ρ) + ...
+- [ ] N(T)-Formel: Anzahl der Nullstellen mit |Im(ρ)| ≤ T
+- [ ] Sieb-Methoden: Brun-Sieb, Selberg-Sieb, Chen-Theorem
+- [ ] Kreismethode (Hardy-Littlewood) für Goldbach
+- [ ] Modulformen (Grundlagen)
+- [ ] p-adische Zahlen
+
 ### Zahlentheorie (Priorität: hoch)
-- [ ] Primzahl-Sieb des Eratosthenes (für große Bereiche)
-- [ ] Miller-Rabin-Primzahltest (für sehr große Zahlen)
-- [ ] Chinesischer Restsatz (CRT)
-- [ ] RSA-Verschlüsselung (als Anwendungsbeispiel der Zahlentheorie)
+- [ ] RSA-Verschlüsselung (als Anwendungsbeispiel)
 - [ ] Diophantische Gleichungen (lineare, quadratische)
+- [ ] Quadratisches Reziprozitätsgesetz (vollständig)
 
 ### Analysis Erweiterungen (Priorität: mittel)
 - [ ] Grenzwertberechnung (symbolisch via SymPy)
