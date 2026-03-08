@@ -23,7 +23,8 @@ import pytest
 from algebra import (
     Polynomial, solve_linear, solve_quadratic,
     gcd, lcm, extended_gcd, mod_inverse,
-    is_prime, prime_factorization, euler_phi
+    is_prime, prime_factorization, euler_phi,
+    rsa_keygen, rsa_encrypt, rsa_decrypt
 )
 
 
@@ -192,3 +193,45 @@ class TestNumberTheory:
 
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])
+
+
+class TestRSA:
+    """Tests für das RSA-Kryptosystem."""
+
+    def test_keygen_returns_keys(self):
+        """rsa_keygen gibt (public_key, private_key) zurück."""
+        pub, priv = rsa_keygen(p=61, q=53)
+        e, n = pub
+        d, n2 = priv
+        assert n == n2  # Gleicher Modulus
+        assert n == 61 * 53  # n = p*q
+
+    def test_encrypt_decrypt_roundtrip(self):
+        """Verschlüsselung und Entschlüsselung sind invers."""
+        pub, priv = rsa_keygen(p=61, q=53)
+        m = 42
+        c = rsa_encrypt(m, pub)
+        m2 = rsa_decrypt(c, priv)
+        assert m2 == m
+
+    def test_encrypt_changes_message(self):
+        """Verschlüsselte Nachricht unterscheidet sich von Original."""
+        pub, priv = rsa_keygen(p=61, q=53)
+        m = 100
+        c = rsa_encrypt(m, pub)
+        assert c != m  # Normalerweise anders (nicht immer garantiert, aber meist)
+
+    def test_multiple_messages(self):
+        """Mehrere Nachrichten korrekt ver- und entschlüsselt."""
+        pub, priv = rsa_keygen(p=61, q=53)
+        messages = [1, 7, 42, 100, 999]
+        for m in messages:
+            c = rsa_encrypt(m, pub)
+            assert rsa_decrypt(c, priv) == m
+
+    def test_different_primes(self):
+        """RSA funktioniert mit anderen Primzahlen."""
+        pub, priv = rsa_keygen(p=47, q=71)
+        m = 88
+        c = rsa_encrypt(m, pub)
+        assert rsa_decrypt(c, priv) == m

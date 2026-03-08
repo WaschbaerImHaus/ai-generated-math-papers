@@ -24,7 +24,8 @@ from numerical_methods import (
     gradient_descent,
     golden_section_search,
     numerical_gradient,
-    simplex
+    simplex,
+    bfgs
 )
 
 
@@ -318,3 +319,57 @@ class TestSimplex:
         # Prüfe x ≥ 0
         for xi in x_opt:
             assert xi >= -1e-6
+
+
+class TestBFGS:
+    """Tests für den BFGS quasi-Newton-Optimierer."""
+
+    def test_bfgs_quadratic_1d(self):
+        """BFGS minimiert f(x) = x² → Minimum bei x=0."""
+        def f(x):
+            return [xi**2 for xi in [sum(x)]][0] if False else x[0]**2
+
+        x_opt, f_opt = bfgs(f, x0=[3.0])
+        assert abs(x_opt[0]) < 1e-5
+        assert abs(f_opt) < 1e-10
+
+    def test_bfgs_quadratic_2d(self):
+        """BFGS minimiert f(x,y) = x² + y² → Minimum bei (0,0)."""
+        def f(x):
+            return x[0]**2 + x[1]**2
+
+        x_opt, f_opt = bfgs(f, x0=[2.0, -3.0])
+        assert abs(x_opt[0]) < 1e-5
+        assert abs(x_opt[1]) < 1e-5
+        assert abs(f_opt) < 1e-10
+
+    def test_bfgs_shifted_minimum(self):
+        """BFGS findet Minimum bei (3, -2) von f(x,y) = (x-3)² + (y+2)²."""
+        def f(x):
+            return (x[0] - 3.0)**2 + (x[1] + 2.0)**2
+
+        x_opt, f_opt = bfgs(f, x0=[0.0, 0.0])
+        assert abs(x_opt[0] - 3.0) < 1e-4
+        assert abs(x_opt[1] + 2.0) < 1e-4
+        assert abs(f_opt) < 1e-8
+
+    def test_bfgs_rosenbrock(self):
+        """BFGS minimiert Rosenbrock-Funktion f(x,y)=100(y-x²)²+(1-x)² → (1,1)."""
+        def f(x):
+            return 100.0 * (x[1] - x[0]**2)**2 + (1.0 - x[0])**2
+
+        x_opt, f_opt = bfgs(f, x0=[-1.0, 1.0], max_iter=5000, tol=1e-8)
+        assert abs(x_opt[0] - 1.0) < 1e-3
+        assert abs(x_opt[1] - 1.0) < 1e-3
+
+    def test_bfgs_returns_tuple(self):
+        """BFGS gibt (x_opt, f_opt) als Tupel zurück."""
+        def f(x):
+            return x[0]**2
+
+        result = bfgs(f, x0=[1.0])
+        assert isinstance(result, tuple)
+        assert len(result) == 2
+        x_opt, f_opt = result
+        assert isinstance(x_opt, list)
+        assert isinstance(f_opt, float)

@@ -382,5 +382,79 @@ class TestSVD:
         assert kappa > 1e5
 
 
+class TestEigenvectors:
+    """Tests für die Eigenvektoren-Berechnung."""
+
+    def test_eigenvectors_2x2_diagonal(self):
+        """Diagonalmatrix hat Einheitsvektoren als Eigenvektoren."""
+        # A = diag(3, 5) → Eigenvektoren sind [1,0] und [0,1]
+        A = Matrix([[3.0, 0.0], [0.0, 5.0]])
+        eigendata = A.eigenvectors()
+        # Sortiere nach Eigenwert
+        eigendata_sorted = sorted(eigendata, key=lambda x: x[0].real)
+
+        # Erster Eigenwert = 3, Eigenvektor = [1, 0]
+        val1, vec1 = eigendata_sorted[0]
+        assert abs(val1 - 3.0) < 1e-6
+        # Eigenvektor-Richtung prüfen (normiert): [1,0] oder [-1,0]
+        assert abs(abs(vec1.components[0]) - 1.0) < 1e-6
+        assert abs(vec1.components[1]) < 1e-6
+
+        # Zweiter Eigenwert = 5
+        val2, vec2 = eigendata_sorted[1]
+        assert abs(val2 - 5.0) < 1e-6
+        assert abs(vec2.components[0]) < 1e-6
+        assert abs(abs(vec2.components[1]) - 1.0) < 1e-6
+
+    def test_eigenvectors_2x2_symmetric(self):
+        """Symmetrische Matrix: Eigenvektoren orthogonal, Eigenwerte reell."""
+        A = Matrix([[2.0, 1.0], [1.0, 2.0]])
+        eigendata = A.eigenvectors()
+        eigendata_sorted = sorted(eigendata, key=lambda x: x[0].real)
+
+        # Eigenwerte: λ₁ = 1, λ₂ = 3
+        assert abs(eigendata_sorted[0][0] - 1.0) < 1e-6
+        assert abs(eigendata_sorted[1][0] - 3.0) < 1e-6
+
+        # Eigenvektoren orthogonal: v₁·v₂ = 0
+        v1 = eigendata_sorted[0][1]
+        v2 = eigendata_sorted[1][1]
+        dot = v1.dot(v2)
+        assert abs(dot) < 1e-6
+
+    def test_eigenvectors_av_equals_lambda_v(self):
+        """Kernbedingung: A·v = λ·v für alle Eigenvektorpaare."""
+        A = Matrix([[4.0, 1.0], [2.0, 3.0]])
+        eigendata = A.eigenvectors()
+
+        for eigenval, eigenvec in eigendata:
+            # A @ v
+            Av = []
+            for i in range(A.rows):
+                row_sum = sum(A.get(i, j) * eigenvec.components[j]
+                              for j in range(A.cols))
+                Av.append(row_sum)
+            # λ·v
+            lambda_v = [eigenval.real * c for c in eigenvec.components]
+            for a, b in zip(Av, lambda_v):
+                assert abs(a - b) < 1e-4
+
+    def test_eigenvectors_3x3_identity(self):
+        """Einheitsmatrix: alle Eigenwerte = 1, Eigenvektoren beliebig."""
+        I = Matrix.identity(3)
+        eigendata = I.eigenvectors()
+        assert len(eigendata) == 3
+        for val, vec in eigendata:
+            assert abs(val.real - 1.0) < 1e-6
+
+    def test_eigenvectors_normalized(self):
+        """Eigenvektoren müssen Einheitsvektoren sein (||v|| = 1)."""
+        A = Matrix([[3.0, 1.0], [0.0, 2.0]])
+        eigendata = A.eigenvectors()
+        for _, vec in eigendata:
+            norm = vec.norm()
+            assert abs(norm - 1.0) < 1e-6
+
+
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])

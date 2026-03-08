@@ -105,6 +105,13 @@
 - [x] Matrixrang (via SVD, robust gegen Fast-Singularität)
 - [x] Konditionszahl κ = σ_max/σ_min
 
+### Build 8 Erweiterungen (2026-03-08)
+- [x] Eigenvektoren via SVD-Kernel (linear_algebra.py) – 5 Tests
+- [x] BFGS quasi-Newton Optimierer (numerical_methods.py) – 5 Tests
+- [x] RSA-Kryptosystem: keygen/encrypt/decrypt (algebra.py) – 5 Tests
+- [x] Umfassende .md-Dokumentation für alle 10 Module (Build 7)
+- **Gesamttests: 333/333 grün**
+
 ### Analytische Zahlentheorie (src/analytic_number_theory.py) - Build 5
 - [x] Primzahlzählfunktion π(x) (exakt via Sieb)
 - [x] Logarithmisches Integral Li(x) (Gauß/Riemann-Approximation)
@@ -126,7 +133,7 @@
 - [ ] p-adische Zahlen
 
 ### Zahlentheorie (Priorität: hoch)
-- [ ] RSA-Verschlüsselung (als Anwendungsbeispiel)
+- [x] RSA-Verschlüsselung (keygen, encrypt, decrypt) – Build 8
 - [ ] Diophantische Gleichungen (lineare, quadratische)
 - [ ] Quadratisches Reziprozitätsgesetz (vollständig)
 
@@ -140,14 +147,14 @@
 - [x] LU-Zerlegung (Doolittle mit Teilpivotisierung) – Build 6
 - [x] QR-Zerlegung (Householder) – Build 6
 - [x] Singulärwertzerlegung (SVD) – Build 6
-- [ ] Eigenvektoren (zu vorhandenen Eigenwerten)
+- [x] Eigenvektoren via SVD-Kernel (zu vorhandenen Eigenwerten) – Build 8
 - [ ] Givens-Rotationen für QR
 
 ### Numerische Methoden (Priorität: mittel)
 - [x] Interpolation (Lagrange, Newton, kubische Splines) – Build 6
 - [x] Optimierung (Gradient Descent, Goldener Schnitt) – Build 6
 - [x] Lineare Programmierung (Simplex-Algorithmus) – Build 6
-- [ ] Optimierung: BFGS (quasi-Newton), Conjugate Gradient
+- [x] BFGS quasi-Newton Optimierung (mit Armijo-Line-Search) – Build 8
 
 ### Visualisierung (Priorität: niedrig)
 - [ ] Funktionsplotter 2D (matplotlib)

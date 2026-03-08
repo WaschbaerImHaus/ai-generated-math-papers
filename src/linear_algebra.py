@@ -486,6 +486,55 @@ class Matrix:
                 break
         return list(np.diag(A))
 
+    def eigenvectors(self) -> list:
+        """
+        @brief Berechnet Eigenwert-Eigenvektor-Paare der Matrix.
+        @description
+            Gibt für jeden Eigenwert λ den zugehörigen normierten Eigenvektor v zurück.
+            Es gilt: A @ v = λ * v
+
+            Methode:
+            - Eigenwerte via eigenvalues() berechnen
+            - Für jeden Eigenwert: (A - λI)v = 0 lösen
+              → Kern von (A - λI) via SVD bestimmen (letzter rechter Singulärvektor
+                zur kleinsten Singulärwert = Kern-Basis)
+
+            Vorteil SVD: Numerisch stabil auch bei fast-singulären Matrizen
+            (A - λI ist per Definition singulär → Gauss-Elimination instabil).
+
+        @return Liste von Tupeln (eigenwert, eigenvektor_als_Vector)
+                Eigenvektoren sind normiert (||v|| = 1).
+        @raises ValueError Wenn Matrix nicht quadratisch.
+        @lastModified: 2026-03-08
+        """
+        if self.rows != self.cols:
+            raise ValueError("Eigenvektoren nur für quadratische Matrizen definiert")
+
+        eigenvals = self.eigenvalues()
+        result = []
+        A_np = np.array(self._data, dtype=float)
+
+        for lam in eigenvals:
+            # (A - λI) bilden: B = A - λ·I
+            lam_real = lam.real if hasattr(lam, 'real') else float(lam)
+            B = A_np - lam_real * np.eye(self.rows)
+
+            # SVD von B: B = U·Σ·Vᵀ
+            # Eigenvektor = letzte Spalte von V (kleinster Singulärwert → Kern)
+            _, _, Vt = np.linalg.svd(B)
+            eigenvec_arr = Vt[-1]  # Letzte Zeile von Vᵀ = letzter rechter Singulärvektor
+
+            # Normieren (SVD liefert bereits normierte Vektoren, aber sicherheitshalber)
+            norm = np.linalg.norm(eigenvec_arr)
+            if norm > 1e-14:
+                eigenvec_arr = eigenvec_arr / norm
+
+            # In internen Vector-Typ konvertieren
+            eigenvec = Vector(eigenvec_arr.tolist())
+            result.append((complex(lam_real), eigenvec))
+
+        return result
+
     def __repr__(self) -> str:
         rows_str = '\n  '.join(str(row) for row in self._data)
         return f"Matrix([\n  {rows_str}\n])"

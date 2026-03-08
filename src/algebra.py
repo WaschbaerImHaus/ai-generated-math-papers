@@ -501,3 +501,72 @@ def euler_phi(n: int) -> int:
         result -= result // temp
 
     return result
+
+
+# =============================================================================
+# RSA-KRYPTOSYSTEM
+# =============================================================================
+
+def rsa_keygen(p: int, q: int) -> tuple:
+    """
+    @brief Erzeugt RSA-Schlüsselpaar aus zwei Primzahlen.
+
+    RSA (Rivest–Shamir–Adleman, 1977) ist das bekannteste Public-Key-Kryptosystem.
+    Sicherheit beruht auf der Schwierigkeit der Primfaktorzerlegung großer Zahlen.
+
+    Schlüsselerzeugung:
+        1. n = p·q (Modulus)
+        2. λ(n) = lcm(p-1, q-1)  (Carmichael-Funktion, hier vereinfacht: φ(n))
+        3. e wählen: 1 < e < φ(n), gcd(e, φ(n)) = 1  (oft e = 65537)
+        4. d = e⁻¹ mod φ(n)  (privater Exponent via erweitertem eukl. Algorithmus)
+
+    Korrektheit: m^{ed} ≡ m (mod n)  für alle m mit gcd(m,n)=1  (Euler-Satz)
+
+    @param p: Erste Primzahl
+    @param q: Zweite Primzahl (p ≠ q)
+    @return: ((e, n), (d, n)) – (public_key, private_key)
+    @lastModified: 2026-03-08
+    """
+    n = p * q
+    phi_n = (p - 1) * (q - 1)  # Eulersche Phi-Funktion für n = p*q
+
+    # Öffentlichen Exponenten e wählen: gcd(e, phi_n) = 1
+    # Standard: e = 65537; für kleine n kleinere Werte probieren
+    e = 65537
+    if math.gcd(e, phi_n) != 1:
+        # Fallback: kleinstes e > 1 mit gcd(e, phi_n) = 1
+        e = 2
+        while e < phi_n and math.gcd(e, phi_n) != 1:
+            e += 1
+
+    # Privaten Exponenten d = e⁻¹ mod phi_n berechnen
+    d = mod_inverse(e, phi_n)
+
+    return (e, n), (d, n)
+
+
+def rsa_encrypt(message: int, public_key: tuple) -> int:
+    """
+    @brief RSA-Verschlüsselung: c = m^e mod n.
+
+    @param message: Klartextnachricht als ganze Zahl (0 ≤ m < n)
+    @param public_key: (e, n) – öffentlicher Schlüssel
+    @return: Chiffretext c
+    @lastModified: 2026-03-08
+    """
+    e, n = public_key
+    # pow(m, e, n) nutzt schnelle modulare Exponentiation (Square-and-Multiply)
+    return pow(message, e, n)
+
+
+def rsa_decrypt(ciphertext: int, private_key: tuple) -> int:
+    """
+    @brief RSA-Entschlüsselung: m = c^d mod n.
+
+    @param ciphertext: Chiffretext c
+    @param private_key: (d, n) – privater Schlüssel
+    @return: Klartextnachricht m
+    @lastModified: 2026-03-08
+    """
+    d, n = private_key
+    return pow(ciphertext, d, n)

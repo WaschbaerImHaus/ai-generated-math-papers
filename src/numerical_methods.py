@@ -515,3 +515,125 @@ def simplex(c: list, A: list, b: list) -> tuple:
     f_opt = -tableau[m][-1]  # Zielfunktionswert (negiert wegen Maximierungsform)
 
     return x_opt, f_opt
+
+
+# ===========================================================================
+# BFGS QUASI-NEWTON OPTIMIERUNG
+# ===========================================================================
+
+def bfgs(
+    f: Callable,
+    x0: list,
+    tol: float = 1e-6,
+    max_iter: int = 1000,
+    h: float = 1e-5
+) -> tuple:
+    """
+    @brief BFGS (Broyden–Fletcher–Goldfarb–Shanno) quasi-Newton Optimierer.
+
+    Minimiert eine beliebige glatte Funktion f: ℝⁿ → ℝ ohne explizite Ableitungen.
+    BFGS approximiert die inverse Hesse-Matrix iterativ und konvergiert
+    superlinear (zwischen linear und quadratisch).
+
+    Mathematischer Hintergrund:
+        Newton-Update: x_{k+1} = x_k - H_k^{-1} · g_k
+        BFGS approximiert H^{-1} direkt als B_k und aktualisiert mit:
+            s = x_{k+1} - x_k
+            y = g_{k+1} - g_k
+            ρ = 1 / (yᵀs)
+            B_{k+1} = (I - ρ s yᵀ) B_k (I - ρ y sᵀ) + ρ s sᵀ
+
+    Wolfe-Bedingungen für Line Search:
+        f(x + α p) ≤ f(x) + c₁ α gᵀp    (Armijo/Suffizienz)
+        g(x + α p)ᵀp ≥ c₂ gᵀp           (Krümmung)
+
+    @param f: Zu minimierende Funktion f(x: list) → float
+    @param x0: Startpunkt als Liste
+    @param tol: Toleranz für Gradientnorm (Abbruchbedingung)
+    @param max_iter: Maximale Iterationsanzahl
+    @param h: Schrittweite für numerischen Gradienten
+    @return: (x_opt, f_opt) – Optimaler Punkt und Funktionswert
+    @lastModified: 2026-03-08
+    """
+    n = len(x0)
+    x = [float(v) for v in x0]
+
+    # Numerischer Gradient: zentrale Differenz O(h²)
+    def grad(x_):
+        g = []
+        for i in range(n):
+            xp = x_[:]
+            xm = x_[:]
+            xp[i] += h
+            xm[i] -= h
+            g.append((f(xp) - f(xm)) / (2.0 * h))
+        return g
+
+    # Einheitsmatrix als Start-Approximation für inverse Hesse (B ≈ H^{-1})
+    B = [[1.0 if i == j else 0.0 for j in range(n)] for i in range(n)]
+
+    g = grad(x)
+
+    for _ in range(max_iter):
+        # Gradientnorm prüfen (Abbruch wenn klein genug)
+        gnorm = math.sqrt(sum(gi**2 for gi in g))
+        if gnorm < tol:
+            break
+
+        # Abstiegsrichtung p = -B · g
+        p = [-sum(B[i][j] * g[j] for j in range(n)) for i in range(n)]
+
+        # Line Search mit Armijo-Bedingung (Backtracking)
+        alpha = 1.0
+        c1 = 1e-4
+        pg = sum(p[i] * g[i] for i in range(n))  # Skalarprod p·g
+        f_x = f(x)
+        for _ in range(50):
+            x_new = [x[i] + alpha * p[i] for i in range(n)]
+            if f(x_new) <= f_x + c1 * alpha * pg:
+                break
+            alpha *= 0.5
+        else:
+            # Kein hinreichender Abstieg gefunden → kleiner Schritt
+            x_new = [x[i] + 1e-8 * p[i] for i in range(n)]
+
+        # s = x_{k+1} - x_k
+        s = [x_new[i] - x[i] for i in range(n)]
+        g_new = grad(x_new)
+        # y = g_{k+1} - g_k
+        y = [g_new[i] - g[i] for i in range(n)]
+
+        # ρ = 1 / (yᵀs)
+        ys = sum(y[i] * s[i] for i in range(n))
+        if abs(ys) < 1e-15:
+            # Degenerate Update überspringen
+            x = x_new
+            g = g_new
+            continue
+
+        rho = 1.0 / ys
+
+        # BFGS-Update: B_{k+1} = (I - ρ s yᵀ) B_k (I - ρ y sᵀ) + ρ s sᵀ
+        # Zuerst: V = I - ρ y sᵀ  →  B_new = Vᵀ B V + ρ s sᵀ
+        # Effizient: Zwei Rang-1-Updates
+        # Temporär: B_mid = B - ρ (B y) sᵀ - ρ s (yᵀ B) + ρ² (yᵀ B y) s sᵀ + ρ s sᵀ
+        By = [sum(B[i][k] * y[k] for k in range(n)) for i in range(n)]
+        yBs = sum(y[i] * sum(B[i][j] * s[j] for j in range(n)) for i in range(n))
+
+        B_new = []
+        for i in range(n):
+            row = []
+            for j in range(n):
+                bij = B[i][j]
+                bij -= rho * By[i] * s[j]            # -ρ (By) sᵀ
+                bij -= rho * s[i] * sum(B[k][j] * y[k] for k in range(n))  # -ρ s (yᵀB)
+                bij += rho**2 * yBs * s[i] * s[j]    # +ρ² (yᵀBy) ssᵀ
+                bij += rho * s[i] * s[j]              # +ρ ssᵀ
+                row.append(bij)
+            B_new.append(row)
+
+        B = B_new
+        x = x_new
+        g = g_new
+
+    return x, float(f(x))

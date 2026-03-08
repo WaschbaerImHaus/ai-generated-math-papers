@@ -98,8 +98,8 @@ specialist-maths/
 │   ├── proof_theory.py           # Beweistheorie, Millennium-Probleme
 │   ├── fourier.py                # Fourier-Transformation (FFT)
 │   ├── numerical_methods.py      # Interpolation, Optimierung, Simplex
-│   └── build.txt                 # Build-Nummer (aktuell: 6)
-├── tests/                        # 318 Tests (100% grün)
+│   └── build.txt                 # Build-Nummer (aktuell: 8)
+├── tests/                        # 333 Tests (100% grün)
 ├── research/                     # Mathematische Notizen und Recherche
 ├── dev-log/                      # Entwicklungs-Tagebuch
 ├── debugging/                    # Debug-Skripte
@@ -119,8 +119,9 @@ specialist-maths/
 7. **Analytische Zahlentheorie**: π(x), Li(x), Primzahlsatz, Dirichlet-L-Reihen
 8. **Beweistheorie**: Collatz, Goldbach, Millennium-Probleme
 9. **Fourier-Analysis**: DFT/FFT, Fourier-Reihen, STFT, Fensterfunktionen
-10. **Numerische Methoden**: Interpolation (Lagrange/Newton/Splines), Simplex
+10. **Numerische Methoden**: Interpolation (Lagrange/Newton/Splines), BFGS, Simplex
+11. **Kryptographie**: RSA (Schlüsselerzeugung, Ver-/Entschlüsselung)
 
 ---
 *Autor: Kurt Ingwer*
-*Build: 6 | Stand: 2026-03-08 | Tests: 318/318 grün*
+*Build: 8 | Stand: 2026-03-08 | Tests: 333/333 grün*

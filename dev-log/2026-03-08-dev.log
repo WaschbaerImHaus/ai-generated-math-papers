@@ -98,3 +98,18 @@ die Millennium-Probleme des Clay Mathematics Institute).
 - Build-Nummer: 6
 Sun Mar  8 03:03:53 UTC 2026
 [2026-03-08 03:03:53] Build 7: .md-Dokumentationsdateien für alle 10 Python-Module erstellt (algebra, analysis, linear_algebra, statistics_math, ode, fourier, numerical_methods, proof_theory, complex_analysis, analytic_number_theory)
+
+2026-03-08 08:04 - Build 8 gestartet
+- Eigenvektoren (linear_algebra.py): Matrix.eigenvectors() via SVD-Kernel implementiert
+  - Für jeden Eigenwert λ: B = A - λI, Kern(B) via SVD (letzter rechter Singulärvektor)
+  - 5 neue Tests in tests/test_linear_algebra.py::TestEigenvectors – alle grün
+- BFGS quasi-Newton (numerical_methods.py): bfgs() implementiert
+  - Armijo-Backtracking Line Search, numerischer Gradient (zentrale Differenz h=1e-5)
+  - BFGS-Update: B_{k+1} = (I - ρ sy^T) B_k (I - ρ ys^T) + ρ ss^T
+  - Rosenbrock-Test mit x0=[-1,1] → Minimum (1,1) bestanden
+  - 5 neue Tests in tests/test_numerical_methods.py::TestBFGS – alle grün
+- RSA-Kryptosystem (algebra.py): rsa_keygen/rsa_encrypt/rsa_decrypt implementiert
+  - Euler-Phi-Funktion, modulares Inverses, schnelle modulare Exponentiation
+  - 5 neue Tests in tests/test_algebra.py::TestRSA – alle grün
+- Gesamttests: 333/333 grün
+- build.txt → 8
