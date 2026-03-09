@@ -835,6 +835,264 @@ def goldbach_circle_method_accuracy(n_max: int) -> list[dict]:
     return results
 
 
+# ===========================================================================
+# FAREY-FOLGEN (HARDY-LITTLEWOOD KREISMETHODE VERTIEFUNG)
+# ===========================================================================
+
+def farey_sequence(n: int) -> list[tuple]:
+    """
+    Erzeugt die Farey-Folge F_n.
+
+    Die Farey-Folge F_n enthält alle reduzierten Brüche p/q mit:
+        0 ≤ p/q ≤ 1,  gcd(p, q) = 1,  1 ≤ q ≤ n
+    in aufsteigender Reihenfolge.
+
+    Beispiele:
+        F_1 = {0/1, 1/1}
+        F_2 = {0/1, 1/2, 1/1}
+        F_3 = {0/1, 1/3, 1/2, 2/3, 1/1}
+
+    Wichtige Eigenschaften:
+        - |F_n| = 1 + Σ_{k=1}^n φ(k)  (φ = Euler'sche Phi-Funktion)
+        - Benachbarte Brüche a/b, c/d ∈ F_n erfüllen: |ad - bc| = 1
+        - Medianten: Wenn a/b, c/d benachbart in F_n, ist ihr Mediant (a+c)/(b+d)
+          der erste neue Bruch, der bei F_{b+d} zwischen ihnen erscheint
+
+    In der Kreismethode: Farey-Folge teilt den Einheitskreis in Bögen ein,
+    die für die Hauptbogen- und Nebenbogenanalyse verwendet werden.
+
+    Effiziente Konstruktion via Stern-Brocot-ähnlichem Algorithmus:
+    Startet mit (0/1, 1/1), generiert schrittweise neue Elemente via
+    Mediantenregel.
+
+    @param n: Ordnung der Farey-Folge (n ≥ 1)
+    @return: Liste von (p, q) Tupeln, aufsteigend sortiert nach p/q
+    @raises ValueError: Wenn n < 1
+    @lastModified: 2026-03-09
+    """
+    if n < 1:
+        raise ValueError(f"n muss ≥ 1 sein, erhalten: {n}")
+
+    # Effiziente Konstruktion: Starte mit a/b=0/1, c/d=1/1
+    # Nutze die Eigenschaft: Wenn a/b und c/d benachbarte Elemente von F_n sind,
+    # dann ist der nächste Term nach c/d gegeben durch:
+    #   floor((b + n) / d) * c - a, floor((b + n) / d) * d - b
+    result = [(0, 1)]  # Start: 0/1
+    a, b = 0, 1       # Aktueller Bruch
+    c, d = 1, n       # Nächster Bruch (1/n ist nach 0/1)
+
+    # Füge c/d direkt ein (falls n > 1, ist 1/n der zweite Bruch)
+    while (c, d) != (1, 1):
+        result.append((c, d))
+        # Berechne nächsten Bruch via Medianten-Algorithmus
+        k = (b + n) // d
+        a_new = k * c - a
+        b_new = k * d - b
+        a, b = c, d
+        c, d = a_new, b_new
+
+    result.append((1, 1))  # Ende: 1/1
+    return result
+
+
+def farey_mediant(a: tuple, b: tuple) -> tuple:
+    """
+    Berechnet den Medianten zweier Farey-Brüche.
+
+    Der Mediant von p/q und r/s ist definiert als (p+r)/(q+s).
+    Er liegt stets zwischen den beiden Brüchen:
+        p/q < (p+r)/(q+s) < r/s  (falls p/q < r/s)
+
+    In der Farey-Folge: Wenn a/b und c/d benachbarte Elemente von F_n sind,
+    erscheint ihr Mediant (a+c)/(b+d) als neues Element in F_{b+d}.
+
+    @param a: Tupel (p, q) – erster Bruch p/q
+    @param b: Tupel (r, s) – zweiter Bruch r/s
+    @return: Tupel (p+r, q+s) – Mediant
+    @lastModified: 2026-03-09
+    """
+    p, q = a
+    r, s = b
+    # Mediant: (p+r)/(q+s) (ist i.A. nicht reduziert, aber das ist korrekt für Farey-Theorie)
+    return (p + r, q + s)
+
+
+def farey_neighbors(n: int, p: int, q: int) -> tuple:
+    """
+    Findet die Nachbarn von p/q in der Farey-Folge F_n.
+
+    Für einen Bruch p/q ∈ F_n gibt es eindeutige linke und rechte Nachbarn
+    a/b (links) und c/d (rechts), so dass:
+        a/b < p/q < c/d   und   |pd - qc| = 1 = |bp - aq|
+
+    Die Nachbarn lassen sich via dem erweiterten Euklidischen Algorithmus finden:
+        Löse bx - ay = 1  →  linker Nachbar
+        Löse cx - dp = 1  →  rechter Nachbar
+
+    @param n: Ordnung der Farey-Folge
+    @param p: Zähler des Bruchs p/q
+    @param q: Nenner des Bruchs p/q (mit gcd(p,q)=1, 1 ≤ q ≤ n)
+    @return: Tupel ((p1, q1), (p2, q2)) – linker und rechter Nachbar
+    @raises ValueError: Wenn q > n oder gcd(p,q) ≠ 1
+    @lastModified: 2026-03-09
+    """
+    if q > n:
+        raise ValueError(f"q={q} > n={n}: Bruch {p}/{q} liegt nicht in F_{n}")
+    if math.gcd(p, q) != 1:
+        raise ValueError(f"gcd({p},{q}) ≠ 1: Bruch {p}/{q} ist nicht reduziert")
+
+    # Erzeuge die vollständige Farey-Folge und suche Nachbarn
+    # Für große n effizienter: Nutzung des Stern-Brocot-Baums
+    # Hier: direkte Suche in der generierten Folge
+    seq = farey_sequence(n)
+
+    # Suche p/q in der Folge
+    target_val = p / q if q != 0 else float('inf')
+    idx = None
+    for i, (a, b) in enumerate(seq):
+        val = a / b if b != 0 else float('inf')
+        if a == p and b == q:
+            idx = i
+            break
+
+    if idx is None:
+        raise ValueError(f"Bruch {p}/{q} nicht in F_{n} gefunden")
+
+    # Linker und rechter Nachbar
+    left = seq[idx - 1] if idx > 0 else seq[0]
+    right = seq[idx + 1] if idx < len(seq) - 1 else seq[-1]
+
+    return (left, right)
+
+
+def farey_arc_length(n: int) -> float:
+    """
+    Berechnet die normierte Bogenlängensumme der Farey-Bögen.
+
+    In der Kreismethode (Hardy-Littlewood) wird der Einheitskreis durch
+    Farey-Bögen aufgeteilt. Die "Länge" eines Farey-Bogens um a/q ist
+    proportional zu 1/q².
+
+    Definition:
+        L(F_n) = Σ_{a/q ∈ F_n} 1/q²
+
+    Diese Summe ist proportional zur Gesamtbogenlänge, die für die
+    Schätzung der Fehlerterme in der Kreismethode benötigt wird.
+
+    Asymptotik: L(F_n) ~ ln(n)/n für große n
+
+    @param n: Ordnung der Farey-Folge
+    @return: Summe Σ 1/q² über alle Elemente der Farey-Folge
+    @raises ValueError: Wenn n < 1
+    @lastModified: 2026-03-09
+    """
+    if n < 1:
+        raise ValueError(f"n muss ≥ 1 sein, erhalten: {n}")
+
+    seq = farey_sequence(n)
+    # Summiere 1/q² für jeden Bruch p/q in der Farey-Folge
+    total = sum(1.0 / (q * q) for _, q in seq)
+    return total
+
+
+def major_minor_arcs(n: int, N: int) -> dict:
+    """
+    Teilt die Farey-Folge F_N in Haupt- und Nebenbögen auf.
+
+    In der Hardy-Littlewood-Kreismethode unterscheidet man:
+    - Hauptbögen (major arcs): Bögen um rationale Punkte a/q mit kleinem Nenner q ≤ n
+      Hier liefert die exponentielle Summe S(α) ≈ μ(q)/φ(q) · v(n, α-a/q)
+      den Hauptbeitrag (gut approximierbar)
+    - Nebenbögen (minor arcs): alle restlichen Bögen mit n < q ≤ N
+      Hier ist S(α) klein (Weyl-Schranken), Beitrag wird abgeschätzt
+
+    Die Aufteilung hängt von der Problemstellung ab:
+    - Für Goldbach (r=2): n ~ N^{1/2} (grob), N ~ ln(n)^B
+
+    @param n: Schwellenwert für Haupt-/Nebenbögen (Nenner ≤ n = Hauptbogen)
+    @param N: Ordnung der Farey-Folge F_N
+    @return: Dictionary mit:
+             'major': Liste (p,q) mit q ≤ n (Hauptbögen)
+             'minor': Liste (p,q) mit n < q ≤ N (Nebenbögen)
+             'fraction_major': Anteil der Hauptbögen
+    @raises ValueError: Wenn n < 1 oder N < n
+    @lastModified: 2026-03-09
+    """
+    if n < 1:
+        raise ValueError(f"n muss ≥ 1 sein, erhalten: {n}")
+    if N < n:
+        raise ValueError(f"N={N} muss ≥ n={n} sein")
+
+    seq = farey_sequence(N)
+
+    # Teile in Haupt- und Nebenbögen auf
+    major = [(p, q) for (p, q) in seq if q <= n]
+    minor = [(p, q) for (p, q) in seq if q > n]
+
+    total = len(seq)
+    fraction_major = len(major) / total if total > 0 else 0.0
+
+    return {
+        'major': major,
+        'minor': minor,
+        'fraction_major': fraction_major
+    }
+
+
+def goldbach_circle_method_full(n: int, farey_order: int = 10) -> dict:
+    """
+    Vollständige Hardy-Littlewood-Analyse für die Goldbach-Vermutung für n.
+
+    Kombiniert alle Komponenten der Kreismethode:
+    1. Farey-Folge F_{farey_order}: Gitterpunkte auf dem Einheitskreis
+    2. Haupt-/Nebenbögen: Unterteilung der Farey-Bögen
+    3. Singuläre Reihe S(n): Lokale Lösungsdichte
+    4. Hardy-Littlewood-Schätzung: r_2(n) ≈ C₂ · n/ln(n)² · S(n)
+    5. Tatsächliche Goldbach-Zerlegungen (exakt)
+
+    Die Theorie besagt (Hardy-Littlewood, 1923, bedingt auf GRH):
+        r_2(n) ~ 2·C₂·n/ln(n)² · S(n)  für n → ∞
+    wobei die Hauptbögen den dominanten Beitrag liefern.
+
+    @param n: Gerade positive ganze Zahl ≥ 4 (zu analysierendes Goldbach-n)
+    @param farey_order: Ordnung der Farey-Folge (Granularität der Zerlegung)
+    @return: Dictionary mit:
+             'singular_series': S(n) (singuläre Reihe)
+             'circle_estimate': Hardy-Littlewood-Schätzung r_2(n)
+             'actual_count': tatsächliche Anzahl Goldbach-Zerlegungen
+             'major_arc_count': Anzahl der Hauptbögen
+             'farey_sequence_size': |F_{farey_order}|
+    @raises ValueError: Wenn n ungerade oder n < 4
+    @lastModified: 2026-03-09
+    """
+    if n < 4 or n % 2 != 0:
+        raise ValueError(f"n muss gerade und ≥ 4 sein, erhalten: {n}")
+
+    # 1. Singuläre Reihe berechnen
+    S_n = hardy_littlewood_singular_series(n)
+
+    # 2. Hardy-Littlewood-Schätzung
+    estimate = goldbach_circle_method_estimate(n)
+
+    # 3. Tatsächliche Goldbach-Zerlegungen (exakt)
+    actual_count = len(goldbach_all_decompositions(n))
+
+    # 4. Farey-Folge aufbauen und in Haupt-/Nebenbögen aufteilen
+    farey_seq = farey_sequence(farey_order)
+
+    # Schwellenwert für Hauptbögen: sqrt(farey_order) (übliche Wahl)
+    threshold = max(1, int(math.isqrt(farey_order)))
+    arcs = major_minor_arcs(threshold, farey_order)
+
+    return {
+        'singular_series': S_n,
+        'circle_estimate': estimate,
+        'actual_count': actual_count,
+        'major_arc_count': len(arcs['major']),
+        'farey_sequence_size': len(farey_seq)
+    }
+
+
 def conjecture_status_report() -> dict:
     """
     Gibt eine Übersicht über alle bekannten offenen Vermutungen zurück.

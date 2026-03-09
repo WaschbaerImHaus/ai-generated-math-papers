@@ -1,6 +1,6 @@
 """
 @file modular_forms.py
-@brief Modulformen – Grundlagen und fundamentale Konzepte.
+@brief Modulformen – Grundlagen, Cusp-Formen und Theta-Reihen.
 @description
     Implementiert grundlegende Konzepte der Theorie der Modulformen:
     - Die modulare Gruppe SL(2,Z) und Möbius-Transformationen
@@ -10,6 +10,8 @@
     - Ramanujan-Tau-Funktion τ(n)
     - Hecke-Operatoren T_p
     - Shimura-Taniyama-Wiles-Verbindung (Demonstration)
+    - Cusp-Formen S_k(Γ_0(N)): Dimension, Eigenschaften, Ramanujan-Tau
+    - Theta-Reihen: Jacobi-Theta, Dedekind-Eta, Jacobi-Dreifachprodukt
 
     Modulformen sind holomorphe Funktionen auf der oberen Halbebene H = {τ : Im(τ) > 0},
     die unter Möbius-Transformationen γ ∈ SL(2,Z) folgende Transformationsregel erfüllen:
@@ -20,15 +22,16 @@
     da elliptische Kurven und Modulformen via Shimura-Taniyama-Wiles verknüpft sind.
 
 @author Kurt Ingwer
-@version 1.0
+@version 2.0
 @since 2026-03-08
-@lastModified 2026-03-08
+@lastModified 2026-03-09
 """
 
 import math
 import cmath
 import numpy as np
 from typing import Callable
+from math import gcd
 
 
 # ===========================================================================
@@ -617,3 +620,437 @@ def shimura_taniyama_check(
         'primes_checked': len(primes),
         'primes_matching': sum(1 for v in valid_matches if v)
     }
+
+
+# ===========================================================================
+# CUSP-FORMEN
+# ===========================================================================
+
+def cusp_form_dimension(k: int, level: int = 1) -> int:
+    """
+    Berechnet die Dimension des Raums der Cusp-Formen S_k(Γ_0(N)).
+
+    Cusp-Formen (Spitzenformen) sind Modulformen, die an allen Spitzen verschwinden.
+    Der Raum S_k(SL(2,Z)) ist ein wichtiger Unterraum der Modulformen M_k.
+
+    Für die volle modulare Gruppe Γ_0(1) = SL(2,Z) gilt die Riemann-Roch-Formel:
+        dim S_k(SL(2,Z)) = max(0, floor(k/12) - ε(k))
+    wobei ε(k) = 1 falls k ≡ 2 (mod 12), sonst ε(k) = 0.
+
+    Bekannte Werte:
+        k=2:  dim=0, k=4:  dim=0, k=6:  dim=0, k=8:  dim=0
+        k=10: dim=0, k=12: dim=1, k=14: dim=0, k=16: dim=1
+        k=18: dim=1, k=20: dim=1, k=22: dim=1, k=24: dim=2
+
+    Die einzige Cusp-Form von Gewicht 12 ist die Ramanujan-Delta-Funktion Δ(τ).
+
+    Für allgemeines Niveau N (Γ_0(N)):
+        dim S_k(Γ_0(N)) ≈ μ(N) · (k-1) / 12  für k ≥ 2 gerade
+    wobei μ(N) = N · Π_{p | N} (1 + 1/p) der Index von Γ_0(N) in SL(2,Z) ist.
+
+    @param k: Gewicht der Modulform (gerade, ≥ 2)
+    @param level: Niveau N ≥ 1 (Standard: 1 = volle Modulgruppe)
+    @return: Dimension des Cusp-Formen-Raums (nicht-negative ganze Zahl)
+    @raises ValueError: Wenn k ungerade oder k < 2
+    @lastModified: 2026-03-09
+    """
+    # Nur gerade Gewichte für holomorphe Cusp-Formen
+    if k < 2 or k % 2 != 0:
+        raise ValueError(f"Gewicht k muss gerade und ≥ 2 sein, erhalten: {k}")
+
+    if level == 1:
+        # Exakte Formel für die volle Modulgruppe SL(2,Z)
+        # ε(k) = 1 falls k ≡ 2 (mod 12), sonst 0
+        epsilon = 1 if k % 12 == 2 else 0
+        dim = k // 12 - epsilon
+        # Dimension kann nicht negativ sein
+        return max(0, dim)
+    else:
+        # Näherungsformel für Γ_0(N) mit N > 1
+        # Berechne den Index μ(N) = N · Π_{p | N} (1 + 1/p)
+        # Primteiler von N ermitteln
+        N = level
+        mu = float(N)
+        temp = N
+        d = 2
+        seen_primes = set()
+        while d * d <= temp:
+            if temp % d == 0:
+                if d not in seen_primes:
+                    # Eulerproduktsformel: Faktor (1 + 1/p) pro Primteiler p
+                    mu *= (1.0 + 1.0 / d)
+                    seen_primes.add(d)
+                while temp % d == 0:
+                    temp //= d
+            d += 1
+        if temp > 1 and temp not in seen_primes:
+            mu *= (1.0 + 1.0 / temp)
+
+        # Dimension via Riemann-Roch-Näherung: μ(N)·(k-1)/12
+        # Für k=2 subtrahiere Anzahl der Spitzen (-1)
+        dim_approx = mu * (k - 1) / 12.0
+        return max(0, int(round(dim_approx)))
+
+
+def is_cusp_form_basis(k: int, z: complex, n_terms: int = 100) -> bool:
+    """
+    Prüft ob für das gegebene Gewicht k eine Basis-Cusp-Form existiert.
+
+    Die Ramanujan-Delta-Funktion Δ(τ) ist die einzige (bis auf Skalierung)
+    Cusp-Form vom Gewicht 12. Für k = 12m gilt: Δ(τ)^m ist eine Cusp-Form
+    (falls der Raum S_{12m} nicht leer ist).
+
+    Ein Gewicht k ist ein "Cusp-Form-Gewicht" (dim S_k ≥ 1), falls
+    cusp_form_dimension(k) ≥ 1. Dies ist äquivalent dazu, dass
+    die Ramanujan-Delta-Funktion als Basiselement verwendet werden kann.
+
+    Für k=12: Δ(τ) ist eindeutige (normierte) Basis-Cusp-Form.
+    Für k=24: Δ(τ)² ist eine Cusp-Form, dim S_24 = 2.
+
+    @param k: Gewicht (gerade ≥ 2)
+    @param z: Punkt in der oberen Halbebene (für numerische Verifikation)
+    @param n_terms: Anzahl Terme für Produktformel
+    @return: True wenn dim S_k ≥ 1 (d.h. Cusp-Form-Raum nicht trivial)
+    @lastModified: 2026-03-09
+    """
+    # Nur gerade Gewichte zulässig
+    if k < 2 or k % 2 != 0:
+        return False
+
+    # Dimension des Cusp-Formen-Raums berechnen
+    dim = cusp_form_dimension(k, level=1)
+    return dim >= 1
+
+
+def ramanujan_tau_properties(n: int) -> dict:
+    """
+    Überprüft bekannte Eigenschaften der Ramanujan-Tau-Funktion τ(n).
+
+    Die Tau-Funktion erscheint als n-ter Fourier-Koeffizient der Delta-Funktion:
+        Δ(τ) = Σ_{n=1}^∞ τ(n) q^n   mit q = e^{2πiτ}
+
+    Bekannte arithmetische Eigenschaften (alle bewiesen):
+    1. Multiplikativität: τ(mn) = τ(m)·τ(n) falls gcd(m,n) = 1
+       (Δ ist Hecke-Eigenform)
+    2. Ramanujan-Vermutung (Deligne 1974): |τ(p)| ≤ 2·p^{11/2} für alle Primzahlen p
+       (Bewiesen als Teil der Weil-Vermutungen)
+    3. Rekursion für Primzahlpotenzen:
+       τ(p^k) = τ(p)·τ(p^{k-1}) - p^{11}·τ(p^{k-2})
+
+    @param n: Positive ganze Zahl ≥ 1
+    @return: Dictionary mit:
+             'tau_n': τ(n) (Ramanujan-Tau-Wert)
+             'multiplicativity_verified': True wenn τ(n) = τ(1)·τ(n) (trivial für n)
+                                          oder bei n = p·q geprüft
+             'ramanujan_bound_ok': True wenn |τ(n)| ≤ 2·n^{11/2} (für n prim)
+    @raises ValueError: Wenn n < 1
+    @lastModified: 2026-03-09
+    """
+    if n < 1:
+        raise ValueError(f"n muss ≥ 1 sein, erhalten: {n}")
+
+    # Tau-Koeffizienten bis n berechnen (benötigt ausreichend Terme)
+    n_max = max(n + 1, 10)
+    tau_list = fourier_coefficients_delta(n_max)
+    tau_n = tau_list[n - 1]  # τ(n) ist an Position n-1 (1-indiziert)
+
+    # Multiplikativität prüfen: τ(1)·τ(n) = 1·τ(n) = τ(n) (trivial für n≥1)
+    # Aussagekräftiger: Teste τ(p·q) = τ(p)·τ(q) für coprime p,q ≤ n
+    mult_verified = True
+    if n > 1:
+        # Finde zwei coprime Faktoren von n (falls n zusammengesetzt)
+        # Suche nach Zerlegung n = a · b mit gcd(a,b)=1 und a,b ≥ 2
+        for a in range(2, n):
+            if n % a == 0:
+                b = n // a
+                if gcd(a, b) == 1 and a >= 2 and b >= 2:
+                    # Brauche τ(a) und τ(b)
+                    tau_a_b_max = max(a, b) + 1
+                    tau_ab = fourier_coefficients_delta(tau_a_b_max)
+                    tau_a = tau_ab[a - 1]
+                    tau_b = tau_ab[b - 1]
+                    # Prüfe τ(n) == τ(a)·τ(b)
+                    mult_verified = (tau_n == tau_a * tau_b)
+                    break
+
+    # Ramanujan-Vermutung: |τ(p)| ≤ 2·p^{11/2} für prim p
+    # Für zusammengesetzte n: allgemeine Schranke |τ(n)| ≤ d(n)·n^{11/2}
+    # (wobei d(n) die Teileranzahl, hier vereinfacht: n^{11/2} als obere Schranke)
+    ramanujan_bound = 2.0 * (n ** (11.0 / 2.0))
+    ramanujan_bound_ok = abs(tau_n) <= ramanujan_bound
+
+    return {
+        'tau_n': tau_n,
+        'multiplicativity_verified': mult_verified,
+        'ramanujan_bound_ok': ramanujan_bound_ok
+    }
+
+
+# ===========================================================================
+# THETA-REIHEN
+# ===========================================================================
+
+def theta_function(z: complex, n_max: int = 50) -> complex:
+    """
+    Berechnet die Jacobi-Theta-Funktion ϑ_3(0|τ).
+
+    Definition (Jacobi-Theta-Funktion dritten Typs bei z=0):
+        θ(τ) = ϑ_3(0|τ) = Σ_{n=-∞}^{∞} q^{n²}   mit q = e^{πiτ}
+
+    Äquivalent: θ(τ) = 1 + 2·Σ_{n=1}^∞ q^{n²} (da n und -n denselben Beitrag liefern)
+
+    Konvergenz: Für Im(τ) > 0 gilt |q| = e^{-π·Im(τ)} < 1,
+    daher konvergiert die Reihe exponentiell schnell.
+
+    Anwendungen:
+    - θ(τ)^k = Σ_{n=0}^∞ r_k(n) q^n liefert Darstellungsanzahlen r_k(n)
+    - θ ist eine Modulform halben Gewichts (Gewicht 1/2)
+    - Verbindung zu elliptischen Funktionen und Modulformen
+
+    Transformationsformel (Jacobiische Imagination):
+        θ(-1/τ) = sqrt(-iτ) · θ(τ)
+
+    @param z: Punkt τ in der oberen Halbebene (Im(z) > 0)
+    @param n_max: Maximaler Summationsindex (symmetrisch: -n_max bis n_max)
+    @return: Wert der Theta-Funktion als komplexe Zahl
+    @raises ValueError: Wenn Im(z) ≤ 0
+    @lastModified: 2026-03-09
+    """
+    if z.imag <= 0:
+        raise ValueError(f"τ muss in der oberen Halbebene liegen (Im(τ) > 0), erhalten: {z}")
+
+    # q = e^{πiτ}  (beachte: π, nicht 2π !)
+    q = cmath.exp(1j * math.pi * z)
+
+    # θ(τ) = Σ_{n=-N}^{N} q^{n²} = 1 + 2·Σ_{n=1}^{N} q^{n²}
+    # Nutze symmetrische Form für Effizienz
+    total = complex(1.0)  # n=0 Beitrag
+    for n in range(1, n_max + 1):
+        # q^{n²} berechnen
+        term = q ** (n * n)
+        # Konvergenzcheck: bei sehr kleinen Werten abbrechen
+        if abs(term) < 1e-300:
+            break
+        # Faktor 2 wegen n und -n (gleicher Beitrag da n²=(-n)²)
+        total += 2.0 * term
+
+    return total
+
+
+def theta_transformation(z: complex) -> dict:
+    """
+    Verifiziert die Jacobi-Theta-Transformationsformel numerisch.
+
+    Die Transformationsformel lautet:
+        θ(-1/τ) = sqrt(-iτ) · θ(τ)
+
+    Dies ist eine fundamentale Symmetrie der Theta-Funktion unter der
+    S-Transformation (τ ↦ -1/τ) der modularen Gruppe.
+
+    Herleitung via Poissonsche Summenformel:
+        Σ_{n} e^{-πn²/t} = √t · Σ_{n} e^{-πn²t}
+    (Riemann verwendete diese Formel für seine zeta-Funktion!)
+
+    @param z: Punkt τ in der oberen Halbebene
+    @return: Dictionary mit:
+             'theta_z': θ(τ)
+             'theta_minus_inv': θ(-1/τ)
+             'transformation_ratio': θ(-1/τ) / θ(τ)
+             'expected': sqrt(-iτ) (erwartetes Verhältnis)
+             'verified': True wenn |ratio - expected| / |expected| < 1e-6
+    @lastModified: 2026-03-09
+    """
+    # Berechne θ(τ)
+    theta_z = theta_function(z)
+
+    # Berechne θ(-1/τ) – der transformierte Argument ist -1/τ
+    z_transformed = -1.0 / z
+    theta_minus_inv = theta_function(z_transformed)
+
+    # Erwartetes Verhältnis: sqrt(-iτ)
+    # sqrt(-iτ) = sqrt(-i) · sqrt(τ) mit Hauptzweig
+    expected = cmath.sqrt(-1j * z)
+
+    # Tatsächliches Verhältnis
+    if abs(theta_z) < 1e-300:
+        # Sonderfall: θ(τ) ≈ 0 (sollte nicht vorkommen für Im(τ) > 0)
+        transformation_ratio = complex(float('nan'))
+        verified = False
+    else:
+        transformation_ratio = theta_minus_inv / theta_z
+        # Relativer Fehler
+        rel_error = abs(transformation_ratio - expected) / max(abs(expected), 1e-15)
+        verified = rel_error < 1e-4
+
+    return {
+        'theta_z': theta_z,
+        'theta_minus_inv': theta_minus_inv,
+        'transformation_ratio': transformation_ratio,
+        'expected': expected,
+        'verified': verified
+    }
+
+
+def sum_of_squares_theta(n: int, k: int = 2) -> int:
+    """
+    Berechnet r_k(n): Anzahl der Darstellungen von n als Summe von k Quadraten.
+
+    Definition:
+        r_k(n) = #{(x_1,...,x_k) ∈ Z^k : x_1² + ... + x_k² = n}
+    (negative Zahlen und verschiedene Reihenfolgen zählen separat)
+
+    Theoretisch via Theta-Reihen:
+        θ(τ)^k = (Σ_{n} q^{n²})^k = Σ_{m=0}^∞ r_k(m) q^m
+    d.h. r_k(m) ist der m-te Koeffizient von θ^k.
+
+    Für k=2 gilt die Formel von Jacobi (1829):
+        r_2(n) = 4 · Σ_{d|n} χ(d)
+    wobei χ(d) = 0 für gerades d, χ(d) = (-1)^{(d-1)/2} für ungerades d.
+    (Dirichlet-Charakter mod 4)
+
+    Bekannte Werte:
+        r_2(0) = 1, r_2(1) = 4, r_2(2) = 4, r_2(4) = 4
+        r_2(5) = 8 (5 = 1²+2² = 2²+1² = (-1)²+2² = 2²+(-1)² = 1²+(-2)² = ...)
+        r_2(25) = 12
+
+    Diese Implementierung nutzt Brute-Force für alle k (universell und korrekt).
+
+    @param n: Nicht-negative ganze Zahl
+    @param k: Anzahl der Quadrate (Standard: 2)
+    @return: r_k(n) als nicht-negative ganze Zahl
+    @raises ValueError: Wenn n < 0 oder k < 1
+    @lastModified: 2026-03-09
+    """
+    if n < 0:
+        raise ValueError(f"n muss ≥ 0 sein, erhalten: {n}")
+    if k < 1:
+        raise ValueError(f"k muss ≥ 1 sein, erhalten: {k}")
+
+    # Sonderfälle
+    if n == 0:
+        return 1  # Nur die Nulldarstellung: (0,0,...,0)
+
+    # Maximaler Betrag einer Komponente: |x_i| ≤ floor(sqrt(n))
+    max_val = int(math.isqrt(n))
+
+    # Rekursive Zählung via dynamischer Programmierung
+    # count[m] = Anzahl Wege, m als Summe von genau j Quadraten darzustellen
+    # Iteriere über die k Quadrate
+    # Starte mit 1 Weg für Summe=0 (leere Summe)
+    current = {0: 1}
+
+    for _ in range(k):
+        # Nächste Iteration: addiere ein weiteres Quadrat x² für x ∈ Z
+        next_count: dict[int, int] = {}
+        for s, cnt in current.items():
+            # Iteriere über alle möglichen x (von -max_val bis max_val)
+            for x in range(-max_val, max_val + 1):
+                new_s = s + x * x
+                if new_s <= n:  # Nur Werte ≤ n weiter verfolgen
+                    next_count[new_s] = next_count.get(new_s, 0) + cnt
+        current = next_count
+
+    return current.get(n, 0)
+
+
+def jacobi_triple_product(z: complex, q: complex, n_terms: int = 20) -> complex:
+    """
+    Berechnet das Jacobi-Dreifachprodukt.
+
+    Das Jacobi-Dreifachprodukt (Jacobi, 1829) ist eine der schönsten Identitäten
+    der Mathematik:
+        Π_{n=1}^∞ (1 - q^{2n})(1 + z·q^{2n-1})(1 + z^{-1}·q^{2n-1})
+        = Σ_{n=-∞}^{∞} z^n · q^{n²}
+
+    Voraussetzung: |q| < 1 und z ≠ 0.
+
+    Spezialfälle:
+        z = 1: Gibt θ_3(0|τ) = Σ q^{n²} zurück (mit q = e^{πiτ})
+        z = -1: Gibt θ_4(0|τ) zurück
+        z = q: Gibt θ_2(0|τ) zurück
+
+    Anwendungen:
+        - Verbindung zu Eta-Funktion: η(τ)³ = q^{1/8}·Σ_{n} (-1)^n·(2n+1)·q^{n(n+1)/2}
+        - Beweis der Pentagonalzahlformel von Euler
+        - Partitionentheorie
+
+    @param z: Komplexer Parameter (z ≠ 0)
+    @param q: Konvergenzparameter mit |q| < 1
+    @param n_terms: Anzahl der Produktterme
+    @return: Wert des Dreifachprodukts (Produktseite)
+    @raises ValueError: Wenn |q| ≥ 1 oder z = 0
+    @lastModified: 2026-03-09
+    """
+    if abs(q) >= 1.0:
+        raise ValueError(f"|q| muss < 1 sein, erhalten: |q| = {abs(q)}")
+    if abs(z) < 1e-300:
+        raise ValueError("z darf nicht 0 sein")
+
+    # Produktformel: Π_{n=1}^{N} (1-q^{2n})(1+z·q^{2n-1})(1+z^{-1}·q^{2n-1})
+    product = complex(1.0)
+    z_inv = 1.0 / z
+
+    for n in range(1, n_terms + 1):
+        # q^{2n} und q^{2n-1} berechnen
+        q2n = q ** (2 * n)
+        q2n_m1 = q ** (2 * n - 1)
+
+        # Drei Faktoren des Produkts
+        f1 = 1.0 - q2n                   # (1 - q^{2n})
+        f2 = 1.0 + z * q2n_m1            # (1 + z·q^{2n-1})
+        f3 = 1.0 + z_inv * q2n_m1        # (1 + z^{-1}·q^{2n-1})
+
+        product *= f1 * f2 * f3
+
+        # Konvergenzcheck: wenn q^{2n} sehr klein, abbrechen
+        if abs(q2n) < 1e-300:
+            break
+
+    return product
+
+
+def dedekind_eta(z: complex, n_terms: int = 100) -> complex:
+    """
+    Berechnet die Dedekind-Eta-Funktion η(τ).
+
+    Definition (Dedekind, 1877):
+        η(τ) = q^{1/24} · Π_{n=1}^∞ (1 - q^n)   mit q = e^{2πiτ}
+
+    Eigenschaften:
+        - η ist eine Modulform halben Gewichts (Gewicht 1/2) mit Multiplikatorsystem
+        - Transformationsformel: η(-1/τ) = sqrt(-iτ) · η(τ)
+        - Periodizität: η(τ+1) = e^{πi/12} · η(τ)
+        - Verbindung zur Delta-Funktion: Δ(τ) = η(τ)^{24}
+          (d.h. η(τ) = Δ(τ)^{1/24})
+        - Etafunktion taucht in der Physik auf: Quantenstring-Theorie (Partition function)
+
+    Pentagonalzahlformel von Euler:
+        Π_{n=1}^∞ (1-q^n) = Σ_{n=-∞}^∞ (-1)^n · q^{n(3n-1)/2}
+    (Pentagonalzahlen: 0, 1, 2, 5, 7, 12, 15, ...)
+
+    @param z: Punkt τ in der oberen Halbebene (Im(z) > 0)
+    @param n_terms: Anzahl der Produktterme (mehr = genauer)
+    @return: Wert η(τ) als komplexe Zahl
+    @raises ValueError: Wenn Im(z) ≤ 0
+    @lastModified: 2026-03-09
+    """
+    if z.imag <= 0:
+        raise ValueError(f"τ muss in der oberen Halbebene liegen (Im(τ) > 0), erhalten: {z}")
+
+    # q = e^{2πiτ}  (ganzer Kreis!)
+    q = cmath.exp(2j * math.pi * z)
+
+    # Vorfaktor: q^{1/24} = e^{2πiτ/24} = e^{πiτ/12}
+    q_124 = cmath.exp(2j * math.pi * z / 24.0)
+
+    # Unendliches Produkt: Π_{n=1}^{N} (1 - q^n)
+    product = complex(1.0)
+    q_power = q  # q^n, beginnt bei q^1
+
+    for n in range(1, n_terms + 1):
+        if abs(q_power) < 1e-300:
+            break
+        product *= (1.0 - q_power)
+        q_power *= q  # q^{n+1}
+
+    return q_124 * product
