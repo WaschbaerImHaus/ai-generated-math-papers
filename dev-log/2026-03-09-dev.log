@@ -151,3 +151,109 @@ Test-Klassen test_farey_sequences:
 ---
 
 Build-Nummer wurde NICHT erhöht (laut Aufgabenstellung).
+
+---
+
+## 2026-03-09 20:14:29 Session – NumPy-Vektorisierung & sympify()-Härtung
+
+---
+
+### 2026-03-09 20:14:29 – AUFGABE 1a: NumPy-Vektorisierung statistics_math.py
+
+- `import numpy as np` hinzugefügt
+- `mean()`: `sum(data)/len(data)` → `float(np.mean(data))`
+- `variance()`: Python-Schleife `sum((x-mu)**2 ...)` → `float(np.var(data, ddof=ddof))`
+- `std_dev()`: `math.sqrt(variance())` → `float(np.std(data, ddof=ddof))` (eigene ValueError-Prüfung beibehalten)
+- `skewness()`: `sum((x-mu)**3 ...)` Schleife → `np.mean((arr - mu)**3)` vektorisiert
+- `kurtosis()`: `sum((x-mu)**4 ...)` Schleife → `np.mean((arr - mu)**4)` vektorisiert
+- Alle `@lastModified` auf 2026-03-09 aktualisiert
+- Tests: **48/48 grün**
+
+### 2026-03-09 20:14:29 – AUFGABE 1b: NumPy-Vektorisierung fourier.py
+
+- `window_hanning()`: list comprehension → `np.arange(n)` + `np.cos` vektorisiert
+- `window_hamming()`: list comprehension → `np.arange(n)` + `np.cos` vektorisiert
+- `window_blackman()`: list comprehension → `np.arange(n)` + 2x `np.cos` vektorisiert
+- `apply_window()`: `[x[k]*window[k] for k ...]` → `np.asarray * np.asarray` (elementweise)
+- `@lastModified` auf 2026-03-09 aktualisiert
+- Tests: **31/31 grün**
+
+### 2026-03-09 20:14:29 – AUFGABE 1c: NumPy-Vektorisierung numerical_methods.py
+
+- `import numpy as np` hinzugefügt
+- `numerical_gradient()`: list comprehension für x_plus/x_minus → `np.zeros(n)` + Vektoraddition
+- `lagrange_interpolation()`: innere j-Schleife → `np.prod(numer_arr/denom_arr)` mit Boolean-Maske
+- `gradient_descent()`: Gradientennorm `sum(gi**2)` → `np.linalg.norm(g)`, Update-Schritt list comprehension → NumPy-Subtraktion
+- `@lastModified` auf 2026-03-09 aktualisiert
+- Tests: **36/36 grün**
+
+### 2026-03-09 20:14:29 – AUFGABE 2: sympify()-Härtung analysis.py
+
+- Import hinzugefügt: `parse_expr`, `standard_transformations`, `implicit_multiplication_application`
+- Neue Hilfsfunktion `_safe_parse()` (nach Imports) mit Whitelist-basiertem `local_dict`
+  * Erlaubte Funktionen: sin, cos, tan, exp, log, ln, sqrt, abs, pi, e, oo, x, y, z, t, n, k
+  * `parse_expr()` statt `sympify()` für Nutzereingaben
+  * Fallback auf `sympify()` nur für SymPy-interne Ausdrücke
+- Alle `sp.sympify(expr_str)` Aufrufe in Nutzereingabe-Funktionen ersetzt:
+  * `symbolic_limit()`, `lhopital_applicable()`, `limit_comparison()`,
+    `partial_fraction_symbolic()`, `improper_integral_symbolic()`
+- `@lastModified` auf 2026-03-09 im Modul-Header aktualisiert
+- SECURITY_RISKS.md: sympify-Eintrag als BEHOBEN markiert
+- SECURITY_FIXED.md: Eintrag für sympify-Code-Injection angelegt
+- Tests: **60/60 grün**
+
+### 2026-03-09 20:14:29 – GESAMTTESTS
+
+Alle **827 Tests grün** (6.56s) – keine Regressionen.
+Build-Nummer wurde NICHT erhöht (laut Aufgabenstellung).
+
+---
+2026-03-09 (Session: LaTeX-Export, REPL, Property-Based Tests)
+---
+
+[2026-03-09 12:00:00] Installation von hypothesis 6.151.9 via pip3
+
+[2026-03-09 12:01:00] Neue Datei angelegt: src/latex_export.py
+  - 15 Funktionen implementiert: number_to_latex, fraction_to_latex,
+    polynomial_to_latex, matrix_to_latex, vector_to_latex, equation_to_latex,
+    sympy_to_latex, solution_to_latex, integral_to_latex, sum_to_latex,
+    limit_to_latex, derivative_to_latex, theorem_to_latex, full_document, save_latex
+  - Erkennung von Spezialwerten: pi, e, sqrt(n), einfache Brüche
+  - Unterstützte LaTeX-Umgebungen: pmatrix, bmatrix, vmatrix, Bmatrix, matrix
+
+[2026-03-09 12:15:00] Neue Datei angelegt: src/repl.py
+  - Klasse MathREPL mit evaluate(), available_commands(), help(), run()
+  - 15 Befehle: prime, factor, gcd, lcm, solve, derive, integrate, limit,
+    eigenvalues, fft, goldbach, collatz, phi, modinv, sqrt, help, exit, quit
+  - Hilfsfunktionen: is_jupyter(), create_jupyter_notebook()
+  - Jupyter-Notebook-Erzeugung als JSON ohne externe nbformat-Abhängigkeit
+
+[2026-03-09 12:30:00] Neue Datei angelegt: tests/test_latex_export.py
+  - 70 Tests für alle 15 latex_export-Funktionen
+  - 70/70 Tests grün
+
+[2026-03-09 12:35:00] Neue Datei angelegt: tests/test_repl.py
+  - 40 Tests für MathREPL und is_jupyter()
+  - Tests für: prime, factor, gcd, lcm, solve, derive, integrate,
+    fft, goldbach, collatz, eigenvalues, help, exit, Randfälle
+  - 40/40 Tests grün
+
+[2026-03-09 12:45:00] Neue Datei angelegt: tests/test_property_based.py
+  - 38 Property-Based Tests mit Hypothesis
+  - Getestete Eigenschaften: GCD-Kommutativität, LCM-GCD-Relation,
+    Primzahleigenschaften, Euler-Phi, modulares Inverses,
+    numerische Ableitung/Integration, Vektor-Eigenschaften,
+    Givens-QR-Orthogonalität, LU-Rekonstruktion,
+    lineare diophantische Gleichungen, Tonelli-Shanks, Pell-Gleichung
+  - Performance-Optimierungen: max_examples=10, deadline=5000
+  - 38/38 Tests grün
+
+[2026-03-09 13:00:00] Dokumentation erstellt:
+  - src/latex_export.md: Vollständige Funktionsreferenz mit KaTeX-Formeln
+  - src/repl.md: Befehlsübersicht, Beispielsession, Fehlerbehandlung
+
+[2026-03-09 13:05:00] Gesamt-Testergebnis: 148 neue Tests grün
+  - tests/test_latex_export.py: 70 Tests
+  - tests/test_repl.py: 40 Tests
+  - tests/test_property_based.py: 38 Tests
+  - Build-Nummer: unverändert (9, kein neuer Build)
