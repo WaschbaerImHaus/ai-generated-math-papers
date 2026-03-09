@@ -6,11 +6,12 @@ Hypothesentests, Bayes-Theorem und Monte-Carlo-Simulation.
 
 Autor: Kurt Ingwer
 Erstellt: 2026-03-05
-Letzte Änderung: 2026-03-07
+Letzte Änderung: 2026-03-09
 """
 
 import math
 import random
+import numpy as np
 from typing import List, Tuple
 
 
@@ -274,14 +275,17 @@ def mean(data: List[float]) -> float:
 
     Formel: mu = (1/n) * sum(x_i)
 
+    Implementierung mit np.mean() für optimale Performance bei großen Datensätzen.
+
     :param data: Liste von Messwerten
     :return: Arithmetischer Mittelwert
     :raises ValueError: Bei leerer Liste
-    :last_modified: 2026-03-05
+    :last_modified: 2026-03-09
     """
     if not data:
         raise ValueError("Datenliste darf nicht leer sein")
-    return sum(data) / len(data)
+    # NumPy-vektorisierte Berechnung statt Python-Schleife
+    return float(np.mean(data))
 
 
 def median(data: List[float]) -> float:
@@ -336,18 +340,19 @@ def variance(data: List[float], ddof: int = 1) -> float:
 
     Formel: s^2 = (1/(n-ddof)) * sum((x_i - mu)^2)
 
+    Implementierung mit np.var() für vektorisierte Berechnung (kein Python-Loop).
+
     :param data: Liste von Messwerten
     :param ddof: Delta Freiheitsgrade (0=Population, 1=Stichprobe)
     :return: Varianz
     :raises ValueError: Bei zu wenigen Datenpunkten
-    :last_modified: 2026-03-05
+    :last_modified: 2026-03-09
     """
     n = len(data)
     if n <= ddof:
         raise ValueError(f"Zu wenige Datenpunkte (n={n}, ddof={ddof})")
-    mu = mean(data)
-    # Summe der quadratischen Abweichungen vom Mittelwert
-    return sum((x - mu) ** 2 for x in data) / (n - ddof)
+    # NumPy berechnet Varianz direkt vektorisiert: np.var(data, ddof=ddof)
+    return float(np.var(data, ddof=ddof))
 
 
 def std_dev(data: List[float], ddof: int = 1) -> float:
@@ -356,12 +361,19 @@ def std_dev(data: List[float], ddof: int = 1) -> float:
 
     Formel: s = sqrt(variance(data, ddof))
 
+    Implementierung mit np.std() für vektorisierte Berechnung (kein Python-Loop).
+
     :param data: Liste von Messwerten
     :param ddof: Delta Freiheitsgrade (0=Population, 1=Stichprobe)
     :return: Standardabweichung
-    :last_modified: 2026-03-05
+    :last_modified: 2026-03-09
     """
-    return math.sqrt(variance(data, ddof))
+    # Validierung über variance() sicherstellen
+    n = len(data)
+    if n <= ddof:
+        raise ValueError(f"Zu wenige Datenpunkte (n={n}, ddof={ddof})")
+    # NumPy berechnet Standardabweichung direkt vektorisiert
+    return float(np.std(data, ddof=ddof))
 
 
 def quartiles(data: List[float]) -> Tuple[float, float, float]:
@@ -416,21 +428,25 @@ def skewness(data: List[float]) -> float:
 
     Formel: g1 = (1/n) * sum((x_i - mu)^3) / sigma^3
 
+    Implementierung mit NumPy-Vektorisierung: keine Python-for-Schleife.
+
     :param data: Liste von Messwerten
     :return: Fisher-Schiefe
     :raises ValueError: Bei weniger als 3 Datenpunkten
-    :last_modified: 2026-03-05
+    :last_modified: 2026-03-09
     """
     n = len(data)
     if n < 3:
         raise ValueError("Mindestens 3 Datenpunkte für Schiefe erforderlich")
-    mu = mean(data)
-    sigma = std_dev(data, ddof=0)
+    # NumPy-Array für vektorisierte Operationen
+    arr = np.asarray(data, dtype=float)
+    mu = np.mean(arr)
+    sigma = np.std(arr, ddof=0)
     if sigma == 0:
         return 0.0
-    # Drittes zentrales Moment
-    m3 = sum((x - mu) ** 3 for x in data) / n
-    return m3 / sigma ** 3
+    # Drittes zentrales Moment vektorisiert: (x - mu)^3 für alle x auf einmal
+    m3 = np.mean((arr - mu) ** 3)
+    return float(m3 / sigma ** 3)
 
 
 def kurtosis(data: List[float]) -> float:
@@ -443,21 +459,25 @@ def kurtosis(data: List[float]) -> float:
 
     Formel: g2 = (1/n) * sum((x_i - mu)^4) / sigma^4 - 3
 
+    Implementierung mit NumPy-Vektorisierung: keine Python-for-Schleife.
+
     :param data: Liste von Messwerten
     :return: Exzess-Kurtosis (Fisher-Definition)
     :raises ValueError: Bei weniger als 4 Datenpunkten
-    :last_modified: 2026-03-05
+    :last_modified: 2026-03-09
     """
     n = len(data)
     if n < 4:
         raise ValueError("Mindestens 4 Datenpunkte für Kurtosis erforderlich")
-    mu = mean(data)
-    sigma = std_dev(data, ddof=0)
+    # NumPy-Array für vektorisierte Operationen
+    arr = np.asarray(data, dtype=float)
+    mu = np.mean(arr)
+    sigma = np.std(arr, ddof=0)
     if sigma == 0:
         return 0.0
-    # Viertes zentrales Moment
-    m4 = sum((x - mu) ** 4 for x in data) / n
-    return m4 / sigma ** 4 - 3.0
+    # Viertes zentrales Moment vektorisiert: (x - mu)^4 für alle x auf einmal
+    m4 = np.mean((arr - mu) ** 4)
+    return float(m4 / sigma ** 4 - 3.0)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

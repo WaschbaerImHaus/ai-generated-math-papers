@@ -25,7 +25,7 @@ Verbindung zur Zahlentheorie:
 @author: Kurt Ingwer
 @version: 1.0
 @since: 2026-03-08
-@lastModified: 2026-03-08
+@lastModified: 2026-03-09
 """
 
 import math
@@ -258,11 +258,16 @@ def window_hanning(n: int) -> list:
     Reduziert Leck-Effekte (spectral leakage) bei nicht-periodischen Signalen.
     Guter Kompromiss zwischen Hauptkeulen-Breite und Seitenkeulendämpfung.
 
+    Implementierung mit np.arange + vektorisierter Formel statt list comprehension.
+
     @param n: Fensterlänge
     @return: Fensterfunktion als Liste
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-09
     """
-    return [0.5 * (1 - math.cos(2 * math.pi * k / (n - 1))) for k in range(n)]
+    # Indizes 0..n-1 als NumPy-Array erzeugen (kein Python-range-Loop nötig)
+    k = np.arange(n)
+    # Vektorisierte Formel: 0.5 * (1 - cos(2π·k/(n-1))) für alle k gleichzeitig
+    return list(0.5 * (1.0 - np.cos(2.0 * np.pi * k / (n - 1))))
 
 
 def window_hamming(n: int) -> list:
@@ -271,11 +276,15 @@ def window_hamming(n: int) -> list:
 
     Etwas bessere Seitenkeulendämpfung als Hanning (42 dB vs 31 dB).
 
+    Implementierung mit np.arange + vektorisierter Formel statt list comprehension.
+
     @param n: Fensterlänge
     @return: Fensterfunktion als Liste
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-09
     """
-    return [0.54 - 0.46 * math.cos(2 * math.pi * k / (n - 1)) for k in range(n)]
+    # Indizes als NumPy-Array; Kosinusberechnung für alle k gleichzeitig
+    k = np.arange(n)
+    return list(0.54 - 0.46 * np.cos(2.0 * np.pi * k / (n - 1)))
 
 
 def window_blackman(n: int) -> list:
@@ -285,15 +294,19 @@ def window_blackman(n: int) -> list:
     Sehr gute Seitenkeulendämpfung (74 dB), aber breitere Hauptkeule.
     Gut für Signale mit nahe beieinander liegenden Frequenzen.
 
+    Implementierung mit np.arange + vektorisierter Formel statt list comprehension.
+
     @param n: Fensterlänge
     @return: Fensterfunktion als Liste
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-09
     """
-    return [
-        0.42 - 0.5 * math.cos(2 * math.pi * k / (n - 1))
-            + 0.08 * math.cos(4 * math.pi * k / (n - 1))
-        for k in range(n)
-    ]
+    # Indizes als NumPy-Array; beide Kosinus-Terme vektorisiert berechnen
+    k = np.arange(n)
+    return list(
+        0.42
+        - 0.5  * np.cos(2.0 * np.pi * k / (n - 1))
+        + 0.08 * np.cos(4.0 * np.pi * k / (n - 1))
+    )
 
 
 def apply_window(x: list, window: list) -> list:
@@ -303,17 +316,22 @@ def apply_window(x: list, window: list) -> list:
     Vor der FFT multipliziert man das Signal mit dem Fenster,
     um Randeffekte (Gibbs-Phänomen) zu reduzieren.
 
+    Implementierung mit NumPy-Elementmultiplikation statt Python-for-Loop.
+
     @param x: Eingangssignal
     @param window: Fensterfunktion (gleiche Länge wie x)
     @return: Gefenstertes Signal
     @raises ValueError: Wenn Längen nicht übereinstimmen
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-09
     """
     if len(x) != len(window):
         raise ValueError(
             f"Signal ({len(x)}) und Fenster ({len(window)}) müssen gleich lang sein"
         )
-    return [x[k] * window[k] for k in range(len(x))]
+    # NumPy-elementweise Multiplikation: kein Python-Loop nötig
+    arr_x = np.asarray(x)
+    arr_w = np.asarray(window)
+    return list(arr_x * arr_w)
 
 
 # ===========================================================================

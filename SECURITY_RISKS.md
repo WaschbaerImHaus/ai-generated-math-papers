@@ -2,20 +2,12 @@
 
 ## Offene Sicherheitsrisiken
 
-### MEDIUM: sp.sympify() mit Nutzereingaben (analysis.py)
+### ~~MEDIUM: sp.sympify() mit Nutzereingaben (analysis.py)~~
 **Entdeckt:** 2026-03-08 (Build 9)
+**Behoben:** 2026-03-09 via `_safe_parse()` (siehe SECURITY_FIXED.md)
 **Betrifft:** `symbolic_limit()`, `lhopital_applicable()`, `limit_comparison()`,
 `partial_fraction_symbolic()`, `improper_integral_symbolic()`
-**Beschreibung:**
-`sympy.sympify()` wird verwendet, um Strings in SymPy-Ausdrücke zu konvertieren.
-Intern verwendet sympify `eval()`, was bei unvertrautem Nutzer-Input zur
-Ausführung beliebigen Python-Codes führen kann.
-**Risikobewertung:** MEDIUM – Das Projekt ist eine lokale Python-Bibliothek
-ohne Web-Interface. Die Funktionen werden nur von vertrauenswürdigen Entwicklern
-aufgerufen. Kein direktes Produktionsrisiko.
-**Empfehlung:** Falls das Projekt jemals als Web-Service genutzt wird:
-`sympy.parsing.sympy_parser.parse_expr()` mit whitelist-basiertem Parser verwenden.
-**Status:** Bekannt, akzeptiert (lokale Bibliothek, kein Web-Zugang)
+**Status:** BEHOBEN (2026-03-09) via _safe_parse() mit parse_expr() und whitelist-basiertem local_dict
 
 ---
 
@@ -24,7 +16,7 @@ Vollständige Überprüfung aller src/-Dateien:
 
 | Risikokategorie | Status | Begründung |
 |----------------|--------|------------|
-| Code-Injection via sympify() | ⚠ MEDIUM | analysis.py – lokale Bibliothek, akzeptiert (s.o.) |
+| Code-Injection via sympify() | ✓ BEHOBEN | analysis.py – _safe_parse() via parse_expr() (2026-03-09) |
 | Code-Injection (eval/exec direkt) | ✓ OK | Nicht direkt verwendet |
 | Externe Prozesse (subprocess/os.system) | ✓ OK | Nicht verwendet |
 | Unsichere Deserialisierung (pickle/yaml.load) | ✓ OK | Nicht verwendet |

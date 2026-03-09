@@ -1,0 +1,4 @@
+# file: /usr/lib/python3/dist-packages/mpmath/libmp/backend.py
+# hypothesis_version: 6.151.9
+
+['1.03', 'MPMATH_NOGMPY', 'MPMATH_NOSAGE', 'MPMATH_SAGE', 'MPMATH_STRICT', 'SAGE_ROOT', 'exec', 'gmpy', 'python', 'sage']

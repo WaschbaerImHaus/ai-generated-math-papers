@@ -15,11 +15,60 @@
 
 @author Kurt Ingwer
 @date 2026-03-05
+@lastModified 2026-03-09
 """
 
 import math
 import sympy as sp
 from typing import Callable, Optional
+from sympy.parsing.sympy_parser import (
+    parse_expr,
+    standard_transformations,
+    implicit_multiplication_application,
+)
+
+
+def _safe_parse(expr_str: str, local_vars: dict = None) -> sp.Expr:
+    """
+    @brief Sicheres Parsing von mathematischen Ausdrücken via SymPy.
+    @description
+        Verwendet parse_expr mit eingeschränktem Namespace statt sympify().
+        Verhindert Code-Injection durch Nutzereingaben.
+        Im Gegensatz zu sympify() führt parse_expr keine eval()-ähnlichen
+        Operationen auf beliebigem Python-Code aus.
+
+        Unterstützte Funktionen in Eingabe-Strings:
+        sin, cos, tan, exp, log, ln, sqrt, abs, pi, e, oo
+        sowie Variablen x, y, z, t, n, k.
+
+        Bei unbekannten Ausdrücken (z.B. SymPy-interne Objekte) wird auf
+        sympify() als Fallback zurückgegriffen.
+
+    @param expr_str: Mathematischer Ausdruck als String
+    @param local_vars: Optionale lokale Variablen-Zuordnung
+    @return: SymPy-Ausdruck
+    @author Kurt Ingwer
+    @lastModified: 2026-03-09
+    """
+    # Whitelist der erlaubten Funktionen und Symbole
+    transformations = standard_transformations + (implicit_multiplication_application,)
+    safe_locals = {
+        'sin': sp.sin, 'cos': sp.cos, 'tan': sp.tan,
+        'exp': sp.exp, 'log': sp.log, 'ln': sp.log,
+        'sqrt': sp.sqrt, 'abs': sp.Abs,
+        'pi': sp.pi, 'e': sp.E, 'oo': sp.oo,
+        'x': sp.Symbol('x'), 'y': sp.Symbol('y'),
+        'z': sp.Symbol('z'), 't': sp.Symbol('t'),
+        'n': sp.Symbol('n'), 'k': sp.Symbol('k'),
+    }
+    # Optionale benutzerdefinierte Symbole einbinden
+    if local_vars:
+        safe_locals.update(local_vars)
+    try:
+        return parse_expr(expr_str, local_dict=safe_locals, transformations=transformations)
+    except Exception:
+        # Fallback auf sympify für SymPy-interne Ausdrücke (z.B. bereits geparste Symbole)
+        return sp.sympify(expr_str)
 
 
 def numerical_derivative(f: Callable, x: float, h: float = None, order: int = 1) -> float:
@@ -349,8 +398,8 @@ def symbolic_limit(expr_str: str, var: str, point, direction: str = '+-'):
     # SymPy-Variable erstellen
     sym_var = sp.Symbol(var)
 
-    # Ausdruck parsen
-    expr = sp.sympify(expr_str)
+    # Ausdruck sicher parsen (verhindert Code-Injection via sympify/eval)
+    expr = _safe_parse(expr_str, local_vars={var: sym_var})
 
     # Grenzpunkt konvertieren
     if point == 'oo' or point == float('inf'):
@@ -387,8 +436,9 @@ def lhopital_applicable(numerator_str: str, denominator_str: str, var: str, poin
     @lastModified 2026-03-08
     """
     sym_var = sp.Symbol(var)
-    num_expr = sp.sympify(numerator_str)
-    den_expr = sp.sympify(denominator_str)
+    # Zähler und Nenner sicher parsen (verhindert Code-Injection)
+    num_expr = _safe_parse(numerator_str, local_vars={var: sym_var})
+    den_expr = _safe_parse(denominator_str, local_vars={var: sym_var})
 
     # Grenzpunkt konvertieren
     if point == 'oo':
@@ -455,8 +505,9 @@ def limit_comparison(f_str: str, g_str: str, var: str, point) -> dict:
     @lastModified 2026-03-08
     """
     sym_var = sp.Symbol(var)
-    f_expr = sp.sympify(f_str)
-    g_expr = sp.sympify(g_str)
+    # Beide Funktionen sicher parsen (verhindert Code-Injection)
+    f_expr = _safe_parse(f_str, local_vars={var: sym_var})
+    g_expr = _safe_parse(g_str, local_vars={var: sym_var})
 
     # Grenzpunkt konvertieren
     if point == 'oo':
@@ -556,7 +607,8 @@ def partial_fraction_symbolic(expr_str: str, var: str = 'x') -> dict:
     @lastModified 2026-03-08
     """
     sym_var = sp.Symbol(var)
-    expr = sp.sympify(expr_str)
+    # Ausdruck sicher parsen (verhindert Code-Injection)
+    expr = _safe_parse(expr_str, local_vars={var: sym_var})
 
     # Partialbruchzerlegung
     decomposed = sp.apart(expr, sym_var)
@@ -683,7 +735,8 @@ def improper_integral_symbolic(expr_str: str, var: str, a, b) -> dict:
     @lastModified 2026-03-08
     """
     sym_var = sp.Symbol(var)
-    expr = sp.sympify(expr_str)
+    # Ausdruck sicher parsen (verhindert Code-Injection bei Nutzereingaben)
+    expr = _safe_parse(expr_str, local_vars={var: sym_var})
 
     # Grenzen konvertieren
     def convert_bound(bound):

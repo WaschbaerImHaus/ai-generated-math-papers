@@ -1,0 +1,4 @@
+# file: /usr/lib/python3/dist-packages/mpmath/rational.py
+# hypothesis_version: 6.151.9
+
+[100, '(%s/%s)', '_mpq_', 'mpq(%s,%s)']

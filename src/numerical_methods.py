@@ -14,10 +14,11 @@ Mathematischer Hintergrund:
 @author: Kurt Ingwer
 @version: 1.0
 @since: 2026-03-08
-@lastModified: 2026-03-08
+@lastModified: 2026-03-09
 """
 
 import math
+import numpy as np
 from typing import Callable, Optional
 
 
@@ -38,28 +39,40 @@ def lagrange_interpolation(x_vals: list, y_vals: list, x: float) -> float:
     Eigenschaften: Pₙ(xᵢ) = yᵢ (genau durch Punkte).
     Nachteil: Runge-Phänomen für hohe n bei äquidistanten Knoten!
 
+    Optimierung: np.prod() für das Produkt der Basis-Polynomfaktoren.
+
     @param x_vals: Stützstellen x₀, ..., xₙ (müssen verschieden sein)
     @param y_vals: Stützwerte y₀, ..., yₙ
     @param x: Auswertungspunkt
     @return: Pₙ(x)
     @raises ValueError: Wenn x_vals und y_vals nicht gleich lang
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-09
     """
     n = len(x_vals)
     if len(y_vals) != n:
         raise ValueError(f"x_vals ({n}) und y_vals ({len(y_vals)}) müssen gleich lang sein")
 
+    # NumPy-Array für vektorisierte Differenzberechnung
+    xv = np.asarray(x_vals, dtype=float)
+    yv = np.asarray(y_vals, dtype=float)
+
     result = 0.0
     for i in range(n):
-        # Basis-Polynom Lᵢ(x) berechnen
-        li = 1.0
-        for j in range(n):
-            if j != i:
-                denom = x_vals[i] - x_vals[j]
-                if abs(denom) < 1e-15:
-                    raise ValueError(f"Doppelte Stützstelle: x[{i}] = x[{j}] = {x_vals[i]}")
-                li *= (x - x_vals[j]) / denom
-        result += y_vals[i] * li
+        # Maske: alle j ≠ i auswählen
+        mask = np.ones(n, dtype=bool)
+        mask[i] = False
+
+        # Nenner: (xᵢ - xⱼ) für alle j ≠ i
+        denom_arr = xv[i] - xv[mask]
+        if np.any(np.abs(denom_arr) < 1e-15):
+            raise ValueError(f"Doppelte Stützstelle bei Index {i}")
+
+        # Zähler: (x - xⱼ) für alle j ≠ i
+        numer_arr = x - xv[mask]
+
+        # np.prod() berechnet das Produkt aller Faktoren ohne Python-Loop
+        li = float(np.prod(numer_arr / denom_arr))
+        result += float(yv[i]) * li
 
     return result
 
@@ -325,6 +338,8 @@ def gradient_descent(f: Callable, grad: Callable, x0: list,
     Konvergenz: O(1/k) für konvexe Funktionen, linear für stark konvexe.
     Lernrate α muss klein genug gewählt werden (α < 2/L, L = Lipschitz-Konstante).
 
+    Optimierung: NumPy-Vektoroperationen für Gradientennorm und Update-Schritt.
+
     @param f: Zielfunktion f: ℝⁿ → ℝ
     @param grad: Gradient ∇f: ℝⁿ → ℝⁿ
     @param x0: Startpunkt (Liste)
@@ -332,22 +347,24 @@ def gradient_descent(f: Callable, grad: Callable, x0: list,
     @param max_iter: Maximale Iterationen
     @param tol: Abbruchtoleranz (Gradientennorm)
     @return: (x_opt, f_opt, n_iter) – Optimum, Funktionswert, Iterationen
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-09
     """
-    x = list(x0)
+    # NumPy-Array für vektorisierte Operationen
+    x = np.asarray(x0, dtype=float)
 
     for iteration in range(max_iter):
-        g = grad(x)
-        # Gradientennorm für Abbruchbedingung
-        g_norm = math.sqrt(sum(gi ** 2 for gi in g))
+        g = np.asarray(grad(list(x)), dtype=float)
+        # Gradientennorm via np.linalg.norm statt Python-Schleife
+        g_norm = float(np.linalg.norm(g))
 
         if g_norm < tol:
             break
 
-        # Gradient-Schritt
-        x = [x[i] - learning_rate * g[i] for i in range(len(x))]
+        # Gradient-Schritt: vektorisierte Subtraktion statt list comprehension
+        x = x - learning_rate * g
 
-    return x, f(x), iteration + 1
+    x_list = list(x)
+    return x_list, f(x_list), iteration + 1
 
 
 def golden_section_search(f: Callable, a: float, b: float,
@@ -405,19 +422,26 @@ def numerical_gradient(f: Callable, x: list, h: float = 1e-5) -> list:
 
     ∂f/∂xᵢ ≈ [f(x + hᵢ) - f(x - hᵢ)] / (2h)
 
+    Optimierung: np.zeros für Array-Initialisierung statt list comprehension.
+    Die Schleife über Dimensionen bleibt erhalten (jede Dimension braucht
+    2 separate Funktionsauswertungen – keine vollständige Vektorisierung möglich).
+
     @param f: Funktion f: ℝⁿ → ℝ
     @param x: Auswertungspunkt
     @param h: Schrittweite
     @return: Numerischer Gradient ∇f(x)
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-09
     """
     n = len(x)
+    # Basis-Array einmalig kopieren statt pro Dimension neu aufbauen
+    x_arr = np.asarray(x, dtype=float)
     grad = []
     for i in range(n):
-        # Einheitsvektor eᵢ
-        x_plus  = [x[j] + (h if j == i else 0) for j in range(n)]
-        x_minus = [x[j] - (h if j == i else 0) for j in range(n)]
-        grad.append((f(x_plus) - f(x_minus)) / (2 * h))
+        # Einheitsvektor eᵢ via np.zeros – schneller als list comprehension
+        ei = np.zeros(n)
+        ei[i] = h
+        # Vorwärts-/Rückwärtsschritt als NumPy-Vektoraddition
+        grad.append(float((f(list(x_arr + ei)) - f(list(x_arr - ei))) / (2.0 * h)))
     return grad
 
 

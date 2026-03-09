@@ -1,0 +1,4 @@
+# file: /usr/lib/python3/dist-packages/mpmath/matrices/linalg.py
+# hypothesis_version: 6.151.9
+
+['0.0', '1.0', 'RAW', 'SKINNY', 'full', 'need n*n matrix', 'raw', 'real', 'skinny']

@@ -1,0 +1,4 @@
+# file: /usr/lib/python3/dist-packages/mpmath/calculus/differentiation.py
+# hypothesis_version: 6.151.9
+
+[0.25, 0.5, 1.4, 'addprec', 'chop', 'direction', 'h', 'method', 'quad', 'radius', 'relative', 'singular', 'step', 'unknown method: %r']

@@ -98,11 +98,13 @@ specialist-maths/
 │   ├── proof_theory.py           # Beweistheorie, Millennium-Probleme
 │   ├── fourier.py                # Fourier-Transformation (FFT)
 │   ├── numerical_methods.py      # Interpolation, Optimierung, Simplex
-│   ├── modular_forms.py          # Modulformen (SL2Z, Eisenstein, Delta, j-Invariante)
+│   ├── modular_forms.py          # Modulformen (SL2Z, Eisenstein, Delta, Cusp, Theta)
 │   ├── p_adic.py                 # p-adische Zahlen (Bewertung, Norm, Hensel-Lift)
 │   ├── visualization.py          # Visualisierung (2D/3D, Vektorfeld, Fraktale)
-│   └── build.txt                 # Build-Nummer (aktuell: 9)
-├── tests/                        # 641 Tests (100% grün)
+│   ├── latex_export.py           # LaTeX-Export (Zahlen, Matrizen, Dokumente)
+│   ├── repl.py                   # Interaktiver REPL-Modus (MathREPL)
+│   └── build.txt                 # Build-Nummer (aktuell: 10)
+├── tests/                        # 903 Tests (100% grün)
 ├── research/                     # Mathematische Notizen und Recherche
 ├── dev-log/                      # Entwicklungs-Tagebuch
 ├── debugging/                    # Debug-Skripte
@@ -131,4 +133,4 @@ specialist-maths/
 
 ---
 *Autor: Kurt Ingwer*
-*Build: 9 | Stand: 2026-03-08 | Tests: 641/641 grün*
+*Build: 10 | Stand: 2026-03-09 | Tests: 903/903 grün*

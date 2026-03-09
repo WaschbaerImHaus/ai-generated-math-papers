@@ -174,10 +174,21 @@
 - [x] Phasenraum-Visualisierung (für ODE) – Build 9
 - [x] Fraktal-Generator (Mandelbrot, Julia, Sierpinski, Newton) – Build 9
 
-## Offene Features (nach Build 9)
-- [ ] Modulformen Vertiefung: Cusp-Formen, Theta-Reihen
-- [ ] Hardy-Littlewood-Kreismethode Vertiefung: Farey-Folgen
-- [ ] Jupyter-Notebook-Integration / REPL-Modus
-- [ ] LaTeX-Export für Ergebnisse
-- [ ] Property-Based Testing (Hypotheses-Bibliothek)
-- [ ] NumPy-Vektorisierung der Kernalgorithmen
+## Build 10 Erweiterungen (2026-03-09)
+- [x] Modulformen Vertiefung: Cusp-Formen (dim S_k, Ramanujan-Tau-Eigenschaften) – 30 Tests
+- [x] Theta-Reihen: Jacobi-θ, Transformation, Summe-der-Quadrate, Dedekind-η, Jacobi-Dreifachprodukt – 34 Tests
+- [x] Farey-Folgen + vollständige Goldbach-Kreismethode (Major/Minor Arcs) – 50 Tests
+- [x] LaTeX-Export → neue latex_export.py (15 Funktionen) – 40 Tests
+- [x] REPL-Modus → neue repl.py (MathREPL, 15 Befehle, Jupyter-Integration) – 30 Tests
+- [x] Property-Based Testing (Hypothesis) → 38 Tests für mathematische Identitäten
+- [x] NumPy-Vektorisierung: statistics_math.py, fourier.py, numerical_methods.py
+- [x] sympify()-Härtung → _safe_parse() mit parse_expr() und Whitelist (SECURITY_FIXED)
+- **Gesamttests: 903/903 grün**
+
+## Offene Features (nach Build 10)
+- [ ] Modulformen: Hecke-Algebra Vertiefung, L-Funktionen elliptischer Kurven
+- [ ] p-adische L-Funktionen (Kubota-Leopoldt)
+- [ ] matplotlib-Animationen für ODE-Trajektorien
+- [ ] SVG/PDF-Export für Vektorgrafiken
+- [ ] Arbitrary Precision via mpmath (>64-Bit für Riemann-Nullstellen)
+- [ ] Paket-Struktur: src/ als Python-Package (__init__.py)
