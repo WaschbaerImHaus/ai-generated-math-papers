@@ -1,4 +1,0 @@
-# file: /usr/lib/python3/dist-packages/mpmath/functions/qfunctions.py
-# hypothesis_version: 6.151.9
-
-[0.5, 'maxterms', 'n cannot be negative']

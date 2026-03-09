@@ -1,4 +1,0 @@
-# file: /home/claude-code/project/specialist-maths/src/algebra.py
-# hypothesis_version: 6.151.9
-
-[4096, 10000, 65537, '+', '-', '0', 'Polynomial', 'expected_sign', 'law_verified', 'legendre_p_q', 'legendre_q_p', 'product']

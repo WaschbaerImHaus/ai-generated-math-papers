@@ -1,4 +1,0 @@
-# file: /usr/lib/python3/dist-packages/mpmath/usertools.py
-# hypothesis_version: 6.151.9
-
-[0.05, 'in  %s %r %r', 'once', 'out %s %r', 'print']

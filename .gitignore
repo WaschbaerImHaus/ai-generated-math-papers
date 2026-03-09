@@ -32,3 +32,6 @@ exports/
 # Betriebssystem
 .DS_Store
 Thumbs.db
+
+# Hypothesis Test-Cache
+.hypothesis/
