@@ -29,7 +29,7 @@ from algebra_core import extended_gcd, mod_inverse
 # PRIMZAHLTEST UND PRIMFAKTORZERLEGUNG
 # =============================================================================
 
-@functools.lru_cache(maxsize=4096)
+@functools.lru_cache(maxsize=10000)
 def is_prime(n: int) -> bool:
     """
     @brief Prüft, ob eine natürliche Zahl eine Primzahl ist.
@@ -40,7 +40,7 @@ def is_prime(n: int) -> bool:
         3. Nur bis sqrt(n) testen (wenn n einen Teiler > sqrt(n) hat,
            hat es auch einen < sqrt(n))
 
-        Laufzeit: O(sqrt(n)) – Ergebnis wird via lru_cache gecacht (bis 4096 Einträge).
+        Laufzeit: O(sqrt(n)) – Ergebnis wird via lru_cache gecacht (bis 10000 Einträge).
         Deutlicher Geschwindigkeitsvorteil bei wiederholten Aufrufen (z.B. in proof_theory).
 
     @param n Die zu prüfende natürliche Zahl.
@@ -65,6 +65,7 @@ def is_prime(n: int) -> bool:
     return True
 
 
+@functools.lru_cache(maxsize=1000)
 def prime_factorization(n: int) -> dict:
     """
     @brief Berechnet die Primfaktorzerlegung einer natürlichen Zahl.
@@ -78,6 +79,10 @@ def prime_factorization(n: int) -> dict:
         3. Falls Rest > 1: Rest selbst ist ein Primfaktor
 
         Beispiel: 360 = 2^3 * 3^2 * 5^1
+
+        Laufzeit: O(sqrt(n)) – Ergebnis wird via lru_cache gecacht (bis 1000 Einträge).
+        Vorteil bei Euler-Phi und anderen zahlentheoretischen Funktionen, die dieselbe
+        Primfaktorzerlegung mehrfach benötigen.
 
     @param n Die zu zerlegende natürliche Zahl (n >= 2).
     @return Dictionary {primzahl: exponent}.
@@ -106,6 +111,7 @@ def prime_factorization(n: int) -> dict:
     return factors
 
 
+@functools.lru_cache(maxsize=1000)
 def euler_phi(n: int) -> int:
     """
     @brief Berechnet Eulers Phi-Funktion phi(n).
@@ -123,6 +129,9 @@ def euler_phi(n: int) -> int:
         - phi ist multiplikativ: phi(m*n) = phi(m)*phi(n) wenn ggT(m,n)=1
 
         Anwendung: Eulers Satz (a^phi(n) ≡ 1 mod n), RSA
+
+        Laufzeit: O(sqrt(n)) – Ergebnis wird via lru_cache gecacht (bis 1000 Einträge).
+        Wichtig bei der Farey-Folge-Länge (Σ φ(k)) und RSA-Berechnungen.
 
     @param n Positive ganze Zahl.
     @return phi(n) - Anzahl der teilerfremden Zahlen.

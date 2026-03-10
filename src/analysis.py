@@ -27,6 +27,17 @@ from sympy.parsing.sympy_parser import (
     implicit_multiplication_application,
 )
 
+# Konfigurationskonstanten aus zentraler config.py importieren
+# Vermeidet Magic Numbers und ermöglicht projektweite Konsistenz
+from config import (
+    H_DERIVATIVE_1,    # Optimale Schrittweite für 1. Ableitung (≈ 6e-6)
+    H_DERIVATIVE_2,    # Optimale Schrittweite für 2. Ableitung (≈ 1.78e-4)
+    NEWTON_TOL,        # Konvergenztoleranz Newton-Raphson (1e-12)
+    BISECTION_TOL,     # Konvergenztoleranz Bisektion (1e-12)
+    SIMPSON_N,         # Standard-Teilintervalle Simpson-Regel (1000)
+    MAX_ITERATIONS,    # Maximale Iterationszahl (1000)
+)
+
 
 def _safe_parse(expr_str: str, local_vars: dict = None) -> sp.Expr:
     """
@@ -105,21 +116,21 @@ def numerical_derivative(f: Callable, x: float, h: float = None, order: int = 1)
     @date 2026-03-05
     """
     if order == 1:
-        # Optimale h für 1. Ableitung: eps^(1/3)
+        # Optimale h für 1. Ableitung: aus config.py (H_DERIVATIVE_1 ≈ eps^(1/3) ≈ 6e-6)
         if h is None:
-            h = 6e-6
+            h = H_DERIVATIVE_1
         return (f(x + h) - f(x - h)) / (2 * h)
     elif order == 2:
-        # Optimale h für 2. Ableitung: eps^(1/4) ~ 1.2e-4
+        # Optimale h für 2. Ableitung: aus config.py (H_DERIVATIVE_2 ≈ eps^(1/4) ≈ 1.78e-4)
         # (größer als bei 1. Ableitung, da h^2 im Nenner -> mehr Auslöschung)
         if h is None:
-            h = 1.5e-4
+            h = H_DERIVATIVE_2
         return (f(x + h) - 2 * f(x) + f(x - h)) / (h ** 2)
     else:
         raise ValueError(f"Ableitungsordnung {order} nicht unterstützt (nur 1 oder 2)")
 
 
-def numerical_integral(f: Callable, a: float, b: float, n: int = 10000) -> float:
+def numerical_integral(f: Callable, a: float, b: float, n: int = SIMPSON_N) -> float:
     """
     @brief Berechnet das bestimmte Integral ∫_a^b f(x) dx mit der Simpson-Regel.
     @description
@@ -139,7 +150,7 @@ def numerical_integral(f: Callable, a: float, b: float, n: int = 10000) -> float
     @param f Die zu integrierende Funktion.
     @param a Untere Integrationsgrenze.
     @param b Obere Integrationsgrenze.
-    @param n Anzahl der Teilintervalle (muss gerade sein, Standard: 10000).
+    @param n Anzahl der Teilintervalle (muss gerade sein, Standard: SIMPSON_N aus config.py).
     @return Näherungswert des Integrals.
     @date 2026-03-05
     """
@@ -160,8 +171,8 @@ def numerical_integral(f: Callable, a: float, b: float, n: int = 10000) -> float
     return result * h / 3
 
 
-def newton_raphson(f: Callable, x0: float, tol: float = 1e-10,
-                   max_iter: int = 1000, h: float = 1e-7) -> float:
+def newton_raphson(f: Callable, x0: float, tol: float = NEWTON_TOL,
+                   max_iter: int = MAX_ITERATIONS, h: float = 1e-7) -> float:
     """
     @brief Newton-Raphson-Verfahren zur Nullstellensuche.
     @description
@@ -182,8 +193,8 @@ def newton_raphson(f: Callable, x0: float, tol: float = 1e-10,
 
     @param f Die Funktion, deren Nullstelle gesucht wird.
     @param x0 Startwert (Anfangsnäherung).
-    @param tol Toleranz (Abbruch wenn |f(x)| < tol).
-    @param max_iter Maximale Anzahl Iterationen.
+    @param tol Toleranz (Abbruch wenn |f(x)| < tol) – Standard: NEWTON_TOL aus config.py.
+    @param max_iter Maximale Anzahl Iterationen – Standard: MAX_ITERATIONS aus config.py.
     @param h Schrittweite für numerische Ableitung.
     @return Näherungswert der Nullstelle.
     @raises RuntimeError Wenn das Verfahren nicht konvergiert.
@@ -210,8 +221,8 @@ def newton_raphson(f: Callable, x0: float, tol: float = 1e-10,
     raise RuntimeError(f"Newton-Raphson: Keine Konvergenz nach {max_iter} Iterationen")
 
 
-def bisection(f: Callable, a: float, b: float, tol: float = 1e-10,
-              max_iter: int = 1000) -> float:
+def bisection(f: Callable, a: float, b: float, tol: float = BISECTION_TOL,
+              max_iter: int = MAX_ITERATIONS) -> float:
     """
     @brief Bisektionsverfahren zur Nullstellensuche im Intervall [a, b].
     @description
@@ -234,8 +245,8 @@ def bisection(f: Callable, a: float, b: float, tol: float = 1e-10,
     @param f Die Funktion, deren Nullstelle gesucht wird.
     @param a Linke Intervallgrenze.
     @param b Rechte Intervallgrenze.
-    @param tol Toleranz für Intervallbreite.
-    @param max_iter Maximale Anzahl Iterationen.
+    @param tol Toleranz für Intervallbreite – Standard: BISECTION_TOL aus config.py.
+    @param max_iter Maximale Anzahl Iterationen – Standard: MAX_ITERATIONS aus config.py.
     @return Näherungswert der Nullstelle.
     @raises ValueError Wenn kein Vorzeichenwechsel in [a, b] vorliegt.
     @date 2026-03-05

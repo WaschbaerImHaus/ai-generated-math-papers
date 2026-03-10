@@ -39,6 +39,7 @@
 """
 
 import math
+import functools
 from typing import Union
 
 
@@ -46,6 +47,7 @@ from typing import Union
 # GRUNDLEGENDE P-ADISCHE FUNKTIONEN
 # ===========================================================================
 
+@functools.lru_cache(maxsize=5000)
 def p_adic_valuation(n: int, p: int) -> Union[int, float]:
     """
     Berechnet die p-adische Bewertung v_p(n).
@@ -64,11 +66,15 @@ def p_adic_valuation(n: int, p: int) -> Union[int, float]:
         v_p(mn) = v_p(m) + v_p(n)     (Bewertung ist ein Homomorphismus)
         v_p(m+n) ≥ min(v_p(m), v_p(n)) (ultrametrische Ungleichung)
 
+    Via lru_cache gecacht (bis 5000 Einträge): Beide Argumente (n, p) sind
+    int und damit hashbar. Kummer-Kongruenzen und p-adische L-Funktionen
+    rufen p_adic_valuation sehr häufig mit denselben (n, p)-Paaren auf.
+
     @param n: Ganzzahl (kann 0 oder negativ sein)
     @param p: Primzahl p ≥ 2
     @return: p-adische Bewertung v_p(n), oder float('inf') für n = 0
     @raises ValueError: Wenn p < 2
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     if p < 2:
         raise ValueError(f"p muss eine Primzahl ≥ 2 sein, erhalten: p = {p}")
@@ -753,6 +759,7 @@ def ostrowski_theorem_demo(n: int) -> dict:
 # BERNOULLI-ZAHLEN UND VERALLGEMEINERTE BERNOULLI-ZAHLEN
 # ===========================================================================
 
+@functools.lru_cache(maxsize=200)
 def bernoulli_number(n: int) -> float:
     """
     Berechnet die n-te Bernoulli-Zahl B_n.
@@ -780,6 +787,12 @@ def bernoulli_number(n: int) -> float:
         - B_n = 0 für alle ungeraden n > 1
         - Zusammenhang mit Riemann-Zeta: ζ(-n) = -B_{n+1} / (n+1) für n ≥ 0
         - Verbindung zu Fermatschen Zahlen und Kummer-Regularität
+
+    Via lru_cache gecacht (bis 200 Einträge): Die Berechnung via Rekurrenz
+    hat Laufzeit O(n²). Durch Caching müssen einzelne Bernoulli-Zahlen nur
+    einmal berechnet werden – besonders wertvoll für Kummer-Kongruenzen und
+    Euler-Maclaurin-Korrekturen, die dieselben B_n mehrfach benötigen.
+    Argument n ist int (hashbar).
 
     @param n: Nicht-negative ganze Zahl (Index der Bernoulli-Zahl)
     @return: Bernoulli-Zahl B_n als Gleitkommazahl

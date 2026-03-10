@@ -23,6 +23,7 @@ import numpy as np
 # COLLATZ-VERMUTUNG (3n+1-Problem)
 # ===========================================================================
 
+@functools.lru_cache(maxsize=500)
 def collatz_sequence(n: int) -> list[int]:
     """
     Berechnet die Collatz-Folge für eine gegebene Startzahl.
@@ -34,10 +35,14 @@ def collatz_sequence(n: int) -> list[int]:
         f(n) = n/2      falls n gerade
         f(n) = 3n + 1   falls n ungerade
 
+    Via lru_cache gecacht (bis 500 Einträge): Bereichsverifikationen und
+    mehrfach aufgerufene Startzahlen profitieren erheblich davon.
+    Argument n ist ein int (hashbar) – Cache-Key ist n selbst.
+
     @param n: Startzahl (positive ganze Zahl)
     @return: Liste aller Glieder der Folge bis 1 (inkl. n und 1)
     @raises ValueError: Wenn n ≤ 0
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     if n <= 0:
         raise ValueError(f"n muss positiv sein, erhalten: {n}")
@@ -135,6 +140,7 @@ def collatz_verify_range(limit: int) -> dict:
 # GOLDBACH-VERMUTUNG
 # ===========================================================================
 
+@functools.lru_cache(maxsize=10000)
 def is_prime_fast(n: int) -> bool:
     """
     Schneller deterministischer Primzahltest für mittlere Zahlen.
@@ -142,9 +148,13 @@ def is_prime_fast(n: int) -> bool:
     Verwendet die 6k±1-Optimierung: Alle Primzahlen > 3 haben die Form
     6k+1 oder 6k-1, weil alle anderen durch 2 oder 3 teilbar sind.
 
-    @param n: Zu prüfende Zahl
+    Via lru_cache gecacht (bis 10000 Einträge): Goldbach-Zerlegungen,
+    Zwillingsprimzahlsuche und Bereichsverifikationen rufen is_prime_fast
+    sehr häufig mit denselben Zahlen auf.
+
+    @param n: Zu prüfende Zahl (hashbar: int)
     @return: True wenn prim, False sonst
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     if n < 2:
         return False
