@@ -1952,3 +1952,25 @@ liefert falsche Ergebnisse (Kettensubstitution).
   - Bugfix: molien_series() falsch aufgerufen mit group_type statt matrices
   - Navigation: Lie-Gruppen, Algebraische Geometrie, Differentialtopologie, Stochastik hinzugefügt
   - 5008/5008 Tests grün
+
+2026-03-10 22:33:08 – classical_geometry.py implementiert
+  - EuclideanGeometry: distance, angle_between, are_parallel, are_perpendicular,
+    circumcenter, incenter, centroid, euler_line_demo
+  - ProjectiveGeometry: homogeneous_coords, projective_line_through,
+    projective_intersection, cross_ratio, harmonic_conjugate,
+    projective_transformation, desargues_theorem_check, pappus_theorem_check
+  - HyperbolicGeometry: poincare_disk_distance, poincare_disk_midpoint,
+    hyperbolic_angle_sum (Möbius-korrigiert), hyperbolic_area,
+    hyperbolic_parallel_lines, gauss_bonnet_hyperbolic, upper_half_plane_distance
+  - EllipticGeometry: spherical_distance (Haversine), spherical_angle_sum,
+    spherical_excess, spherical_area, lune_area, girard_theorem
+  - AffinGeometry: affine_combination, affine_map, barycentric_coords,
+    affine_hull, convex_hull_2d (Gift-Wrapping), is_affinely_independent
+  - SyntheticGeometry: hilbert_axioms_overview, incidence_axioms_demo,
+    parallel_axiom_demo, axiom_independence_demo, finite_projective_plane
+  - Standalone: euler_characteristic_polygon, pick_theorem,
+    ptolemy_theorem_check, nine_point_circle, morley_theorem_demo
+  - 122 Tests in test_classical_geometry.py – alle grün
+  - Bugfix: Hyperbolische Winkelsumme via Möbius-Transformation (vorher
+    immer = π wegen euklidischer Berechnung)
+  - Dokumentation: classical_geometry.md angelegt
