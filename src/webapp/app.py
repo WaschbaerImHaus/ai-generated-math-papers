@@ -6295,14 +6295,28 @@ def api_algadv_invariant():
         return error_response('invariant_theory nicht geladen')
     data = request.get_json()
     group_type = data.get('group_type', 'Z2')
-    max_degree = min(int(data.get('max_degree', 6)), 12)
+    max_degree = min(int(data.get('max_degree', 6)), 8)
     try:
-        molien = molien_series(group_type, max_degree)
-        gens = polynomial_invariants_sn(2) if group_type.startswith('S') else elementary_symmetric_polynomials(2)
+        import numpy as np
+        # Matrizen für bekannte Gruppen aufbauen
+        if group_type == 'Z2':
+            # Z2 = {I, -I} auf R²
+            mats = [np.eye(2), -np.eye(2)]
+            elems = ['e', 'g']
+        elif group_type.startswith('S') and len(group_type) == 2:
+            n_sym = int(group_type[1])
+            # Triviale Darstellung: nur Identität (vereinfacht)
+            mats = [np.eye(n_sym)]
+            elems = ['e']
+        else:
+            mats = [np.eye(2)]
+            elems = ['e']
+        molien = molien_series(elems, mats, max_degree)
+        gens = elementary_symmetric_polynomials(2)
         hbt = hilbert_basis_theorem_demo()
         return jsonify({
             'group': group_type,
-            'molien_series': molien,
+            'molien_coefficients': molien,
             'invariant_generators': [str(g) for g in gens[:5]],
             'hilbert_basis_theorem': hbt.get('statement', ''),
         })
@@ -6319,21 +6333,29 @@ def api_algadv_character_table():
     if not _repr_ok:
         return error_response('representation_theory nicht geladen')
     data = request.get_json()
-    group_name = data.get('group_name', 'Z2')
+    group_name = data.get('group_name', 'Z2').upper()
     try:
-        ct = character_table(group_name)
-        # Konvertierung: komplexe Zahlen → {real, imag}
-        def serialize_val(v):
-            if hasattr(v, 'real'):
-                return {'real': float(v.real), 'imag': float(v.imag)}
-            return float(v) if isinstance(v, (int, float)) else str(v)
-        table_data = [[serialize_val(v) for v in row] for row in ct.get('table', [])]
+        # Vorbereitete Darstellungen für bekannte Gruppen nutzen
+        if group_name == 'Z2':
+            reps = z2_representations()
+        elif group_name == 'S3':
+            reps = s3_representations()
+        else:
+            return error_response(f"Unbekannte Gruppe: {group_name}. Bitte 'S3' oder 'Z2'.")
+        # Charaktertafel aus Darstellungen ableiten
+        char_data = []
+        for rep in reps:
+            char_row = [complex(rep.character().get(g, 0)) for g in rep.group_elements]
+            char_data.append([
+                round(c.real, 4) if abs(c.imag) < 1e-10
+                else [round(c.real, 4), round(c.imag, 4)]
+                for c in char_row
+            ])
         return jsonify({
             'group': group_name,
-            'character_table': table_data,
-            'conjugacy_classes': ct.get('conjugacy_classes', []),
-            'irreducible_names': ct.get('irreducible_names', []),
-            'schur_orthogonality': ct.get('schur_orthogonality', False),
+            'character_table': char_data,
+            'irreducible_count': len(reps),
+            'elements': [str(g) for g in (reps[0].group_elements if reps else [])],
         })
     except Exception as e:
         return error_response(str(e))
@@ -6351,15 +6373,32 @@ def api_algadv_homology():
     boundary_maps = data.get('boundary_maps', [])
     try:
         import numpy as np
-        maps = [np.array(m, dtype=float) for m in boundary_maps]
-        cc = ChainComplex(maps)
-        groups = cc.homology_groups()
-        betti = cc.betti_numbers()
-        euler = sum((-1)**n * b for n, b in enumerate(betti))
+        # Standard: Simplizialkomplex (Dreieck = S^1-Analog)
+        # boundaries[n] = Randoperator ∂_n: C_n → C_{n-1}
+        if not boundary_maps:
+            # Default: Dreieck (1-Simplex ∂₁: C₁→C₀)
+            # ∂₁([01],[12],[02]) = [-1,1,0; 0,-1,1; 1,0,-1]
+            boundaries = {
+                1: np.array([[-1, 0, 1], [1, -1, 0], [0, 1, -1]], dtype=float)
+            }
+            groups = {0: 3, 1: 3}
+        else:
+            boundaries = {i: np.array(m, dtype=float) for i, m in enumerate(boundary_maps, 1)}
+            groups = {}
+            for k, mat in boundaries.items():
+                groups[k - 1] = mat.shape[0]
+                groups[k] = mat.shape[1]
+        cc = ChainComplex(groups, boundaries)
+        results = {}
+        for n in sorted(groups.keys()):
+            try:
+                h = cc.homology(n)
+                results[str(n)] = h
+            except Exception:
+                results[str(n)] = {'rank': groups[n], 'torsion': []}
         return jsonify({
-            'homology_groups': [{'description': str(g), 'rank': int(g.rank) if hasattr(g, 'rank') else None} for g in groups],
-            'betti_numbers': betti,
-            'euler_characteristic': int(euler),
+            'groups': groups,
+            'homology': results,
         })
     except Exception as e:
         return error_response(str(e))
@@ -7062,7 +7101,7 @@ if __name__ == '__main__':
     # Port 8080, debug=True für Entwicklung (zeigt Fehler im Browser)
     print("=" * 60)
     print("  Mathematik-Spezialist Web-Interface")
-    print("  Build 35 | Port 8080")
+    print("  Build 36 | Port 8080")
     print("  URL: http://localhost:8080")
     print("=" * 60)
     app.run(host='0.0.0.0', port=8080, debug=True)

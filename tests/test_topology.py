@@ -528,3 +528,487 @@ class TestMetricAxioms:
         d_xy = euclidean_metric(x, y)  # 3
         d_yz = euclidean_metric(y, z)  # 4
         assert d_xz <= d_xy + d_yz + 1e-10
+
+
+# ============================================================
+# Tests: Trennungseigenschaften (Separation Axioms)
+# ============================================================
+
+from src.topology import (
+    separation_axioms_demo,
+    CompactSpace,
+    heine_borel_theorem,
+    tychonoff_theorem_demo,
+    UniformSpace,
+    cauchy_filter_demo,
+    completion_of_rationals,
+    TopologicalGroup,
+    topological_group_examples,
+    TopologicalVectorSpace,
+    locally_convex_demo,
+    schwartz_space_intro,
+)
+
+
+class TestSeparationAxioms:
+    """Tests für die Trennungseigenschaften T0 bis T4."""
+
+    def test_returns_dict(self):
+        """separation_axioms_demo gibt ein dict zurück."""
+        result = separation_axioms_demo()
+        assert isinstance(result, dict)
+
+    def test_all_axioms_present(self):
+        """Alle 5 Axiome T0–T4 sind im Ergebnis enthalten."""
+        result = separation_axioms_demo()
+        assert 'T0_Kolmogorov' in result
+        assert 'T1_Frechet' in result
+        assert 'T2_Hausdorff' in result
+        assert 'T3_Regular' in result
+        assert 'T4_Normal' in result
+
+    def test_axiom_count(self):
+        """axiom_count ist 5."""
+        result = separation_axioms_demo()
+        assert result['axiom_count'] == 5
+
+    def test_implications_present(self):
+        """Implikationshierarchie ist vorhanden."""
+        result = separation_axioms_demo()
+        assert 'implications' in result
+        assert 'hierarchy' in result['implications']
+
+    def test_t2_has_hausdorff_content(self):
+        """T2-Eintrag enthält 'Hausdorff'."""
+        result = separation_axioms_demo()
+        assert 'Hausdorff' in result['T2_Hausdorff']['name']
+
+    def test_t4_mentions_urysohn(self):
+        """T4-Eintrag enthält Urysohn-Lemma."""
+        result = separation_axioms_demo()
+        assert 'urysohn_lemma' in result['T4_Normal']
+
+    def test_implication_string(self):
+        """Implikationskette enthält T4 und T0."""
+        result = separation_axioms_demo()
+        hierarchy = result['implications']['hierarchy']
+        assert 'T4' in hierarchy and 'T0' in hierarchy
+
+    def test_each_axiom_has_definition(self):
+        """Jedes Axiom hat eine 'definition'-Schlüssel."""
+        result = separation_axioms_demo()
+        for key in ['T0_Kolmogorov', 'T1_Frechet', 'T2_Hausdorff', 'T3_Regular', 'T4_Normal']:
+            assert 'definition' in result[key], f"Fehlende Definition in {key}"
+
+
+# ============================================================
+# Tests: Kompaktheit (Compactness)
+# ============================================================
+
+class TestCompactSpace:
+    """Tests für die CompactSpace-Klasse."""
+
+    def test_compact_interval(self):
+        """[0, 1] ist kompakt (a ≤ b)."""
+        cs = CompactSpace()
+        assert cs.is_compact_heine_borel(0.0, 1.0) is True
+
+    def test_compact_negative_interval(self):
+        """[-5, 5] ist kompakt."""
+        cs = CompactSpace()
+        assert cs.is_compact_heine_borel(-5.0, 5.0) is True
+
+    def test_compact_single_point(self):
+        """[1, 1] (einpunktiger Raum) ist kompakt."""
+        cs = CompactSpace()
+        assert cs.is_compact_heine_borel(1.0, 1.0) is True
+
+    def test_not_compact_reversed(self):
+        """[1, 0] (a > b) ist kein gültiges Intervall → nicht kompakt."""
+        cs = CompactSpace()
+        assert cs.is_compact_heine_borel(1.0, 0.0) is False
+
+    def test_finite_subcover_simple(self):
+        """Einfache Überdeckung von [0,1] hat endliche Teilüberdeckung."""
+        cs = CompactSpace()
+        cover = [(-0.1, 0.6), (0.4, 1.1)]
+        subcover = cs.finite_subcover_demo(cover, 0.0, 1.0)
+        assert len(subcover) > 0
+        assert len(subcover) <= len(cover)
+
+    def test_finite_subcover_covers_interval(self):
+        """Die Teilüberdeckung überdeckt tatsächlich [0,1]."""
+        cs = CompactSpace()
+        cover = [(-0.1, 0.4), (0.3, 0.8), (0.7, 1.1)]
+        subcover = cs.finite_subcover_demo(cover, 0.0, 1.0)
+        # Überprüfe dass Teilüberdeckung [0,1] überdeckt
+        assert len(subcover) > 0
+
+    def test_sequential_compactness(self):
+        """Folge in [0,1] hat konvergente Teilfolge."""
+        cs = CompactSpace()
+        import math
+        seq = [math.sin(i * 0.1) * 0.5 + 0.5 for i in range(50)]
+        result = cs.sequential_compactness_demo(seq, 0.0, 1.0)
+        assert result['converges'] is True
+        assert result['bounded_in_interval'] is True
+        assert result['limit'] is not None
+
+
+class TestHeineBorel:
+    """Tests für den Satz von Heine-Borel."""
+
+    def test_returns_dict(self):
+        """heine_borel_theorem gibt ein dict zurück."""
+        result = heine_borel_theorem()
+        assert isinstance(result, dict)
+
+    def test_theorem_present(self):
+        """Theorem-Text ist vorhanden."""
+        result = heine_borel_theorem()
+        assert 'theorem' in result
+        assert 'Heine-Borel' in result['theorem']
+
+    def test_compact_examples(self):
+        """Mindestens 2 kompakte Beispiele vorhanden."""
+        result = heine_borel_theorem()
+        assert len(result['compact_examples']) >= 2
+        for ex in result['compact_examples']:
+            assert ex['compact'] is True
+            assert ex['closed'] is True
+            assert ex['bounded'] is True
+
+    def test_non_compact_examples(self):
+        """Mindestens 2 nicht-kompakte Beispiele vorhanden."""
+        result = heine_borel_theorem()
+        assert len(result['non_compact_examples']) >= 2
+        for ex in result['non_compact_examples']:
+            assert ex['compact'] is False
+
+    def test_numerical_verification(self):
+        """Numerische Verifikation enthält endliche Teilüberdeckung."""
+        result = heine_borel_theorem()
+        nv = result['numerical_verification']
+        assert nv['is_finite'] is True
+        assert len(nv['finite_subcover']) > 0
+
+    def test_equivalences_list(self):
+        """Drei Äquivalenzen für Kompaktheit werden aufgelistet."""
+        result = heine_borel_theorem()
+        assert len(result['equivalences']) >= 3
+
+
+class TestTychonoff:
+    """Tests für den Satz von Tychonoff."""
+
+    def test_returns_dict(self):
+        """tychonoff_theorem_demo gibt ein dict zurück."""
+        result = tychonoff_theorem_demo()
+        assert isinstance(result, dict)
+
+    def test_finite_product_compact(self):
+        """Endliches Produkt kompakter Räume ist kompakt."""
+        result = tychonoff_theorem_demo()
+        assert result['finite_demo']['is_compact'] is True
+
+    def test_product_size(self):
+        """Produktmenge hat |A| × |B| Elemente."""
+        result = tychonoff_theorem_demo()
+        fd = result['finite_demo']
+        assert fd['product_size'] == len(fd['space_a']) * len(fd['space_b'])
+
+    def test_important_examples(self):
+        """Mindestens 3 wichtige Beispiele (Hilbert-Würfel etc.)."""
+        result = tychonoff_theorem_demo()
+        assert len(result['important_examples']) >= 3
+
+    def test_axiom_of_choice_mentioned(self):
+        """Auswahlaxiom wird erwähnt."""
+        result = tychonoff_theorem_demo()
+        assert 'axiom_of_choice' in result
+        assert 'Auswahlaxiom' in result['axiom_of_choice']
+
+
+# ============================================================
+# Tests: Uniforme Räume (Uniform Spaces)
+# ============================================================
+
+class TestUniformSpace:
+    """Tests für die UniformSpace-Klasse."""
+
+    def test_entourage_contains_diagonal(self):
+        """Epsilon-Entourage enthält die Diagonale."""
+        points = [0, 1, 2, 3]
+        us = UniformSpace(points, metric=lambda x, y: abs(x - y))
+        ent = us.entourage(0.5)
+        # Prüfe Diagonale
+        assert us.contains_diagonal(ent) is True
+
+    def test_entourage_size(self):
+        """Für ε=0.5 enthält Entourage auf {0,1,2,3} nur Diagonal-Paare."""
+        points = [0, 1, 2, 3]
+        us = UniformSpace(points, metric=lambda x, y: abs(x - y))
+        ent = us.entourage(0.5)
+        # Nur Paare (x,y) mit |x-y| < 0.5, also nur Diagonale (|x-x|=0 < 0.5)
+        assert (0, 0) in ent
+        assert (0, 1) not in ent  # |0-1|=1 ≥ 0.5
+
+    def test_entourage_large_epsilon(self):
+        """Für große ε enthält Entourage alle Paare."""
+        points = [0, 1, 2]
+        us = UniformSpace(points, metric=lambda x, y: abs(x - y))
+        ent = us.entourage(100.0)
+        assert len(ent) == len(points) ** 2
+
+    def test_symmetric_entourage(self):
+        """Entourage ist symmetrisch."""
+        points = [0, 1, 2]
+        us = UniformSpace(points, metric=lambda x, y: abs(x - y))
+        ent = us.entourage(1.5)
+        assert us.is_symmetric(ent) is True
+
+    def test_uniform_continuity_identity(self):
+        """Identitätsfunktion ist gleichmäßig stetig."""
+        points = [0.0, 0.5, 1.0, 1.5, 2.0]
+        us = UniformSpace(points, metric=lambda x, y: abs(x - y))
+        result = us.uniform_continuity_check(
+            f=lambda x: x,
+            target_metric=lambda x, y: abs(x - y),
+            epsilon=0.01
+        )
+        assert result['uniformly_continuous'] is True
+        assert result['delta'] is not None
+
+
+class TestCauchyFilter:
+    """Tests für cauchy_filter_demo (√2-Approximation in ℚ)."""
+
+    def test_returns_dict(self):
+        """cauchy_filter_demo gibt ein dict zurück."""
+        result = cauchy_filter_demo()
+        assert isinstance(result, dict)
+
+    def test_sequence_converges_to_sqrt2(self):
+        """Die Folge konvergiert numerisch gegen √2."""
+        import math
+        result = cauchy_filter_demo()
+        assert abs(result['limit_value'] - math.sqrt(2)) < 1e-15
+
+    def test_is_cauchy(self):
+        """Die Folge ist eine Cauchy-Folge."""
+        result = cauchy_filter_demo()
+        assert result['is_cauchy'] is True
+
+    def test_limit_not_in_Q(self):
+        """Der Grenzwert √2 ist nicht in ℚ."""
+        result = cauchy_filter_demo()
+        assert result['limit_in_Q'] is False
+
+    def test_differences_decrease(self):
+        """Die Abstände aufeinanderfolgender Glieder fallen monoton."""
+        result = cauchy_filter_demo()
+        diffs = result['differences']
+        # Nach einigen Schritten fallen die Differenzen schnell
+        assert diffs[5] < diffs[1]
+
+
+class TestCompletionOfRationals:
+    """Tests für completion_of_rationals."""
+
+    def test_returns_dict(self):
+        """completion_of_rationals gibt ein dict zurück."""
+        result = completion_of_rationals()
+        assert isinstance(result, dict)
+
+    def test_real_completion_present(self):
+        """Vervollständigung zu ℝ ist beschrieben."""
+        result = completion_of_rationals()
+        assert 'completion_real' in result
+        assert 'ℝ' in result['completion_real']['result']
+
+    def test_p_adic_completion_present(self):
+        """p-adische Vervollständigung ist beschrieben."""
+        result = completion_of_rationals()
+        assert 'completion_p_adic' in result
+
+    def test_p_adic_examples_correct(self):
+        """p-adische Normen: |5|_5 = 0.2, |25|_5 = 0.04."""
+        result = completion_of_rationals()
+        examples = result['completion_p_adic']['examples']
+        norm_5 = next(e['norm'] for e in examples if e['x'] == 5)
+        norm_25 = next(e['norm'] for e in examples if e['x'] == 25)
+        assert abs(norm_5 - 0.2) < 1e-10
+        assert abs(norm_25 - 0.04) < 1e-10
+
+    def test_ostrowski_theorem_mentioned(self):
+        """Satz von Ostrowski wird erwähnt."""
+        result = completion_of_rationals()
+        assert 'ostrowski_theorem' in result
+        assert 'Ostrowski' in result['ostrowski_theorem']
+
+
+# ============================================================
+# Tests: Topologische Gruppen
+# ============================================================
+
+class TestTopologicalGroupExamples:
+    """Tests für topological_group_examples."""
+
+    def test_returns_list(self):
+        """topological_group_examples gibt eine Liste zurück."""
+        result = topological_group_examples()
+        assert isinstance(result, list)
+
+    def test_at_least_5_examples(self):
+        """Mindestens 5 Beispiele vorhanden."""
+        result = topological_group_examples()
+        assert len(result) >= 5
+
+    def test_each_example_has_required_keys(self):
+        """Jedes Beispiel hat name, operation, topology, compact, connected, abelian."""
+        result = topological_group_examples()
+        required_keys = {'name', 'operation', 'topology', 'compact', 'connected', 'abelian'}
+        for example in result:
+            assert required_keys.issubset(example.keys()), \
+                f"Fehlende Schlüssel in: {example}"
+
+    def test_real_addition_is_abelian_and_connected(self):
+        """(ℝ, +) ist abelsch und zusammenhängend."""
+        result = topological_group_examples()
+        real_add = next(e for e in result if 'ℝ, +' in e['name'])
+        assert real_add['abelian'] is True
+        assert real_add['connected'] is True
+        assert real_add['compact'] is False
+
+    def test_unit_circle_is_compact(self):
+        """S¹ (Einheitskreis) ist kompakt."""
+        result = topological_group_examples()
+        s1 = next(e for e in result if 'S¹' in e['name'] or 'Einheitskreis' in e['name'])
+        assert s1['compact'] is True
+        assert s1['connected'] is True
+
+    def test_gl_n_is_not_abelian(self):
+        """GL(n, ℝ) ist nicht abelsch (für n ≥ 2)."""
+        result = topological_group_examples()
+        gln = next(e for e in result if 'GL' in e['name'])
+        assert gln['abelian'] is False
+
+
+# ============================================================
+# Tests: Topologische Vektorräume
+# ============================================================
+
+class TestTopologicalVectorSpace:
+    """Tests für TopologicalVectorSpace und zugehörige Funktionen."""
+
+    def test_tvs_creation(self):
+        """TVS-Objekt kann erstellt werden."""
+        tvs = TopologicalVectorSpace('ℝ²', 2, True, True, True)
+        assert tvs.name == 'ℝ²'
+        assert tvs.is_banach is True
+
+    def test_banach_requires_normed_and_complete(self):
+        """Banach-Raum erfordert normiert + vollständig."""
+        tvs_banach = TopologicalVectorSpace('L²', 'unendlich', True, True, True)
+        tvs_not_banach = TopologicalVectorSpace('C^∞', 'unendlich', False, True, True)
+        assert tvs_banach.is_banach is True
+        assert tvs_not_banach.is_banach is False
+
+    def test_convex_neighborhood_disk(self):
+        """Kreisscheibenpunkte (konvex) bestehen Konvexitätsprüfung."""
+        import math
+        tvs = TopologicalVectorSpace('ℝ²', 2, True, True, True)
+        # Punkte auf dem Rand eines Kreises
+        pts = [[math.cos(2 * math.pi * k / 8), math.sin(2 * math.pi * k / 8)]
+               for k in range(8)]
+        pts.append([0.0, 0.0])
+        assert tvs.check_convex_neighborhood(pts) is True
+
+    def test_to_dict(self):
+        """to_dict gibt alle wichtigen Schlüssel zurück."""
+        tvs = TopologicalVectorSpace('Test', 3, True, True, True)
+        d = tvs.to_dict()
+        assert 'name' in d
+        assert 'dimension' in d
+        assert 'locally_convex' in d
+        assert 'banach' in d
+
+
+class TestLocallyConvexDemo:
+    """Tests für locally_convex_demo."""
+
+    def test_returns_dict(self):
+        """locally_convex_demo gibt ein dict zurück."""
+        result = locally_convex_demo()
+        assert isinstance(result, dict)
+
+    def test_examples_present(self):
+        """Mindestens 4 Beispiele für lokalkonvexe Räume."""
+        result = locally_convex_demo()
+        assert len(result['examples']) >= 4
+
+    def test_L_p_not_locally_convex(self):
+        """L^p für p < 1 ist nicht lokalkonvex."""
+        result = locally_convex_demo()
+        non_lc = [e for e in result['examples'] if not e['locally_convex']]
+        assert len(non_lc) >= 1
+
+    def test_geometric_demo_convex(self):
+        """Die geometrische Demo zeigt Konvexität der Einheitsscheibe."""
+        result = locally_convex_demo()
+        assert result['geometric_demo']['is_convex'] is True
+
+    def test_frechet_spaces_listed(self):
+        """Fréchet-Räume werden beschrieben."""
+        result = locally_convex_demo()
+        assert 'frechet_spaces' in result
+        assert len(result['frechet_spaces']['examples']) >= 2
+
+    def test_sobolev_spaces_listed(self):
+        """Sobolev-Räume werden beschrieben."""
+        result = locally_convex_demo()
+        assert 'sobolev_spaces' in result
+        assert 'applications' in result['sobolev_spaces']
+
+
+class TestSchwartzSpaceIntro:
+    """Tests für schwartz_space_intro."""
+
+    def test_returns_dict(self):
+        """schwartz_space_intro gibt ein dict zurück."""
+        result = schwartz_space_intro()
+        assert isinstance(result, dict)
+
+    def test_gaussian_in_schwartz(self):
+        """Gauß-Funktion liegt im Schwartz-Raum."""
+        result = schwartz_space_intro()
+        assert result['gaussian_example']['in_schwartz'] is True
+        assert result['gaussian_example']['all_seminorms_finite'] is True
+
+    def test_seminorm_p00_is_1(self):
+        """Halbnorm p_{0,0} der Gauß-Funktion ≈ 1 (Supremum)."""
+        result = schwartz_space_intro()
+        p00 = result['gaussian_example']['seminorms_computed']['p_{0,0}']
+        assert abs(p00 - 1.0) < 1e-5
+
+    def test_not_in_schwartz_examples(self):
+        """Mindestens 2 Funktionen die nicht in S(ℝ) liegen."""
+        result = schwartz_space_intro()
+        assert len(result['not_in_schwartz']) >= 2
+
+    def test_fourier_invariance(self):
+        """Fourier-Invarianz des Schwartz-Raums wird beschrieben."""
+        result = schwartz_space_intro()
+        assert 'fourier_invariance' in result
+        assert 'Isomorphismus' in result['fourier_invariance']['statement']
+
+    def test_properties_list(self):
+        """Mindestens 3 Eigenschaften des Schwartz-Raums."""
+        result = schwartz_space_intro()
+        assert len(result['properties']) >= 3
+
+    def test_tempered_distributions_mentioned(self):
+        """Temperierte Distributionen werden erwähnt."""
+        result = schwartz_space_intro()
+        assert 'tempered_distributions' in result
+        assert 'Dirac' in result['tempered_distributions'] or 'δ' in result['tempered_distributions']

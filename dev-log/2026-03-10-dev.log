@@ -1940,3 +1940,15 @@ liefert falsche Ergebnisse (Kettensubstitution).
 - numpy.bool_/complex Serialisierung behoben
 - frozenset Serialisierung in Birkhoff-Endpunkt behoben
 - heat_equation_explicit/wave_equation_explicit gibt 2D-Matrix zurück; letzte Zeile extrahiert
+
+2026-03-10 22:05 - Build 36: Neue Module und Bugfixes
+  - algebraic_geometry.py: AffineVariety, ProjectiveVariety, Gröbner-Basen, Nullstellensatz (117 Tests)
+  - lie_groups.py: SO, SU, GL, LieAlgebra, ExponentialMap, BCH, Klassifikation (169 Tests)
+  - stochastic.py: MarkovChain, BrownianMotion, SDE, ErgodicTheory, PoissonProcess (div. Tests)
+  - differential_topology.py: DifferentialForm, DeRhamCohomology, MorseTheory, SphereTopology (div. Tests)
+  - app.py: 4 neue Seiten-Routen, 16 neue API-Routen für neue Module
+  - Bugfix: character_table() falsch aufgerufen mit 1 statt 3 Argumenten
+  - Bugfix: ChainComplex() fehlte boundaries-Argument
+  - Bugfix: molien_series() falsch aufgerufen mit group_type statt matrices
+  - Navigation: Lie-Gruppen, Algebraische Geometrie, Differentialtopologie, Stochastik hinzugefügt
+  - 5008/5008 Tests grün

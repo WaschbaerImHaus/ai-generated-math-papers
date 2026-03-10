@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+<!--
+    @file differential_topology.html
+    @brief Differentialtopologie: Differentialformen, Morse-Theorie, de Rham-Kohomologie.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+{% block title %}Differentialtopologie – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>&#8711; Differentialtopologie</h1>
+    <p class="page-desc">
+        Differentialformen, äußere Ableitung, de Rham-Kohomologie, Morse-Theorie und Sphären-Topologie.
+        $$H^k_{dR}(M) = \frac{\ker(d: \Omega^k \to \Omega^{k+1})}{\operatorname{im}(d: \Omega^{k-1} \to \Omega^k)}$$
+    </p>
+</div>
+
+<!-- Section 1: Differentialformen -->
+<section class="math-section">
+    <h2>&#8658; Differentialformen &amp; äußere Ableitung</h2>
+    <p>
+        Eine $k$-<strong>Differentialform</strong> $\omega \in \Omega^k(M)$ ist ein alternierendes
+        kovariantes Tensorfeld. Die <strong>äußere Ableitung</strong> $d\omega \in \Omega^{k+1}(M)$
+        erfüllt $d \circ d = 0$. Eine Form heißt <em>geschlossen</em> falls $d\omega = 0$,
+        und <em>exakt</em> falls $\omega = d\eta$.
+        $$\omega = f_1 \, dx + f_2 \, dy \implies d\omega = \left(\frac{\partial f_2}{\partial x} - \frac{\partial f_1}{\partial y}\right) dx \wedge dy$$
+    </p>
+    <div class="card-grid">
+        <div class="card">
+            <h3>1-Form und äußere Ableitung</h3>
+            <div class="input-row">
+                <label>Koeffizienten (kommagetrennt, z.B. für $f_1 dx + f_2 dy$):</label>
+            </div>
+            <input type="text" id="form-coefficients" value="x*y, x**2" style="width:220px">
+            <div class="input-row">
+                <label>Variablen:</label>
+                <input type="text" id="form-variables" value="x,y" style="width:100px">
+                <label>Grad $k$:</label>
+                <input type="number" id="form-degree" value="1" min="0" max="3" style="width:60px">
+            </div>
+            <button onclick="calcDifferentialForm()" class="btn-calc">Berechnen</button>
+            <div id="form-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Section 2: Morse-Theorie -->
+<section class="math-section">
+    <h2>&#9652; Morse-Theorie</h2>
+    <p>
+        Eine glatte Funktion $f: M \to \mathbb{R}$ heißt <strong>Morse-Funktion</strong>,
+        wenn alle kritischen Punkte ($\nabla f = 0$) nicht-degeneriert sind (Hesse-Matrix invertierbar).
+        Der <strong>Morse-Index</strong> $\lambda(p)$ = Anzahl negativer Eigenwerte der Hesse-Matrix.
+        <strong>Morse-Ungleichungen</strong>: $\mu_k \geq b_k$ (Morse-Zahl $\geq$ Betti-Zahl).
+    </p>
+    <div class="card-grid">
+        <div class="card">
+            <h3>Kritische Punkte &amp; Morse-Index</h3>
+            <div class="input-row">
+                <label>Funktion $f(x,y)$:</label>
+                <input type="text" id="morse-function" value="x**2 - y**2" style="width:200px">
+                <label>Variablen:</label>
+                <input type="text" id="morse-variables" value="x,y" style="width:100px">
+            </div>
+            <button onclick="calcMorseTheory()" class="btn-calc">Morse-Analyse</button>
+            <div id="morse-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Section 3: de Rham-Kohomologie -->
+<section class="math-section">
+    <h2>H de Rham-Kohomologie</h2>
+    <p>
+        Die <strong>de Rham-Kohomologiegruppen</strong> $H^k_{dR}(M)$ sind topologische Invarianten.
+        <strong>Betti-Zahlen</strong> $b_k = \dim H^k_{dR}(M)$, <strong>Euler-Charakteristik</strong>
+        $\chi(M) = \sum_k (-1)^k b_k$.
+        Bekannte Beispiele:
+        $H^k(S^n) = \mathbb{R}$ für $k=0,n$, sonst $0$.
+        $H^k(T^n) = \binom{n}{k} \cdot \mathbb{R}$.
+    </p>
+    <div class="card-grid">
+        <div class="card">
+            <h3>Betti-Zahlen &amp; Euler-Charakteristik</h3>
+            <div class="input-row">
+                <label>Raum:</label>
+                <select id="cohom-space" style="width:120px">
+                    <option value="sphere">Sphäre $S^n$</option>
+                    <option value="torus">Torus $T^n$</option>
+                </select>
+                <label>$n$:</label>
+                <input type="number" id="cohom-n" value="2" min="1" max="6" style="width:60px">
+            </div>
+            <button onclick="calcCohomology()" class="btn-calc">Berechnen</button>
+            <div id="cohom-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Section 4: Sphären-Topologie -->
+<section class="math-section">
+    <h2>S Sphären-Topologie</h2>
+    <p>
+        Die $n$-<strong>Sphäre</strong> $S^n = \{x \in \mathbb{R}^{n+1} \mid |x|=1\}$ ist eine
+        kompakte, orientierbare Mannigfaltigkeit.
+        <strong>Whitney-Einbettungssatz</strong>: Jede $n$-Mannigfaltigkeit lässt sich in $\mathbb{R}^{2n}$
+        einbetten (glatt).
+        <strong>Satz vom Igel</strong> (Hairy Ball): Auf $S^{2k}$ gibt es kein überall nicht-verschwindendes
+        Vektorfeld.
+        Bekannte Homotopiegruppen: $\pi_k(S^n)$ für kleine $k,n$.
+    </p>
+    <div class="card-grid">
+        <div class="card">
+            <h3>Sphäre $S^n$ – Topologische Invarianten</h3>
+            <div class="input-row">
+                <label>$n$:</label>
+                <input type="number" id="sphere-n" value="2" min="1" max="7" style="width:60px">
+            </div>
+            <button onclick="calcSphereTopology()" class="btn-calc">Analysieren</button>
+            <div id="sphere-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * @brief Differentialform und äußere Ableitung berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcDifferentialForm() {
+    const div = document.getElementById('form-result');
+    const coeff_str = document.getElementById('form-coefficients').value;
+    const coefficients = coeff_str.split(',').map(s => s.trim());
+    const variables = document.getElementById('form-variables').value.split(',').map(s => s.trim());
+    const degree = parseInt(document.getElementById('form-degree').value);
+    try {
+        const data = await apiPost('/api/differential_topology/differential_form', { coefficients, variables, degree });
+        let html = `<strong>${degree}-Form und äußere Ableitung $d\\omega$</strong><br>`;
+        html += `Koeffizienten: $${coefficients.join(', ')}$<br>`;
+        if (data.exterior_derivative !== undefined) html += `Äußere Ableitung: $d\\omega = ${data.exterior_derivative}$<br>`;
+        html += `Geschlossen ($d\\omega = 0$): ${data.is_closed ? '✓' : '✗'}<br>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Morse-Theorie: kritische Punkte und Morse-Index.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcMorseTheory() {
+    const div = document.getElementById('morse-result');
+    const func = document.getElementById('morse-function').value;
+    const variables = document.getElementById('morse-variables').value.split(',').map(s => s.trim());
+    try {
+        const data = await apiPost('/api/differential_topology/morse_theory', { function: func, variables });
+        let html = `<strong>Morse-Analyse: $f = ${func}$</strong><br>`;
+        html += `Morse-Funktion: ${data.is_morse_function ? '✓ (alle krit. Punkte nicht-degeneriert)' : '✗'}<br>`;
+        if (data.critical_points && data.critical_points.length > 0) {
+            html += '<br><strong>Kritische Punkte:</strong><ul>';
+            data.critical_points.forEach(cp => {
+                html += `<li>$${cp.point}$ – Morse-Index $\\lambda = ${cp.morse_index}$</li>`;
+            });
+            html += '</ul>';
+        }
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief de Rham-Betti-Zahlen berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcCohomology() {
+    const div = document.getElementById('cohom-result');
+    const space = document.getElementById('cohom-space').value;
+    const n = parseInt(document.getElementById('cohom-n').value);
+    try {
+        const data = await apiPost('/api/differential_topology/cohomology', { space, n });
+        const spaceName = space === 'sphere' ? `S^{${n}}` : `T^{${n}}`;
+        let html = `<strong>de Rham-Kohomologie von $${spaceName}$</strong><br>`;
+        html += '<br><strong>Betti-Zahlen $b_k$:</strong><ul>';
+        data.betti_numbers.forEach((b, k) => {
+            html += `<li>$b_{${k}} = H^{${k}}_{dR} \\cong \\mathbb{R}^{${b}}$</li>`;
+        });
+        html += '</ul>';
+        html += `Euler-Charakteristik: $\\chi = ${data.euler_characteristic}$`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Sphären-Topologie analysieren.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcSphereTopology() {
+    const div = document.getElementById('sphere-result');
+    const n = parseInt(document.getElementById('sphere-n').value);
+    try {
+        const data = await apiPost('/api/differential_topology/sphere', { n });
+        let html = `<strong>Topologie der $S^{${n}}$</strong><br>`;
+        html += `Orientierbar: ${data.is_orientable ? '✓' : '✗'}<br>`;
+        html += `Whitney-Einbettungsdimension: $\\mathbb{R}^{${data.whitney_dim}}$<br>`;
+        if (data.homology_groups) {
+            html += '<br><strong>Homologiegruppen $H_k(S^n)$:</strong><ul>';
+            Object.entries(data.homology_groups).forEach(([k, h]) => {
+                html += `<li>$H_{${k}} = ${h}$</li>`;
+            });
+            html += '</ul>';
+        }
+        if (data.hairy_ball) html += `<br><em>Satz vom Igel: ${data.hairy_ball}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+</script>
+{% endblock %}

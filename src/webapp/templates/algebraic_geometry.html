@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+<!--
+    @file algebraic_geometry.html
+    @brief Algebraische Geometrie: Gröbner-Basen, Nullstellensatz,
+           Elliptische Kurven und Bézout-Theorem.
+    @description
+        Interaktive Web-Seite für algebraische Geometrie.
+        Berechnung von Gröbner-Basen (Buchberger-Algorithmus), Hilbertscher
+        Nullstellensatz, Gruppenstruktur elliptischer Kurven über endlichen
+        Körpern sowie Schnittpunktanzahlen via Bézout-Theorem.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+
+{% block title %}Algebraische Geometrie – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>&#119974; Algebraische Geometrie</h1>
+    <p class="page-desc">
+        Gröbner-Basen (Buchberger-Algorithmus, Reduktion), Hilbertscher Nullstellensatz,
+        Gruppenstruktur elliptischer Kurven $y^2 = x^3 + ax + b$ über $\mathbb{F}_p$
+        sowie Schnittpunktanzahlen nach dem Satz von Bézout.
+    </p>
+</div>
+
+<!-- ===== SECTION 1: GRÖBNER-BASEN ===== -->
+<section class="math-section">
+    <h2>&#120069; Gröbner-Basen</h2>
+    <p>
+        Eine <strong>Gröbner-Basis</strong> $G = \{g_1, \ldots, g_t\}$ eines Ideals
+        $I \subseteq k[x_1,\ldots,x_n]$ ist eine Erzeugendenmenge, sodass der
+        Leitterm jedes $f \in I$ durch einen Leitterm aus $G$ teilbar ist.
+        <strong>Buchberger-Algorithmus</strong>: Iterative Berechnung über S-Polynome
+        $S(f,g) = \frac{\mathrm{lcm}(LM(f),LM(g))}{LT(f)} \cdot f - \frac{\mathrm{lcm}(LM(f),LM(g))}{LT(g)} \cdot g$.
+        Anwendungen: Gleichungssysteme lösen, Idealzugehörigkeit, Eliminationstheorie.
+    </p>
+
+    <div class="card-grid">
+
+        <!-- Gröbner-Basis berechnen -->
+        <div class="card">
+            <h3>Gröbner-Basis $G$ eines Ideals</h3>
+            <p>
+                Gegeben Erzeuger $f_1, \ldots, f_k \in k[x_1,\ldots,x_n]$:
+                Der Buchberger-Algorithmus berechnet eine reduzierte Gröbner-Basis bzgl.
+                einer Monomordnung (lex, grlex, grevlex).
+                $$I = \langle f_1, \ldots, f_k \rangle \xrightarrow{\text{Buchberger}} G$$
+            </p>
+            <div class="input-row">
+                <label>Generatoren (eine Zeile pro Polynom):</label>
+            </div>
+            <textarea id="groebner-generators" rows="4" style="width:100%">x**2 + y - 1
+x + y**2 - 1</textarea>
+            <div class="input-row">
+                <label>Variablen (kommagetrennt):</label>
+                <input type="text" id="groebner-variables" value="x,y" style="width:120px">
+            </div>
+            <button onclick="calcGroebnerBasis()" class="btn-calc">Gröbner-Basis berechnen</button>
+            <div id="groebner-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 2: NULLSTELLENSATZ ===== -->
+<section class="math-section">
+    <h2>&#8709; Hilbertscher Nullstellensatz</h2>
+    <p>
+        <strong>Schwacher Nullstellensatz</strong>: $I \subsetneq k[x_1,\ldots,x_n]$
+        $\Rightarrow$ $V(I) \neq \emptyset$ für algebraisch abgeschlossenes $k$.
+        <strong>Starker Nullstellensatz</strong>:
+        $I(V(I)) = \sqrt{I}$ (Radikalideal).
+        Korollar: $f$ verschwindet auf $V(I)$ genau dann, wenn $f^m \in I$ für ein $m \geq 1$.
+    </p>
+
+    <div class="card-grid">
+
+        <!-- Nullstellensatz anwenden -->
+        <div class="card">
+            <h3>Nullstellensatz &amp; Varietät $V(I)$</h3>
+            <p>
+                Berechnung der algebraischen Varietät $V(I) = \{x \in k^n \mid f(x) = 0 \; \forall f \in I\}$
+                und Überprüfung des Nullstellensatzes.
+                $$\sqrt{I} = \{f \in k[x] \mid \exists m \in \mathbb{N} : f^m \in I\}$$
+            </p>
+            <div class="input-row">
+                <label>Generatoren (eine Zeile pro Polynom):</label>
+            </div>
+            <textarea id="nullstellensatz-generators" rows="4" style="width:100%">x**2 - 1
+y**2 - 1</textarea>
+            <div class="input-row">
+                <label>Variablen (kommagetrennt):</label>
+                <input type="text" id="nullstellensatz-variables" value="x,y" style="width:120px">
+            </div>
+            <button onclick="calcNullstellensatz()" class="btn-calc">Nullstellensatz anwenden</button>
+            <div id="nullstellensatz-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 3: ELLIPTISCHE KURVEN ===== -->
+<section class="math-section">
+    <h2>&#8734; Elliptische Kurven</h2>
+    <p>
+        Eine <strong>elliptische Kurve</strong> über $\mathbb{F}_p$ ist:
+        $$E: y^2 \equiv x^3 + ax + b \pmod{p}, \quad \Delta = -16(4a^3 + 27b^2) \neq 0$$
+        Die Menge der Punkte $E(\mathbb{F}_p) \cup \{\mathcal{O}\}$ bildet eine abelsche Gruppe
+        (Gruppengesetz durch Sekantenverfahren und Tangentenmethode).
+        <strong>Satz von Hasse</strong>: $|E(\mathbb{F}_p)| \in [p+1-2\sqrt{p},\, p+1+2\sqrt{p}]$.
+    </p>
+
+    <div class="card-grid">
+
+        <!-- Elliptische Kurve -->
+        <div class="card">
+            <h3>Elliptische Kurve $y^2 = x^3 + ax + b$ über $\mathbb{F}_p$</h3>
+            <p>
+                Berechnung der Punktgruppe, Überprüfung der Nicht-Singularität
+                ($\Delta \neq 0$) und Gruppenoperationen.
+            </p>
+            <div class="input-row">
+                <label>$a$:</label>
+                <input type="number" id="elliptic-a" value="-1" step="1">
+                <label>$b$:</label>
+                <input type="number" id="elliptic-b" value="1" step="1">
+                <label>$p$ (Primzahl):</label>
+                <input type="number" id="elliptic-p" value="7" step="1" min="2">
+            </div>
+            <button onclick="calcEllipticCurve()" class="btn-calc">Kurve analysieren</button>
+            <div id="elliptic-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 4: BÉZOUT-THEOREM ===== -->
+<section class="math-section">
+    <h2>&#8745; Bézout-Theorem</h2>
+    <p>
+        <strong>Satz von Bézout</strong>: Zwei projektive Kurven vom Grad $d_1$ und $d_2$
+        über einem algebraisch abgeschlossenen Körper schneiden sich in genau
+        $d_1 \cdot d_2$ Punkten (gezählt mit Vielfachheit und über $\mathbb{P}^2$).
+        $$\#(C_1 \cap C_2) = d_1 \cdot d_2 \quad \text{(mit Vielfachheiten)}$$
+        Anwendung: Grad einer Kurve, Schnittpunktberechnung, projektive Geometrie.
+    </p>
+
+    <div class="card-grid">
+
+        <!-- Bézout-Schnittpunkte -->
+        <div class="card">
+            <h3>Bézout-Schnittpunkte zweier Kurven</h3>
+            <p>
+                Gegeben zwei Kurven $C_1$ (Grad $d_1$) und $C_2$ (Grad $d_2$):
+                Berechnung der erwarteten Schnittpunktanzahl und Verifikation
+                mit Resultante.
+                $$\deg(C_1) = d_1, \quad \deg(C_2) = d_2 \implies \#(C_1 \cap C_2) = d_1 \cdot d_2$$
+            </p>
+            <div class="input-row">
+                <label>Grad $d_1$ (Kurve 1):</label>
+                <input type="number" id="bezout-d1" value="2" min="1" max="10" step="1">
+            </div>
+            <div class="input-row">
+                <label>Grad $d_2$ (Kurve 2):</label>
+                <input type="number" id="bezout-d2" value="3" min="1" max="10" step="1">
+            </div>
+            <button onclick="calcBezoutTheorem()" class="btn-calc">Bézout-Schnittpunkte berechnen</button>
+            <div id="bezout-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * @brief Gröbner-Basis eines Polynomideals berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcGroebnerBasis() {
+    const div = document.getElementById('groebner-result');
+    // Generatoren zeilenweise einlesen
+    const rawGenerators = document.getElementById('groebner-generators').value;
+    const generators = rawGenerators.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+    const variables = document.getElementById('groebner-variables').value;
+    try {
+        const data = await apiPost('/api/algebraic_geometry/groebner', {
+            generators,
+            variables
+        });
+        const r = data;
+        let html = '<strong>Gröbner-Basis</strong><br>';
+        html += `Ideal erzeugt von: ${r.generators ? r.generators.join(', ') : generators.join(', ')}<br>`;
+        if (r.groebner_basis) {
+            html += '<br><strong>Reduzierte Gröbner-Basis:</strong><ul>';
+            r.groebner_basis.forEach(g => {
+                html += `<li>$${g}$</li>`;
+            });
+            html += '</ul>';
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Nullstellensatz anwenden und Varietät berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcNullstellensatz() {
+    const div = document.getElementById('nullstellensatz-result');
+    // Generatoren zeilenweise einlesen
+    const rawGenerators = document.getElementById('nullstellensatz-generators').value;
+    const generators = rawGenerators.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+    const variables = document.getElementById('nullstellensatz-variables').value;
+    try {
+        const data = await apiPost('/api/algebraic_geometry/nullstellensatz', {
+            generators,
+            variables
+        });
+        const r = data;
+        let html = '<strong>Hilbertscher Nullstellensatz</strong><br>';
+        if (r.variety) {
+            html += '<br><strong>Varietät $V(I)$:</strong><ul>';
+            r.variety.forEach(pt => {
+                const coords = Object.entries(pt).map(([k,v]) => `${k} = ${v}`).join(', ');
+                html += `<li>(${coords})</li>`;
+            });
+            html += '</ul>';
+        }
+        if (r.radical) {
+            html += `<strong>Radikalideal $\\sqrt{I}$</strong>: ${r.radical}<br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Elliptische Kurve über endlichem Körper analysieren.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcEllipticCurve() {
+    const div = document.getElementById('elliptic-result');
+    const a = parseInt(document.getElementById('elliptic-a').value);
+    const b = parseInt(document.getElementById('elliptic-b').value);
+    const p = parseInt(document.getElementById('elliptic-p').value);
+    try {
+        const data = await apiPost('/api/algebraic_geometry/elliptic_curve', { a, b, p });
+        const r = data;
+        let html = `<strong>Elliptische Kurve $y^2 \\equiv x^3 + ${a}x + ${b} \\pmod{${p}}$</strong><br>`;
+        // Diskriminante und Nicht-Singularität
+        if (r.discriminant !== undefined) {
+            html += `Diskriminante: $\\Delta = ${r.discriminant}$ `;
+            html += r.is_nonsingular ? '(nicht-singulär ✓)' : '(singulär ✗)';
+            html += '<br>';
+        }
+        // Punkte der Kurve
+        if (r.points !== undefined) {
+            html += `Anzahl Punkte $|E(\\mathbb{F}_{${p}})| = ${r.num_points}$ (inkl. $\\mathcal{O}$)<br>`;
+        }
+        // Hasse-Schranke
+        if (r.hasse_bound) {
+            html += `Hasse-Schranke: $[${r.hasse_bound[0]}, ${r.hasse_bound[1]}]$<br>`;
+        }
+        if (r.description) html += `<br><em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Bézout-Theorem: Schnittpunktanzahl zweier Kurven berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcBezoutTheorem() {
+    const div = document.getElementById('bezout-result');
+    const d1 = parseInt(document.getElementById('bezout-d1').value);
+    const d2 = parseInt(document.getElementById('bezout-d2').value);
+    try {
+        const data = await apiPost('/api/algebraic_geometry/intersection', { d1, d2 });
+        const r = data;
+        let html = `<strong>Satz von Bézout: $\\deg(C_1) = ${d1}$, $\\deg(C_2) = ${d2}$</strong><br>`;
+        html += `Erwartete Schnittpunkte: $d_1 \\cdot d_2 = ${d1} \\cdot ${d2} = ${d1*d2}$<br>`;
+        if (r.intersection_number !== undefined) {
+            html += `Schnittpunktzahl: <strong>${r.intersection_number}</strong><br>`;
+        }
+        if (r.examples) {
+            html += '<br><strong>Beispiele:</strong><ul>';
+            r.examples.forEach(ex => {
+                html += `<li>${ex}</li>`;
+            });
+            html += '</ul>';
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+</script>
+{% endblock %}

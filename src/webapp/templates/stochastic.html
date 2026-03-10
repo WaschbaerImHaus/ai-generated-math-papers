@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+<!--
+    @file stochastic.html
+    @brief Stochastische Prozesse und Ergodentheorie: Markov-Ketten,
+           Brownsche Bewegung, Geometrische Brownschen Bewegung (GBM/SDE)
+           und Ergodentheorie (logistische Abbildung).
+    @description
+        Interaktive Web-Seite für stochastische Prozesse.
+        Markov-Ketten (stationäre Verteilung, n-Schritt-Übergang),
+        Brownsche Bewegung (Pfadsimulation), geometrische Brownsche Bewegung
+        (Black-Scholes-Modell), ergodentheoretische Iterationen.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+
+{% block title %}Stochastische Prozesse &amp; Ergodentheorie – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>&#119966; Stochastische Prozesse &amp; Ergodentheorie</h1>
+    <p class="page-desc">
+        Markov-Ketten (Übergangsmatrix, stationäre Verteilung, Ergodizität),
+        Brownsche Bewegung $B_t$ (Wiener-Prozess, $\mathbb{E}[B_t]=0$, $\mathrm{Var}(B_t)=t$),
+        Geometrische Brownsche Bewegung (Black-Scholes: $dS = \mu S\,dt + \sigma S\,dW$)
+        und Ergodentheorie (logistische Abbildung, Poincaré-Wiederkehr).
+    </p>
+</div>
+
+<!-- ===== SECTION 1: MARKOV-KETTEN ===== -->
+<section class="math-section">
+    <h2>&#9654; Markov-Ketten</h2>
+    <p>
+        Ein <strong>Markov-Prozess</strong> erfüllt die Markov-Eigenschaft:
+        $$P(X_{n+1} = j \mid X_n = i, X_{n-1}, \ldots) = P(X_{n+1} = j \mid X_n = i) = p_{ij}$$
+        Die <strong>Übergangsmatrix</strong> $P = (p_{ij})$ ist stochastisch: $p_{ij} \geq 0$, $\sum_j p_{ij} = 1$.
+        <strong>Stationäre Verteilung</strong>: $\pi P = \pi$, $\sum_i \pi_i = 1$.
+        <strong>Ergodizität</strong>: Irreduzible, aperiodische Ketten konvergieren zur stationären Verteilung.
+    </p>
+
+    <div class="card-grid">
+
+        <!-- Markov-Kette -->
+        <div class="card">
+            <h3>Markov-Kette: $n$-Schritt-Übergang &amp; stationäre Verteilung</h3>
+            <p>
+                Berechnung der $n$-Schritt-Übergangsmatrix $P^n$,
+                stationäre Verteilung $\pi$ (Eigenvektor zum Eigenwert 1 von $P^T$)
+                und Konvergenzverhalten.
+            </p>
+            <div class="input-row">
+                <label>Übergangsmatrix (zeilenweise, JSON):</label>
+            </div>
+            <textarea id="markov-matrix" rows="3" style="width:100%">[[0.7, 0.3], [0.4, 0.6]]</textarea>
+            <div class="input-row">
+                <label>Schrittzahl $n$:</label>
+                <input type="number" id="markov-nsteps" value="10" min="1" max="1000" step="1">
+            </div>
+            <button onclick="calcMarkovChain()" class="btn-calc">Markov-Kette analysieren</button>
+            <div id="markov-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 2: BROWNSCHE BEWEGUNG ===== -->
+<section class="math-section">
+    <h2>&#8767; Brownsche Bewegung</h2>
+    <p>
+        Ein <strong>Wiener-Prozess</strong> $\{B_t\}_{t \geq 0}$ erfüllt:
+        $B_0 = 0$, unabhängige Inkremente, $B_t - B_s \sim \mathcal{N}(0, t-s)$,
+        stetige Pfade (fast sicher).
+        $$\mathbb{E}[B_t] = 0, \quad \mathrm{Cov}(B_s, B_t) = \min(s,t)$$
+        <strong>Quadratische Variation</strong>: $[B]_t = t$ (Nicht-Differenzierbarkeit).
+        Simulation: $B_{t_{k+1}} = B_{t_k} + \sqrt{\Delta t}\, Z_k$, $Z_k \sim \mathcal{N}(0,1)$.
+    </p>
+
+    <div class="card-grid">
+
+        <!-- Brownsche Bewegung simulieren -->
+        <div class="card">
+            <h3>Brownsche Bewegung $B_t$ (Wiener-Prozess)</h3>
+            <p>
+                Simulation mehrerer unabhängiger Pfade des Wiener-Prozesses.
+                Ausgabe von Mittelwert, Varianz und Endzuständen aller Pfade.
+            </p>
+            <div class="input-row">
+                <label>Endzeit $T$:</label>
+                <input type="number" id="bm-T" value="1.0" min="0.1" max="100" step="0.1">
+                <label>Schritte $n$:</label>
+                <input type="number" id="bm-nsteps" value="100" min="10" max="10000" step="10">
+            </div>
+            <div class="input-row">
+                <label>Pfade $m$:</label>
+                <input type="number" id="bm-npaths" value="5" min="1" max="50" step="1">
+            </div>
+            <button onclick="calcBrownianMotion()" class="btn-calc">Brownsche Bewegung simulieren</button>
+            <div id="bm-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 3: GEOMETRISCHE BROWNSCHE BEWEGUNG ===== -->
+<section class="math-section">
+    <h2>&#8721; Geometrische Brownsche Bewegung (GBM / SDE)</h2>
+    <p>
+        Die <strong>Geometrische Brownsche Bewegung</strong> ist das Black-Scholes-Modell
+        für Aktienpreise:
+        $$dS_t = \mu S_t\, dt + \sigma S_t\, dW_t$$
+        Analytische Lösung (Itô-Formel):
+        $$S_t = S_0 \exp\!\left[\left(\mu - \frac{\sigma^2}{2}\right)t + \sigma W_t\right]$$
+        Euler-Maruyama-Diskretisierung: $S_{k+1} = S_k + \mu S_k \Delta t + \sigma S_k \sqrt{\Delta t}\, Z_k$.
+    </p>
+
+    <div class="card-grid">
+
+        <!-- Geometrische Brownsche Bewegung -->
+        <div class="card">
+            <h3>GBM: $dS = \mu S\,dt + \sigma S\,dW$ (Black-Scholes)</h3>
+            <p>
+                Simulation eines GBM-Pfades (Euler-Maruyama).
+                Drift $\mu$ (erwartete Rendite), Volatilität $\sigma$, Startkurs $S_0$.
+            </p>
+            <div class="input-row">
+                <label>Drift $\mu$:</label>
+                <input type="number" id="sde-mu" value="0.05" step="0.01">
+                <label>Volatilität $\sigma$:</label>
+                <input type="number" id="sde-sigma" value="0.2" min="0.001" step="0.01">
+            </div>
+            <div class="input-row">
+                <label>Startkurs $S_0$:</label>
+                <input type="number" id="sde-S0" value="100.0" min="0.01" step="1">
+                <label>Endzeit $T$:</label>
+                <input type="number" id="sde-T" value="1.0" min="0.01" step="0.1">
+            </div>
+            <button onclick="calcSDE()" class="btn-calc">GBM simulieren</button>
+            <div id="sde-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 4: ERGODENTHEORIE ===== -->
+<section class="math-section">
+    <h2>&#8594; Ergodentheorie</h2>
+    <p>
+        <strong>Birkhoffs Ergodensatz</strong>: Für einen ergodischen Maßerhaltenden
+        Dynamischen System gilt
+        $$\lim_{N\to\infty} \frac{1}{N}\sum_{k=0}^{N-1} f(T^k x) = \int f \, d\mu \quad \mu\text{-fast sicher.}$$
+        <strong>Logistische Abbildung</strong>: $x_{n+1} = r x_n(1 - x_n)$
+        ist für $r = 4$ ergodisch bzgl. des arcsin-Maßes $d\mu = \frac{dx}{\pi\sqrt{x(1-x)}}$.
+        Poincaré-Wiederkehrsatz: Jede messbare Menge wird fast sicher unendlich oft besucht.
+    </p>
+
+    <div class="card-grid">
+
+        <!-- Ergodentheorie -->
+        <div class="card">
+            <h3>Ergodentheorie: Logistische Abbildung $x_{n+1} = rx_n(1-x_n)$</h3>
+            <p>
+                Iteration der logistischen Abbildung, Berechnung des zeitlichen Mittels
+                und Vergleich mit Raummittel (Ergodizitätsprüfung).
+                Für $r = 4$: chaotisches, ergodisches Verhalten.
+            </p>
+            <div class="input-row">
+                <label>Parameter $r$:</label>
+                <input type="number" id="ergodic-r" value="4.0" min="0.01" max="4.0" step="0.1">
+            </div>
+            <div class="input-row">
+                <label>Startwert $x_0 \in (0,1)$:</label>
+                <input type="number" id="ergodic-x0" value="0.3" min="0.001" max="0.999" step="0.01">
+            </div>
+            <div class="input-row">
+                <label>Iterationen $n$:</label>
+                <input type="number" id="ergodic-niter" value="1000" min="10" max="100000" step="100">
+            </div>
+            <button onclick="calcErgodic()" class="btn-calc">Ergodizität prüfen</button>
+            <div id="ergodic-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * @brief Markov-Kette analysieren: n-Schritt-Übergang und stationäre Verteilung.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcMarkovChain() {
+    const div = document.getElementById('markov-result');
+    try {
+        // Übergangsmatrix aus Textarea parsen
+        const transition_matrix = JSON.parse(document.getElementById('markov-matrix').value);
+        const n_steps = parseInt(document.getElementById('markov-nsteps').value);
+        const data = await apiPost('/api/stochastic/markov_chain', {
+            transition_matrix,
+            n_steps
+        });
+        const r = data;
+        let html = '<strong>Markov-Kette</strong><br>';
+        // Stationäre Verteilung
+        if (r.stationary_distribution) {
+            html += '<br><strong>Stationäre Verteilung $\\pi$:</strong><br>';
+            html += '[' + r.stationary_distribution.map(v => typeof v === 'number' ? v.toFixed(6) : v).join(', ') + ']<br>';
+        }
+        // n-Schritt-Übergangsmatrix
+        if (r.n_step_matrix) {
+            html += `<br><strong>$P^{${n_steps}}$:</strong><br>`;
+            html += '<table class="math-table"><tbody>';
+            r.n_step_matrix.forEach(row => {
+                html += '<tr>' + row.map(v => `<td>${typeof v === 'number' ? v.toFixed(6) : v}</td>`).join('') + '</tr>';
+            });
+            html += '</tbody></table>';
+        }
+        if (r.is_ergodic !== undefined) {
+            html += `<br>Ergodisch: ${r.is_ergodic ? '✓' : '✗'}<br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Brownsche Bewegung (Wiener-Prozess) simulieren.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcBrownianMotion() {
+    const div = document.getElementById('bm-result');
+    const T = parseFloat(document.getElementById('bm-T').value);
+    const n_steps = parseInt(document.getElementById('bm-nsteps').value);
+    const n_paths = parseInt(document.getElementById('bm-npaths').value);
+    try {
+        const data = await apiPost('/api/stochastic/brownian_motion', {
+            T,
+            n_steps,
+            n_paths
+        });
+        const r = data;
+        let html = `<strong>Brownsche Bewegung: $T = ${T}$, ${n_steps} Schritte, ${n_paths} Pfade</strong><br>`;
+        // Endwerte aller Pfade
+        if (r.final_values) {
+            html += '<br><strong>Endwerte $B_T$:</strong><br>';
+            html += '[' + r.final_values.map(v => typeof v === 'number' ? v.toFixed(4) : v).join(', ') + ']<br>';
+        }
+        if (r.mean !== undefined) {
+            html += `<br>Empirisches Mittel: $\\hat{\\mu} = ${typeof r.mean === 'number' ? r.mean.toFixed(6) : r.mean}$ (erwartet: $0$)<br>`;
+        }
+        if (r.variance !== undefined) {
+            html += `Empirische Varianz: $\\hat{\\sigma}^2 = ${typeof r.variance === 'number' ? r.variance.toFixed(6) : r.variance}$ (erwartet: $T = ${T}$)<br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Geometrische Brownsche Bewegung (GBM/SDE) simulieren.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcSDE() {
+    const div = document.getElementById('sde-result');
+    const mu = parseFloat(document.getElementById('sde-mu').value);
+    const sigma = parseFloat(document.getElementById('sde-sigma').value);
+    const S0 = parseFloat(document.getElementById('sde-S0').value);
+    const T = parseFloat(document.getElementById('sde-T').value);
+    try {
+        const data = await apiPost('/api/stochastic/sde', { mu, sigma, S0, T });
+        const r = data;
+        let html = `<strong>Geometrische Brownsche Bewegung</strong><br>`;
+        html += `$\\mu = ${mu}$, $\\sigma = ${sigma}$, $S_0 = ${S0}$, $T = ${T}$<br>`;
+        if (r.S_final !== undefined) {
+            html += `<br>Simulierter Endkurs: $S_T = ${typeof r.S_final === 'number' ? r.S_final.toFixed(4) : r.S_final}$<br>`;
+        }
+        if (r.expected_S_T !== undefined) {
+            html += `Erwarteter Endkurs: $\\mathbb{E}[S_T] = S_0 e^{\\mu T} = ${typeof r.expected_S_T === 'number' ? r.expected_S_T.toFixed(4) : r.expected_S_T}$<br>`;
+        }
+        if (r.log_return !== undefined) {
+            html += `Log-Rendite: $\\ln(S_T/S_0) = ${typeof r.log_return === 'number' ? r.log_return.toFixed(6) : r.log_return}$<br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Ergodentheorie: Logistische Abbildung iterieren und Ergodizität prüfen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcErgodic() {
+    const div = document.getElementById('ergodic-result');
+    const r = parseFloat(document.getElementById('ergodic-r').value);
+    const x0 = parseFloat(document.getElementById('ergodic-x0').value);
+    const n_iter = parseInt(document.getElementById('ergodic-niter').value);
+    try {
+        const data = await apiPost('/api/stochastic/ergodic', { r, x0, n_iter });
+        const result = data.result;
+        let html = `<strong>Logistische Abbildung: $r = ${r}$, $x_0 = ${x0}$, $n = ${n_iter}$</strong><br>`;
+        // Zeitliches Mittel
+        if (result.time_average !== undefined) {
+            html += `<br>Zeitliches Mittel: $\\bar{x} = \\frac{1}{n}\\sum x_k = ${typeof result.time_average === 'number' ? result.time_average.toFixed(8) : result.time_average}$<br>`;
+        }
+        // Raummittel (theoretischer Wert für r=4: 1/2)
+        if (result.space_average !== undefined) {
+            html += `Raummittel (theoret.): $\\int x\\, d\\mu = ${typeof result.space_average === 'number' ? result.space_average.toFixed(8) : result.space_average}$<br>`;
+        }
+        if (result.lyapunov_exponent !== undefined) {
+            html += `Lyapunov-Exponent: $\\lambda = ${typeof result.lyapunov_exponent === 'number' ? result.lyapunov_exponent.toFixed(6) : result.lyapunov_exponent}$`;
+            html += result.lyapunov_exponent > 0 ? ' (chaotisch ✓)<br>' : ' (regulär)<br>';
+        }
+        if (result.description) html += `<em>${result.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+</script>
+{% endblock %}

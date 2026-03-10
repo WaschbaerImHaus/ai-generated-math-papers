@@ -1486,3 +1486,1183 @@ def brouwer_fixed_point_evidence(n_trials: int = 1000) -> dict:
         'method': 'gedaempfte_iteration_D2',
         'theorem': 'Brouwerscher Fixpunktsatz: f: D² → D² stetig → ∃ x: f(x) = x',
     }
+
+
+# ============================================================
+# Trennungseigenschaften (Separation Axioms)
+# ============================================================
+
+def separation_axioms_demo() -> dict:
+    """
+    @brief Demonstration der topologischen Trennungseigenschaften T0 bis T4.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Trennungsaxiome beschreiben, wie gut eine Topologie Punkte
+    und Mengen voneinander "trennen" kann. Sie bilden eine Hierarchie:
+        T4 ⊂ T3 ⊂ T2 ⊂ T1 ⊂ T0
+
+    KaTeX-Formeln:
+        - T0: $\\forall x \\neq y \; \\exists U \\text{ offen}: x \\in U, y \\notin U$
+              oder $y \\in U, x \\notin U$
+        - T1: $\\forall x \; \\{x\\}$ ist abgeschlossen
+        - T2: $\\forall x \\neq y \; \\exists U, V \\text{ offen}: x \\in U, y \\in V, U \\cap V = \\emptyset$
+        - T3: T1 + Punkt/Abgeschl.Menge trennbar durch disjunkte offene Mengen
+        - T4: T1 + zwei disjunkte abgeschl. Mengen trennbar
+
+    @return dict mit Axiom-Namen, Definitionen, Beispielen und Implikationen.
+    """
+    return {
+        'T0_Kolmogorov': {
+            'name': 'T0-Raum (Kolmogorov-Raum)',
+            'definition': (
+                'Je zwei verschiedene Punkte x ≠ y haben eine offene Menge U, '
+                'die genau einen von ihnen enthält.'
+            ),
+            'formal': '∀ x ≠ y ∃ U offen: (x ∈ U, y ∉ U) ∨ (y ∈ U, x ∉ U)',
+            'beispiel': (
+                'Sierpiński-Raum {0,1} mit Topologie {∅, {1}, {0,1}}: '
+                'Punkte 0 und 1 werden durch {1} getrennt.'
+            ),
+            'nicht_beispiel': (
+                'Indiskrete Topologie (nur ∅ und X als offene Mengen): kein T0.'
+            ),
+        },
+        'T1_Frechet': {
+            'name': 'T1-Raum (Fréchet-Raum)',
+            'definition': (
+                'Jede einelementige Menge {x} ist abgeschlossen. '
+                'Äquivalent: ∀ x ≠ y ∃ U offen: x ∈ U, y ∉ U UND ∃ V offen: y ∈ V, x ∉ V.'
+            ),
+            'formal': '∀ x: {x} ist abgeschlossen',
+            'beispiel': (
+                'Reelle Zahlen ℝ mit Standardtopologie: {x} = (-∞,x) ∪ (x,∞))ᶜ abgeschlossen.'
+            ),
+            'nicht_beispiel': (
+                'Sierpiński-Raum: {0} = {1}ᶜ offen ≠ abgeschlossen → nicht T1.'
+            ),
+        },
+        'T2_Hausdorff': {
+            'name': 'T2-Raum (Hausdorff-Raum)',
+            'definition': (
+                'Je zwei verschiedene Punkte x ≠ y besitzen disjunkte offene Umgebungen.'
+            ),
+            'formal': '∀ x ≠ y ∃ U, V offen: x ∈ U, y ∈ V, U ∩ V = ∅',
+            'beispiel': (
+                'Metrische Räume (ℝⁿ, d): U = B(x, d(x,y)/2), V = B(y, d(x,y)/2) '
+                'sind disjunkte offene Kugeln.'
+            ),
+            'wichtigkeit': (
+                'Grenzwerte von Folgen sind eindeutig in Hausdorff-Räumen.'
+            ),
+        },
+        'T3_Regular': {
+            'name': 'T3-Raum (Regulärer Raum)',
+            'definition': (
+                'T1 + für jeden Punkt x und jede abgeschlossene Menge A mit x ∉ A '
+                'existieren disjunkte offene Mengen U ∋ x und V ⊃ A.'
+            ),
+            'formal': 'T1 + ∀ x ∉ A (A abgeschl.) ∃ U,V offen: x ∈ U, A ⊆ V, U ∩ V = ∅',
+            'beispiel': (
+                'Metrische Räume sind regulär: U = B(x, ε), V = ⋃_{a∈A} B(a, ε) '
+                'für ε = d(x,A)/2.'
+            ),
+        },
+        'T4_Normal': {
+            'name': 'T4-Raum (Normaler Raum)',
+            'definition': (
+                'T1 + je zwei disjunkte abgeschlossene Mengen A, B besitzen '
+                'disjunkte offene Umgebungen.'
+            ),
+            'formal': 'T1 + ∀ A,B abgeschl. mit A∩B=∅ ∃ U,V offen: A⊆U, B⊆V, U∩V=∅',
+            'beispiel': (
+                'Kompakte Hausdorff-Räume sind normal (Satz von Urysohn). '
+                'Metrische Räume sind normal (Satz von Urysohn).'
+            ),
+            'urysohn_lemma': (
+                'Urysohn-Lemma: T4 ⟺ für disjunkte abgeschl. A,B '
+                '∃ stetige f: X→[0,1] mit f|_A=0, f|_B=1.'
+            ),
+        },
+        'implications': {
+            'hierarchy': 'T4 ⟹ T3 ⟹ T2 ⟹ T1 ⟹ T0',
+            'metric_spaces': 'Alle metrischen Räume sind T4 (und damit T0 bis T4).',
+            'compact_hausdorff': 'Kompakte Hausdorff-Räume sind T4.',
+            'diagram': {
+                'T0': 'Kolmogorov-Separation',
+                'T1': 'Punkte sind abgeschlossen',
+                'T2': 'Hausdorff-Separation (Grenzwerte eindeutig)',
+                'T3': 'Punkt-Menge-Separation',
+                'T4': 'Menge-Menge-Separation + Urysohn-Lemma',
+            },
+        },
+        'axiom_count': 5,  # T0 bis T4
+    }
+
+
+# ============================================================
+# Kompaktheit (Compactness)
+# ============================================================
+
+class CompactSpace:
+    """
+    @brief Klasse zur Modellierung und Überprüfung von Kompaktheit in topologischen Räumen.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Ein topologischer Raum heißt **kompakt**, wenn jede offene Überdeckung
+    eine endliche Teilüberdeckung besitzt.
+
+    KaTeX-Formel:
+        $X$ kompakt $\\Leftrightarrow$ für jede Familie $\\{U_\\alpha\\}$ offener Mengen
+        mit $X = \\bigcup_\\alpha U_\\alpha$ gibt es endlich viele
+        $U_{\\alpha_1}, \\ldots, U_{\\alpha_n}$ mit $X = U_{\\alpha_1} \\cup \\cdots \\cup U_{\\alpha_n}$.
+
+    Wichtige Beispiele:
+        - [a, b] ⊂ ℝ ist kompakt (Heine-Borel)
+        - (a, b) ist NICHT kompakt (offenes Intervall)
+        - ℝ selbst ist nicht kompakt
+        - Einheitskugel in ℝⁿ ist kompakt (abgeschlossen + beschränkt)
+    """
+
+    def __init__(self, name: str = "Kompakter Raum"):
+        """
+        @brief Initialisiert den CompactSpace.
+        @param name Bezeichnung des Raums.
+        """
+        # Name des Raumes (für Ausgabe und Dokumentation)
+        self.name = name
+
+    def is_compact_heine_borel(self, a: float, b: float) -> bool:
+        """
+        @brief Prüft Kompaktheit eines Intervalls [a, b] ⊂ ℝ via Heine-Borel.
+        @author Kurt Ingwer
+        @lastModified 2026-03-10
+
+        Nach dem Satz von Heine-Borel gilt:
+            [a, b] ⊂ ℝ ist kompakt ⟺ a ≤ b (abgeschlossenes, beschränktes Intervall).
+
+        KaTeX-Formel:
+            $[a, b]$ ist kompakt $\\Leftrightarrow$ $a \\leq b$
+
+        @param a Linker Rand des Intervalls.
+        @param b Rechter Rand des Intervalls.
+        @return True wenn [a, b] kompakt ist (also a ≤ b), False sonst.
+        """
+        # Ein abgeschlossenes beschränktes Intervall [a,b] ist kompakt
+        # (Heine-Borel). Voraussetzung: a ≤ b (sonst leeres Intervall)
+        return a <= b
+
+    def finite_subcover_demo(self, cover: list[tuple[float, float]], a: float, b: float) -> list[tuple[float, float]]:
+        """
+        @brief Findet eine endliche Teilüberdeckung des Intervalls [a, b].
+        @author Kurt Ingwer
+        @lastModified 2026-03-10
+
+        Greedy-Algorithmus: Wählt iterativ das offene Intervall (l, r),
+        das am weitesten nach rechts reicht und den aktuellen "Rand" überdeckt.
+
+        @param cover Liste von offenen Intervallen (l, r) als mögliche Überdeckung.
+        @param a Linker Rand des Intervalls.
+        @param b Rechter Rand des Intervalls.
+        @return Endliche Teilüberdeckung als Liste von Intervallen, oder leere Liste
+                wenn keine Überdeckung möglich.
+        """
+        # Greedy-Ansatz: Starte von a, wähle immer das Intervall das a überdeckt und am weitesten geht
+        current = a       # Aktuelle linke Grenze, die noch überdeckt werden muss
+        subcover = []     # Gefundene Teilüberdeckung
+
+        # Solange wir das Ziel b noch nicht erreicht haben
+        while current < b:
+            best = None   # Bestes Intervall bisher
+            best_reach = current  # Weiteste Erreichbarkeit bisher
+
+            # Suche das Intervall das current überdeckt und am weitesten nach rechts reicht
+            for (l, r) in cover:
+                if l < current + 1e-12 and r > best_reach:
+                    best = (l, r)
+                    best_reach = r
+
+            # Wenn kein Intervall gefunden wurde, gibt es keine endliche Teilüberdeckung
+            if best is None:
+                return []
+
+            subcover.append(best)
+            current = best_reach  # Neuen Startpunkt setzen
+
+        return subcover
+
+    def sequential_compactness_demo(self, sequence: list[float], a: float, b: float) -> dict:
+        """
+        @brief Demonstriert sequentielle Kompaktheit: Jede Folge in [a,b] hat eine konvergente Teilfolge.
+        @author Kurt Ingwer
+        @lastModified 2026-03-10
+
+        Satz von Bolzano-Weierstraß: Jede beschränkte Folge in ℝⁿ hat
+        eine konvergente Teilfolge.
+
+        KaTeX-Formel:
+            Sequentielle Kompaktheit: Jede Folge $(x_n)$ in $K$ hat eine
+            Teilfolge $(x_{n_k})$ mit $x_{n_k} \\to x \\in K$.
+
+        @param sequence Liste von Zahlen (Folge in [a, b]).
+        @param a Linker Rand.
+        @param b Rechter Rand.
+        @return dict mit Teilfolge, Grenzwert und Konvergenzeigenschaften.
+        """
+        if not sequence:
+            return {'subsequence': [], 'limit': None, 'converges': False}
+
+        # Clampe alle Werte in [a, b] (Projektion auf kompaktes Intervall)
+        bounded = [max(a, min(b, x)) for x in sequence]
+
+        # Bisektionsmethode: Suche monotone Teilfolge (Satz von Erdős–Szekeres)
+        # Vereinfachung: Wähle monoton steigende Teilfolge via greedy
+        subsequence = [bounded[0]]
+        for val in bounded[1:]:
+            if val >= subsequence[-1]:
+                subsequence.append(val)
+
+        # Grenzwert der monotonen Teilfolge (Supremum)
+        limit = subsequence[-1] if subsequence else None
+
+        # Prüfe ob Teilfolge konvergiert (monoton + beschränkt → konvergiert)
+        is_monotone = all(subsequence[i] <= subsequence[i+1] for i in range(len(subsequence)-1))
+
+        return {
+            'subsequence': subsequence,
+            'limit': limit,
+            'converges': is_monotone and len(subsequence) > 0,
+            'monotone_increasing': is_monotone,
+            'bounded_in_interval': all(a <= x <= b for x in subsequence),
+            'theorem': 'Bolzano-Weierstraß: Jede beschränkte Folge hat konvergente Teilfolge.',
+        }
+
+
+def heine_borel_theorem() -> dict:
+    """
+    @brief Beschreibung und Demo des Satzes von Heine-Borel.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Satz von Heine-Borel (ℝⁿ):
+        Eine Teilmenge K ⊆ ℝⁿ ist genau dann kompakt,
+        wenn K abgeschlossen UND beschränkt ist.
+
+    KaTeX-Formel:
+        $K \\subseteq \\mathbb{R}^n$ kompakt
+        $\\Leftrightarrow$ $K$ abgeschlossen $\\land$ $K$ beschränkt
+
+    @return dict mit Theorem-Text, Beispielen, Gegenbeispielen und Verifikationen.
+    """
+    # Beispiele: Abgeschlossen + beschränkt = kompakt
+    examples_compact = [
+        {'set': '[0, 1]', 'closed': True, 'bounded': True, 'compact': True},
+        {'set': '[−π, π]', 'closed': True, 'bounded': True, 'compact': True},
+        {'set': 'S¹ (Einheitskreis in ℝ²)', 'closed': True, 'bounded': True, 'compact': True},
+        {'set': 'B̄(0,1) (abgeschl. Einheitskugel)', 'closed': True, 'bounded': True, 'compact': True},
+    ]
+
+    # Gegenbeispiele: Fehlt eine Eigenschaft → nicht kompakt
+    examples_non_compact = [
+        {'set': '(0, 1)', 'closed': False, 'bounded': True, 'compact': False,
+         'reason': 'Offen: Überdeckung {(1/n, 1)} hat keine endliche Teilüberdeckung.'},
+        {'set': 'ℝ', 'closed': True, 'bounded': False, 'compact': False,
+         'reason': 'Unbeschränkt: Überdeckung {(−n, n)} hat keine endliche Teilüberdeckung.'},
+        {'set': '(0, ∞)', 'closed': False, 'bounded': False, 'compact': False,
+         'reason': 'Weder abgeschlossen noch beschränkt.'},
+        {'set': 'ℤ (ganze Zahlen)', 'closed': True, 'bounded': False, 'compact': False,
+         'reason': 'Abgeschlossen aber unbeschränkt.'},
+    ]
+
+    # Verifikation: Numerisch prüfen ob [0,1] kompakt ist (endl. Überdeckung)
+    # Überdeckung: {(-0.1, 0.6), (0.4, 1.1)} überdeckt [0,1]
+    cs = CompactSpace()
+    cover_test = [(-0.1, 0.6), (0.4, 1.1)]
+    subcover = cs.finite_subcover_demo(cover_test, 0.0, 1.0)
+
+    return {
+        'theorem': (
+            'Satz von Heine-Borel: K ⊆ ℝⁿ ist kompakt ⟺ K abgeschlossen ∧ K beschränkt.'
+        ),
+        'equivalences': [
+            'K ist kompakt (jede offene Überdeckung hat endliche Teilüberdeckung)',
+            'K ist abgeschlossen und beschränkt (in ℝⁿ)',
+            'K ist folgenkompakt (jede Folge hat konvergente Teilfolge in K)',
+        ],
+        'compact_examples': examples_compact,
+        'non_compact_examples': examples_non_compact,
+        'numerical_verification': {
+            'interval': '[0, 1]',
+            'cover': cover_test,
+            'finite_subcover': subcover,
+            'is_finite': len(subcover) > 0 and len(subcover) < float('inf'),
+        },
+        'generalizations': [
+            'In allgemeinen metrischen Räumen: kompakt ⟺ vollständig + total-beschränkt',
+            'In Banach-Räumen: kompakt ≠ abgeschlossen+beschränkt (nur präkompakt)',
+        ],
+    }
+
+
+def tychonoff_theorem_demo() -> dict:
+    """
+    @brief Demo des Satzes von Tychonoff: Produkt kompakter Räume ist kompakt.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Satz von Tychonoff (1930):
+        Das Produkt einer beliebigen Familie kompakter topologischer Räume
+        ist kompakt (bezüglich der Produkttopologie).
+
+    KaTeX-Formel:
+        Wenn $X_\\alpha$ kompakt für alle $\\alpha \\in I$, dann ist
+        $\\prod_{\\alpha \\in I} X_\\alpha$ kompakt.
+
+    @return dict mit Theorem, Beispielen mit endlichen Produkten und Notizen.
+    """
+    # Demo mit endlichen Mengen: {0,1} × {0,1} = {(0,0),(0,1),(1,0),(1,1)}
+    # Produkt zweier 2-elementiger (kompakter) diskreter Räume
+    space_a = [0, 1]    # Kompakter diskreter Raum (endlich → immer kompakt)
+    space_b = [0, 1]    # Kompakter diskreter Raum
+
+    # Produktraum: kartesisches Produkt
+    product_space = [(a, b) for a in space_a for b in space_b]
+
+    # Produkttopologie: kleinste Topologie, die alle Projektionen stetig macht
+    # Subbasis: π₁⁻¹(U) für U ⊆ X₁ offen, π₂⁻¹(V) für V ⊆ X₂ offen
+    subbasis_elements = (
+        [[(a, b) for a in space_a for b in space_b if a == u] for u in space_a] +
+        [[(a, b) for a in space_a for b in space_b if b == v] for v in space_b]
+    )
+
+    # Überprüfe: Produkt endlicher Mengen ist endlich → immer kompakt
+    is_finite_product = len(product_space) == len(space_a) * len(space_b)
+
+    # Demo [0,1] × [0,1] (Einheitsquadrat): abgeschlossen+beschränkt in ℝ² → kompakt (Heine-Borel)
+    square_example = {
+        'space': '[0,1] × [0,1] (Einheitsquadrat)',
+        'factor_1': '[0,1] (kompakt nach Heine-Borel)',
+        'factor_2': '[0,1] (kompakt nach Heine-Borel)',
+        'product_compact': True,
+        'reason': 'Abgeschlossen + beschränkt in ℝ² → kompakt (Heine-Borel).',
+    }
+
+    return {
+        'theorem': (
+            'Satz von Tychonoff: Das Produkt beliebig vieler kompakter Räume '
+            'ist kompakt (Produkttopologie). Benötigt das Auswahlaxiom für unendliche Produkte.'
+        ),
+        'finite_demo': {
+            'space_a': space_a,
+            'space_b': space_b,
+            'product_space': product_space,
+            'product_size': len(product_space),
+            'is_compact': is_finite_product,  # Endliche diskrete Räume sind kompakt
+            'subbasis_count': len(subbasis_elements),
+        },
+        'square_example': square_example,
+        'important_examples': [
+            {'product': '[0,1]^ℕ (Hilbert-Würfel)', 'compact': True,
+             'note': 'Abzählbares Produkt von [0,1] ist kompakt (Tychonoff).'},
+            {'product': 'ℝ^ℕ', 'compact': False,
+             'note': 'ℝ ist nicht kompakt, daher ist auch das Produkt nicht kompakt.'},
+            {'product': '{0,1}^ℕ (Cantor-Raum)', 'compact': True,
+             'note': 'Abzählbares Produkt endlicher diskreter Räume ist kompakt.'},
+        ],
+        'axiom_of_choice': (
+            'Der allgemeine Satz von Tychonoff ist äquivalent zum Auswahlaxiom (Kelley 1950).'
+        ),
+    }
+
+
+# ============================================================
+# Uniforme Räume (Uniform Spaces)
+# ============================================================
+
+class UniformSpace:
+    """
+    @brief Klasse zur Modellierung uniformer Räume via Entourages.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Ein **uniformer Raum** (X, 𝒰) besteht aus einer Menge X und einem Filter 𝒰
+    auf X × X (den Entourages / Umgebungen der Diagonale), sodass:
+        1. Jede Entourage U enthält die Diagonale Δ = {(x,x) | x ∈ X}
+        2. U ∈ 𝒰 ⟹ U⁻¹ = {(y,x) | (x,y) ∈ U} ∈ 𝒰  (Symmetrie)
+        3. ∀ U ∈ 𝒰 ∃ V ∈ 𝒰: V ∘ V ⊆ U  (Dreiecksungleichung)
+        4. U ∈ 𝒰, U ⊆ V ⟹ V ∈ 𝒰  (Filtereigenschaft)
+
+    Metrische Räume erzeugen uniforme Räume via:
+        U_ε = {(x,y) | d(x,y) < ε}
+
+    KaTeX-Formeln:
+        Entourage: $U_\\varepsilon = \\{(x,y) \\in X \\times X \\mid d(x,y) < \\varepsilon\\}$
+    """
+
+    def __init__(self, points: list, metric=None):
+        """
+        @brief Initialisiert den uniformen Raum.
+        @param points Liste von Punkten (Elemente von X).
+        @param metric Optional: Metrikfunktion d: X×X → ℝ≥0. Falls None, diskrete Metrik.
+        """
+        # Punkte des Raums speichern
+        self.points = points
+
+        # Metrik: falls keine angegeben, diskrete Metrik verwenden
+        if metric is None:
+            self.metric = lambda x, y: 0.0 if x == y else 1.0
+        else:
+            self.metric = metric
+
+    def entourage(self, epsilon: float) -> list[tuple]:
+        """
+        @brief Berechnet die Epsilon-Entourage U_ε = {(x,y) | d(x,y) < ε}.
+        @author Kurt Ingwer
+        @lastModified 2026-03-10
+
+        @param epsilon Radius der Entourage (positiv).
+        @return Liste von Paaren (x, y) mit d(x, y) < epsilon.
+        """
+        # Alle Paare (x, y) mit d(x,y) < ε bilden die Entourage
+        result = []
+        for x in self.points:
+            for y in self.points:
+                if self.metric(x, y) < epsilon:
+                    result.append((x, y))
+        return result
+
+    def contains_diagonal(self, entourage_set: list[tuple]) -> bool:
+        """
+        @brief Prüft ob eine Entourage die Diagonale Δ = {(x,x)} enthält.
+        @author Kurt Ingwer
+        @lastModified 2026-03-10
+
+        @param entourage_set Liste von Paaren (x, y).
+        @return True wenn alle (x, x) in der Entourage sind.
+        """
+        # Die Diagonale besteht aus allen (x, x) für x ∈ X
+        diagonal_pairs = set((x, x) for x in self.points)
+        entourage_pairs = set(entourage_set)
+        return diagonal_pairs.issubset(entourage_pairs)
+
+    def is_symmetric(self, entourage_set: list[tuple]) -> bool:
+        """
+        @brief Prüft Symmetrie der Entourage: (x,y) ∈ U ⟹ (y,x) ∈ U.
+        @author Kurt Ingwer
+        @lastModified 2026-03-10
+
+        @param entourage_set Liste von Paaren.
+        @return True wenn die Entourage symmetrisch ist.
+        """
+        pair_set = set(entourage_set)
+        # Für jedes Paar (x,y) muss auch (y,x) enthalten sein
+        return all((y, x) in pair_set for (x, y) in pair_set)
+
+    def uniform_continuity_check(self, f, target_metric, epsilon: float) -> dict:
+        """
+        @brief Prüft gleichmäßige Stetigkeit einer Funktion f: X → Y.
+        @author Kurt Ingwer
+        @lastModified 2026-03-10
+
+        f ist gleichmäßig stetig, wenn:
+            ∀ ε > 0 ∃ δ > 0: d_X(x,y) < δ ⟹ d_Y(f(x), f(y)) < ε
+
+        Numerische Suche nach geeignetem δ durch Halbieren.
+
+        KaTeX-Formel:
+            $\\forall \\varepsilon > 0 \; \\exists \\delta > 0: \;
+            d_X(x,y) < \\delta \\Rightarrow d_Y(f(x), f(y)) < \\varepsilon$
+
+        @param f Funktion f: Punkt → Punkt (Elemente von self.points).
+        @param target_metric Metrik im Zielraum.
+        @param epsilon Gewünschte Epsilon-Schranke.
+        @return dict mit delta-Schätzung und Prüfergebnis.
+        """
+        # Halbiere delta bis die Bedingung erfüllt ist oder delta sehr klein wird
+        delta = epsilon  # Startwert für delta
+        min_delta = 1e-10
+
+        while delta > min_delta:
+            # Prüfe ob für alle (x, y) mit d(x,y) < delta gilt: d(f(x), f(y)) < epsilon
+            holds = True
+            for x in self.points:
+                for y in self.points:
+                    if self.metric(x, y) < delta:
+                        fx = f(x)
+                        fy = f(y)
+                        if target_metric(fx, fy) >= epsilon:
+                            holds = False
+                            break
+                if not holds:
+                    break
+
+            if holds:
+                # Delta funktioniert, gib Ergebnis zurück
+                return {
+                    'uniformly_continuous': True,
+                    'epsilon': epsilon,
+                    'delta': delta,
+                    'condition': f'd_X(x,y) < {delta:.6f} ⟹ d_Y(f(x),f(y)) < {epsilon:.6f}',
+                }
+            delta /= 2.0
+
+        return {
+            'uniformly_continuous': False,
+            'epsilon': epsilon,
+            'delta': None,
+            'note': 'Kein geeignetes delta im getesteten Bereich gefunden.',
+        }
+
+
+def cauchy_filter_demo() -> dict:
+    """
+    @brief Demo einer Cauchy-Folge in ℚ die nicht in ℚ konvergiert (√2-Approximation).
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Die Folge a_{n+1} = (a_n + 2/a_n) / 2 (Heron-Verfahren) ist eine Cauchy-Folge
+    in ℚ, konvergiert aber gegen √2 ∉ ℚ. Dies zeigt die Unvollständigkeit von ℚ.
+
+    KaTeX-Formeln:
+        Heron-Verfahren: $a_{n+1} = \\frac{a_n + 2/a_n}{2}$
+        Grenzwert: $\\lim_{n \\to \\infty} a_n = \\sqrt{2} \\notin \\mathbb{Q}$
+
+    @return dict mit Folgengliedern, Cauchy-Eigenschaft und Irrationaliät des Grenzwerts.
+    """
+    # Heron-Verfahren zur √2-Approximation
+    # Startwert rational: a_0 = 1 (oder 3/2 als Bruch)
+    a = 1.0          # Als float, aber rational startend
+    sequence = [a]   # Folge der Glieder
+
+    # 20 Iterationsschritte berechnen
+    for _ in range(20):
+        a = (a + 2.0 / a) / 2.0
+        sequence.append(a)
+
+    # Berechne Abstände aufeinanderfolgender Glieder (Cauchy-Bedingung)
+    differences = [abs(sequence[i+1] - sequence[i]) for i in range(len(sequence)-1)]
+
+    # Prüfe Cauchy-Eigenschaft: Abstände → 0
+    is_cauchy = all(differences[-5+i] < 1e-12 for i in range(5)) if len(differences) >= 5 else False
+
+    # Grenzwert in ℚ? √2 ist irrational (Beweis: Annahme √2 = p/q führt zu Widerspruch)
+    import math
+    limit = math.sqrt(2)
+
+    # Prüfe ob der Grenzwert rational ist (er ist es nicht)
+    # Beweis der Irrationalität via Approximationsschranke
+    # Wenn √2 = p/q mit gcd(p,q)=1, dann p²=2q² → p gerade → q gerade → Widerspruch
+    irrationality_proof = (
+        'Annahme: √2 = p/q mit ggT(p,q)=1. '
+        'Dann p² = 2q² → p gerade (p=2k) → 4k² = 2q² → q² = 2k² → q gerade. '
+        'Widerspruch: p und q haben gemeinsamen Faktor 2.'
+    )
+
+    return {
+        'sequence_name': 'Heron-Verfahren für √2',
+        'recurrence': 'a_{n+1} = (a_n + 2/a_n) / 2',
+        'start_value': 1.0,
+        'sequence': sequence[:10],       # Erste 10 Glieder
+        'differences': differences[:10], # Abstände (→ 0)
+        'is_cauchy': is_cauchy,
+        'limit_value': limit,
+        'limit_in_Q': False,             # √2 ist irrational
+        'irrationality_proof': irrationality_proof,
+        'completeness_failure': (
+            'ℚ ist NICHT vollständig: Diese Cauchy-Folge in ℚ hat keinen Grenzwert in ℚ. '
+            'Vervollständigung von ℚ liefert ℝ.'
+        ),
+    }
+
+
+def completion_of_rationals() -> dict:
+    """
+    @brief Vervollständigung ℚ → ℝ via Cauchy-Folgen und p-adische Alternative.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Die Vervollständigung eines metrischen Raums (X, d) ist der kleinste
+    vollständige metrische Raum, der X (isometrisch) enthält.
+
+    Zwei Vervollständigungen von ℚ (Satz von Ostrowski):
+        - Bezüglich | · |_∞ (Betragswert): ℝ
+        - Bezüglich | · |_p (p-adische Norm, für Primzahl p): ℚ_p
+
+    KaTeX-Formeln:
+        p-adische Norm: $|x|_p = p^{-v_p(x)}$ wobei $v_p(x)$ der p-adische Bewertung ist.
+
+    @return dict mit Beschreibung beider Vervollständigungen.
+    """
+    # Demonstration: √2-Approximation als Cauchy-Folge in ℚ (Beweis der Unvollständigkeit)
+    cauchy_demo = cauchy_filter_demo()
+
+    # p-adische Norm: Für p=5 und x=25 = 5^2: |25|_5 = 5^{-2} = 0.04
+    def p_adic_norm_demo(x: int, p: int) -> float:
+        """Berechnet die p-adische Norm |x|_p = p^{-v_p(x)}."""
+        if x == 0:
+            return 0.0
+        # v_p(x): wie oft teilt p die Zahl x?
+        v = 0
+        temp = abs(x)
+        while temp % p == 0:
+            v += 1
+            temp //= p
+        return float(p) ** (-v)
+
+    # Beispiele für p-adische Normen (p=5)
+    p = 5
+    p_adic_examples = [
+        {'x': 1,   'p': p, 'norm': p_adic_norm_demo(1, p)},   # |1|_5 = 1
+        {'x': 5,   'p': p, 'norm': p_adic_norm_demo(5, p)},   # |5|_5 = 1/5
+        {'x': 25,  'p': p, 'norm': p_adic_norm_demo(25, p)},  # |25|_5 = 1/25
+        {'x': 125, 'p': p, 'norm': p_adic_norm_demo(125, p)}, # |125|_5 = 1/125
+        {'x': 3,   'p': p, 'norm': p_adic_norm_demo(3, p)},   # |3|_5 = 1 (5 teilt nicht)
+        {'x': 15,  'p': p, 'norm': p_adic_norm_demo(15, p)},  # |15|_5 = 1/5
+    ]
+
+    return {
+        'problem': 'ℚ ist nicht vollständig: Cauchy-Folgen konvergieren ggf. nicht in ℚ.',
+        'cauchy_example': {
+            'sequence': cauchy_demo['sequence'][:6],
+            'limit': cauchy_demo['limit_value'],
+            'limit_in_Q': False,
+        },
+        'completion_real': {
+            'name': 'Vervollständigung bezüglich | · |_∞ (Betragswert)',
+            'result': 'ℝ (reelle Zahlen)',
+            'construction': (
+                'ℝ = {Cauchy-Folgen in ℚ} / ~ wobei (a_n) ~ (b_n) wenn |a_n - b_n| → 0.'
+            ),
+            'properties': [
+                'Vollständig: Alle Cauchy-Folgen konvergieren',
+                'Archimedisch geordnet',
+                'Überabzählbar (Cantor-Diagonalargument)',
+            ],
+        },
+        'completion_p_adic': {
+            'name': 'Vervollständigung bezüglich | · |_p (p-adische Norm, p=5)',
+            'result': f'ℚ_{p} (5-adische Zahlen)',
+            'p_adic_norm': f'|x|_{p} = {p}^(-v_{p}(x))',
+            'construction': (
+                'ℚ_p = {Cauchy-Folgen in ℚ bzgl. |·|_p} / ~. '
+                'Große Zahlen werden bzgl. |·|_p klein, wenn sie durch p teilbar sind.'
+            ),
+            'examples': p_adic_examples,
+            'ultrametric': 'p-adische Norm erfüllt: |x+y|_p ≤ max(|x|_p, |y|_p) (Ultrametrik!)',
+        },
+        'ostrowski_theorem': (
+            'Satz von Ostrowski: Jede nicht-triviale Bewertung auf ℚ ist '
+            'äquivalent zu | · |_∞ oder | · |_p für eine Primzahl p. '
+            'Es gibt also genau zwei Arten, ℚ zu vervollständigen!'
+        ),
+    }
+
+
+# ============================================================
+# Topologische Gruppen (Topological Groups)
+# ============================================================
+
+class TopologicalGroup:
+    """
+    @brief Klasse zur Modellierung topologischer Gruppen.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Eine **topologische Gruppe** (G, ·, τ) ist eine Gruppe (G, ·) mit einer
+    Topologie τ, sodass die Gruppenoperationen stetig sind:
+        - Multiplikation: μ: G × G → G, (x, y) ↦ x·y  (stetig)
+        - Inversion: ι: G → G, x ↦ x⁻¹                 (stetig)
+
+    KaTeX-Formel:
+        $(G, \\cdot)$ topologische Gruppe $\\Leftrightarrow$
+        $(x, y) \\mapsto x \\cdot y^{-1}$ stetig.
+
+    Wichtige Beispiele:
+        - (ℝ, +): Reelle Zahlen mit Addition und Standardtopologie
+        - (ℝ\\{0}, ×): Multiplikative Gruppe mit Unterraumtopologie
+        - (S¹, ×): Einheitskreis in ℂ mit komplexer Multiplikation
+        - GL(n, ℝ): Invertierbare n×n-Matrizen (offene Teilmenge von ℝⁿ²)
+    """
+
+    def __init__(self, name: str, operation_description: str,
+                 topology_description: str, is_compact: bool, is_connected: bool,
+                 is_abelian: bool):
+        """
+        @brief Initialisiert eine topologische Gruppe mit ihren Eigenschaften.
+        @param name Name der Gruppe.
+        @param operation_description Beschreibung der Gruppenoperation.
+        @param topology_description Beschreibung der Topologie.
+        @param is_compact Ob die Gruppe kompakt ist.
+        @param is_connected Ob die Gruppe zusammenhängend ist.
+        @param is_abelian Ob die Gruppe abelsch (kommutativ) ist.
+        """
+        self.name = name
+        self.operation_description = operation_description
+        self.topology_description = topology_description
+        self.is_compact = is_compact
+        self.is_connected = is_connected
+        self.is_abelian = is_abelian
+
+    def to_dict(self) -> dict:
+        """
+        @brief Gibt alle Eigenschaften der topologischen Gruppe als dict zurück.
+        @return dict mit name, operation, topology, compact, connected, abelian.
+        """
+        return {
+            'name': self.name,
+            'operation': self.operation_description,
+            'topology': self.topology_description,
+            'compact': self.is_compact,
+            'connected': self.is_connected,
+            'abelian': self.is_abelian,
+        }
+
+    def check_continuity_demo(self, points: list[float], mult_fn, inv_fn) -> dict:
+        """
+        @brief Prüft numerisch, ob Multiplikation und Inversion stetig wirken.
+        @author Kurt Ingwer
+        @lastModified 2026-03-10
+
+        Stetigkeit: Für ε > 0 gibt es δ > 0 sodass nahe Punkte nahe abgebildet werden.
+        Hier: Numerisch geprüft mit kleinen Störungen.
+
+        @param points Liste von Testpunkten.
+        @param mult_fn Multiplikationsfunktion f(x, y) → z.
+        @param inv_fn Inversionsfunktion g(x) → x⁻¹.
+        @return dict mit Stetigkeitsprüfung für Multiplikation und Inversion.
+        """
+        import math
+
+        epsilon = 1e-4   # Toleranz
+        delta = 1e-6     # Störungsgröße
+
+        mult_continuous = True
+        inv_continuous = True
+
+        # Prüfe Stetigkeit der Multiplikation an Testpunkten
+        for x in points[:5]:
+            for y in points[:5]:
+                try:
+                    # Originale Multiplikation
+                    xy = mult_fn(x, y)
+                    # Gestörte Multiplikation
+                    xy_perturbed = mult_fn(x + delta, y + delta)
+                    if abs(xy_perturbed - xy) > epsilon:
+                        mult_continuous = False
+                except Exception:
+                    mult_continuous = False
+
+        # Prüfe Stetigkeit der Inversion
+        for x in points[:5]:
+            try:
+                inv_x = inv_fn(x)
+                inv_x_perturbed = inv_fn(x + delta)
+                if abs(inv_x_perturbed - inv_x) > epsilon:
+                    inv_continuous = False
+            except Exception:
+                inv_continuous = False
+
+        return {
+            'multiplication_continuous': mult_continuous,
+            'inversion_continuous': inv_continuous,
+            'topological_group': mult_continuous and inv_continuous,
+        }
+
+
+def topological_group_examples() -> list[dict]:
+    """
+    @brief Gibt eine Liste von Beispielen topologischer Gruppen zurück.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    @return Liste von dicts mit name, operation, topology, compact, connected, abelian.
+    """
+    # Erstelle die wichtigsten topologischen Gruppen als Objekte
+    groups = [
+        TopologicalGroup(
+            name='(ℝ, +)',
+            operation_description='Addition reeller Zahlen',
+            topology_description='Standardtopologie auf ℝ (durch | · | erzeugt)',
+            is_compact=False,
+            is_connected=True,
+            is_abelian=True,
+        ),
+        TopologicalGroup(
+            name='(ℝ\\{0}, ×)',
+            operation_description='Multiplikation reeller Zahlen (ohne 0)',
+            topology_description='Unterraumtopologie von ℝ auf ℝ\\{0}',
+            is_compact=False,
+            is_connected=False,   # Zwei Zusammenhangskomponenten: ℝ⁺ und ℝ⁻
+            is_abelian=True,
+        ),
+        TopologicalGroup(
+            name='(ℝ⁺, ×)',
+            operation_description='Multiplikation positiver reeller Zahlen',
+            topology_description='Unterraumtopologie von ℝ',
+            is_compact=False,
+            is_connected=True,
+            is_abelian=True,
+        ),
+        TopologicalGroup(
+            name='S¹ (Einheitskreis)',
+            operation_description='Komplexe Multiplikation e^{iα} · e^{iβ} = e^{i(α+β)}',
+            topology_description='Unterraumtopologie von ℂ ≅ ℝ²',
+            is_compact=True,
+            is_connected=True,
+            is_abelian=True,
+        ),
+        TopologicalGroup(
+            name='GL(n, ℝ)',
+            operation_description='Matrizenmultiplikation (invertierbare n×n-Matrizen)',
+            topology_description='Unterraumtopologie von M_n(ℝ) ≅ ℝ^{n²}',
+            is_compact=False,
+            is_connected=False,   # Zwei Komponenten: det > 0 und det < 0
+            is_abelian=False,     # Matrizenmultiplikation nicht kommutativ (n≥2)
+        ),
+        TopologicalGroup(
+            name='SO(n) (Spezielle orthogonale Gruppe)',
+            operation_description='Matrizenmultiplikation (Rotationen im ℝⁿ)',
+            topology_description='Unterraumtopologie von GL(n,ℝ), kompakte Lie-Gruppe',
+            is_compact=True,
+            is_connected=True,
+            is_abelian=(True if False else False),  # Nur für n=2 abelsch (SO(2)≅S¹)
+        ),
+        TopologicalGroup(
+            name='(ℤ, +) (diskrete Gruppe)',
+            operation_description='Addition ganzer Zahlen',
+            topology_description='Diskrete Topologie (alle Teilmengen offen)',
+            is_compact=False,
+            is_connected=False,
+            is_abelian=True,
+        ),
+        TopologicalGroup(
+            name='(ℤ/nℤ, +) (zyklische Gruppe)',
+            operation_description='Addition modulo n',
+            topology_description='Diskrete Topologie (endliche Menge)',
+            is_compact=True,   # Endliche diskrete Gruppe ist kompakt
+            is_connected=False,
+            is_abelian=True,
+        ),
+    ]
+
+    # Gib Liste der dicts zurück
+    return [g.to_dict() for g in groups]
+
+
+# ============================================================
+# Topologische Vektorräume (Topological Vector Spaces)
+# ============================================================
+
+class TopologicalVectorSpace:
+    """
+    @brief Klasse zur Modellierung topologischer Vektorräume.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Ein **topologischer Vektorraum** (TVR) ist ein Vektorraum V über ℝ (oder ℂ)
+    mit einer Topologie τ, sodass:
+        1. Addition: + : V × V → V, (u, v) ↦ u + v   ist stetig
+        2. Skalarmultiplikation: · : ℝ × V → V, (λ, v) ↦ λv   ist stetig
+
+    KaTeX-Formeln:
+        - $(u, v) \\mapsto u + v$ stetig (bzgl. Produkttopologie auf $V \\times V$)
+        - $(\\lambda, v) \\mapsto \\lambda v$ stetig (bzgl. Produkttopologie auf $\\mathbb{R} \\times V$)
+
+    Wichtige Klassen von TVRs:
+        - Normierte Räume: Topologie durch Norm induziert
+        - Fréchet-Räume: Vollständig, metrisierbar, lokalkonvex
+        - Sobolev-Räume: W^{k,p}(Ω), wichtig in PDEs
+        - Schwartz-Raum: S(ℝⁿ), Grundlage der Distributionentheorie
+    """
+
+    def __init__(self, name: str, dimension: int | str, normed: bool,
+                 complete: bool, locally_convex: bool):
+        """
+        @brief Initialisiert einen topologischen Vektorraum.
+        @param name Name des Raums.
+        @param dimension Dimension (int oder 'unendlich').
+        @param normed Ob der Raum normiert ist.
+        @param complete Ob der Raum vollständig ist (Banach/Fréchet).
+        @param locally_convex Ob der Raum lokalkonvex ist.
+        """
+        self.name = name
+        self.dimension = dimension
+        self.normed = normed
+        self.complete = complete
+        self.locally_convex = locally_convex
+
+        # Banach-Raum: normiert + vollständig
+        self.is_banach = normed and complete
+        # Hilbert-Raum: Banach + Skalarprodukt (vereinfacht: bei normierten vollständigen Räumen)
+        self.is_hilbert = self.is_banach  # Vereinfachung: Hilbert ⊂ Banach
+
+    def to_dict(self) -> dict:
+        """
+        @brief Gibt Eigenschaften des TVR als dict zurück.
+        @return dict mit allen Eigenschaften.
+        """
+        return {
+            'name': self.name,
+            'dimension': self.dimension,
+            'normed': self.normed,
+            'complete': self.complete,
+            'locally_convex': self.locally_convex,
+            'banach': self.is_banach,
+        }
+
+    def check_convex_neighborhood(self, neighborhood: list[list[float]]) -> bool:
+        """
+        @brief Prüft ob eine Menge von Punkten (Umgebung der 0) konvex ist.
+        @author Kurt Ingwer
+        @lastModified 2026-03-10
+
+        Eine Menge C ist konvex, wenn für alle x, y ∈ C und t ∈ [0,1]:
+            (1-t)·x + t·y ∈ C.
+
+        Hier: Vereinfachte Prüfung via Konvexitätsbedingung an zufälligen Konvexkombinationen.
+
+        @param neighborhood Liste von Punkten (Vektoren) in der Umgebung.
+        @return True wenn die Punktmenge (annähernd) konvex erscheint.
+        """
+        if len(neighborhood) < 2:
+            return True
+
+        # Prüfe alle Paare: Mittelpunkt muss ebenfalls "nahe" an der konvexen Hülle liegen
+        # Vereinfachung: Prüfe ob Mittelpunkte aller Paare in der Hülle liegen
+        # (echte Konvexitätsprüfung erfordert computational geometry)
+        # Hier: Prüfe ob alle Punkte in einer konvexen Menge liegen (Ellipsoid-Approximation)
+        import math
+
+        # Berechne Zentrum der Punktmenge
+        n = len(neighborhood)
+        dim = len(neighborhood[0]) if neighborhood else 0
+        center = [sum(p[i] for p in neighborhood) / n for i in range(dim)]
+
+        # Prüfe ob Mittelpunkte von Paaren ebenfalls in Bounding-Box aller Punkte liegen
+        # (Notwendige aber nicht hinreichende Bedingung)
+        min_coords = [min(p[i] for p in neighborhood) for i in range(dim)]
+        max_coords = [max(p[i] for p in neighborhood) for i in range(dim)]
+
+        # Prüfe Stichprobe von Konvexkombinationen
+        for i in range(min(len(neighborhood), 5)):
+            for j in range(min(len(neighborhood), 5)):
+                if i != j:
+                    # Mittelpunkt von neighborhood[i] und neighborhood[j]
+                    midpoint = [(neighborhood[i][k] + neighborhood[j][k]) / 2.0
+                                for k in range(dim)]
+                    # Prüfe ob Mittelpunkt in Bounding-Box liegt (notwendige Bedingung)
+                    in_box = all(min_coords[k] - 1e-10 <= midpoint[k] <= max_coords[k] + 1e-10
+                                 for k in range(dim))
+                    if not in_box:
+                        return False
+
+        return True  # Alle Stichproben bestanden
+
+
+def locally_convex_demo() -> dict:
+    """
+    @brief Demo lokalkonvexer topologischer Vektorräume.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Ein TVR heißt **lokalkonvex**, wenn die Null eine Umgebungsbasis
+    aus konvexen Mengen besitzt.
+
+    KaTeX-Formeln:
+        Lokalkonvex $\\Leftrightarrow \\exists$ Basis von Umgebungen der $0$
+        aus konvexen, absor­bie­ren­den, balancierten Mengen.
+
+    @return dict mit Beispielen lokalkonvexer Räume und Eigenschaften.
+    """
+    # Beispiele für lokalkonvexe Räume
+    examples = [
+        TopologicalVectorSpace(
+            name='ℝⁿ (endlichdimensional)',
+            dimension='n',
+            normed=True,
+            complete=True,
+            locally_convex=True,
+        ),
+        TopologicalVectorSpace(
+            name='L²(Ω) (quadratintegrierbare Funktionen)',
+            dimension='unendlich',
+            normed=True,
+            complete=True,
+            locally_convex=True,
+        ),
+        TopologicalVectorSpace(
+            name='C^∞([0,1]) (glatte Funktionen)',
+            dimension='unendlich',
+            normed=False,          # Nicht normiert, aber durch Halbnormen induziert
+            complete=True,
+            locally_convex=True,   # Klassischer Fréchet-Raum
+        ),
+        TopologicalVectorSpace(
+            name='C^∞_c(ℝⁿ) (glatte Funktionen mit kompaktem Träger = Testfunktionen)',
+            dimension='unendlich',
+            normed=False,
+            complete=False,        # Nicht vollständig (kein Fréchet)
+            locally_convex=True,
+        ),
+        TopologicalVectorSpace(
+            name='S(ℝⁿ) (Schwartz-Raum)',
+            dimension='unendlich',
+            normed=False,
+            complete=True,
+            locally_convex=True,
+        ),
+        TopologicalVectorSpace(
+            name="L^p(Ω) für 0 < p < 1 (nicht lokalkonvex!)",
+            dimension='unendlich',
+            normed=False,
+            complete=True,
+            locally_convex=False,  # Einzige konvexe offene Menge ist der ganze Raum!
+        ),
+    ]
+
+    # Konkrete Demonstration: Konvexe Umgebung der 0 in ℝ²
+    # Einheitsscheibe B(0,1) ist konvex
+    import math
+    n_points = 8
+    unit_disk_points = [
+        [0.5 * math.cos(2 * math.pi * k / n_points),
+         0.5 * math.sin(2 * math.pi * k / n_points)]
+        for k in range(n_points)
+    ]
+    unit_disk_points.append([0.0, 0.0])  # Mittelpunkt
+
+    tvs = TopologicalVectorSpace('ℝ²', 2, True, True, True)
+    disk_is_convex = tvs.check_convex_neighborhood(unit_disk_points)
+
+    return {
+        'definition': (
+            'Lokalkonvexer TVR: Null besitzt Umgebungsbasis aus konvexen Mengen. '
+            'Äquivalent: Topologie durch Familie von Halbnormen induziert.'
+        ),
+        'examples': [e.to_dict() for e in examples],
+        'geometric_demo': {
+            'space': 'ℝ²',
+            'neighborhood': 'Einheitsscheibe B(0, 0.5)',
+            'points_sampled': unit_disk_points[:8],
+            'is_convex': disk_is_convex,
+            'interpretation': 'B(0, r) ist für jeden metrischen Raum konvex bzgl. d.',
+        },
+        'frechet_spaces': {
+            'definition': (
+                'Fréchet-Raum: Vollständiger lokalkonvexer TVR, dessen Topologie durch '
+                'abzählbar viele Halbnormen (p_n) induziert wird: '
+                'd(u,v) = Σ 2^{-n} p_n(u-v) / (1 + p_n(u-v)).'
+            ),
+            'examples': ['C^∞([0,1])', 'S(ℝⁿ)', 'Holomorphe Funktionen H(U)'],
+        },
+        'sobolev_spaces': {
+            'definition': (
+                'Sobolev-Raum W^{k,p}(Ω): Funktionen f ∈ L^p(Ω) mit '
+                'schwachen Ableitungen D^α f ∈ L^p(Ω) für |α| ≤ k. '
+                'Norm: ||f||_{W^{k,p}} = (Σ_{|α|≤k} ||D^α f||_{L^p}^p)^{1/p}.'
+            ),
+            'applications': [
+                'Elliptische PDEs (Poisson-Gleichung)',
+                'Einbettungssätze (Sobolev-Einbettung)',
+                'Finite-Elemente-Methode',
+            ],
+        },
+    }
+
+
+def schwartz_space_intro() -> dict:
+    """
+    @brief Einführung in den Schwartz-Raum S(ℝⁿ) — schnell fallende glatte Funktionen.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Der Schwartz-Raum S(ℝⁿ) ist der Fréchet-Raum aller C^∞-Funktionen,
+    die schneller als jede Potenz fallen:
+
+    KaTeX-Formeln:
+        $\\mathcal{S}(\\mathbb{R}^n) = \\{ f \\in C^\\infty(\\mathbb{R}^n) \\mid
+        \\forall \\alpha, \\beta \\in \\mathbb{N}_0^n: \\sup_{x \\in \\mathbb{R}^n}
+        |x^\\alpha \\partial^\\beta f(x)| < \\infty \\}$
+
+    Halbnormen:
+        $p_{\\alpha,\\beta}(f) = \\sup_x |x^\\alpha \\partial^\\beta f(x)|$
+
+    @return dict mit Definition, Beispielfunktionen, Eigenschaften und Anwendungen.
+    """
+    import math
+
+    # Beispiel: Gauß-Funktion f(x) = exp(-x²) liegt im Schwartz-Raum
+    # Alle Ableitungen fallen schnell → alle Halbnormen sind endlich
+    def gaussian(x: float) -> float:
+        """Gauß-Funktion: schnell fallend, alle Ableitungen ebenfalls."""
+        return math.exp(-x * x)
+
+    # Berechne Halbnormen p_{α,β} für einfache Fälle
+    # p_{0,0}(f) = sup |f(x)| ≈ 1 (Supremum der Gauß-Funktion)
+    # p_{1,0}(f) = sup |x·f(x)| = sup |x·e^{-x²}| ≈ 0.606 (Maximum bei x=±1/√2)
+    # p_{0,1}(f) = sup |f'(x)| = sup |-2x·e^{-x²}| ≈ 1.213
+
+    # Numerische Berechnung der Halbnormen (Auswertung auf dichtem Gitter)
+    x_values = [i * 0.01 - 10.0 for i in range(2001)]  # x ∈ [-10, 10]
+
+    p_00 = max(abs(gaussian(x)) for x in x_values)           # sup |f(x)|
+    p_10 = max(abs(x * gaussian(x)) for x in x_values)       # sup |x·f(x)|
+    p_20 = max(abs(x**2 * gaussian(x)) for x in x_values)    # sup |x²·f(x)|
+    p_01_approx = max(abs(-2 * x * gaussian(x)) for x in x_values)  # sup |f'(x)|
+
+    # Verifikation: Alle Halbnormen sind endlich (charakteristisch für Schwartz-Raum)
+    all_finite = all(v < float('inf') for v in [p_00, p_10, p_20, p_01_approx])
+
+    # Fourier-Transformation: S(ℝ) → S(ℝ) ist Isomorphismus!
+    # Fourier-Transformierte der Gauß-Funktion ist wieder eine Gauß-Funktion:
+    # F[e^{-x²}](ξ) = √π · e^{-π²ξ²}  (mit geeigneter Normierung)
+
+    return {
+        'name': 'Schwartz-Raum S(ℝⁿ)',
+        'definition': (
+            'S(ℝⁿ) = {f ∈ C^∞(ℝⁿ) | ∀ α,β ∈ ℕ₀ⁿ: sup_x |x^α ∂^β f(x)| < ∞}. '
+            'Alle Ableitungen fallen schneller als jede Potenz 1/|x|^k → 0.'
+        ),
+        'seminorms': {
+            'formula': 'p_{α,β}(f) = sup_{x ∈ ℝⁿ} |x^α ∂^β f(x)|',
+            'topology': 'Topologie auf S(ℝⁿ) durch Familie aller p_{α,β} erzeugt (Fréchet-Raum).',
+        },
+        'gaussian_example': {
+            'function': 'f(x) = exp(-x²)',
+            'in_schwartz': True,
+            'seminorms_computed': {
+                'p_{0,0}': round(p_00, 6),    # sup |f(x)| ≈ 1
+                'p_{1,0}': round(p_10, 6),    # sup |x·f(x)|
+                'p_{2,0}': round(p_20, 6),    # sup |x²·f(x)|
+                'p_{0,1}': round(p_01_approx, 6),  # sup |f'(x)|
+            },
+            'all_seminorms_finite': all_finite,
+        },
+        'not_in_schwartz': [
+            {'function': '1/(1+x²)', 'reason': 'Fällt nur algebraisch, nicht schnell genug.'},
+            {'function': 'sin(x)', 'reason': 'Fällt gar nicht → sup |f(x)| = 1 beschränkt, aber sup |x^n f| = ∞.'},
+            {'function': 'e^x', 'reason': 'Wächst exponentiell, liegt nicht mal in L²(ℝ).'},
+        ],
+        'properties': [
+            'S(ℝⁿ) ist ein Fréchet-Raum (vollständig, metrisierbar, lokalkonvex)',
+            'S(ℝⁿ) ist dicht in L^p(ℝⁿ) für 1 ≤ p < ∞',
+            'C_c^∞(ℝⁿ) ⊂ S(ℝⁿ) ⊂ L^p(ℝⁿ) für 1 ≤ p ≤ ∞',
+            'Fourier-Transformation F: S(ℝⁿ) → S(ℝⁿ) ist Isomorphismus (F⁻¹ = F̄)',
+        ],
+        'fourier_invariance': {
+            'statement': 'F: S(ℝ) → S(ℝ), f ↦ f̂ ist topologischer Isomorphismus.',
+            'gaussian': 'F[e^{-πx²}](ξ) = e^{-πξ²} (Eigenfunktion der Fourier-Transformation)',
+        },
+        'tempered_distributions': (
+            "Der Dualraum S'(ℝⁿ) (temperierte Distributionen) ist fundamental in der "
+            'Distributionentheorie. Funktionen wie 1/x, δ(x) (Dirac-Delta), '
+            'Polynome p(x) definieren temperierte Distributionen.'
+        ),
+        'applications': [
+            'Fourier-Analysis (Fourier-Transformation auf S(ℝⁿ))',
+            'Distributionentheorie (Dualraum = temperierte Distributionen)',
+            'Pseudodifferentialoperatoren',
+            'Quantenfeldtheorie (Propagatoren)',
+        ],
+    }

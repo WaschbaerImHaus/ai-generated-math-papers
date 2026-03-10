@@ -236,15 +236,24 @@
         <!-- === Gruppe: Geometrie & Topologie === -->
         <div class="nav-group">
             <input type="checkbox" id="nav-geo"
-                {% if request.path in ['/topology', '/tensor', '/spinors'] %}checked{% endif %}>
+                {% if request.path in ['/topology', '/tensor', '/spinors', '/algebraic_geometry', '/differential_topology', '/lie_groups'] %}checked{% endif %}>
             <label class="nav-group-label" for="nav-geo">Geometrie &amp; Topologie</label>
             <div class="nav-group-content">
                 <ul class="nav-list">
-                    <li><a href="/topology" class="nav-link {% if '/topology' in request.path %}active{% endif %}">
+                    <li><a href="/topology" class="nav-link {% if request.path == '/topology' %}active{% endif %}">
                         &#8734; Topologie
+                    </a></li>
+                    <li><a href="/differential_topology" class="nav-link {% if request.path == '/differential_topology' %}active{% endif %}">
+                        &#8711; Differentialtopologie
                     </a></li>
                     <li><a href="/tensor" class="nav-link {% if '/tensor' in request.path %}active{% endif %}">
                         g Tensor-Geometrie
+                    </a></li>
+                    <li><a href="/algebraic_geometry" class="nav-link {% if request.path == '/algebraic_geometry' %}active{% endif %}">
+                        V Algebraische Geometrie
+                    </a></li>
+                    <li><a href="/lie_groups" class="nav-link {% if request.path == '/lie_groups' %}active{% endif %}">
+                        L Lie-Gruppen
                     </a></li>
                     <li><a href="/spinors" class="nav-link {% if '/spinors' in request.path %}active{% endif %}">
                         &#963; Spinoren
@@ -270,15 +279,18 @@
             </div>
         </div>
 
-        <!-- === Gruppe: Statistik === -->
+        <!-- === Gruppe: Statistik & Stochastik === -->
         <div class="nav-group">
             <input type="checkbox" id="nav-statistik"
-                {% if request.path == '/statistics' %}checked{% endif %}>
-            <label class="nav-group-label" for="nav-statistik">Statistik</label>
+                {% if request.path in ['/statistics', '/stochastic'] %}checked{% endif %}>
+            <label class="nav-group-label" for="nav-statistik">Statistik &amp; Stochastik</label>
             <div class="nav-group-content">
                 <ul class="nav-list">
-                    <li><a href="/statistics" class="nav-link {% if '/statistics' in request.path %}active{% endif %}">
+                    <li><a href="/statistics" class="nav-link {% if request.path == '/statistics' %}active{% endif %}">
                         &#963; Statistik
+                    </a></li>
+                    <li><a href="/stochastic" class="nav-link {% if request.path == '/stochastic' %}active{% endif %}">
+                        &#126; Stochastik
                     </a></li>
                 </ul>
             </div>

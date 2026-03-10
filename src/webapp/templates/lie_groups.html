@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+<!--
+    @file lie_groups.html
+    @brief Lie-Gruppen und Lie-Algebren: SO(n)-Rotationen, Lie-Klammer,
+           Exponentialabbildung und Klassifikation halbeinfacher Lie-Algebren.
+    @description
+        Interaktive Web-Seite für Lie-Gruppen und Lie-Algebren.
+        Rotationsgruppen SO(2)/SO(3), Lie-Klammer [X,Y]=XY-YX, Exponential-
+        abbildung exp: g -> G sowie die Cartan-Klassifikation A_n, B_n, C_n, D_n.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+
+{% block title %}Lie-Gruppen und Lie-Algebren – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>&#120099; Lie-Gruppen &amp; Lie-Algebren</h1>
+    <p class="page-desc">
+        Lie-Gruppen sind differenzierbare Mannigfaltigkeiten mit Gruppenstruktur.
+        Zu jeder Lie-Gruppe $G$ gehört eine Lie-Algebra $\mathfrak{g} = T_e G$
+        (Tangentialraum am neutralen Element) mit der Lie-Klammer $[X,Y] = XY - YX$.
+        Exponentialabbildung $\exp: \mathfrak{g} \to G$, Cartan-Klassifikation.
+    </p>
+</div>
+
+<!-- ===== SECTION 1: SO(n)-ROTATIONEN ===== -->
+<section class="math-section">
+    <h2>&#8635; SO(n)-Rotationsgruppen</h2>
+    <p>
+        Die <strong>spezielle orthogonale Gruppe</strong>
+        $SO(n) = \{A \in M_n(\mathbb{R}) \mid A^T A = I, \det(A) = 1\}$
+        beschreibt orientierungserhaltende Rotationen im $\mathbb{R}^n$.
+        Lie-Algebra: $\mathfrak{so}(n) = \{X \in M_n(\mathbb{R}) \mid X^T = -X\}$ (schiefsymmetrische Matrizen).
+        <strong>SO(2)</strong>: $R(\theta) = \begin{pmatrix}\cos\theta & -\sin\theta \\ \sin\theta & \cos\theta\end{pmatrix}$,
+        <strong>SO(3)</strong>: Rodrigues-Formel $R = I + \sin\theta\, K + (1-\cos\theta)\, K^2$.
+    </p>
+
+    <div class="card-grid">
+
+        <!-- SO(n)-Rotationsmatrix -->
+        <div class="card">
+            <h3>Rotationsmatrix $R \in SO(n)$</h3>
+            <p>
+                Berechnung einer Rotationsmatrix für $n = 2$ oder $n = 3$
+                und Verifikation der Orthogonalitätseigenschaft $R^T R = I$.
+            </p>
+            <div class="input-row">
+                <label>Dimension $n$:</label>
+                <select id="so-n">
+                    <option value="2" selected>$n = 2$ (SO(2))</option>
+                    <option value="3">$n = 3$ (SO(3))</option>
+                </select>
+            </div>
+            <div class="input-row">
+                <label>Winkel $\theta$ (Bogenmass):</label>
+                <input type="number" id="so-theta" value="0.7854" step="0.01">
+                <span style="font-size:0.85em;color:#888">(z.B. $\pi/4 \approx 0.7854$)</span>
+            </div>
+            <button onclick="calcSORotation()" class="btn-calc">Rotationsmatrix berechnen</button>
+            <div id="so-rotation-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 2: LIE-KLAMMER ===== -->
+<section class="math-section">
+    <h2>&#91;&#183;,&#183;&#93; Lie-Klammer</h2>
+    <p>
+        Die <strong>Lie-Klammer</strong> $[X, Y] = XY - YX$ erfüllt:
+        <em>Antikommutativität</em>: $[X,Y] = -[Y,X]$,
+        <em>Jacobi-Identität</em>: $[[X,Y],Z] + [[Y,Z],X] + [[Z,X],Y] = 0$.
+        Die Lie-Klammer macht $\mathfrak{g}$ zur Lie-Algebra.
+        Beispiel $\mathfrak{su}(2)$: $[e_1, e_2] = e_3$, $[e_2, e_3] = e_1$, $[e_3, e_1] = e_2$.
+    </p>
+
+    <div class="card-grid">
+
+        <!-- Lie-Klammer [X,Y] -->
+        <div class="card">
+            <h3>Lie-Klammer $[X, Y] = XY - YX$</h3>
+            <p>
+                Eingabe zweier $2 \times 2$-Matrizen $X, Y \in \mathfrak{g}$ als JSON-Array.
+                Berechnung des Kommutators, Verifikation der Jacobi-Identität.
+                Format: $[[a,b],[c,d]]$ für $\begin{pmatrix}a & b \\ c & d\end{pmatrix}$.
+            </p>
+            <div class="input-row">
+                <label>Matrix $X$ (2×2 JSON):</label>
+                <input type="text" id="liebracket-X" value="[[0,1],[-1,0]]" style="width:180px">
+            </div>
+            <div class="input-row">
+                <label>Matrix $Y$ (2×2 JSON):</label>
+                <input type="text" id="liebracket-Y" value="[[0,0],[1,0]]" style="width:180px">
+            </div>
+            <button onclick="calcLieBracket()" class="btn-calc">Lie-Klammer $[X,Y]$ berechnen</button>
+            <div id="liebracket-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 3: EXPONENTIALABBILDUNG ===== -->
+<section class="math-section">
+    <h2>&#8495; Exponentialabbildung</h2>
+    <p>
+        Die <strong>Exponentialabbildung</strong> $\exp: \mathfrak{g} \to G$ verbindet
+        Lie-Algebra und Lie-Gruppe:
+        $$\exp(X) = \sum_{k=0}^\infty \frac{X^k}{k!} = I + X + \frac{X^2}{2!} + \frac{X^3}{3!} + \cdots$$
+        Eigenschaften: $\exp(0) = I$, $\exp((s+t)X) = \exp(sX)\exp(tX)$,
+        $\frac{d}{dt}\exp(tX)\big|_{t=0} = X$.
+        Für $X \in \mathfrak{so}(3)$ gilt: $\exp(X) \in SO(3)$ (Rodrigues-Formel).
+    </p>
+
+    <div class="card-grid">
+
+        <!-- Exponentialabbildung -->
+        <div class="card">
+            <h3>Matrixexponential $\exp(X)$</h3>
+            <p>
+                Berechnung des Matrixexponentials einer $2 \times 2$-Matrix via
+                Potenzreihe oder diagonalisierter Form. Verifikation: $\det(\exp(X)) = e^{\mathrm{tr}(X)}$.
+            </p>
+            <div class="input-row">
+                <label>Matrix $X$ (2×2 JSON):</label>
+                <input type="text" id="expmap-X" value="[[0,-1],[1,0]]" style="width:180px">
+            </div>
+            <button onclick="calcExponentialMap()" class="btn-calc">$\exp(X)$ berechnen</button>
+            <div id="expmap-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 4: KLASSIFIKATION ===== -->
+<section class="math-section">
+    <h2>&#120068; Klassifikation halbeinfacher Lie-Algebren</h2>
+    <p>
+        <strong>Cartan-Klassifikation</strong> der einfachen komplexen Lie-Algebren
+        (Killing-Form nicht-degeneriert):
+        <em>Klassische Serien</em>:
+        $A_n = \mathfrak{sl}(n+1)$, $B_n = \mathfrak{so}(2n+1)$,
+        $C_n = \mathfrak{sp}(2n)$, $D_n = \mathfrak{so}(2n)$.
+        <em>Ausnahme-Algebren</em>: $G_2, F_4, E_6, E_7, E_8$.
+        Dynkin-Diagramme kodieren die Cartan-Matrix $a_{ij} = 2\langle\alpha_i,\alpha_j\rangle/\langle\alpha_j,\alpha_j\rangle$.
+    </p>
+
+    <div class="card-grid">
+
+        <!-- Klassifikation laden -->
+        <div class="card">
+            <h3>Cartan-Klassifikation der Lie-Algebren</h3>
+            <p>
+                Übersicht aller einfachen Lie-Algebren mit Dimension, Rang,
+                Dynkin-Diagramm-Typ und Anwendungen in der Physik (Standardmodell,
+                Quantenmechanik, Stringtheorie).
+            </p>
+            <button onclick="loadLieClassification()" class="btn-calc">Klassifikation laden</button>
+            <div id="classification-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * @brief SO(n)-Rotationsmatrix berechnen und Orthogonalität prüfen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcSORotation() {
+    const div = document.getElementById('so-rotation-result');
+    const n = parseInt(document.getElementById('so-n').value);
+    const theta = parseFloat(document.getElementById('so-theta').value);
+    try {
+        const data = await apiPost('/api/lie_groups/so_rotation', { n, theta });
+        const r = data;
+        let html = `<strong>Rotation $R \\in SO(${n})$, $\\theta = ${theta.toFixed(4)}$</strong><br>`;
+        // Rotationsmatrix als HTML-Tabelle ausgeben
+        if (r.rotation_matrix) {
+            html += '<strong>Rotationsmatrix:</strong><br>';
+            html += '<table class="math-table"><tbody>';
+            r.rotation_matrix.forEach(row => {
+                html += '<tr>' + row.map(v => `<td>${typeof v === 'number' ? v.toFixed(6) : v}</td>`).join('') + '</tr>';
+            });
+            html += '</tbody></table>';
+        }
+        // Orthogonalitätsprüfung
+        if (r.is_orthogonal !== undefined) {
+            html += `<br>Orthogonal ($R^T R = I$): ${r.is_orthogonal ? '✓' : '✗'}<br>`;
+        }
+        if (r.determinant !== undefined) {
+            html += `$\\det(R) = ${typeof r.determinant === 'number' ? r.determinant.toFixed(6) : r.determinant}$<br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Lie-Klammer [X,Y] = XY - YX berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcLieBracket() {
+    const div = document.getElementById('liebracket-result');
+    try {
+        const X = JSON.parse(document.getElementById('liebracket-X').value);
+        const Y = JSON.parse(document.getElementById('liebracket-Y').value);
+        const data = await apiPost('/api/lie_groups/lie_bracket', { X, Y });
+        const r = data;
+        let html = '<strong>Lie-Klammer $[X, Y] = XY - YX$</strong><br>';
+        // Ergebnis-Matrix
+        if (r.lie_bracket) {
+            html += '<strong>$[X,Y]$:</strong><br>';
+            html += '<table class="math-table"><tbody>';
+            r.lie_bracket.forEach(row => {
+                html += '<tr>' + row.map(v => `<td>${typeof v === 'number' ? v.toFixed(6) : v}</td>`).join('') + '</tr>';
+            });
+            html += '</tbody></table>';
+        }
+        // Jacobi-Identität
+        if (r.jacobi_holds !== undefined) {
+            html += `<br>Jacobi-Identität: ${r.jacobi_holds ? '✓ erfüllt' : '✗ nicht erfüllt'}<br>`;
+        }
+        if (r.anticommutative !== undefined) {
+            html += `Antikommutativität $[X,Y] = -[Y,X]$: ${r.anticommutative ? '✓' : '✗'}<br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Matrixexponential exp(X) berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcExponentialMap() {
+    const div = document.getElementById('expmap-result');
+    try {
+        const X = JSON.parse(document.getElementById('expmap-X').value);
+        const data = await apiPost('/api/lie_groups/exponential_map', { X });
+        const r = data;
+        let html = '<strong>Exponentialabbildung $\\exp(X)$</strong><br>';
+        // exp(X)-Matrix ausgeben
+        if (r.exp_X) {
+            html += '<strong>$\\exp(X)$:</strong><br>';
+            html += '<table class="math-table"><tbody>';
+            r.exp_X.forEach(row => {
+                html += '<tr>' + row.map(v => `<td>${typeof v === 'number' ? v.toFixed(6) : v}</td>`).join('') + '</tr>';
+            });
+            html += '</tbody></table>';
+        }
+        // Determinante und Spur prüfen
+        if (r.determinant !== undefined && r.trace_X !== undefined) {
+            html += `<br>$\\det(\\exp(X)) = ${typeof r.determinant === 'number' ? r.determinant.toFixed(6) : r.determinant}$`;
+            html += ` $= e^{\\mathrm{tr}(X)} = e^{${typeof r.trace_X === 'number' ? r.trace_X.toFixed(4) : r.trace_X}}$<br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Klassifikation halbeinfacher Lie-Algebren laden (GET-Anfrage).
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function loadLieClassification() {
+    const div = document.getElementById('classification-result');
+    try {
+        // GET-Anfrage ohne Body
+        const res = await fetch('/api/lie_groups/classification');
+        const data = await res.json();
+        const r = data;
+        let html = '<strong>Cartan-Klassifikation einfacher Lie-Algebren</strong><br>';
+        // Klassische Serien
+        if (r.classical_series) {
+            html += '<br><strong>Klassische Serien:</strong><ul>';
+            r.classical_series.forEach(s => {
+                html += `<li><strong>${s.name}</strong>`;
+                if (s.algebra) html += ` $= ${s.algebra}$`;
+                if (s.dimension) html += `, Dim: $${s.dimension}$`;
+                if (s.description) html += ` – ${s.description}`;
+                html += '</li>';
+            });
+            html += '</ul>';
+        }
+        // Ausnahme-Algebren
+        if (r.exceptional) {
+            html += '<br><strong>Ausnahme-Algebren:</strong><ul>';
+            r.exceptional.forEach(e => {
+                html += `<li><strong>${e.name}</strong>`;
+                if (e.dimension) html += `, Dim: $${e.dimension}$`;
+                if (e.description) html += ` – ${e.description}`;
+                html += '</li>';
+            });
+            html += '</ul>';
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+</script>
+{% endblock %}
