@@ -1,95 +1,352 @@
 {% extends "base.html" %}
 <!--
     @file operations_research.html
-    @brief Operations Research: Lineare Programmierung, Spieltheorie, Netzwerkflüsse.
+    @brief Operations Research: Lineares Programmieren (Simplex-Methode),
+           Spieltheorie (Nash-Gleichgewicht, Minimax) und Netzwerk-Fluss (Max-Flow).
+    @description
+        Interaktive Web-Seite fuer Operations Research (OR).
+        Lineare Programme (LP) mit der Simplex-Methode loesen,
+        Spieltheorie (Gefangenendilemma, Minimax-Theorem),
+        Netzwerkfluss (Ford-Fulkerson / Edmonds-Karp Max-Flow-Algorithmus).
     @author Kurt Ingwer
     @date 2026-03-10
     @lastModified 2026-03-10
 -->
+
 {% block title %}Operations Research – Mathematik-Spezialist{% endblock %}
+
 {% block content %}
 <div class="page-header">
-    <h1>&#9874; Operations Research</h1>
+    <h1>&#8734; Operations Research</h1>
     <p class="page-desc">
-        Optimierung realer Entscheidungsprobleme: Lineare Programmierung (Simplex-Methode),
-        Spieltheorie (Nash-Gleichgewichte) und Netzwerk-Flüsse (Ford-Fulkerson).
+        Operations Research (OR): Optimierung realer Entscheidungsprobleme.
+        Lineare Programme $\min c^\top x$ s.t. $Ax \leq b$, $x \geq 0$ (Simplex-Methode),
+        Spieltheorie (Nash-Gleichgewicht, Minimax-Theorem von von Neumann),
+        und Netzwerk-Fluss $\max \sum_e f_e$ s.t. Kapazitaetsbeschraenkungen (Ford-Fulkerson).
     </p>
 </div>
+
+<!-- ===== SECTION 1: LINEARES PROGRAMM ===== -->
 <section class="math-section">
-    <h2>&#9654; Lineare Programmierung</h2>
+    <h2>&#8805; Lineares Programm (LP)</h2>
     <p>
-        Maximiere $c^T x$ unter $Ax \leq b$, $x \geq 0$.
-        $$\max\; 3x + 5y \quad \text{s.t.}\quad x \leq 4,\; 2y \leq 12,\; 3x+5y \leq 25$$
+        Ein <strong>lineares Programm</strong> in Standardform:
+        $$\min_{x \in \mathbb{R}^n} c^\top x \quad \text{s.t.} \quad Ax \leq b,\; x \geq 0$$
+        Die <strong>Simplex-Methode</strong> wandert an Ecken des zulaessigen Polyeders
+        $P = \{x \geq 0 \mid Ax \leq b\}$ entlang, bis die optimale Ecke erreicht ist.
+        <strong>Dualitaet</strong> (starke Dualitaet): $\min c^\top x = \max b^\top y$
+        fuer $y \geq 0$, $A^\top y \geq c$.
     </p>
+
     <div class="card-grid">
         <div class="card">
-            <h3>Simplex-Methode</h3>
-            <button onclick="calcLP()" class="btn-calc">LP lösen</button>
+            <h3>LP loesen: $\min c^\top x$ s.t. $Ax \leq b$, $x \geq 0$</h3>
+            <p>
+                Loesung eines linearen Programms mit der Simplex-Methode.
+                Zielfunktionskoeffizienten $c$, Nebenbedingungsmatrix $A$
+                und rechte Seite $b$ als JSON eingeben.
+            </p>
+            <div class="input-row">
+                <label>Zielfunktion $c$ (JSON-Array, zu minimieren):</label>
+            </div>
+            <input type="text" id="lp-c" value="[-1, -2]"
+                   style="width:100%;margin-bottom:8px">
+
+            <div class="input-row">
+                <label>Nebenbedingungsmatrix $A$ (JSON, Zeilen = Ungleichungen):</label>
+            </div>
+            <textarea id="lp-A" rows="3" style="width:100%">[[1, 2], [3, 1], [1, 0], [0, 1]]</textarea>
+
+            <div class="input-row">
+                <label>Rechte Seite $b$ (JSON-Array):</label>
+            </div>
+            <input type="text" id="lp-b" value="[14, 14, 4, 6]"
+                   style="width:100%;margin-bottom:8px">
+
+            <small>Beispiel: $\min -x_1 - 2x_2$ s.t. $x_1+2x_2 \leq 14$, $3x_1+x_2 \leq 14$</small>
+            <br><br>
+            <button onclick="calcLinearProgramming()" class="btn-calc">LP loesen (Simplex)</button>
             <div id="lp-result" class="result-box"></div>
         </div>
     </div>
 </section>
+
+<!-- ===== SECTION 2: SPIELTHEORIE ===== -->
 <section class="math-section">
-    <h2>&#9654; Spieltheorie</h2>
-    <p>Nash-Gleichgewicht: $u_i(s_i^*, s_{-i}^*) \geq u_i(s_i, s_{-i}^*)$ für alle $s_i$.</p>
+    <h2>&#9812; Spieltheorie</h2>
+    <p>
+        Die <strong>Spieltheorie</strong> analysiert strategische Interaktionen
+        rationaler Akteure.
+        <strong>Nash-Gleichgewicht</strong>: Strategieprofil $(s_1^*, \ldots, s_n^*)$,
+        bei dem kein Spieler durch einseitige Abweichung gewinnt.
+        <strong>Minimax-Theorem</strong> (von Neumann, 1928): In Zwei-Personen-Nullsummenspielen:
+        $$\max_{x} \min_{y} x^\top A y = \min_{y} \max_{x} x^\top A y$$
+        <strong>Gefangenendilemma</strong>: Klassisches Beispiel fuer Nash-Gleichgewicht
+        (gegenseitiges Defektieren), das nicht Pareto-optimal ist.
+    </p>
+
     <div class="card-grid">
         <div class="card">
-            <h3>Spielanalyse</h3>
+            <h3>Spieltheorie: Nash-Gleichgewicht &amp; Minimax</h3>
+            <p>
+                Analyse klassischer Zwei-Personen-Spiele: Gefangenendilemma
+                oder Minimax (optimale gemischte Strategie im Nullsummenspiel).
+            </p>
             <div class="input-row">
-                <label>Spiel:</label>
+                <label>Spieltyp:</label>
                 <select id="game-type">
-                    <option value="prisoners_dilemma">Gefangenendilemma</option>
-                    <option value="minimax">Minimax</option>
+                    <option value="prisoners_dilemma">Gefangenendilemma (Nash-GG)</option>
+                    <option value="minimax">Nullsummenspiel (Minimax)</option>
                 </select>
             </div>
-            <button onclick="calcGame()" class="btn-calc">Analysieren</button>
+            <div class="input-row">
+                <label>Auszahlungsmatrix $A$ (JSON, nur bei Minimax):</label>
+            </div>
+            <textarea id="game-matrix" rows="3" style="width:100%">[[3, 0], [5, 1]]</textarea>
+            <small>Gefangenendilemma: Matrix wird ignoriert (klassische Auszahlung).</small>
+            <br><br>
+            <button onclick="calcGameTheory()" class="btn-calc">Spieltheorie analysieren</button>
             <div id="game-result" class="result-box"></div>
         </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 3: NETZWERK-FLUSS ===== -->
+<section class="math-section">
+    <h2>&#8614; Netzwerk-Fluss (Max-Flow)</h2>
+    <p>
+        Das <strong>Max-Flow-Problem</strong>: Maximiere den Fluss von Quelle $s$
+        zur Senke $t$ in einem Netzwerk $(V, E, c)$:
+        $$\max \sum_{v:(s,v)\in E} f(s,v) \quad \text{s.t.}\quad
+          0 \leq f(u,v) \leq c(u,v),\;
+          \sum_u f(u,v) = \sum_w f(v,w)\ \forall v \neq s,t$$
+        <strong>Max-Flow-Min-Cut-Theorem</strong>: Maximaler Fluss = minimaler Schnitt.
+        <strong>Edmonds-Karp</strong> (BFS-basiert): $O(VE^2)$.
+    </p>
+
+    <div class="card-grid">
         <div class="card">
-            <h3>Max-Flow (Ford-Fulkerson)</h3>
-            <p>Max-Flow = Min-Cut: $\max_{f} \text{val}(f) = \min_{(S,T)} \text{cap}(S,T)$</p>
-            <button onclick="calcFlow()" class="btn-calc">Max-Flow berechnen</button>
+            <h3>Max-Flow: $\max |f|$ im Netzwerk</h3>
+            <p>
+                Berechnung des maximalen Flusses mit dem Edmonds-Karp-Algorithmus.
+                Kantenformat: <code>[Knoten_von, Knoten_zu, Kapazitaet]</code>.
+                Knoten 0 = Quelle $s$, letzter Knoten = Senke $t$.
+            </p>
+            <div class="input-row">
+                <label>Kanten (JSON: [[von, zu, Kapazitaet], ...]):</label>
+            </div>
+            <textarea id="flow-edges" rows="4" style="width:100%">[[0,1,10],[0,2,10],[1,2,2],[1,3,4],[1,4,8],[2,4,9],[3,5,10],[4,3,6],[4,5,10]]</textarea>
+            <div class="input-row">
+                <label>Anzahl Knoten $|V|$:</label>
+                <input type="number" id="flow-nodes" value="6" min="2" max="100" step="1">
+                <label>Quelle $s$:</label>
+                <input type="number" id="flow-source" value="0" min="0" step="1">
+                <label>Senke $t$:</label>
+                <input type="number" id="flow-sink" value="5" min="0" step="1">
+            </div>
+            <button onclick="calcNetworkFlow()" class="btn-calc">Max-Flow berechnen</button>
             <div id="flow-result" class="result-box"></div>
         </div>
     </div>
 </section>
+
+{% endblock %}
+
+{% block scripts %}
 <script>
-async function calcLP() {
+/**
+ * @brief Lineares Programm mit der Simplex-Methode loesen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcLinearProgramming() {
     const div = document.getElementById('lp-result');
-    div.innerHTML = '<span class="loading">Berechne...</span>';
     try {
-        const data = await apiPost('/api/or/linear_programming', { problem: 'maximize' });
-        let html = `<strong>${data.title || 'LP-Lösung'}</strong><br>`;
-        for (const [k, v] of Object.entries(data)) {
-            if (k !== 'title') html += `<strong>${k}:</strong> ${JSON.stringify(v)}<br>`;
+        // Eingaben parsen
+        const c = JSON.parse(document.getElementById('lp-c').value);
+        const A = JSON.parse(document.getElementById('lp-A').value);
+        const b = JSON.parse(document.getElementById('lp-b').value);
+        const data = await apiPost('/api/or/linear_programming', { c, A, b });
+        const r = data;
+        let html = `<strong>Lineares Programm – Simplex-Methode</strong><br>`;
+        html += `$\\min c^\\top x$ s.t. $Ax \\leq b$, $x \\geq 0$<br>`;
+
+        // Optimale Loesung x*
+        if (r.x_optimal) {
+            html += '<br><strong>Optimale Loesung $x^*$:</strong><br>';
+            html += '$x^* = [' + r.x_optimal.map(v =>
+                typeof v === 'number' ? v.toFixed(6) : v).join(',\\; ') + ']$<br>';
         }
-        showResult(div, html); renderMathInElement(div);
-    } catch (e) { div.innerHTML = `<span class="error">${e.message}</span>`; }
+
+        // Optimaler Zielfunktionswert
+        if (r.optimal_value !== undefined) {
+            const val = typeof r.optimal_value === 'number'
+                ? r.optimal_value.toFixed(6) : r.optimal_value;
+            html += `<br>Optimaler Zielfunktionswert: $c^\\top x^* = ${val}$<br>`;
+        }
+
+        // Status (optimal / unbeschraenkt / unzulaessig)
+        if (r.status) {
+            html += `Status: <strong>${r.status}</strong><br>`;
+        }
+
+        // Duale Variablen (Schattenpreise)
+        if (r.dual_variables) {
+            html += '<br><strong>Duale Variablen (Schattenpreise) $y^*$:</strong><br>';
+            html += '$y^* = [' + r.dual_variables.map(v =>
+                typeof v === 'number' ? v.toFixed(6) : v).join(',\\; ') + ']$<br>';
+        }
+
+        // Anzahl Simplex-Iterationen
+        if (r.iterations !== undefined) {
+            html += `<br>Simplex-Iterationen: ${r.iterations}<br>`;
+        }
+
+        // Beschreibung
+        if (r.description) html += `<br><em>${r.description}</em>`;
+
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
 }
-async function calcGame() {
+
+/**
+ * @brief Spieltheorie-Analyse: Nash-Gleichgewicht oder Minimax-Strategie.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcGameTheory() {
     const div = document.getElementById('game-result');
-    div.innerHTML = '<span class="loading">Berechne...</span>';
     const game_type = document.getElementById('game-type').value;
     try {
-        const data = await apiPost('/api/or/game_theory', { game_type });
-        let html = `<strong>${data.title || 'Spieltheorie'}</strong><br>`;
-        for (const [k, v] of Object.entries(data)) {
-            if (k !== 'title') html += `<strong>${k}:</strong> ${JSON.stringify(v)}<br>`;
+        // Auszahlungsmatrix nur bei Minimax relevant
+        let payoff_matrix = null;
+        if (game_type === 'minimax') {
+            payoff_matrix = JSON.parse(document.getElementById('game-matrix').value);
         }
-        showResult(div, html); renderMathInElement(div);
-    } catch (e) { div.innerHTML = `<span class="error">${e.message}</span>`; }
+        const body = { game_type };
+        if (payoff_matrix) body.payoff_matrix = payoff_matrix;
+
+        const data = await apiPost('/api/or/game_theory', body);
+        const r = data;
+
+        let html = '';
+        if (game_type === 'prisoners_dilemma') {
+            html = `<strong>Gefangenendilemma – Nash-Gleichgewicht</strong><br>`;
+
+            // Auszahlungsmatrix anzeigen
+            html += '<br><strong>Auszahlungsmatrix (Spieler 1 / Spieler 2):</strong><br>';
+            html += '<table class="math-table"><thead><tr>';
+            html += '<th></th><th>Kooperieren (C)</th><th>Defektieren (D)</th></tr></thead><tbody>';
+            html += '<tr><td>Kooperieren (C)</td><td>(3, 3)</td><td>(0, 5)</td></tr>';
+            html += '<tr><td>Defektieren (D)</td><td>(5, 0)</td><td>(1, 1)</td></tr>';
+            html += '</tbody></table>';
+
+            // Nash-Gleichgewicht
+            if (r.nash_equilibrium) {
+                html += `<br><strong>Nash-Gleichgewicht:</strong> $(${r.nash_equilibrium.join(', ')})$<br>`;
+            }
+            if (r.dominant_strategy) {
+                html += `Dominante Strategie: <strong>${r.dominant_strategy}</strong><br>`;
+            }
+            if (r.pareto_optimal !== undefined) {
+                html += `Pareto-optimal: ${r.pareto_optimal ? 'Ja' : '<strong>Nein</strong> (soziales Dilemma!)'}<br>`;
+            }
+
+        } else {
+            html = `<strong>Nullsummenspiel – Minimax-Theorem</strong><br>`;
+
+            // Minimax-Wert
+            if (r.minimax_value !== undefined) {
+                const mv = typeof r.minimax_value === 'number'
+                    ? r.minimax_value.toFixed(6) : r.minimax_value;
+                html += `<br><strong>Spielwert (Minimax = Maximin):</strong> $v = ${mv}$<br>`;
+            }
+
+            // Optimale gemischte Strategie Spieler 1
+            if (r.player1_strategy) {
+                html += '<br><strong>Optimale gemischte Strategie Spieler 1:</strong><br>';
+                html += '$x^* = [' + r.player1_strategy.map(v =>
+                    typeof v === 'number' ? v.toFixed(4) : v).join(',\\; ') + ']$<br>';
+            }
+
+            // Optimale gemischte Strategie Spieler 2
+            if (r.player2_strategy) {
+                html += '<strong>Optimale gemischte Strategie Spieler 2:</strong><br>';
+                html += '$y^* = [' + r.player2_strategy.map(v =>
+                    typeof v === 'number' ? v.toFixed(4) : v).join(',\\; ') + ']$<br>';
+            }
+        }
+
+        // Beschreibung
+        if (r.description) html += `<br><em>${r.description}</em>`;
+
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
 }
-async function calcFlow() {
+
+/**
+ * @brief Maximalen Fluss im Netzwerk mit dem Edmonds-Karp-Algorithmus berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcNetworkFlow() {
     const div = document.getElementById('flow-result');
-    div.innerHTML = '<span class="loading">Berechne...</span>';
     try {
-        const data = await apiPost('/api/or/network_flow', {});
-        let html = `<strong>${data.title || 'Max-Flow'}</strong><br>`;
-        for (const [k, v] of Object.entries(data)) {
-            if (k !== 'title') html += `<strong>${k}:</strong> ${JSON.stringify(v)}<br>`;
+        const edges = JSON.parse(document.getElementById('flow-edges').value);
+        const num_nodes = parseInt(document.getElementById('flow-nodes').value);
+        const source = parseInt(document.getElementById('flow-source').value);
+        const sink = parseInt(document.getElementById('flow-sink').value);
+
+        const data = await apiPost('/api/or/network_flow', {
+            edges,
+            num_nodes,
+            source,
+            sink
+        });
+        const r = data;
+        let html = `<strong>Netzwerk-Fluss: Max-Flow</strong><br>`;
+        html += `Quelle $s = ${source}$, Senke $t = ${sink}$, $|V| = ${num_nodes}$<br>`;
+
+        // Maximaler Fluss
+        if (r.max_flow !== undefined) {
+            html += `<br><strong>Maximaler Fluss:</strong> $|f^*| = ${r.max_flow}$<br>`;
         }
-        showResult(div, html); renderMathInElement(div);
-    } catch (e) { div.innerHTML = `<span class="error">${e.message}</span>`; }
+
+        // Min-Cut (Max-Flow-Min-Cut-Theorem)
+        if (r.min_cut !== undefined) {
+            html += `Minimaler Schnitt (Kapazitaet): $c(S, T) = ${r.min_cut}$<br>`;
+        }
+
+        // Knoten auf der Quellseite des Schnitts
+        if (r.cut_partition) {
+            const s_side = r.cut_partition.source_side || [];
+            const t_side = r.cut_partition.sink_side || [];
+            html += `<br>Schnitt-Partition:<br>`;
+            html += `&nbsp;&nbsp;Quellseite $S = \\{${s_side.join(', ')}\\}$<br>`;
+            html += `&nbsp;&nbsp;Senkenseite $T = \\{${t_side.join(', ')}\\}$<br>`;
+        }
+
+        // Fluss auf einzelnen Kanten
+        if (r.flow_on_edges && r.flow_on_edges.length > 0) {
+            html += '<br><strong>Fluss auf Kanten:</strong><br>';
+            html += '<table class="math-table"><thead><tr>';
+            html += '<th>Von</th><th>Zu</th><th>Fluss</th><th>Kapazitaet</th></tr>';
+            html += '</thead><tbody>';
+            r.flow_on_edges.forEach(edge => {
+                const [u, v, f, cap] = edge;
+                html += `<tr><td>${u}</td><td>${v}</td><td>${f}</td><td>${cap}</td></tr>`;
+            });
+            html += '</tbody></table>';
+        }
+
+        // Beschreibung
+        if (r.description) html += `<br><em>${r.description}</em>`;
+
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
 }
 </script>
 {% endblock %}
