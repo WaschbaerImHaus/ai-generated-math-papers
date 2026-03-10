@@ -1,8 +1,9 @@
 """
-Fourier-Analysis – DFT, FFT, Fourier-Reihen, Fensterfunktionen.
-
-Dieses Modul implementiert die diskrete und schnelle Fourier-Transformation
-sowie Fourier-Reihen für periodische Funktionen:
+@file fourier.py
+@brief Fourier-Analysis – DFT, FFT, Fourier-Reihen, Fensterfunktionen.
+@description
+    Dieses Modul implementiert die diskrete und schnelle Fourier-Transformation
+    sowie Fourier-Reihen für periodische Funktionen:
     - DFT (Diskrete Fourier-Transformation, O(n²))
     - FFT (Cooley-Tukey, O(n log n))
     - Inverse FFT (IFFT)
@@ -10,22 +11,22 @@ sowie Fourier-Reihen für periodische Funktionen:
     - Fensterfunktionen (Hanning, Hamming, Blackman, Kaiser)
     - Spektralanalyse und Leistungsdichtespektrum
 
-Mathematischer Hintergrund:
-    Fourier-Transformation (kontinuierlich):
-        F(ω) = ∫_{-∞}^{∞} f(t) e^{-iωt} dt
-    Diskrete Fourier-Transformation:
-        X[k] = Σ_{n=0}^{N-1} x[n] · e^{-2πi·kn/N}
-    Inverse DFT:
-        x[n] = (1/N) · Σ_{k=0}^{N-1} X[k] · e^{2πi·kn/N}
+    Mathematischer Hintergrund:
+        Fourier-Transformation (kontinuierlich):
+            F(ω) = ∫_{-∞}^{∞} f(t) e^{-iωt} dt
+        Diskrete Fourier-Transformation:
+            X[k] = Σ_{n=0}^{N-1} x[n] · e^{-2πi·kn/N}
+        Inverse DFT:
+            x[n] = (1/N) · Σ_{k=0}^{N-1} X[k] · e^{2πi·kn/N}
 
-Verbindung zur Zahlentheorie:
-    Die Fourier-Transformation ist entscheidend für Riemanns Explizite Formel
-    und die Analyse der Zeta-Nullstellen über den Poisson-Summationsformel.
+    Verbindung zur Zahlentheorie:
+        Die Fourier-Transformation ist entscheidend für Riemanns Explizite Formel
+        und die Analyse der Zeta-Nullstellen über den Poisson-Summationsformel.
 
-@author: Kurt Ingwer
-@version: 1.0
-@since: 2026-03-08
-@lastModified: 2026-03-09
+@author Kurt Ingwer
+@version 1.0
+@since 2026-03-08
+@lastModified 2026-03-10
 """
 
 import math
@@ -38,7 +39,7 @@ from typing import Callable, Optional
 # DISKRETE FOURIER-TRANSFORMATION (DFT)
 # ===========================================================================
 
-def dft(x: list) -> list:
+def dft(x: list[complex] | list[float]) -> list[complex]:
     """
     Berechnet die diskrete Fourier-Transformation (DFT).
 
@@ -65,7 +66,7 @@ def dft(x: list) -> list:
     return result
 
 
-def idft(x: list) -> list:
+def idft(x: list[complex]) -> list[complex]:
     """
     Berechnet die inverse diskrete Fourier-Transformation (IDFT).
 
@@ -89,7 +90,7 @@ def idft(x: list) -> list:
 # SCHNELLE FOURIER-TRANSFORMATION (FFT) – COOLEY-TUKEY
 # ===========================================================================
 
-def fft(x: list) -> list:
+def fft(x: list[complex] | list[float]) -> list[complex]:
     """
     Schnelle Fourier-Transformation (FFT) nach Cooley-Tukey (radix-2).
 
@@ -133,7 +134,7 @@ def fft(x: list) -> list:
     return result
 
 
-def ifft(x: list) -> list:
+def ifft(x: list[complex]) -> list[complex]:
     """
     Inverse schnelle Fourier-Transformation (IFFT).
 
@@ -150,7 +151,7 @@ def ifft(x: list) -> list:
     return [v.conjugate() / n for v in fft_conj]
 
 
-def fft_padded(x: list) -> list:
+def fft_padded(x: list[complex] | list[float]) -> list[complex]:
     """
     FFT mit automatischer Nullauffüllung auf nächste Zweierpotenz (Zero-Padding).
 
@@ -176,8 +177,12 @@ def fft_padded(x: list) -> list:
 # FOURIER-REIHEN FÜR PERIODISCHE FUNKTIONEN
 # ===========================================================================
 
-def fourier_coefficients(f: Callable, period: float, n_terms: int,
-                         n_samples: int = 1000) -> tuple:
+def fourier_coefficients(
+    f: Callable[[float], float],
+    period: float,
+    n_terms: int,
+    n_samples: int = 1000
+) -> tuple[list[float], list[float]]:
     """
     Berechnet Fourier-Koeffizienten einer periodischen Funktion numerisch.
 
@@ -222,8 +227,12 @@ def fourier_coefficients(f: Callable, period: float, n_terms: int,
     return a_coeffs, b_coeffs
 
 
-def fourier_series_eval(t: float, a_coeffs: list, b_coeffs: list,
-                        period: float) -> float:
+def fourier_series_eval(
+    t: float,
+    a_coeffs: list[float],
+    b_coeffs: list[float],
+    period: float
+) -> float:
     """
     Wertet eine Fourier-Reihe an einem Punkt t aus.
 
@@ -251,7 +260,7 @@ def fourier_series_eval(t: float, a_coeffs: list, b_coeffs: list,
 # FENSTERFUNKTIONEN (für spektrale Analyse)
 # ===========================================================================
 
-def window_hanning(n: int) -> list:
+def window_hanning(n: int) -> list[float]:
     """
     Hanning-Fenster (raised cosine): w[k] = 0.5(1 - cos(2πk/N)).
 
@@ -270,7 +279,7 @@ def window_hanning(n: int) -> list:
     return list(0.5 * (1.0 - np.cos(2.0 * np.pi * k / (n - 1))))
 
 
-def window_hamming(n: int) -> list:
+def window_hamming(n: int) -> list[float]:
     """
     Hamming-Fenster: w[k] = 0.54 - 0.46·cos(2πk/N).
 
@@ -287,7 +296,7 @@ def window_hamming(n: int) -> list:
     return list(0.54 - 0.46 * np.cos(2.0 * np.pi * k / (n - 1)))
 
 
-def window_blackman(n: int) -> list:
+def window_blackman(n: int) -> list[float]:
     """
     Blackman-Fenster: w[k] = 0.42 - 0.5·cos(2πk/N) + 0.08·cos(4πk/N).
 
@@ -309,7 +318,7 @@ def window_blackman(n: int) -> list:
     )
 
 
-def apply_window(x: list, window: list) -> list:
+def apply_window(x: list[float] | list[complex], window: list[float]) -> list[float | complex]:
     """
     Wendet eine Fensterfunktion auf eine Signalfolge an.
 
@@ -338,7 +347,7 @@ def apply_window(x: list, window: list) -> list:
 # SPEKTRALANALYSE
 # ===========================================================================
 
-def power_spectrum(x: list, sample_rate: float = 1.0) -> tuple:
+def power_spectrum(x: list[float], sample_rate: float = 1.0) -> tuple[list[float], list[float]]:
     """
     Berechnet das Leistungsdichtespektrum eines Signals.
 
@@ -367,7 +376,7 @@ def power_spectrum(x: list, sample_rate: float = 1.0) -> tuple:
     return freqs, power
 
 
-def dominant_frequency(x: list, sample_rate: float = 1.0) -> float:
+def dominant_frequency(x: list[float], sample_rate: float = 1.0) -> float:
     """
     Findet die dominante Frequenz in einem Signal.
 
@@ -392,8 +401,12 @@ def dominant_frequency(x: list, sample_rate: float = 1.0) -> float:
 # KURZE FOURIER-TRANSFORMATION (STFT)
 # ===========================================================================
 
-def stft(x: list, window_size: int, hop_size: int,
-         window_type: str = 'hanning') -> list:
+def stft(
+    x: list[float],
+    window_size: int,
+    hop_size: int,
+    window_type: str = 'hanning'
+) -> list[list[complex]]:
     """
     Kurzzeit-Fourier-Transformation (Short-Time Fourier Transform, STFT).
 

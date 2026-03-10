@@ -384,7 +384,7 @@ def variance(data: list[float], ddof: int = 1) -> float:
     return float(np.var(data, ddof=ddof))
 
 
-def std_dev(data: List[float], ddof: int = 1) -> float:
+def std_dev(data: list[float], ddof: int = 1) -> float:
     """
     Berechnet die Standardabweichung einer Datenmenge.
 
@@ -405,7 +405,7 @@ def std_dev(data: List[float], ddof: int = 1) -> float:
     return float(np.std(data, ddof=ddof))
 
 
-def quartiles(data: List[float]) -> Tuple[float, float, float]:
+def quartiles(data: list[float]) -> tuple[float, float, float]:
     """
     Berechnet die drei Quartile (Q1, Q2, Q3) einer Datenmenge.
 
@@ -434,7 +434,7 @@ def quartiles(data: List[float]) -> Tuple[float, float, float]:
     return q1, q2, q3
 
 
-def iqr(data: List[float]) -> float:
+def iqr(data: list[float]) -> float:
     """
     Berechnet den Interquartilsabstand (IQR = Q3 - Q1).
 
@@ -448,7 +448,7 @@ def iqr(data: List[float]) -> float:
     return q3 - q1
 
 
-def skewness(data: List[float]) -> float:
+def skewness(data: list[float]) -> float:
     """
     Berechnet die Schiefe (3. standardisiertes Moment) einer Verteilung.
 
@@ -478,7 +478,7 @@ def skewness(data: List[float]) -> float:
     return float(m3 / sigma ** 3)
 
 
-def kurtosis(data: List[float]) -> float:
+def kurtosis(data: list[float]) -> float:
     """
     Berechnet die Exzess-Kurtosis (4. Moment - 3) einer Verteilung.
 
@@ -705,7 +705,7 @@ def poisson_cdf(k: int, lam: float) -> float:
 # Hypothesentests
 # ─────────────────────────────────────────────────────────────────────────────
 
-def t_test_one_sample(data: List[float], mu: float) -> Tuple[float, float]:
+def t_test_one_sample(data: list[float], mu: float) -> tuple[float, float]:
     """
     Führt einen einseitigen Ein-Stichproben-t-Test durch.
 
@@ -742,10 +742,10 @@ def t_test_one_sample(data: List[float], mu: float) -> Tuple[float, float]:
 
 
 def t_test_two_sample(
-    data1: List[float],
-    data2: List[float],
+    data1: list[float],
+    data2: list[float],
     equal_var: bool = True
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """
     Führt einen Zwei-Stichproben-t-Test (Welch oder Student) durch.
 
@@ -789,9 +789,9 @@ def t_test_two_sample(
 
 
 def chi_square_test(
-    observed: List[float],
-    expected: List[float]
-) -> Tuple[float, float]:
+    observed: list[float],
+    expected: list[float]
+) -> tuple[float, float]:
     """
     Führt den Chi-Quadrat-Anpassungstest durch.
 

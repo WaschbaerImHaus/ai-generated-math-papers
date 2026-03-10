@@ -305,3 +305,55 @@
 ## Neue Datei: debugging/run_doctests.sh (Aufgabe 3)
 - Durchläuft alle *.py in src/, führt python3 -m doctest aus
 - Farbige Ausgabe (grün/rot), Gesamtstatistik, Exit-Code 0/1
+
+---
+
+2026-03-10 BUILD 15: Fuzz-Tests, Lazy-Loading, Type Hints
+
+## Aufgabe 1: Fuzz-Tests (tests/test_fuzzing.py)
+- Neue Datei: tests/test_fuzzing.py
+- Hypothesis-basierte Fuzz-Tests für 5 Modulbereiche:
+  * Algebra: gcd, lcm, euler_phi, is_prime, prime_factorization (7 Tests)
+    - gcd immer positiv, gcd teilt beide Zahlen, lcm ist Vielfaches beider
+    - gcd*lcm = a*b Relation, euler_phi in [1,n-1], is_prime konsistent mit factorization
+    - prime_factorization Rekonstruktion, euler_phi Primzahlformel
+  * Analysis: numerical_derivative, numerical_integral (5 Tests)
+    - Ableitung linearer Funktion = 1, Ableitung Konstante = 0
+    - Integral positiv, Integral Formel b³/3, Additivität
+  * Vektoren: Vector.norm, Vector.dot, Vector.normalize (5 Tests)
+    - Norm nicht-negativ, dot commutativ, normalize Einheitsvektor
+    - Dreiecksungleichung, Homogenität der Norm
+  * Graphentheorie: complete_graph, cycle_graph, binomial_coefficient, catalan_number (7 Tests)
+    - K_n Kantenzahl n(n-1)/2, K_n Knotenzahl, C_n 2-regulär
+    - C_n hat n Kanten, Symmetrie C(n,k)=C(n,n-k), Catalan positiv, Pascal-Relation
+  * Topologie: euclidean_metric (4 Tests)
+    - Symmetrie, d(p,p)=0, Dreiecksungleichung, Nichtnegativität
+- @settings(max_examples=50) für numerisch aufwendige Tests
+- assume() für ungültige Eingaben (Nullvektoren, ungleiche Längen)
+
+## Aufgabe 2: Lazy-Loading in __init__.py
+- src/__init__.py komplett überarbeitet
+- Direktimporte durch importlib-basiertes Lazy-Loading ersetzt
+- __getattr__(name) lädt Module erst beim ersten Zugriff
+- Caching im globals()-Dict für wiederholten Zugriff
+- Neue Hilfsfunktionen: list_modules(), loaded_modules()
+- 27 Module im _MODULE_MAP-Verzeichnis registriert
+- __version__ = "13.0", __author__ = "Kurt Ingwer"
+
+## Aufgabe 3: Type Hints aktualisiert
+- ode.py: Signaturen von euler_method, runge_kutta4, runge_kutta45, solve_linear_ode
+  auf Python 3.10+ Syntax umgestellt (tuple[], list[], X | Y statt Union/Optional)
+  Docstring zu @file/@brief/@description-Format aktualisiert
+- statistics_math.py: Alle öffentlichen Funktionen von List[]/Tuple[] auf
+  list[]/tuple[] umgestellt; mode() auf list[Any] erweitert
+  Docstring zu @file/@brief-Format aktualisiert
+- fourier.py: Alle Funktionen mit präzisen Type Hints versehen:
+  dft/fft/fft_padded: list[complex]|list[float] -> list[complex]
+  ifft/idft: list[complex] -> list[complex]
+  fourier_coefficients: tuple[list[float], list[float]]
+  window_*: -> list[float]
+  apply_window: list[float]|list[complex] -> list[float|complex]
+  power_spectrum: -> tuple[list[float], list[float]]
+  stft: -> list[list[complex]]
+
+## Build 15

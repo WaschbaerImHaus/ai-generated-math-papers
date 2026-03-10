@@ -1,12 +1,21 @@
 """
-ODE-Modul: Gewöhnliche Differentialgleichungen (Ordinary Differential Equations).
+@file ode.py
+@brief ODE-Modul: Gewöhnliche Differentialgleichungen (Ordinary Differential Equations).
+@description
+    Enthält numerische Lösungsverfahren für ODE-Anfangswertprobleme,
+    lineare ODE mit konstanten Koeffizienten sowie Laplace-Transformation.
 
-Enthält numerische Lösungsverfahren für ODE-Anfangswertprobleme,
-lineare ODE mit konstanten Koeffizienten sowie Laplace-Transformation.
+    Implementierte Verfahren:
+    - Euler-Methode (1. Ordnung, explizit)
+    - Runge-Kutta 4. Ordnung (klassisch, fest)
+    - Runge-Kutta-Fehlberg 45 (adaptiv, eingebettet)
+    - Lineare ODE n-ter Ordnung via Zustandsraumsystem
+    - Laplace-Transformation (numerisch, Simpson-Regel)
+    - Inverse Laplace-Transformation (Stehfest-Algorithmus)
 
-Autor: Kurt Ingwer
-Erstellt: 2026-03-05
-Letzte Änderung: 2026-03-07
+@author Kurt Ingwer
+@date 2026-03-05
+@lastModified 2026-03-10
 """
 
 import math
@@ -42,12 +51,12 @@ def _scale_state(c: float, a: StateType) -> StateType:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def euler_method(
-    f: ODEFunc,
+    f: Callable[[float, float | list[float]], float | list[float]],
     t0: float,
-    y0: StateType,
+    y0: float | list[float],
     t_end: float,
     n_steps: int
-) -> Tuple[List[float], List[StateType]]:
+) -> tuple[list[float], list[float | list[float]]]:
     """
     Löst ein Anfangswertproblem (AWP) mit dem expliziten Euler-Verfahren.
 
@@ -90,12 +99,12 @@ def euler_method(
 # ─────────────────────────────────────────────────────────────────────────────
 
 def runge_kutta4(
-    f: ODEFunc,
+    f: Callable[[float, float | list[float]], float | list[float]],
     t0: float,
-    y0: StateType,
+    y0: float | list[float],
     t_end: float,
     n_steps: int
-) -> Tuple[List[float], List[StateType]]:
+) -> tuple[list[float], list[float | list[float]]]:
     """
     Löst ein Anfangswertproblem mit dem klassischen Runge-Kutta-Verfahren 4. Ordnung.
 
@@ -151,14 +160,14 @@ def runge_kutta4(
 # ─────────────────────────────────────────────────────────────────────────────
 
 def runge_kutta45(
-    f: ODEFunc,
+    f: Callable[[float, float | list[float]], float | list[float]],
     t0: float,
-    y0: StateType,
+    y0: float | list[float],
     t_end: float,
     tol: float = 1e-6,
     h_min: float = 1e-10,
     h_max: float = 0.1
-) -> Tuple[List[float], List[StateType]]:
+) -> tuple[list[float], list[float | list[float]]]:
     """
     Löst ein AWP mit dem adaptiven Runge-Kutta-Fehlberg-Verfahren (RK45).
 
@@ -261,11 +270,11 @@ def runge_kutta45(
 # ─────────────────────────────────────────────────────────────────────────────
 
 def solve_linear_ode(
-    coeffs: List[float],
-    initial: List[float],
-    t_vals: List[float],
-    forcing: Optional[Callable[[float], float]] = None
-) -> List[float]:
+    coeffs: list[float],
+    initial: list[float],
+    t_vals: list[float],
+    forcing: Callable[[float], float] | None = None
+) -> list[float]:
     """
     Löst eine lineare ODE n-ter Ordnung mit konstanten Koeffizienten.
 
@@ -337,7 +346,7 @@ def laplace_transform(
     s: float,
     t_max: float = 50.0,
     n_intervals: int = 10000
-) -> float:
+) -> float:  # Rückgabe: Näherungswert F(s) = ∫₀^∞ f(t)·e^{-st} dt
     """
     Berechnet die einseitige Laplace-Transformation numerisch.
 
