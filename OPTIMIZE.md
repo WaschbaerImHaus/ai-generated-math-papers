@@ -1,29 +1,33 @@
 # OPTIMIZE.md - specialist-maths
 
 Optimierungsvorschläge und -status für alle Bereiche des Projekts.
-Letzte Aktualisierung: 2026-03-10
+Letzte Aktualisierung: 2026-03-10 (Build 15)
 
 ---
 
-## Bereits erledigt (Build 1–13)
+## Erledigt (Build 1–15)
 
 ### Architektur
 - [x] **Modul-Trennung**: `algebra.py` → `algebra_core.py`, `algebra_numbertheory.py`, `algebra_diophantine.py`
 - [x] **Modul-Trennung**: `linear_algebra.py` → `vectors.py`, `matrix_ops.py`, `matrix_decomp.py`
 - [x] **Paket-Struktur**: `src/__init__.py` angelegt; konsistente Imports via `from specialist_maths import ...`
-- [x] **Konfigurationsdatei**: `config.py` mit globalen Konstanten (H_DERIVATIVE_1/2, NEWTON_TOL, BISECTION_TOL, SIMPSON_N, MAX_ITERATIONS, etc.)
+- [x] **Konfigurationsdatei**: `config.py` mit globalen Konstanten (H_DERIVATIVE_1/2, NEWTON_TOL, etc.)
 - [x] **Fehlerbehandlung**: `exceptions.py` mit `MathematicalError`-Hierarchie (`ConvergenceError`, `DomainError`, etc.)
+- [x] **Lazy-Loading in `__init__.py`**: Module erst bei Bedarf laden (spart Startzeit bei teilweiser Nutzung)
+- [x] **Differential-Geometrie / Tensorrechnung**: `tensor_geometry.py` mit Christoffel-Symbolen, Riemannscher Krümmung, Geodäten, Schwarzschild-Metrik, Differentialformen (Build 15)
 
 ### Geschwindigkeit
 - [x] **NumPy-Vektorisierung**: Mandelbrot-Fraktal vollständig vektorisiert (numpy-Broadcasting statt Pixel-Schleife)
-- [x] **Eisenstein-Reihe Optimierung**: `eisenstein_series_fast()` nutzt Symmetrie des (m,n)-Gitters → ~4x Speedup gegenüber naiver Doppelsumme
-- [x] **Multiprocessing**: `goldbach_verification_range()` verwendet `multiprocessing.Pool.map` für parallele Primzahl-Checks
+- [x] **Eisenstein-Reihe Optimierung**: `eisenstein_series_fast()` nutzt Symmetrie des (m,n)-Gitters → ~4x Speedup
+- [x] **Multiprocessing**: `goldbach_verification_range()` verwendet `multiprocessing.Pool.map`
 - [x] **Caching**: `lru_cache` für `is_prime`, `euler_phi`, `prime_factorization`, `p_adic_valuation`, `bernoulli_number`
 
 ### Code-Qualität
 - [x] **Type Hints**: Vollständige Typ-Annotationen in `algebra_core.py`, `algebra_numbertheory.py`, `algebra_diophantine.py`, `analysis.py`, `linear_algebra.py`, `vectors.py`, `matrix_ops.py`, `matrix_decomp.py`, `topology.py`, `graph_theory.py`, `config.py`, `exceptions.py`
-- [x] **Doctests**: Ausführbare `>>>` Beispiele in allen Hauptmodulen eingefügt (diese Aufgabe, Build 13)
-- [x] **sympify()-Härtung**: `safe_parse_expr()` in `analysis.py` – verwendet `parse_expr()` mit Whitelist statt `sympify()` (verhindert Code-Injection)
+- [x] **Doctests**: Ausführbare `>>>` Beispiele in allen Hauptmodulen eingefügt
+- [x] **sympify()-Härtung**: `safe_parse_expr()` in `analysis.py` – verhindert Code-Injection via Whitelist
+- [x] **Logging-System**: `math_logger.py` mit konfigurierbarem Log-Level je Modul
+- [x] **Schritt-für-Schritt-Modus**: `step_by_step.py` – Zwischenergebnisse bei iterativen Algorithmen
 
 ### Benutzerfreundlichkeit
 - [x] **REPL-Modus**: `repl.py` implementiert (interaktive Kommandozeile für Berechnungen)
@@ -32,52 +36,64 @@ Letzte Aktualisierung: 2026-03-10
 ### Tests
 - [x] **Property-Based Testing**: `tests/test_property_based.py` mit Hypotheses-Bibliothek
 - [x] **Performance-Benchmarks**: `debugging/profile_performance.py` + `PERFORMANCE_REPORT.md`
+- [x] **Fuzzing**: `tests/test_fuzzing.py` mit zufälligen Eingaben und Randwert-Tests
 
 ---
 
 ## Offen / Noch nicht erledigt
 
 ### Code-Qualität (hohe Priorität)
-- [ ] **Type Hints**: Fehlende Annotationen in `modular_forms.py`, `complex_analysis.py`, `ode.py`, `statistics_math.py`, `fourier.py`, `analytic_number_theory.py`, `proof_theory.py`
-- [ ] **Logging-System**: `logging`-Modul statt `print()` für Debug-Ausgaben; konfigurierbarer Log-Level je Modul
-- [ ] **Schritt-für-Schritt-Modus**: Zwischenergebnisse bei iterativen Algorithmen ausgeben (Newton, Bisektion, Runge-Kutta etc.)
+- [ ] **Type Hints fehlend**: `modular_forms.py`, `complex_analysis.py`, `ode.py`, `statistics_math.py`, `fourier.py`, `analytic_number_theory.py`, `proof_theory.py` haben noch keine vollständigen Annotationen
+- [ ] **Docblock-Stil vereinheitlichen**: `statistics_math.py` nutzt `:param:` (Sphinx), alle anderen `@param` (Doxygen) → Vereinheitlichung auf einen Stil (empfohlen: Google-Style oder Doxygen)
+- [ ] **Zentrales Test-Discovery-Skript**: Ein Skript das pytest, Doctests und Property-Tests in einem Lauf ausführt (`make test` o.ä.)
 
-### Tests
-- [ ] **Fuzzing**: Zufällige Eingaben mit `atheris` oder `hypothesis.extra.numpy` testen; besonders für Randwerte (n=0, negative Zahlen, sehr große Zahlen)
+### Sicherheit
+- [ ] **`analysis.py` `_safe_parse()` Fallback**: Stiller Fallback auf `sp.sympify()` bei Parse-Fehler sollte geloggt werden (schwer debuggbar ohne Log-Ausgabe)
+- [ ] **`repl.py` Eingabe-Validierung**: Prüfen ob unsichere Eval-Aufrufe vorhanden sind; ggf. Sandboxing ergänzen
 
 ### Geschwindigkeit (konkrete Hot-Spots)
-- [ ] **Fourier-Koeffizienten delta**: Polynommultiplikation O(n²) pro Term → FFT-basierte Faltung O(n log n) via `numpy.fft.fft`
-- [ ] **Cython/Numba**: Performance-kritische Schleifen in `proof_theory.py` (Sieb), `complex_analysis.py` (ζ-Iteration) → Numba-JIT für 10–50x Speedup; Numba derzeit nicht installiert
+- [ ] **Fourier-Koeffizienten delta-Funktion**: Polynommultiplikation O(n²) pro Term → FFT-basierte Faltung O(n log n) via `numpy.fft.fft`
+- [ ] **Cython/Numba JIT**: Performance-kritische Schleifen in `proof_theory.py` (Sieb), `complex_analysis.py` (ζ-Iteration) → Numba-JIT für 10–50x Speedup; Numba derzeit nicht installiert
 - [ ] **Symbolische vs. Numerische Wahl**: Automatische Entscheidung je nach Problem-Typ (kleine Polynome → SymPy symbolisch; große Matrizen → NumPy numerisch)
+- [ ] **`prime_factorization()` + `euler_phi()`**: Zwei separate Primfaktor-Traversierungen; `euler_phi` könnte `prime_factorization()` direkt wiederverwenden
+- [ ] **`bisection()` + `newton_raphson()` Hybridmethode**: Illinois/Brent-Methode wäre konvergenzgarantiert UND schnell → Kombination beider Algorithmen
+- [ ] **Christoffel-Symbole cachen**: `christoffel_symbols()` wird in `riemann_tensor()` mehrfach an benachbarten Punkten aufgerufen – Memoization könnte Rechenzeit halbieren
 
 ### Architektur
-- [ ] **Lazy-Loading in `__init__.py`**: Module erst bei Bedarf laden statt alle beim Import (spart Startzeit bei teilweiser Nutzung)
-- [ ] **Plugin-System**: Neue mathematische Gebiete als Python-Packages einbinden ohne Core zu ändern
-- [ ] **Differential-Geometrie / Tensorrechnung**: Neues Modul `tensor_geometry.py` mit Christoffel-Symbolen, Riemannscher Krümmung, Lie-Ableitungen
+- [ ] **Plugin-System**: Neue mathematische Gebiete als Python-Packages einbinden ohne Core zu ändern (z.B. via `importlib` + Konfigurations-Registry)
+- [ ] **Differentialformen-Modul vertiefen**: `tensor_geometry.py` enthält bereits `wedge_product`, `exterior_derivative`, `hodge_star`; de Rham-Kohomologie und Stokes-Satz fehlen noch
+- [ ] **Kategorientheorie-Modul**: Objekte, Morphismen, Funktoren, natürliche Transformationen – Verbindung zu abstrakter Algebra
 
 ### Visualisierung
-- [ ] **Interactive Mode**: `matplotlib`-Widgets statt statischer Bilder (`ipywidgets` für Jupyter)
-- [ ] **Animation**: `matplotlib.animation` für ODE-Trajektorien und iterative Algorithmen (Newton-Konvergenz, Fraktal-Zoom)
+- [ ] **Interactive Mode**: `matplotlib`-Widgets statt statischer Bilder (`ipywidgets` für Jupyter, `matplotlib.widgets` für CLI)
+- [ ] **Animation**: `matplotlib.animation` für ODE-Trajektorien und iterative Algorithmen (Newton-Konvergenz, Geodäten auf Sphäre)
 - [ ] **Export-Formate**: SVG/PDF-Export neben PNG für Vektorgrafiken (LaTeX-ready)
-- [ ] **Adaptives Gitter**: Feineres Gitter in interessanten Regionen (Nullstellen, Singularitäten) → bessere Fraktal-Qualität
+- [ ] **Adaptives Gitter**: Feineres Gitter in interessanten Regionen (Nullstellen, Singularitäten)
+- [ ] **3D-Visualisierung Krümmung**: Gaußsche Krümmung als Farbkodierung auf Mannigfaltigkeiten (Sphäre, Torus, Sattelfläche) in `visualization.py` ergänzen
 
 ### Mathematische Vertiefung
-- [ ] **Arbitrary Precision**: `mpmath` für Rechnungen mit >64-Bit-Genauigkeit (wichtig für Riemann-Nullstellen-Verifikation mit >100 Stellen)
-- [ ] **Notebook-Integration**: Jupyter-Notebook-kompatible Ausgaben (HTML-Darstellung für Matrizen, Polynome, LaTeX in Notebooks)
-- [ ] **Differential-Formen**: Äußere Ableitung, Stokes-Satz, de Rham-Kohomologie als neues Modul
+- [ ] **Arbitrary Precision mit mpmath**: `mpmath` für Rechnungen mit >64-Bit-Genauigkeit (wichtig für Riemann-Nullstellen-Verifikation mit >100 Stellen)
+- [ ] **Notebook-Integration**: Jupyter-kompatible Ausgaben (HTML-Darstellung für Matrizen, Polynome, LaTeX-Rendering in Notebooks)
+- [ ] **Symplektische Geometrie**: Hamilton-Mechanik, symplektische Mannigfaltigkeiten, Poisson-Klammern (Erweiterung von `tensor_geometry.py`)
+- [ ] **Faserräume und Verbindungen**: Prinzipal-Faserbündel, Gauge-Theorie (Yang-Mills) – Bezug zu Standardmodell der Teilchenphysik
+- [ ] **Spinor-Rechnung**: Clifford-Algebren, Dirac-Gleichung – Erweiterung von `tensor_geometry.py` Richtung Quantenfeldtheorie
+- [ ] **Algebraische Topologie**: Homologiegruppen, Betti-Zahlen, Euler-Charakteristik (Ergänzung zu `topology.py`)
+
+### Neue Ideen (entdeckt 2026-03-10)
+- [ ] **Paralleles symbolisches Rechnen**: SymPy-Berechnungen (Grenzwerte, Integrale) parallelisieren via `concurrent.futures.ProcessPoolExecutor`
+- [ ] **Benchmark-Regressions-Tests**: Automatischer Vergleich von Laufzeiten zwischen Builds; Alarm bei >10% Verlangsamung
+- [ ] **Interoperabilität SageMath**: Export/Import-Schnittstelle zu SageMath für Berechnungen die SymPy nicht beherrscht
+- [ ] **Automatische Formel-Vereinfachung**: Ergebnisse standardmäßig durch `sp.simplify()` + `sp.nsimplify()` vereinfachen und schönste Darstellung wählen
+- [ ] **Geodäten-Visualisierung**: Aus `tensor_geometry.geodesic_equation()` direkt 3D-Plots auf Sphäre/Torus erzeugen via `visualization.py`
+- [ ] **Numerische Stabilitäts-Analyse**: Konditionszahlen aller Matrixoperationen automatisch protokollieren; Warnung bei Kondition > 1e10
 
 ---
 
-## Neue Optimierungsideen (entdeckt beim Durchlesen, 2026-03-10)
+## Prioritäten (empfohlene Reihenfolge)
 
-### Sicherheit
-- [ ] **analysis.py `_safe_parse()`**: Fallback auf `sp.sympify()` bei Parse-Fehler sollte geloggt werden (stiller Fallback ist schwer debuggbar)
-- [ ] **repl.py Eingabe-Validierung**: Prüfen ob auch dort unsichere Eval-Aufrufe vorhanden sind
-
-### Performance
-- [ ] **`prime_factorization()` + `euler_phi()`**: Derzeit zwei separate Primfaktor-Traversierungen; `euler_phi` könnte `prime_factorization()` wiederverwenden statt selbst zu iterieren
-- [ ] **`bisection()` + `newton_raphson()`**: Hybridmethode (Illinois/Brent) wäre konvergenzgarantiert UND schnell → Kombination aus beiden
-
-### Wartbarkeit
-- [ ] **Einheitlicher Docblock-Stil**: `statistics_math.py` nutzt `:param:` (Sphinx), alle anderen `@param` (Doxygen) → Vereinheitlichung auf einen Stil
-- [ ] **Zentrales Test-Discovery-Skript**: Ein Skript das sowohl `pytest`, Doctests und Property-Tests in einem Lauf ausführt
+1. Type Hints in den verbleibenden Modulen ergänzen (einfach, hoher Nutzen für IDE-Support)
+2. Docblock-Stil vereinheitlichen (Wartbarkeit)
+3. Zentrales Test-Discovery-Skript (Entwicklungskomfort)
+4. Geodäten-Visualisierung (zeigt tensor_geometry.py in Aktion)
+5. Bisection/Newton Hybridmethode (numerische Verbesserung)
+6. mpmath Arbitrary Precision (für Millennium-Problem-Recherche wichtig)

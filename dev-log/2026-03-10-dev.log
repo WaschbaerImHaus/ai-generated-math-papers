@@ -372,3 +372,45 @@
 - src/webapp/app.py: Import von step_by_step, 6 neue API-Routen (/api/steps/*), GET /steps
 - src/webapp/templates/base.html: Navigationseintrag "Schritt-für-Schritt" (Symbol ∑)
 - src/analysis.py: newton_raphson() um verbose=True Parameter erweitert (optionales Logging)
+
+---
+
+2026-03-10 — Build 15
+
+## OPTIMIZE.md aufgeräumt
+- Alle erledigten Punkte (Build 1–14) mit [x] markiert
+- Neu hinzugekommen: tensor_geometry.py (Differential-Geometrie) als erledigt markiert
+- Lazy-Loading und Logging/Schritt-für-Schritt als erledigt markiert
+- Neue offene Ideen ergänzt: Geodäten-Visualisierung, paralleles symbolisches Rechnen,
+  Benchmark-Regressions-Tests, SageMath-Interoperabilität, Symplektische Geometrie,
+  Faserräume, Spinoren, Algebraische Topologie
+
+## Neues Modul: src/tensor_geometry.py
+- Klasse Tensor: allgemeiner (p,q)-Tensor mit Arithmetik, Kontraktion, äußerem Produkt,
+  Symmetrisierung/Antisymmetrisierung
+- Klasse MetricTensor: g_{ij} mit innerem Produkt, Norm, Indexhebung/-senkung, Volumenelement
+- Christoffel-Symbole: Γ^k_{ij} via zentralem Differenzenquotienten
+- Riemann-Krümmungstensor R^l_{kij} (numerisch)
+- Ricci-Tensor R_{ij} (Kontraktion des Riemann-Tensors)
+- Ricci-Skalar R = g^{ij} R_{ij}
+- Gaußsche Krümmung K = R/2 (2D)
+- Geodätengleichung: Runge-Kutta 4 für d²x^k/dt² + Γ^k_{ij} ẋ^i ẋ^j = 0
+- Geodätischer Abstand: numerische Integration der Bogenlänge
+- Mannigfaltigkeiten: sphere_metric, torus_metric, hyperbolic_plane_metric, saddle_metric, flat_metric
+- Differentialformen: wedge_product, exterior_derivative, hodge_star, lie_derivative_vector
+- Einstein-Tensor: G_{ij} = R_{ij} - ½ g_{ij} R
+- Schwarzschild-Metrik: ds² = -(1-r_s/r)c²dt² + (1-r_s/r)⁻¹ dr²
+- Vakuum-Check: check_vacuum_solution (G_{ij} ≈ 0?)
+- Hilfsfunktionen: levi_civita_symbol, kronecker_delta, parallel_transport
+
+## Neue Testdatei: tests/test_tensor_geometry.py
+- 82 Tests in 10 Klassen
+- Abdeckung: Tensor-Arithmetik, Metriken, Christoffel-Symbole, Krümmung,
+  Gaußsche Krümmung, Geodäten, Differentialformen, Einstein-Gleichungen,
+  Hilfsfunktionen, Edge-Cases
+
+## Neue Dokumentation: src/tensor_geometry.md
+- Vollständige KaTeX-Formeln für alle Konzepte
+- Tabelle: Krümmungen aller implementierten Mannigfaltigkeiten
+- Verbindungen zur ART, Quantenfeldtheorie, algebraischen Topologie
+- Gaußscher Bonnet-Satz, Holonomie, musical isomorphisms
