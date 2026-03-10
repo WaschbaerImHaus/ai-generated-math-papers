@@ -1,283 +1,848 @@
 {% extends "base.html" %}
-{% block title %}Erweiterte Algebra – Mathematik-Spezialist{% endblock %}
-
-{% block content %}
 <!--
     @file algebra_advanced.html
     @brief Erweiterte Algebra: Darstellungstheorie, Verbandstheorie, Algebraische Strukturen,
            Invariantentheorie, Universelle Algebra, Homologische Algebra, Multilineare Algebra.
+    @description
+        Interaktive Web-Seite für fortgeschrittene algebraische Themen.
+        Alle Abschnitte bieten Eingabefelder und rufen Flask-API-Endpunkte auf.
     @author Kurt Ingwer
     @date 2026-03-10
     @lastModified 2026-03-10
 -->
+
+{% block title %}Erweiterte Algebra – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
 <div class="page-header">
-    <h1>Erweiterte Algebra</h1>
+    <h1>&#8734; Erweiterte Algebra</h1>
     <p class="page-desc">
-        Die moderne Algebra umfasst weit mehr als Gruppen und Ringe. Hier finden sich
-        Darstellungstheorie (wie Gruppen auf Vektorräumen wirken), Verbandstheorie
-        (geordnete Mengen), Invariantentheorie (symmetrische Strukturen unter Gruppenoperationen),
-        Homologische Algebra (Kettenkomplexe, Homologiegruppen) und Universelle Algebra.
+        Darstellungstheorie, Verbandstheorie, Algebraische Strukturen, Invariantentheorie,
+        Universelle Algebra, Homologische Algebra und Multilineare Algebra.
     </p>
 </div>
 
-<!-- === Sektion 1: Algebraische Strukturen (Magma → Gruppe) === -->
-<div class="card">
-    <h2>Algebraische Strukturen: Magma → Gruppe</h2>
+<!-- ===== SECTION 1: DARSTELLUNGSTHEORIE ===== -->
+<section class="math-section">
+    <h2>&#961; Darstellungstheorie</h2>
     <p>
-        Die algebraische Hierarchie: Magma → Halbgruppe → Monoid → Gruppe → Abel'sche Gruppe.
-        Jede Stufe fügt weitere Axiome hinzu.
+        Eine <strong>Darstellung</strong> einer Gruppe $G$ ist ein Gruppenhomomorphismus
+        $\rho: G \to \mathrm{GL}(V)$ in die allgemeine lineare Gruppe eines Vektorraums $V$.
+        Der <strong>Charakter</strong> $\chi_\rho(g) = \mathrm{Tr}(\rho(g))$ ist eine
+        Klassenfunktion und enthält alle wesentlichen Informationen über $\rho$.
+        <strong>Maschke-Satz</strong>: Jede Darstellung einer endlichen Gruppe über $\mathbb{C}$
+        ist vollständig reduzibel.
     </p>
-    <ul style="margin:8px 0 12px 20px; line-height:1.8;">
-        <li><strong>Magma:</strong> $(M, \cdot)$ mit abgeschlossener Operation</li>
-        <li><strong>Halbgruppe:</strong> + Assoziativität $a(bc)=(ab)c$</li>
-        <li><strong>Monoid:</strong> + neutrales Element $ea=ae=a$</li>
-        <li><strong>Gruppe:</strong> + Inverse $a\cdot a^{-1}=e$</li>
-    </ul>
-    <div class="input-row">
-        <label for="struct-table">Verknüpfungstafel (JSON, z.B. [[0,1],[1,0]]):</label>
-        <input type="text" id="struct-table" class="input-field" value="[[0,1],[1,0]]" style="width:300px;">
-    </div>
-    <div class="input-row">
-        <label for="struct-elements">Elemente (kommagetrennt):</label>
-        <input type="text" id="struct-elements" class="input-field" value="e,a" style="width:150px;">
-    </div>
-    <button class="btn" onclick="checkAlgStruct()">Struktur prüfen</button>
-    <div id="struct-result" class="result-area"></div>
-</div>
 
-<!-- === Sektion 2: Invariantentheorie === -->
-<div class="card">
-    <h2>Invariantentheorie</h2>
-    <p>
-        Die Invariantentheorie untersucht Polynome, die unter Gruppenoperationen invariant sind.
-        Der <em>Reynolds-Operator</em> $\mathcal{R}[f] = \frac{1}{|G|}\sum_{g\in G} g\cdot f$
-        projiziert ein Polynom auf den Invariantenunterraum.
-    </p>
-    <p>
-        Die <em>Molien-Reihe</em> $M(t) = \frac{1}{|G|}\sum_{g\in G}\frac{1}{\det(I-tg)}$
-        gibt die Dimension der Invariantenräume jedes Grades als erzeugende Funktion.
-    </p>
-    <div class="input-row">
-        <label for="inv-group">Gruppe:</label>
-        <select id="inv-group" class="input-field">
-            <option value="Z2">Z₂ (Ordnung 2)</option>
-            <option value="Z3">Z₃ (Ordnung 3)</option>
-            <option value="S3">S₃ (Ordnung 6)</option>
-        </select>
-    </div>
-    <div class="input-row">
-        <label for="inv-degree">Max. Grad für Molien-Reihe:</label>
-        <input type="number" id="inv-degree" class="input-field" value="6" min="1" max="12" style="width:80px;">
-    </div>
-    <button class="btn" onclick="calcInvariant()">Invarianten berechnen</button>
-    <div id="inv-result" class="result-area"></div>
-</div>
+    <div class="card-grid">
 
-<!-- === Sektion 3: Darstellungstheorie === -->
-<div class="card">
-    <h2>Darstellungstheorie</h2>
-    <p>
-        Eine <em>Darstellung</em> einer Gruppe $G$ ist ein Homomorphismus $\rho: G \to GL(V)$.
-        Die <em>Charaktertafel</em> enthält die Charaktere $\chi(g) = \text{Tr}(\rho(g))$
-        aller irreduziblen Darstellungen.
-    </p>
-    <p>
-        Schur-Orthogonalitätsrelationen: $\sum_{g\in G} \chi_i(g)\overline{\chi_j(g)} = |G|\delta_{ij}$
-    </p>
-    <div class="input-row">
-        <label for="rep-group">Gruppe:</label>
-        <select id="rep-group" class="input-field">
-            <option value="Z2">Z₂</option>
-            <option value="Z3">Z₃</option>
-            <option value="Z4">Z₄</option>
-            <option value="S3">S₃</option>
-            <option value="D4">D₄</option>
-        </select>
-    </div>
-    <button class="btn" onclick="calcRepresentation()">Charaktertafel berechnen</button>
-    <div id="rep-result" class="result-area"></div>
-</div>
+        <!-- Charaktertafel -->
+        <div class="card">
+            <h3>Charaktertafel</h3>
+            <p>
+                Die Charaktertafel listet alle irreduziblen Charaktere $\chi_i$ über
+                den Konjugationsklassen auf.
+                <strong>Schur-Orthogonalität</strong>: $\langle \chi_i, \chi_j \rangle = \delta_{ij}$.
+            </p>
+            <div class="input-row">
+                <label>Gruppe:</label>
+                <select id="repr-group-ct">
+                    <option value="S3">$S_3$ (Symmetriegruppe, Ordnung 6)</option>
+                    <option value="Z2">$\mathbb{Z}/2\mathbb{Z}$ (Ordnung 2)</option>
+                </select>
+            </div>
+            <button onclick="calcCharacterTable()" class="btn-calc">Charaktertafel berechnen</button>
+            <div id="repr-ct-result" class="result-box"></div>
+        </div>
 
-<!-- === Sektion 4: Homologische Algebra === -->
-<div class="card">
-    <h2>Homologische Algebra</h2>
-    <p>
-        Ein <em>Kettenkomplex</em> $(C_\bullet, \partial)$ ist eine Folge von Gruppen
-        $\cdots \to C_2 \xrightarrow{\partial_2} C_1 \xrightarrow{\partial_1} C_0 \to 0$
-        mit $\partial_{n-1}\circ\partial_n = 0$. Die <em>Homologiegruppen</em> sind
-        $H_n = \ker\partial_n / \text{im}\,\partial_{n+1}$.
-    </p>
-    <div class="input-row">
-        <label for="hom-complex">Randoperatoren als Matrizen (JSON-Array von Matrizen):</label>
-        <input type="text" id="hom-complex" class="input-field"
-               value="[[[1,-1,0],[0,1,-1]],[[1],[1],[1]]]" style="width:400px;">
-    </div>
-    <button class="btn" onclick="calcHomology()">Homologie berechnen</button>
-    <div id="hom-result" class="result-area"></div>
-</div>
+        <!-- Schur-Orthogonalität -->
+        <div class="card">
+            <h3>Schur-Orthogonalitätsrelationen</h3>
+            <p>
+                Das <strong>Schur-Lemma</strong>: Jeder Intertwiner $\phi: V \to W$
+                zwischen irreduziblen Darstellungen ist entweder null oder ein Isomorphismus.
+                Daraus folgt $\frac{1}{|G|}\sum_{g\in G} \chi_i(g)\overline{\chi_j(g)} = \delta_{ij}$.
+            </p>
+            <div class="input-row">
+                <label>Gruppe:</label>
+                <select id="repr-group-schur">
+                    <option value="S3">$S_3$</option>
+                    <option value="Z2">$\mathbb{Z}/2\mathbb{Z}$</option>
+                </select>
+            </div>
+            <button onclick="calcSchurOrthogonality()" class="btn-calc">Orthogonalität prüfen</button>
+            <div id="repr-schur-result" class="result-box"></div>
+        </div>
 
-<!-- === Sektion 5: Multilineare Algebra === -->
-<div class="card">
-    <h2>Multilineare Algebra</h2>
+        <!-- Burnside-Lemma -->
+        <div class="card">
+            <h3>Burnside-Lemma</h3>
+            <p>
+                Anzahl der Orbits unter einer Gruppenoperation:
+                $|X/G| = \frac{1}{|G|} \sum_{g \in G} |X^g|$
+                Beispiel: Halskette aus Perlen mit $n$ Farben und $r$ Rotationen.
+            </p>
+            <div class="input-row">
+                <label>Farben $n$:</label>
+                <input type="number" id="burnside-colors" value="3" min="1" max="8">
+            </div>
+            <div class="input-row">
+                <label>Rotationen $r$:</label>
+                <input type="number" id="burnside-rot" value="4" min="2" max="12">
+            </div>
+            <button onclick="calcBurnside()" class="btn-calc">Orbits zählen</button>
+            <div id="repr-burnside-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 2: VERBANDSTHEORIE ===== -->
+<section class="math-section">
+    <h2>&#8743; Verbandstheorie</h2>
     <p>
-        Das <em>Tensorprodukt</em> $A \otimes B$ zweier Matrizen ist das Kronecker-Produkt.
-        Die <em>äußere Algebra</em> $\bigwedge V$ enthält Alternierungsprodukte $u\wedge v = -v\wedge u$.
+        Ein <strong>Verband</strong> $(L, \leq)$ ist eine partiell geordnete Menge,
+        in der je zwei Elemente $a, b$ ein Supremum $a \vee b$ und
+        ein Infimum $a \wedge b$ besitzen.
+        <strong>Distributiv</strong>: $a \wedge (b \vee c) = (a \wedge b) \vee (a \wedge c)$.
+        <strong>Modular</strong>: $a \leq c \Rightarrow a \vee (b \wedge c) = (a \vee b) \wedge c$.
     </p>
-    <div class="input-row">
-        <label for="tensor-A">Matrix $A$ (JSON, 2D):</label>
-        <input type="text" id="tensor-A" class="input-field" value="[[1,0],[0,1]]" style="width:200px;">
+
+    <div class="card-grid">
+
+        <div class="card">
+            <h3>Verband erstellen und analysieren</h3>
+            <p>
+                Der <strong>Teilerverband</strong> $\mathrm{Div}(n)$: Teiler von $n$ geordnet
+                durch Teilbarkeit. Der <strong>Potenzmengeverband</strong> $\mathcal{P}([n])$
+                ist stets eine Boolesche Algebra.
+            </p>
+            <div class="input-row">
+                <label>Typ:</label>
+                <select id="lattice-type">
+                    <option value="divisibility">Teilerverband $\mathrm{Div}(n)$</option>
+                    <option value="power_set">Potenzmenge $\mathcal{P}([n])$</option>
+                </select>
+            </div>
+            <div class="input-row">
+                <label>$n$:</label>
+                <input type="number" id="lattice-n" value="12" min="2" max="30">
+            </div>
+            <button onclick="createLattice()" class="btn-calc">Verband analysieren</button>
+            <div id="lattice-create-result" class="result-box"></div>
+        </div>
+
+        <div class="card">
+            <h3>Distributivitäts-Test</h3>
+            <p>
+                Nach dem Satz von <strong>Birkhoff</strong>: Ein endlicher distributiver Verband
+                ist isomorph zum Verband der Ordnungsideale eines Posets.
+                Jordan-Dedekind-Kettenbedingung: Alle maximalen Ketten haben gleiche Länge.
+            </p>
+            <div class="input-row">
+                <label>Typ:</label>
+                <select id="distrib-type">
+                    <option value="divisibility">Teilerverband</option>
+                    <option value="power_set">Potenzmenge</option>
+                </select>
+            </div>
+            <div class="input-row">
+                <label>$n$:</label>
+                <input type="number" id="distrib-n" value="12" min="2" max="30">
+            </div>
+            <button onclick="checkDistributive()" class="btn-calc">Distributivität prüfen</button>
+            <div id="lattice-distrib-result" class="result-box"></div>
+        </div>
+
+        <div class="card">
+            <h3>Birkhoff-Darstellungssatz</h3>
+            <p>
+                Jeder endliche distributive Verband $L$ ist isomorph zu
+                $J(\mathrm{Irr}(L))$, dem Verband der Ordnungsideale
+                der join-irreduziblen Elemente.
+            </p>
+            <div class="input-row">
+                <label>$n$ (Teilerverband):</label>
+                <input type="number" id="birkhoff-n" value="12" min="2" max="30">
+            </div>
+            <button onclick="calcBirkhoff()" class="btn-calc">Birkhoff-Satz anwenden</button>
+            <div id="lattice-birkhoff-result" class="result-box"></div>
+        </div>
+
     </div>
-    <div class="input-row">
-        <label for="tensor-B">Matrix $B$ (JSON, 2D):</label>
-        <input type="text" id="tensor-B" class="input-field" value="[[2,1],[1,2]]" style="width:200px;">
+</section>
+
+<!-- ===== SECTION 3: MULTILINEARE ALGEBRA ===== -->
+<section class="math-section">
+    <h2>&#8855; Multilineare Algebra</h2>
+    <p>
+        Das <strong>Tensorprodukt</strong> $A \otimes B$ (Kronecker-Produkt) hat Dimension
+        $(mp) \times (nq)$ für $A \in \mathbb{R}^{m \times n}$, $B \in \mathbb{R}^{p \times q}$.
+        Das <strong>äußere Produkt</strong> $u \wedge v$ ist antisymmetrisch und misst
+        die Fläche des Parallelogramms.
+        Der <strong>Sylvestersche Trägheitssatz</strong>: Die Signatur $(p,q,r)$ einer
+        Bilinearform ist ein vollständiges Invariant.
+    </p>
+
+    <div class="card-grid">
+
+        <div class="card">
+            <h3>Tensorprodukt $A \otimes B$</h3>
+            <p>$(A \otimes B)_{(i-1)p+k,(j-1)q+l} = a_{ij} \cdot b_{kl}$</p>
+            <div class="input-row">
+                <label>Matrix $A$ (JSON):</label>
+                <input type="text" id="tensor-A" value="[[1,0],[0,1]]" style="width:200px">
+            </div>
+            <div class="input-row">
+                <label>Matrix $B$ (JSON):</label>
+                <input type="text" id="tensor-B" value="[[1,2],[3,4]]" style="width:200px">
+            </div>
+            <button onclick="calcTensorProduct()" class="btn-calc">$A \otimes B$ berechnen</button>
+            <div id="multilinear-tensor-result" class="result-box"></div>
+        </div>
+
+        <div class="card">
+            <h3>Äußeres Produkt $u \wedge v$</h3>
+            <p>
+                $u \wedge v$ ist antisymmetrisch.
+                $\|u \wedge v\| = \|u\| \cdot \|v\| \cdot |\sin\theta|$ = Fläche des Parallelogramms.
+                Gram-Determinante: $\det G(u,v) = \|u \wedge v\|^2$.
+            </p>
+            <div class="input-row">
+                <label>Vektor $u$ (JSON):</label>
+                <input type="text" id="wedge-u" value="[1,0,0]" style="width:150px">
+            </div>
+            <div class="input-row">
+                <label>Vektor $v$ (JSON):</label>
+                <input type="text" id="wedge-v" value="[0,1,0]" style="width:150px">
+            </div>
+            <button onclick="calcWedgeProduct()" class="btn-calc">$u \wedge v$ berechnen</button>
+            <div id="multilinear-wedge-result" class="result-box"></div>
+        </div>
+
+        <div class="card">
+            <h3>Signatur $(p,q,r)$ einer Bilinearform</h3>
+            <p>
+                Sylvesterscher Trägheitssatz: $p$ positive, $q$ negative, $r$ Null-Eigenwerte.
+                Minkowski-Metrik: Signatur $(1,3,0)$ (oder $(3,1,0)$).
+            </p>
+            <div class="input-row">
+                <label>Matrix $M$ (JSON):</label>
+                <input type="text" id="sig-M" value="[[2,1],[1,-1]]" style="width:200px">
+            </div>
+            <button onclick="calcSignature()" class="btn-calc">Signatur berechnen</button>
+            <div id="multilinear-sig-result" class="result-box"></div>
+        </div>
+
     </div>
-    <button class="btn" onclick="calcTensorProduct()">Tensorprodukt berechnen</button>
-    <div id="tensor-result" class="result-area"></div>
-</div>
+</section>
+
+<!-- ===== SECTION 4: HOMOLOGISCHE ALGEBRA ===== -->
+<section class="math-section">
+    <h2>&#8706; Homologische Algebra</h2>
+    <p>
+        <strong>Kettenkomplex</strong>:
+        $\cdots \xrightarrow{\partial_{n+1}} C_n \xrightarrow{\partial_n} C_{n-1} \to \cdots$
+        mit $\partial_{n-1} \circ \partial_n = 0$.
+        <strong>Homologiegruppen</strong>: $H_n = \ker \partial_n / \mathrm{im} \partial_{n+1}$.
+        <strong>Betti-Zahlen</strong> $\beta_n = \mathrm{rank}(H_n)$.
+        <strong>Euler-Charakteristik</strong>: $\chi = \sum_n (-1)^n \beta_n$.
+    </p>
+
+    <div class="card-grid">
+
+        <div class="card">
+            <h3>Simpliziale Kettenkomplexe</h3>
+            <p>
+                Dreieck $\Delta^2$: $\beta = (1,0,1)$, $\chi=1$.<br>
+                Tetraeder $\Delta^3$: $\beta = (1,0,0,1)$, $\chi=0$.<br>
+                Kreis $S^1$: $\beta = (1,1)$, $\chi=0$.
+            </p>
+            <div class="input-row">
+                <label>Simplex:</label>
+                <select id="chain-simplex">
+                    <option value="triangle">Dreieck $\Delta^2$</option>
+                    <option value="tetrahedron">Tetraeder $\Delta^3$</option>
+                    <option value="circle">Kreis $S^1$</option>
+                </select>
+            </div>
+            <button onclick="calcChainComplex()" class="btn-calc">Kettenkomplex analysieren</button>
+            <div id="homo-chain-result" class="result-box"></div>
+        </div>
+
+        <div class="card">
+            <h3>Homologiegruppen $H_n$</h3>
+            <p>
+                $H_0$: Anzahl Zusammenhangskomponenten.<br>
+                $H_1$: Anzahl unabhängiger Schleifen (1D-Löcher).<br>
+                $H_2$: Anzahl 2D-Hohlräume.
+            </p>
+            <div class="input-row">
+                <label>Simplex:</label>
+                <select id="homology-simplex">
+                    <option value="triangle">Dreieck</option>
+                    <option value="tetrahedron">Tetraeder</option>
+                    <option value="circle">Kreis</option>
+                </select>
+            </div>
+            <button onclick="calcHomology()" class="btn-calc">Homologie berechnen</button>
+            <div id="homo-homology-result" class="result-box"></div>
+        </div>
+
+        <div class="card">
+            <h3>Ext- und Tor-Gruppen</h3>
+            <p>
+                Abgeleitete Funktoren: $\mathrm{Ext}^n$ und $\mathrm{Tor}_n$.
+                Für $\mathbb{Z}/n\mathbb{Z}$:
+                $\mathrm{Ext}^1(\mathbb{Z}/n, \mathbb{Z}/m) \cong \mathbb{Z}/\gcd(n,m)$.
+            </p>
+            <div class="input-row">
+                <label>$n$ ($\mathbb{Z}/n\mathbb{Z}$):</label>
+                <input type="number" id="ext-n" value="2" min="1" max="12">
+            </div>
+            <div class="input-row">
+                <label>$m$ ($\mathbb{Z}/m\mathbb{Z}$):</label>
+                <input type="number" id="ext-m" value="3" min="1" max="12">
+            </div>
+            <div class="input-row">
+                <label>Grad:</label>
+                <input type="number" id="ext-deg" value="1" min="0" max="3">
+            </div>
+            <button onclick="calcExtTor()" class="btn-calc">Ext und Tor berechnen</button>
+            <div id="homo-ext-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 5: ALGEBRAISCHE STRUKTUREN ===== -->
+<section class="math-section">
+    <h2>&#9670; Algebraische Strukturen</h2>
+    <p>
+        Hierarchie: <strong>Magma</strong> (abgeschlossen) →
+        <strong>Halbgruppe</strong> (assoziativ) →
+        <strong>Monoid</strong> (Neutralelement) →
+        <strong>Gruppe</strong> (Inverse) →
+        <strong>Abelsche Gruppe</strong> (kommutativ).
+    </p>
+
+    <div class="card-grid">
+
+        <div class="card">
+            <h3>Magma-Analyse</h3>
+            <p>
+                Ein <strong>Magma</strong> $(M, \cdot)$: Menge mit abgeschlossener
+                binärer Operation. $\mathbb{Z}/2\mathbb{Z}$: Tabelle $[[0,1],[1,0]]$.
+            </p>
+            <div class="input-row">
+                <label>Tabelle (JSON):</label>
+                <input type="text" id="magma-table" value="[[0,1],[1,0]]" style="width:180px">
+            </div>
+            <div class="input-row">
+                <label>Elemente (JSON):</label>
+                <input type="text" id="magma-elements" value='["e","a"]' style="width:180px">
+            </div>
+            <button onclick="analyzeMagma()" class="btn-calc">Magma analysieren</button>
+            <div id="algstruct-magma-result" class="result-box"></div>
+        </div>
+
+        <div class="card">
+            <h3>Gruppenaxiome prüfen</h3>
+            <p>
+                Prüft alle Axiome: Abgeschlossenheit, Assoziativität,
+                Neutralelement, Inverse. Beispiel $\mathbb{Z}/3\mathbb{Z}$: $[[0,1,2],[1,2,0],[2,0,1]]$.
+            </p>
+            <div class="input-row">
+                <label>Tabelle (JSON):</label>
+                <input type="text" id="grp-table" value="[[0,1,2],[1,2,0],[2,0,1]]" style="width:200px">
+            </div>
+            <div class="input-row">
+                <label>Elemente (JSON):</label>
+                <input type="text" id="grp-elements" value='["0","1","2"]' style="width:200px">
+            </div>
+            <button onclick="checkGroup()" class="btn-calc">Gruppenaxiome prüfen</button>
+            <div id="algstruct-grp-result" class="result-box"></div>
+        </div>
+
+        <div class="card">
+            <h3>Strukturhierarchie</h3>
+            <p>
+                Vollständige Hierarchie algebraischer Strukturen mit Axiomen und Beispielen.
+            </p>
+            <button onclick="loadHierarchy()" class="btn-calc">Hierarchie laden</button>
+            <div id="algstruct-hier-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 6: INVARIANTENTHEORIE ===== -->
+<section class="math-section">
+    <h2>&#8473; Invariantentheorie</h2>
+    <p>
+        <strong>Invariante</strong>: $f \in k[x_1,\ldots,x_n]$ mit $f(g \cdot x) = f(x)$ für alle $g \in G$.
+        <strong>Hauptsatz</strong>: $k[x_1,\ldots,x_n]^{S_n}$ wird erzeugt von
+        $e_1,\ldots,e_n$ (elementarsymmetrische Polynome).
+        <strong>Reynolds-Operator</strong>: $R_G[f] = \frac{1}{|G|}\sum_{g\in G} g\cdot f$.
+    </p>
+
+    <div class="card-grid">
+
+        <div class="card">
+            <h3>Reynolds-Operator $R_G$</h3>
+            <p>
+                Projiziert ein Polynom auf seinen invarianten Teil: $R_G^2 = R_G$.
+                Eingabe: Polynom in Variablen $x_1, x_2, \ldots$ (oder $x, y$).
+            </p>
+            <div class="input-row">
+                <label>Polynom $f$:</label>
+                <input type="text" id="reynolds-poly" value="x1**2 + x2**2" style="width:200px">
+            </div>
+            <div class="input-row">
+                <label>Gruppe $S_n$, $n$:</label>
+                <input type="number" id="reynolds-n" value="2" min="2" max="4">
+            </div>
+            <button onclick="calcReynolds()" class="btn-calc">Reynolds anwenden</button>
+            <div id="inv-reynolds-result" class="result-box"></div>
+        </div>
+
+        <div class="card">
+            <h3>Molien-Reihe $M_G(t)$</h3>
+            <p>
+                $M_G(t) = \frac{1}{|G|} \sum_{g \in G} \frac{1}{\det(I - t\rho(g))}$
+                erzeugt die Dimensionen der Invariantenräume pro Grad.
+            </p>
+            <div class="input-row">
+                <label>Gruppe:</label>
+                <select id="molien-group">
+                    <option value="Z2">$\mathbb{Z}/2\mathbb{Z}$ (Reflexion)</option>
+                    <option value="S2">$S_2$ (Permutation)</option>
+                </select>
+            </div>
+            <div class="input-row">
+                <label>Max. Grad:</label>
+                <input type="number" id="molien-deg" value="8" min="2" max="12">
+            </div>
+            <button onclick="calcMolien()" class="btn-calc">Molien-Reihe berechnen</button>
+            <div id="inv-molien-result" class="result-box"></div>
+        </div>
+
+        <div class="card">
+            <h3>Symmetrische Polynome</h3>
+            <p>
+                Elementarsymmetrische Polynome $e_k(x_1,\ldots,x_n)$:
+                $e_k = \sum_{i_1 < \cdots < i_k} x_{i_1} \cdots x_{i_k}$.
+                Hauptsatz: Jedes symmetrische Polynom ist ein Polynom in $e_1,\ldots,e_n$.
+            </p>
+            <div class="input-row">
+                <label>$n$ (Variablen):</label>
+                <input type="number" id="sym-n" value="3" min="1" max="5">
+            </div>
+            <button onclick="calcSymmetricPolys()" class="btn-calc">Symmetrische Polynome</button>
+            <div id="inv-sym-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 7: UNIVERSELLE ALGEBRA ===== -->
+<section class="math-section">
+    <h2>&#8704; Universelle Algebra</h2>
+    <p>
+        <strong>Varietät</strong>: Klasse von Algebren definiert durch Gleichungsaxiome.
+        <strong>Birkhoffs HSP-Satz</strong>: Eine Klasse ist genau dann eine Varietät, wenn
+        sie unter <em>H</em>omomorphismen, <em>S</em>ubstrukturen und direkten
+        <em>P</em>rodukten abgeschlossen ist: $\mathcal{K} = \mathrm{HSP}(\mathcal{K})$.
+    </p>
+
+    <div class="card-grid">
+
+        <div class="card">
+            <h3>Varietäten der Algebra</h3>
+            <p>
+                Gruppen, Ringe und Verbände sind klassische Varietäten.
+                Jede Varietät wird durch ihre <strong>Signatur</strong> $\Sigma = (F, \mathrm{ar})$
+                (Funktionssymbole mit Stelligkeiten) und Gleichungsaxiome definiert.
+            </p>
+            <div class="input-row">
+                <label>Varietät:</label>
+                <select id="variety-name">
+                    <option value="groups">Gruppen</option>
+                    <option value="rings">Ringe</option>
+                    <option value="lattices">Verbände</option>
+                </select>
+            </div>
+            <button onclick="checkVariety()" class="btn-calc">Varietät analysieren</button>
+            <div id="univ-variety-result" class="result-box"></div>
+        </div>
+
+        <div class="card">
+            <h3>Birkhoff HSP-Satz</h3>
+            <p>
+                Der Fundamentalsatz der universellen Algebra.
+                Eine Klasse $\mathcal{K}$ von Algebren ist genau dann eine Varietät
+                (durch Gleichungen axiomatisierbar), wenn $\mathcal{K} = \mathrm{HSP}(\mathcal{K})$.
+            </p>
+            <button onclick="loadBirkhoffHSP()" class="btn-calc">HSP-Satz demonstrieren</button>
+            <div id="univ-birkhoff-result" class="result-box"></div>
+        </div>
+
+        <div class="card">
+            <h3>Freies Monoid $\Sigma^*$</h3>
+            <p>
+                $\Sigma^* = \{\varepsilon, a, b, aa, ab, \ldots\}$ mit Konkatenation.
+                Initiales Objekt in der Kategorie der Monoide.
+                Reguläre Sprachen sind Quotienten des freien Monoids.
+            </p>
+            <div class="input-row">
+                <label>Alphabet (JSON):</label>
+                <input type="text" id="free-monoid-alpha" value='["a","b"]' style="width:150px">
+            </div>
+            <button onclick="calcFreeMonoid()" class="btn-calc">Freies Monoid generieren</button>
+            <div id="univ-free-result" class="result-box"></div>
+        </div>
+
+    </div>
+</section>
+
 {% endblock %}
 
 {% block scripts %}
 <script>
 /**
- * @file algebra_advanced.html (scripts)
- * @brief JavaScript für die Erweiterte-Algebra-Seite.
+ * @brief Charaktertafel einer Gruppe berechnen.
  * @author Kurt Ingwer
- * @date 2026-03-10
+ * @lastModified 2026-03-10
  */
-
-/** Prüft die algebraische Struktur einer Verknüpfungstafel. */
-async function checkAlgStruct() {
-    const resultDiv = document.getElementById('struct-result');
-    const elements = document.getElementById('struct-elements').value.split(',').map(e => e.trim());
-    let table;
+async function calcCharacterTable() {
+    const div = document.getElementById('repr-ct-result');
+    const group = document.getElementById('repr-group-ct').value;
     try {
-        table = JSON.parse(document.getElementById('struct-table').value);
-    } catch(e) {
-        showError(resultDiv, 'Ungültiges JSON für Tafel.'); return;
-    }
-    try {
-        const data = await apiPost('/api/algebra_adv/check_structure', { table, elements });
-        let html = '<table class="data-table"><tbody>';
-        for (const [k, v] of Object.entries(data)) {
-            const icon = v === true ? '&#10003;' : v === false ? '&#10007;' : '';
-            const col = v === true ? '#a6e3a1' : v === false ? '#f38ba8' : 'inherit';
-            html += `<tr><td><strong>${k}</strong></td><td style="color:${col}">${icon} ${JSON.stringify(v)}</td></tr>`;
-        }
-        html += '</tbody></table>';
-        showResult(resultDiv, html);
-    } catch(e) { showError(resultDiv, e.message); }
-}
-
-/** Berechnet Reynolds-Operator und Molien-Reihe für eine Gruppe. */
-async function calcInvariant() {
-    const resultDiv = document.getElementById('inv-result');
-    const group_type = document.getElementById('inv-group').value;
-    const max_degree = parseInt(document.getElementById('inv-degree').value);
-    try {
-        const data = await apiPost('/api/algebra_adv/invariant', { group_type, max_degree });
-        let html = `<h3>Invariantentheorie für ${group_type}</h3>`;
-        if (data.molien_series) {
-            html += '<p><strong>Molien-Reihe (Koeffizienten):</strong></p>';
-            html += '<table class="data-table"><thead><tr><th>Grad</th><th>Dimension</th></tr></thead><tbody>';
-            data.molien_series.forEach((d, i) => {
-                html += `<tr><td>${i}</td><td>${d}</td></tr>`;
+        const data = await apiPost('/api/representation/character_table', { group_name: group });
+        const r = data.result;
+        let html = `<strong>Charaktertafel von ${r.group}</strong> (Ordnung ${r.order})<br>`;
+        html += `Irreduzible Darstellungen: ${r.irreducible_count}<br>`;
+        if (r.characters && r.characters.length > 0) {
+            html += '<table class="math-table"><thead><tr><th></th>';
+            (r.class_representatives || []).forEach((rep, i) => {
+                html += `<th>[${rep}]</th>`;
             });
-            html += '</tbody></table>';
-        }
-        if (data.invariant_generators) {
-            html += '<p><strong>Erzeuger der Invariantenalgebra:</strong></p><ul>';
-            data.invariant_generators.forEach(g => { html += `<li><code>${g}</code></li>`; });
-            html += '</ul>';
-        }
-        if (data.hilbert_basis_theorem) {
-            html += `<p style="color:#a6e3a1;">${data.hilbert_basis_theorem}</p>`;
-        }
-        showResult(resultDiv, html);
-    } catch(e) { showError(resultDiv, e.message); }
-}
-
-/** Zeigt die Charaktertafel einer Gruppe. */
-async function calcRepresentation() {
-    const resultDiv = document.getElementById('rep-result');
-    const group_name = document.getElementById('rep-group').value;
-    try {
-        const data = await apiPost('/api/algebra_adv/character_table', { group_name });
-        let html = `<h3>Charaktertafel von ${group_name}</h3>`;
-        if (data.character_table && data.conjugacy_classes && data.irreducible_names) {
-            const classes = data.conjugacy_classes;
-            const names = data.irreducible_names;
-            html += '<table class="data-table"><thead><tr><th>Darst.</th>';
-            classes.forEach(c => { html += `<th>${c}</th>`; });
             html += '</tr></thead><tbody>';
-            data.character_table.forEach((row, i) => {
-                html += `<tr><td><strong>${names[i] || `χ${i+1}`}</strong></td>`;
-                row.forEach(v => {
-                    const val = typeof v === 'object' ? `${v.real.toFixed(2)}+${v.imag.toFixed(2)}i` : v;
-                    html += `<td>${val}</td>`;
+            r.characters.forEach((row, i) => {
+                html += `<tr><td>$\\chi_{${i+1}}$</td>`;
+                row.forEach(val => {
+                    const v = typeof val === 'number' ? val.toFixed(2) : val;
+                    html += `<td>${v}</td>`;
                 });
                 html += '</tr>';
             });
             html += '</tbody></table>';
         }
-        if (data.schur_orthogonality) {
-            html += `<p style="color:#a6e3a1;">&#10003; Schur-Orthogonalitätsrelationen erfüllt</p>`;
-        }
-        showResult(resultDiv, html);
-    } catch(e) { showError(resultDiv, e.message); }
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
 }
 
-/** Berechnet die Homologiegruppen eines Kettenkomplexes. */
-async function calcHomology() {
-    const resultDiv = document.getElementById('hom-result');
-    let boundary_maps;
+/**
+ * @brief Schur-Orthogonalitätsrelationen prüfen.
+ * @lastModified 2026-03-10
+ */
+async function calcSchurOrthogonality() {
+    const div = document.getElementById('repr-schur-result');
+    const group = document.getElementById('repr-group-schur').value;
     try {
-        boundary_maps = JSON.parse(document.getElementById('hom-complex').value);
-    } catch(e) {
-        showError(resultDiv, 'Ungültiges JSON für Randoperatoren.'); return;
-    }
-    try {
-        const data = await apiPost('/api/algebra_adv/homology', { boundary_maps });
-        let html = '<h3>Homologiegruppen</h3>';
-        if (Array.isArray(data.homology_groups)) {
-            html += '<table class="data-table"><thead><tr><th>n</th><th>H_n</th><th>Rang</th></tr></thead><tbody>';
-            data.homology_groups.forEach((h, i) => {
-                html += `<tr><td>$H_{${i}}$</td><td>${h.description || h}</td><td>${h.rank ?? ''}</td></tr>`;
-            });
-            html += '</tbody></table>';
-        }
-        if (data.betti_numbers) {
-            html += '<p><strong>Betti-Zahlen:</strong> ' + data.betti_numbers.join(', ') + '</p>';
-        }
-        if (data.euler_characteristic !== undefined) {
-            html += `<p><strong>Euler-Charakteristik:</strong> $\\chi = ${data.euler_characteristic}$</p>`;
-        }
-        showResult(resultDiv, html);
-    } catch(e) { showError(resultDiv, e.message); }
+        const data = await apiPost('/api/representation/schur_orthogonality', { group_name: group });
+        const r = data.result;
+        let html = `<strong>Schur-Orthogonalität für ${r.group}</strong><br>`;
+        html += `$\\langle \\chi_i, \\chi_j \\rangle = \\delta_{ij}$: `;
+        html += r.schur_orthogonality_holds ? '✓ erfüllt' : '✗ verletzt';
+        html += '<br><table class="math-table"><thead><tr><th>$i$</th><th>$j$</th>';
+        html += '<th>$\\langle\\chi_i,\\chi_j\\rangle$</th><th>Erwartet</th></tr></thead><tbody>';
+        r.pairs.forEach(p => {
+            html += `<tr><td>${p.i+1}</td><td>${p.j+1}</td><td>${p.inner_product}</td><td>${p.expected}</td></tr>`;
+        });
+        html += '</tbody></table>';
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
 }
 
-/** Berechnet das Kronecker-Tensorprodukt zweier Matrizen. */
+/**
+ * @brief Burnside-Lemma: Orbits unter Rotationssymmetrie.
+ * @lastModified 2026-03-10
+ */
+async function calcBurnside() {
+    const div = document.getElementById('repr-burnside-result');
+    const colors = parseInt(document.getElementById('burnside-colors').value);
+    const rot = parseInt(document.getElementById('burnside-rot').value);
+    try {
+        const data = await apiPost('/api/representation/burnside', {
+            n_colorings: colors, n_rotations: rot
+        });
+        const r = data.result;
+        let html = `<strong>Burnside: ${colors} Farben, ${rot} Rotationen</strong><br>`;
+        html += `Fixpunktmengen $|X^{r^k}|$: [${r.fixed_counts.join(', ')}]<br>`;
+        const sum = r.fixed_counts.reduce((a,b) => a+b, 0);
+        html += `Orbits: $\\frac{1}{${rot}} \\cdot ${sum} = ${r.orbit_count}$`;
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Verband erstellen und analysieren. */
+async function createLattice() {
+    const div = document.getElementById('lattice-create-result');
+    const type = document.getElementById('lattice-type').value;
+    const n = parseInt(document.getElementById('lattice-n').value);
+    try {
+        const data = await apiPost('/api/lattice/create', { type, n });
+        const r = data.result;
+        let html = `<strong>${type === 'power_set' ? 'Potenzmenge' : 'Teilerverband'} für $n=${r.n}$</strong><br>`;
+        html += `Elemente (${r.element_count}): ${r.elements.slice(0,15).join(', ')}`;
+        if (r.elements.length > 15) html += ', ...';
+        html += `<br>Distributiv: ${r.is_distributive ? '✓' : '✗'}`;
+        html += ` | Modular: ${r.is_modular ? '✓' : '✗'}`;
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Distributivität eines Verbands prüfen. */
+async function checkDistributive() {
+    const div = document.getElementById('lattice-distrib-result');
+    const type = document.getElementById('distrib-type').value;
+    const n = parseInt(document.getElementById('distrib-n').value);
+    try {
+        const data = await apiPost('/api/lattice/is_distributive', { type, n });
+        const r = data.result;
+        let html = `<strong>Distributivitätstest $n=${r.n}$</strong><br>`;
+        html += `Distributiv: ${r.is_distributive ? '✓' : '✗'} | Modular: ${r.is_modular ? '✓' : '✗'}<br>`;
+        html += `Jordan-Dedekind: ${r.jordan_dedekind_chain_condition ? '✓' : '✗'}<br>`;
+        html += `<em>${r.note}</em>`;
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Birkhoff-Darstellungssatz anwenden. */
+async function calcBirkhoff() {
+    const div = document.getElementById('lattice-birkhoff-result');
+    const n = parseInt(document.getElementById('birkhoff-n').value);
+    try {
+        const data = await apiPost('/api/lattice/birkhoff', { n });
+        showResult(div, `<pre style="white-space:pre-wrap">${JSON.stringify(data.result, null, 2)}</pre>`);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Tensorprodukt zweier Matrizen berechnen. */
 async function calcTensorProduct() {
-    const resultDiv = document.getElementById('tensor-result');
-    let A, B;
+    const div = document.getElementById('multilinear-tensor-result');
     try {
-        A = JSON.parse(document.getElementById('tensor-A').value);
-        B = JSON.parse(document.getElementById('tensor-B').value);
-    } catch(e) {
-        showError(resultDiv, 'Ungültiges JSON für Matrizen.'); return;
-    }
+        const A = JSON.parse(document.getElementById('tensor-A').value);
+        const B = JSON.parse(document.getElementById('tensor-B').value);
+        const data = await apiPost('/api/multilinear/tensor_product', { A, B });
+        const r = data.result;
+        let html = `<strong>$A \\otimes B$</strong>: ${r.shape_A[0]}×${r.shape_A[1]} ⊗ ${r.shape_B[0]}×${r.shape_B[1]} → ${r.shape_result[0]}×${r.shape_result[1]}<br>`;
+        html += '<table class="math-table"><tbody>';
+        r.tensor_product.forEach(row => {
+            html += '<tr>' + row.map(v => `<td>${typeof v === 'number' ? v.toFixed(2) : v}</td>`).join('') + '</tr>';
+        });
+        html += '</tbody></table>';
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Äußeres Produkt berechnen. */
+async function calcWedgeProduct() {
+    const div = document.getElementById('multilinear-wedge-result');
     try {
-        const data = await apiPost('/api/algebra_adv/tensor_product', { A, B });
-        let html = '<h3>Kronecker-Tensorprodukt $A \\otimes B$</h3>';
-        if (data.result) {
-            html += '<div style="overflow-x:auto;"><table class="data-table">';
-            data.result.forEach(row => {
-                html += '<tr>' + row.map(v => `<td>${typeof v === 'number' ? v.toFixed(3) : v}</td>`).join('') + '</tr>';
-            });
-            html += '</table></div>';
-            html += `<p>Dimensionen: ${data.shape[0]}×${data.shape[1]}</p>`;
+        const u = JSON.parse(document.getElementById('wedge-u').value);
+        const v = JSON.parse(document.getElementById('wedge-v').value);
+        const data = await apiPost('/api/multilinear/exterior_product', { u, v });
+        const r = data.result;
+        let html = `<strong>$u \\wedge v$</strong>: [${r.wedge_product.map(x => parseFloat(x.toFixed ? x.toFixed(4) : x)).join(', ')}]<br>`;
+        html += `Fläche: $${r.area.toFixed(6)}$ | Gram-Det: $${r.gram_determinant.toFixed(6)}$`;
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Signatur einer Bilinearform berechnen. */
+async function calcSignature() {
+    const div = document.getElementById('multilinear-sig-result');
+    try {
+        const M = JSON.parse(document.getElementById('sig-M').value);
+        const data = await apiPost('/api/multilinear/signature', { M });
+        const r = data.result;
+        let html = `<strong>Signatur $(p,q,r) = (${r.positive}, ${r.negative}, ${r.zero})$</strong><br>`;
+        html += r.description;
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Kettenkomplex analysieren. */
+async function calcChainComplex() {
+    const div = document.getElementById('homo-chain-result');
+    const simplex = document.getElementById('chain-simplex').value;
+    try {
+        const data = await apiPost('/api/homological/chain_complex', { simplex_type: simplex });
+        const r = data.result;
+        let html = `<strong>Kettenkomplex: ${r.simplex_type}</strong><br>`;
+        Object.entries(r.homology).forEach(([deg, info]) => {
+            html += `$H_{${deg}}$: $\\beta_{${deg}} = ${info.betti_number}$`;
+            if (info.torsion && info.torsion.length > 0) html += ` Torsion: [${info.torsion.join(', ')}]`;
+            html += '<br>';
+        });
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Homologiegruppen berechnen. */
+async function calcHomology() {
+    const div = document.getElementById('homo-homology-result');
+    const simplex = document.getElementById('homology-simplex').value;
+    try {
+        const data = await apiPost('/api/homological/homology', { simplex_type: simplex });
+        const r = data.result;
+        let html = `<strong>Homologie: ${r.simplex_type}</strong><br>`;
+        html += `$\\chi = ${r.euler_characteristic}$, `;
+        html += `$\\beta = (${Object.values(r.betti_numbers).join(', ')})$<br>`;
+        Object.values(r.interpretation).forEach(s => { html += `${s}<br>`; });
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Ext- und Tor-Gruppen berechnen. */
+async function calcExtTor() {
+    const div = document.getElementById('homo-ext-result');
+    const n = parseInt(document.getElementById('ext-n').value);
+    const m = parseInt(document.getElementById('ext-m').value);
+    const deg = parseInt(document.getElementById('ext-deg').value);
+    try {
+        const data = await apiPost('/api/homological/ext_tor', { n, m, degree: deg });
+        const r = data.result;
+        let html = `<strong>${r.description}</strong><br>`;
+        html += `Ext: <pre>${JSON.stringify(r.ext, null, 2)}</pre>`;
+        html += `Tor: <pre>${JSON.stringify(r.tor, null, 2)}</pre>`;
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Magma analysieren. */
+async function analyzeMagma() {
+    const div = document.getElementById('algstruct-magma-result');
+    try {
+        const table = JSON.parse(document.getElementById('magma-table').value);
+        const elements = JSON.parse(document.getElementById('magma-elements').value);
+        const data = await apiPost('/api/algebraic_structures/magma', { table, elements });
+        const r = data.result;
+        let html = `<strong>Magma-Analyse</strong><br>`;
+        html += `Halbgruppe: ${r.is_semigroup ? '✓' : '✗'} | Kommutativ: ${r.is_commutative ? '✓' : '✗'}`;
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Gruppenaxiome prüfen. */
+async function checkGroup() {
+    const div = document.getElementById('algstruct-grp-result');
+    try {
+        const table = JSON.parse(document.getElementById('grp-table').value);
+        const elements = JSON.parse(document.getElementById('grp-elements').value);
+        const data = await apiPost('/api/algebraic_structures/check_group', { table, elements });
+        const r = data.result;
+        let html = `<strong>Strukturtest</strong><br>`;
+        html += `Magma ✓ | Halbgruppe: ${r.is_semigroup ? '✓' : '✗'} | `;
+        html += `Monoid: ${r.is_monoid ? '✓' : '✗'} | `;
+        html += `Gruppe: ${r.is_group ? '✓' : '✗'} | `;
+        html += `Abel: ${r.is_abelian ? '✓' : '✗'}`;
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Strukturhierarchie laden. */
+async function loadHierarchy() {
+    const div = document.getElementById('algstruct-hier-result');
+    try {
+        const res = await fetch('/api/algebraic_structures/hierarchy');
+        const data = await res.json();
+        showResult(div, `<pre style="white-space:pre-wrap">${JSON.stringify(data.result, null, 2)}</pre>`);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Reynolds-Operator anwenden. */
+async function calcReynolds() {
+    const div = document.getElementById('inv-reynolds-result');
+    const poly = document.getElementById('reynolds-poly').value;
+    const n = parseInt(document.getElementById('reynolds-n').value);
+    try {
+        const data = await apiPost('/api/invariant/reynolds_operator', { poly, n });
+        const r = data.result;
+        let html = `<strong>Reynolds über $${r.group}$</strong><br>`;
+        html += `$R_G[${r.input_poly}] = ${r.reynolds_image}$<br>`;
+        html += `Elementarsymm.: ${r.elementary_symmetric.join(', ')}`;
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Molien-Reihe berechnen. */
+async function calcMolien() {
+    const div = document.getElementById('inv-molien-result');
+    const group_type = document.getElementById('molien-group').value;
+    const max_degree = parseInt(document.getElementById('molien-deg').value);
+    try {
+        const data = await apiPost('/api/invariant/molien_series', { group_type, max_degree });
+        const r = data.result;
+        let html = `<strong>Molien-Reihe für ${r.group}</strong><br>`;
+        html += `Koeffizienten $[t^0,\\ldots,t^{${r.max_degree}}]$: [${r.molien_coefficients.join(', ')}]`;
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Symmetrische Polynome berechnen. */
+async function calcSymmetricPolys() {
+    const div = document.getElementById('inv-sym-result');
+    const n = parseInt(document.getElementById('sym-n').value);
+    try {
+        const data = await apiPost('/api/invariant/symmetric_polynomials', { n });
+        const r = data.result;
+        let html = `<strong>Elementarsymm. Polynome für $n=${r.n}$</strong><br>`;
+        r.elementary_symmetric.forEach((p, i) => { html += `$e_{${i+1}} = ${p}$<br>`; });
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Varietät analysieren. */
+async function checkVariety() {
+    const div = document.getElementById('univ-variety-result');
+    const variety = document.getElementById('variety-name').value;
+    try {
+        const data = await apiPost('/api/universal/algebra_check', { variety });
+        const r = data.result;
+        let html = `<strong>Varietät der ${r.variety}</strong><br>`;
+        html += `HSP-Satz: ${r.birkhoff_theorem}<br>`;
+        if (r.axioms && r.axioms.length > 0) {
+            html += 'Axiome: <ul>' + r.axioms.map(a => `<li>${a}</li>`).join('') + '</ul>';
         }
-        showResult(resultDiv, html);
-    } catch(e) { showError(resultDiv, e.message); }
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Birkhoff HSP-Satz demonstrieren. */
+async function loadBirkhoffHSP() {
+    const div = document.getElementById('univ-birkhoff-result');
+    try {
+        const res = await fetch('/api/universal/birkhoff');
+        const data = await res.json();
+        showResult(div, `<pre style="white-space:pre-wrap">${JSON.stringify(data.result, null, 2)}</pre>`);
+    } catch(e) { showError(div, e.message); }
+}
+
+/** @brief Freies Monoid generieren. */
+async function calcFreeMonoid() {
+    const div = document.getElementById('univ-free-result');
+    try {
+        const alphabet = JSON.parse(document.getElementById('free-monoid-alpha').value);
+        const data = await apiPost('/api/universal/free_monoid', { alphabet });
+        const r = data.result;
+        let html = `<strong>Freies Monoid $\\{${r.alphabet.join(',')}\\}^*$</strong><br>`;
+        html += `${r.description}<br>`;
+        html += `<pre style="white-space:pre-wrap">${JSON.stringify(r.free_monoid_sample, null, 2)}</pre>`;
+        showResult(div, html);
+    } catch(e) { showError(div, e.message); }
 }
 </script>
 {% endblock %}

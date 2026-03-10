@@ -1843,3 +1843,100 @@ liefert falsche Ergebnisse (Kettensubstitution).
 ---
 
 ### Gesamtergebnis: 138/138 Tests grün
+
+2026-03-10 23:45:00 - Build 35: Flask-Webapp um 15 neue mathematische Module erweitert
+
+## Build 35 – Webapp-Erweiterung
+
+### Neue API-Endpunkte in src/webapp/app.py (36 neue Endpunkte)
+
+**Darstellungstheorie** (representation_theory.py):
+- POST /api/representation/character_table
+- POST /api/representation/schur_orthogonality
+- POST /api/representation/burnside
+
+**Verbandstheorie** (lattice_theory.py):
+- POST /api/lattice/create
+- POST /api/lattice/is_distributive
+- POST /api/lattice/birkhoff
+
+**Multilineare Algebra** (multilinear_algebra.py):
+- POST /api/multilinear/tensor_product
+- POST /api/multilinear/exterior_product
+- POST /api/multilinear/signature
+
+**Homologische Algebra** (homological_algebra.py):
+- POST /api/homological/chain_complex
+- POST /api/homological/homology
+- POST /api/homological/ext_tor
+
+**Algebraische Strukturen** (algebraic_structures.py):
+- POST /api/algebraic_structures/magma
+- POST /api/algebraic_structures/check_group
+- GET  /api/algebraic_structures/hierarchy
+
+**Invariantentheorie** (invariant_theory.py):
+- POST /api/invariant/reynolds_operator
+- POST /api/invariant/molien_series
+- POST /api/invariant/symmetric_polynomials
+
+**Universelle Algebra** (universal_algebra.py):
+- POST /api/universal/algebra_check
+- GET  /api/universal/birkhoff
+- POST /api/universal/free_monoid
+
+**Modelltheorie** (model_theory.py):
+- POST /api/model/satisfies
+- POST /api/model/elementary_equivalence
+- POST /api/model/quantifier_elimination
+
+**Formale Beweistheorie** (proof_theory_formal.py):
+- POST /api/proof_formal/sequent_calculus
+- POST /api/proof_formal/natural_deduction
+- GET  /api/proof_formal/ordinals
+
+**Rekursionstheorie** (recursion_theory.py):
+- POST /api/recursion/turing_machine
+- GET  /api/recursion/halting_problem_demo
+- POST /api/recursion/ackermann
+
+**Maßtheorie** (measure_theory.py):
+- POST /api/measure/lebesgue_integral
+- POST /api/measure/sigma_algebra
+- GET  /api/measure/convergence_theorems
+
+**Spezielle Funktionen** (special_functions.py):
+- POST /api/special/bessel
+- POST /api/special/legendre
+- GET  /api/special/gamma_properties
+
+**Funktionalanalysis** (functional_analysis.py):
+- POST /api/functional/banach_space
+- POST /api/functional/hilbert_space
+- POST /api/functional/fixed_point
+
+**PDE** (pde.py):
+- POST /api/pde/classify
+- POST /api/pde/heat_equation
+- POST /api/pde/wave_equation
+
+**Operatoralgebren** (operator_algebras.py):
+- GET  /api/operator_algebras/cstar_demo
+- GET  /api/operator_algebras/factors
+- GET  /api/operator_algebras/k_theory
+
+### Neue HTML-Templates
+- templates/algebra_advanced.html (7 Sektionen, 21 interaktive Cards)
+- templates/logic_foundations.html (3 Sektionen, 9 interaktive Cards)
+- templates/analysis_advanced.html (5 Sektionen, 15 interaktive Cards)
+
+### Navigation base.html aktualisiert
+- Gruppe "Grundlagen": Logik & Grundlagen → /logic_foundations
+- Gruppe "Algebra": Erweiterte Algebra → /algebra_advanced
+- Gruppe "Analysis": Erweiterte Analysis → /analysis_advanced
+
+### Bugs behoben
+- API-Signaturen an echte Module angepasst (BesselFunctions ohne Arg, Magma mit callable)
+- numpy.bool_/complex Serialisierung behoben
+- frozenset Serialisierung in Birkhoff-Endpunkt behoben
+- heat_equation_explicit/wave_equation_explicit gibt 2D-Matrix zurück; letzte Zeile extrahiert

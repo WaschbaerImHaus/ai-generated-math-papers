@@ -4511,6 +4511,46 @@ def page_analysis_advanced():
     return render_template('analysis_advanced.html')
 
 
+@app.route('/algebraic_geometry')
+def page_algebraic_geometry():
+    """
+    @brief Seite für Algebraische Geometrie (Varietäten, Nullstellensatz, Gröbner-Basen).
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    return render_template('algebraic_geometry.html')
+
+
+@app.route('/lie_groups')
+def page_lie_groups():
+    """
+    @brief Seite für Lie-Gruppen und Lie-Algebren.
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    return render_template('lie_groups.html')
+
+
+@app.route('/stochastic')
+def page_stochastic():
+    """
+    @brief Seite für Stochastische Prozesse und Ergodentheorie.
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    return render_template('stochastic.html')
+
+
+@app.route('/differential_topology')
+def page_differential_topology():
+    """
+    @brief Seite für Differentialtopologie (Differentialformen, Morse-Theorie).
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    return render_template('differential_topology.html')
+
+
 # ===========================================================================
 # API: Darstellungstheorie (representation_theory.py)
 # ===========================================================================
@@ -4540,17 +4580,20 @@ def api_repr_character_table():
         else:
             return error_response(f"Unbekannte Gruppe: {group_name}. Bitte 'S3' oder 'Z2' wählen.")
 
-        # Charaktertafel aus Darstellungen aufbauen
-        table = character_table(reps, group_name)
+        # Charaktere aus den Darstellungen direkt berechnen
+        # character_table(group_elements, conjugacy_classes, representations)
+        # Einfache Variante: Charaktere direkt aus den Darstellungen ableiten
+        char_data = []
+        for rep in reps:
+            char_row = [complex(rep.character().get(g, 0)) for g in rep.group_elements]
+            char_data.append([round(c.real, 4) if abs(c.imag) < 1e-10 else [round(c.real,4), round(c.imag,4)] for c in char_row])
 
-        # Ergebnis für JSON aufbereiten
         result = {
             'group': group_name,
-            'order': table.get('group_order', len(reps)),
-            'irreducible_count': table.get('irreducible_count', len(reps)),
-            'characters': table.get('characters', []),
-            'class_sizes': table.get('class_sizes', []),
-            'class_representatives': table.get('class_representatives', []),
+            'order': len(reps[0].group_elements) if reps else 0,
+            'irreducible_count': len(reps),
+            'characters': char_data,
+            'class_representatives': [str(g) for g in (reps[0].group_elements if reps else [])],
         }
         return jsonify({'result': result})
     except Exception as e:
@@ -4581,15 +4624,22 @@ def api_repr_schur_orthogonality():
         else:
             return error_response(f"Unbekannte Gruppe: {group_name}")
 
-        # Schur-Lemma für alle Paare prüfen
+        # Schur-Orthogonalität durch inneres Produkt der Charaktere prüfen
+        # ⟨χᵢ, χⱼ⟩ = (1/|G|) Σ_g χᵢ(g)·conj(χⱼ(g))
+        import numpy as np
         results = []
+        n_group = len(reps[0].group_elements) if reps else 1
         for i, r1 in enumerate(reps):
+            char1 = np.array([r1.character().get(g, 0) for g in r1.group_elements], dtype=complex)
             for j, r2 in enumerate(reps):
-                lemma = schur_lemma(r1, r2)
+                char2 = np.array([r2.character().get(g, 0) for g in r2.group_elements], dtype=complex)
+                # Inneres Produkt der Charaktere
+                ip = np.sum(char1 * np.conj(char2)) / n_group
+                is_orth = abs(ip) < 0.01 if i != j else abs(ip - 1.0) < 0.01
                 results.append({
                     'i': i, 'j': j,
-                    'orthogonal': lemma.get('are_orthogonal', False),
-                    'inner_product': str(lemma.get('inner_product', '?')),
+                    'orthogonal': bool(is_orth),
+                    'inner_product': f'{ip.real:.4f}',
                     'expected': 1 if i == j else 0
                 })
 
@@ -4628,14 +4678,15 @@ def api_repr_burnside():
         # Fix(r^k) = n_colors^gcd(k, n_rot) für Rotationen
         import math
         fix_counts = [n_colors ** math.gcd(k, n_rot) for k in range(n_rot)]
-        result = burnside_lemma(fix_counts)
+        # burnside_lemma(group_elements, action_dict) – wir berechnen direkt
+        orbit_count = sum(fix_counts) // n_rot
 
         return jsonify({'result': {
             'n_colors': n_colors,
             'n_rotations': n_rot,
             'fixed_counts': fix_counts,
-            'orbit_count': result.get('orbit_count', sum(fix_counts) // n_rot),
-            'description': result.get('description', ''),
+            'orbit_count': orbit_count,
+            'description': f'Burnside: ({" + ".join(str(f) for f in fix_counts)}) / {n_rot} = {orbit_count}',
         }})
     except Exception as e:
         return error_response(str(e))
@@ -4744,7 +4795,20 @@ def api_lattice_birkhoff():
         lat = divisibility_lattice(n)
         birkhoff = birkhoff_representation_theorem(lat)
 
-        return jsonify({'result': birkhoff})
+        # frozenset und andere nicht-serialisierbare Typen konvertieren
+        def make_serializable(obj):
+            """Wandelt nicht-JSON-serialisierbare Typen in serialisierbare um."""
+            if isinstance(obj, (frozenset, set)):
+                return sorted([make_serializable(e) for e in obj])
+            if isinstance(obj, dict):
+                return {str(k): make_serializable(v) for k, v in obj.items()}
+            if isinstance(obj, (list, tuple)):
+                return [make_serializable(e) for e in obj]
+            if hasattr(obj, 'item'):
+                return obj.item()
+            return obj
+
+        return jsonify({'result': make_serializable(birkhoff)})
     except Exception as e:
         return error_response(str(e))
 
@@ -4892,21 +4956,23 @@ def api_homological_chain_complex():
             simplices = {0: [[0], [1]], 1: [[0,1]]}
 
         cc = simplicial_complex_to_chain(simplices)
-        # Homologiegruppen berechnen
-        homology = cc.homology_groups()
+        # Betti-Zahlen: cc.betti_numbers() → {deg: int}
+        betti = cc.betti_numbers()
+        euler = cc.euler_characteristic()
 
         result = {
             'simplex_type': simplex_type,
-            'chain_groups': {str(k): v for k, v in cc.chain_groups.items()},
+            'chain_groups': {str(k): v for k, v in cc.groups.items()},
             'homology': {}
         }
-        for deg, h in homology.items():
+        for deg in sorted(cc.groups.keys()):
+            h = cc.homology(deg)
             result['homology'][str(deg)] = {
-                'betti_number': h.get('betti_number', 0),
+                'betti_number': betti.get(deg, 0),
                 'torsion': [str(t) for t in h.get('torsion', [])],
                 'rank': h.get('rank', 0)
             }
-
+        result['euler_characteristic'] = euler
         return jsonify({'result': result})
     except Exception as e:
         return error_response(str(e))
@@ -4942,10 +5008,9 @@ def api_homological_homology():
             simplices = {0: [[0],[1]], 1: [[0,1]]}
 
         cc = simplicial_complex_to_chain(simplices)
-        homology = cc.homology_groups()
-
-        betti = {str(k): v.get('betti_number', 0) for k, v in homology.items()}
-        euler = sum((-1)**int(k) * b for k, b in betti.items())
+        betti_raw = cc.betti_numbers()  # {deg: int}
+        betti = {str(k): v for k, v in betti_raw.items()}
+        euler = cc.euler_characteristic()
 
         return jsonify({'result': {
             'simplex_type': simplex_type,
@@ -5015,9 +5080,15 @@ def api_algstruct_magma():
         table = data.get('table', [[0,1],[1,0]])
         elements = data.get('elements', ['e', 'a'])
 
-        # Magma aus der Tabelle erstellen
-        m = Magma(elements, table)
-        is_sg = m.is_semigroup()
+        # Magma aus der Tabelle erstellen (operation = callable aus Tabelle)
+        def make_op(elems, tbl):
+            return lambda x, y: elems[tbl[elems.index(x)][elems.index(y)]]
+
+        op = make_op(elements, table)
+        m = Magma(elements, op)
+        # Semigroup-Test über separate Instanz
+        sg = Semigroup(elements, op)
+        is_sg = sg.is_semigroup()
         is_comm = m.is_commutative()
 
         return jsonify({'result': {
@@ -5049,18 +5120,26 @@ def api_algstruct_check_group():
         table = data.get('table', [[0,1],[1,0]])
         elements = data.get('elements', ['e', 'a'])
 
-        m = Magma(elements, table)
-        sg = Semigroup(elements, table) if m.is_semigroup() else None
-        mon = Monoid(elements, table) if sg and sg.has_identity() else None
-        grp = GroupFromMagma(elements, table) if mon and mon.all_have_inverses() else None
+        # Operation aus Tabelle erzeugen
+        def make_op2(elems, tbl):
+            return lambda x, y: elems[tbl[elems.index(x)][elems.index(y)]]
+
+        op = make_op2(elements, table)
+        sg = Semigroup(elements, op)
+        is_sg = sg.is_semigroup()
+        mon = Monoid(elements, op)
+        is_mon = mon.has_identity() if is_sg else False
+        grp = GroupFromMagma(elements, op)
+        is_grp = grp.is_group() if is_mon else False
+        is_abel = grp.is_commutative() if is_grp else False
 
         return jsonify({'result': {
             'elements': elements,
             'is_magma': True,
-            'is_semigroup': m.is_semigroup(),
-            'is_monoid': sg.has_identity() if sg else False,
-            'is_group': grp is not None,
-            'is_abelian': grp.is_abelian() if grp else False,
+            'is_semigroup': is_sg,
+            'is_monoid': is_mon,
+            'is_group': is_grp,
+            'is_abelian': is_abel,
             'hierarchy': 'Magma → Halbgruppe → Monoid → Gruppe → Abel. Gruppe'
         }})
     except Exception as e:
@@ -5121,8 +5200,26 @@ def api_invariant_reynolds():
 
         poly_expr = sp.sympify(poly_str, locals=local_dict)
 
-        # Reynolds-Operator über S_n anwenden
-        invariant = reynolds_operator(poly_expr, list(symbols), 'Sn', n)
+        # Reynolds-Operator: Mittlung über alle Permutationen von S_n
+        # reynolds_operator(poly_expr, group_elements, action)
+        from itertools import permutations
+
+        # Alle Permutationen von S_n als Gruppenelemente
+        sym_list = list(symbols)
+        perm_list = list(permutations(range(n)))
+
+        def perm_action(perm_idx):
+            # Permutation als Substitution auf poly_expr
+            perm = perm_list[perm_idx]
+            subs = {sym_list[i]: sym_list[perm[i]] for i in range(n)}
+            return lambda p: p.subs(subs)
+
+        # Manuell mitteln
+        total = sp.Integer(0)
+        for perm in perm_list:
+            subs = {sym_list[i]: sym_list[perm[i]] for i in range(n)}
+            total += poly_expr.subs(subs)
+        invariant = sp.simplify(total / len(perm_list))
         fund = elementary_symmetric_polynomials(n)
 
         return jsonify({'result': {
@@ -5601,7 +5698,9 @@ def api_measure_lebesgue_integral():
 
         # Lebesgue-Integral berechnen
         integral = lebesgue_integral(f, a, b)
-        comparison = riemann_vs_lebesgue(func_type)
+        # riemann_vs_lebesgue akzeptiert nur 'dirichlet', 'bounded_discontinuous', 'improper'
+        riem_type = 'bounded_discontinuous' if func_type in ['step', 'polynomial'] else 'dirichlet'
+        comparison = riemann_vs_lebesgue(riem_type)
 
         return jsonify({'result': {
             'function': fname,
@@ -5633,17 +5732,25 @@ def api_measure_sigma_algebra():
         generators = data.get('generators', [[1, 2], [3]])
 
         # σ-Algebra aus Generatoren erzeugen
-        sigma = SigmaAlgebra(base_set)
-        for gen in generators:
-            sigma.add_generator(frozenset(gen))
+        # SigmaAlgebra(universe: frozenset, sets: list)
+        universe = frozenset(base_set)
+        gen_sets = [frozenset(g) for g in generators]
+        sigma = SigmaAlgebra(universe, gen_sets)
+        # generated_sigma_algebra(generators) gibt neue SigmaAlgebra zurück
+        gen_sigma = sigma.generated_sigma_algebra(gen_sets)
+        generated = gen_sigma.sets  # set von frozensets
 
-        generated = sigma.generate()
+        # JSON-serialisierbar machen
+        gen_list = sorted(
+            [sorted(list(s)) for s in generated],
+            key=lambda s: (len(s), s)
+        )
 
         return jsonify({'result': {
             'base_set': list(base_set),
             'generators': [list(g) for g in generators],
             'sigma_algebra_size': len(generated),
-            'sigma_algebra': [sorted(list(s)) for s in sorted(generated, key=lambda s: (len(s), sorted(s)))],
+            'sigma_algebra': gen_list,
             'description': 'σ(G): kleinste σ-Algebra die G enthält'
         }})
     except Exception as e:
@@ -5696,21 +5803,25 @@ def api_special_bessel():
         n = int(data.get('n', 0))
         x = float(data.get('x', 1.0))
 
-        bf = BesselFunctions(n)
-        jn = bf.J(x)
-        yn = bf.Y(x)
+        # BesselFunctions() ohne Argument; J(nu, x), Y(nu, x)
+        bf = BesselFunctions()
+        jn = bf.J(float(n), x)
+        try:
+            yn = bf.Y(float(n), x)
+        except Exception:
+            yn = None
 
         # Werte für Plot-Punkte
         xs = [round(0.1 * i, 2) for i in range(1, 51)]
-        j_vals = [bf.J(xi) for xi in xs]
+        j_vals = [bf.J(float(n), xi) for xi in xs]
 
         return jsonify({'result': {
             'n': n, 'x': x,
             'J_n_x': float(jn),
-            'Y_n_x': float(yn) if not np.isinf(yn) else None,
+            'Y_n_x': float(yn) if yn is not None and not np.isinf(yn) else None,
             'plot_x': xs,
             'plot_J': [float(v) for v in j_vals],
-            'zeros_approx': bf.zeros(3) if hasattr(bf, 'zeros') else [],
+            'zeros_approx': bf.zeros(float(n), 3) if hasattr(bf, 'zeros') else [],
             'description': f'Bessel-Funktion J_{n}({x}) = {float(jn):.6f}'
         }})
     except Exception as e:
@@ -5738,10 +5849,12 @@ def api_special_legendre():
         lp = LegendrePolynomials()
         pn = lp.P(n, x)
 
-        # Erste n+1 Polynome als symbolische Ausdrücke
+        # Erste Polynome an verschiedenen Punkten auswerten (kein symbolic-Attribut)
         polys = []
         for k in range(min(n + 1, 6)):
-            polys.append({'degree': k, 'formula': str(lp.symbolic(k))})
+            # Werte an einigen Stützpunkten
+            sample_vals = [(xi/4 - 1.0, round(lp.P(k, xi/4 - 1.0), 5)) for xi in range(5)]
+            polys.append({'degree': k, 'formula': f'P_{k}(x)', 'sample_values': sample_vals})
 
         return jsonify({'result': {
             'n': n, 'x': x,
@@ -5769,10 +5882,21 @@ def api_special_gamma():
         zeta_vals = riemann_zeta_special_values()
         erf = error_function_properties()
 
+        # numpy-Typen in Python-Standardtypen konvertieren
+        def np_safe(obj):
+            """Konvertiert numpy-Typen in JSON-serialisierbare Python-Typen."""
+            if hasattr(obj, 'item'):  # numpy scalar → Python
+                return obj.item()
+            if isinstance(obj, dict):
+                return {k: np_safe(v) for k, v in obj.items()}
+            if isinstance(obj, (list, tuple)):
+                return [np_safe(v) for v in obj]
+            return obj
+
         return jsonify({'result': {
-            'gamma_properties': props,
-            'zeta_special_values': zeta_vals,
-            'error_function': erf
+            'gamma_properties': np_safe(props),
+            'zeta_special_values': np_safe(zeta_vals),
+            'error_function': np_safe(erf)
         }})
     except Exception as e:
         return error_response(str(e))
@@ -5804,12 +5928,14 @@ def api_functional_banach():
         p_map = {'1': 1, '2': 2, 'inf': float('inf')}
         p = p_map.get(norm_type, 2)
 
-        bs = BanachSpace(dimension=len(vectors[0]), p=p)
+        # BanachSpace(vectors, norm_func)
+        norm_func = lambda v: float(np.linalg.norm(v, ord=p))
+        bs = BanachSpace(vectors, norm_func)
         norms = [bs.norm(v) for v in vectors]
 
         # Dreiecksungleichung prüfen
         v1, v2 = np.array(vectors[0]), np.array(vectors[1])
-        triangle_lhs = float(bs.norm((v1 + v2).tolist()))
+        triangle_lhs = float(norm_func((v1 + v2).tolist()))
         triangle_rhs = float(norms[0]) + float(norms[1])
 
         hahn_banach = hahn_banach_theorem_demo()
@@ -5845,7 +5971,10 @@ def api_functional_hilbert():
             return error_response("functional_analysis nicht verfügbar")
 
         vectors = data.get('vectors', [[1.0, 0.0], [0.0, 1.0]])
-        hs = HilbertSpace(dimension=len(vectors[0]))
+
+        # HilbertSpace(vectors, inner_product_func)
+        ip_func = lambda u, v: float(np.dot(np.array(u), np.conj(np.array(v))))
+        hs = HilbertSpace(vectors, ip_func)
 
         # Skalarprodukte berechnen
         inner_products = []
@@ -5974,11 +6103,18 @@ def api_pde_heat():
         N = len(u0)
 
         # Explizites Finite-Differenzen-Verfahren
-        u_final, u_history = heat_equation_explicit(u0, L, T, alpha, N_t=50)
+        # heat_equation_explicit(u0, L, T, alpha, nx, nt) → np.ndarray
+        # heat_equation_explicit gibt (nt+1) × (nx+1)-Array zurück; letzte Zeile = Endzustand
+        u_hist = heat_equation_explicit(u0_list, L, T, alpha, nx=N, nt=200)
+        u_final = u_hist[-1] if u_hist.ndim == 2 else u_hist
 
         # Analytische Lösung zum Vergleich
+        # heat_equation_analytical(x, t, L, n_terms) – kein alpha-Parameter
         x_arr = np.linspace(0, L, N)
-        u_analytical = heat_equation_analytical(x_arr, T, alpha, L, n_terms=10)
+        try:
+            u_analytical = heat_equation_analytical(x_arr, T, L, n_terms=10)
+        except Exception:
+            u_analytical = None
 
         return jsonify({'result': {
             'u0': u0_list,
@@ -6019,10 +6155,16 @@ def api_pde_wave():
         N = len(u0)
 
         # Explizites Finite-Differenzen-Verfahren
-        u_final, _ = wave_equation_explicit(u0, v0, L, T, c, N_t=100)
+        # wave_equation_explicit(u0, u0_t, L, T, c, nx, nt) → np.ndarray
+        # wave_equation_explicit gibt (nt+1) × (nx+1)-Array zurück; letzte Zeile = Endzustand
+        u_hist = wave_equation_explicit(u0_list, v0_list, L, T, c, nx=N, nt=200)
+        u_final = u_hist[-1] if u_hist.ndim == 2 else u_hist
 
         x_arr = np.linspace(0, L, N)
-        u_analytical = wave_equation_analytical(x_arr, T, c, L, n_terms=10)
+        try:
+            u_analytical = wave_equation_analytical(x_arr, T, c, L, n_terms=10)
+        except Exception:
+            u_analytical = None
 
         return jsonify({'result': {
             'u0': u0_list,
@@ -6055,10 +6197,23 @@ def api_opalg_cstar():
         gns = gns_construction_demo()
         cuntz = cuntz_algebra_demo()
 
+        # complex-Zahlen in str konvertieren (nicht JSON-serialisierbar)
+        def complex_safe(obj):
+            """Konvertiert complex und numpy-Typen in JSON-serialisierbare Typen."""
+            if isinstance(obj, complex):
+                return {'real': obj.real, 'imag': obj.imag, 'str': str(obj)}
+            if hasattr(obj, 'item'):
+                return obj.item()
+            if isinstance(obj, dict):
+                return {k: complex_safe(v) for k, v in obj.items()}
+            if isinstance(obj, (list, tuple)):
+                return [complex_safe(v) for v in obj]
+            return obj
+
         return jsonify({'result': {
-            'gelfand_transform': gelfand,
-            'gns_construction': gns,
-            'cuntz_algebra': cuntz,
+            'gelfand_transform': complex_safe(gelfand),
+            'gns_construction': complex_safe(gns),
+            'cuntz_algebra': complex_safe(cuntz),
             'description': 'C*-Algebra: Banach-*-Algebra mit ||a*a|| = ||a||²'
         }})
     except Exception as e:
@@ -6542,6 +6697,362 @@ def api_analysisadv_operator_algebra():
         return error_response(str(e))
 
 
+
+
+# ===========================================================================
+# API: Algebraische Geometrie (algebraic_geometry.py)
+# ===========================================================================
+
+try:
+    from algebraic_geometry import (
+        AffineVariety, ProjectiveVariety, HilbertBasisTheorem,
+        NullstellensatzDemo, EllipticCurveGeometry, IntersectionTheory,
+        compute_groebner_basis, ideal_radical
+    )
+    _alg_geom_available = True
+except ImportError:
+    _alg_geom_available = False
+
+
+@app.route('/api/algebraic_geometry/groebner', methods=['POST'])
+def api_alg_geom_groebner():
+    """@brief Gröbner-Basis berechnen. @lastModified 2026-03-10"""
+    if not _alg_geom_available:
+        return error_response('Modul algebraic_geometry nicht verfügbar')
+    try:
+        data = request.get_json()
+        gen_strs = data.get('generators', ['x**2 - y', 'x - 1'])
+        var_strs = data.get('variables', ['x', 'y'])
+        import sympy
+        variables = [sympy.Symbol(v) for v in var_strs]
+        generators = [sympy.sympify(g) for g in gen_strs]
+        gb = compute_groebner_basis(generators, variables)
+        return jsonify({'title': 'Gröbner-Basis', 'generators': gen_strs,
+                        'variables': var_strs, 'groebner_basis': [str(p) for p in gb], 'size': len(gb)})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/algebraic_geometry/nullstellensatz', methods=['POST'])
+def api_alg_geom_nullstellensatz():
+    """@brief Hilbert'scher Nullstellensatz. @lastModified 2026-03-10"""
+    if not _alg_geom_available:
+        return error_response('Modul algebraic_geometry nicht verfügbar')
+    try:
+        data = request.get_json()
+        gen_strs = data.get('generators', ['x**2 + 1'])
+        var_strs = data.get('variables', ['x'])
+        import sympy
+        variables = [sympy.Symbol(v) for v in var_strs]
+        generators = [sympy.sympify(g) for g in gen_strs]
+        nss = NullstellensatzDemo()
+        result = nss.weak_nullstellensatz(generators, variables)
+        return jsonify({'title': 'Nullstellensatz', **result})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/algebraic_geometry/elliptic_curve', methods=['POST'])
+def api_alg_geom_elliptic():
+    """@brief Elliptische Kurve y² = x³ + ax + b. @lastModified 2026-03-10"""
+    if not _alg_geom_available:
+        return error_response('Modul algebraic_geometry nicht verfügbar')
+    try:
+        data = request.get_json()
+        a = float(data.get('a', -1)); b = float(data.get('b', 1)); p = int(data.get('p', 7))
+        ec = EllipticCurveGeometry(a, b)
+        pts = ec.rational_points_mod_p(p)
+        return jsonify({'title': f'Kurve y²=x³+{a}x+{b}', 'a': a, 'b': b,
+                        'discriminant': ec.discriminant(), 'j_invariant': ec.j_invariant(),
+                        'is_smooth': ec.is_smooth(), 'mod_p': p,
+                        'num_points': len(pts), 'points': [str(pt) for pt in pts[:20]]})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/algebraic_geometry/intersection', methods=['POST'])
+def api_alg_geom_intersection():
+    """@brief Bézout-Theorem. @lastModified 2026-03-10"""
+    if not _alg_geom_available:
+        return error_response('Modul algebraic_geometry nicht verfügbar')
+    try:
+        data = request.get_json()
+        d1 = int(data.get('d1', 2)); d2 = int(data.get('d2', 3))
+        it = IntersectionTheory()
+        result = it.bezout_theorem(d1, d2)
+        return jsonify({'title': f'Bézout: Grad {d1} ∩ Grad {d2}', **result})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Lie-Gruppen (lie_groups.py)
+# ===========================================================================
+
+try:
+    from lie_groups import (
+        SO, SU, GL, LieAlgebra, ExponentialMap,
+        classify_simple_lie_algebra, exceptional_lie_algebras_info,
+        fundamental_representation_su2, cartan_matrix
+    )
+    _lie_available = True
+except ImportError:
+    _lie_available = False
+
+
+@app.route('/api/lie_groups/so_rotation', methods=['POST'])
+def api_lie_so_rotation():
+    """@brief SO(n)-Rotation. @lastModified 2026-03-10"""
+    if not _lie_available:
+        return error_response('Modul lie_groups nicht verfügbar')
+    try:
+        import numpy as np
+        data = request.get_json()
+        n = int(data.get('n', 3)); theta = float(data.get('theta', 1.5707963))
+        so = SO(n)
+        R = so.rotation_2d(theta) if n == 2 else so.rotation_3d_z(theta)
+        return jsonify({'title': f'SO({n}) θ={theta:.4f}', 'n': n, 'theta': theta,
+                        'is_element': bool(so.is_element(R)), 'matrix': R.tolist(),
+                        'determinant': float(np.linalg.det(R))})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/lie_groups/lie_bracket', methods=['POST'])
+def api_lie_bracket():
+    """@brief Lie-Klammer [X,Y]. @lastModified 2026-03-10"""
+    if not _lie_available:
+        return error_response('Modul lie_groups nicht verfügbar')
+    try:
+        import numpy as np
+        data = request.get_json()
+        X = np.array(data.get('X', [[0, -1], [1, 0]]), dtype=float)
+        Y = np.array(data.get('Y', [[0, 1], [1, 0]]), dtype=float)
+        la = LieAlgebra([X, Y])
+        bracket = la.bracket(X, Y)
+        return jsonify({'title': 'Lie-Klammer [X, Y]', 'bracket': bracket.tolist(),
+                        'killing_form': float(la.killing_form(X, Y)),
+                        'is_semisimple': la.is_semisimple()})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/lie_groups/exponential_map', methods=['POST'])
+def api_lie_exp_map():
+    """@brief exp(X) berechnen. @lastModified 2026-03-10"""
+    if not _lie_available:
+        return error_response('Modul lie_groups nicht verfügbar')
+    try:
+        import numpy as np
+        data = request.get_json()
+        X = np.array(data.get('X', [[0, -1.5707963], [1.5707963, 0]]), dtype=float)
+        em = ExponentialMap()
+        exp_X = em.exp_map(X)
+        return jsonify({'title': 'exp(X)', 'X': X.tolist(), 'exp_X': exp_X.tolist(),
+                        'determinant': float(np.linalg.det(exp_X))})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/lie_groups/classification', methods=['GET'])
+def api_lie_classification():
+    """@brief Cartan-Klassifikation. @lastModified 2026-03-10"""
+    if not _lie_available:
+        return error_response('Modul lie_groups nicht verfügbar')
+    try:
+        info = exceptional_lie_algebras_info()
+        return jsonify({'title': 'Cartan-Klassifikation', 'exceptional': info,
+                        'classical_types': {'A_n': 'su(n+1)', 'B_n': 'so(2n+1)',
+                                            'C_n': 'sp(2n)', 'D_n': 'so(2n)'}})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Stochastische Prozesse (stochastic.py)
+# ===========================================================================
+
+try:
+    from stochastic import (
+        MarkovChain, BrownianMotion, StochasticDifferentialEquation,
+        ErgodicTheory, PoissonProcess, random_walk_1d, gambler_ruin_probability
+    )
+    _stochastic_available = True
+except ImportError:
+    _stochastic_available = False
+
+
+@app.route('/api/stochastic/markov_chain', methods=['POST'])
+def api_stoch_markov():
+    """@brief Markov-Kette analysieren. @lastModified 2026-03-10"""
+    if not _stochastic_available:
+        return error_response('Modul stochastic nicht verfügbar')
+    try:
+        data = request.get_json()
+        P = data.get('transition_matrix', [[0.7, 0.3], [0.4, 0.6]])
+        n_steps = int(data.get('n_steps', 10))
+        mc = MarkovChain(P)
+        stat = mc.stationary_distribution()
+        sim = mc.simulate(0, n_steps, seed=42)
+        return jsonify({'title': 'Markov-Kette', 'transition_matrix': P,
+                        'stationary_distribution': stat.tolist() if hasattr(stat, 'tolist') else list(stat),
+                        'simulation': sim.tolist() if hasattr(sim, 'tolist') else list(sim),
+                        'is_ergodic': mc.is_ergodic()})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/stochastic/brownian_motion', methods=['POST'])
+def api_stoch_brownian():
+    """@brief Brownsche Bewegung. @lastModified 2026-03-10"""
+    if not _stochastic_available:
+        return error_response('Modul stochastic nicht verfügbar')
+    try:
+        data = request.get_json()
+        T = float(data.get('T', 1.0)); n_steps = int(data.get('n_steps', 100))
+        n_paths = int(data.get('n_paths', 3))
+        bm = BrownianMotion()
+        t_vals, paths = bm.simulate(T, n_steps, n_paths=n_paths, seed=42)
+        return jsonify({'title': f'Brownsche Bewegung T={T}',
+                        'T': T, 'n_steps': n_steps, 'n_paths': n_paths,
+                        't_values': t_vals.tolist(),
+                        'paths': paths.tolist() if hasattr(paths, 'tolist') else paths})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/stochastic/sde', methods=['POST'])
+def api_stoch_sde():
+    """@brief Geometrische Brownsche Bewegung. @lastModified 2026-03-10"""
+    if not _stochastic_available:
+        return error_response('Modul stochastic nicht verfügbar')
+    try:
+        data = request.get_json()
+        mu = float(data.get('mu', 0.1)); sigma = float(data.get('sigma', 0.2))
+        S0 = float(data.get('S0', 100.0)); T = float(data.get('T', 1.0))
+        sde = StochasticDifferentialEquation()
+        t_vals, paths = sde.geometric_brownian_motion(mu, sigma, S0, T, 200)
+        return jsonify({'title': f'GBM μ={mu} σ={sigma}', 'mu': mu, 'sigma': sigma,
+                        'S0': S0, 'T': T, 't_values': t_vals.tolist(),
+                        'paths': paths.tolist() if hasattr(paths, 'tolist') else paths})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/stochastic/ergodic', methods=['POST'])
+def api_stoch_ergodic():
+    """@brief Logistische Abbildung / Ergodentheorie. @lastModified 2026-03-10"""
+    if not _stochastic_available:
+        return error_response('Modul stochastic nicht verfügbar')
+    try:
+        data = request.get_json()
+        r = float(data.get('r', 3.9)); x0 = float(data.get('x0', 0.5))
+        n_iter = int(data.get('n_iter', 200))
+        et = ErgodicTheory()
+        orbit = et.logistic_map(r, x0, n_iter)
+        lyap = et.lyapunov_exponent(r, x0, n_iter)
+        time_avg = et.time_average(orbit)
+        orb_list = orbit[:20].tolist() if hasattr(orbit, 'tolist') else list(orbit[:20])
+        return jsonify({'title': f'Logistische Abbildung r={r}', 'r': r, 'x0': x0,
+                        'orbit_first_20': orb_list, 'time_average': float(time_avg),
+                        'lyapunov_exponent': float(lyap), 'is_chaotic': float(lyap) > 0})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Differentialtopologie (differential_topology.py)
+# ===========================================================================
+
+try:
+    from differential_topology import (
+        DifferentialForm, DeRhamCohomology, MorseTheory,
+        TransversalityTheory, SphereTopology,
+        whitney_embedding_dimension, compute_jacobian,
+        hairy_ball_theorem_demo, poincare_hopf_theorem_demo
+    )
+    _diff_top_available = True
+except ImportError:
+    _diff_top_available = False
+
+
+@app.route('/api/differential_topology/differential_form', methods=['POST'])
+def api_diff_top_form():
+    """@brief Differentialform + äußere Ableitung. @lastModified 2026-03-10"""
+    if not _diff_top_available:
+        return error_response('Modul differential_topology nicht verfügbar')
+    try:
+        data = request.get_json()
+        coeff_strs = data.get('coefficients', ['x*y', 'x**2'])
+        var_strs = data.get('variables', ['x', 'y'])
+        degree = int(data.get('degree', 1))
+        import sympy
+        variables = [sympy.Symbol(v) for v in var_strs]
+        coefficients = [sympy.sympify(c) for c in coeff_strs]
+        form = DifferentialForm(degree, coefficients, variables)
+        d_form = form.exterior_derivative()
+        return jsonify({'title': f'{degree}-Form', 'coefficients': coeff_strs,
+                        'exterior_derivative': str(d_form), 'is_closed': form.is_closed()})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/differential_topology/morse_theory', methods=['POST'])
+def api_diff_top_morse():
+    """@brief Morse-Index berechnen. @lastModified 2026-03-10"""
+    if not _diff_top_available:
+        return error_response('Modul differential_topology nicht verfügbar')
+    try:
+        import sympy
+        data = request.get_json()
+        f_str = data.get('function', 'x**2 + y**2')
+        var_strs = data.get('variables', ['x', 'y'])
+        variables = [sympy.Symbol(v) for v in var_strs]
+        f_expr = sympy.sympify(f_str)
+        mt = MorseTheory()
+        crit_pts = mt.morse_function_critical_points(f_expr, variables)
+        results = [{'point': str(pt), 'morse_index': mt.morse_index(f_expr, pt, variables)}
+                   for pt in crit_pts[:5]]
+        return jsonify({'title': f'Morse: f={f_str}', 'function': f_str,
+                        'critical_points': results,
+                        'is_morse_function': mt.is_morse_function(f_expr, variables)})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/differential_topology/cohomology', methods=['POST'])
+def api_diff_top_cohom():
+    """@brief de Rham-Betti-Zahlen. @lastModified 2026-03-10"""
+    if not _diff_top_available:
+        return error_response('Modul differential_topology nicht verfügbar')
+    try:
+        data = request.get_json()
+        space = data.get('space', 'sphere'); n = int(data.get('n', 2))
+        dr = DeRhamCohomology()
+        betti = dr.betti_numbers_sphere(n) if space == 'sphere' else dr.betti_numbers_torus(n)
+        return jsonify({'title': f'de Rham: {n}-{space}', 'space': space, 'n': n,
+                        'betti_numbers': betti, 'euler_characteristic': dr.euler_characteristic(betti)})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/differential_topology/sphere', methods=['POST'])
+def api_diff_top_sphere():
+    """@brief n-Sphäre Topologie. @lastModified 2026-03-10"""
+    if not _diff_top_available:
+        return error_response('Modul differential_topology nicht verfügbar')
+    try:
+        data = request.get_json()
+        n = int(data.get('n', 2))
+        sph = SphereTopology(n)
+        return jsonify({'title': f'S^{n}', 'n': n, 'is_orientable': sph.is_orientable(),
+                        'whitney_dim': whitney_embedding_dimension(n),
+                        'homotopy_groups': sph.homotopy_groups_low(n),
+                        'homology_groups': sph.homology_groups(n),
+                        'hairy_ball': hairy_ball_theorem_demo()})
+    except Exception as e:
+        return error_response(str(e))
+
 # ===========================================================================
 # HAUPTPROGRAMM
 # ===========================================================================
@@ -6555,3 +7066,4 @@ if __name__ == '__main__':
     print("  URL: http://localhost:8080")
     print("=" * 60)
     app.run(host='0.0.0.0', port=8080, debug=True)
+# Diese Zeile wird nie erreicht, aber Python braucht etwas hier
