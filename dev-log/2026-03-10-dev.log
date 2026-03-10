@@ -414,3 +414,17 @@
 - Tabelle: Krümmungen aller implementierten Mannigfaltigkeiten
 - Verbindungen zur ART, Quantenfeldtheorie, algebraischen Topologie
 - Gaußscher Bonnet-Satz, Holonomie, musical isomorphisms
+
+2026-03-10 $(date +%H:%M:%S) [Build 15] formal_proof.py erstellt
+  - ProofStatus (Enum): 6 Status-Werte (UNVERIFIED, VERIFIED_SYMBOLIC, VERIFIED_NUMERIC, ASSUMED, FAILED, PENDING)
+  - ProofStep (Dataclass): verify_symbolic() via SymPy simplify, verify_numeric() für Testwerte
+  - ProofChain: assume/step/numeric_step/conclude, status_summary, to_text, to_html (Farbkodierung)
+  - InductionProof (erbt ProofChain): verify_base_case, verify_induction_empirically, prove_by_symbolic_induction
+  - ContradictionProof (erbt ProofChain): negate, derive_contradiction, qed
+  - TheoremRegistry: register/get/list_theorems/load_classics (5 klassische Sätze)
+  - Vorgefertigte Beweise: prove_gauss_sum, prove_sqrt2_irrational, prove_infinitely_many_primes,
+    prove_fermat_little_theorem, riemann_hypothesis_evidence, goldbach_evidence
+  - tests/test_formal_proof.py: ~60 Tests in 10 Klassen
+  - webapp/app.py: 5 neue Routen (/proofs, /api/proof/gauss_sum, sqrt2, primes_infinite, rh_evidence, induction_check)
+  - webapp/templates/proofs.html: Interaktives Beweise-Interface mit Induktions-Tester
+  - webapp/templates/base.html: Navigations-Link "⊢ Beweise" eingefügt

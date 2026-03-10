@@ -1,0 +1,526 @@
+{% extends "base.html" %}
+{#
+    @file proofs.html
+    @brief Seite für formale mathematische Beweise.
+    @description
+        Zeigt klassische mathematische Beweise mit Farbkodierung:
+        - Grün (✓): Symbolisch via SymPy verifiziert
+        - Blaugrün (~): Numerisch für endlich viele Fälle verifiziert
+        - Gelb (⊢): Als Axiom/Voraussetzung angenommen
+        - Orange (?): Ausstehend / offene Vermutung
+        - Rot (✗): Verifikation fehlgeschlagen
+        - Grau (○): Noch nicht geprüft
+
+        Enthält interaktiven Induktions-Tester für die Gaußsche Summenformel.
+    @author Kurt Ingwer
+    @date 2026-03-10
+#}
+
+{% block title %}⊢ Formale Beweise — Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>⊢ Formale Beweise</h1>
+    <p class="page-subtitle">
+        Strukturierte mathematische Beweise mit symbolischer und numerischer Verifikation.
+        <br>
+        Farblegende:
+        <span class="badge badge-symbolic">✓ Symbolisch</span>
+        <span class="badge badge-numeric">~ Numerisch</span>
+        <span class="badge badge-assumed">⊢ Annahme</span>
+        <span class="badge badge-pending">? Ausstehend</span>
+        <span class="badge badge-failed">✗ Fehlgeschlagen</span>
+    </p>
+</div>
+
+<!-- ===== BEWEISE-AUSWAHL ===== -->
+<div class="proof-selector">
+    <button class="btn btn-primary" onclick="loadProof('gauss_sum')">
+        Gaußsche Summe
+    </button>
+    <button class="btn btn-secondary" onclick="loadProof('sqrt2')">
+        √2 irrational
+    </button>
+    <button class="btn btn-secondary" onclick="loadProof('primes_infinite')">
+        ∞ Primzahlen
+    </button>
+    <button class="btn btn-secondary" onclick="loadProof('rh_evidence')">
+        Riemann-Hypothese
+    </button>
+</div>
+
+<!-- ===== BEWEIS-ANZEIGE ===== -->
+<div class="card" id="proof-display-card" style="display:none">
+    <div class="card-header">
+        <span id="proof-display-title">Beweis</span>
+        <span id="proof-strength-badge" class="badge">—</span>
+    </div>
+    <div class="card-body">
+        <!-- Status-Zusammenfassung -->
+        <div id="proof-summary" class="proof-meta-summary" style="display:none">
+            <span class="meta-item">Schritte: <strong id="meta-total">0</strong></span>
+            <span class="meta-item">Verifiziert: <strong id="meta-verified">0</strong></span>
+            <span class="meta-item">Symbolisch: <strong id="meta-symbolic">0</strong></span>
+            <span class="meta-item">Numerisch: <strong id="meta-numeric">0</strong></span>
+            <span class="meta-item">Vollständig: <strong id="meta-complete">–</strong></span>
+        </div>
+
+        <!-- HTML-Beweisanzeige (vom Backend gerendert) -->
+        <div id="proof-html-content">
+            <!-- Hier wird der Beweis-HTML eingefügt -->
+        </div>
+
+        <!-- Lade-Spinner -->
+        <div id="proof-loading" style="display:none" class="loading-indicator">
+            ⏳ Beweis wird berechnet...
+        </div>
+    </div>
+</div>
+
+<!-- ===== INTERAKTIVER INDUKTIONS-TESTER ===== -->
+<div class="card">
+    <div class="card-header">
+        🔬 Interaktiver Induktions-Tester: Gaußsche Summenformel
+    </div>
+    <div class="card-body">
+        <p class="formula-description">
+            Prüfe die Formel $\displaystyle\sum_{k=1}^{n} k = \frac{n(n+1)}{2}$ für ein beliebiges $n$:
+        </p>
+        <div class="input-row">
+            <label for="induction-n">Wert von $n$:</label>
+            <input type="number" id="induction-n" value="10" min="1" max="10000"
+                   class="math-input" style="width:120px">
+            <button class="btn btn-primary" onclick="checkInduction()">
+                P(n) prüfen
+            </button>
+        </div>
+        <div id="induction-result" class="result-container"></div>
+    </div>
+</div>
+
+<!-- ===== THEORIE-ERKLÄRUNG ===== -->
+<div class="card">
+    <div class="card-header">📚 Über Beweismethoden</div>
+    <div class="card-body">
+        <div class="theory-grid">
+            <!-- Vollständige Induktion -->
+            <div class="theory-block">
+                <h3>Vollständige Induktion</h3>
+                <p>
+                    Beweist eine Aussage $P(n)$ für alle $n \geq n_0$:
+                </p>
+                <ol>
+                    <li><strong>Basisfall:</strong> $P(n_0)$ ist wahr</li>
+                    <li><strong>IV:</strong> Annahme $P(n)$ ist wahr</li>
+                    <li><strong>Schritt:</strong> $P(n) \Rightarrow P(n+1)$</li>
+                    <li><strong>Schluss:</strong> $P(n)$ gilt $\forall n \geq n_0$</li>
+                </ol>
+            </div>
+            <!-- Widerspruchsbeweis -->
+            <div class="theory-block">
+                <h3>Widerspruchsbeweis (Reductio ad absurdum)</h3>
+                <p>
+                    Beweist $A$ durch Widerlegung von $\neg A$:
+                </p>
+                <ol>
+                    <li><strong>Annahme:</strong> $\neg A$ gilt</li>
+                    <li><strong>Ableitung:</strong> Aus $\neg A$ folgt $B$</li>
+                    <li><strong>Widerspruch:</strong> $B$ widerspricht bekannter Tatsache</li>
+                    <li><strong>Schluss:</strong> $\neg A$ ist falsch, also $A$ wahr</li>
+                </ol>
+            </div>
+            <!-- Symbolische Verifikation -->
+            <div class="theory-block">
+                <h3>Symbolische Verifikation (SymPy)</h3>
+                <p>
+                    Prüft algebraische Identitäten durch:
+                    $$\text{simplify}(L - R) = 0 \Leftrightarrow L = R$$
+                </p>
+                <p>
+                    Stark für algebraische Umformungen, begrenzt für
+                    komplexe analytische Aussagen.
+                </p>
+            </div>
+            <!-- Numerische Evidenz -->
+            <div class="theory-block">
+                <h3>Numerische Evidenz</h3>
+                <p>
+                    Prüft $P(n)$ für $n \in \{n_0, \ldots, n_{\max}\}$.
+                </p>
+                <p class="warning-note">
+                    ⚠ Kein vollständiger Beweis — nur Evidenz für endlich viele Fälle!
+                    $P(n)$ könnte für große $n$ falsch sein.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<style>
+    /* ===== PROOF-SPEZIFISCHE STILE ===== */
+
+    /* Farbkodierung der Beweisschritte */
+    .proof-container {
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+    }
+
+    .proof-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: var(--ctp-lavender, #b4befe);
+    }
+
+    .proof-description {
+        color: var(--ctp-subtext0, #a6adc8);
+        margin-bottom: 1rem;
+        font-family: inherit;
+        font-size: 0.85rem;
+    }
+
+    .proof-steps {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .proof-step {
+        padding: 0.4rem 0.6rem;
+        margin: 0.2rem 0;
+        border-radius: 4px;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        border-left: 3px solid transparent;
+    }
+
+    /* Symbolisch verifiziert: Grün */
+    .proof-symbolic {
+        background: rgba(166, 227, 161, 0.12);
+        border-left-color: #a6e3a1;
+        color: #a6e3a1;
+    }
+
+    /* Numerisch verifiziert: Blaugrün */
+    .proof-numeric {
+        background: rgba(148, 226, 213, 0.12);
+        border-left-color: #94e2d5;
+        color: #94e2d5;
+    }
+
+    /* Annahme: Gelb */
+    .proof-assumed {
+        background: rgba(249, 226, 175, 0.10);
+        border-left-color: #f9e2af;
+        color: #f9e2af;
+    }
+
+    /* Fehlgeschlagen: Rot */
+    .proof-failed {
+        background: rgba(243, 139, 168, 0.12);
+        border-left-color: #f38ba8;
+        color: #f38ba8;
+    }
+
+    /* Ausstehend: Orange */
+    .proof-pending {
+        background: rgba(250, 179, 135, 0.12);
+        border-left-color: #fab387;
+        color: #fab387;
+    }
+
+    /* Unverifiziert: Grau */
+    .proof-unverified {
+        background: rgba(166, 173, 200, 0.08);
+        border-left-color: #6c7086;
+        color: #a6adc8;
+    }
+
+    .proof-status-icon {
+        font-weight: bold;
+        min-width: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .proof-statement {
+        flex: 1;
+    }
+
+    .proof-justification {
+        color: rgba(166, 173, 200, 0.6);
+        font-size: 0.82rem;
+        font-style: italic;
+        flex-shrink: 0;
+    }
+
+    .proof-summary {
+        margin-top: 1rem;
+        padding: 0.5rem;
+        background: rgba(49, 50, 68, 0.5);
+        border-radius: 4px;
+        font-size: 0.85rem;
+        color: #cdd6f4;
+    }
+
+    /* Badges für Farblegende */
+    .badge {
+        padding: 0.15rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .badge-symbolic { background: rgba(166,227,161,0.2); color: #a6e3a1; }
+    .badge-numeric  { background: rgba(148,226,213,0.2); color: #94e2d5; }
+    .badge-assumed  { background: rgba(249,226,175,0.2); color: #f9e2af; }
+    .badge-pending  { background: rgba(250,179,135,0.2); color: #fab387; }
+    .badge-failed   { background: rgba(243,139,168,0.2); color: #f38ba8; }
+
+    /* Beweis-Selektor */
+    .proof-selector {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Meta-Zusammenfassung */
+    .proof-meta-summary {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        color: #a6adc8;
+    }
+
+    .meta-item strong {
+        color: #cdd6f4;
+    }
+
+    /* Stärke-Badges in der Karte */
+    #proof-strength-badge {
+        font-size: 0.8rem;
+        padding: 0.1rem 0.5rem;
+        border-radius: 10px;
+    }
+
+    /* Induktions-Tester */
+    .formula-description {
+        margin-bottom: 0.8rem;
+        font-size: 0.95rem;
+    }
+
+    .warning-note {
+        background: rgba(250, 179, 135, 0.1);
+        border-left: 3px solid #fab387;
+        padding: 0.5rem 0.8rem;
+        border-radius: 0 4px 4px 0;
+        font-size: 0.85rem;
+        color: #fab387;
+    }
+
+    /* Theorie-Grid */
+    .theory-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+
+    .theory-block {
+        background: rgba(49, 50, 68, 0.5);
+        border-radius: 6px;
+        padding: 1rem;
+    }
+
+    .theory-block h3 {
+        color: #b4befe;
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .theory-block ol {
+        margin: 0.5rem 0 0 1.2rem;
+        font-size: 0.85rem;
+        color: #a6adc8;
+    }
+
+    .theory-block ol li {
+        margin-bottom: 0.3rem;
+    }
+
+    /* Lade-Indikator */
+    .loading-indicator {
+        text-align: center;
+        padding: 2rem;
+        color: #a6adc8;
+        font-size: 1rem;
+    }
+
+    /* Induktions-Ergebnis */
+    #induction-result .result-success {
+        padding: 1rem;
+        border-radius: 6px;
+    }
+
+    .induction-valid {
+        background: rgba(166, 227, 161, 0.12);
+        border: 1px solid rgba(166, 227, 161, 0.3);
+        color: #a6e3a1;
+        padding: 1rem;
+        border-radius: 6px;
+        font-family: 'Courier New', monospace;
+    }
+
+    .induction-invalid {
+        background: rgba(243, 139, 168, 0.12);
+        border: 1px solid rgba(243, 139, 168, 0.3);
+        color: #f38ba8;
+        padding: 1rem;
+        border-radius: 6px;
+    }
+</style>
+
+<script>
+    /**
+     * Lädt einen Beweis über die API und zeigt ihn an.
+     * @param {string} proofId - ID des Beweises ('gauss_sum', 'sqrt2', ...)
+     */
+    async function loadProof(proofId) {
+        // Karte einblenden und Inhalt zurücksetzen
+        const card = document.getElementById('proof-display-card');
+        const content = document.getElementById('proof-html-content');
+        const loading = document.getElementById('proof-loading');
+        const summary = document.getElementById('proof-summary');
+
+        card.style.display = '';
+        content.innerHTML = '';
+        loading.style.display = '';
+        summary.style.display = 'none';
+
+        try {
+            // API-Anfrage senden
+            const response = await fetch(`/api/proof/${proofId}`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP ${response.status}`);
+            }
+
+            // Beweis-Titel setzen
+            document.getElementById('proof-display-title').textContent =
+                '⊢ ' + (data.theorem || 'Beweis');
+
+            // Stärke-Badge aktualisieren (falls summary vorhanden)
+            if (data.summary) {
+                const badge = document.getElementById('proof-strength-badge');
+                const strengthMap = {
+                    'symbolic': { text: '✓ Symbolisch', cls: 'badge-symbolic' },
+                    'numeric':  { text: '~ Numerisch',  cls: 'badge-numeric'  },
+                    'informal': { text: '○ Informell',  cls: 'badge-assumed'  },
+                    'failed':   { text: '✗ Fehlgeschl.', cls: 'badge-failed' },
+                };
+                const s = data.summary.strength || 'informal';
+                const info = strengthMap[s] || { text: s, cls: '' };
+                badge.textContent = info.text;
+                badge.className = `badge ${info.cls}`;
+
+                // Meta-Werte befüllen
+                document.getElementById('meta-total').textContent = data.summary.total_steps || 0;
+                document.getElementById('meta-verified').textContent = data.summary.verified || 0;
+                document.getElementById('meta-symbolic').textContent = data.summary.symbolic || 0;
+                document.getElementById('meta-numeric').textContent = data.summary.numeric || 0;
+                document.getElementById('meta-complete').textContent =
+                    data.summary.is_complete ? 'Ja ✓' : 'Nein ✗';
+                summary.style.display = 'flex';
+            }
+
+            // HTML-Inhalt einfügen (vom Backend gerendert)
+            content.innerHTML = data.html || '<p>Kein Inhalt</p>';
+
+            // KaTeX auf neu geladene Inhalte anwenden
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(content, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ]
+                });
+            }
+
+        } catch (err) {
+            content.innerHTML = `<div class="result-error">⚠ Fehler: ${err.message}</div>`;
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+
+    /**
+     * Prüft die Gaußsche Summenformel für einen Eingabewert n.
+     * Sendet POST an /api/proof/induction_check.
+     */
+    async function checkInduction() {
+        const n = parseInt(document.getElementById('induction-n').value);
+        const container = document.getElementById('induction-result');
+
+        // Eingabe validieren
+        if (isNaN(n) || n < 1) {
+            container.innerHTML = '<div class="result-error">⚠ Bitte eine positive Ganzzahl eingeben.</div>';
+            return;
+        }
+
+        container.innerHTML = '<div class="loading-indicator">⏳ Prüfe...</div>';
+
+        try {
+            const response = await fetch('/api/proof/induction_check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ n: n })
+            });
+            const data = await response.json();
+
+            if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+
+            if (data.is_valid) {
+                container.innerHTML = `
+                    <div class="induction-valid">
+                        <strong>✓ P(${n}) ist WAHR!</strong><br>
+                        ${data.formula}<br><br>
+                        <em>Linke Seite:</em> Σ(k=1..${n}) k = <strong>${data.lhs}</strong><br>
+                        <em>Rechte Seite:</em> ${n}·(${n}+1)/2 = <strong>${data.rhs}</strong>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="induction-invalid">
+                        <strong>✗ P(${n}) ist FALSCH!</strong><br>
+                        LHS = ${data.lhs} ≠ RHS = ${data.rhs}
+                    </div>
+                `;
+            }
+
+            // KaTeX auf neuen Inhalt anwenden
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(container, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ]
+                });
+            }
+
+        } catch (err) {
+            container.innerHTML = `<div class="result-error">⚠ Fehler: ${err.message}</div>`;
+        }
+    }
+
+    // Beim Laden: Gaußschen Beweis direkt anzeigen
+    window.addEventListener('load', () => {
+        loadProof('gauss_sum');
+    });
+</script>
+{% endblock %}

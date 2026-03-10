@@ -2045,6 +2045,130 @@ def steps_prime_factorization():
 
 
 # ===========================================================================
+# FORMALE BEWEISE — Routen für Beweisinfrastruktur
+# ===========================================================================
+
+@app.route('/proofs')
+def proofs_page():
+    """
+    @brief Seite für formale Beweise.
+    @description Zeigt alle klassischen Beweise mit Schrittanzeige und
+                 interaktivem Induktions-Tester.
+    @date 2026-03-10
+    """
+    return render_template('proofs.html')
+
+
+@app.route('/api/proof/gauss_sum', methods=['GET'])
+def proof_gauss_sum():
+    """
+    @brief API-Endpunkt: Beweis der Gaußschen Summenformel.
+    @description Gibt Theorem, Schritte, Zusammenfassung und HTML-Darstellung zurück.
+    @return JSON mit theorem, steps, summary und html
+    @date 2026-03-10
+    """
+    try:
+        from formal_proof import prove_gauss_sum
+        proof = prove_gauss_sum()
+        summary = proof.status_summary()
+        return jsonify({
+            'theorem': proof.theorem,
+            'steps': [str(s) for s in proof.steps],
+            'summary': summary,
+            'html': proof.to_html()
+        })
+    except Exception as e:
+        return error_response(f"Gauß-Beweis Fehler: {str(e)}")
+
+
+@app.route('/api/proof/sqrt2', methods=['GET'])
+def proof_sqrt2():
+    """
+    @brief API-Endpunkt: Irrationalitätsbeweis von √2.
+    @description Gibt Theorem, Schritte und HTML des Widerspruchsbeweises zurück.
+    @return JSON mit theorem, steps und html
+    @date 2026-03-10
+    """
+    try:
+        from formal_proof import prove_sqrt2_irrational
+        proof = prove_sqrt2_irrational()
+        return jsonify({
+            'theorem': proof.theorem,
+            'steps': [str(s) for s in proof.steps],
+            'html': proof.to_html()
+        })
+    except Exception as e:
+        return error_response(f"√2-Beweis Fehler: {str(e)}")
+
+
+@app.route('/api/proof/primes_infinite', methods=['GET'])
+def proof_primes_infinite():
+    """
+    @brief API-Endpunkt: Euklids Beweis unendlich vieler Primzahlen.
+    @description Gibt Theorem, Schritte und HTML des Widerspruchsbeweises zurück.
+    @return JSON mit theorem, steps und html
+    @date 2026-03-10
+    """
+    try:
+        from formal_proof import prove_infinitely_many_primes
+        proof = prove_infinitely_many_primes()
+        return jsonify({
+            'theorem': proof.theorem,
+            'steps': [str(s) for s in proof.steps],
+            'html': proof.to_html()
+        })
+    except Exception as e:
+        return error_response(f"Primzahlen-Beweis Fehler: {str(e)}")
+
+
+@app.route('/api/proof/rh_evidence', methods=['GET'])
+def proof_rh_evidence():
+    """
+    @brief API-Endpunkt: Empirische Evidenz für die Riemann-Hypothese.
+    @description Gibt Theorem, Schritte, Zusammenfassung und HTML zurück.
+    @return JSON mit theorem, steps, summary und html
+    @date 2026-03-10
+    """
+    try:
+        from formal_proof import riemann_hypothesis_evidence
+        proof = riemann_hypothesis_evidence()
+        return jsonify({
+            'theorem': proof.theorem,
+            'steps': [str(s) for s in proof.steps],
+            'summary': proof.status_summary(),
+            'html': proof.to_html()
+        })
+    except Exception as e:
+        return error_response(f"Riemann-Evidenz Fehler: {str(e)}")
+
+
+@app.route('/api/proof/induction_check', methods=['POST'])
+def proof_induction_check():
+    """
+    @brief API-Endpunkt: Interaktiver Induktions-Tester für Gaußsche Summe.
+    @description Prüft P(n): Σ(k=1..n) k = n(n+1)/2 für eine gegebene Zahl n.
+    @request JSON mit {'n': int}
+    @return JSON mit n, lhs, rhs, is_valid
+    @date 2026-03-10
+    """
+    try:
+        data = request.get_json()
+        n = int(data.get('n', 1))
+        # Gaußsche Summe für n prüfen
+        lhs = sum(range(1, n + 1))           # Direkte Summe
+        rhs = n * (n + 1) // 2              # Gaußsche Formel
+        return jsonify({
+            'n': n,
+            'lhs': lhs,
+            'rhs': rhs,
+            'is_valid': lhs == rhs,
+            'formula': f"Σ(k=1..{n}) k = {lhs} = {n}·{n+1}/2 = {rhs}"
+        })
+    except Exception as e:
+        return error_response(f"Induktions-Test Fehler: {str(e)}")
+
+
+# ===========================================================================
 # HAUPTPROGRAMM
 # ===========================================================================
 
@@ -2053,7 +2177,7 @@ if __name__ == '__main__':
     # Port 8080, debug=True für Entwicklung (zeigt Fehler im Browser)
     print("=" * 60)
     print("  Mathematik-Spezialist Web-Interface")
-    print("  Build 14 | Port 8080")
+    print("  Build 15 | Port 8080")
     print("  URL: http://localhost:8080")
     print("=" * 60)
     app.run(host='0.0.0.0', port=8080, debug=True)
