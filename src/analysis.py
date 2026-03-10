@@ -156,6 +156,12 @@ def numerical_integral(f: Callable[[float], float], a: float, b: float, n: int =
     @param n Anzahl der Teilintervalle (muss gerade sein, Standard: SIMPSON_N aus config.py).
     @return Näherungswert des Integrals.
     @date 2026-03-05
+
+    Beispiele:
+    >>> round(numerical_integral(lambda x: x**2, 0, 1), 4)
+    0.3333
+    >>> round(numerical_integral(lambda x: 1, 0, 5), 4)
+    5.0
     """
     # Sicherstellen dass n gerade ist (Anforderung der Simpson-Regel)
     if n % 2 != 0:
@@ -259,6 +265,12 @@ def bisection(f: Callable[[float], float], a: float, b: float, tol: float = BISE
     @return Näherungswert der Nullstelle.
     @raises ValueError Wenn kein Vorzeichenwechsel in [a, b] vorliegt.
     @date 2026-03-05
+
+    Beispiele:
+    >>> round(bisection(lambda x: x - 1, 0, 2), 4)
+    1.0
+    >>> abs(bisection(lambda x: x**2 - 4, 0, 3) - 2.0) < 1e-6
+    True
     """
     fa = f(a)
     fb = f(b)

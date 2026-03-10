@@ -48,6 +48,16 @@ def is_prime(n: int) -> bool:
     @return True wenn n eine Primzahl ist, sonst False.
     @author Kurt Ingwer
     @lastModified 2026-03-10
+
+    Beispiele:
+    >>> is_prime(7)
+    True
+    >>> is_prime(4)
+    False
+    >>> is_prime(2)
+    True
+    >>> is_prime(1)
+    False
     """
     if n < 2:
         return False
@@ -89,6 +99,14 @@ def prime_factorization(n: int) -> dict[int, int]:
     @return Dictionary {primzahl: exponent}.
     @author Kurt Ingwer
     @lastModified 2026-03-10
+
+    Beispiele:
+    >>> prime_factorization(12)
+    {2: 2, 3: 1}
+    >>> prime_factorization(360)
+    {2: 3, 3: 2, 5: 1}
+    >>> prime_factorization(7)
+    {7: 1}
     """
     factors = {}
 
@@ -138,6 +156,14 @@ def euler_phi(n: int) -> int:
     @return phi(n) - Anzahl der teilerfremden Zahlen.
     @author Kurt Ingwer
     @lastModified 2026-03-10
+
+    Beispiele:
+    >>> euler_phi(12)
+    4
+    >>> euler_phi(7)
+    6
+    >>> euler_phi(1)
+    1
     """
     if n == 1:
         return 1

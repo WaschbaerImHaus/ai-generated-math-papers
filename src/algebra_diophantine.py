@@ -178,6 +178,12 @@ def solve_pythagorean_triples(n: int) -> list[tuple[int, int, int]]:
     @return Sortierte Liste von (a, b, c) Tupeln mit a < b < c.
     @author Kurt Ingwer
     @lastModified 2026-03-10
+
+    Beispiele:
+    >>> solve_pythagorean_triples(20)
+    [(3, 4, 5), (5, 12, 13), (8, 15, 17)]
+    >>> solve_pythagorean_triples(5)
+    [(3, 4, 5)]
     """
     triples = []
 
@@ -339,6 +345,14 @@ def is_quadratic_residue(a: int, p: int) -> bool:
     @return True wenn a ein quadratischer Rest mod p ist.
     @author Kurt Ingwer
     @lastModified 2026-03-10
+
+    Beispiele:
+    >>> is_quadratic_residue(2, 7)
+    True
+    >>> is_quadratic_residue(3, 7)
+    False
+    >>> is_quadratic_residue(1, 5)
+    True
     """
     a = a % p
     # 0 ist kein quadratischer Rest im üblichen Sinne

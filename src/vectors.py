@@ -61,6 +61,12 @@ class Vector:
         @return Skalarprodukt v · w.
         @raises ValueError Bei unterschiedlichen Dimensionen.
         @date 2026-03-05
+
+        Beispiele:
+        >>> Vector([1, 0, 0]).dot(Vector([0, 1, 0]))
+        0
+        >>> Vector([1, 2, 3]).dot(Vector([4, 5, 6]))
+        32
         """
         if self.dim != other.dim:
             raise ValueError(f"Dimensionen passen nicht: {self.dim} vs {other.dim}")
@@ -75,6 +81,12 @@ class Vector:
 
         @return Euklidische Länge des Vektors.
         @date 2026-03-05
+
+        Beispiele:
+        >>> Vector([3, 4]).norm()
+        5.0
+        >>> Vector([1, 0, 0]).norm()
+        1.0
         """
         return math.sqrt(self.dot(self))
 

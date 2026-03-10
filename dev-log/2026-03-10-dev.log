@@ -276,3 +276,32 @@
 - build.txt: 13 → 14
 - app.py: Build 12 → Build 13 (API-health)
 - base.html: Build 12 → Build 13
+
+---
+
+2026-03-10 - Build 14: Doctests, OPTIMIZE.md-Überarbeitung, run_doctests.sh
+
+## Doctests eingefügt (Aufgabe 1)
+- algebra_core.py: gcd(), lcm(), mod_inverse(), solve_linear(), solve_quadratic(), Polynomial.evaluate()
+- algebra_numbertheory.py: is_prime(), prime_factorization(), euler_phi()
+- algebra_diophantine.py: solve_pythagorean_triples(), is_quadratic_residue()
+- vectors.py: Vector.dot(), Vector.norm()
+- analysis.py: numerical_integral(), bisection()
+- statistics_math.py: mean(), median(), variance()
+- graph_theory.py: binomial_coefficient(), bell_numbers(), catalan_number()
+- topology.py: euclidean_metric(), manhattan_metric(), euler_characteristic_polygon()
+- Alle 8 Dateien: python3 -m doctest *.py → EXIT:0 (keine Fehler)
+
+## OPTIMIZE.md neu strukturiert (Aufgabe 2)
+- Erledigte Punkte mit [x] markiert (Build 1–13)
+- Offene Punkte übersichtlich gegliedert nach Kategorie
+- Neue Optimierungsideen aus Code-Review hinzugefügt:
+  - Fallback-Logging in _safe_parse()
+  - euler_phi() könnte prime_factorization() wiederverwenden
+  - Hybridmethode Bisection+Newton (Brent-Algorithmus)
+  - Einheitlicher Docblock-Stil (:param vs @param)
+  - Zentrales Test-Discovery-Skript
+
+## Neue Datei: debugging/run_doctests.sh (Aufgabe 3)
+- Durchläuft alle *.py in src/, führt python3 -m doctest aus
+- Farbige Ausgabe (grün/rot), Gesamtstatistik, Exit-Code 0/1

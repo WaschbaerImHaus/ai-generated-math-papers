@@ -1,18 +1,29 @@
 """
-Statistik-Modul für das specialist-maths Projekt.
+@file statistics_math.py
+@brief Statistik-Modul für das specialist-maths Projekt.
+@description
+    Enthält deskriptive Statistik, Wahrscheinlichkeitsverteilungen,
+    Hypothesentests, Bayes-Theorem und Monte-Carlo-Simulation.
 
-Enthält deskriptive Statistik, Wahrscheinlichkeitsverteilungen,
-Hypothesentests, Bayes-Theorem und Monte-Carlo-Simulation.
+    Implementierte Funktionen:
+    - Deskriptive Statistik: mean, median, mode, variance, std_dev,
+      quartiles, iqr, skewness, kurtosis
+    - Normalverteilung: PDF, CDF, PPF (Quantilfunktion)
+    - Binomialverteilung: PMF, CDF
+    - Poisson-Verteilung: PMF, CDF
+    - Hypothesentests: t-Test (ein/zwei Stichproben), Chi-Quadrat-Test
+    - Bayes-Theorem
+    - Monte-Carlo-Simulation: Pi-Schätzung
 
-Autor: Kurt Ingwer
-Erstellt: 2026-03-05
-Letzte Änderung: 2026-03-09
+@author Kurt Ingwer
+@date 2026-03-05
+@lastModified 2026-03-10
 """
 
 import math
 import random
 import numpy as np
-from typing import List, Tuple
+from typing import Any
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -269,7 +280,7 @@ def _chi2_cdf(x: float, df: int) -> float:
 # Deskriptive Statistik
 # ─────────────────────────────────────────────────────────────────────────────
 
-def mean(data: List[float]) -> float:
+def mean(data: list[float]) -> float:
     """
     Berechnet den arithmetischen Mittelwert einer Datenmenge.
 
@@ -281,6 +292,12 @@ def mean(data: List[float]) -> float:
     :return: Arithmetischer Mittelwert
     :raises ValueError: Bei leerer Liste
     :last_modified: 2026-03-09
+
+    Beispiele:
+    >>> mean([1, 2, 3, 4, 5])
+    3.0
+    >>> mean([10, 20])
+    15.0
     """
     if not data:
         raise ValueError("Datenliste darf nicht leer sein")
@@ -288,7 +305,7 @@ def mean(data: List[float]) -> float:
     return float(np.mean(data))
 
 
-def median(data: List[float]) -> float:
+def median(data: list[float]) -> float:
     """
     Berechnet den Median (Zentralwert) einer Datenmenge.
 
@@ -298,6 +315,12 @@ def median(data: List[float]) -> float:
     :return: Median
     :raises ValueError: Bei leerer Liste
     :last_modified: 2026-03-05
+
+    Beispiele:
+    >>> median([1, 2, 3])
+    2.0
+    >>> median([1, 3, 5, 7])
+    4.0
     """
     if not data:
         raise ValueError("Datenliste darf nicht leer sein")
@@ -310,7 +333,7 @@ def median(data: List[float]) -> float:
     return float(sorted_data[mid])
 
 
-def mode(data: List[float]) -> List[float]:
+def mode(data: list[Any]) -> list[Any]:
     """
     Berechnet den/die Modalwert(e) einer Datenmenge.
 
@@ -332,7 +355,7 @@ def mode(data: List[float]) -> List[float]:
     return [k for k, v in freq.items() if v == max_freq]
 
 
-def variance(data: List[float], ddof: int = 1) -> float:
+def variance(data: list[float], ddof: int = 1) -> float:
     """
     Berechnet die Varianz einer Datenmenge.
 
@@ -347,6 +370,12 @@ def variance(data: List[float], ddof: int = 1) -> float:
     :return: Varianz
     :raises ValueError: Bei zu wenigen Datenpunkten
     :last_modified: 2026-03-09
+
+    Beispiele:
+    >>> round(variance([2, 4, 4, 4, 5, 5, 7, 9]), 4)
+    4.5714
+    >>> variance([1, 1, 1], ddof=0)
+    0.0
     """
     n = len(data)
     if n <= ddof:

@@ -101,6 +101,14 @@ class Polynomial:
         @param x Der Auswertungspunkt.
         @return Wert des Polynoms an der Stelle x.
         @date 2026-03-05
+
+        Beispiele:
+        >>> Polynomial([1, 0, -1]).evaluate(2)
+        3
+        >>> Polynomial([1, -3, 2]).evaluate(1)
+        0
+        >>> Polynomial([1, -3, 2]).evaluate(2)
+        0
         """
         # Horner-Schema: Von links beginnend akkumulieren
         result = 0
@@ -244,6 +252,14 @@ def solve_linear(a: float, b: float) -> float | str:
     @raises ValueError Wenn keine oder unendlich viele Lösungen existieren.
     @author Kurt Ingwer
     @lastModified 2026-03-10
+
+    Beispiele:
+    >>> solve_linear(2, -6)
+    3.0
+    >>> solve_linear(5, -10)
+    2.0
+    >>> solve_linear(3, -9)
+    3.0
     """
     if a == 0:
         if b == 0:
@@ -282,6 +298,14 @@ def solve_quadratic(a: float, b: float, c: float) -> list[complex]:
     @raises ValueError Wenn a = 0.
     @author Kurt Ingwer
     @lastModified 2026-03-10
+
+    Beispiele:
+    >>> solve_quadratic(1, -3, 2)
+    [2.0, 1.0]
+    >>> solve_quadratic(1, 0, -4)
+    [2.0, -2.0]
+    >>> len(solve_quadratic(1, 0, 1))  # komplexe Wurzeln
+    2
     """
     if a == 0:
         raise ValueError("a darf nicht 0 sein (dann ist es keine quadratische Gleichung)")
@@ -328,6 +352,14 @@ def gcd(a: int, b: int) -> int:
     @return ggT(a, b), immer >= 0.
     @author Kurt Ingwer
     @lastModified 2026-03-10
+
+    Beispiele:
+    >>> gcd(12, 8)
+    4
+    >>> gcd(0, 5)
+    5
+    >>> gcd(7, 13)
+    1
     """
     # Negative Zahlen behandeln
     a, b = abs(a), abs(b)
@@ -352,6 +384,14 @@ def lcm(a: int, b: int) -> int:
     @return kgV(a, b).
     @author Kurt Ingwer
     @lastModified 2026-03-10
+
+    Beispiele:
+    >>> lcm(4, 6)
+    12
+    >>> lcm(3, 5)
+    15
+    >>> lcm(0, 7)
+    0
     """
     if a == 0 or b == 0:
         return 0
@@ -406,6 +446,14 @@ def mod_inverse(a: int, m: int) -> int:
     @raises ValueError Wenn ggT(a, m) != 1 (kein Inverses existiert).
     @author Kurt Ingwer
     @lastModified 2026-03-10
+
+    Beispiele:
+    >>> mod_inverse(3, 7)
+    5
+    >>> mod_inverse(2, 9)
+    5
+    >>> (3 * mod_inverse(3, 7)) % 7
+    1
     """
     g, x, _ = extended_gcd(a % m, m)
     if g != 1:

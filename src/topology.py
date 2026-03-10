@@ -28,6 +28,12 @@ def euclidean_metric(x: list[float], y: list[float]) -> float:
     @param x Erster Punkt als Liste von Koordinaten.
     @param y Zweiter Punkt als Liste von Koordinaten.
     @return Euklidischer Abstand als float.
+
+    Beispiele:
+    >>> euclidean_metric([0, 0], [3, 4])
+    5.0
+    >>> euclidean_metric([0, 0, 0], [1, 0, 0])
+    1.0
     """
     # Summe der quadratischen Differenzen berechnen, dann Wurzel ziehen
     return math.sqrt(sum((xi - yi) ** 2 for xi, yi in zip(x, y)))
@@ -48,6 +54,12 @@ def manhattan_metric(x: list[float], y: list[float]) -> float:
     @param x Erster Punkt als Liste von Koordinaten.
     @param y Zweiter Punkt als Liste von Koordinaten.
     @return Manhattan-Abstand als float.
+
+    Beispiele:
+    >>> manhattan_metric([0, 0], [3, 4])
+    7
+    >>> manhattan_metric([1, 2], [4, 6])
+    7
     """
     # Summe aller absoluten Koordinatendifferenzen
     return sum(abs(xi - yi) for xi, yi in zip(x, y))
@@ -731,6 +743,12 @@ def euler_characteristic_polygon(n_vertices: int, n_edges: int, n_faces: int) ->
     @param n_edges Anzahl der Kanten E.
     @param n_faces Anzahl der Flächen F.
     @return Euler-Charakteristik als int.
+
+    Beispiele:
+    >>> euler_characteristic_polygon(8, 12, 6)
+    2
+    >>> euler_characteristic_polygon(4, 6, 4)
+    2
     """
     return n_vertices - n_edges + n_faces
 

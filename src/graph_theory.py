@@ -1289,6 +1289,14 @@ def binomial_coefficient(n: int, k: int) -> int:
     @param n Gesamtzahl.
     @param k Auswahl.
     @return Binomialkoeffizient als int.
+
+    Beispiele:
+    >>> binomial_coefficient(10, 3)
+    120
+    >>> binomial_coefficient(5, 0)
+    1
+    >>> binomial_coefficient(5, 5)
+    1
     """
     if k < 0 or k > n:
         return 0
@@ -1359,6 +1367,12 @@ def bell_numbers(n: int) -> list[int]:
 
     @param n Maximaler Index.
     @return Liste [B_0, B_1, ..., B_n].
+
+    Beispiele:
+    >>> bell_numbers(3)
+    [1, 1, 2, 5]
+    >>> bell_numbers(0)
+    [1]
     """
     if n < 0:
         return []
@@ -1392,6 +1406,14 @@ def catalan_number(n: int) -> int:
 
     @param n Index (n ≥ 0).
     @return Catalan-Zahl C_n.
+
+    Beispiele:
+    >>> catalan_number(5)
+    42
+    >>> catalan_number(0)
+    1
+    >>> catalan_number(4)
+    14
     """
     if n < 0:
         return 0
