@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 import pytest
 from analysis import (
     numerical_derivative, numerical_integral,
-    newton_raphson, bisection,
+    newton_raphson, bisection, brent_method,
     taylor_series, is_continuous
 )
 
@@ -143,6 +143,88 @@ class TestTaylorSeries:
         result = taylor_series(math.cos, center=0, degree=15, evaluate_at=math.pi/3)
         expected = math.cos(math.pi/3)
         assert abs(result - expected) < 1e-8
+
+
+class TestBrentMethod:
+    """
+    Tests für die Brent-Methode (Hybridverfahren aus Bisection + Sekante + IQI).
+    Die Brent-Methode kombiniert die Konvergenzsicherheit der Bisection
+    mit der Geschwindigkeit des Sekantenverfahrens und der IQI.
+    """
+
+    def test_brent_simple_root(self):
+        """x^2 - 2 hat die Wurzel sqrt(2) ≈ 1.41421356 im Intervall [1, 2]."""
+        f = lambda x: x**2 - 2
+        root = brent_method(f, 1.0, 2.0)
+        assert abs(root - math.sqrt(2)) < 1e-10, (
+            f"Erwartete Wurzel sqrt(2) ≈ {math.sqrt(2):.10f}, erhielt {root:.10f}"
+        )
+
+    def test_brent_known_root(self):
+        """sin(x) hat eine Nullstelle bei x = π ≈ 3.14159 im Intervall [3, 4]."""
+        root = brent_method(math.sin, 3.0, 4.0)
+        assert abs(root - math.pi) < 1e-10, (
+            f"Erwartete Nullstelle bei π ≈ {math.pi:.10f}, erhielt {root:.10f}"
+        )
+
+    def test_brent_negative_root(self):
+        """x^2 - 4 hat negative Wurzel x = -2 im Intervall [-3, -1]."""
+        f = lambda x: x**2 - 4
+        root = brent_method(f, -3.0, -1.0)
+        assert abs(root - (-2.0)) < 1e-10, (
+            f"Erwartete negative Wurzel -2.0, erhielt {root:.10f}"
+        )
+
+    def test_brent_close_bracket(self):
+        """Sehr enges Startintervall [1.4, 1.5] für Wurzel von x^2 - 2."""
+        f = lambda x: x**2 - 2
+        root = brent_method(f, 1.4, 1.5, tol=1e-12)
+        assert abs(root - math.sqrt(2)) < 1e-10, (
+            f"Enges Intervall: Erwartete sqrt(2) ≈ {math.sqrt(2):.12f}, erhielt {root:.12f}"
+        )
+
+    def test_brent_no_sign_change_raises(self):
+        """Wirft ValueError wenn f(a) und f(b) dasselbe Vorzeichen haben."""
+        f = lambda x: x**2 + 1  # Immer positiv – keine reelle Nullstelle
+        with pytest.raises(ValueError, match="Kein Vorzeichenwechsel"):
+            brent_method(f, 1.0, 3.0)
+
+    def test_brent_tolerance(self):
+        """Brent-Methode hält die angegebene Toleranz ein."""
+        f = lambda x: x**3 - x - 2  # Nullstelle bei ≈ 1.5214
+        tol = 1e-9
+        root = brent_method(f, 1.0, 2.0, tol=tol)
+        # Prüfen: f(root) ist nahe 0 und Nullstelle ist korrekt
+        assert abs(f(root)) < 1e-6, (
+            f"f(root) = {f(root):.2e} sollte kleiner als 1e-6 sein"
+        )
+
+    def test_brent_vs_bisection_same_root(self):
+        """Brent-Methode und Bisection finden dieselbe Nullstelle (cos(x) in [1, 2])."""
+        f = lambda x: math.cos(x)  # Nullstelle bei π/2 ≈ 1.5708 in [1, 2]
+        root_brent = brent_method(f, 1.0, 2.0, tol=1e-12)
+        root_bisection = bisection(f, 1.0, 2.0, tol=1e-12)
+        # Beide Ergebnisse sollten sehr nah beieinander liegen
+        assert abs(root_brent - root_bisection) < 1e-9, (
+            f"Brent: {root_brent:.12f}, Bisection: {root_bisection:.12f} "
+            f"– Differenz: {abs(root_brent - root_bisection):.2e}"
+        )
+        # Und beide nahe dem echten Wert π/2
+        assert abs(root_brent - math.pi / 2) < 1e-10
+
+    def test_brent_cubic(self):
+        """Kubisches Polynom x^3 - 6x^2 + 11x - 6 hat Wurzeln bei x=1, 2, 3."""
+        # Suche Nullstelle bei x = 3 im Intervall [2.5, 3.5]
+        f = lambda x: x**3 - 6 * x**2 + 11 * x - 6
+        root = brent_method(f, 2.5, 3.5, tol=1e-12)
+        assert abs(root - 3.0) < 1e-10, (
+            f"Erwartete Wurzel 3.0, erhielt {root:.12f}"
+        )
+        # Suche auch Wurzel bei x = 1 im Intervall [0.5, 1.5]
+        root2 = brent_method(f, 0.5, 1.5, tol=1e-12)
+        assert abs(root2 - 1.0) < 1e-10, (
+            f"Erwartete Wurzel 1.0, erhielt {root2:.12f}"
+        )
 
 
 if __name__ == '__main__':

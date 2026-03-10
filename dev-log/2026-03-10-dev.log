@@ -455,3 +455,25 @@
 - BSD-Vermutung (Mordell-Weil-Rang = L-Funktions-Nullstellenordnung)
 - Shimura-Taniyama-Wiles / Fermats Letzter Satz
 - Kongruente Zahlen / Tunnell-Theorem
+
+## 2026-03-10 – Build 19 – Brent-Methode
+
+### Implementiert: brent_method() in src/analysis.py
+- Hybridverfahren kombiniert Bisection + Sekante + Inverse Quadratische Interpolation (IQI)
+- Garantierte globale Konvergenz (wie Bisection), superlineare Nah-Konvergenz
+- Akzeptanzbedingungen nach Brent (1973): IQI/Sekante nur wenn ausreichend Fortschritt
+- Fallback auf Bisection bei: s außerhalb Bereich, Schritt zu groß, oder Erstschritt
+- Wirft ValueError bei fehlendem Vorzeichenwechsel, ConvergenceError bei Nichtkonvergenz
+- Type Hints: Callable[[float], float], vollständiger Doxygen-DocBlock
+
+### 8 neue Tests in tests/test_analysis.py (TestBrentMethod):
+- test_brent_simple_root: x²-2 → sqrt(2)
+- test_brent_known_root: sin(x) → π
+- test_brent_negative_root: x²-4 → -2
+- test_brent_close_bracket: enges Intervall [1.4, 1.5]
+- test_brent_no_sign_change_raises: ValueError-Prüfung
+- test_brent_tolerance: Toleranzeinhhaltung (x³-x-2)
+- test_brent_vs_bisection_same_root: cos(x) → π/2
+- test_brent_cubic: kubisches Polynom, 2 Nullstellen
+
+### Testergebnis: 26/26 ✓ (test_analysis.py)

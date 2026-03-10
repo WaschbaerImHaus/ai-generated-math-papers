@@ -321,6 +321,151 @@ def bisection(f: Callable[[float], float], a: float, b: float, tol: float = BISE
     return (a + b) / 2
 
 
+def brent_method(f: Callable[[float], float], a: float, b: float,
+                 tol: float = 1e-10, max_iter: int = 100) -> float:
+    """
+    @brief Brent-Methode zur Nullstellensuche – robustes Hybridverfahren.
+    @description
+        Die Brent-Methode (1973) kombiniert drei Verfahren:
+        1. Bisection (Intervallhalbierung) – garantiert Konvergenz
+        2. Sekanten-Methode – superlineare Konvergenz nahe der Nullstelle
+        3. Inverse quadratische Interpolation (IQI) – kubische Konvergenz
+
+        Algorithmus-Idee (nach Brent 1973):
+        - Halte immer [a, b] mit Vorzeichenwechsel (a ist der letzte Schritt, b der beste)
+        - Versuche IQI oder Sekantenverfahren (schneller Schritt s)
+        - Akzeptiere s nur, wenn er „genug Fortschritt" bringt:
+            * s liegt innerhalb von [(3a+b)/4, b]
+            * |s - b| < |b - b_prev| / 2  (nicht zu nah am letzten Schritt)
+            * (Erste Iteration oder b_prev == b_prev_prev) → Bisection
+        - Andernfalls Fallback auf Bisection
+        - Garantiert: mindestens so schnell wie Bisection, i.d.R. superlinear
+
+        Konvergenzeigenschaften:
+        - Worst-case: wie Bisection O(log((b-a)/tol)) Iterationen
+        - Normalfall: superlineare bis kubische Konvergenz
+        - Global konvergent (kein Divergenzrisiko wie bei Newton-Raphson)
+
+        Literatur: Brent, R.P. (1973). Algorithms for Minimization without
+        Derivatives. Prentice-Hall, Englewood Cliffs, NJ.
+
+    @param f Die Funktion, deren Nullstelle gesucht wird.
+    @param a Linke Intervallgrenze mit Vorzeichenwechsel zu b.
+    @param b Rechte Intervallgrenze (initialer bester Schätzwert).
+    @param tol Toleranz für die Nullstelle – Standard: 1e-10.
+    @param max_iter Maximale Iterationsanzahl – Standard: 100.
+    @return Näherungswert der Nullstelle.
+    @raises ValueError Wenn f(a) und f(b) dasselbe Vorzeichen haben.
+    @raises ConvergenceError Wenn keine Konvergenz innerhalb max_iter erreicht wird.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    fa = f(a)
+    fb = f(b)
+
+    # Voraussetzung: Vorzeichenwechsel zwischen a und b (Zwischenwertsatz)
+    if fa * fb > 0:
+        raise ValueError(
+            f"brent_method: Kein Vorzeichenwechsel in [{a}, {b}] "
+            f"(f({a})={fa:.4g}, f({b})={fb:.4g}). "
+            "f(a) und f(b) müssen verschiedene Vorzeichen haben."
+        )
+
+    # Exakte Nullstelle bereits an Intervallgrenzen?
+    if abs(fa) < tol:
+        return a
+    if abs(fb) < tol:
+        return b
+
+    # b ist immer der aktuell beste Schätzwert (|f(b)| ≤ |f(a)|)
+    # Falls nicht: a und b tauschen
+    if abs(fa) < abs(fb):
+        a, b = b, a
+        fa, fb = fb, fa
+
+    # c ist die vorherige Grenze des Intervalls (Sekantenverfahren: a → c)
+    c = a
+    fc = fa
+
+    # b_prev: voriger b-Wert (für Schritt-Größen-Kontrolle)
+    b_prev = a
+    # b_prev_prev: vorvorigier b-Wert (Erstiterations-Flag)
+    b_prev_prev = a
+    # Flags ob Bisection im letzten Schritt genutzt wurde
+    bisect_flag = True
+
+    for i in range(max_iter):
+        # Konvergenzcheck: Intervall kleiner als Toleranz
+        if abs(b - a) < tol or abs(fb) < tol:
+            return b
+
+        # --- Schritt berechnen: IQI oder Sekante ---
+        if abs(fa - fc) > 1e-15 and abs(fb - fc) > 1e-15:
+            # Inverse quadratische Interpolation (IQI):
+            # Durch drei Punkte (a, fa), (b, fb), (c, fc) ein
+            # quadratisches Polynom in f legen und nach x auflösen
+            # Formel: Lagrange-Interpolation invertiert
+            s = (a * fb * fc / ((fa - fb) * (fa - fc))
+                 + b * fa * fc / ((fb - fa) * (fb - fc))
+                 + c * fa * fb / ((fc - fa) * (fc - fb)))
+        else:
+            # Sekantenverfahren (nur 2 Punkte nötig):
+            # s = b - fb * (b - a) / (fb - fa)
+            s = b - fb * (b - a) / (fb - fa)
+
+        # --- Akzeptanzbedingungen für den schnellen Schritt s ---
+        # Berechne die Grenzen für die Bisection
+        mid = (a + b) / 2.0
+
+        # Bedingung 1: s liegt nicht im "akzeptierten" Bereich
+        # Akzeptierter Bereich: zwischen (3a+b)/4 und b
+        cond1 = not ((min(b, (3 * a + b) / 4) < s < max(b, (3 * a + b) / 4))
+                     or (min((3 * a + b) / 4, b) <= s <= max((3 * a + b) / 4, b)))
+
+        # Bedingung 2: Schritt ist nicht klein genug (relativ zum letzten Schritt)
+        cond2 = bisect_flag and abs(s - b) >= abs(b - b_prev) / 2
+
+        # Bedingung 3: Kein bisect im letzten Schritt und Schritt zu groß
+        cond3 = (not bisect_flag) and abs(s - b) >= abs(b_prev - b_prev_prev) / 2
+
+        # Bedingung 4: Bisect-Flag aktiv und b_prev == c (Erstschritt)
+        cond4 = bisect_flag and abs(b - a) < tol
+
+        # Wenn eine der Bedingungen verletzt: auf Bisection zurückfallen
+        if cond1 or cond2 or cond3 or cond4:
+            s = mid
+            bisect_flag = True
+        else:
+            bisect_flag = False
+
+        # --- Schritt auswerten ---
+        fs = f(s)
+
+        # b_prev_prev und b_prev aktualisieren (Verlaufshistorie für Schrittkontrolle)
+        b_prev_prev = b_prev
+        b_prev = b
+
+        # Neues Intervall bestimmen: Seite mit Vorzeichenwechsel behalten
+        if fa * fs < 0:
+            # Nullstelle liegt in [a, s] → b = s
+            b, fb = s, fs
+        else:
+            # Nullstelle liegt in [s, b] → a = s
+            a, fa = s, fs
+
+        # Sicherstellen dass |f(b)| ≤ |f(a)| (b = bester Schätzwert)
+        if abs(fa) < abs(fb):
+            a, b = b, a
+            fa, fb = fb, fa
+
+        # c (altes a) aktualisieren
+        c = a
+        fc = fa
+
+    # Keine Konvergenz innerhalb der maximalen Iterationsanzahl
+    raise ConvergenceError("Brent-Methode", max_iter, last_value=float(b))
+
+
 def taylor_series(f: Callable[[float], float], center: float, degree: int, evaluate_at: float) -> float:
     """
     @brief Berechnet die Taylor-Reihe einer Funktion symbolisch via SymPy.
