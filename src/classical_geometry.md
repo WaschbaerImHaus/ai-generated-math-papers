@@ -1,9 +1,6 @@
-# classical_geometry.py – Dokumentation
+# Modul: Klassische Geometrie (`classical_geometry.py`)
 
-**Autor:** Kurt Ingwer
-**Letzte Änderung:** 2026-03-10
-**Python:** 3.13.7
-**Abhängigkeiten:** numpy, math, itertools
+> **Autor:** Kurt Ingwer | **Letzte Änderung:** 2026-03-10 | **Python:** 3.13.7 | **Abhängigkeiten:** numpy, math, itertools
 
 ---
 

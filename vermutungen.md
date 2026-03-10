@@ -1,168 +1,152 @@
 # Unbewiesene und unwiderlegte mathematische Vermutungen
 
 > Sortiert nach geschätztem Alter der Vermutung (älteste zuerst).
-> Stand: 2026-03-10
-> Quellen: Wikipedia, MathWorld, Clay Mathematics Institute, AMS
+> Stand: 2026-03-10 | Quellen: Wikipedia, MathWorld, Clay Mathematics Institute, AMS
+
+## Kategorien-Legende (aus `vermutungen_analyse.md`)
+
+| Kat. | Bedeutung | Zeithorizont |
+|------|-----------|--------------|
+| 🟢 **A** | Hohe Wahrscheinlichkeit – klare Angriffspunkte, aktive Forschung | 10–50 Jahre |
+| 🟡 **B** | Mittlere Wahrscheinlichkeit – grundlegend neue Ideen nötig | 50–100 Jahre |
+| 🔴 **C** | Niedrige Wahrscheinlichkeit – möglicherweise unentscheidbar | >100 Jahre |
+| ⬛ **D** | Formal möglicherweise ZFC-unentscheidbar | Unbestimmbar |
+| ✓ | Bereits bewiesen | – |
+| – | Historisch / widerlegt | – |
 
 ---
 
 ## Antike (~600 v. Chr. – 500 n. Chr.)
 
-| # | Vermutung | Erstmals formuliert | Gebiet | Anmerkung |
-|---|-----------|--------------------|----|---|
-| 1 | **Euklids 5. Postulat** (Parallelenpostulat als notwendig) | ~300 v. Chr. | Geometrie | Wurde 1829–1832 durch Gauß/Bolyai/Lobatschewski widerlegt (nichteuklidische Geometrien existieren) – historisch interessant |
-| 2 | **Perfekte Zahlen sind gerade** | ~350 v. Chr. (Euklid) | Zahlentheorie | Kein ungerader perfekter Wert bekannt; Beweis offen |
-| 3 | **Es gibt unendlich viele vollkommene Zahlen** | ~350 v. Chr. | Zahlentheorie | Äquivalent zu: Unendlich viele Mersenne-Primzahlen |
+| # | Kat. | Vermutung | Jahr | Gebiet | Status/Anmerkung |
+|---|------|-----------|------|--------|------------------|
+| 1 | – | **Euklids 5. Postulat** (Parallelenpostulat) | ~300 v. Chr. | Geometrie | Widerlegt 1829–1832 (Gauß/Bolyai/Lobatschewski) |
+| 2 | 🟡 B | **Perfekte Zahlen sind gerade** | ~350 v. Chr. | Zahlentheorie | Kein ungerader perfekter Wert bekannt |
+| 3 | 🟡 B | **Unendlich viele vollkommene Zahlen** | ~350 v. Chr. | Zahlentheorie | Äquivalent zu: ∞ viele Mersenne-Primzahlen |
 
 ---
 
 ## Mittelalter & frühe Neuzeit (500 – 1700)
 
-| # | Vermutung | Erstmals formuliert | Gebiet | Anmerkung |
-|---|-----------|--------------------|----|---|
-| 4 | **Catalan-Vermutung** (nur 8,9 sind konsek. Primpotenzen) | 1844 (Catalan) | Zahlentheorie | Beweis: Mihailescu 2002 ✓ (historisch) |
-| 5 | **Fermat-Vermutung** (xⁿ+yⁿ=zⁿ hat keine ganzzahligen Lösungen für n>2) | 1637 (Fermat) | Zahlentheorie | Beweis: Wiles 1995 ✓ (historisch) |
+| # | Kat. | Vermutung | Jahr | Gebiet | Status/Anmerkung |
+|---|------|-----------|------|--------|------------------|
+| 4 | ✓ | **Catalan-Vermutung** (nur 8,9 konsek. Primpotenzen) | 1844 | Zahlentheorie | Beweis: Mihailescu 2002 |
+| 5 | ✓ | **Fermat-Vermutung** (xⁿ+yⁿ=zⁿ, n>2) | 1637 | Zahlentheorie | Beweis: Wiles 1995 |
 
 ---
 
-## 17. Jahrhundert
+## 17.–18. Jahrhundert
 
-| # | Vermutung | Jahr | Gebiet | Status |
-|---|-----------|------|--------|--------|
-| 6 | **Goldbach-Vermutung**: Jede gerade Zahl > 2 ist Summe zweier Primzahlen | 1742 | Zahlentheorie | **Offen** – verifiziert bis 4×10¹⁸ |
-| 7 | **Zwillingsprimzahl-Vermutung**: Unendlich viele Primzahlpaare (p, p+2) | ~1849 (de Polignac) | Zahlentheorie | **Offen** – Maynard/Zhang: Lücken < 246 |
-
----
-
-## 18. Jahrhundert
-
-| # | Vermutung | Jahr | Gebiet | Status |
-|---|-----------|------|--------|--------|
-| 8 | **Collatz-Vermutung** (3n+1): Jede positive ganze Zahl erreicht 1 | 1937 (Collatz) | Zahlentheorie/Dynamik | **Offen** – verifiziert bis ~2,95×10²⁰ |
-| 9 | **Legendres Vermutung**: Zwischen n² und (n+1)² liegt stets eine Primzahl | 1798 | Zahlentheorie | **Offen** |
-| 10 | **Brocard-Vermutung**: Zwischen pₙ² und pₙ₊₁² liegen mind. 4 Primzahlen | 1904 | Zahlentheorie | **Offen** |
+| # | Kat. | Vermutung | Jahr | Gebiet | Status/Anmerkung |
+|---|------|-----------|------|--------|------------------|
+| 6 | 🟢 A | **Goldbach-Vermutung**: Jede gerade Zahl > 2 = Summe zweier Primzahlen | 1742 | Zahlentheorie | Verifiziert bis 4×10¹⁸; Vinogradov: ternäre Form bewiesen |
+| 7 | 🟢 A | **Zwillingsprimzahl-Vermutung**: ∞ viele Primzahlpaare (p, p+2) | ~1849 | Zahlentheorie | Zhang (2013): Lücken <7×10⁷; Maynard: <246 |
+| 8 | 🔴 C | **Collatz-Vermutung** (3n+1 → 1) | 1937 | Zahlentheorie/Dynamik | Verifiziert bis 2,95×10²⁰; Conway: verallg. unentscheidbar |
+| 9 | 🟢 A | **Legendres Vermutung**: Zwischen n² und (n+1)² liegt stets eine Primzahl | 1798 | Zahlentheorie | Folgt aus Riemann-Hypothese; Bertrand ↔ n und 2n |
+| 10 | 🟢 A | **Brocard-Vermutung**: Zwischen pₙ² und pₙ₊₁² liegen ≥4 Primzahlen | 1904 | Zahlentheorie | Numerisch gut gestützt; unbewiesen |
 
 ---
 
 ## 19. Jahrhundert
 
-| # | Vermutung | Jahr | Gebiet | Status |
-|---|-----------|------|--------|--------|
-| 11 | **Riemann-Hypothese**: Alle nichttrivialen Nullstellen der Riemannschen ζ-Funktion liegen auf Re(s)=1/2 | 1859 (Riemann) | Analytische Zahlentheorie | **Offen** – Millennium-Problem (1M$) |
-| 12 | **Bertrand-Postulat** (verallgemeinert): Für n>1 existiert stets eine Primzahl zwischen n und 2n | 1845 | Zahlentheorie | Beweis: Tschebyschow 1850 ✓ |
-| 13 | **Hadamard/de la Vallée-Poussin**: Primzahlsatz | 1792 (Gauß, Vermutung) | Zahlentheorie | Beweis 1896 ✓ |
-| 14 | **Jacobi-Vermutung**: Kein Gegenbeispiel für n=2 zu Ax+By=0 ⟹ f bijektiv | 1939 | Algebraische Geometrie | **Offen** (allgemein für n≥2) |
-| 15 | **Schanuel-Vermutung**: Transzendenzzahltheorie – Rang-Vermutung | 1960er | Transzendenztheorie | **Offen** |
-| 16 | **abc-Vermutung**: Für cop. a+b=c: rad(abc)^(1+ε) > c für alle ε>0, bis auf endl. Ausnahmen | 1985 (Masser, Oesterlé) | Zahlentheorie | **Offen** – Mochizukis Beweis kontrovers |
-| 17 | **Birch & Swinnerton-Dyer-Vermutung**: Rang einer elliptischen Kurve = Nullstellenordnung der L-Funktion bei s=1 | 1965 | Elliptische Kurven | **Offen** – Millennium-Problem (1M$) |
+| # | Kat. | Vermutung | Jahr | Gebiet | Status/Anmerkung |
+|---|------|-----------|------|--------|------------------|
+| 11 | 🟡 B | **Riemann-Hypothese**: Nullstellen von ζ(s) auf Re(s)=1/2 | 1859 | Analytische ZT | Millennium-Problem (1M$); 10¹³ Nullstellen verifiziert |
+| 12 | ✓ | **Bertrand-Postulat**: Primzahl zwischen n und 2n | 1845 | Zahlentheorie | Beweis: Tschebyschow 1850 |
+| 13 | ✓ | **Primzahlsatz** π(x) ~ x/ln(x) | 1792 (Gauß) | Zahlentheorie | Beweis: Hadamard/de la Vallée-Poussin 1896 |
+| 14 | 🟡 B | **Jacobian-Vermutung**: Det(Jac f) = const ⟹ f bijektiv | 1939 | Alg. Geometrie | Für n=2 intensiv untersucht; n≥3 offen |
+| 15 | 🔴 C | **Schanuel-Vermutung**: Transzendenztranszendenz-Rang | 1960er | Transzendenztheorie | Impliziert Lindemann-Weierstraß; sehr grundlegend |
+| 16 | 🟡 B | **abc-Vermutung**: rad(abc)^(1+ε) > c fast immer | 1985 | Zahlentheorie | Mochizukis IUT-Beweis (2012) kontrovers |
+| 17 | 🟡 B | **Birch & Swinnerton-Dyer**: Rang ell. Kurve = Nullst.-Ordnung L(E,s) bei s=1 | 1965 | Ell. Kurven | Millennium-Problem (1M$); für Rang 0,1 bewiesen |
+| 18 | 🟢 A | **Artin-Vermutung** (primitive Wurzeln): a ≠ ±1,□ → ∞ viele Primzahlen | 1927 | Zahlentheorie | Hooley (1967): wahr unter GRH; aktive Forschung |
+| 19 | 🟡 B | **Lehmer-Vermutung**: Mahler-Maß ≥ Lehmer-Konstante | 1933 | Zahlentheorie | Engste bekannte Unterschranke aus Lehmer (1933) |
+| 20 | 🟡 B | **Bunyakovsky-Vermutung**: Irreduzible Polynome → ∞ viele Primzahlen | 1857 | Zahlentheorie | Spezialfall: Dirichlet-Satz (bewiesen) |
 
 ---
 
 ## 20. Jahrhundert (1900–1950)
 
-| # | Vermutung | Jahr | Gebiet | Status |
-|---|-----------|------|--------|--------|
-| 18 | **Hilbert-Probleme**: 23 offene Probleme | 1900 | Alle Gebiete | Mehrere noch offen |
-| 19 | **Poincaré-Vermutung** (3-Sphäre) | 1904 (Poincaré) | Topologie | Beweis: Perelman 2003 ✓ |
-| 20 | **Hodge-Vermutung**: Jede Hodge-Klasse ist rationale Linearkombination von algebraischen Zyklen | 1950 (Hodge) | Algebraische Geometrie | **Offen** – Millennium-Problem (1M$) |
-| 21 | **P ≠ NP**: Ist jedes effizient prüfbare Problem auch effizient lösbar? | 1971 (Cook/Levin) | Komplexitätstheorie | **Offen** – Millennium-Problem (1M$) |
-| 22 | **Navier-Stokes Glattheit**: Existenz und Eindeutigkeit glatter Lösungen | 1845/2000 | Partielle DGL | **Offen** – Millennium-Problem (1M$) |
-| 23 | **Yang-Mills Massenücke**: Beweis der Massenücke in Quantenfeldtheorie | 2000 | Math. Physik/Geometrie | **Offen** – Millennium-Problem (1M$) |
-| 24 | **Langlands-Programm**: Vereinheitlichung von Zahlentheorie und Geometrie | 1967 (Langlands) | Zahlentheorie/Geometrie | **Teilweise bewiesen** (Wiles, Taylor, Lafforgue) |
-| 25 | **Artin-Vermutung über primitive Wurzeln**: Jede ganze Zahl ≠ ±1, □ ist prim. Wurzel für ∞ viele Primzahlen | 1927 (Artin) | Zahlentheorie | **Offen** |
-| 26 | **Bateman-Horn-Vermutung**: Quantitative Primzahl-Vermutung für Polynome | 1962 | Zahlentheorie | **Offen** |
-| 27 | **Erdős-Straus-Vermutung**: 4/n = 1/x + 1/y + 1/z hat Lösungen für alle n≥2 | 1948 (Erdős) | Zahlentheorie | **Offen** – verifiziert bis 10¹⁴ |
-| 28 | **Beal-Vermutung**: Aˣ+Bʸ=Cᶻ (x,y,z>2) ⟹ A,B,C haben gemeinsamen Primteiler | 1997 (Beal) | Zahlentheorie | **Offen** |
-| 29 | **Cramér-Vermutung**: Maximale Primzahllücke bei p ~ (log p)² | 1936 (Cramér) | Zahlentheorie | **Offen** |
-| 30 | **Bunyakovsky-Vermutung**: Irreduzible Polynome liefern unendlich viele Primzahlen | 1857 | Zahlentheorie | **Offen** |
-| 31 | **Waring-Problem Verfeinerungen**: Optimale g(k) für alle k | 1770 | Additive Zahlentheorie | Teils gelöst, G(k) meist **offen** |
-| 32 | **Erdős-Szemerédi-Vermutung**: Summen- oder Produktmengen sind groß | 1983 | Kombinatorik/Zahlentheorie | **Offen** |
-| 33 | **Lonely Runner-Vermutung** | 1967 (Wills) | Kombinatorik | **Offen** für ≥7 Läufer |
-| 34 | **Hadwiger-Vermutung**: Jeder Graph ohne Kₙ-Minor ist (n-1)-färbbar | 1943 | Graphentheorie | **Offen** für n≥7 |
-| 35 | **Graceful Tree-Vermutung**: Jeder Baum ist anmutig | 1966 (Kotzig/Rosa) | Graphentheorie | **Offen** |
-| 36 | **Erdős–Gallai-Vermutung** (Primzahlen als Summen) | 1959 | Kombinatorik | **Offen** |
-| 37 | **Turán-Vermutung über Nullstellen der ζ-Funktion** | 1948 | Analysis | **Offen** |
-| 38 | **Uniformisierungsvermutung** für höhere Dimensionen | Versch. | Topologie | **Offen** |
-| 39 | **Novikov-Vermutung**: Rationale Poincaré-Dualität unter Homotopieäquivalenz | 1965 | Topologie | **Offen** (allgemein) |
-| 40 | **Baum-Connes-Vermutung**: K-Theorie von C*-Algebren | 1982 | Operator-Algebren | **Offen** (allgemein) |
-| 41 | **Farrell-Jones-Vermutung** | 1993 | Topologie/Algebra | **Offen** (allgemein) |
+| # | Kat. | Vermutung | Jahr | Gebiet | Status/Anmerkung |
+|---|------|-----------|------|--------|------------------|
+| 21 | ✓ | **Poincaré-Vermutung** (3-Sphäre) | 1904 | Topologie | Beweis: Perelman 2003 |
+| 22 | 🟡 B | **Hodge-Vermutung** (algebraische Zyklen) | 1950 | Alg. Geometrie | Millennium-Problem (1M$); komplex-analytische Methoden |
+| 23 | 🔴 C | **P ≠ NP** | 1971 | Komplexitätstheorie | Millennium-Problem (1M$); möglicherweise ZFC-unentscheidbar |
+| 24 | 🟡 B | **Navier-Stokes Glattheit** | 1845/2000 | Partielle DGL | Millennium-Problem (1M$); 2D gelöst; 3D offen |
+| 25 | 🟡 B | **Yang-Mills Massenücke** | 2000 | Math. Physik | Millennium-Problem (1M$); erfordert neue QFT-Mathematik |
+| 26 | 🟢 A | **Langlands-Programm** | 1967 | ZT/Geometrie | Teilweise bewiesen: Wiles, Taylor, Lafforgue, Ngô |
+| 27 | 🟡 B | **Bateman-Horn-Vermutung** (Primzahlen aus Polynomen) | 1962 | Zahlentheorie | Verallgemeinerung vieler Primzahlvermutungen |
+| 28 | 🟢 A | **Erdős-Straus-Vermutung**: 4/n = 1/x+1/y+1/z | 1948 | Zahlentheorie | Verifiziert bis 10¹⁴; beweisbar für Restklassen |
+| 29 | 🟡 B | **Beal-Vermutung**: Aˣ+Bʸ=Cᶻ → gcd(A,B,C)>1 | 1997 | Zahlentheorie | Verallgemeinerung von Fermat |
+| 30 | 🟡 B | **Cramér-Vermutung**: Primzahllücke ~ (log p)² | 1936 | Zahlentheorie | Granville: Faktor 2·e^{−γ} nötig |
+| 31 | 🟡 B | **Waring-Problem**: Optimale G(k) für alle k | 1770 | Add. ZT | g(k) bekannt; G(k) größtenteils offen |
+| 32 | 🟡 B | **Erdős-Szemerédi-Vermutung** (Summen/Produkt-Mengen) | 1983 | Komb./ZT | Beste Exp.: 4/3+ε (Solymosi) |
+| 33 | 🟡 B | **Lonely Runner-Vermutung** | 1967 | Kombinatorik | Für ≤7 Läufer bewiesen |
+| 34 | 🟡 B | **Hadwiger-Vermutung** (Graphen, Kₙ-Minor) | 1943 | Graphentheorie | Für n≤6 bewiesen |
+| 35 | 🟡 B | **Graceful Tree-Vermutung** | 1966 | Graphentheorie | Für viele Baumklassen bewiesen |
+| 36 | 🟡 B | **Erdős–Ko–Rado Verallgemeinerungen** | 1961 | Kombinatorik | Viele Varianten bewiesen |
+| 37 | 🟡 B | **Turán-Vermutung** (Nullstellen ζ) | 1948 | Analysis | Offen |
+| 38 | 🟢 A | **Novikov-Vermutung** (Poincaré-Dualität) | 1965 | Topologie | Für große Klassen bewiesen; allgemein offen |
+| 39 | 🟢 A | **Baum-Connes-Vermutung** (K-Theorie C*-Algebren) | 1982 | Op.-Algebren | Für hyperbole Gruppen bewiesen |
+| 40 | 🟢 A | **Farrell-Jones-Vermutung** | 1993 | Top./Algebra | Für CAT(0)-Gruppen bewiesen |
+| 41 | 🟡 B | **Grothendieck-Standardvermutungen** | 1969 | Alg. Geometrie | Nur Lefschetz-Vermutung bewiesen |
+| 42 | 🟡 B | **Fontaine-Mazur-Vermutung** | 1995 | Zahlentheorie | Teilresultate durch Kisin |
+| 43 | 🔴 C | **Smooth-Poincaré Dim=4** | 1982 | Differentialtopologie | Einzig offene Dimension; exotische R⁴ bekannt |
+| 44 | 🟡 B | **Gromov-Vermutung** (Füllungsradius) | 1983 | Differentialgeometrie | Offen |
+| 45 | 🟡 B | **Andrews-Curtis-Vermutung** | 1965 | Gruppentheorie | Computationell intensiv untersucht |
+| 46 | 🟡 B | **Whitehead-Vermutung** (Asphärizität) | 1941 | Topologie | Für endlich viele Zellen bewiesen |
+| 47 | 🟡 B | **Freiman-Struktursatz** Verbesserungen | 1964 | Add. Kombinatorik | Sanders/Schoen: quant. Verbesserungen |
+| 48 | 🟡 B | **Lehmer-Problem** (Mahler-Maß) | 1933 | Zahlentheorie | Offen |
+| 49 | 🟡 B | **Mandelbrot MLC** (lok. Zusammenhang) | 1982 | Dyn. Systeme | Für Teile der Mandelbrot-Menge bekannt |
+| 50 | 🟢 A | **Gyárfás-Vermutung** (Graphenfärbung) | 1975 | Graphentheorie | Für Chordal-Graphen bewiesen; aktive Forschung |
+| 51 | 🟢 A | **Seymours 2. Nachbar-Vermutung** | 1990 | Graphentheorie | Für Turniere mit rationalen Gewichten bewiesen |
 
 ---
 
-## 20. Jahrhundert (1950–2000)
+## 20. Jahrhundert (1950–2000) – Bewiesene Vermutungen
 
-| # | Vermutung | Jahr | Gebiet | Status |
-|---|-----------|------|--------|--------|
-| 42 | **Jacobian-Vermutung** (dim ≥ 2): Det(Jac f) = const ⟹ f bijektiv | 1939 (Keller) | Alg. Geometrie | **Offen** |
-| 43 | **Hartshorne-Vermutung**: Kompakte komplexe Mannigfaltigkeiten | 1970 | Alg. Geometrie | **Offen** |
-| 44 | **Grothendieck-Standard-Vermutungen** (4 Vermutungen) | 1969 | Alg. Geometrie | **Größtenteils offen** |
-| 45 | **Bloch-Kato-Vermutung** | 1986 | K-Theorie/Algebra | Beweis: Voevodsky 2011 ✓ |
-| 46 | **Serre-Vermutung** (mod. Galois-Darstellungen) | 1973 | Zahlentheorie | Beweis: Khare-Wintenberger 2009 ✓ |
-| 47 | **Weil-Vermutungen** | 1949 (Weil) | Alg. Geometrie | Beweis: Deligne 1974 ✓ |
-| 48 | **Fontaine-Mazur-Vermutung** | 1995 | Zahlentheorie | **Offen** |
-| 49 | **Sato-Tate-Vermutung** | 1963 | Zahlentheorie | Beweis 2006–2011 ✓ |
-| 50 | **Elliptische-Kurven-Rang-Vermutung**: Unendlich hohe Ränge möglich? | ~1970 | Zahlentheorie | **Offen** |
-| 51 | **Lehmer-Vermutung**: Mahler-Maß ≥ Lehmer-Konstante | 1933 | Zahlentheorie | **Offen** |
-| 52 | **Mandelbrot-Lokal-Zusammenhangsvermutung (MLC)** | 1982 | Dynamische Systeme | **Offen** |
-| 53 | **Feigenbaum-Vermutungen** | 1978 | Dynamische Systeme | Teils bewiesen |
-| 54 | **Rota-Vermutung** (Matroide) | 1970 | Kombinatorik | Beweis: Huh et al. 2022 ✓ |
-| 55 | **Read-Vermutung** (chromatische Polynome) | 1968 | Graphentheorie | Beweis: Huh 2012 ✓ |
-| 56 | **Hadwiger-Nelson-Problem**: Chromatische Zahl des Euklidischen Raums | 1950 | Geometrie/Graphentheorie | **Offen** (5, 6 oder 7) |
-| 57 | **Oppenheim-Vermutung** | 1929 | Homogene Dynamik | Beweis: Margulis 1987 ✓ |
-| 58 | **Zeeman-Vermutung** (Poincaré für 5-dim.) | 1960 | Topologie | Beweis ✓ (dim ≥ 5) |
-| 59 | **Schoen-Yau-Positive-Energie-Satz** | 1979 | Differentialgeometrie | Beweis 1979–81 ✓ |
-| 60 | **Virtual Haken-Vermutung** | 1968 | 3-Mannigfaltigkeiten | Beweis: Agol 2012 ✓ |
-| 61 | **Temperley-Lieb-Vermutungen** | 1971 | Kombinatorik/Algebra | Teils offen |
-| 62 | **Conway-Vermutung** (Knoten-Invarianten) | 1970 | Topologie | Teils **offen** |
-| 63 | **Kervaire-Invariante-Vermutung** | 1960 | Topologie | Beweis: Hill-Hopkins-Ravenel 2009 ✓ |
-| 64 | **Geometrisierungs-Vermutung** (Thurston) | 1982 | 3-Mannigfaltigkeiten | Beweis: Perelman 2003 ✓ |
-| 65 | **Donaldson-Geometrie-Vermutung** | 1983 | 4-Mannigfaltigkeiten | Teils bewiesen |
-| 66 | **Smooth-Poincaré-Vermutung dim=4** | 1982 | Differentialtopologie | **Offen** |
-| 67 | **Gromov-Vermutung**: Füllungsradius vs. Volumen | 1983 | Differentialgeometrie | **Offen** |
-| 68 | **Kontsevich-Integral** vollständige Invariante? | 1993 | Topologie | **Offen** |
-| 69 | **Andrews-Curtis-Vermutung** | 1965 | Gruppentheorie | **Offen** |
-| 70 | **Whitehead-Vermutung** (Aspährizität) | 1941 | Topologie | **Offen** |
-| 71 | **Freiman-Struktursatz** Verbesserungen | 1964 | Additive Kombinatorik | **Teilweise offen** |
-| 72 | **Erdős–Ko–Rado Verallgemeinerungen** | 1961 | Kombinatorik | **Teils offen** |
-| 73 | **Berge-Vermutung** (Graphen) | 1960 | Graphentheorie | Beweis: Chudnovsky et al. 2006 ✓ |
-| 74 | **Gyárfás-Vermutung** | 1975 | Graphentheorie | **Offen** |
-| 75 | **Seymour's 2. Nachbar-Vermutung** | 1990 | Graphentheorie | **Offen** |
+| # | Kat. | Vermutung | Jahr | Gebiet | Beweis |
+|---|------|-----------|------|--------|--------|
+| 52 | ✓ | **Weil-Vermutungen** | 1949 | Alg. Geometrie | Deligne 1974 |
+| 53 | ✓ | **Serre-Vermutung** (Galois-Darst.) | 1973 | Zahlentheorie | Khare-Wintenberger 2009 |
+| 54 | ✓ | **Sato-Tate-Vermutung** | 1963 | Zahlentheorie | Taylor et al. 2006–2011 |
+| 55 | ✓ | **Bloch-Kato-Vermutung** | 1986 | K-Theorie | Voevodsky 2011 |
+| 56 | ✓ | **Oppenheim-Vermutung** | 1929 | Homogene Dynamik | Margulis 1987 |
+| 57 | ✓ | **Virtual Haken-Vermutung** | 1968 | 3-Mannigf. | Agol 2012 |
+| 58 | ✓ | **Kervaire-Invariante** | 1960 | Topologie | Hill-Hopkins-Ravenel 2009 |
+| 59 | ✓ | **Geometrisierungs-Vermutung** (Thurston) | 1982 | 3-Mannigf. | Perelman 2003 |
+| 60 | ✓ | **Rota-Vermutung** (Matroide) | 1970 | Kombinatorik | Huh et al. 2022 |
+| 61 | ✓ | **Read-Vermutung** (chrom. Polynome) | 1968 | Graphentheorie | Huh 2012 |
+| 62 | ✓ | **Positive-Energie-Satz** (Schoen-Yau) | 1979 | Differentialgeom. | Schoen-Yau 1979–81 |
+| 63 | ✓ | **Berge-Vermutung** (Graphen) | 1960 | Graphentheorie | Chudnovsky et al. 2006 |
+| 64 | ✓ | **Zeeman-Vermutung** (dim≥5) | 1960 | Topologie | Beweis für dim≥5 |
 
 ---
 
 ## 21. Jahrhundert (2000–2026)
 
-| # | Vermutung | Jahr | Gebiet | Status |
-|---|-----------|------|--------|--------|
-| 76 | **Mochizuki's IUT-Theorie** (abc-Vermutung) | 2012 | Zahlentheorie | **Kontrovers** – nicht akzeptiert |
-| 77 | **Elias-Khovanov-Williamson**: Diagrammatische Soergel-Bimoduln | 2012 | Darstellungstheorie | Beweis 2012 ✓ |
-| 78 | **Cap-Set-Vermutung** | 2016 | Kombinatorik | Beweis: Croot-Lev-Pach 2016 ✓ |
-| 79 | **Erdős-Distanz-Problem** | 1946/2011 | Kombinatorik/Geometrie | Beweis: Guth-Katz 2011 ✓ |
+| # | Kat. | Vermutung | Jahr | Gebiet | Status/Anmerkung |
+|---|------|-----------|------|--------|------------------|
+| 65 | 🟡 B | **Mochizukis IUT-Theorie** (abc-Vermutung) | 2012 | Zahlentheorie | Nicht allgemein akzeptiert |
+| 66 | ✓ | **Cap-Set-Vermutung** | 2016 | Kombinatorik | Croot-Lev-Pach 2016 |
+| 67 | ✓ | **Erdős-Distanz-Problem** | 1946/2011 | Komb./Geom. | Guth-Katz 2011 |
 
 ---
 
 ## Millennium-Probleme (Clay Institute, je 1 Mio. $)
 
-| Problem | Jahr | Status |
-|---------|------|--------|
-| Riemann-Hypothese | 1859 | **Offen** |
-| P vs. NP | 1971 | **Offen** |
-| Navier-Stokes (Glattheit) | 1845/2000 | **Offen** |
-| Hodge-Vermutung | 1950 | **Offen** |
-| Birch & Swinnerton-Dyer | 1965 | **Offen** |
-| Yang-Mills Massenücke | 1954/2000 | **Offen** |
-| Poincaré-Vermutung | 1904/2000 | **Gelöst** (Perelman 2003) ✓ |
+| Problem | Jahr | Kat. | Status |
+|---------|------|------|--------|
+| **Riemann-Hypothese** | 1859 | 🟡 B | **Offen** |
+| **P vs. NP** | 1971 | 🔴 C | **Offen** |
+| **Navier-Stokes** (Glattheit) | 1845/2000 | 🟡 B | **Offen** |
+| **Hodge-Vermutung** | 1950 | 🟡 B | **Offen** |
+| **Birch & Swinnerton-Dyer** | 1965 | 🟡 B | **Offen** |
+| **Yang-Mills Massenücke** | 1954/2000 | 🟡 B | **Offen** |
+| **Poincaré-Vermutung** | 1904 | ✓ | **Gelöst** (Perelman 2003) |
 
 ---
 
 ## Legende
-
-- ✓ = Bewiesen
-- **Offen** = Unbewiesene Vermutung
-- **Kontrovers** = Beweis umstritten
-- **Teils bewiesen** = Teilresultate vorhanden
-
----
-
-*Diese Liste ist nicht vollständig. Es gibt Tausende offener Vermutungen in der Mathematik.*
-*Die ältesten stammen aus der Antike (Euklid, Pythagoras, ~600-300 v. Chr.).*
+- ✓ = Bewiesen | 🟢 A = Hohe Chance | 🟡 B = Mittlere Chance | 🔴 C = Niedrig | ⬛ D = Unentscheidbar
+- Vollständige Analyse: [`vermutungen_analyse.md`](./vermutungen_analyse.md)
+- Beweisversuche: [`src/kategorie_a_untersuchungen.py`](./src/kategorie_a_untersuchungen.py)
