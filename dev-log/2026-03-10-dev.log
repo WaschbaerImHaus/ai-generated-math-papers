@@ -1761,3 +1761,85 @@ liefert falsche Ergebnisse (Kettensubstitution).
 - Bugfix: Laplace Boundary-Test korrigiert (Ecken vom left/right überschrieben)
 - Gesamtzahl Tests: 4371 alle grün
 - Webapp-Integration für 15 neue Module läuft als Hintergrund-Agent
+
+2026-03-10 21:31:42 - Neue Module implementiert: src/pde.py und src/operator_algebras.py (kein Build-Increment, kein Commit)
+
+## pde.py – Partielle Differentialgleichungen
+
+### Implementierte Funktionen
+
+#### Klassifikation
+- classify_pde(A, B, C): Typ (elliptisch/parabolisch/hyperbolisch) anhand Diskriminante B²-4AC
+
+#### Wärmeleitungsgleichung u_t = α²u_xx
+- heat_equation_explicit(): FTCS (r ≤ 1/2 Stabilitätsbedingung, Warnung bei Verletzung)
+- heat_equation_implicit(): BTCS, unbedingt stabil, sparse Tridiagonal-LGS
+- heat_equation_crank_nicolson(): θ=1/2, O(Δt²+Δx²), unbedingt stabil
+- heat_equation_analytical(): Fourier-Reihe, Koeffizienten numerisch per Trapezregel
+
+#### Wellengleichung u_tt = c²u_xx
+- wave_equation_explicit(): Leapfrog (CFL: cΔt/Δx ≤ 1, Warnung bei Verletzung)
+- wave_equation_analytical(): Fourier-Reihen-Lösung
+- wave_dispersion_relation(): ω = ck (nicht-dispersiv)
+
+#### Laplace/Poisson
+- laplace_equation_2d(): SOR-Iteration mit ω_opt = 2/(1+sin(π/N))
+- poisson_equation_2d(): Direkte sparse Lösung (5-Punkt-Stern, scipy.sparse)
+- green_function_laplace_2d(): G = -1/(2π)·ln(r), Singularitätsregularisierung
+- harmonic_function_properties(): Maximum-Prinzip, Mittelwerteigenschaft
+
+#### Schrödinger-Gleichung
+- schrodinger_stationary(): Tridiagonales Eigenwertproblem (eigh_tridiagonal)
+- schrodinger_harmonic_oscillator(): Numerisch vs. analytisch E_n = n+1/2
+- schrodinger_time_dependent(): Crank-Nicolson (unitär, normerhaltend), komplex
+
+#### FEM 1D
+- fem_1d_poisson(): Galerkin, Hutfunktionen, O(h²)-Konvergenz
+- fem_convergence_demo(): Konvergenzordnungsnachweis (log-log)
+
+#### Charakteristiken & Burgers
+- method_of_characteristics(): au_x + bu_t = c·u, Charakteristikenkurven
+- burgers_equation(): u_t + u·u_x = ν·u_xx, Upwind-Schema, periodische Randbedingungen
+
+### Tests: 62 Tests in tests/test_pde.py (alle grün)
+
+---
+
+## operator_algebras.py – Operatoralgebren
+
+### Implementierte Klassen
+
+#### CStarAlgebra
+- __init__: Validierung (Dimension, nicht-leer)
+- multiply, star, norm: Grundoperationen
+- is_cstar_algebra: C*-Identität ‖a*a‖=‖a‖² verifikation
+- is_commutative: Kommutatoren aller Erzeuger-Paare
+- spectrum: Eigenwerte, nahe Werte zusammengefasst
+- spectral_radius: r(a) = max|λ|
+
+#### VonNeumannAlgebra (erbt CStarAlgebra)
+- commutant: Nullraum von Kronecker-Produkt-System [(S^T⊗I)-(I⊗S)]
+- bicommutant: Doppelter Kommutant (Bikommutant-Satz)
+- is_von_neumann_algebra: M = M'' Verifikation über Rang-Vergleich
+- center: Z(M) = M ∩ M' (Kommutant der gesamten Algebra)
+- is_factor: Z(M) = {λI} Prüfung
+
+#### Projection (erbt CStarAlgebra)
+- is_projection: P = P* = P² (Idempotenz + Selbstadjungiertheit)
+- range_space: Bildraum via SVD (Rank-1-Basisvektoren)
+- orthogonal_complement: I - P
+- partial_isometry: V*V ist Projektion?
+
+### Implementierte Funktionen
+- gelfand_transform_demo(): D_n ≅ C({1,...,n}), Supremumsnorm = Operatornorm
+- gns_construction_demo(): M_2(ℂ) mit normierter Spur, Gram-Matrix
+- factors_classification(): Murray-von Neumann: I_n, I_∞, II_1, II_∞, III
+- k_theory_intro(): K₀/K₁-Klassen, Bott-Periodizität, unitäre Äquivalenz
+- cuntz_algebra_demo(): O₂ Toy-Modell in M_4(ℂ), Cuntz-Relationen verifiziert
+- trace_class_operators(): S₁(H), Spurklassen-Norm, Zyklizität Tr(AB)=Tr(BA)
+
+### Tests: 76 Tests in tests/test_operator_algebras.py (alle grün)
+
+---
+
+### Gesamtergebnis: 138/138 Tests grün

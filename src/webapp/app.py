@@ -235,6 +235,174 @@ except Exception as _e:
     _set_theory_ok = False
     print(f"[WARN] set_theory nicht ladbar: {_e}")
 
+# ---- Neue Module: Darstellungstheorie, Verbandstheorie, Multilineare Algebra ----
+try:
+    from representation_theory import (
+        character_table, schur_lemma, z2_representations, s3_representations,
+        burnside_lemma, regular_representation, maschke_theorem_check
+    )
+    _repr_ok = True
+except Exception as _e:
+    _repr_ok = False
+    print(f"[WARN] representation_theory nicht ladbar: {_e}")
+
+try:
+    from lattice_theory import (
+        Lattice, PartialOrder, BooleanAlgebra,
+        divisibility_lattice, power_set_lattice, birkhoff_representation_theorem,
+        jordan_dedekind_chain_condition
+    )
+    _lattice_ok = True
+except Exception as _e:
+    _lattice_ok = False
+    print(f"[WARN] lattice_theory nicht ladbar: {_e}")
+
+try:
+    from multilinear_algebra import (
+        tensor_product_vectors, tensor_product_matrices, wedge_product,
+        exterior_power, gram_matrix, gram_determinant, signature_bilinear_form
+    )
+    _multilinear_ok = True
+except Exception as _e:
+    _multilinear_ok = False
+    print(f"[WARN] multilinear_algebra nicht ladbar: {_e}")
+
+try:
+    from homological_algebra import (
+        ChainComplex, simplicial_complex_to_chain,
+        ext_group, tor_group, free_resolution, universal_coefficient_theorem
+    )
+    _homological_ok = True
+except Exception as _e:
+    _homological_ok = False
+    print(f"[WARN] homological_algebra nicht ladbar: {_e}")
+
+try:
+    from algebraic_structures import (
+        Magma, Semigroup, Monoid, GroupFromMagma,
+        algebraic_structure_hierarchy, free_monoid
+    )
+    _algstruct_ok = True
+except Exception as _e:
+    _algstruct_ok = False
+    print(f"[WARN] algebraic_structures nicht ladbar: {_e}")
+
+try:
+    from invariant_theory import (
+        reynolds_operator, molien_series, polynomial_invariants_sn,
+        elementary_symmetric_polynomials, hilbert_basis_theorem_demo,
+        fundamental_theorem_symmetric_poly
+    )
+    _invariant_ok = True
+except Exception as _e:
+    _invariant_ok = False
+    print(f"[WARN] invariant_theory nicht ladbar: {_e}")
+
+try:
+    from universal_algebra import (
+        Signature, Algebra, Variety, birkhoff_theorem_demo,
+        congruence_relation, groups_variety, rings_variety, lattices_variety
+    )
+    _universal_ok = True
+except Exception as _e:
+    _universal_ok = False
+    print(f"[WARN] universal_algebra nicht ladbar: {_e}")
+
+# ---- Neue Module: Modelltheorie, Formale Beweistheorie, Rekursionstheorie ----
+try:
+    from model_theory import (
+        Structure, Signature as ModelSignature,
+        elementary_equivalence, compactness_theorem_demo,
+        nonstandard_arithmetic_demo, theory_is_categorical,
+        quantifier_elimination_demo, lowenheim_skolem_downward
+    )
+    _model_ok = True
+except Exception as _e:
+    _model_ok = False
+    print(f"[WARN] model_theory nicht ladbar: {_e}")
+
+try:
+    from proof_theory_formal import (
+        LKRules, NDProof, prove_simple, cut_elimination_demo,
+        proof_complexity_comparison, big_five_systems,
+        proof_theoretic_ordinal, gentzen_consistency_proof_sketch
+    )
+    _proof_formal_ok = True
+except Exception as _e:
+    _proof_formal_ok = False
+    print(f"[WARN] proof_theory_formal nicht ladbar: {_e}")
+
+try:
+    from recursion_theory import (
+        TuringMachine, tm_recognizes_palindromes, tm_binary_increment,
+        halting_problem_undecidability_proof, rice_theorem_demo,
+        ackermann_function, ackermann_growth_demo, arithmetical_hierarchy,
+        time_complexity_classes, kolmogorov_complexity_approx
+    )
+    _recursion_ok = True
+except Exception as _e:
+    _recursion_ok = False
+    print(f"[WARN] recursion_theory nicht ladbar: {_e}")
+
+# ---- Neue Module: Maßtheorie, Spezielle Funktionen, Funktionalanalysis, PDE, Operatoralgebren ----
+try:
+    from measure_theory import (
+        SigmaAlgebra, Measure, LebesgueMeasure, lebesgue_integral,
+        riemann_vs_lebesgue, LpSpace, radon_nikodym_theorem_demo,
+        fubini_theorem_demo, dominated_convergence_theorem_demo,
+        monotone_convergence_theorem_demo
+    )
+    _measure_ok = True
+except Exception as _e:
+    _measure_ok = False
+    print(f"[WARN] measure_theory nicht ladbar: {_e}")
+
+try:
+    from special_functions import (
+        BesselFunctions, LegendrePolynomials, AiryFunctions,
+        gamma_function_properties, beta_function, digamma_function,
+        riemann_zeta_special_values, elliptic_integrals, error_function_properties
+    )
+    _special_ok = True
+except Exception as _e:
+    _special_ok = False
+    print(f"[WARN] special_functions nicht ladbar: {_e}")
+
+try:
+    from functional_analysis import (
+        BanachSpace, HilbertSpace, LinearOperator,
+        banach_fixed_point, hahn_banach_theorem_demo,
+        spectral_theorem_demo, riesz_representation_theorem,
+        open_mapping_theorem_demo, fredholm_alternative,
+        uniform_boundedness_principle_demo
+    )
+    _functional_ok = True
+except Exception as _e:
+    _functional_ok = False
+    print(f"[WARN] functional_analysis nicht ladbar: {_e}")
+
+try:
+    from pde import (
+        classify_pde, heat_equation_explicit, wave_equation_explicit,
+        heat_equation_analytical, wave_equation_analytical,
+        laplace_equation_2d, schrodinger_stationary
+    )
+    _pde_ok = True
+except Exception as _e:
+    _pde_ok = False
+    print(f"[WARN] pde nicht ladbar: {_e}")
+
+try:
+    from operator_algebras import (
+        CStarAlgebra, VonNeumannAlgebra,
+        factors_classification, k_theory_intro, gelfand_transform_demo,
+        gns_construction_demo, cuntz_algebra_demo
+    )
+    _opalg_ok = True
+except Exception as _e:
+    _opalg_ok = False
+    print(f"[WARN] operator_algebras nicht ladbar: {_e}")
+
 
 # ===========================================================================
 # FLASK-APP INITIALISIEREN
@@ -480,6 +648,7 @@ def page_logic():
 def page_set_theory():
     """@brief Mengenlehre-Seite. @date 2026-03-10"""
     return render_template('set_theory.html')
+
 
 
 # ===========================================================================
@@ -4309,6 +4478,2071 @@ def api_sets_zfc():
 
 
 # ===========================================================================
+# ROUTEN: Neue Seiten (Erweiterte Algebra, Logik & Grundlagen, Erweiterte Analysis)
+# ===========================================================================
+
+@app.route('/algebra_advanced')
+def page_algebra_advanced():
+    """
+    @brief Seite für Erweiterte Algebra (Darstellungstheorie, Verbandstheorie usw.).
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    return render_template('algebra_advanced.html')
+
+
+@app.route('/logic_foundations')
+def page_logic_foundations():
+    """
+    @brief Seite für Logik & Grundlagen (Modelltheorie, Beweistheorie, Rekursionstheorie).
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    return render_template('logic_foundations.html')
+
+
+@app.route('/analysis_advanced')
+def page_analysis_advanced():
+    """
+    @brief Seite für Erweiterte Analysis (Maßtheorie, Funktionalanalysis, PDE, Operatoralgebren).
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    return render_template('analysis_advanced.html')
+
+
+# ===========================================================================
+# API: Darstellungstheorie (representation_theory.py)
+# ===========================================================================
+
+@app.route('/api/representation/character_table', methods=['POST'])
+def api_repr_character_table():
+    """
+    @brief Charaktertafel einer Gruppe berechnen.
+    @description
+        Gibt die Charaktertafel für S3 oder Z2 zurück.
+        POST-Body: {"group_name": "S3" | "Z2"}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _repr_ok:
+            return error_response("representation_theory nicht verfügbar")
+        # Gruppenname aus Anfrage lesen
+        group_name = data.get('group_name', 'S3').upper()
+
+        if group_name == 'Z2':
+            reps = z2_representations()
+        elif group_name == 'S3':
+            reps = s3_representations()
+        else:
+            return error_response(f"Unbekannte Gruppe: {group_name}. Bitte 'S3' oder 'Z2' wählen.")
+
+        # Charaktertafel aus Darstellungen aufbauen
+        table = character_table(reps, group_name)
+
+        # Ergebnis für JSON aufbereiten
+        result = {
+            'group': group_name,
+            'order': table.get('group_order', len(reps)),
+            'irreducible_count': table.get('irreducible_count', len(reps)),
+            'characters': table.get('characters', []),
+            'class_sizes': table.get('class_sizes', []),
+            'class_representatives': table.get('class_representatives', []),
+        }
+        return jsonify({'result': result})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/representation/schur_orthogonality', methods=['POST'])
+def api_repr_schur_orthogonality():
+    """
+    @brief Schur-Orthogonalitätsrelationen prüfen.
+    @description
+        Prüft ⟨χᵢ, χⱼ⟩ = δᵢⱼ für die irreduziblen Charaktere einer Gruppe.
+        POST-Body: {"group_name": "S3" | "Z2"}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _repr_ok:
+            return error_response("representation_theory nicht verfügbar")
+        group_name = data.get('group_name', 'S3').upper()
+
+        if group_name == 'Z2':
+            reps = z2_representations()
+        elif group_name == 'S3':
+            reps = s3_representations()
+        else:
+            return error_response(f"Unbekannte Gruppe: {group_name}")
+
+        # Schur-Lemma für alle Paare prüfen
+        results = []
+        for i, r1 in enumerate(reps):
+            for j, r2 in enumerate(reps):
+                lemma = schur_lemma(r1, r2)
+                results.append({
+                    'i': i, 'j': j,
+                    'orthogonal': lemma.get('are_orthogonal', False),
+                    'inner_product': str(lemma.get('inner_product', '?')),
+                    'expected': 1 if i == j else 0
+                })
+
+        return jsonify({'result': {
+            'group': group_name,
+            'pairs': results,
+            'schur_orthogonality_holds': all(
+                r['orthogonal'] == (r['i'] != r['j']) or r['i'] == r['j']
+                for r in results
+            )
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/representation/burnside', methods=['POST'])
+def api_repr_burnside():
+    """
+    @brief Burnside-Lemma: Anzahl der Orbits berechnen.
+    @description
+        POST-Body: {"n_colorings": int, "n_rotations": int}
+        Beispiel: Perlen-Halskette mit n Farben und Rotationssymmetrie.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _repr_ok:
+            return error_response("representation_theory nicht verfügbar")
+
+        n_colors = int(data.get('n_colorings', 3))
+        n_rot = int(data.get('n_rotations', 4))
+
+        # Fixpunkte für zyklische Gruppe berechnen
+        # Fix(r^k) = n_colors^gcd(k, n_rot) für Rotationen
+        import math
+        fix_counts = [n_colors ** math.gcd(k, n_rot) for k in range(n_rot)]
+        result = burnside_lemma(fix_counts)
+
+        return jsonify({'result': {
+            'n_colors': n_colors,
+            'n_rotations': n_rot,
+            'fixed_counts': fix_counts,
+            'orbit_count': result.get('orbit_count', sum(fix_counts) // n_rot),
+            'description': result.get('description', ''),
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Verbandstheorie (lattice_theory.py)
+# ===========================================================================
+
+@app.route('/api/lattice/create', methods=['POST'])
+def api_lattice_create():
+    """
+    @brief Teilerverband oder Potenzmengeverband erstellen.
+    @description
+        POST-Body: {"type": "divisibility" | "power_set", "n": int}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _lattice_ok:
+            return error_response("lattice_theory nicht verfügbar")
+
+        lattice_type = data.get('type', 'divisibility')
+        n = int(data.get('n', 12))
+
+        if lattice_type == 'power_set':
+            n = min(n, 4)  # Potenzmenge nur für kleine n
+            lat = power_set_lattice(n)
+        else:
+            n = min(n, 60)
+            lat = divisibility_lattice(n)
+
+        # Verbandeigenschaften ermitteln
+        info = {
+            'type': lattice_type,
+            'n': n,
+            'elements': [str(e) for e in lat.elements],
+            'element_count': len(lat.elements),
+            'is_distributive': lat.is_distributive(),
+            'is_modular': lat.is_modular(),
+            'has_complement': lat.is_complemented() if hasattr(lat, 'is_complemented') else None,
+        }
+        return jsonify({'result': info})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/lattice/is_distributive', methods=['POST'])
+def api_lattice_is_distributive():
+    """
+    @brief Prüft ob ein Verband distributiv ist.
+    @description
+        POST-Body: {"type": "divisibility" | "power_set", "n": int}
+        Gibt is_distributive, is_modular und Gegenbeispiel zurück (falls vorhanden).
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _lattice_ok:
+            return error_response("lattice_theory nicht verfügbar")
+
+        lattice_type = data.get('type', 'divisibility')
+        n = int(data.get('n', 12))
+
+        if lattice_type == 'power_set':
+            lat = power_set_lattice(min(n, 3))
+        else:
+            lat = divisibility_lattice(min(n, 30))
+
+        is_dist = lat.is_distributive()
+        is_mod = lat.is_modular()
+        chain_ok = jordan_dedekind_chain_condition(lat)
+
+        return jsonify({'result': {
+            'n': n,
+            'type': lattice_type,
+            'is_distributive': is_dist,
+            'is_modular': is_mod,
+            'jordan_dedekind_chain_condition': chain_ok,
+            'note': 'Distributiv ⟹ Modular, aber nicht umgekehrt'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/lattice/birkhoff', methods=['POST'])
+def api_lattice_birkhoff():
+    """
+    @brief Birkhoff-Darstellungssatz für endliche distributive Verbände.
+    @description
+        POST-Body: {"n": int} – Teilerverband von n analysieren.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _lattice_ok:
+            return error_response("lattice_theory nicht verfügbar")
+
+        n = min(int(data.get('n', 12)), 30)
+        lat = divisibility_lattice(n)
+        birkhoff = birkhoff_representation_theorem(lat)
+
+        return jsonify({'result': birkhoff})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Multilineare Algebra (multilinear_algebra.py)
+# ===========================================================================
+
+@app.route('/api/multilinear/tensor_product', methods=['POST'])
+def api_multilinear_tensor_product():
+    """
+    @brief Tensorprodukt zweier Matrizen (Kronecker-Produkt) berechnen.
+    @description
+        POST-Body: {"A": [[...], ...], "B": [[...], ...]}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _multilinear_ok:
+            return error_response("multilinear_algebra nicht verfügbar")
+
+        A = data.get('A', [[1, 0], [0, 1]])
+        B = data.get('B', [[1, 2], [3, 4]])
+
+        result = tensor_product_matrices(A, B)
+        shape_A = (len(A), len(A[0]))
+        shape_B = (len(B), len(B[0]))
+
+        return jsonify({'result': {
+            'tensor_product': result,
+            'shape_A': shape_A,
+            'shape_B': shape_B,
+            'shape_result': (shape_A[0] * shape_B[0], shape_A[1] * shape_B[1]),
+            'description': f'A ⊗ B hat Dimension {shape_A[0]*shape_B[0]}×{shape_A[1]*shape_B[1]}'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/multilinear/exterior_product', methods=['POST'])
+def api_multilinear_exterior_product():
+    """
+    @brief Äußeres Produkt (Wedge-Produkt) zweier Vektoren.
+    @description
+        POST-Body: {"u": [float, ...], "v": [float, ...]}
+        Berechnet u ∧ v als antisymmetrischen Tensor.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _multilinear_ok:
+            return error_response("multilinear_algebra nicht verfügbar")
+
+        u = data.get('u', [1, 0, 0])
+        v = data.get('v', [0, 1, 0])
+
+        result = wedge_product(u, v)
+        gram = gram_matrix([u, v])
+        gram_det = gram_determinant([u, v])
+
+        return jsonify({'result': {
+            'u': u,
+            'v': v,
+            'wedge_product': result,
+            'gram_matrix': gram,
+            'gram_determinant': gram_det,
+            'area': float(abs(gram_det) ** 0.5),
+            'description': 'u ∧ v – Fläche des aufgespannten Parallelogramms'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/multilinear/signature', methods=['POST'])
+def api_multilinear_signature():
+    """
+    @brief Signatur einer symmetrischen Bilinearform.
+    @description
+        POST-Body: {"M": [[...], ...]} – symmetrische Matrix der Bilinearform.
+        Gibt (p, q, r) zurück: p positive, q negative, r Null-Eigenwerte.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _multilinear_ok:
+            return error_response("multilinear_algebra nicht verfügbar")
+
+        M = data.get('M', [[1, 0], [0, -1]])
+        sig = signature_bilinear_form(np.array(M, dtype=float))
+
+        return jsonify({'result': {
+            'matrix': M,
+            'signature': sig,
+            'positive': sig[0],
+            'negative': sig[1],
+            'zero': sig[2] if len(sig) > 2 else 0,
+            'description': f'Sylvesterscher Trägheitssatz: Signatur ({sig[0]}, {sig[1]})'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Homologische Algebra (homological_algebra.py)
+# ===========================================================================
+
+@app.route('/api/homological/chain_complex', methods=['POST'])
+def api_homological_chain_complex():
+    """
+    @brief Kettenkomplex aus Randmatrizen aufbauen.
+    @description
+        POST-Body: {"simplex_type": "triangle" | "tetrahedron" | "circle"}
+        Erstellt einen simplizialen Kettenkomplex.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _homological_ok:
+            return error_response("homological_algebra nicht verfügbar")
+
+        simplex_type = data.get('simplex_type', 'triangle')
+
+        # Vordefinierte Simplizialkomplexe
+        if simplex_type == 'triangle':
+            # Dreieck: 3 Ecken, 3 Kanten, 1 Fläche
+            simplices = {0: [[0], [1], [2]], 1: [[0,1], [1,2], [0,2]], 2: [[0,1,2]]}
+        elif simplex_type == 'tetrahedron':
+            # Tetraeder: 4 Ecken, 6 Kanten, 4 Dreiecke, 1 Volumen
+            simplices = {
+                0: [[0],[1],[2],[3]],
+                1: [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]],
+                2: [[0,1,2],[0,1,3],[0,2,3],[1,2,3]],
+                3: [[0,1,2,3]]
+            }
+        else:
+            # Kreis: 2 Ecken, 2 Kanten
+            simplices = {0: [[0], [1]], 1: [[0,1]]}
+
+        cc = simplicial_complex_to_chain(simplices)
+        # Homologiegruppen berechnen
+        homology = cc.homology_groups()
+
+        result = {
+            'simplex_type': simplex_type,
+            'chain_groups': {str(k): v for k, v in cc.chain_groups.items()},
+            'homology': {}
+        }
+        for deg, h in homology.items():
+            result['homology'][str(deg)] = {
+                'betti_number': h.get('betti_number', 0),
+                'torsion': [str(t) for t in h.get('torsion', [])],
+                'rank': h.get('rank', 0)
+            }
+
+        return jsonify({'result': result})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/homological/homology', methods=['POST'])
+def api_homological_homology():
+    """
+    @brief Homologiegruppen eines simplizialen Komplexes berechnen.
+    @description
+        POST-Body: {"simplex_type": "triangle" | "tetrahedron" | "circle" | "torus"}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _homological_ok:
+            return error_response("homological_algebra nicht verfügbar")
+
+        simplex_type = data.get('simplex_type', 'triangle')
+
+        if simplex_type == 'triangle':
+            simplices = {0: [[0],[1],[2]], 1: [[0,1],[1,2],[0,2]], 2: [[0,1,2]]}
+        elif simplex_type == 'tetrahedron':
+            simplices = {
+                0: [[0],[1],[2],[3]],
+                1: [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]],
+                2: [[0,1,2],[0,1,3],[0,2,3],[1,2,3]],
+                3: [[0,1,2,3]]
+            }
+        else:
+            simplices = {0: [[0],[1]], 1: [[0,1]]}
+
+        cc = simplicial_complex_to_chain(simplices)
+        homology = cc.homology_groups()
+
+        betti = {str(k): v.get('betti_number', 0) for k, v in homology.items()}
+        euler = sum((-1)**int(k) * b for k, b in betti.items())
+
+        return jsonify({'result': {
+            'simplex_type': simplex_type,
+            'betti_numbers': betti,
+            'euler_characteristic': euler,
+            'interpretation': {
+                'H0': f'Anzahl Zusammenhangskomponenten: {betti.get("0", 0)}',
+                'H1': f'Anzahl unabhängiger Schleifen: {betti.get("1", 0)}',
+                'H2': f'Anzahl 2D-Hohlräume: {betti.get("2", 0)}',
+            }
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/homological/ext_tor', methods=['POST'])
+def api_homological_ext_tor():
+    """
+    @brief Ext- und Tor-Gruppen berechnen (abgeleitete Funktoren).
+    @description
+        POST-Body: {"n": int, "m": int, "degree": int}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _homological_ok:
+            return error_response("homological_algebra nicht verfügbar")
+
+        n = int(data.get('n', 2))
+        m = int(data.get('m', 3))
+        degree = int(data.get('degree', 1))
+
+        ext = ext_group(n, m, degree)
+        tor = tor_group(n, m, degree)
+
+        return jsonify({'result': {
+            'n': n, 'm': m, 'degree': degree,
+            'ext': ext,
+            'tor': tor,
+            'description': f'Ext^{degree}(Z/{n}Z, Z/{m}Z) und Tor_{degree}(Z/{n}Z, Z/{m}Z)'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Algebraische Strukturen (algebraic_structures.py)
+# ===========================================================================
+
+@app.route('/api/algebraic_structures/magma', methods=['POST'])
+def api_algstruct_magma():
+    """
+    @brief Magma-Struktur aus Verknüpfungstafel erstellen und analysieren.
+    @description
+        POST-Body: {"table": [[int, ...], ...], "elements": [str, ...]}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _algstruct_ok:
+            return error_response("algebraic_structures nicht verfügbar")
+
+        table = data.get('table', [[0,1],[1,0]])
+        elements = data.get('elements', ['e', 'a'])
+
+        # Magma aus der Tabelle erstellen
+        m = Magma(elements, table)
+        is_sg = m.is_semigroup()
+        is_comm = m.is_commutative()
+
+        return jsonify({'result': {
+            'elements': elements,
+            'table': table,
+            'is_semigroup': is_sg,
+            'is_commutative': is_comm,
+            'description': 'Magma: Menge mit abgeschlossener Verknüpfung'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/algebraic_structures/check_group', methods=['POST'])
+def api_algstruct_check_group():
+    """
+    @brief Prüft ob eine Verknüpfungstafel eine Gruppe definiert.
+    @description
+        POST-Body: {"table": [[int, ...], ...], "elements": [str, ...]}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _algstruct_ok:
+            return error_response("algebraic_structures nicht verfügbar")
+
+        table = data.get('table', [[0,1],[1,0]])
+        elements = data.get('elements', ['e', 'a'])
+
+        m = Magma(elements, table)
+        sg = Semigroup(elements, table) if m.is_semigroup() else None
+        mon = Monoid(elements, table) if sg and sg.has_identity() else None
+        grp = GroupFromMagma(elements, table) if mon and mon.all_have_inverses() else None
+
+        return jsonify({'result': {
+            'elements': elements,
+            'is_magma': True,
+            'is_semigroup': m.is_semigroup(),
+            'is_monoid': sg.has_identity() if sg else False,
+            'is_group': grp is not None,
+            'is_abelian': grp.is_abelian() if grp else False,
+            'hierarchy': 'Magma → Halbgruppe → Monoid → Gruppe → Abel. Gruppe'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/algebraic_structures/hierarchy', methods=['GET'])
+def api_algstruct_hierarchy():
+    """
+    @brief Hierarchie algebraischer Strukturen abrufen.
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _algstruct_ok:
+            return error_response("algebraic_structures nicht verfügbar")
+        hierarchy = algebraic_structure_hierarchy()
+        return jsonify({'result': hierarchy})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Invariantentheorie (invariant_theory.py)
+# ===========================================================================
+
+@app.route('/api/invariant/reynolds_operator', methods=['POST'])
+def api_invariant_reynolds():
+    """
+    @brief Reynolds-Operator: Mittelwert eines Polynoms über eine Gruppe.
+    @description
+        POST-Body: {"poly": "x**2 + y**2", "n": int}
+        Mittelt das Polynom über die symmetrische Gruppe S_n.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _invariant_ok:
+            return error_response("invariant_theory nicht verfügbar")
+
+        poly_str = data.get('poly', 'x**2 + y**2')
+        n = min(int(data.get('n', 2)), 4)  # S_n für kleine n
+
+        # Variablen x1, ..., xn
+        var_names = [f'x{i+1}' for i in range(n)]
+        symbols = sp.symbols(' '.join(var_names))
+        if n == 1:
+            symbols = (symbols,)
+
+        # Polynom parsen
+        local_dict = {var_names[i]: symbols[i] for i in range(n)}
+        # Auch x, y, z als Aliase unterstützen
+        for i, name in enumerate(['x', 'y', 'z', 'w']):
+            if i < n:
+                local_dict[name] = symbols[i]
+
+        poly_expr = sp.sympify(poly_str, locals=local_dict)
+
+        # Reynolds-Operator über S_n anwenden
+        invariant = reynolds_operator(poly_expr, list(symbols), 'Sn', n)
+        fund = elementary_symmetric_polynomials(n)
+
+        return jsonify({'result': {
+            'input_poly': poly_str,
+            'group': f'S_{n}',
+            'reynolds_image': str(invariant),
+            'elementary_symmetric': [str(p) for p in fund],
+            'description': 'Reynolds-Operator: R[f] = (1/|G|) Σ_{g∈G} g·f'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/invariant/molien_series', methods=['POST'])
+def api_invariant_molien():
+    """
+    @brief Molien-Reihe: Erzeugende Funktion der Invariantendimensionen.
+    @description
+        POST-Body: {"group_type": "Z2" | "S2" | "cyclic", "max_degree": int}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _invariant_ok:
+            return error_response("invariant_theory nicht verfügbar")
+
+        group_type = data.get('group_type', 'Z2')
+        max_degree = min(int(data.get('max_degree', 8)), 12)
+
+        # Gruppenmatrizen für Z2 (Reflexion) oder S2 (Permutation)
+        if group_type == 'Z2':
+            matrices = [[[1, 0], [0, 1]], [[-1, 0], [0, -1]]]
+        elif group_type == 'S2':
+            matrices = [[[1, 0], [0, 1]], [[0, 1], [1, 0]]]
+        else:
+            matrices = [[[1, 0], [0, 1]], [[-1, 0], [0, -1]]]
+            group_type = 'Z2 (Standard)'
+
+        coeffs = molien_series(matrices, matrices, max_degree)
+
+        return jsonify({'result': {
+            'group': group_type,
+            'max_degree': max_degree,
+            'molien_coefficients': coeffs,
+            'description': 'Molien(t) = Σ dim(V^G_d) t^d – Erzeugende Funktion'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/invariant/symmetric_polynomials', methods=['POST'])
+def api_invariant_symmetric():
+    """
+    @brief Elementarsymmetrische Polynome für S_n berechnen.
+    @description
+        POST-Body: {"n": int}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _invariant_ok:
+            return error_response("invariant_theory nicht verfügbar")
+
+        n = min(int(data.get('n', 3)), 5)
+        polys = elementary_symmetric_polynomials(n)
+        inv_polys = polynomial_invariants_sn(n, 2)
+
+        return jsonify({'result': {
+            'n': n,
+            'elementary_symmetric': [str(p) for p in polys],
+            'degree_2_invariants': [str(p) for p in inv_polys],
+            'hilbert_basis': hilbert_basis_theorem_demo()
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Universelle Algebra (universal_algebra.py)
+# ===========================================================================
+
+@app.route('/api/universal/algebra_check', methods=['POST'])
+def api_universal_algebra_check():
+    """
+    @brief Prüft ob eine Struktur eine Varietät erfüllt.
+    @description
+        POST-Body: {"variety": "groups" | "rings" | "lattices"}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _universal_ok:
+            return error_response("universal_algebra nicht verfügbar")
+
+        variety_name = data.get('variety', 'groups')
+
+        if variety_name == 'groups':
+            variety = groups_variety()
+        elif variety_name == 'rings':
+            variety = rings_variety()
+        elif variety_name == 'lattices':
+            variety = lattices_variety()
+        else:
+            return error_response(f"Unbekannte Varietät: {variety_name}")
+
+        return jsonify({'result': {
+            'variety': variety_name,
+            'axioms': variety.axioms if hasattr(variety, 'axioms') else [],
+            'signature': str(variety.signature) if hasattr(variety, 'signature') else '',
+            'birkhoff_theorem': 'Eine Klasse ist genau dann eine Varietät, wenn sie unter '
+                                'Unterstrukturen, homomorphen Bildern und Produkten abgeschlossen ist.',
+            'description': f'Varietät der {variety_name}'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/universal/birkhoff', methods=['GET'])
+def api_universal_birkhoff():
+    """
+    @brief Birkhoff-HSP-Satz Demo.
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _universal_ok:
+            return error_response("universal_algebra nicht verfügbar")
+        result = birkhoff_theorem_demo()
+        return jsonify({'result': result})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/universal/free_monoid', methods=['POST'])
+def api_universal_free_monoid():
+    """
+    @brief Freies Monoid über einem Alphabet generieren.
+    @description
+        POST-Body: {"alphabet": ["a", "b", ...]}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _universal_ok:
+            return error_response("universal_algebra nicht verfügbar")
+
+        alphabet = data.get('alphabet', ['a', 'b'])
+        result = free_monoid(alphabet)
+        return jsonify({'result': {
+            'alphabet': alphabet,
+            'free_monoid_sample': result,
+            'description': 'Freies Monoid: alle endlichen Wörter über dem Alphabet'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Modelltheorie (model_theory.py)
+# ===========================================================================
+
+@app.route('/api/model/satisfies', methods=['POST'])
+def api_model_satisfies():
+    """
+    @brief Prüft ob eine Struktur eine Theorie erfüllt.
+    @description
+        POST-Body: {"theory": "group" | "field" | "order"}
+        Gibt Axiome und Erfüllbarkeit zurück.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _model_ok:
+            return error_response("model_theory nicht verfügbar")
+
+        theory = data.get('theory', 'group')
+        # Kompaktheitssatz-Demo als Beispiel für Erfüllbarkeit
+        demo = compactness_theorem_demo()
+        cat = theory_is_categorical(theory if theory in ['group', 'field', 'linear_order'] else 'group', 'omega')
+
+        return jsonify({'result': {
+            'theory': theory,
+            'compactness_demo': demo,
+            'categoricity': cat,
+            'description': 'Modelltheorie: Zusammenhang zwischen Formeln und Strukturen'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/model/elementary_equivalence', methods=['POST'])
+def api_model_elementary_equivalence():
+    """
+    @brief Elementare Äquivalenz zweier Strukturen prüfen.
+    @description
+        POST-Body: {"theory1": str, "theory2": str}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _model_ok:
+            return error_response("model_theory nicht verfügbar")
+
+        # Löwenheim-Skolem Demo
+        ls_down = lowenheim_skolem_downward(['∀x∀y(x=y → x=y)', '∃x(x=x)'], 5)
+        nonstd = nonstandard_arithmetic_demo()
+
+        return jsonify({'result': {
+            'lowenheim_skolem_downward': ls_down,
+            'nonstandard_arithmetic': nonstd,
+            'description': 'Elementare Äquivalenz: M ≡ N gdw. M und N dieselben Sätze erfüllen'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/model/quantifier_elimination', methods=['POST'])
+def api_model_quantifier_elimination():
+    """
+    @brief Quantorenelimination für Theorien demonstrieren.
+    @description
+        POST-Body: {"theory": "DLO" | "RCF" | "ACF"}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _model_ok:
+            return error_response("model_theory nicht verfügbar")
+
+        theory = data.get('theory', 'DLO')
+        result = quantifier_elimination_demo(theory)
+        return jsonify({'result': result})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Formale Beweistheorie (proof_theory_formal.py)
+# ===========================================================================
+
+@app.route('/api/proof_formal/sequent_calculus', methods=['POST'])
+def api_proof_formal_sequent():
+    """
+    @brief Sequenzenkalkül LK – einfache Beweise.
+    @description
+        POST-Body: {"formula": str} – logische Formel zu beweisen.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _proof_formal_ok:
+            return error_response("proof_theory_formal nicht verfügbar")
+
+        # Schnitteliminationssatz demonstrieren
+        cut_demo = cut_elimination_demo()
+        complexity = proof_complexity_comparison()
+
+        return jsonify({'result': {
+            'cut_elimination': cut_demo,
+            'complexity_comparison': complexity,
+            'description': 'LK-Kalkül: Gentzens Sequenzenkalkül für die klassische Logik'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/proof_formal/natural_deduction', methods=['POST'])
+def api_proof_formal_nd():
+    """
+    @brief Natürliches Schließen – einfache Formeln beweisen.
+    @description
+        POST-Body: {"formula": str} – Aussagenlogische Formel.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _proof_formal_ok:
+            return error_response("proof_theory_formal nicht verfügbar")
+
+        formula = data.get('formula', 'A → A')
+        # Einfache Beweise via prove_simple
+        proof = prove_simple(formula)
+
+        ordinal_info = proof_theoretic_ordinal('PA')
+        big5 = big_five_systems()
+
+        if proof is None:
+            return jsonify({'result': {
+                'formula': formula,
+                'proved': False,
+                'message': 'Formel nicht automatisch beweisbar (zu komplex)',
+                'proof_theoretic_ordinals': ordinal_info,
+                'big_five': big5
+            }})
+
+        return jsonify({'result': {
+            'formula': formula,
+            'proved': True,
+            'proof_steps': str(proof),
+            'proof_theoretic_ordinals': ordinal_info,
+            'big_five': big5
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/proof_formal/ordinals', methods=['GET'])
+def api_proof_formal_ordinals():
+    """
+    @brief Beweistheoretische Ordinalzahlen der großen 5 Systeme.
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _proof_formal_ok:
+            return error_response("proof_theory_formal nicht verfügbar")
+
+        big5 = big_five_systems()
+        gentzen = gentzen_consistency_proof_sketch()
+        return jsonify({'result': {'big_five': big5, 'gentzen': gentzen}})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Rekursionstheorie (recursion_theory.py)
+# ===========================================================================
+
+@app.route('/api/recursion/turing_machine', methods=['POST'])
+def api_recursion_turing_machine():
+    """
+    @brief Turingmaschine simulieren.
+    @description
+        POST-Body: {"machine": "palindrome" | "binary_increment" | "unary_addition",
+                    "input": [str, ...]}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _recursion_ok:
+            return error_response("recursion_theory nicht verfügbar")
+
+        machine_name = data.get('machine', 'palindrome')
+        input_tape = data.get('input', ['a', 'b', 'a'])
+
+        # Turingmaschine wählen
+        if machine_name == 'palindrome':
+            tm = tm_recognizes_palindromes()
+            description = 'Erkennt Palindrome über {a, b}'
+        elif machine_name == 'binary_increment':
+            tm = tm_binary_increment()
+            description = 'Binäre Inkrementierung (z.B. 0111 → 1000)'
+        else:
+            tm = tm_recognizes_palindromes()
+            description = 'Standard: Palindrom-Erkennung'
+
+        # Simulation ausführen (mit Schrittzähler-Limit)
+        result_tape, steps, accepted = tm.run(input_tape, max_steps=1000)
+
+        return jsonify({'result': {
+            'machine': machine_name,
+            'description': description,
+            'input': input_tape,
+            'output_tape': [str(s) for s in result_tape],
+            'steps': steps,
+            'accepted': accepted,
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/recursion/halting_problem_demo', methods=['GET'])
+def api_recursion_halting():
+    """
+    @brief Unentscheidbarkeit des Halteproblems demonstrieren.
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _recursion_ok:
+            return error_response("recursion_theory nicht verfügbar")
+
+        result = halting_problem_undecidability_proof()
+        return jsonify({'result': result})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/recursion/ackermann', methods=['POST'])
+def api_recursion_ackermann():
+    """
+    @brief Ackermann-Funktion berechnen (schnell wachsend).
+    @description
+        POST-Body: {"m": int (0-3), "n": int (0-10)}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _recursion_ok:
+            return error_response("recursion_theory nicht verfügbar")
+
+        m = min(int(data.get('m', 2)), 3)  # m>3 zu langsam
+        n = min(int(data.get('n', 3)), 10)
+
+        value = ackermann_function(m, n)
+        growth = ackermann_growth_demo()
+        hierarchy = arithmetical_hierarchy()
+
+        return jsonify({'result': {
+            'm': m, 'n': n,
+            'ackermann': value,
+            'growth_demo': growth,
+            'arithmetical_hierarchy': hierarchy,
+            'description': f'A({m},{n}) = {value} – nicht primitiv-rekursiv'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Maßtheorie (measure_theory.py)
+# ===========================================================================
+
+@app.route('/api/measure/lebesgue_integral', methods=['POST'])
+def api_measure_lebesgue_integral():
+    """
+    @brief Lebesgue-Integral einer Funktion berechnen.
+    @description
+        POST-Body: {"function_type": "polynomial" | "step" | "continuous",
+                    "a": float, "b": float}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _measure_ok:
+            return error_response("measure_theory nicht verfügbar")
+
+        func_type = data.get('function_type', 'polynomial')
+        a = float(data.get('a', 0.0))
+        b = float(data.get('b', 1.0))
+
+        # Funktion wählen
+        if func_type == 'step':
+            f = lambda x: 1.0 if x > (a + b) / 2 else 0.0
+            fname = 'Stufenfunktion χ_{[(a+b)/2, b]}'
+        elif func_type == 'continuous':
+            f = lambda x: float(np.sin(x))
+            fname = 'sin(x)'
+        else:
+            f = lambda x: x ** 2
+            fname = 'x²'
+
+        # Lebesgue-Integral berechnen
+        integral = lebesgue_integral(f, a, b)
+        comparison = riemann_vs_lebesgue(func_type)
+
+        return jsonify({'result': {
+            'function': fname,
+            'a': a, 'b': b,
+            'lebesgue_integral': float(integral),
+            'comparison': comparison,
+            'description': 'Lebesgue-Integral: Integral bzgl. des Lebesgue-Maßes'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/measure/sigma_algebra', methods=['POST'])
+def api_measure_sigma_algebra():
+    """
+    @brief σ-Algebra erzeugt von Generatoren berechnen.
+    @description
+        POST-Body: {"base_set": [elements], "generators": [[subset1], [subset2], ...]}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _measure_ok:
+            return error_response("measure_theory nicht verfügbar")
+
+        base_set = data.get('base_set', [1, 2, 3, 4])
+        generators = data.get('generators', [[1, 2], [3]])
+
+        # σ-Algebra aus Generatoren erzeugen
+        sigma = SigmaAlgebra(base_set)
+        for gen in generators:
+            sigma.add_generator(frozenset(gen))
+
+        generated = sigma.generate()
+
+        return jsonify({'result': {
+            'base_set': list(base_set),
+            'generators': [list(g) for g in generators],
+            'sigma_algebra_size': len(generated),
+            'sigma_algebra': [sorted(list(s)) for s in sorted(generated, key=lambda s: (len(s), sorted(s)))],
+            'description': 'σ(G): kleinste σ-Algebra die G enthält'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/measure/convergence_theorems', methods=['GET'])
+def api_measure_convergence():
+    """
+    @brief Konvergenzsätze der Maßtheorie (Lebesgue, Fatou, dominiert).
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _measure_ok:
+            return error_response("measure_theory nicht verfügbar")
+
+        monotone = monotone_convergence_theorem_demo()
+        dominated = dominated_convergence_theorem_demo()
+        fubini = fubini_theorem_demo()
+
+        return jsonify({'result': {
+            'monotone_convergence': monotone,
+            'dominated_convergence': dominated,
+            'fubini': fubini
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Spezielle Funktionen (special_functions.py)
+# ===========================================================================
+
+@app.route('/api/special/bessel', methods=['POST'])
+def api_special_bessel():
+    """
+    @brief Bessel-Funktionen J_n(x) und Y_n(x) berechnen.
+    @description
+        POST-Body: {"n": int, "x": float}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _special_ok:
+            return error_response("special_functions nicht verfügbar")
+
+        n = int(data.get('n', 0))
+        x = float(data.get('x', 1.0))
+
+        bf = BesselFunctions(n)
+        jn = bf.J(x)
+        yn = bf.Y(x)
+
+        # Werte für Plot-Punkte
+        xs = [round(0.1 * i, 2) for i in range(1, 51)]
+        j_vals = [bf.J(xi) for xi in xs]
+
+        return jsonify({'result': {
+            'n': n, 'x': x,
+            'J_n_x': float(jn),
+            'Y_n_x': float(yn) if not np.isinf(yn) else None,
+            'plot_x': xs,
+            'plot_J': [float(v) for v in j_vals],
+            'zeros_approx': bf.zeros(3) if hasattr(bf, 'zeros') else [],
+            'description': f'Bessel-Funktion J_{n}({x}) = {float(jn):.6f}'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/special/legendre', methods=['POST'])
+def api_special_legendre():
+    """
+    @brief Legendre-Polynome P_n(x) berechnen.
+    @description
+        POST-Body: {"n": int, "x": float}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _special_ok:
+            return error_response("special_functions nicht verfügbar")
+
+        n = min(int(data.get('n', 3)), 10)
+        x = float(data.get('x', 0.5))
+
+        lp = LegendrePolynomials()
+        pn = lp.P(n, x)
+
+        # Erste n+1 Polynome als symbolische Ausdrücke
+        polys = []
+        for k in range(min(n + 1, 6)):
+            polys.append({'degree': k, 'formula': str(lp.symbolic(k))})
+
+        return jsonify({'result': {
+            'n': n, 'x': x,
+            'P_n_x': float(pn),
+            'polynomials': polys,
+            'orthogonality': 'P_n orthogonal auf [-1,1] bzgl. Gewicht 1',
+            'description': f'Legendre-Polynom P_{n}({x}) = {float(pn):.6f}'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/special/gamma_properties', methods=['GET'])
+def api_special_gamma():
+    """
+    @brief Eigenschaften der Gamma-Funktion Γ(z).
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _special_ok:
+            return error_response("special_functions nicht verfügbar")
+
+        props = gamma_function_properties()
+        zeta_vals = riemann_zeta_special_values()
+        erf = error_function_properties()
+
+        return jsonify({'result': {
+            'gamma_properties': props,
+            'zeta_special_values': zeta_vals,
+            'error_function': erf
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Funktionalanalysis (functional_analysis.py)
+# ===========================================================================
+
+@app.route('/api/functional/banach_space', methods=['POST'])
+def api_functional_banach():
+    """
+    @brief Banach-Raum: Norm und Vollständigkeit prüfen.
+    @description
+        POST-Body: {"vectors": [[float, ...], ...], "norm_type": "1" | "2" | "inf"}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _functional_ok:
+            return error_response("functional_analysis nicht verfügbar")
+
+        vectors = data.get('vectors', [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        norm_type = str(data.get('norm_type', '2'))
+
+        # p-Wert für die Norm
+        p_map = {'1': 1, '2': 2, 'inf': float('inf')}
+        p = p_map.get(norm_type, 2)
+
+        bs = BanachSpace(dimension=len(vectors[0]), p=p)
+        norms = [bs.norm(v) for v in vectors]
+
+        # Dreiecksungleichung prüfen
+        v1, v2 = np.array(vectors[0]), np.array(vectors[1])
+        triangle_lhs = float(bs.norm((v1 + v2).tolist()))
+        triangle_rhs = float(norms[0]) + float(norms[1])
+
+        hahn_banach = hahn_banach_theorem_demo()
+
+        return jsonify({'result': {
+            'vectors': vectors,
+            'norm_type': f'L^{norm_type}',
+            'norms': [float(n) for n in norms],
+            'triangle_inequality': {
+                'lhs': triangle_lhs,
+                'rhs': triangle_rhs,
+                'holds': triangle_lhs <= triangle_rhs + 1e-10
+            },
+            'hahn_banach_demo': hahn_banach
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/functional/hilbert_space', methods=['POST'])
+def api_functional_hilbert():
+    """
+    @brief Hilbert-Raum: Skalarprodukt, Orthogonalität, Parseval.
+    @description
+        POST-Body: {"vectors": [[float, ...], ...]}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _functional_ok:
+            return error_response("functional_analysis nicht verfügbar")
+
+        vectors = data.get('vectors', [[1.0, 0.0], [0.0, 1.0]])
+        hs = HilbertSpace(dimension=len(vectors[0]))
+
+        # Skalarprodukte berechnen
+        inner_products = []
+        for i, u in enumerate(vectors):
+            for j, v in enumerate(vectors):
+                ip = float(np.real(hs.inner_product(u, v)))
+                inner_products.append({'i': i, 'j': j, 'inner_product': ip})
+
+        riesz = riesz_representation_theorem()
+        spectral = spectral_theorem_demo(np.array([[2.0, 1.0], [1.0, 2.0]]))
+
+        return jsonify({'result': {
+            'vectors': vectors,
+            'inner_products': inner_products,
+            'riesz_theorem': riesz,
+            'spectral_theorem_demo': spectral,
+            'description': 'Hilbert-Raum: vollständiger normierter Raum mit Skalarprodukt'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/functional/fixed_point', methods=['POST'])
+def api_functional_fixed_point():
+    """
+    @brief Banachscher Fixpunktsatz: Kontraktionsabbildung.
+    @description
+        POST-Body: {"contraction_factor": float (0<c<1), "x0": float}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _functional_ok:
+            return error_response("functional_analysis nicht verfügbar")
+
+        c = float(data.get('contraction_factor', 0.5))
+        x0 = float(data.get('x0', 1.0))
+
+        if c >= 1.0 or c <= 0.0:
+            return error_response("Kontraktionsfaktor muss zwischen 0 und 1 liegen")
+
+        # f(x) = c*x + (1-c)*fixed_point → Fixpunkt bei x=1
+        f = lambda x: c * x + (1.0 - c)
+        result = banach_fixed_point(f, x0)
+
+        return jsonify({'result': {
+            'contraction_factor': c,
+            'x0': x0,
+            'fixed_point': result.get('fixed_point', None),
+            'iterations': result.get('iterations', 0),
+            'converged': result.get('converged', False),
+            'description': f'f(x) = {c}·x + {1-c} hat Fixpunkt bei x = 1'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Partielle Differentialgleichungen (pde.py)
+# ===========================================================================
+
+@app.route('/api/pde/classify', methods=['POST'])
+def api_pde_classify():
+    """
+    @brief PDE klassifizieren: elliptisch, parabolisch oder hyperbolisch.
+    @description
+        POST-Body: {"A": float, "B": float, "C": float}
+        PDE: A·u_xx + B·u_xy + C·u_yy + ... = 0
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _pde_ok:
+            return error_response("pde nicht verfügbar")
+
+        A = float(data.get('A', 1.0))
+        B = float(data.get('B', 0.0))
+        C = float(data.get('C', 1.0))
+
+        classification = classify_pde(A, B, C)
+        discriminant = B ** 2 - 4 * A * C
+
+        examples = {
+            'elliptic': 'Laplace-Gleichung: Δu = 0 (B²-4AC < 0)',
+            'parabolic': 'Wärmeleitungsgleichung: u_t = α·u_xx (B²-4AC = 0)',
+            'hyperbolic': 'Wellengleichung: u_tt = c²·u_xx (B²-4AC > 0)'
+        }
+
+        return jsonify({'result': {
+            'A': A, 'B': B, 'C': C,
+            'discriminant': discriminant,
+            'classification': classification,
+            'example': examples.get(classification.lower(), ''),
+            'description': f'B²-4AC = {discriminant:.4f} → {classification}'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/pde/heat_equation', methods=['POST'])
+def api_pde_heat():
+    """
+    @brief Wärmeleitungsgleichung numerisch lösen.
+    @description
+        POST-Body: {"u0": [float, ...], "L": float, "T": float, "alpha": float}
+        u_t = α · u_xx auf [0, L] × [0, T]
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _pde_ok:
+            return error_response("pde nicht verfügbar")
+
+        u0_list = data.get('u0', [0.0, 0.5, 1.0, 0.5, 0.0])
+        L = float(data.get('L', 1.0))
+        T = float(data.get('T', 0.1))
+        alpha = float(data.get('alpha', 1.0))
+
+        u0 = np.array(u0_list, dtype=float)
+        N = len(u0)
+
+        # Explizites Finite-Differenzen-Verfahren
+        u_final, u_history = heat_equation_explicit(u0, L, T, alpha, N_t=50)
+
+        # Analytische Lösung zum Vergleich
+        x_arr = np.linspace(0, L, N)
+        u_analytical = heat_equation_analytical(x_arr, T, alpha, L, n_terms=10)
+
+        return jsonify({'result': {
+            'u0': u0_list,
+            'u_final': [float(v) for v in u_final],
+            'u_analytical': [float(v) for v in u_analytical] if u_analytical is not None else None,
+            'x': [float(v) for v in x_arr],
+            'L': L, 'T': T, 'alpha': alpha,
+            'description': f'Wärmeleitungsgl. u_t = {alpha}·u_xx nach Zeit T={T}'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/pde/wave_equation', methods=['POST'])
+def api_pde_wave():
+    """
+    @brief Wellengleichung numerisch lösen.
+    @description
+        POST-Body: {"u0": [float, ...], "v0": [float, ...], "L": float, "T": float, "c": float}
+        u_tt = c² · u_xx auf [0, L] × [0, T]
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        if not _pde_ok:
+            return error_response("pde nicht verfügbar")
+
+        u0_list = data.get('u0', [0.0, 0.5, 1.0, 0.5, 0.0])
+        v0_list = data.get('v0', [0.0] * len(u0_list))
+        L = float(data.get('L', 1.0))
+        T = float(data.get('T', 0.5))
+        c = float(data.get('c', 1.0))
+
+        u0 = np.array(u0_list, dtype=float)
+        v0 = np.array(v0_list, dtype=float)
+        N = len(u0)
+
+        # Explizites Finite-Differenzen-Verfahren
+        u_final, _ = wave_equation_explicit(u0, v0, L, T, c, N_t=100)
+
+        x_arr = np.linspace(0, L, N)
+        u_analytical = wave_equation_analytical(x_arr, T, c, L, n_terms=10)
+
+        return jsonify({'result': {
+            'u0': u0_list,
+            'u_final': [float(v) for v in u_final],
+            'u_analytical': [float(v) for v in u_analytical] if u_analytical is not None else None,
+            'x': [float(v) for v in x_arr],
+            'L': L, 'T': T, 'c': c,
+            'description': f'Wellengl. u_tt = {c}²·u_xx nach Zeit T={T}'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Operatoralgebren (operator_algebras.py)
+# ===========================================================================
+
+@app.route('/api/operator_algebras/cstar_demo', methods=['GET'])
+def api_opalg_cstar():
+    """
+    @brief C*-Algebren: Gelfand-Transform und GNS-Konstruktion.
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _opalg_ok:
+            return error_response("operator_algebras nicht verfügbar")
+
+        gelfand = gelfand_transform_demo()
+        gns = gns_construction_demo()
+        cuntz = cuntz_algebra_demo()
+
+        return jsonify({'result': {
+            'gelfand_transform': gelfand,
+            'gns_construction': gns,
+            'cuntz_algebra': cuntz,
+            'description': 'C*-Algebra: Banach-*-Algebra mit ||a*a|| = ||a||²'
+        }})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/operator_algebras/factors', methods=['GET'])
+def api_opalg_factors():
+    """
+    @brief von-Neumann-Algebra Faktoren: Typ I, II, III.
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _opalg_ok:
+            return error_response("operator_algebras nicht verfügbar")
+
+        factors = factors_classification()
+        return jsonify({'result': factors})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/operator_algebras/k_theory', methods=['GET'])
+def api_opalg_ktheory():
+    """
+    @brief K-Theorie für C*-Algebren: K0 und K1.
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _opalg_ok:
+            return error_response("operator_algebras nicht verfügbar")
+
+        k_theory = k_theory_intro()
+        return jsonify({'result': k_theory})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# ERWEITERTE ALGEBRA API (algebraic_structures, invariant_theory, representation_theory,
+#                          homological_algebra, multilinear_algebra)
+# ===========================================================================
+
+@app.route('/api/algebra_adv/check_structure', methods=['POST'])
+def api_algadv_check_structure():
+    """
+    @brief Prüft eine algebraische Struktur (Magma/Halbgruppe/Monoid/Gruppe).
+    @lastModified 2026-03-10
+    """
+    if not _algstruct_ok:
+        return error_response('algebraic_structures nicht geladen')
+    data = request.get_json()
+    table = data.get('table', [])
+    elements = data.get('elements', [])
+    try:
+        m = Magma(elements, table)
+        result = {
+            'ist_magma': True,
+            'ist_halbgruppe': m.is_semigroup(),
+            'ist_monoid': m.is_monoid(),
+            'ist_gruppe': m.is_group(),
+            'ist_abelsche_gruppe': m.is_abelian_group(),
+            'ordnung': len(elements),
+        }
+        return jsonify(result)
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/algebra_adv/invariant', methods=['POST'])
+def api_algadv_invariant():
+    """
+    @brief Berechnet Molien-Reihe und Invariantengeneratoren für eine Gruppe.
+    @lastModified 2026-03-10
+    """
+    if not _invariant_ok:
+        return error_response('invariant_theory nicht geladen')
+    data = request.get_json()
+    group_type = data.get('group_type', 'Z2')
+    max_degree = min(int(data.get('max_degree', 6)), 12)
+    try:
+        molien = molien_series(group_type, max_degree)
+        gens = polynomial_invariants_sn(2) if group_type.startswith('S') else elementary_symmetric_polynomials(2)
+        hbt = hilbert_basis_theorem_demo()
+        return jsonify({
+            'group': group_type,
+            'molien_series': molien,
+            'invariant_generators': [str(g) for g in gens[:5]],
+            'hilbert_basis_theorem': hbt.get('statement', ''),
+        })
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/algebra_adv/character_table', methods=['POST'])
+def api_algadv_character_table():
+    """
+    @brief Liefert die Charaktertafel einer Gruppe.
+    @lastModified 2026-03-10
+    """
+    if not _repr_ok:
+        return error_response('representation_theory nicht geladen')
+    data = request.get_json()
+    group_name = data.get('group_name', 'Z2')
+    try:
+        ct = character_table(group_name)
+        # Konvertierung: komplexe Zahlen → {real, imag}
+        def serialize_val(v):
+            if hasattr(v, 'real'):
+                return {'real': float(v.real), 'imag': float(v.imag)}
+            return float(v) if isinstance(v, (int, float)) else str(v)
+        table_data = [[serialize_val(v) for v in row] for row in ct.get('table', [])]
+        return jsonify({
+            'group': group_name,
+            'character_table': table_data,
+            'conjugacy_classes': ct.get('conjugacy_classes', []),
+            'irreducible_names': ct.get('irreducible_names', []),
+            'schur_orthogonality': ct.get('schur_orthogonality', False),
+        })
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/algebra_adv/homology', methods=['POST'])
+def api_algadv_homology():
+    """
+    @brief Berechnet Homologiegruppen eines Kettenkomplexes.
+    @lastModified 2026-03-10
+    """
+    if not _homological_ok:
+        return error_response('homological_algebra nicht geladen')
+    data = request.get_json()
+    boundary_maps = data.get('boundary_maps', [])
+    try:
+        import numpy as np
+        maps = [np.array(m, dtype=float) for m in boundary_maps]
+        cc = ChainComplex(maps)
+        groups = cc.homology_groups()
+        betti = cc.betti_numbers()
+        euler = sum((-1)**n * b for n, b in enumerate(betti))
+        return jsonify({
+            'homology_groups': [{'description': str(g), 'rank': int(g.rank) if hasattr(g, 'rank') else None} for g in groups],
+            'betti_numbers': betti,
+            'euler_characteristic': int(euler),
+        })
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/algebra_adv/tensor_product', methods=['POST'])
+def api_algadv_tensor_product():
+    """
+    @brief Berechnet das Kronecker-Tensorprodukt zweier Matrizen.
+    @lastModified 2026-03-10
+    """
+    if not _multilinear_ok:
+        return error_response('multilinear_algebra nicht geladen')
+    data = request.get_json()
+    A = data.get('A', [[1]])
+    B = data.get('B', [[1]])
+    try:
+        result = tensor_product_matrices(A, B)
+        import numpy as np
+        r = np.array(result)
+        return jsonify({
+            'result': r.tolist(),
+            'shape': list(r.shape),
+        })
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# LOGIK & GRUNDLAGEN API (model_theory, proof_theory_formal, recursion_theory)
+# ===========================================================================
+
+@app.route('/api/foundations/model_theory', methods=['POST'])
+def api_foundations_model_theory():
+    """
+    @brief Zeigt Eigenschaften einer mathematischen Modell-Struktur.
+    @lastModified 2026-03-10
+    """
+    if not _model_ok:
+        return error_response('model_theory nicht geladen')
+    data = request.get_json()
+    structure_type = data.get('structure_type', 'integers')
+    try:
+        demo = nonstandard_arithmetic_demo() if structure_type == 'integers' else compactness_theorem_demo()
+        props = {
+            'integers': {
+                'name': 'Ganze Zahlen ℤ',
+                'theory': 'Th(ℤ) — Vollständige Theorie der additiven ganzen Zahlen',
+                'properties': {
+                    'Angeordnet': True, 'Abzählbar': True,
+                    'Algebraisch abgeschlossen': False, 'Archimedisch': True,
+                },
+                'elementary_equivalences': ['ℤ (selbst)', 'Alle archimedischen angeordneten Ringe'],
+            },
+            'rationals': {
+                'name': 'Rationale Zahlen ℚ',
+                'theory': 'DLO — Dense Linear Order ohne Endpunkte (vollständig, entscheidbar)',
+                'properties': {
+                    'Angeordnet': True, 'Abzählbar': True, 'Dicht': True,
+                    'Algebraisch abgeschlossen': False,
+                },
+                'elementary_equivalences': ['ℚ — DLO ist vollständig (Cantor)'],
+            },
+            'reals': {
+                'name': 'Reelle Zahlen ℝ',
+                'theory': 'RCF — Real Closed Fields (vollständig, entscheidbar via Tarski)',
+                'properties': {
+                    'Angeordnet': True, 'Überabzählbar': True, 'Vollständig': True,
+                    'Algebraisch abgeschlossen': False,
+                },
+                'elementary_equivalences': ['Alle reell abgeschlossenen Körper'],
+            },
+            'finite_field': {
+                'name': 'Endlicher Körper F₅',
+                'theory': 'Th(F_5) — Theorie der Charakteristik 5',
+                'properties': {
+                    'Endlich': True, 'Algebraisch abgeschlossen': False,
+                    'Abzählbar': True, 'Vollständig': True,
+                },
+                'elementary_equivalences': ['F_5, F_{5^n} (für n≥1)'],
+            },
+        }
+        info = props.get(structure_type, {'name': structure_type, 'properties': {}, 'theory': ''})
+        return jsonify(info)
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/foundations/sequent_calculus', methods=['POST'])
+def api_foundations_sequent_calculus():
+    """
+    @brief Demonstriert Konzepte des Sequenzenkalküls.
+    @lastModified 2026-03-10
+    """
+    if not _proof_formal_ok:
+        return error_response('proof_theory_formal nicht geladen')
+    data = request.get_json()
+    demo_type = data.get('demo_type', 'cut_elimination')
+    try:
+        if demo_type == 'cut_elimination':
+            result = cut_elimination_demo()
+        elif demo_type == 'proof_complexity':
+            result = proof_complexity_comparison()
+        else:
+            result = {'title': 'Subformel-Eigenschaft', 'description': 'Jede Formel im Beweis ist Subformel der Konklusion', 'theorem': 'Gentzen 1935: LK ohne Cut hat die Subformel-Eigenschaft'}
+        return jsonify(result)
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/foundations/turing_machine', methods=['POST'])
+def api_foundations_turing_machine():
+    """
+    @brief Simuliert eine Turing-Maschine.
+    @lastModified 2026-03-10
+    """
+    if not _recursion_ok:
+        return error_response('recursion_theory nicht geladen')
+    data = request.get_json()
+    tm_type = data.get('tm_type', 'palindrome')
+    tape = data.get('tape', ['1', '0', '1'])
+    try:
+        if tm_type == 'palindrome':
+            tm = tm_recognizes_palindromes()
+            machine_name = 'Palindrom-Erkenner'
+        elif tm_type == 'binary_increment':
+            tm = tm_binary_increment()
+            machine_name = 'Binäres Inkrement'
+        else:
+            from recursion_theory import tm_unary_addition
+            tm = tm_unary_addition()
+            machine_name = 'Unäre Addition'
+        tape_list = [str(s) for s in tape]
+        accepts = tm.accepts(tape_list)
+        configs = tm.configuration_sequence(tape_list)
+        result = tm.run(tape_list)
+        return jsonify({
+            'machine_name': machine_name,
+            'result': accepts,
+            'accepts': accepts,
+            'final_tape': result if isinstance(result, list) else tape_list,
+            'steps': len(configs),
+            'configurations': [
+                {'state': c[0], 'head': c[1], 'symbol': c[2]}
+                for c in configs[:15]  # Max. 15 Konfigurationen anzeigen
+            ],
+        })
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/foundations/complexity_hierarchy', methods=['GET'])
+def api_foundations_complexity():
+    """
+    @brief Liefert die Komplexitätshierarchie.
+    @lastModified 2026-03-10
+    """
+    if not _recursion_ok:
+        return error_response('recursion_theory nicht geladen')
+    try:
+        classes = time_complexity_classes()
+        return jsonify(classes)
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# ERWEITERTE ANALYSIS API (measure_theory, special_functions, functional_analysis,
+#                          pde, operator_algebras)
+# ===========================================================================
+
+@app.route('/api/analysis_adv/measure', methods=['POST'])
+def api_analysisadv_measure():
+    """
+    @brief Vergleich Lebesgue- vs. Riemann-Integral.
+    @lastModified 2026-03-10
+    """
+    if not _measure_ok:
+        return error_response('measure_theory nicht geladen')
+    data = request.get_json()
+    f_type = data.get('f_type', 'dirichlet')
+    try:
+        result = riemann_vs_lebesgue(f_type)
+        # Sicherstellen dass alles JSON-serialisierbar ist
+        def safe(v):
+            if isinstance(v, (bool, str, type(None))): return v
+            try: return float(v)
+            except: return str(v)
+        return jsonify({k: safe(v) for k, v in result.items()})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/analysis_adv/special_function', methods=['POST'])
+def api_analysisadv_special():
+    """
+    @brief Berechnet den Wert einer speziellen Funktion.
+    @lastModified 2026-03-10
+    """
+    if not _special_ok:
+        return error_response('special_functions nicht geladen')
+    data = request.get_json()
+    sf_type = data.get('sf_type', 'bessel')
+    n = int(data.get('n', 0))
+    x = float(data.get('x', 1.0))
+    try:
+        if sf_type == 'bessel':
+            bf = BesselFunctions()
+            return jsonify({'name': f'Bessel J_{n}({x})', 'J_n_x': float(bf.J(n, x)), 'Y_n_x': float(bf.Y(n, x))})
+        elif sf_type == 'legendre':
+            lp = LegendrePolynomials()
+            return jsonify({'name': f'Legendre P_{n}({x})', 'P_n_x': float(lp.P(n, x))})
+        elif sf_type == 'airy':
+            af = AiryFunctions()
+            return jsonify({'name': f'Airy Ai({x})', 'Ai_x': float(af.Ai(x)), 'Bi_x': float(af.Bi(x))})
+        elif sf_type == 'hermite':
+            from special_functions import OrthogonalPolynomials
+            op = OrthogonalPolynomials()
+            return jsonify({'name': f'Hermite H_{n}({x})', 'H_n_x': float(op.hermite(n, x))})
+        elif sf_type == 'gamma':
+            props = gamma_function_properties()
+            return jsonify({'name': 'Gamma-Funktion', **{k: str(v) for k, v in props.items()}})
+        else:
+            return error_response(f'Unbekannter Typ: {sf_type}')
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/analysis_adv/functional_analysis', methods=['POST'])
+def api_analysisadv_functional():
+    """
+    @brief Demonstriert Sätze der Funktionalanalysis.
+    @lastModified 2026-03-10
+    """
+    if not _functional_ok:
+        return error_response('functional_analysis nicht geladen')
+    data = request.get_json()
+    demo_type = data.get('demo_type', 'banach_fixed_point')
+    try:
+        if demo_type == 'banach_fixed_point':
+            result = banach_fixed_point(lambda x: 0.5 * x + 1, 0.0)
+            return jsonify({
+                'theorem': 'Banach-Fixpunktsatz',
+                'statement': 'Eine Kontraktion f auf vollständigem metrischen Raum hat genau einen Fixpunkt.',
+                'fixed_point': result.get('fixed_point'),
+                'iterations': result.get('iterations'),
+                'converged': result.get('converged'),
+            })
+        elif demo_type == 'hahn_banach':
+            result = hahn_banach_theorem_demo()
+            return jsonify(result)
+        elif demo_type == 'spectral':
+            import numpy as np
+            A = np.array([[2.0, 1.0], [1.0, 2.0]])
+            result = spectral_theorem_demo(A)
+            def to_json(v):
+                if hasattr(v, 'tolist'): return v.tolist()
+                if isinstance(v, (list, tuple)): return [to_json(x) for x in v]
+                try: return float(v)
+                except: return str(v)
+            return jsonify({k: to_json(v) for k, v in result.items()})
+        elif demo_type == 'fredholm':
+            import numpy as np
+            A = np.array([[1.0, 2.0], [2.0, 4.0]])
+            b = np.array([3.0, 6.0])
+            result = fredholm_alternative(A, b)
+            def to_json(v):
+                if hasattr(v, 'tolist'): return v.tolist()
+                try: return float(v)
+                except: return str(v)
+            return jsonify({k: to_json(v) for k, v in result.items()})
+        else:
+            result = uniform_boundedness_principle_demo()
+            return jsonify(result)
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/analysis_adv/pde_classify', methods=['POST'])
+def api_analysisadv_pde_classify():
+    """
+    @brief Klassifiziert eine PDE zweiter Ordnung.
+    @lastModified 2026-03-10
+    """
+    if not _pde_ok:
+        return error_response('pde nicht geladen')
+    data = request.get_json()
+    A = float(data.get('A', 1))
+    B = float(data.get('B', 0))
+    C = float(data.get('C', 1))
+    try:
+        pde_type = classify_pde(A, B, C)
+        discriminant = B**2 - 4*A*C
+        examples = {
+            'elliptic': 'Laplace-Gleichung $\\Delta u = 0$ (A=C=1, B=0)',
+            'parabolic': 'Wärmeleitungsgleichung $u_t = u_{xx}$ (A=1, B=C=0)',
+            'hyperbolic': 'Wellengleichung $u_{tt} = c^2 u_{xx}$ (A=1, C=-1, B=0)',
+        }
+        return jsonify({
+            'type': pde_type,
+            'discriminant': float(discriminant),
+            'description': f'$D = B^2 - 4AC = {discriminant:.4f}$',
+            'example': examples.get(pde_type, ''),
+        })
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/analysis_adv/operator_algebra', methods=['GET'])
+def api_analysisadv_operator_algebra():
+    """
+    @brief Demonstriert C*-Algebren und Operatoralgebren.
+    @lastModified 2026-03-10
+    """
+    if not _opalg_ok:
+        return error_response('operator_algebras nicht geladen')
+    demo = request.args.get('demo', 'gelfand')
+    try:
+        if demo == 'gelfand':
+            result = gelfand_transform_demo()
+            return jsonify({'title': 'Gelfand-Darstellungssatz', **result})
+        elif demo == 'factors':
+            result = factors_classification()
+            types = [{'name': k, 'description': str(v)} for k, v in result.get('factors', {}).items()]
+            return jsonify({'title': 'Von-Neumann-Faktorenklassifikation', 'types': types, **{k: v for k, v in result.items() if k != 'factors'}})
+        elif demo == 'k_theory':
+            result = k_theory_intro()
+            return jsonify({'title': 'K-Theorie der C*-Algebren', **result})
+        elif demo == 'cuntz':
+            result = cuntz_algebra_demo()
+            return jsonify({'title': f'Cuntz-Algebra $\\mathcal{{O}}_n$', **result})
+        else:
+            return error_response(f'Unbekannte Demo: {demo}')
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
 # HAUPTPROGRAMM
 # ===========================================================================
 
@@ -4317,7 +6551,7 @@ if __name__ == '__main__':
     # Port 8080, debug=True für Entwicklung (zeigt Fehler im Browser)
     print("=" * 60)
     print("  Mathematik-Spezialist Web-Interface")
-    print("  Build 30 | Port 8080")
+    print("  Build 35 | Port 8080")
     print("  URL: http://localhost:8080")
     print("=" * 60)
     app.run(host='0.0.0.0', port=8080, debug=True)

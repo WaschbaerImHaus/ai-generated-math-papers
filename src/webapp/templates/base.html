@@ -117,7 +117,7 @@
         <!-- === Gruppe: Grundlagen === -->
         <div class="nav-group">
             <input type="checkbox" id="nav-grundlagen"
-                {% if request.path in ['/', '/proofs', '/steps', '/logic', '/set_theory'] %}checked{% endif %}>
+                {% if request.path in ['/', '/proofs', '/steps', '/logic', '/set_theory', '/logic_foundations'] %}checked{% endif %}>
             <label class="nav-group-label" for="nav-grundlagen">Grundlagen</label>
             <div class="nav-group-content">
                 <ul class="nav-list">
@@ -136,6 +136,9 @@
                     <li><a href="/set_theory" class="nav-link {% if request.path == '/set_theory' %}active{% endif %}">
                         &#8712; Mengenlehre
                     </a></li>
+                    <li><a href="/logic_foundations" class="nav-link {% if request.path == '/logic_foundations' %}active{% endif %}">
+                        &#8718; Logik &amp; Grundlagen
+                    </a></li>
                 </ul>
             </div>
         </div>
@@ -143,7 +146,7 @@
         <!-- === Gruppe: Algebra === -->
         <div class="nav-group">
             <input type="checkbox" id="nav-algebra"
-                {% if request.path in ['/algebra', '/linear_algebra', '/group_theory', '/ring_theory', '/galois_theory', '/modules_algebra'] %}checked{% endif %}>
+                {% if request.path in ['/algebra', '/linear_algebra', '/group_theory', '/ring_theory', '/galois_theory', '/modules_algebra', '/algebra_advanced'] %}checked{% endif %}>
             <label class="nav-group-label" for="nav-algebra">Algebra</label>
             <div class="nav-group-content">
                 <ul class="nav-list">
@@ -165,6 +168,9 @@
                     <li><a href="/modules_algebra" class="nav-link {% if '/modules_algebra' in request.path %}active{% endif %}">
                         M Moduln &amp; Komm. Algebra
                     </a></li>
+                    <li><a href="/algebra_advanced" class="nav-link {% if request.path == '/algebra_advanced' %}active{% endif %}">
+                        &#8734; Erweiterte Algebra
+                    </a></li>
                 </ul>
             </div>
         </div>
@@ -172,7 +178,7 @@
         <!-- === Gruppe: Analysis & Differentialgleichungen === -->
         <div class="nav-group">
             <input type="checkbox" id="nav-analysis"
-                {% if request.path in ['/analysis', '/ode', '/complex', '/fourier'] %}checked{% endif %}>
+                {% if request.path in ['/analysis', '/ode', '/complex', '/fourier', '/analysis_advanced'] %}checked{% endif %}>
             <label class="nav-group-label" for="nav-analysis">Analysis &amp; Differentialgl.</label>
             <div class="nav-group-content">
                 <ul class="nav-list">
@@ -187,6 +193,9 @@
                     </a></li>
                     <li><a href="/fourier" class="nav-link {% if '/fourier' in request.path %}active{% endif %}">
                         &#8767; Fourier-Analysis
+                    </a></li>
+                    <li><a href="/analysis_advanced" class="nav-link {% if request.path == '/analysis_advanced' %}active{% endif %}">
+                        &#8706; Erweiterte Analysis
                     </a></li>
                 </ul>
             </div>

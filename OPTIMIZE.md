@@ -97,3 +97,11 @@ Letzte Aktualisierung: 2026-03-10 (Build 15)
 4. Geodäten-Visualisierung (zeigt tensor_geometry.py in Aktion)
 5. Bisection/Newton Hybridmethode (numerische Verbesserung)
 6. mpmath Arbitrary Precision (für Millennium-Problem-Recherche wichtig)
+
+### Neue Ideen (Build 34, 2026-03-10)
+- [ ] **PDE-Visualisierung**: Wärme-/Wellengleichung als Animation (matplotlib.animation) direkt in Webapp
+- [ ] **Funktionalanalysis-Interaktiv**: Spektrum einer Matrix in Webapp interaktiv zeigen (Eigenwerte als Punkte in komplexer Ebene)
+- [ ] **Operator-Algebren C*-Visualisierung**: Gelfand-Spektrum als Kreis in der Webapp darstellen
+- [ ] **Test-Parallelisierung**: pytest-xdist für parallele Test-Ausführung (bei 4371 Tests 4x schneller möglich)
+- [ ] **Maßtheorie-Visualisierung**: Cantor-Mengen-Konstruktion als interaktives SVG (Stufen 0-8)
+- [ ] **Spezielle Funktionen Galerie**: Alle Bessel-Funktionen J_0..J_5 und Legendre P_0..P_5 als Plots in einer Galerie-Seite

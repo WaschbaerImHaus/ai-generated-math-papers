@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+{% block title %}Erweiterte Algebra – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file algebra_advanced.html
+    @brief Erweiterte Algebra: Darstellungstheorie, Verbandstheorie, Algebraische Strukturen,
+           Invariantentheorie, Universelle Algebra, Homologische Algebra, Multilineare Algebra.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+<div class="page-header">
+    <h1>Erweiterte Algebra</h1>
+    <p class="page-desc">
+        Die moderne Algebra umfasst weit mehr als Gruppen und Ringe. Hier finden sich
+        Darstellungstheorie (wie Gruppen auf Vektorräumen wirken), Verbandstheorie
+        (geordnete Mengen), Invariantentheorie (symmetrische Strukturen unter Gruppenoperationen),
+        Homologische Algebra (Kettenkomplexe, Homologiegruppen) und Universelle Algebra.
+    </p>
+</div>
+
+<!-- === Sektion 1: Algebraische Strukturen (Magma → Gruppe) === -->
+<div class="card">
+    <h2>Algebraische Strukturen: Magma → Gruppe</h2>
+    <p>
+        Die algebraische Hierarchie: Magma → Halbgruppe → Monoid → Gruppe → Abel'sche Gruppe.
+        Jede Stufe fügt weitere Axiome hinzu.
+    </p>
+    <ul style="margin:8px 0 12px 20px; line-height:1.8;">
+        <li><strong>Magma:</strong> $(M, \cdot)$ mit abgeschlossener Operation</li>
+        <li><strong>Halbgruppe:</strong> + Assoziativität $a(bc)=(ab)c$</li>
+        <li><strong>Monoid:</strong> + neutrales Element $ea=ae=a$</li>
+        <li><strong>Gruppe:</strong> + Inverse $a\cdot a^{-1}=e$</li>
+    </ul>
+    <div class="input-row">
+        <label for="struct-table">Verknüpfungstafel (JSON, z.B. [[0,1],[1,0]]):</label>
+        <input type="text" id="struct-table" class="input-field" value="[[0,1],[1,0]]" style="width:300px;">
+    </div>
+    <div class="input-row">
+        <label for="struct-elements">Elemente (kommagetrennt):</label>
+        <input type="text" id="struct-elements" class="input-field" value="e,a" style="width:150px;">
+    </div>
+    <button class="btn" onclick="checkAlgStruct()">Struktur prüfen</button>
+    <div id="struct-result" class="result-area"></div>
+</div>
+
+<!-- === Sektion 2: Invariantentheorie === -->
+<div class="card">
+    <h2>Invariantentheorie</h2>
+    <p>
+        Die Invariantentheorie untersucht Polynome, die unter Gruppenoperationen invariant sind.
+        Der <em>Reynolds-Operator</em> $\mathcal{R}[f] = \frac{1}{|G|}\sum_{g\in G} g\cdot f$
+        projiziert ein Polynom auf den Invariantenunterraum.
+    </p>
+    <p>
+        Die <em>Molien-Reihe</em> $M(t) = \frac{1}{|G|}\sum_{g\in G}\frac{1}{\det(I-tg)}$
+        gibt die Dimension der Invariantenräume jedes Grades als erzeugende Funktion.
+    </p>
+    <div class="input-row">
+        <label for="inv-group">Gruppe:</label>
+        <select id="inv-group" class="input-field">
+            <option value="Z2">Z₂ (Ordnung 2)</option>
+            <option value="Z3">Z₃ (Ordnung 3)</option>
+            <option value="S3">S₃ (Ordnung 6)</option>
+        </select>
+    </div>
+    <div class="input-row">
+        <label for="inv-degree">Max. Grad für Molien-Reihe:</label>
+        <input type="number" id="inv-degree" class="input-field" value="6" min="1" max="12" style="width:80px;">
+    </div>
+    <button class="btn" onclick="calcInvariant()">Invarianten berechnen</button>
+    <div id="inv-result" class="result-area"></div>
+</div>
+
+<!-- === Sektion 3: Darstellungstheorie === -->
+<div class="card">
+    <h2>Darstellungstheorie</h2>
+    <p>
+        Eine <em>Darstellung</em> einer Gruppe $G$ ist ein Homomorphismus $\rho: G \to GL(V)$.
+        Die <em>Charaktertafel</em> enthält die Charaktere $\chi(g) = \text{Tr}(\rho(g))$
+        aller irreduziblen Darstellungen.
+    </p>
+    <p>
+        Schur-Orthogonalitätsrelationen: $\sum_{g\in G} \chi_i(g)\overline{\chi_j(g)} = |G|\delta_{ij}$
+    </p>
+    <div class="input-row">
+        <label for="rep-group">Gruppe:</label>
+        <select id="rep-group" class="input-field">
+            <option value="Z2">Z₂</option>
+            <option value="Z3">Z₃</option>
+            <option value="Z4">Z₄</option>
+            <option value="S3">S₃</option>
+            <option value="D4">D₄</option>
+        </select>
+    </div>
+    <button class="btn" onclick="calcRepresentation()">Charaktertafel berechnen</button>
+    <div id="rep-result" class="result-area"></div>
+</div>
+
+<!-- === Sektion 4: Homologische Algebra === -->
+<div class="card">
+    <h2>Homologische Algebra</h2>
+    <p>
+        Ein <em>Kettenkomplex</em> $(C_\bullet, \partial)$ ist eine Folge von Gruppen
+        $\cdots \to C_2 \xrightarrow{\partial_2} C_1 \xrightarrow{\partial_1} C_0 \to 0$
+        mit $\partial_{n-1}\circ\partial_n = 0$. Die <em>Homologiegruppen</em> sind
+        $H_n = \ker\partial_n / \text{im}\,\partial_{n+1}$.
+    </p>
+    <div class="input-row">
+        <label for="hom-complex">Randoperatoren als Matrizen (JSON-Array von Matrizen):</label>
+        <input type="text" id="hom-complex" class="input-field"
+               value="[[[1,-1,0],[0,1,-1]],[[1],[1],[1]]]" style="width:400px;">
+    </div>
+    <button class="btn" onclick="calcHomology()">Homologie berechnen</button>
+    <div id="hom-result" class="result-area"></div>
+</div>
+
+<!-- === Sektion 5: Multilineare Algebra === -->
+<div class="card">
+    <h2>Multilineare Algebra</h2>
+    <p>
+        Das <em>Tensorprodukt</em> $A \otimes B$ zweier Matrizen ist das Kronecker-Produkt.
+        Die <em>äußere Algebra</em> $\bigwedge V$ enthält Alternierungsprodukte $u\wedge v = -v\wedge u$.
+    </p>
+    <div class="input-row">
+        <label for="tensor-A">Matrix $A$ (JSON, 2D):</label>
+        <input type="text" id="tensor-A" class="input-field" value="[[1,0],[0,1]]" style="width:200px;">
+    </div>
+    <div class="input-row">
+        <label for="tensor-B">Matrix $B$ (JSON, 2D):</label>
+        <input type="text" id="tensor-B" class="input-field" value="[[2,1],[1,2]]" style="width:200px;">
+    </div>
+    <button class="btn" onclick="calcTensorProduct()">Tensorprodukt berechnen</button>
+    <div id="tensor-result" class="result-area"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * @file algebra_advanced.html (scripts)
+ * @brief JavaScript für die Erweiterte-Algebra-Seite.
+ * @author Kurt Ingwer
+ * @date 2026-03-10
+ */
+
+/** Prüft die algebraische Struktur einer Verknüpfungstafel. */
+async function checkAlgStruct() {
+    const resultDiv = document.getElementById('struct-result');
+    const elements = document.getElementById('struct-elements').value.split(',').map(e => e.trim());
+    let table;
+    try {
+        table = JSON.parse(document.getElementById('struct-table').value);
+    } catch(e) {
+        showError(resultDiv, 'Ungültiges JSON für Tafel.'); return;
+    }
+    try {
+        const data = await apiPost('/api/algebra_adv/check_structure', { table, elements });
+        let html = '<table class="data-table"><tbody>';
+        for (const [k, v] of Object.entries(data)) {
+            const icon = v === true ? '&#10003;' : v === false ? '&#10007;' : '';
+            const col = v === true ? '#a6e3a1' : v === false ? '#f38ba8' : 'inherit';
+            html += `<tr><td><strong>${k}</strong></td><td style="color:${col}">${icon} ${JSON.stringify(v)}</td></tr>`;
+        }
+        html += '</tbody></table>';
+        showResult(resultDiv, html);
+    } catch(e) { showError(resultDiv, e.message); }
+}
+
+/** Berechnet Reynolds-Operator und Molien-Reihe für eine Gruppe. */
+async function calcInvariant() {
+    const resultDiv = document.getElementById('inv-result');
+    const group_type = document.getElementById('inv-group').value;
+    const max_degree = parseInt(document.getElementById('inv-degree').value);
+    try {
+        const data = await apiPost('/api/algebra_adv/invariant', { group_type, max_degree });
+        let html = `<h3>Invariantentheorie für ${group_type}</h3>`;
+        if (data.molien_series) {
+            html += '<p><strong>Molien-Reihe (Koeffizienten):</strong></p>';
+            html += '<table class="data-table"><thead><tr><th>Grad</th><th>Dimension</th></tr></thead><tbody>';
+            data.molien_series.forEach((d, i) => {
+                html += `<tr><td>${i}</td><td>${d}</td></tr>`;
+            });
+            html += '</tbody></table>';
+        }
+        if (data.invariant_generators) {
+            html += '<p><strong>Erzeuger der Invariantenalgebra:</strong></p><ul>';
+            data.invariant_generators.forEach(g => { html += `<li><code>${g}</code></li>`; });
+            html += '</ul>';
+        }
+        if (data.hilbert_basis_theorem) {
+            html += `<p style="color:#a6e3a1;">${data.hilbert_basis_theorem}</p>`;
+        }
+        showResult(resultDiv, html);
+    } catch(e) { showError(resultDiv, e.message); }
+}
+
+/** Zeigt die Charaktertafel einer Gruppe. */
+async function calcRepresentation() {
+    const resultDiv = document.getElementById('rep-result');
+    const group_name = document.getElementById('rep-group').value;
+    try {
+        const data = await apiPost('/api/algebra_adv/character_table', { group_name });
+        let html = `<h3>Charaktertafel von ${group_name}</h3>`;
+        if (data.character_table && data.conjugacy_classes && data.irreducible_names) {
+            const classes = data.conjugacy_classes;
+            const names = data.irreducible_names;
+            html += '<table class="data-table"><thead><tr><th>Darst.</th>';
+            classes.forEach(c => { html += `<th>${c}</th>`; });
+            html += '</tr></thead><tbody>';
+            data.character_table.forEach((row, i) => {
+                html += `<tr><td><strong>${names[i] || `χ${i+1}`}</strong></td>`;
+                row.forEach(v => {
+                    const val = typeof v === 'object' ? `${v.real.toFixed(2)}+${v.imag.toFixed(2)}i` : v;
+                    html += `<td>${val}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+        }
+        if (data.schur_orthogonality) {
+            html += `<p style="color:#a6e3a1;">&#10003; Schur-Orthogonalitätsrelationen erfüllt</p>`;
+        }
+        showResult(resultDiv, html);
+    } catch(e) { showError(resultDiv, e.message); }
+}
+
+/** Berechnet die Homologiegruppen eines Kettenkomplexes. */
+async function calcHomology() {
+    const resultDiv = document.getElementById('hom-result');
+    let boundary_maps;
+    try {
+        boundary_maps = JSON.parse(document.getElementById('hom-complex').value);
+    } catch(e) {
+        showError(resultDiv, 'Ungültiges JSON für Randoperatoren.'); return;
+    }
+    try {
+        const data = await apiPost('/api/algebra_adv/homology', { boundary_maps });
+        let html = '<h3>Homologiegruppen</h3>';
+        if (Array.isArray(data.homology_groups)) {
+            html += '<table class="data-table"><thead><tr><th>n</th><th>H_n</th><th>Rang</th></tr></thead><tbody>';
+            data.homology_groups.forEach((h, i) => {
+                html += `<tr><td>$H_{${i}}$</td><td>${h.description || h}</td><td>${h.rank ?? ''}</td></tr>`;
+            });
+            html += '</tbody></table>';
+        }
+        if (data.betti_numbers) {
+            html += '<p><strong>Betti-Zahlen:</strong> ' + data.betti_numbers.join(', ') + '</p>';
+        }
+        if (data.euler_characteristic !== undefined) {
+            html += `<p><strong>Euler-Charakteristik:</strong> $\\chi = ${data.euler_characteristic}$</p>`;
+        }
+        showResult(resultDiv, html);
+    } catch(e) { showError(resultDiv, e.message); }
+}
+
+/** Berechnet das Kronecker-Tensorprodukt zweier Matrizen. */
+async function calcTensorProduct() {
+    const resultDiv = document.getElementById('tensor-result');
+    let A, B;
+    try {
+        A = JSON.parse(document.getElementById('tensor-A').value);
+        B = JSON.parse(document.getElementById('tensor-B').value);
+    } catch(e) {
+        showError(resultDiv, 'Ungültiges JSON für Matrizen.'); return;
+    }
+    try {
+        const data = await apiPost('/api/algebra_adv/tensor_product', { A, B });
+        let html = '<h3>Kronecker-Tensorprodukt $A \\otimes B$</h3>';
+        if (data.result) {
+            html += '<div style="overflow-x:auto;"><table class="data-table">';
+            data.result.forEach(row => {
+                html += '<tr>' + row.map(v => `<td>${typeof v === 'number' ? v.toFixed(3) : v}</td>`).join('') + '</tr>';
+            });
+            html += '</table></div>';
+            html += `<p>Dimensionen: ${data.shape[0]}×${data.shape[1]}</p>`;
+        }
+        showResult(resultDiv, html);
+    } catch(e) { showError(resultDiv, e.message); }
+}
+</script>
+{% endblock %}

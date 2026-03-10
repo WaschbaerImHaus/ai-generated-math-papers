@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% block title %}Logik & Grundlagen – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file logic_foundations.html
+    @brief Modelltheorie, Formale Beweistheorie, Rekursionstheorie.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+<div class="page-header">
+    <h1>Logik &amp; Grundlagen</h1>
+    <p class="page-desc">
+        Die mathematischen Grundlagen umfassen Modelltheorie (Strukturen und Wahrheit),
+        Beweistheorie (formale Beweissysteme: Sequenzenkalkül, natürliches Schließen)
+        und Rekursionstheorie (Turing-Maschinen, Entscheidbarkeit, Komplexität).
+        Gödels Unvollständigkeitssätze verbinden alle drei Gebiete.
+    </p>
+</div>
+
+<!-- === Sektion 1: Modelltheorie === -->
+<div class="card">
+    <h2>Modelltheorie</h2>
+    <p>
+        Die Modelltheorie untersucht die Beziehung zwischen formalen Sprachen und
+        mathematischen Strukturen. Eine <em>Struktur</em> $\mathcal{M} = (M, \sigma)$
+        besteht aus einem Träger $M$ und einer Interpretation $\sigma$ der Symbole.
+    </p>
+    <p>
+        Compactness-Theorem: Wenn jede endliche Teilmenge von $\Gamma$ ein Modell hat,
+        dann hat auch $\Gamma$ ein Modell.
+    </p>
+    <div class="input-row">
+        <label for="model-type">Beispielstruktur:</label>
+        <select id="model-type" class="input-field">
+            <option value="integers">Ganze Zahlen ℤ</option>
+            <option value="rationals">Rationale Zahlen ℚ</option>
+            <option value="reals">Reelle Zahlen ℝ</option>
+            <option value="finite_field">Endlicher Körper F₅</option>
+        </select>
+    </div>
+    <button class="btn" onclick="calcModelTheory()">Modell-Eigenschaften zeigen</button>
+    <div id="model-result" class="result-area"></div>
+</div>
+
+<!-- === Sektion 2: Sequenzenkalkül (LK) === -->
+<div class="card">
+    <h2>Formale Beweistheorie: Sequenzenkalkül LK</h2>
+    <p>
+        Ein <em>Sequenzenkalkül</em> leitet Aussagen in der Form $\Gamma \vdash \Delta$
+        (Prämissenmenge $\Gamma$ führt zu Konklusion $\Delta$) her. Das System LK von
+        Gentzen (1935) hat Regeln für alle logischen Konnektive.
+    </p>
+    <p>
+        <em>Schnittelimination</em> (Hauptsatz): Jeder LK-Beweis kann so umgeformt werden,
+        dass die Schnittregel nicht verwendet wird. Folgerung: <em>Subformel-Eigenschaft</em>.
+    </p>
+    <div class="input-row">
+        <label for="seq-demo">Demo-Typ:</label>
+        <select id="seq-demo" class="input-field">
+            <option value="cut_elimination">Schnittelimination</option>
+            <option value="subformula_property">Subformel-Eigenschaft</option>
+            <option value="proof_complexity">Beweiskomplexität</option>
+        </select>
+    </div>
+    <button class="btn" onclick="calcSequentCalculus()">Demo ausführen</button>
+    <div id="seq-result" class="result-area"></div>
+</div>
+
+<!-- === Sektion 3: Rekursionstheorie === -->
+<div class="card">
+    <h2>Rekursionstheorie</h2>
+    <p>
+        Die Rekursionstheorie (Berechenbarkeitstheorie) untersucht, welche Funktionen
+        berechenbar sind. <em>Turing-Maschinen</em> (1936) formalisieren den intuitiven
+        Begriff der Berechenbarkeit.
+    </p>
+    <p>
+        Halteproblem: Es gibt keine Turing-Maschine, die für beliebige Eingabe $(M, w)$
+        entscheidet, ob $M$ auf $w$ hält. Beweis: Cantors Diagonalargument.
+    </p>
+    <div class="input-row">
+        <label for="tm-type">Turing-Maschinen-Beispiel:</label>
+        <select id="tm-type" class="input-field">
+            <option value="palindrome">Palindrom-Erkenner</option>
+            <option value="binary_increment">Binäres Inkrement</option>
+            <option value="unary_add">Unäre Addition</option>
+        </select>
+    </div>
+    <div class="input-row">
+        <label for="tm-input">Eingabeband (kommagetrennte Symbole):</label>
+        <input type="text" id="tm-input" class="input-field" value="1,0,1" style="width:200px;">
+    </div>
+    <button class="btn" onclick="runTuringMachine()">Turing-Maschine simulieren</button>
+    <div id="tm-result" class="result-area"></div>
+</div>
+
+<!-- === Sektion 4: Arithmetische Hierarchie === -->
+<div class="card">
+    <h2>Arithmetische Hierarchie &amp; Komplexität</h2>
+    <p>
+        Die arithmetische Hierarchie klassifiziert Mengen nach ihren logischen Definitionen:
+        $\Sigma_0^0 = \Pi_0^0$ (entscheidbar), $\Sigma_1^0$ (rekursiv aufzählbar),
+        $\Pi_1^0$ (co-r.e.), $\Sigma_2^0, \Pi_2^0, \ldots$
+    </p>
+    <p>
+        Komplexitätsklassen: $\mathbf{P} \subseteq \mathbf{NP} \subseteq \mathbf{PSPACE} \subseteq \mathbf{EXPTIME}$.
+        Das $\mathbf{P} \stackrel{?}{=} \mathbf{NP}$-Problem ist eines der Millennium-Probleme.
+    </p>
+    <button class="btn" onclick="loadComplexityHierarchy()">Hierarchie laden</button>
+    <div id="complexity-result" class="result-area"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * @file logic_foundations.html (scripts)
+ * @brief JavaScript für die Logik-&-Grundlagen-Seite.
+ * @author Kurt Ingwer
+ * @date 2026-03-10
+ */
+
+/** Zeigt Eigenschaften einer Modell-Struktur. */
+async function calcModelTheory() {
+    const resultDiv = document.getElementById('model-result');
+    const structure_type = document.getElementById('model-type').value;
+    try {
+        const data = await apiPost('/api/foundations/model_theory', { structure_type });
+        let html = `<h3>Struktur: ${data.name || structure_type}</h3>`;
+        if (data.properties) {
+            html += '<table class="data-table"><thead><tr><th>Eigenschaft</th><th>Wert</th></tr></thead><tbody>';
+            for (const [k, v] of Object.entries(data.properties)) {
+                const icon = v === true ? '&#10003;' : v === false ? '&#10007;' : '';
+                const col = v === true ? '#a6e3a1' : v === false ? '#f38ba8' : 'inherit';
+                html += `<tr><td>${k}</td><td style="color:${col}">${icon} ${JSON.stringify(v)}</td></tr>`;
+            }
+            html += '</tbody></table>';
+        }
+        if (data.theory) {
+            html += `<p><strong>Theorie:</strong> ${data.theory}</p>`;
+        }
+        if (data.elementary_equivalences) {
+            html += '<p><strong>Elementar-äquivalent zu:</strong> ' + data.elementary_equivalences.join(', ') + '</p>';
+        }
+        showResult(resultDiv, html);
+    } catch(e) { showError(resultDiv, e.message); }
+}
+
+/** Demonstriert Sequenzenkalkül-Konzepte. */
+async function calcSequentCalculus() {
+    const resultDiv = document.getElementById('seq-result');
+    const demo_type = document.getElementById('seq-demo').value;
+    try {
+        const data = await apiPost('/api/foundations/sequent_calculus', { demo_type });
+        let html = `<h3>${data.title || demo_type}</h3>`;
+        if (data.description) html += `<p>${data.description}</p>`;
+        if (data.theorem) html += `<p><strong>Satz:</strong> ${data.theorem}</p>`;
+        if (data.proof_sketch) {
+            html += '<p><strong>Beweis-Skizze:</strong></p><ol>';
+            (Array.isArray(data.proof_sketch) ? data.proof_sketch : [data.proof_sketch]).forEach(step => {
+                html += `<li>${step}</li>`;
+            });
+            html += '</ol>';
+        }
+        if (data.example) html += `<p><strong>Beispiel:</strong> <code>${data.example}</code></p>`;
+        if (data.implication) html += `<p style="color:#a6e3a1;">${data.implication}</p>`;
+        showResult(resultDiv, html);
+    } catch(e) { showError(resultDiv, e.message); }
+}
+
+/** Simuliert eine Turing-Maschine. */
+async function runTuringMachine() {
+    const resultDiv = document.getElementById('tm-result');
+    const tm_type = document.getElementById('tm-type').value;
+    const inputRaw = document.getElementById('tm-input').value;
+    const tape = inputRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    try {
+        const data = await apiPost('/api/foundations/turing_machine', { tm_type, tape });
+        let html = `<h3>Turing-Maschine: ${data.machine_name || tm_type}</h3>`;
+        html += `<p><strong>Eingabe:</strong> <code>[${tape.join(', ')}]</code></p>`;
+        if (data.result !== undefined) {
+            const accepts = data.result === true || data.accepts === true;
+            html += `<p style="color:${accepts ? '#a6e3a1' : '#f38ba8'}; font-size:1.1rem;">
+                ${accepts ? '&#10003; Akzeptiert' : '&#10007; Abgelehnt / Ergebnis: ' + JSON.stringify(data.result)}
+            </p>`;
+        }
+        if (data.steps) {
+            html += `<p><strong>Schritte:</strong> ${data.steps}</p>`;
+        }
+        if (data.final_tape) {
+            html += `<p><strong>Endband:</strong> <code>[${data.final_tape.join(', ')}]</code></p>`;
+        }
+        if (data.configurations && data.configurations.length <= 20) {
+            html += '<p><strong>Konfigurationsfolge:</strong></p>';
+            html += '<table class="data-table"><thead><tr><th>Schritt</th><th>Zustand</th><th>Position</th><th>Symbol</th></tr></thead><tbody>';
+            data.configurations.forEach((c, i) => {
+                html += `<tr><td>${i}</td><td>${c.state}</td><td>${c.head}</td><td><code>${c.symbol}</code></td></tr>`;
+            });
+            html += '</tbody></table>';
+        }
+        showResult(resultDiv, html);
+    } catch(e) { showError(resultDiv, e.message); }
+}
+
+/** Lädt die Komplexitätshierarchie. */
+async function loadComplexityHierarchy() {
+    const resultDiv = document.getElementById('complexity-result');
+    try {
+        const response = await fetch('/api/foundations/complexity_hierarchy');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+
+        let html = '<h3>Komplexitätsklassen</h3>';
+        if (data.classes) {
+            html += '<table class="data-table"><thead><tr><th>Klasse</th><th>Definition</th><th>Beispiele</th></tr></thead><tbody>';
+            for (const [cls, info] of Object.entries(data.classes)) {
+                const examples = Array.isArray(info.examples) ? info.examples.join(', ') : '';
+                html += `<tr><td><strong>${cls}</strong></td><td>${info.definition || info}</td><td>${examples}</td></tr>`;
+            }
+            html += '</tbody></table>';
+        }
+        if (data.hierarchy) {
+            html += `<p style="margin-top:12px;"><strong>Inklusion:</strong> ${data.hierarchy}</p>`;
+        }
+        if (data.open_problems) {
+            html += '<p><strong>Offene Probleme:</strong></p><ul>';
+            data.open_problems.forEach(p => { html += `<li>${p}</li>`; });
+            html += '</ul>';
+        }
+        showResult(resultDiv, html);
+    } catch(e) { showError(resultDiv, e.message); }
+}
+</script>
+{% endblock %}
