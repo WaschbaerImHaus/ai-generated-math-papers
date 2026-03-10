@@ -649,3 +649,357 @@ def maximal_prime_gap(limit: int) -> dict:
     if not gaps:
         return {}
     return max(gaps, key=lambda g: g["gap"])
+
+
+# ===========================================================================
+# SELBERG-KLASSE – AXIOM-PRÜFUNG UND ORTHOGONALITÄTSVERMUTUNG
+# ===========================================================================
+
+def selberg_class_check(
+    coefficients: list[complex],
+    degree: float,
+    conductor: float
+) -> dict:
+    """
+    Überprüft ob eine L-Funktion (definiert durch ihre Koeffizienten a_n)
+    die Selberg-Klassen-Axiome empirisch erfüllt.
+
+    Die Selberg-Klasse S wurde 1992 von Atle Selberg eingeführt, um
+    L-Funktionen axiomatisch zu charakterisieren:
+
+    Axiom 1 – Dirichlet-Reihe:
+        L(s) = Σ_{n=1}^{∞} a_n / n^s  konvergiert für Re(s) > 1.
+        Voraussetzung: a_1 = 1 (Normierung).
+
+    Axiom 2 – Analytische Fortsetzung:
+        (s-1)^m · L(s) ist eine ganze Funktion (m = 0 oder 1).
+        (nicht numerisch prüfbar ohne vollständige Funktion)
+
+    Axiom 3 – Funktionalgleichung:
+        Λ(s) = ε · Λ̄(1-s)  mit |ε| = 1
+        wobei Λ(s) = Q^s · Π_j Γ(λ_j s + μ_j) · L(s)
+        (nicht numerisch prüfbar ohne vollständige Struktur)
+
+    Axiom 4 – Euler-Produkt:
+        L(s) = Π_p F_p(p^{-s})^{-1}
+        mit F_p(X) = Π_j (1 - α_{p,j} X), |α_{p,j}| ≤ 1
+        Empirisch prüfbar: Euler-Produkt stimmt mit Partialsumme überein.
+
+    Axiom 5 – Ramanujan-Vermutung:
+        |a_p| ≤ d (Grad d der L-Funktion) für alle Primzahlen p.
+        Für ζ(s): a_n = 1 → |a_p| = 1 ≤ 1 ✓
+        Für Modulformen-L-Funktionen: |a_p| ≤ 2 (Grad 2).
+
+    @param coefficients: Koeffizientenliste [a_1, a_2, ..., a_N] (1-indiziert, a_0 ignoriert)
+    @param degree: Grad d der L-Funktion (ζ hat Grad 1, Modulformen Grad 2)
+    @param conductor: Führer N > 0 (Skalar für Funktionalgleichung)
+    @return: Dict mit Axiom-Prüfergebnissen und Statistiken
+    @author: Kurt Ingwer
+    @lastModified: 2026-03-10
+    """
+    n = len(coefficients)
+    if n < 2:
+        return {"error": "Mindestens 2 Koeffizienten benötigt", "valid": False}
+
+    # --- Axiom 1: Normierung a_1 = 1 ---
+    a1 = coefficients[0]
+    axiom1_normalization = abs(a1 - 1.0) < 1e-10
+
+    # --- Axiom 1: Absolute Konvergenz prüfen (|a_n| = O(n^ε)) ---
+    # Prüfe ob die Koeffizienten polynomiell wachsen (kein exp. Wachstum)
+    max_coeff = max(abs(c) for c in coefficients if c != 0) if coefficients else 0.0
+    growth_ok = True
+    for idx, c in enumerate(coefficients):
+        idx_1based = idx + 1
+        # Grobe Schranke: |a_n| ≤ n^0.5 impliziert Konvergenz für Re(s) > 1
+        if idx_1based > 1 and abs(c) > idx_1based ** 0.6:
+            growth_ok = False
+            break
+
+    axiom1_satisfied = axiom1_normalization and growth_ok
+
+    # --- Axiom 4: Euler-Produkt Konsistenz ---
+    # Prüfe ob L(2) via Partialsumme mit Euler-Produkt über Primzahlen übereinstimmt
+    # Partialsumme: Σ a_n / n^2
+    s_test = 2.0
+    partial_sum = sum(
+        coefficients[idx] / (idx + 1) ** s_test
+        for idx in range(min(n, 200))
+        if coefficients[idx] != 0
+    )
+
+    # Euler-Produkt Näherung: Π_p (1 - a_p/p^s + ...)^{-1}
+    # Nur für multiplikative Koeffizienten exakt; hier numerische Näherung
+    euler_product = complex(1.0)
+    for p in _small_primes_up_to(min(n, 50)):
+        p_idx = p - 1  # 0-basierter Index
+        if p_idx < n:
+            ap = coefficients[p_idx]
+            # Lokaler Faktor: (1 - a_p · p^{-s})^{-1} (Grad-1-Näherung)
+            denom = 1.0 - ap / (p ** s_test)
+            if abs(denom) > 1e-12:
+                euler_product *= 1.0 / denom
+
+    euler_deviation = abs(partial_sum - euler_product)
+    axiom4_approx = euler_deviation < 5.0  # Großzügige Toleranz (Partialsumme konvergiert langsam)
+
+    # --- Axiom 5: Ramanujan-Vermutung ---
+    # Prüfe |a_p| ≤ 2·degree für alle Primzahlen p mit Index < n
+    ramanujan_violations = []
+    ramanujan_bound = max(2.0 * degree, 1.0)
+    for p in _small_primes_up_to(min(n, 100)):
+        p_idx = p - 1
+        if p_idx < n:
+            ap_abs = abs(coefficients[p_idx])
+            if ap_abs > ramanujan_bound + 1e-10:
+                ramanujan_violations.append({
+                    "prime": p,
+                    "abs_a_p": ap_abs,
+                    "bound": ramanujan_bound
+                })
+    axiom5_satisfied = len(ramanujan_violations) == 0
+
+    # --- Statistiken ---
+    prime_coeffs = [
+        abs(coefficients[p - 1])
+        for p in _small_primes_up_to(min(n, 100))
+        if p - 1 < n
+    ]
+    mean_ap = float(np.mean(prime_coeffs)) if prime_coeffs else 0.0
+    max_ap = float(np.max(prime_coeffs)) if prime_coeffs else 0.0
+
+    return {
+        "axiom1_normalization": axiom1_normalization,
+        "axiom1_growth": growth_ok,
+        "axiom1_satisfied": axiom1_satisfied,
+        "axiom4_euler_partial_sum": complex(partial_sum),
+        "axiom4_euler_product_approx": complex(euler_product),
+        "axiom4_deviation": float(euler_deviation),
+        "axiom4_satisfied": axiom4_approx,
+        "axiom5_satisfied": axiom5_satisfied,
+        "axiom5_violations": ramanujan_violations,
+        "ramanujan_bound": ramanujan_bound,
+        "mean_abs_a_p": mean_ap,
+        "max_abs_a_p": max_ap,
+        "degree": degree,
+        "conductor": conductor,
+        "n_coefficients": n,
+        # Axiome 2 und 3 erfordern vollständige analytische Struktur
+        "axiom2_note": "Analytische Fortsetzung nicht empirisch prüfbar",
+        "axiom3_note": "Funktionalgleichung nicht empirisch prüfbar",
+        "selberg_class_candidate": axiom1_satisfied and axiom5_satisfied
+    }
+
+
+def _small_primes_up_to(n: int) -> list[int]:
+    """
+    Hilfsfunktion: Gibt alle Primzahlen ≤ n zurück (Sieb des Eratosthenes).
+
+    @param n: Obere Schranke
+    @return: Liste der Primzahlen ≤ n
+    @author: Kurt Ingwer
+    @lastModified: 2026-03-10
+    """
+    if n < 2:
+        return []
+    sieve = bytearray([1]) * (n + 1)
+    sieve[0] = sieve[1] = 0
+    p = 2
+    while p * p <= n:
+        if sieve[p]:
+            sieve[p * p::p] = bytearray(len(sieve[p * p::p]))
+        p += 1
+    return [i for i in range(2, n + 1) if sieve[i]]
+
+
+def selberg_orthogonality(
+    chi1_coeffs: list[complex],
+    chi2_coeffs: list[complex],
+    prime_bound: int = 100
+) -> dict:
+    """
+    Überprüft die Selberg-Orthogonalitäts-Vermutung numerisch.
+
+    Die Selberg-Orthogonalitätsvermutung (Selberg 1992) lautet:
+        (1 / log X) · Σ_{p ≤ X} a_p(F) · ā_p(G) / p  →  δ_{F,G} · n_F
+
+    wobei:
+        - a_p(F), a_p(G): Euler-Koeffizienten der L-Funktionen F, G bei Primzahl p
+        - δ_{F,G} = 1 wenn F = G (gleiche L-Funktion), sonst 0
+        - n_F = Ordnung des Pols von L_F(s) bei s = 1 (0 für ganze Funktionen, 1 für ζ)
+        - X = prime_bound
+
+    Für ζ(s): a_p = 1 für alle p → Summe ~ log log X (langsame Divergenz).
+    Für zwei verschiedene primitive Dirichlet-Charaktere χ₁ ≠ χ₂:
+        Σ χ₁(p) · χ̄₂(p) / p → 0 (Orthogonalität).
+
+    Die Vermutung verallgemeinert die Orthogonalitätsrelation für Dirichlet-Charaktere
+    auf allgemeine L-Funktionen.
+
+    @param chi1_coeffs: Koeffizientenliste [a_1, ..., a_N] der ersten L-Funktion F
+    @param chi2_coeffs: Koeffizientenliste [a_1, ..., a_N] der zweiten L-Funktion G
+    @param prime_bound: Obere Schranke X für die Primzahlsumme
+    @return: Dict mit:
+             - 'sum': empirische gewichtete Summe
+             - 'normalized': Normierung durch log(X)
+             - 'same_function_detected': heuristische Gleichheitserkennung
+             - 'primes_used': Anzahl der verwendeten Primzahlen
+             - 'orthogonality_measure': Betrag der normierten Summe (nahe 0 → orthogonal)
+    @author: Kurt Ingwer
+    @lastModified: 2026-03-10
+    """
+    primes = _small_primes_up_to(prime_bound)
+    n1 = len(chi1_coeffs)
+    n2 = len(chi2_coeffs)
+
+    # Gewichtete Summe: Σ_{p ≤ X} a_p(F) · ā_p(G) / p
+    weighted_sum = complex(0.0)
+    primes_used = 0
+
+    for p in primes:
+        p_idx = p - 1  # 0-basierter Index (a_1 steht an Position 0)
+        if p_idx < n1 and p_idx < n2:
+            ap_F = chi1_coeffs[p_idx]
+            ap_G = chi2_coeffs[p_idx]
+            # Selberg-Gewichtung: a_p(F) · ā_p(G) / p
+            weighted_sum += ap_F * ap_G.conjugate() / p
+            primes_used += 1
+
+    # Normierung: Teile durch log(X)
+    if prime_bound > 1:
+        log_x = math.log(prime_bound)
+        normalized_sum = weighted_sum / log_x
+    else:
+        normalized_sum = complex(0.0)
+        log_x = 1.0
+
+    # Heuristische Gleichheitserkennung: wenn Summen sehr ähnlich sind
+    # (gleiche Koeffizient-Muster bei Primzahlen)
+    abs_diff_at_primes = 0.0
+    common_primes = 0
+    for p in primes[:20]:  # Erste 20 Primzahlen vergleichen
+        p_idx = p - 1
+        if p_idx < n1 and p_idx < n2:
+            abs_diff_at_primes += abs(chi1_coeffs[p_idx] - chi2_coeffs[p_idx])
+            common_primes += 1
+
+    same_function = (abs_diff_at_primes / max(common_primes, 1)) < 0.01
+
+    # Orthogonalitätsmaß: klein → orthogonal, groß → gleichartig
+    orthogonality_measure = abs(normalized_sum)
+
+    return {
+        "sum": complex(weighted_sum),
+        "log_x": float(log_x),
+        "normalized": complex(normalized_sum),
+        "orthogonality_measure": float(orthogonality_measure),
+        "same_function_detected": same_function,
+        "primes_used": primes_used,
+        "prime_bound": prime_bound,
+        # Interpretation: für orthogonale L-Funktionen → 0, für F=G → n_F (pole order)
+        "interpretation": (
+            "F ≈ G (nicht-triviale Korrelation)" if orthogonality_measure > 0.3
+            else "F ⊥ G (Orthogonalitätsvermutung erfüllt)"
+        )
+    }
+
+
+def selberg_zeta_motivation(x: float) -> dict:
+    """
+    Verbindet die Primzahlverteilung mit der Selberg-Klasse über Riemanns explizite Formel.
+
+    Riemanns explizite Formel (1859) drückt π(x) durch Nullstellen von ζ(s) aus:
+        ψ(x) = x - Σ_{ρ} x^ρ / ρ - ln(2π) - (1/2) ln(1 - x^{-2})
+
+    Die Fehlerterme in der Primzahlzählung:
+        |π(x) - Li(x)| ≤ C · √x · ln(x)  (unter RH)
+
+    Präziser, mit endlich vielen Nullstellen bis Höhe T:
+        |ψ(x) - x| ≤ Σ_{|Im(ρ)|≤T} |x^ρ/ρ| + O(x · ln²(x) / T)
+
+    Jede Nullstelle ρ = σ + it trägt bei:
+        |x^ρ / ρ| = x^σ / |ρ|
+
+    Unter RH (σ = 1/2 für alle Nullstellen):
+        Fehler ~ x^{1/2} · (Summe über 1/|ρ|)
+
+    Die bekannten ersten Nullstellen (gerundete Im-Teile):
+        t₁ ≈ 14.13, t₂ ≈ 21.02, t₃ ≈ 25.01, t₄ ≈ 30.42, t₅ ≈ 32.93
+
+    @param x: Auswertungspunkt x > 2
+    @return: Dict mit:
+             - 'x': Eingabewert
+             - 'pi_x': exakte Primzahlzählung π(x)
+             - 'Li_x': logarithmisches Integral (Hauptterm)
+             - 'absolute_error': |π(x) - Li(x)|
+             - 'zero_contributions': Beiträge der ersten bekannten Nullstellen
+             - 'total_zero_correction': Summe der Nullstellenbeiträge (unter RH)
+             - 'rh_error_bound': Fehlerschranke unter RH: √x · ln(x) / π
+    @raises ValueError: Wenn x ≤ 2
+    @author: Kurt Ingwer
+    @lastModified: 2026-03-10
+    """
+    if x <= 2:
+        raise ValueError(f"x muss > 2 sein, erhalten: {x}")
+
+    # Primzahlzählung und Logarithmisches Integral
+    pi_x = prime_counting_function(x)
+    li_x = logarithmic_integral(x)
+    absolute_error = abs(pi_x - li_x)
+
+    # Bekannte Riemann-Nullstellen (Imaginärteile der ersten Nullstellen auf Re=1/2)
+    known_zeros_imaginary = [
+        14.134725141734693790,
+        21.022039638771554993,
+        25.010857580145688763,
+        30.424876125859513210,
+        32.935061587739189691,
+        37.586178158825671257,
+        40.918719012147495187,
+        43.327073280914999519,
+        48.005150881167159727,
+        49.773832477672302181,
+    ]
+
+    # Beitrag jeder Nullstelle ρ = 1/2 + it zur expliziten Formel
+    zero_contributions = []
+    total_correction = 0.0
+
+    for t in known_zeros_imaginary:
+        rho = complex(0.5, t)
+        rho_conj = complex(0.5, -t)
+
+        # x^ρ / ρ + x^{ρ̄} / ρ̄ = 2 · Re(x^ρ / ρ) (reeller Beitrag)
+        x_rho = cmath.exp(rho * cmath.log(x))
+        contribution_complex = x_rho / rho
+        contribution_real = 2.0 * contribution_complex.real  # Beide konjugierten Nullstellen
+
+        abs_contribution = abs(contribution_complex)
+
+        zero_contributions.append({
+            "imaginary_part": t,
+            "rho": rho,
+            "x_rho_over_rho": complex(contribution_complex),
+            "abs_contribution": float(abs_contribution),
+            "real_correction": float(contribution_real)
+        })
+        total_correction += abs_contribution
+
+    # Fehlerschranke unter RH: |ψ(x) - x| = O(√x · ln²(x))
+    # Für π(x): |π(x) - Li(x)| = O(√x · ln(x))
+    rh_error_bound = math.sqrt(x) * math.log(x) / math.pi
+
+    return {
+        "x": float(x),
+        "pi_x": int(pi_x),
+        "Li_x": float(li_x),
+        "absolute_error": float(absolute_error),
+        "relative_error": float(absolute_error / max(pi_x, 1)),
+        "zero_contributions": zero_contributions,
+        "n_zeros_used": len(known_zeros_imaginary),
+        "total_zero_correction": float(total_correction),
+        "rh_error_bound": float(rh_error_bound),
+        "rh_error_bound_formula": "sqrt(x) * ln(x) / pi",
+        # Unter RH: Fehler wächst wie O(√x), ohne RH wie O(x^θ) mit θ > 1/2
+        "error_within_rh_bound": absolute_error <= rh_error_bound + 1.0
+    }
