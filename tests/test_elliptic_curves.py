@@ -173,11 +173,14 @@ class TestECPoint:
         assert result == -P
 
     def test_rmul(self):
-        """n * P funktioniert (via __rmul__)."""
+        """n * P funktioniert (via __rmul__). Für 2-Torsionspunkt P gilt: 2*P=O, 3*P=P."""
         curve = EllipticCurve(-1, 0)
         P = ECPoint(0, 0, curve)
+        # 2-Torsionspunkt: 2*P = O (neutrales Element)
+        assert (2 * P).is_infinity
+        # 3*P = 2*P + P = O + P = P
         result = 3 * P
-        assert result.is_infinity  # 2-Torsion, 2*P=O, 3*P=P, aber P ist 2-Torsion
+        assert result == P
 
     def test_on_curve_true(self):
         """Punkt auf Kurve: on_curve() = True."""
