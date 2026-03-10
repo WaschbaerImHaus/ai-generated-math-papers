@@ -43,9 +43,9 @@ Letzte Aktualisierung: 2026-03-10 (Build 15)
 ## Offen / Noch nicht erledigt
 
 ### Code-Qualität (hohe Priorität)
-- [ ] **Type Hints fehlend**: `modular_forms.py`, `complex_analysis.py`, `ode.py`, `statistics_math.py`, `fourier.py`, `analytic_number_theory.py`, `proof_theory.py` haben noch keine vollständigen Annotationen
-- [ ] **Docblock-Stil vereinheitlichen**: `statistics_math.py` nutzt `:param:` (Sphinx), alle anderen `@param` (Doxygen) → Vereinheitlichung auf einen Stil (empfohlen: Google-Style oder Doxygen)
-- [ ] **Zentrales Test-Discovery-Skript**: Ein Skript das pytest, Doctests und Property-Tests in einem Lauf ausführt (`make test` o.ä.)
+- [x] **Type Hints fehlend**: Alle Module vollständig annotiert (Build 20–21)
+- [x] **Docblock-Stil vereinheitlichen**: Alles auf Doxygen `@param/@return` (Build 20)
+- [x] **Zentrales Test-Discovery-Skript**: `Makefile` mit `make test/test-fast/test-coverage/lint` (Build 20)
 
 ### Sicherheit
 - [ ] **`analysis.py` `_safe_parse()` Fallback**: Stiller Fallback auf `sp.sympify()` bei Parse-Fehler sollte geloggt werden (schwer debuggbar ohne Log-Ausgabe)
@@ -56,12 +56,12 @@ Letzte Aktualisierung: 2026-03-10 (Build 15)
 - [ ] **Cython/Numba JIT**: Performance-kritische Schleifen in `proof_theory.py` (Sieb), `complex_analysis.py` (ζ-Iteration) → Numba-JIT für 10–50x Speedup; Numba derzeit nicht installiert
 - [ ] **Symbolische vs. Numerische Wahl**: Automatische Entscheidung je nach Problem-Typ (kleine Polynome → SymPy symbolisch; große Matrizen → NumPy numerisch)
 - [ ] **`prime_factorization()` + `euler_phi()`**: Zwei separate Primfaktor-Traversierungen; `euler_phi` könnte `prime_factorization()` direkt wiederverwenden
-- [ ] **`bisection()` + `newton_raphson()` Hybridmethode**: Illinois/Brent-Methode wäre konvergenzgarantiert UND schnell → Kombination beider Algorithmen
+- [x] **`bisection()` + `newton_raphson()` Hybridmethode**: `brent_method()` implementiert (Build 19)
 - [ ] **Christoffel-Symbole cachen**: `christoffel_symbols()` wird in `riemann_tensor()` mehrfach an benachbarten Punkten aufgerufen – Memoization könnte Rechenzeit halbieren
 
 ### Architektur
 - [ ] **Plugin-System**: Neue mathematische Gebiete als Python-Packages einbinden ohne Core zu ändern (z.B. via `importlib` + Konfigurations-Registry)
-- [ ] **Differentialformen-Modul vertiefen**: `tensor_geometry.py` enthält bereits `wedge_product`, `exterior_derivative`, `hodge_star`; de Rham-Kohomologie und Stokes-Satz fehlen noch
+- [x] **Differentialformen-Modul vertiefen**: de Rham-Kohomologie + Stokes-Satz in `topology.py` (Build 25)
 - [ ] **Kategorientheorie-Modul**: Objekte, Morphismen, Funktoren, natürliche Transformationen – Verbindung zu abstrakter Algebra
 
 ### Visualisierung

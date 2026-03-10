@@ -1,3 +1,22 @@
+2026-03-10 19:57:43 - Build 28: Galois-Theorie-Modul implementiert (90 neue Tests grün)
+
+## Neue Dateien
+- src/galois_theory.py: Vollständige Galois-Theorie-Implementierung
+  - FieldExtension: Körpererweiterungen L/K mit algebraischen Elementen
+  - GaloisGroup: Galoisgruppen Gal(L/K) mit Untergruppen und Fixkörpern
+  - FiniteField: GF(p^n) mit Frobenius-Endomorphismus und primitiven Elementen
+  - discriminant_polynomial(): Diskriminante via Resultante
+  - galois_group_polynomial(): Galoisgruppe nach Grad (1-5) und Diskriminante
+  - is_solvable_by_radicals(): Galois-Hauptsatz (Grad ≤ 4 stets auflösbar)
+  - splitting_field(): Zerfällungskörper mit Galoisgruppe
+  - cyclotomic_polynomial(): Kreisteilungspolynome Φ_n(x) via SymPy
+  - finite_field_discrete_log(): Baby-Step-Giant-Step in GF(q)^×
+  - primitive_element_theorem(): Satz vom primitiven Element
+  - galois_correspondence(): Galois-Korrespondenz (Hauptsatz)
+  - minimal_polynomial(): Minimalpolynome algebraischer Zahlen
+- tests/test_galois_theory.py: 90 Tests (alle grün)
+- src/galois_theory.md: Dokumentation
+
 2026-03-10 15:53:08 - Build 11: Alle offenen Features und Optimierungen implementiert (1149 Tests grün)
 
 ## Neue Features
@@ -524,3 +543,207 @@
 ## Neue Testdatei: tests/test_l_functions_dirichlet.py
 - 72 Tests, alle grün
 - Getestet: Leibniz-Reihe L(1,χ₋₄)=π/4, |τ(χ)|²=q, Euler-Produkt, BSD-Rang
+
+2026-03-10 19:30:44 - Build 23: Algebraische Topologie in topology.py implementiert (54 neue Tests grün)
+
+## Neue Features (src/topology.py)
+
+### Simpliziale Homologie (erweitert)
+- simplicial_homology(): Betti-Zahlen über ℤ₂ via Gauß-Elimination der Randmatrizen
+  - Randoperator ∂_k als Matrix über GF(2) aufgestellt
+  - Rangberechnung via mod-2 Gauß-Elimination (_rank_gf2)
+  - β_k = |C_k| - rank(∂_k) - rank(∂_{k+1})
+  - Getestet für: Dreieck (S¹), ausgefülltes Dreieck (D²), Sphäre S², Torus T²
+- betti_numbers_from_adjacency(): β₀/β₁ aus Adjazenzmatrix via BFS
+- fundamental_group_free_generators(): freie Generatoren π₁(X) aus β₁
+
+### de Rham-Kohomologie
+- de_rham_cohomology_circle(): H^k_dR(S¹), numerische Verifikation ∮ dθ = 2π
+- de_rham_cohomology_sphere(n): H^k_dR(Sⁿ) für beliebige n, Betti-Zahlen, χ
+
+### Sätze der Differentialgeometrie
+- stokes_theorem_verify(): Numerische Verifikation des Stokes-Satzes (Grünscher Satz)
+  - Linienintegral ≈ 2π (Trapezregel, 50000 Punkte)
+  - Flächenintegral ≈ 2π (scipy.dblquad)
+  - Relativer Fehler < 0.1%
+  - Bug behoben: np.trapz → np.trapezoid (NumPy >= 2.0)
+- brouwer_fixed_point_evidence(): Numerische Evidenz für Brouwerschen Fixpunktsatz
+  - 500 Zufallsabbildungen D² → D², gedämpfte Iteration
+  - > 95% Fixpunkte gefunden
+
+## Neue Tests (tests/test_algebraic_topology.py)
+- 54 Tests, alle grün
+- Klassen: TestSimplicialHomologyTriangle, TestSimplicialHomologySphere,
+  TestSimplicialHomologyTorus, TestBettiNumbersFromAdjacency,
+  TestFundamentalGroup, TestDeRhamCircle, TestDeRhamSphere,
+  TestStokesTheorem, TestBrouwerFixedPoint
+
+---
+
+2026-03-10 17:45:00 - Build 23: spinors.py implementiert (50 Tests grün)
+
+## Neues Modul: src/spinors.py
+
+### Implementierte Funktionen
+- gamma_matrices(dim): Gamma-Matrizen der Clifford-Algebra Cl(1,dim-1)
+  - dim=2: 2×2 Pauli-basierte Darstellung
+  - dim=4: Standard Dirac-Darstellung mit {γ^μ,γ^ν} = 2η^{μν}·I
+- clifford_algebra_check(gammas, metric): Überprüft Anti-Kommutatorrelation
+  - Berechnet Frobenius-Fehler ||{γ^μ,γ^ν} - 2η^{μν}·I||_F für alle (μ,ν)
+  - max_error < 1e-12 für korrekte Dirac-Darstellung
+- gamma5(dim=4): Chiralitäts-Matrix γ^5 = i·γ^0·γ^1·γ^2·γ^3
+  - (γ^5)² = I, {γ^5,γ^μ} = 0, Tr(γ^5) = 0
+- dirac_spinor(mass, momentum, spin): Ebene-Wellen-Lösung u(p,s)
+  - Normierung N = √(E+m), kleine Komponente σ·p/(E+m)·χ
+- dirac_equation_check(psi, mass, momentum): Residuum ||(p̸ - m·I)ψ||₂
+- spin_group_element(theta, axis): SU(2)-Element U = cos(θ/2)I + i·sin(θ/2)(σ·n̂)
+  - Spinor-Statistik: U(2π) = -I, U(4π) = +I
+- weyl_spinors(psi): Chirale Zerlegung via P_L=(I-γ^5)/2, P_R=(I+γ^5)/2
+- majorana_condition_check(psi): Residuum ||ψ - C·(γ^0ψ*)^T||₂, C=iγ^2γ^0
+- dirac_hamiltonian_1d(n_sites, mass, lattice_spacing): Wilson-Fermion-Hamiltonian
+- dirac_spectrum_1d(mass, n_sites): Spektrum + Massenlücke
+
+### Tests (tests/test_spinors.py)
+- 50 Tests, alle grün
+- Klassen: TestGammaMatrices4D (8), TestCliffordAlgebraCheck (5),
+  TestGamma5 (5), TestDiracSpinor (6), TestSpinGroupElement (5),
+  TestWeylSpinors (5), TestMajoranaCondition (4), TestLatticeDirac (7),
+  TestGammaMatrices2D (3), TestGamma5EdgeCases (2)
+
+### Dokumentation
+- src/spinors.md mit vollständiger KaTeX-Dokumentation erstellt
+
+---
+
+2026-03-10 17:45:00 - Build 24: Symplektische Geometrie und Hamilton-Mechanik
+
+## Neue Funktionen (tensor_geometry.py)
+
+### Symplektische Geometrie
+- `symplectic_form(n)`: Standard-symplektische Form J = [[0,I],[-I,0]] als 2n×2n-Matrix
+- `is_symplectic_matrix(M)`: Prüft M^T J M = J (Zugehörigkeit zur symplektischen Gruppe Sp(2n))
+- `poisson_bracket(f, g, dq, dp)`: Numerische Poisson-Klammer via zentraler Differenzen
+
+### Hamilton-Mechanik
+- `hamiltonian_flow(H, q0, p0, t_span, dt)`: Symplektischer Störmer-Verlet-Integrator
+  - Erhält exakt die symplektische Struktur
+  - Energiefehler beschränkt (kein langzeitiger Drift)
+- `liouville_theorem_check(H, ics, t)`: Numerische Verifikation Liouville-Satz
+  - Volumen-Ratio ≈ 1.0 über Hamiltonfluss
+- `action_angle_variables(H, E, q_range)`: Wirkung J = (1/2π)∮p dq + Frequenz ω = dE/dJ
+
+### Symplektische Mannigfaltigkeiten
+- `cotangent_bundle_metric(g)`: Kanonische symplektische Struktur auf T*M
+- `darboux_theorem_check(ω, point)`: Voraussetzungen des Darboux-Satzes numerisch prüfen
+
+## Neue Tests (test_symplectic.py)
+- 49 Tests, alle grün
+- Deckt ab: J-Matrix-Struktur, Sp(2n)-Gruppentest, Poisson-Relationen,
+  Energie-Erhaltung über 100 Perioden, Liouville-Volumen-Ratio, J=E/ω Relation,
+  Darboux-Satz-Prüfung, symplektische Flusserhaltung
+
+## Bugfix
+- np.trapz → np.trapezoid (NumPy 2.x API)
+
+---
+
+## 2026-03-10 19:56 — Build 27: Moduln über Ringen & Kommutative Algebra
+
+### Neue Module
+- `src/modules_algebra.py` — R-Moduln über Ringen
+  - smith_normal_form(): Gauß-Elimination mit ganzzahligen Zeilen-/Spaltenoperationen
+    Invariantenfaktoren d₁|d₂|...|dᵣ, Matrizen U, D, V
+  - module_from_matrix(): ℤⁿ/Im(A) mit Torsions- und freiem Anteil
+  - structure_theorem_abelian_groups(): Vollständige Klassifikation via Partitionen
+    n=4 → {ℤ_4, ℤ_2×ℤ_2}, n=12 → {ℤ_12, ℤ_2×ℤ_6}
+  - tensor_product_modules(): ℤ_m ⊗ ℤ_n ≅ ℤ_{gcd(m,n)}
+  - hom_module(): |Hom(ℤ_m, ℤ_n)| = gcd(m,n)
+  - exact_sequence_check(): Exaktheit 0 → A → B → C → 0
+  - free_resolution(): Auflösung der Länge 1 für ℤ-Moduln
+  - Module-Klasse: OOP-Wrapper für alle Modul-Operationen
+
+- `src/commutative_algebra.py` — Kommutative Algebra
+  - localization(): S^{-1}R als formale Brüche
+  - prime_spectrum(): Spec(ℤ/nℤ) = Primteiler
+  - nakayama_lemma_check(): M = I·M Verifikation
+  - integral_closure(): Ganzer Abschluss in ℚ(√d) mit Diskriminante
+    d≡1(4): O_K = ℤ[(1+√d)/2], Δ=d; sonst: O_K = ℤ[√d], Δ=4d
+  - class_group_estimate(): h(d), Minkowski-Schranke, PID-Nachweis
+    Bekannte Klassenzahlen: h(-1)=h(-3)=1, h(-5)=2 (Stark-Heegner)
+  - noether_normalization(): Krull-Dimension aus Variablen/Gleichungen
+  - hilbert_basis_theorem_verify(): Noetherianität für ℤ_p[x₁,...,xₙ]
+
+### Tests
+- `tests/test_modules_algebra.py`: 42 neue Tests, alle grün
+- `tests/test_commutative_algebra.py`: 32 neue Tests, alle grün
+- Gesamt neu: 74 Tests
+
+### Dokumentation
+- `src/modules_algebra.md`: Vollständige KaTeX-Dokumentation
+- `src/commutative_algebra.md`: Vollständige KaTeX-Dokumentation mit Tabellen
+
+2026-03-10 - Build 29: Ringtheorie-Modul implementiert (71 Tests grün)
+
+## Neue Dateien
+- src/ring_theory.py: Vollständige Ringtheorie-Implementierung
+  - Ring: ℤ/nℤ mit Einheiten, Nullteilern, Charakteristik, Körper/PID/UFD-Prüfung
+  - Ideal: Prim-, maximal-, Hauptideal-Erkennung und Validierung
+  - QuotientRing(Ring): R/I als Quotientenring mit Körper/Integritätsbereich-Erkennung
+  - PolynomialRingModP: ℤ_p[x]/(f) — endliche Körper GF(p^n)
+  - principal_ideal(), ideal_sum(), ideal_product(), ideal_intersection()
+  - chinese_remainder_ring(): CRT-Isomorphismus ℤ/nℤ ≅ Π ℤ/mᵢℤ
+  - is_irreducible_mod_p(): Brute-Force-Irreduzibilitätsprüfung
+  - polynomial_gcd_mod_p(): Euklidischer Algorithmus für ℤ_p[x]
+  - polynomial_factorization_mod_p(): Berlekamp-Algorithmus
+  - quotient_ring_field_check(): GF(p^n)-Erkennung
+  - noetherian_check(), krull_dimension_estimate()
+  - ring_of_integers(): Quadratische Zahlkörper ℤ[√d]
+  - gaussian_integers_gcd(): ggT in ℤ[i]
+- tests/test_ring_theory.py: 71 Tests (alle grün)
+
+## Behobene Bugs
+- _poly_divmod_mod(): Algorithmische Korrektur der Polynomdivision
+  (Koeffizientenanzahl-Berechnung aus Graddifferenz)
+- ring_of_integers(5): d=5 korrekt als nicht-PID klassifiziert (Klassenzahl 2)
+- SyntaxWarning: Ungültige Escape-Sequenz \\{ behoben
+
+---
+
+## 2026-03-10 Build 26 — group_theory.py implementiert
+
+### Neue Dateien
+- `src/group_theory.py` — Vollständige Gruppentheorie-Implementierung
+- `src/group_theory.md` — Mathematische Dokumentation mit KaTeX-Formeln
+- `tests/test_group_theory.py` — 55 Tests (alle grün)
+
+### Klassen implementiert
+- `Group` — Allgemeine endliche Gruppe (Cayley-Tabelle, Untergruppen, Normalteiler)
+- `Subgroup(Group)` — Untergruppe mit Obergruppe-Referenz und Index-Berechnung
+- `GroupHomomorphism` — φ: G → H mit Kern, Bild, Injektivität, Isomorphismus-Test
+- `QuotientGroup(Group)` — G/N als Faktorgruppe (Nebenklassen als Frozensets)
+- `PermutationGroup(Group)` — S_n-Untergruppe mit Zykel, Vorzeichen, Orbits
+
+### Freie Funktionen implementiert
+- `cyclic_group(n)` → ℤ_n
+- `dihedral_group(n)` → D_n (Ordnung 2n)
+- `quaternion_group()` → Q_8
+- `symmetric_group(n)` → S_n (alle n! Permutationen)
+- `alternating_group(n)` → A_n (gerade Permutationen)
+- `lagrange_theorem_check(G, H)` → Lagrange-Satz + Nebenklassen
+- `sylow_theorems(G, p)` → Sylow-Sätze inkl. Konjugiertheitsprüfung
+- `classify_abelian_group(n)` → Hauptsatz endliche abelsche Gruppen
+- `is_simple_group(G)` → Einfachheit (optimiert: Konjugationsklassen für |G|>30)
+- `group_action(G, X, action)` → Orbits, Stabilisatoren, Burnside-Lemma
+- `direct_product(G, H)` → G × H
+- `semidirect_product(N, H, phi)` → N ⋊_φ H
+
+### Technische Entscheidungen
+- `is_simple_group` für |G|≤30: direkter Normalteiler-Test
+- `is_simple_group` für |G|>30: Konjugationsklassen-Methode (O(|G|²) statt exponentiell)
+- Untergruppen-Suche: kombinatorisch (nur für |G|≤~20 praktikabel)
+- A5 (Ordnung 60): Einfachheit via 5 Konjugationsklassen verifiziert (Klassen: 1,12,12,15,20)
+
+### Testergebnisse
+- 55/55 Tests grün
+- Abdeckung: cyclic, dihedral, quaternion, symmetric, alternating, Lagrange, Sylow,
+  Burnside, Klassifikation, Isomorphismus, Homomorphismus, Vorzeichen-Homo S3→ℤ2

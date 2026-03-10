@@ -369,3 +369,103 @@ Die Geodätengleichung wird als System erster Ordnung formuliert und mit dem kla
 - **Sphäre bei $\theta = 0, \pi$**: Koordinaten-Singularität (kein Fehler in der Geometrie)
 - **Schwarzschild bei $r = r_s$**: Koordinaten-Singularität (Ereignishorizont); echte Singularität bei $r = 0$
 - **Hyperbolische Ebene bei $y = 0$**: Rand der Halbebene; kleine Regularisierung $y \to \max(y, 10^{-12})$
+
+---
+
+## 10. Symplektische Geometrie und Hamilton-Mechanik
+
+*(Hinzugefügt: Build 24, 2026-03-10)*
+
+Die **symplektische Geometrie** ist die mathematische Grundlage der klassischen Mechanik. Während die Riemannsche Geometrie Abstände und Winkel beschreibt, beschreibt die symplektische Geometrie **Flächen im Phasenraum** und die Struktur von Erhaltungsgrößen.
+
+### 10.1 Symplektische Form
+
+Die **Standard-symplektische Form** auf $\mathbb{R}^{2n}$ (Phasenraum mit $n$ Freiheitsgraden):
+
+$$\omega = \sum_{i=1}^{n} dq_i \wedge dp_i$$
+
+Als Matrix (die **symplektische Einheitsmatrix** $J$):
+
+$$J = \begin{pmatrix} 0 & I_n \\ -I_n & 0 \end{pmatrix}$$
+
+Eigenschaften von $J$:
+- $J^T = -J$ (Schiefsymmetrie)
+- $\det(J) = 1$ (nicht-entartet)
+- $J^2 = -I_{2n}$ (analog zur imaginären Einheit)
+
+**Funktion:** `symplectic_form(n)` → $(2n \times 2n)$-Matrix
+
+### 10.2 Symplektische Gruppe Sp(2n)
+
+Eine Matrix $M$ gehört zur **symplektischen Gruppe** $\text{Sp}(2n)$, wenn:
+$$M^T J M = J$$
+
+Dies sind genau die **kanonischen Transformationen** der klassischen Mechanik — Koordinatenwechsel, die die physikalischen Gleichungen invariant lassen.
+
+Beispiele: Rotationen im Phasenraum, Schermatrizen $\begin{pmatrix}1 & t \\ 0 & 1\end{pmatrix}$.
+
+**Funktion:** `is_symplectic_matrix(M)` → bool
+
+### 10.3 Poisson-Klammer
+
+Die **Poisson-Klammer** zweier Observablen $f, g$ auf dem Phasenraum:
+
+$$\{f, g\} = \frac{\partial f}{\partial q} \cdot \frac{\partial g}{\partial p} - \frac{\partial f}{\partial p} \cdot \frac{\partial g}{\partial q}$$
+
+Fundamentale Eigenschaften:
+- **Kanonische Relation**: $\{q, p\} = 1$ (klassisches Analogon zu $[\hat{q}, \hat{p}] = i\hbar$)
+- **Energieerhaltung**: $\{H, H\} = 0$
+- **Jacobi-Identität**: $\{f, \{g, h\}\} + \{g, \{h, f\}\} + \{h, \{f, g\}\} = 0$
+
+**Funktion:** `poisson_bracket(f_vals, g_vals, dq, dp)` → 2D-Array
+
+### 10.4 Hamiltonscher Fluss (Störmer-Verlet)
+
+Die **Hamiltonschen Bewegungsgleichungen** lauten:
+$$\frac{dq}{dt} = +\frac{\partial H}{\partial p}, \quad \frac{dp}{dt} = -\frac{\partial H}{\partial q}$$
+
+Der **Störmer-Verlet-Integrator** (auch: "leapfrog") ist **symplektisch**:
+
+$$p_{n+1/2} = p_n - \frac{dt}{2} \frac{\partial H}{\partial q}(q_n)$$
+$$q_{n+1} = q_n + dt \cdot \frac{\partial H}{\partial p}(p_{n+1/2})$$
+$$p_{n+1} = p_{n+1/2} - \frac{dt}{2} \frac{\partial H}{\partial q}(q_{n+1})$$
+
+Vorteil: Die Energie schwankt zwar, aber **driftet nicht** — auch nach Millionen von Schritten bleibt die Energie beschränkt. Nicht-symplektische Methoden wie Euler verlieren oder gewinnen Energie systematisch.
+
+**Funktion:** `hamiltonian_flow(H_func, q0, p0, t_span, dt)` → dict mit `q, p, t, H`
+
+### 10.5 Liouville-Satz
+
+> *Der Hamiltonsche Fluss ist volumenerhaltend.*
+
+Formal: Für jede messbare Menge $U$ im Phasenraum gilt:
+$$\text{Vol}(\Phi_t(U)) = \text{Vol}(U)$$
+
+Äquivalent: $\text{div}(\mathbf{X}_H) = 0$ mit $\mathbf{X}_H = (\partial_p H, -\partial_q H)$.
+
+Anschauung: Ein "Schwarm" von Phasenpunkten verändert sein Volumen nicht — er wird gestreckt, gestaucht, aber nie komprimiert oder aufgeblasen.
+
+**Funktion:** `liouville_theorem_check(H_func, initial_conditions, t)` → dict mit `ratio ≈ 1`
+
+### 10.6 Wirkungs-Winkelvariablen
+
+Für **integrable Systeme** existieren kanonische Koordinaten $(J, \theta)$, in denen $H = H(J)$ nur von der **Wirkungsvariablen** $J$ abhängt:
+
+$$J = \frac{1}{2\pi} \oint_\gamma p \, dq, \quad \omega = \frac{\partial H}{\partial J} = \frac{dE}{dJ}$$
+
+Beispiel harmonischer Oszillator $H = \frac{p^2}{2} + \frac{\omega_0^2 q^2}{2}$:
+- Energiebahn: Ellipse mit Fläche $\pi \cdot \frac{\sqrt{2E}}{\omega_0} \cdot \sqrt{2E} = \frac{2\pi E}{\omega_0}$
+- $J = \frac{E}{\omega_0}$, Frequenz $\omega = \omega_0$
+
+**Funktion:** `action_angle_variables(H_func, E, q_range)` → dict mit `J`, `omega`
+
+### 10.7 Darboux-Satz
+
+> *Alle symplektischen Mannigfaltigkeiten gleicher Dimension sind lokal äquivalent.*
+
+Im Gegensatz zur Riemannschen Geometrie (wo die **Krümmung** ein lokales Invariant ist) gibt es in der symplektischen Geometrie **kein lokales Invariant**: Jede symplektische Mannigfaltigkeit $(M, \omega)$ sieht lokal wie $(\mathbb{R}^{2n}, \omega_\text{std})$ aus.
+
+Prüfbedingungen: (1) $\det(\omega) \neq 0$, (2) $d\omega = 0$, (3) $\omega^T = -\omega$.
+
+**Funktion:** `darboux_theorem_check(omega, point)` → dict
+

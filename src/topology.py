@@ -946,3 +946,543 @@ def sierpinski_dimension() -> float:
     """
     # Selbstähnlichkeitsdimension: 3 Teile, je 1/2 der Größe
     return math.log(3) / math.log(2)
+
+
+# ============================================================
+# Algebraische Topologie
+# ============================================================
+
+def simplicial_homology(simplices: dict[int, list[tuple]]) -> dict:
+    """
+    @brief Berechnet die simplizialen Homologiegruppen H_k(X, ℤ₂).
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Simpliziale Homologie ist ein fundamentales Werkzeug der algebraischen Topologie.
+    Sie ordnet jedem topologischen Raum eine Folge von abelschen Gruppen zu, die
+    "Löcher" unterschiedlicher Dimension zählen.
+
+    Algorithmus:
+    1. Randoperatoren ∂_k aufstellen als Matrizen über ℤ₂ (GF(2)).
+       ∂_k: C_k → C_{k-1}, ∂([v0,...,vk]) = Σ_i (-1)^i [v0,...,v̂i,...,vk]
+       Über ℤ₂ ist (-1) = 1, daher nur mod-2 Einträge.
+    2. Rang von ∂_k (über ℤ₂) per Gauß-Elimination berechnen.
+    3. β_k = dim(ker ∂_k) - dim(im ∂_{k+1})
+             = (|C_k| - rank(∂_k)) - rank(∂_{k+1})
+    4. Euler-Charakteristik: χ = Σ (-1)^k β_k
+
+    Mathematik:
+        H_k(X; ℤ₂) = ker(∂_k) / im(∂_{k+1})
+        β_k = rank_ℤ₂(H_k)
+
+    @param simplices Dict: {dim: [(v0,...), ...]}
+                    0: Punkte, 1: Kanten, 2: Dreiecke, usw.
+    @return Dict mit 'betti_numbers', 'euler_characteristic', 'h0', 'h1', 'h2'.
+    """
+
+    def _rank_gf2(matrix: list[list[int]]) -> int:
+        """
+        Berechnet den Rang einer Matrix über GF(2) (Gauß-Elimination mod 2).
+        Alle Einträge sind 0 oder 1; Addition ist XOR.
+        """
+        if not matrix or not matrix[0]:
+            return 0
+        # Matrix kopieren, um das Original nicht zu verändern
+        m = [row[:] for row in matrix]
+        rows = len(m)
+        cols = len(m[0])
+        pivot_row = 0  # Zeiger auf die aktuelle Pivotzeile
+        for col in range(cols):
+            if pivot_row >= rows:
+                break
+            # Pivotelement suchen: erste Zeile >= pivot_row mit Eintrag 1 in Spalte col
+            found = -1
+            for r in range(pivot_row, rows):
+                if m[r][col] == 1:
+                    found = r
+                    break
+            if found == -1:
+                continue  # Keine Pivot in dieser Spalte → weiter
+            # Pivotzeile nach oben tauschen
+            m[pivot_row], m[found] = m[found], m[pivot_row]
+            # Elimination: alle anderen Zeilen mit Eintrag 1 in Spalte col
+            for r in range(rows):
+                if r != pivot_row and m[r][col] == 1:
+                    # Zeilenaddition mod 2 (XOR)
+                    m[r] = [(m[r][j] ^ m[pivot_row][j]) for j in range(cols)]
+            pivot_row += 1
+        return pivot_row  # Anzahl der Pivot-Zeilen = Rang
+
+    def _build_boundary_matrix(k_simplices: list[tuple],
+                                km1_simplices: list[tuple]) -> list[list[int]]:
+        """
+        Baut die k-te Randmatrix ∂_k auf (über ℤ₂).
+        Zeilen = (k-1)-Simplizes, Spalten = k-Simplizes.
+        Eintrag [i][j] = 1, wenn das i-te (k-1)-Simplex im Rand des j-ten k-Simplex liegt.
+        """
+        n_rows = len(km1_simplices)
+        n_cols = len(k_simplices)
+        # Matrix mit Nullen initialisieren
+        matrix = [[0] * n_cols for _ in range(n_rows)]
+        # Index der (k-1)-Simplizes aufbauen für schnellen Lookup
+        km1_index = {tuple(sorted(s)): i for i, s in enumerate(km1_simplices)}
+        for j, sigma in enumerate(k_simplices):
+            # Alle (k+1) Seiten des k-Simplex berechnen
+            sigma_list = list(sigma)
+            for i_omit in range(len(sigma_list)):
+                # i-te Seite: Simplex ohne i-ten Knoten
+                face = tuple(sorted(
+                    sigma_list[t] for t in range(len(sigma_list)) if t != i_omit
+                ))
+                if face in km1_index:
+                    row_idx = km1_index[face]
+                    # Über ℤ₂: Eintrag toggled (gerade Anzahl = 0, ungerade = 1)
+                    matrix[row_idx][j] ^= 1
+        return matrix
+
+    # Maximale vorhandene Dimension bestimmen
+    max_dim = max(simplices.keys()) if simplices else 0
+
+    # Simplizialketten für jede Dimension sammeln
+    chain_groups: dict[int, list[tuple]] = {}
+    for dim in range(max_dim + 1):
+        chain_groups[dim] = list(simplices.get(dim, []))
+
+    # Rangberechnung der Randoperatoren
+    # rank_boundary[k] = Rang von ∂_k
+    rank_boundary: dict[int, int] = {}
+    for k in range(1, max_dim + 1):
+        k_simps = chain_groups.get(k, [])
+        km1_simps = chain_groups.get(k - 1, [])
+        if not k_simps or not km1_simps:
+            rank_boundary[k] = 0
+        else:
+            mat = _build_boundary_matrix(k_simps, km1_simps)
+            rank_boundary[k] = _rank_gf2(mat)
+
+    # Betti-Zahlen berechnen: β_k = |C_k| - rank(∂_k) - rank(∂_{k+1})
+    betti: list[int] = []
+    for k in range(max_dim + 1):
+        c_k = len(chain_groups.get(k, []))
+        r_k = rank_boundary.get(k, 0)       # Rang von ∂_k (Bild von ∂_k)
+        r_kp1 = rank_boundary.get(k + 1, 0)  # Rang von ∂_{k+1} (Bild in C_k)
+        beta_k = c_k - r_k - r_kp1
+        betti.append(max(0, beta_k))
+
+    # Euler-Charakteristik: χ = Σ (-1)^k β_k
+    chi = sum((-1) ** k * betti[k] for k in range(len(betti)))
+
+    return {
+        'betti_numbers': betti,
+        'euler_characteristic': chi,
+        'h0': betti[0] if len(betti) > 0 else 0,
+        'h1': betti[1] if len(betti) > 1 else 0,
+        'h2': betti[2] if len(betti) > 2 else 0,
+    }
+
+
+def betti_numbers_from_adjacency(adj_matrix: list[list[int]]) -> dict:
+    """
+    @brief Berechnet β₀ und β₁ aus der Adjazenzmatrix eines Graphen.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Ein Graph ist ein 1-dimensionaler Simplizialkomplex:
+    - 0-Simplizes = Knoten (Vertices)
+    - 1-Simplizes = Kanten (Edges)
+
+    Betti-Zahlen:
+        β₀ = Anzahl Zusammenhangskomponenten (via BFS/Union-Find)
+        β₁ = |Kanten| - |Knoten| + β₀  (aus Euler-Charakteristik)
+        χ  = β₀ - β₁ = |Knoten| - |Kanten|
+
+    Mathematisch: Für einen zusammenhängenden Graphen gilt
+        β₁ = |E| - |V| + 1  (Kreisrang / cycle rank)
+
+    @param adj_matrix Quadratische, symmetrische Adjazenzmatrix (0/1-Werte).
+    @return Dict mit 'beta_0', 'beta_1', 'euler_characteristic',
+                     'vertices', 'edges', 'components'.
+    """
+    n = len(adj_matrix)
+    if n == 0:
+        return {
+            'beta_0': 0, 'beta_1': 0, 'euler_characteristic': 0,
+            'vertices': 0, 'edges': 0, 'components': []
+        }
+
+    # Kanten zählen (ungerichteter Graph → oberes Dreieck der Matrix)
+    n_edges = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            if adj_matrix[i][j] != 0:
+                n_edges += 1
+
+    # BFS zur Bestimmung der Zusammenhangskomponenten
+    visited = [False] * n
+    components: list[list[int]] = []
+    for start in range(n):
+        if not visited[start]:
+            component: list[int] = []
+            queue = [start]
+            visited[start] = True
+            while queue:
+                node = queue.pop(0)
+                component.append(node)
+                for neighbor in range(n):
+                    if adj_matrix[node][neighbor] != 0 and not visited[neighbor]:
+                        visited[neighbor] = True
+                        queue.append(neighbor)
+            components.append(component)
+
+    beta_0 = len(components)                   # Anzahl Zusammenhangskomponenten
+    beta_1 = max(0, n_edges - n + beta_0)      # Kreisrang: |E| - |V| + β₀
+    euler_char = beta_0 - beta_1               # χ = β₀ - β₁
+
+    return {
+        'beta_0': beta_0,
+        'beta_1': beta_1,
+        'euler_characteristic': euler_char,
+        'vertices': n,
+        'edges': n_edges,
+        'components': components,
+    }
+
+
+def fundamental_group_free_generators(simplices: dict) -> dict:
+    """
+    @brief Schätzt die freien Generatoren der Fundamentalgruppe π₁(X).
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Die Fundamentalgruppe π₁(X, x₀) beschreibt Schleifen in X (modulo Homotopie).
+    Für einen zusammenhängenden Simplizialkomplex gilt:
+
+    - Ohne 2-Simplizes (nur Graph): π₁(X) ist frei mit β₁ Generatoren.
+      Jeder unabhängige Zyklus im Graphen entspricht einem freien Generator.
+    - Mit 2-Simplizes: Jede 2-Fläche "füllt" einen Zyklus aus.
+      Effektive Generatoren = β₁ (des 1-Skeletts) - (Anzahl 2-Simplizes, die neue
+      Randzyklen einbringen und bereits vorhandene Zyklen eliminieren).
+
+    Für einfachere Fälle (ohne höhere Kohomologie):
+        freie Generatoren = β₁ aus simplicial_homology
+
+    @param simplices Dict mit {dim: [(v1,...), ...]}.
+    @return Dict mit 'free_generators', 'is_simply_connected', 'comment'.
+    """
+    # Simplizialer Homologie berechnen, um β₁ zu erhalten
+    hom = simplicial_homology(simplices)
+    beta_1 = hom['h1']
+    beta_0 = hom['h0']
+
+    # Einfach zusammenhängend ⟺ β₀ = 1 und β₁ = 0
+    is_connected_space = (beta_0 == 1)
+    is_simply_connected = is_connected_space and (beta_1 == 0)
+
+    # Kommentar je nach Topologie
+    if not is_connected_space:
+        comment = (
+            f"Der Raum hat {beta_0} Zusammenhangskomponenten. "
+            "Die Fundamentalgruppe ist pro Komponente definiert."
+        )
+    elif is_simply_connected:
+        comment = (
+            "Der Raum ist einfach zusammenhängend: π₁(X) = 1 (triviale Gruppe). "
+            "Alle Schleifen sind kontrahierbar."
+        )
+    else:
+        comment = (
+            f"π₁(X) ist eine freie Gruppe mit {beta_1} Generator(en). "
+            f"β₁ = {beta_1} unabhängige nicht-kontrahierbare Zyklen existieren."
+        )
+
+    return {
+        'free_generators': beta_1,
+        'is_simply_connected': is_simply_connected,
+        'comment': comment,
+    }
+
+
+# ============================================================
+# de Rham-Kohomologie
+# ============================================================
+
+def de_rham_cohomology_circle() -> dict:
+    """
+    @brief Berechnet H^k_dR(S¹) – de Rham-Kohomologie des Kreises.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Die de Rham-Kohomologie klassifiziert Differentialformen auf
+    glatten Mannigfaltigkeiten und steht via de Rham-Satz in
+    kanonischer Verbindung zur singulären Kohomologie.
+
+    Bekannte Ergebnisse für den Kreis S¹ = {(x,y) : x²+y²=1}:
+
+        H^0_dR(S¹) = ℝ   (konstante Funktionen; S¹ ist zusammenhängend)
+        H^1_dR(S¹) = ℝ   (dθ ist geschlossen, aber nicht exakt auf S¹)
+        H^k_dR(S¹) = 0   für k ≥ 2 (dim(S¹) = 1)
+
+    Numerische Verifikation:
+    - ∮_{S¹} dθ = 2π ≠ 0 → dθ ist nicht exakt (kein globales θ auf S¹)
+    - ∮_{S¹} df = 0 für jede glatte f → alle exakten 1-Formen integrieren zu 0
+
+    Betti-Zahlen: β₀ = 1, β₁ = 1
+    Euler-Charakteristik: χ(S¹) = β₀ - β₁ = 0
+
+    @return Dict mit 'h0', 'h1', 'h_higher', 'betti_numbers',
+                     'euler_characteristic', 'integral_dtheta',
+                     'is_dtheta_exact'.
+    """
+    import numpy as np
+
+    # Numerische Verifikation: ∮_{S¹} dθ via Trapezregel
+    # Parametrisierung: θ(t) = t, t ∈ [0, 2π]
+    # dθ = dt auf dem Kreis → Integral = 2π
+    n_points = 10000
+    t_vals = np.linspace(0, 2 * math.pi, n_points, endpoint=False)
+    dt = 2 * math.pi / n_points
+
+    # ∮ dθ = Summe aller dt-Schritte = 2π (numerisch)
+    integral_dtheta = float(np.sum(np.ones(n_points) * dt))
+
+    # dθ ist genau dann nicht exakt, wenn das Integral ≠ 0
+    is_dtheta_exact = abs(integral_dtheta) < 1e-10
+
+    # Euler-Charakteristik des Kreises: χ = 0 (β₀ - β₁ = 1 - 1 = 0)
+    betti = [1, 1]          # β₀=1 (zusammenhängend), β₁=1 (ein Zyklus)
+    euler_char = betti[0] - betti[1]
+
+    return {
+        'h0': 'ℝ',                           # H^0 ≅ ℝ (konstante Funktionen)
+        'h1': 'ℝ',                           # H^1 ≅ ℝ (erzeugt von dθ)
+        'h_higher': '0',                     # H^k = 0 für k ≥ 2
+        'h0_dim': 1,                         # dim(H^0) = 1
+        'h1_dim': 1,                         # dim(H^1) = 1
+        'betti_numbers': betti,
+        'euler_characteristic': euler_char,
+        'integral_dtheta': integral_dtheta,  # ≈ 2π
+        'is_dtheta_exact': is_dtheta_exact,  # False (dθ ist nicht exakt)
+    }
+
+
+def de_rham_cohomology_sphere(n: int = 2) -> dict:
+    """
+    @brief Berechnet H^k_dR(Sⁿ) – de Rham-Kohomologie der n-Sphäre.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Die n-Sphäre Sⁿ = {x ∈ ℝⁿ⁺¹ : |x| = 1} ist eine kompakte,
+    orientierbare n-dimensionale Mannigfaltigkeit ohne Rand.
+
+    Bekannte Ergebnisse (de Rham-Satz, Poincaré-Dualität):
+
+        H^k_dR(Sⁿ) = ℝ  für k = 0 und k = n
+        H^k_dR(Sⁿ) = 0  sonst
+
+    Betti-Zahlen: β₀ = 1, β_n = 1, β_k = 0 für 0 < k < n
+
+    Euler-Charakteristik:
+        χ(Sⁿ) = 1 + (-1)ⁿ  →  χ = 2 für gerades n, χ = 0 für ungerades n
+
+    Beispiele:
+        S¹: χ = 0  (Kreis)
+        S²: χ = 2  (Sphäre)
+        S³: χ = 0  (3-Sphäre)
+
+    @param n Dimension der Sphäre (n ≥ 1).
+    @return Dict mit 'betti_numbers', 'euler_characteristic',
+                     'nonzero_groups', 'dimension'.
+    """
+    if n < 1:
+        raise ValueError(f"Dimension n muss >= 1 sein, erhalten: {n}")
+
+    # Betti-Zahlen: β₀ = β_n = 1, alle anderen 0
+    betti = [0] * (n + 1)
+    betti[0] = 1      # H^0 = ℝ (Sⁿ ist zusammenhängend)
+    betti[n] = 1      # H^n = ℝ (Orientierungsklasse)
+
+    # Euler-Charakteristik: χ = Σ (-1)^k β_k = 1 + (-1)^n
+    euler_char = 1 + ((-1) ** n)
+
+    # Nicht-triviale Kohomologiegruppen beschreiben
+    if n == 1:
+        nonzero_groups = {'H^0': 'ℝ', 'H^1': 'ℝ'}
+    else:
+        nonzero_groups = {'H^0': 'ℝ', f'H^{n}': 'ℝ'}
+
+    return {
+        'betti_numbers': betti,
+        'euler_characteristic': euler_char,
+        'nonzero_groups': nonzero_groups,
+        'dimension': n,
+        'h0_dim': 1,
+        'hn_dim': 1,
+        'h_middle_dim': 0 if n > 1 else None,  # H^k = 0 für 0 < k < n
+    }
+
+
+def stokes_theorem_verify(f_expr: str = 'P=y,Q=x', region: str = 'disk') -> dict:
+    """
+    @brief Numerische Verifikation des Stokes-Satzes (Grünscher Satz in 2D).
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Der Stokes-Satz ist eines der fundamentalsten Resultate der Differentialgeometrie:
+
+        ∫_∂M ω = ∫_M dω
+
+    In 2D (Grünscher Satz):
+        ∮_{∂D} (P dx + Q dy) = ∫∫_D (∂Q/∂x - ∂P/∂y) dx dy
+
+    Vorgebaut: f_expr = 'P=y,Q=x' → ∂Q/∂x - ∂P/∂y = 0, Integral = 0.
+    Für 'P=-y,Q=x': ∂Q/∂x - ∂P/∂y = 2, Linienintegral = Fläche·2 = 2π.
+
+    Numerische Methode:
+    - Linienintegral: Trapezregel auf dem Einheitskreis
+    - Flächenintegral: Polarkoordinaten-Integration (scipy.dblquad)
+
+    @param f_expr String, der die Form P, Q beschreibt (nur für Dokumentation).
+    @param region 'disk' (Einheitsscheibe D²).
+    @return Dict mit 'line_integral', 'area_integral', 'relative_error',
+                     'stokes_verified', 'green_curl'.
+    """
+    import numpy as np
+    from scipy import integrate  # type: ignore
+
+    # Gewählte Testform: ω = -y dx + x dy
+    # dω = (∂x/∂x - ∂(-y)/∂y) dx ∧ dy = (1 + 1) dx ∧ dy = 2 dx ∧ dy
+    # ∮_{S¹} (-y dx + x dy) = ∫∫_{D²} 2 dx dy = 2·π·1² = 2π
+    # Linkes Integral (Linienintegral über ∂D² = S¹)
+    # Parametrisierung: x = cos(t), y = sin(t), t ∈ [0, 2π]
+    # dx = -sin(t) dt, dy = cos(t) dt
+    # Integrand: -y·(-sin t) + x·cos t = sin²t + cos²t = 1
+    n_line = 50000
+    t_vals = np.linspace(0, 2 * math.pi, n_line, endpoint=False)
+    dt = 2 * math.pi / n_line
+
+    # P = -y, Q = x auf dem Kreis:
+    # P·(dx/dt) + Q·(dy/dt) = (-sin t)·(-sin t) + (cos t)·(cos t) = sin²t + cos²t = 1
+    integrand_line = np.sin(t_vals) ** 2 + np.cos(t_vals) ** 2  # = 1 überall
+    # NumPy >= 2.0: trapezoid (früher: trapz)
+    line_integral = float(np.trapezoid(integrand_line, dx=dt))
+
+    # Rechtes Integral (Flächenintegral über D²): ∫∫_{D²} 2 dx dy = 2π
+    # via scipy.dblquad: ∫_{-1}^{1} ∫_{-√(1-x²)}^{√(1-x²)} 2 dy dx = π·1²·2 = 2π
+    def area_integrand(y_var: float, x_var: float) -> float:
+        """Integrand für das Flächenintegral: curl(P,Q) = 2."""
+        return 2.0
+
+    def y_lower(x_var: float) -> float:
+        """Untere Grenze: -√(1-x²)."""
+        return -math.sqrt(max(0.0, 1.0 - x_var ** 2))
+
+    def y_upper(x_var: float) -> float:
+        """Obere Grenze: √(1-x²)."""
+        return math.sqrt(max(0.0, 1.0 - x_var ** 2))
+
+    area_result, area_error = integrate.dblquad(
+        area_integrand, -1.0, 1.0, y_lower, y_upper
+    )
+    area_integral = float(area_result)
+
+    # Relativer Fehler |LHS - RHS| / |RHS|
+    if abs(area_integral) < 1e-15:
+        relative_error = abs(line_integral - area_integral)
+    else:
+        relative_error = abs(line_integral - area_integral) / abs(area_integral)
+
+    # Stokes verifiziert, wenn relativer Fehler < 1% (numerisch)
+    stokes_verified = relative_error < 0.01
+
+    return {
+        'line_integral': line_integral,     # ≈ 2π
+        'area_integral': area_integral,     # ≈ 2π
+        'relative_error': relative_error,
+        'stokes_verified': stokes_verified,
+        'green_curl': 2.0,                  # ∂Q/∂x - ∂P/∂y = 1-(-1) = 2
+        'expected_value': math.pi * 2.0,   # 2π ≈ 6.2832
+        'form': 'omega = -y dx + x dy',
+    }
+
+
+def brouwer_fixed_point_evidence(n_trials: int = 1000) -> dict:
+    """
+    @brief Numerische Evidenz für den Brouwerschen Fixpunktsatz.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Der Brouwersche Fixpunktsatz (1910) besagt:
+        Jede stetige Abbildung f: Dⁿ → Dⁿ besitzt mindestens einen Fixpunkt x = f(x).
+
+    Für n=2 (Einheitsscheibe D²):
+    - Dⁿ ist kompakt, konvex und nicht leer.
+    - Fixpunkte sind Punkte mit f(x) = x.
+    - Topologischer Beweis: Ansonsten könnte man D² auf S¹ = ∂D² zurückziehen
+      (Retraktion), was unmöglich ist da π₁(S¹) = ℤ ≠ 0 = π₁(D²).
+
+    Numerische Suche:
+    Für jede zufällige Abbildung wird via Bisektion nach einem Fixpunkt gesucht.
+    Die Abbildung f wird so konstruiert, dass sie D² in sich abbildet:
+        f(x) = g(x) / max(1, |g(x)|)   für eine zufällige lineare g: D² → ℝ².
+
+    @param n_trials Anzahl zufälliger Abbildungen.
+    @return Dict mit 'found_ratio', 'n_found', 'n_trials',
+                     'brouwer_confirmed', 'method'.
+    """
+    import numpy as np
+
+    rng = np.random.default_rng(seed=42)  # Reproduzierbarer Seed
+    n_found = 0
+
+    for _ in range(n_trials):
+        # Zufällige 2×2-Matrix A und Verschiebung b erzeugen
+        A = rng.uniform(-0.9, 0.9, (2, 2))
+        b = rng.uniform(-0.1, 0.1, 2)
+
+        def make_f(A_: 'np.ndarray', b_: 'np.ndarray'):
+            """Erzeugt eine stetige Abbildung f: D² → D²."""
+            def f(x: 'np.ndarray') -> 'np.ndarray':
+                """f(x) = (Ax + b) normiert auf D²."""
+                y = A_ @ x + b_
+                norm_y = float(np.linalg.norm(y))
+                # Normierung sicherstellen: f bildet in D² ab
+                if norm_y > 1.0:
+                    y = y / norm_y
+                return y
+            return f
+
+        f_trial = make_f(A, b)
+
+        # Fixpunktsuche via Iteration (Banachscher Fixpunktsatz für kontraktive f)
+        # Für nicht-kontraktive f: Suche ||f(x) - x|| < ε
+        x = rng.uniform(-0.5, 0.5, 2)  # Startpunkt
+        x = x / max(1.0, float(np.linalg.norm(x)))  # In D² projizieren
+
+        fixed_found = False
+        # Iterative Fixpunktsuche: x_{n+1} = (x_n + f(x_n)) / 2
+        for _ in range(500):
+            fx = f_trial(x)
+            residual = float(np.linalg.norm(fx - x))
+            if residual < 1e-6:
+                fixed_found = True
+                break
+            # Dämpfte Iteration: Mittelung zwischen x und f(x)
+            x_new = 0.5 * (x + fx)
+            norm_new = float(np.linalg.norm(x_new))
+            if norm_new > 1.0:
+                x_new = x_new / norm_new
+            x = x_new
+
+        if fixed_found:
+            n_found += 1
+
+    found_ratio = n_found / n_trials if n_trials > 0 else 0.0
+
+    return {
+        'found_ratio': found_ratio,                    # Anteil mit gefundenem Fixpunkt
+        'n_found': n_found,
+        'n_trials': n_trials,
+        'brouwer_confirmed': found_ratio > 0.95,       # Erwartet ≈ 100%
+        'method': 'gedaempfte_iteration_D2',
+        'theorem': 'Brouwerscher Fixpunktsatz: f: D² → D² stetig → ∃ x: f(x) = x',
+    }

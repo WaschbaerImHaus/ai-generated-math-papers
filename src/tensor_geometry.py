@@ -1396,3 +1396,532 @@ def parallel_transport(
         result.append(v.copy().tolist())
 
     return result
+
+
+# ===========================================================================
+# SYMPLEKTISCHE GEOMETRIE UND HAMILTON-MECHANIK
+# ===========================================================================
+#
+# Die symplektische Geometrie ist die mathematische Sprache der klassischen
+# Mechanik. Ein symplektischer Vektorraum (V, ω) trägt eine nicht-entartete,
+# schiefsymmetrische Bilinearform ω (die "symplektische Form").
+#
+# Im Phasenraum mit Koordinaten (q₁,...,qₙ, p₁,...,pₙ) ist ω = Σ dqᵢ ∧ dpᵢ.
+# Die zugehörige Matrix ist J = [[0, Iₙ], [-Iₙ, 0]].
+#
+# Hamiltonsche Mechanik: Aus dem Hamilton H(q,p) folgen Bewegungsgleichungen
+#   dq/dt = ∂H/∂p,   dp/dt = -∂H/∂q
+# Der Fluss erhält ω (Liouville-Satz) und die Energie (falls ∂H/∂t = 0).
+# ===========================================================================
+
+
+def symplectic_form(n: int) -> np.ndarray:
+    """
+    @brief Standard-symplektische Form auf ℝ^{2n} als (2n×2n)-Matrix J.
+
+    @description
+        Die Standard-symplektische Form auf ℝ^{2n} lautet:
+            ω = Σ_{i=1}^{n} dqᵢ ∧ dpᵢ
+
+        Als Blockmatrix:
+            J = [[  0  ,  Iₙ ],
+                 [ -Iₙ ,   0 ]]
+
+        Eigenschaften:
+        - Schiefsymmetrie:   J^T = -J
+        - Nicht-Entartetheit: det(J) = 1 ≠ 0
+        - Geschlossenheit:   dω = 0 (trivial, da ω linear/konstant ist)
+        - J² = -I_{2n}  (analog zur imaginären Einheit)
+
+        Bedeutung: J beschreibt die Geometrie des Phasenraums in der
+        klassischen Mechanik. Hamiltonsche Gleichungen können kompakt als
+        ż = J · ∇H(z) mit z = (q, p) geschrieben werden.
+
+    @param n: Hälfte der Dimension (Freiheitsgrade); resultiert in 2n×2n-Matrix.
+    @return: (2n × 2n)-Matrix J der Standard-symplektischen Form.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # Identitätsmatrix der Größe n×n
+    I_n = np.eye(n)
+    # Nullmatrix der Größe n×n
+    Z = np.zeros((n, n))
+
+    # Blockmatrix J = [[0, I], [-I, 0]] (2n×2n)
+    top    = np.block([Z,    I_n])   # obere Hälfte:  [0  | I]
+    bottom = np.block([-I_n, Z  ])   # untere Hälfte: [-I | 0]
+
+    return np.block([[top], [bottom]])
+
+
+def is_symplectic_matrix(M: np.ndarray) -> bool:
+    """
+    @brief Prüft ob M zur symplektischen Gruppe Sp(2n) gehört.
+
+    @description
+        Eine (2n×2n)-Matrix M ist symplektisch, wenn gilt:
+            M^T J M = J
+
+        wobei J die Standard-symplektische Form ist.
+
+        Die symplektische Gruppe Sp(2n) ist die Symmetriegruppe der
+        klassischen Mechanik: Kanonische Transformationen erhalten ω.
+
+        Folgerungen:
+        - det(M) = ±1 (tatsächlich immer +1 für Sp(2n))
+        - M invertierbar mit M⁻¹ = -J M^T J
+        - Sp(2n) ⊂ SL(2n, ℝ)
+
+        Beispiele: Rotationen im Phasenraum, Scherungen, Shear-Matrizen.
+
+    @param M: Quadratische Matrix (Dimension muss gerade sein).
+    @return: True, falls M^T J M = J (bis auf numerische Toleranz 1e-8).
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    rows, cols = M.shape
+    if rows != cols or rows % 2 != 0:
+        # Symplektische Matrizen müssen quadratisch und gerader Dimension sein
+        return False
+
+    n = rows // 2
+    J = symplectic_form(n)   # Standard-symplektische Form
+
+    # Berechne M^T J M und vergleiche mit J
+    MTJM = M.T @ J @ M
+    return bool(np.allclose(MTJM, J, atol=1e-8))
+
+
+def poisson_bracket(
+    f_vals: np.ndarray,
+    g_vals: np.ndarray,
+    dq: float,
+    dp: float,
+) -> np.ndarray:
+    """
+    @brief Numerische Poisson-Klammer {f, g} auf dem Phasenraum (q, p).
+
+    @description
+        Die Poisson-Klammer zweier Observablen f, g auf dem Phasenraum ist:
+            {f, g} = ∂f/∂q · ∂g/∂p − ∂f/∂p · ∂g/∂q
+
+        Numerisch werden die partiellen Ableitungen via zentraler Differenzen
+        approximiert:
+            ∂f/∂q ≈ (f[q+1,:] - f[q-1,:]) / (2·dq)   (Achse 0 = q-Achse)
+            ∂f/∂p ≈ (f[:,p+1] - f[:,p-1]) / (2·dp)   (Achse 1 = p-Achse)
+
+        Wichtige Eigenschaften der Poisson-Klammer:
+        - Schiefsymmetrie:    {f, g} = -{g, f}
+        - Bilinearität
+        - Jacobi-Identität:  {f, {g, h}} + {g, {h, f}} + {h, {f, g}} = 0
+        - Kanonische Relation: {qᵢ, pⱼ} = δᵢⱼ   (klassisches Analogon zu [q̂,p̂]=iℏ)
+        - Energieerhaltung:   {H, H} = 0
+
+        Mit `np.gradient` werden Randwerte automatisch einseitig approximiert,
+        was die volle 2D-Auswertung ohne Randkorrekturen ermöglicht.
+
+    @param f_vals: 2D-Array f[i,j] = f(qᵢ, pⱼ) über dem (q,p)-Gitter.
+    @param g_vals: 2D-Array g[i,j] = g(qᵢ, pⱼ) über dem (q,p)-Gitter.
+    @param dq: Gitterabstand in q-Richtung.
+    @param dp: Gitterabstand in p-Richtung.
+    @return: 2D-Array {f,g}[i,j] über dem (q,p)-Gitter.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # Partielle Ableitungen mittels np.gradient (zentrale Differenzen innen,
+    # einseitige Differenzen am Rand)
+    df_dq = np.gradient(f_vals, dq, axis=0)   # ∂f/∂q  (q = Achse 0)
+    df_dp = np.gradient(f_vals, dp, axis=1)   # ∂f/∂p  (p = Achse 1)
+    dg_dq = np.gradient(g_vals, dq, axis=0)   # ∂g/∂q
+    dg_dp = np.gradient(g_vals, dp, axis=1)   # ∂g/∂p
+
+    # Poisson-Klammer: {f,g} = ∂f/∂q · ∂g/∂p − ∂f/∂p · ∂g/∂q
+    return df_dq * dg_dp - df_dp * dg_dq
+
+
+def hamiltonian_flow(
+    H_func: Callable,
+    q0: float,
+    p0: float,
+    t_span: float = 10.0,
+    dt: float = 0.01,
+) -> dict:
+    """
+    @brief Löst Hamiltonsche Gleichungen mit dem symplektischen Störmer-Verlet-Integrator.
+
+    @description
+        Die Hamiltonschen Bewegungsgleichungen lauten:
+            dq/dt = +∂H/∂p
+            dp/dt = −∂H/∂q
+
+        Störmer-Verlet-Schema (leapfrog, "velocity Verlet" in Phasenraumform):
+            p_{n+1/2} = pₙ − (dt/2) · ∂H/∂q(qₙ)
+            q_{n+1}   = qₙ + dt · ∂H/∂p(p_{n+1/2})     ← Halbschritt-Impuls
+            p_{n+1}   = p_{n+1/2} − (dt/2) · ∂H/∂q(q_{n+1})
+
+        Vorteile gegenüber Euler/Runge-Kutta:
+        - Symplektisch: erhält exakt die symplektische 2-Form ω = dq∧dp
+        - Zeitumkehrinvariant
+        - Energie schwankt nur beschränkt (keine langzeitige Drift)
+        - Geeignet für lange Simulationen (astronomische Zeiträume)
+
+        Numerische Gradienten werden mit h = 1e-6 berechnet.
+
+    @param H_func: Hamilton-Funktion H(q, p) → float.
+    @param q0: Anfangs-Koordinate.
+    @param p0: Anfangs-Impuls.
+    @param t_span: Gesamte Simulationszeit.
+    @param dt: Zeitschrittgröße (kleiner = genauer, aber langsamer).
+    @return: Dictionary mit Arrays 'q', 'p', 't', 'H' (Energie entlang Trajektorie).
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # Schrittweite für numerische Ableitung von H
+    _h = 1e-6
+
+    def dH_dq(q: float, p: float) -> float:
+        """Numerische partielle Ableitung ∂H/∂q (zentral)."""
+        return (H_func(q + _h, p) - H_func(q - _h, p)) / (2.0 * _h)
+
+    def dH_dp(q: float, p: float) -> float:
+        """Numerische partielle Ableitung ∂H/∂p (zentral)."""
+        return (H_func(q, p + _h) - H_func(q, p - _h)) / (2.0 * _h)
+
+    # Anzahl der Zeitschritte
+    n_steps = int(t_span / dt)
+
+    # Initialisierung der Ausgabe-Arrays
+    q_arr = np.zeros(n_steps + 1)
+    p_arr = np.zeros(n_steps + 1)
+    t_arr = np.zeros(n_steps + 1)
+    H_arr = np.zeros(n_steps + 1)
+
+    # Anfangswerte setzen
+    q_arr[0] = q0
+    p_arr[0] = p0
+    t_arr[0] = 0.0
+    H_arr[0] = H_func(q0, p0)
+
+    q = q0
+    p = p0
+
+    # Störmer-Verlet-Integration (symplektischer Leapfrog)
+    for i in range(1, n_steps + 1):
+        # Halber Impulsschritt: p_{n+1/2} = pₙ − (dt/2)·∂H/∂q(qₙ)
+        p_half = p - 0.5 * dt * dH_dq(q, p)
+
+        # Voller Koordinatenschritt: q_{n+1} = qₙ + dt·∂H/∂p(p_{n+1/2})
+        q = q + dt * dH_dp(q, p_half)
+
+        # Zweiter halber Impulsschritt: p_{n+1} = p_{n+1/2} − (dt/2)·∂H/∂q(q_{n+1})
+        p = p_half - 0.5 * dt * dH_dq(q, p_half)
+
+        # Ergebnis speichern
+        q_arr[i] = q
+        p_arr[i] = p
+        t_arr[i] = i * dt
+        H_arr[i] = H_func(q, p)
+
+    return {
+        'q': q_arr,   # Koordinaten-Trajektorie
+        'p': p_arr,   # Impuls-Trajektorie
+        't': t_arr,   # Zeitachse
+        'H': H_arr,   # Energie entlang der Trajektorie
+    }
+
+
+def liouville_theorem_check(
+    H_func: Callable,
+    initial_conditions: "list[tuple]",
+    t: float = 5.0,
+) -> dict:
+    """
+    @brief Numerische Verifikation des Liouville-Satzes (Phasenraumvolumen-Erhaltung).
+
+    @description
+        Liouville-Satz: Der Hamiltonsche Fluss Φ_t ist volumenerhaltend,
+        d.h. für jede messbare Menge U im Phasenraum gilt:
+            Vol(Φ_t(U)) = Vol(U)
+
+        Äquivalent: div(X_H) = 0, wobei X_H = (∂H/∂p, −∂H/∂q) das
+        Hamiltonsche Vektorfeld ist.
+
+        Numerische Methode:
+        - Bilde ein Ensemble von N Anfangsbedingungen (qᵢ, pᵢ)
+        - Entwickle jede mit Störmer-Verlet bis Zeit t
+        - Schätze das initiale und finale Phasenraumvolumen durch die
+          konvexe Hülle des Ensembles (via maximale Ausdehnung/Fläche)
+        - Die Jacobi-Determinante det(∂(q,p)/∂(q₀,p₀)) sollte ≈ 1 sein
+
+        Approximation der Fläche: Verwende Kovarianzmatrix der Punktwolke.
+        Für kleine Perturbationen: A ≈ π · √det(Cov) (Ellipsen-Flächenformel).
+
+    @param H_func: Hamilton-Funktion H(q, p).
+    @param initial_conditions: Liste von (q₀, p₀)-Tupeln (Ensemble).
+    @param t: Entwicklungszeit.
+    @return: Dictionary mit 'volume_initial', 'volume_final', 'ratio'.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # Ensemble vorwärtsentwickeln
+    dt = min(0.01, t / 500)   # Adaptive Schrittweite
+
+    # Initiale Positionen als Array (N × 2)
+    init_array = np.array(initial_conditions, dtype=float)   # (N, 2)
+
+    # Finale Positionen berechnen
+    final_positions = []
+    for (q0, p0) in initial_conditions:
+        result = hamiltonian_flow(H_func, q0, p0, t_span=t, dt=dt)
+        final_positions.append((result['q'][-1], result['p'][-1]))
+
+    final_array = np.array(final_positions, dtype=float)   # (N, 2)
+
+    # Schätze Phasenraumvolumen via Kovarianz-Determinante
+    # Für eine gleichförmige Ellipse: Fläche ∝ √det(Cov)
+    def _volume_estimate(pts: np.ndarray) -> float:
+        """Schätzt das 2D-Phasenraumvolumen via √det(Kovarianz)."""
+        if pts.shape[0] < 2:
+            return 1.0
+        cov = np.cov(pts.T)
+        if cov.ndim == 0:
+            # Nur 1D (degenerierter Fall)
+            return float(np.sqrt(abs(float(cov))))
+        det_cov = np.linalg.det(cov)
+        return float(np.sqrt(max(abs(det_cov), 1e-30)))
+
+    vol_initial = _volume_estimate(init_array)
+    vol_final   = _volume_estimate(final_array)
+
+    # Verhältnis ≈ 1 bestätigt Liouville
+    ratio = vol_final / vol_initial if vol_initial > 1e-30 else float('nan')
+
+    return {
+        'volume_initial': vol_initial,
+        'volume_final':   vol_final,
+        'ratio':          ratio,
+    }
+
+
+def action_angle_variables(
+    H_func: Callable,
+    E: float,
+    q_range: tuple = (-2.0, 2.0),
+) -> dict:
+    """
+    @brief Berechnet Wirkungs-Winkelvariablen (J, θ) für integrable Systeme.
+
+    @description
+        Für integrable Hamiltonsche Systeme existieren kanonische Koordinaten
+        (J, θ) – die Wirkungs-Winkelvariablen – in denen H nur von J abhängt:
+            H = H(J)   →   dθ/dt = ∂H/∂J = ω(J) = const.
+
+        Wirkungsvariable (Adiabateninvariante):
+            J = (1/2π) ∮_γ p dq   (geschlossene Energiebahn γ mit H = E)
+
+        Frequenz:
+            ω = dH/dJ = dE/dJ   (Kreisfrequenz der periodischen Bewegung)
+
+        Numerisch: Finde p(q, E) aus H(q,p) = E via Bisektion:
+            p(q) = p solch dass H(q,p) = E  (positiver Ast)
+        Integration über eine halbe Periode (q_min bis q_max) × 2:
+            J = (2/2π) ∫_{q_min}^{q_max} p(q) dq
+
+        Beispiel harmonischer Oszillator H = p²/2 + ω₀²q²/2:
+            Energiebahn: p² + ω₀²q² = 2E  (Ellipse)
+            J = E/ω₀,   ω = ω₀
+
+    @param H_func: Hamilton-Funktion H(q, p).
+    @param E: Energie (Wert der Erhaltungsgröße).
+    @param q_range: Suchbereich für die q-Koordinate als (q_min, q_max).
+    @return: Dictionary mit 'J' (Wirkung), 'omega' (Frequenz), 'q_vals', 'p_vals'.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    q_min, q_max = q_range
+
+    # Erstelle q-Gitter mit 2000 Punkten (hohe Auflösung für gute Integration)
+    n_pts = 2000
+    q_vals = np.linspace(q_min, q_max, n_pts)
+
+    def find_p_positive(q: float) -> float:
+        """
+        Findet den positiven Impuls p > 0 für H(q, p) = E via Bisektion.
+        Gibt 0.0 zurück, falls kein positiver Impuls existiert (klassisch verboten).
+        """
+        # Energiedifferenz bei p=0
+        H0 = H_func(q, 0.0)
+        if H0 > E:
+            # Klassisch verbotene Region (kinetische Energie wäre negativ)
+            return 0.0
+
+        # Obere Grenze für p suchen (H wächst mit p²)
+        p_upper = 0.1
+        while H_func(q, p_upper) < E and p_upper < 1e6:
+            p_upper *= 2.0
+
+        if H_func(q, p_upper) < E:
+            return 0.0   # Keine Lösung gefunden
+
+        # Bisektion in [0, p_upper]
+        p_lo, p_hi = 0.0, p_upper
+        for _ in range(60):
+            p_mid = 0.5 * (p_lo + p_hi)
+            if H_func(q, p_mid) < E:
+                p_lo = p_mid
+            else:
+                p_hi = p_mid
+        return 0.5 * (p_lo + p_hi)
+
+    # Berechne p(q) für alle q-Werte
+    p_vals = np.array([find_p_positive(q) for q in q_vals])
+
+    # Maske: nur Punkte mit p > 0 (klassisch erlaubte Region)
+    mask = p_vals > 1e-10
+    if not np.any(mask):
+        return {'J': 0.0, 'omega': float('nan'), 'q_vals': q_vals, 'p_vals': p_vals}
+
+    q_allowed = q_vals[mask]
+    p_allowed = p_vals[mask]
+
+    # Wirkungsvariable: J = (1/2π) ∮ p dq = (2/2π) ∫_{q_min}^{q_max} p dq
+    # Faktor 2: Hin- und Rückweg der periodischen Bahn
+    J = (2.0 / (2.0 * np.pi)) * np.trapezoid(p_allowed, q_allowed)
+
+    # Frequenz: ω = dE/dJ via numerischer Ableitung
+    delta_E = E * 1e-4 + 1e-8   # Kleine Energie-Perturbation
+
+    def compute_J_at_E(energy: float) -> float:
+        """Hilfsfunktion: Berechne J für gegebene Energie."""
+        p_temp = np.array([find_p_positive(q) for q in q_vals])
+        m = p_temp > 1e-10
+        if not np.any(m):
+            return 0.0
+        return (2.0 / (2.0 * np.pi)) * np.trapezoid(p_temp[m], q_vals[m])
+
+    J_plus  = compute_J_at_E(E + delta_E)
+    J_minus = compute_J_at_E(E - delta_E)
+
+    # ω = dE/dJ ≈ (2·δE) / (J_plus - J_minus)   (invertierter Quotient)
+    dJ = J_plus - J_minus
+    omega = (2.0 * delta_E) / dJ if abs(dJ) > 1e-15 else float('nan')
+
+    return {
+        'J':      J,         # Wirkungsvariable
+        'omega':  omega,     # Grundkreisfrequenz
+        'q_vals': q_vals,    # q-Gitter (zum Plotten)
+        'p_vals': p_vals,    # p(q)-Werte (positiver Ast)
+    }
+
+
+def cotangent_bundle_metric(base_metric: np.ndarray) -> dict:
+    """
+    @brief Natürliche symplektische Struktur auf dem Kotangentialbündel T*M.
+
+    @description
+        Für eine Riemannsche Mannigfaltigkeit (M, g) trägt das Kotangential-
+        bündel T*M eine natürliche (kanonische) symplektische Struktur:
+
+        Kanonische 1-Form (Liouville-Form / tautologische Form):
+            θ = pᵢ dqⁱ   (in lokalen Koordinaten)
+
+        Kanonische symplektische Form:
+            ω = -dθ = dqⁱ ∧ dpᵢ = Σᵢ dqⁱ ∧ dpᵢ
+
+        Diese Form ist:
+        - Exakt: ω = dθ   (daher trivialerweise geschlossen dω = 0)
+        - Nicht-entartet
+        - Kanonisch (unabhängig von der Wahl der Basismetrik g)
+
+        Die symplektische Form auf T*M hat Dimension 2n (n = dim M).
+
+        Liouville-Form in Koordinaten: θ = Σᵢ pᵢ dqⁱ
+        Als Vektor (diskrete Näherung): θᵢ entspricht dem i-ten Impuls.
+
+    @param base_metric: n×n Riemannsche Basismetrik g_{ij} auf M.
+    @return: Dictionary mit 'symplectic_form' (2n×2n), 'is_exact' (bool),
+             'liouville_form' (1D-Array der Länge 2n).
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    n = base_metric.shape[0]   # Dimension der Basis-Mannigfaltigkeit
+
+    # Kanonische symplektische Form auf T*M: ω = dq ∧ dp (Standard-J für n DOF)
+    omega = symplectic_form(n)   # (2n × 2n)-Matrix
+
+    # Liouville-Form θ = pᵢ dqⁱ: Als 2n-Vektor mit 1 in p-Komponenten (n bis 2n-1)
+    liouville = np.zeros(2 * n)
+    liouville[n:] = 1.0   # pᵢ-Koeffizienten (symbolisch = 1 für Einheitsimpulse)
+
+    return {
+        'symplectic_form': omega,
+        'is_exact':        True,     # ω = dθ ist exakt (und damit geschlossen)
+        'liouville_form':  liouville,
+    }
+
+
+def darboux_theorem_check(omega: np.ndarray, point: np.ndarray) -> dict:
+    """
+    @brief Numerische Überprüfung der Voraussetzungen des Darboux-Satzes.
+
+    @description
+        Darboux-Satz (Grundsatz der symplektischen Geometrie):
+            Jede symplektische Mannigfaltigkeit (M, ω) ist lokal diffeomorph
+            zu (ℝ^{2n}, ω_std), d.h. es existieren lokale Koordinaten (q, p),
+            sodass ω = Σᵢ dqⁱ ∧ dpᵢ.
+
+        Im Gegensatz zur Riemannschen Geometrie (wo die Krümmung ein lokales
+        Invariant ist) hat die symplektische Geometrie kein lokales Invariant:
+        Alle symplektischen Mannigfaltigkeiten gleicher Dimension sind lokal äquivalent!
+
+        Numerische Überprüfung (für eine konstante symplektische Form ω auf ℝ^{2n}):
+        1. Nicht-Entartetheit: det(ω) ≠ 0
+        2. Geschlossenheit: dω = 0 (für konstante Matrizen trivial erfüllt)
+        3. Schiefsymmetrie: ω^T = -ω
+
+        Falls alle drei Bedingungen erfüllt sind, garantiert der Darboux-Satz,
+        dass lokale Koordinaten existieren, die ω auf Normalform bringen.
+
+    @param omega: (2n×2n)-Matrix der symplektischen Form.
+    @param point: Referenzpunkt auf der Mannigfaltigkeit (für zukünftige Erweiterungen).
+    @return: Dictionary mit 'is_non_degenerate', 'is_closed', 'is_antisymmetric',
+             'darboux_applicable', 'det_omega'.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    rows, cols = omega.shape
+    if rows != cols:
+        return {
+            'is_non_degenerate':  False,
+            'is_closed':          False,
+            'is_antisymmetric':   False,
+            'darboux_applicable': False,
+            'det_omega':          0.0,
+        }
+
+    # (1) Nicht-Entartetheit: det(ω) ≠ 0
+    det_omega = float(np.linalg.det(omega))
+    is_non_degenerate = abs(det_omega) > 1e-10
+
+    # (2) Geschlossenheit: dω = 0
+    # Für eine konstante Matrix (keine Ortsabhängigkeit) ist dω trivialerweise 0.
+    is_closed = True   # Exakte 2-Form auf flachem Raum ist immer geschlossen
+
+    # (3) Schiefsymmetrie: ω^T = -ω
+    is_antisymmetric = bool(np.allclose(omega + omega.T, 0, atol=1e-10))
+
+    # Darboux anwendbar: alle drei Bedingungen erfüllt und Dimension gerade
+    darboux_applicable = (
+        is_non_degenerate
+        and is_closed
+        and is_antisymmetric
+        and rows % 2 == 0
+    )
+
+    return {
+        'is_non_degenerate':  is_non_degenerate,
+        'is_closed':          is_closed,
+        'is_antisymmetric':   is_antisymmetric,
+        'darboux_applicable': darboux_applicable,
+        'det_omega':          det_omega,
+    }

@@ -195,5 +195,26 @@
 - [x] 72 Tests in tests/test_l_functions_dirichlet.py, alle grün
 - [x] Dokumentiert: Leibniz-Reihe L(1,χ₋₄)=π/4, |τ|²=q, BSD-Vermutung
 
+### Moduln über Ringen (src/modules_algebra.py) - Build 27
+- [x] smith_normal_form(): Smith-Normalform A = U·D·V mit Teilbarkeitskette d₁|d₂|...|dᵣ
+- [x] module_from_matrix(): ℤ-Modul M = ℤⁿ/Im(A) aus Relationsmatrix
+- [x] structure_theorem_abelian_groups(): Klassifikation aller abelschen Gruppen der Ordnung n
+- [x] tensor_product_modules(): ℤ_m ⊗ ℤ_n ≅ ℤ_{gcd(m,n)}
+- [x] hom_module(): |Hom(ℤ_m, ℤ_n)| = gcd(m,n)
+- [x] exact_sequence_check(): Exaktheit 0 → A → B → C → 0 prüfen
+- [x] free_resolution(): Freie Auflösung via Smith-Normalform
+- [x] Module-Klasse: rank(), torsion_submodule(), free_part(), is_free(), is_finitely_generated()
+- [x] 42 Tests in tests/test_modules_algebra.py, alle grün
+
+### Kommutative Algebra (src/commutative_algebra.py) - Build 27
+- [x] localization(): S^{-1}R Lokalisierung an multiplikativer Menge
+- [x] prime_spectrum(): Spec(ℤ/nℤ) = {(p) : p Primteiler von n}
+- [x] nakayama_lemma_check(): Nakayama M = I·M ⟹ M = 0 Verifikation
+- [x] integral_closure(): Ganzer Abschluss von ℤ in ℚ(√d), Diskriminante, PID-Test
+- [x] class_group_estimate(): Klassenzahl h(d), Minkowski-Schranke, PID-Nachweis
+- [x] noether_normalization(): Krull-Dimension, algebraisch unabhängige Elemente
+- [x] hilbert_basis_theorem_verify(): Endliche Erzeugbarkeit im Polynomring über ℤ_p
+- [x] 32 Tests in tests/test_commutative_algebra.py, alle grün
+
 ## Offene Aufgaben
 _(keine bekannten offenen Features mehr)_
