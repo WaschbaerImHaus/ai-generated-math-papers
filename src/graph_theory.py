@@ -8,7 +8,7 @@
 
 import heapq
 import math
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 
 # ============================================================
@@ -35,11 +35,11 @@ class Graph:
         @brief Initialisiert einen leeren Graphen.
         @param directed True für gerichteten Graphen, False für ungerichteten.
         """
-        self.directed = directed          # Gerichtet oder ungerichtet
-        self.adj: Dict[Any, Set] = {}     # Adjazenzliste: {knoten: {nachbarn}}
-        self.weights: Dict[Tuple, float] = {}  # Kantengewichte: {(u,v): weight}
+        self.directed = directed                        # Gerichtet oder ungerichtet
+        self.adj: dict[Any, set] = {}                  # Adjazenzliste: {knoten: {nachbarn}}
+        self.weights: dict[tuple, float] = {}          # Kantengewichte: {(u,v): weight}
 
-    def add_vertex(self, v: Any) -> None:
+    def add_vertex(self, v: int | str) -> None:
         """
         @brief Fügt einen Knoten zum Graphen hinzu.
         @author Kurt Ingwer
@@ -51,7 +51,7 @@ class Graph:
         if v not in self.adj:
             self.adj[v] = set()
 
-    def add_edge(self, u: Any, v: Any, weight: float = 1.0) -> None:
+    def add_edge(self, u: int | str, v: int | str, weight: float = 1.0) -> None:
         """
         @brief Fügt eine Kante (u,v) mit optionalem Gewicht hinzu.
         @author Kurt Ingwer
@@ -77,7 +77,7 @@ class Graph:
             self.adj[v].add(u)
             self.weights[(v, u)] = weight
 
-    def remove_vertex(self, v: Any) -> None:
+    def remove_vertex(self, v: int | str) -> None:
         """
         @brief Entfernt einen Knoten und alle angrenzenden Kanten.
         @author Kurt Ingwer
@@ -97,7 +97,7 @@ class Graph:
         # Knoten selbst entfernen
         del self.adj[v]
 
-    def remove_edge(self, u: Any, v: Any) -> None:
+    def remove_edge(self, u: int | str, v: int | str) -> None:
         """
         @brief Entfernt die Kante (u,v).
         @author Kurt Ingwer
@@ -117,14 +117,14 @@ class Graph:
                 self.adj[v].discard(u)
             self.weights.pop((v, u), None)
 
-    def vertices(self) -> list:
+    def vertices(self) -> list[int | str]:
         """
         @brief Gibt alle Knoten des Graphen zurück.
         @return Sortierte Liste aller Knoten.
         """
         return sorted(self.adj.keys(), key=lambda x: (str(type(x)), x))
 
-    def edges(self) -> list:
+    def edges(self) -> list[tuple]:
         """
         @brief Gibt alle Kanten als Liste von Tupeln zurück.
         @author Kurt Ingwer
@@ -150,7 +150,7 @@ class Graph:
 
         return result
 
-    def neighbors(self, v: Any) -> list:
+    def neighbors(self, v: int | str) -> list[int | str]:
         """
         @brief Gibt die Nachbarn eines Knotens zurück.
         @param v Knoten.
@@ -160,7 +160,7 @@ class Graph:
             return []
         return sorted(self.adj[v], key=lambda x: (str(type(x)), x))
 
-    def degree(self, v: Any) -> int:
+    def degree(self, v: int | str) -> int:
         """
         @brief Grad (Anzahl der Kanten) eines Knotens.
         @author Kurt Ingwer
@@ -175,7 +175,7 @@ class Graph:
             return 0
         return len(self.adj[v])
 
-    def degree_sequence(self) -> list:
+    def degree_sequence(self) -> list[int]:
         """
         @brief Sortierte Liste aller Knotengrade (absteigend).
         @author Kurt Ingwer
@@ -188,7 +188,7 @@ class Graph:
         """
         return sorted([self.degree(v) for v in self.adj], reverse=True)
 
-    def adjacency_matrix(self) -> list:
+    def adjacency_matrix(self) -> list[list[float]]:
         """
         @brief Adjazenzmatrix als 2D-Liste.
         @author Kurt Ingwer
@@ -212,7 +212,7 @@ class Graph:
 
         return matrix
 
-    def adjacency_list(self) -> dict:
+    def adjacency_list(self) -> dict[int | str, list[int | str]]:
         """
         @brief Adjazenzliste als Dict.
         @return Dict {knoten: sorted_liste_der_nachbarn}.
@@ -240,7 +240,7 @@ class Graph:
         # Alle Knoten müssen besucht worden sein
         return len(visited) == len(self.adj)
 
-    def _bfs_visited(self, start: Any) -> set:
+    def _bfs_visited(self, start: int | str) -> set:
         """
         @brief Interne BFS-Hilfsmethode – gibt Menge besuchter Knoten zurück.
         @param start Startknoten.
@@ -258,7 +258,7 @@ class Graph:
 
         return visited
 
-    def connected_components(self) -> list:
+    def connected_components(self) -> list[set]:
         """
         @brief Findet alle Zusammenhangskomponenten.
         @author Kurt Ingwer
@@ -404,7 +404,7 @@ class Graph:
 
         return comp
 
-    def subgraph(self, vertices: list) -> 'Graph':
+    def subgraph(self, vertices: list[int | str]) -> 'Graph':
         """
         @brief Erzeugt den durch vertices induzierten Teilgraphen.
         @author Kurt Ingwer
@@ -438,7 +438,7 @@ class Graph:
 # Traversierung und kürzeste Wege
 # ============================================================
 
-def bfs(graph: Graph, start: Any) -> dict:
+def bfs(graph: Graph, start: int | str) -> dict[str, dict]:
     """
     @brief Breitensuche (Breadth-First Search).
     @author Kurt Ingwer
@@ -484,7 +484,7 @@ def bfs(graph: Graph, start: Any) -> dict:
     }
 
 
-def dfs(graph: Graph, start: Any) -> dict:
+def dfs(graph: Graph, start: int | str) -> dict[str, dict]:
     """
     @brief Tiefensuche (Depth-First Search).
     @author Kurt Ingwer
@@ -530,7 +530,7 @@ def dfs(graph: Graph, start: Any) -> dict:
     }
 
 
-def dijkstra(graph: Graph, start: Any) -> dict:
+def dijkstra(graph: Graph, start: int | str) -> dict[str, dict]:
     """
     @brief Dijkstra-Algorithmus für kürzeste Wege (nicht-negative Gewichte).
     @author Kurt Ingwer
@@ -589,7 +589,7 @@ def dijkstra(graph: Graph, start: Any) -> dict:
     return {'distances': distances, 'path': paths}
 
 
-def bellman_ford(graph: Graph, start: Any) -> dict:
+def bellman_ford(graph: Graph, start: int | str) -> dict[str, dict | bool]:
     """
     @brief Bellman-Ford-Algorithmus für kürzeste Wege.
     @author Kurt Ingwer
@@ -640,7 +640,7 @@ def bellman_ford(graph: Graph, start: Any) -> dict:
     }
 
 
-def floyd_warshall(graph: Graph) -> list:
+def floyd_warshall(graph: Graph) -> list[list[float]]:
     """
     @brief Floyd-Warshall-Algorithmus: Alle kürzesten Wege.
     @author Kurt Ingwer
@@ -751,7 +751,7 @@ def kruskal_mst(graph: Graph) -> Graph:
     return mst
 
 
-def prim_mst(graph: Graph, start: Any = None) -> Graph:
+def prim_mst(graph: Graph, start: int | str | None = None) -> Graph:
     """
     @brief Prim-Algorithmus: Minimaler Spannbaum.
     @author Kurt Ingwer
@@ -806,7 +806,7 @@ def prim_mst(graph: Graph, start: Any = None) -> Graph:
     return mst
 
 
-def topological_sort(graph: Graph) -> list:
+def topological_sort(graph: Graph) -> list[int | str]:
     """
     @brief Topologische Sortierung für gerichtete azyklische Graphen (DAGs).
     @author Kurt Ingwer
@@ -880,7 +880,7 @@ def chromatic_number_greedy(graph: Graph) -> int:
     return max(coloring.values()) + 1  # Farben: 0, 1, ..., k-1 → k Farben
 
 
-def graph_coloring_greedy(graph: Graph) -> dict:
+def graph_coloring_greedy(graph: Graph) -> dict[int | str, int]:
     """
     @brief Greedy-Graph-Färbung.
     @author Kurt Ingwer
@@ -912,7 +912,7 @@ def graph_coloring_greedy(graph: Graph) -> dict:
     return coloring
 
 
-def is_eulerian(graph: Graph) -> dict:
+def is_eulerian(graph: Graph) -> dict[str, bool | list]:
     """
     @brief Prüft ob der Graph einen Euler-Kreis oder Euler-Pfad besitzt.
     @author Kurt Ingwer
@@ -945,7 +945,7 @@ def is_eulerian(graph: Graph) -> dict:
     }
 
 
-def is_hamiltonian_path(graph: Graph) -> dict:
+def is_hamiltonian_path(graph: Graph) -> dict[str, bool | list]:
     """
     @brief Sucht einen Hamiltonpfad (besucht alle Knoten genau einmal).
     @author Kurt Ingwer
@@ -965,7 +965,7 @@ def is_hamiltonian_path(graph: Graph) -> dict:
     if n == 0:
         return {'has_path': False, 'path': []}
 
-    def backtrack(path: list, visited: set) -> Optional[list]:
+    def backtrack(path: list, visited: set) -> list | None:
         """Backtracking-Suche nach einem Hamiltonpfad."""
         if len(path) == n:
             return path  # Alle Knoten besucht → Pfad gefunden!
@@ -1343,7 +1343,7 @@ def stirling_numbers_second_kind(n: int, k: int) -> int:
     return dp[n][k]
 
 
-def bell_numbers(n: int) -> list:
+def bell_numbers(n: int) -> list[int]:
     """
     @brief Bell-Zahlen B_0, B_1, ..., B_n.
     @author Kurt Ingwer
@@ -1469,7 +1469,7 @@ def partition_count(n: int) -> int:
     return dp[n]
 
 
-def multinomial_coefficient(n: int, groups: list) -> int:
+def multinomial_coefficient(n: int, groups: list[int]) -> int:
     """
     @brief Multinomialkoeffizient n! / (k1! * k2! * ... * km!).
     @author Kurt Ingwer

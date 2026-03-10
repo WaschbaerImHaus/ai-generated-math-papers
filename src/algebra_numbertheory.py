@@ -20,6 +20,7 @@
 
 import math
 import functools
+from typing import Callable
 
 # Abhängigkeiten aus dem Kern-Modul importieren
 from algebra_core import extended_gcd, mod_inverse
@@ -66,7 +67,7 @@ def is_prime(n: int) -> bool:
 
 
 @functools.lru_cache(maxsize=1000)
-def prime_factorization(n: int) -> dict:
+def prime_factorization(n: int) -> dict[int, int]:
     """
     @brief Berechnet die Primfaktorzerlegung einer natürlichen Zahl.
     @description
@@ -167,7 +168,7 @@ def euler_phi(n: int) -> int:
 # RSA-KRYPTOSYSTEM
 # =============================================================================
 
-def rsa_keygen(p: int, q: int) -> tuple:
+def rsa_keygen(p: int, q: int) -> tuple[tuple[int, int], tuple[int, int]]:
     """
     @brief Erzeugt RSA-Schlüsselpaar aus zwei Primzahlen.
     @description
@@ -206,7 +207,7 @@ def rsa_keygen(p: int, q: int) -> tuple:
     return (e, n), (d, n)
 
 
-def rsa_encrypt(message: int, public_key: tuple) -> int:
+def rsa_encrypt(message: int, public_key: tuple[int, int]) -> int:
     """
     @brief RSA-Verschlüsselung: c = m^e mod n.
     @description
@@ -223,7 +224,7 @@ def rsa_encrypt(message: int, public_key: tuple) -> int:
     return pow(message, e, n)
 
 
-def rsa_decrypt(ciphertext: int, private_key: tuple) -> int:
+def rsa_decrypt(ciphertext: int, private_key: tuple[int, int]) -> int:
     """
     @brief RSA-Entschlüsselung: m = c^d mod n.
     @description

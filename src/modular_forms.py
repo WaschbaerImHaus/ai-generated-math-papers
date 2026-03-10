@@ -254,6 +254,10 @@ def eisenstein_series_fast(k: int, z: complex, n_terms: int = 50) -> complex:
     @author Kurt Ingwer
     @lastModified 2026-03-10
     """
+    # τ muss in der oberen Halbebene liegen: Im(τ) > 0
+    if z.imag <= 0:
+        raise ValueError(f"τ={z} liegt nicht in der oberen Halbebene (Im(τ)={z.imag:.4f} ≤ 0)")
+
     # Für ungerades k oder k < 4: Fallback auf vollständige Summe
     # (Symmetrie gilt nur für gerades k)
     if k < 4 or k % 2 != 0:

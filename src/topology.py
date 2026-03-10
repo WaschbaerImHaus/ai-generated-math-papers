@@ -7,14 +7,14 @@
 """
 
 import math
-from typing import Callable, List, Optional, Tuple, Any
+from typing import Callable
 
 
 # ============================================================
 # Standardmetriken
 # ============================================================
 
-def euclidean_metric(x: list, y: list) -> float:
+def euclidean_metric(x: list[float], y: list[float]) -> float:
     """
     @brief Euklidische Metrik: d(x,y) = sqrt(Σ(x_i - y_i)²).
     @author Kurt Ingwer
@@ -33,7 +33,7 @@ def euclidean_metric(x: list, y: list) -> float:
     return math.sqrt(sum((xi - yi) ** 2 for xi, yi in zip(x, y)))
 
 
-def manhattan_metric(x: list, y: list) -> float:
+def manhattan_metric(x: list[float], y: list[float]) -> float:
     """
     @brief Manhattan-Metrik (Taxicab): d(x,y) = Σ|x_i - y_i|.
     @author Kurt Ingwer
@@ -53,7 +53,7 @@ def manhattan_metric(x: list, y: list) -> float:
     return sum(abs(xi - yi) for xi, yi in zip(x, y))
 
 
-def chebyshev_metric(x: list, y: list) -> float:
+def chebyshev_metric(x: list[float], y: list[float]) -> float:
     """
     @brief Chebyshev-Metrik: d(x,y) = max|x_i - y_i|.
     @author Kurt Ingwer
@@ -73,7 +73,7 @@ def chebyshev_metric(x: list, y: list) -> float:
     return max(abs(xi - yi) for xi, yi in zip(x, y))
 
 
-def discrete_metric(x: Any, y: Any) -> float:
+def discrete_metric(x: object, y: object) -> float:
     """
     @brief Diskrete Metrik: d(x,y) = 0 wenn x=y, sonst 1.
     @author Kurt Ingwer
@@ -92,7 +92,7 @@ def discrete_metric(x: Any, y: Any) -> float:
     return 0.0 if x == y else 1.0
 
 
-def p_norm_metric(x: list, y: list, p: float) -> float:
+def p_norm_metric(x: list[float], y: list[float], p: float) -> float:
     """
     @brief Lp-Metrik: d(x,y) = (Σ|x_i - y_i|^p)^{1/p}.
     @author Kurt Ingwer
@@ -137,7 +137,7 @@ class MetricSpace:
     Beispiele: (ℝⁿ, euklidisch), (C([a,b]), ‖·‖∞), (Graphen, Pfadlänge)
     """
 
-    def __init__(self, distance_func: Callable):
+    def __init__(self, distance_func: Callable[[list, list], float]) -> None:
         """
         @brief Initialisiert den metrischen Raum mit einer Abstandsfunktion.
         @param distance_func Callable d(x, y) → float (die Metrik).
@@ -145,7 +145,7 @@ class MetricSpace:
         # Die Metrikfunktion als Attribut speichern
         self.d = distance_func
 
-    def verify_metric_axioms(self, points: list) -> dict:
+    def verify_metric_axioms(self, points: list[list[float]]) -> dict[str, bool]:
         """
         @brief Prüft alle 4 Metrik-Axiome für eine Liste von Punkten.
         @author Kurt Ingwer
@@ -198,7 +198,7 @@ class MetricSpace:
 
         return results
 
-    def open_ball(self, center: Any, radius: float, points: list) -> list:
+    def open_ball(self, center: list[float], radius: float, points: list[list[float]]) -> list[list[float]]:
         """
         @brief Offene Kugel B(center, r) = {x ∈ points : d(center, x) < r}.
         @author Kurt Ingwer
@@ -215,7 +215,7 @@ class MetricSpace:
         # Alle Punkte zurückgeben, deren Abstand zum Zentrum < Radius ist
         return [p for p in points if self.d(center, p) < radius]
 
-    def is_open_set(self, subset: list, all_points: list, tol: float = 1e-9) -> bool:
+    def is_open_set(self, subset: list[list[float]], all_points: list[list[float]], tol: float = 1e-9) -> bool:
         """
         @brief Prüft ob eine Teilmenge (in diskreten Punkten) offen ist.
         @author Kurt Ingwer
@@ -255,7 +255,7 @@ class MetricSpace:
 
         return True
 
-    def is_cauchy_sequence(self, sequence: list, tol: float = 1e-10) -> bool:
+    def is_cauchy_sequence(self, sequence: list[list[float]], tol: float = 1e-10) -> bool:
         """
         @brief Prüft ob eine Folge Cauchy ist.
         @author Kurt Ingwer
@@ -294,7 +294,7 @@ class MetricSpace:
 # Topologische Eigenschaften
 # ============================================================
 
-def is_connected(points: list, metric_func: Callable, radius: float) -> bool:
+def is_connected(points: list[list[float]], metric_func: Callable[[list, list], float], radius: float) -> bool:
     """
     @brief Prüft ob ein diskreter Punktraum epsilon-zusammenhängend ist.
     @author Kurt Ingwer
@@ -341,7 +341,7 @@ def is_connected(points: list, metric_func: Callable, radius: float) -> bool:
     return all(find(i) == root for i in range(len(points)))
 
 
-def hausdorff_distance(set_a: list, set_b: list, metric_func: Callable) -> float:
+def hausdorff_distance(set_a: list[list[float]], set_b: list[list[float]], metric_func: Callable[[list, list], float]) -> float:
     """
     @brief Hausdorff-Abstand zwischen zwei Mengen.
     @author Kurt Ingwer
@@ -372,7 +372,7 @@ def hausdorff_distance(set_a: list, set_b: list, metric_func: Callable) -> float
     return max(directed_hausdorff(set_a, set_b), directed_hausdorff(set_b, set_a))
 
 
-def compute_diameter(points: list, metric_func: Callable) -> float:
+def compute_diameter(points: list[list[float]], metric_func: Callable[[list, list], float]) -> float:
     """
     @brief Durchmesser einer Menge: diam(A) = sup_{x,y∈A} d(x,y).
     @author Kurt Ingwer
@@ -398,7 +398,7 @@ def compute_diameter(points: list, metric_func: Callable) -> float:
     return max_dist
 
 
-def is_compact_discrete(points: list, metric_func: Callable, epsilon: float) -> bool:
+def is_compact_discrete(points: list[list[float]], metric_func: Callable[[list, list], float], epsilon: float) -> bool:
     """
     @brief Prüft (epsilon-)Kompaktheit einer diskreten Punktmenge.
     @author Kurt Ingwer
@@ -461,7 +461,7 @@ class ParametricCurve:
     Mathematisch: γ = (γ₁(t), γ₂(t), ..., γₙ(t))
     """
 
-    def __init__(self, funcs: list, t_range: tuple):
+    def __init__(self, funcs: list[Callable[[float], float]], t_range: tuple[float, float]) -> None:
         """
         @brief Initialisiert die parametrische Kurve.
         @param funcs Liste von Funktionen [x(t), y(t), ...] – eine pro Dimension.
@@ -472,7 +472,7 @@ class ParametricCurve:
         self.t_start = t_range[0]
         self.t_end = t_range[1]
 
-    def evaluate(self, t: float) -> list:
+    def evaluate(self, t: float) -> list[float]:
         """
         @brief Wertet die Kurve bei Parameterwert t aus.
         @author Kurt Ingwer
@@ -596,7 +596,7 @@ class ParametricCurve:
         dist = math.sqrt(sum((s - e) ** 2 for s, e in zip(start, end)))
         return dist < tol
 
-    def winding_number(self, point: list) -> int:
+    def winding_number(self, point: list[float]) -> int:
         """
         @brief Umlaufzahl einer geschlossenen Kurve um einen Punkt.
         @author Kurt Ingwer
@@ -639,7 +639,7 @@ class ParametricCurve:
         return round(total_angle / (2 * math.pi))
 
 
-def circle_curve(radius: float = 1.0, center: list = None) -> ParametricCurve:
+def circle_curve(radius: float = 1.0, center: list[float] | None = None) -> ParametricCurve:
     """
     @brief Erzeugt einen Kreis als ParametricCurve.
     @author Kurt Ingwer
@@ -763,7 +763,7 @@ def genus_from_euler(euler_char: int, orientable: bool = True) -> int:
         return 2 - euler_char
 
 
-def betti_numbers_graph(adjacency_matrix: list) -> dict:
+def betti_numbers_graph(adjacency_matrix: list[list[int | float]]) -> dict[str, int | list]:
     """
     @brief Betti-Zahlen eines Graphen.
     @author Kurt Ingwer
@@ -826,7 +826,7 @@ def betti_numbers_graph(adjacency_matrix: list) -> dict:
 # Fraktale Dimensionen
 # ============================================================
 
-def box_counting_dimension(points: list, epsilon_values: list) -> float:
+def box_counting_dimension(points: list[list[float]], epsilon_values: list[float]) -> float:
     """
     @brief Box-Counting-Dimension (Minkowski-Bouligand-Dimension).
     @author Kurt Ingwer

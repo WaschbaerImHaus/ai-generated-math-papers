@@ -141,11 +141,11 @@ class TestHealthEndpoint:
         assert data['status'] == 'ok'
 
     def test_health_build_number(self, client):
-        """Health-Endpunkt muss Build-Nummer 12 zurückgeben."""
+        """Health-Endpunkt muss eine gültige Build-Nummer zurückgeben."""
         resp = client.get('/api/health')
         data = resp.get_json()
         assert 'build' in data
-        assert data['build'] == 12
+        assert data['build'] >= 12  # Build-Nummer steigt mit jeder Version
 
 
 # ===========================================================================

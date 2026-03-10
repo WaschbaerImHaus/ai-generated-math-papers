@@ -272,6 +272,27 @@ def _sieve_of_eratosthenes(n: int) -> list:
     return [i for i in range(2, n + 1) if is_prime_arr[i]]
 
 
+def _check_goldbach_worker(args: tuple) -> tuple | None:
+    """
+    @brief Modullevelfunktion für multiprocessing.Pool (picklebar).
+    @description
+        Prüft ob n als Summe zweier Primzahlen darstellbar ist.
+        Muss auf Modulebene definiert sein, da lokale Funktionen nicht
+        vom pickle-Modul serialisiert werden können (multiprocessing-Einschränkung).
+    @param args Tupel (n, primes, prime_set)
+    @return (n, p, q) bei Erfolg, None wenn keine Zerlegung gefunden.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    n, primes, prime_set = args
+    for p in primes:
+        if p > n // 2:
+            break
+        if (n - p) in prime_set:
+            return (n, p, n - p)
+    return None
+
+
 def goldbach_verification_range(n_max: int = 10000) -> dict:
     """
     @brief Verifiziert die Goldbach-Vermutung für alle geraden n ≤ n_max.
@@ -302,29 +323,13 @@ def goldbach_verification_range(n_max: int = 10000) -> dict:
     # Alle geraden Zahlen > 2 als Prüfliste aufbauen
     even_numbers = list(range(4, n_max + 1, 2))
 
-    def check_goldbach(n):
-        """
-        Prüft ob n als Summe zweier Primzahlen darstellbar ist (Goldbach).
-        Wird als Worker-Funktion im Pool ausgeführt.
-        Gibt (n, p, q) bei Erfolg zurück, None wenn keine Zerlegung gefunden.
-        """
-        # Iteriere über alle Primzahlen p ≤ n//2
-        for p in primes:
-            if p > n // 2:
-                # Alle möglichen p exhaustiv geprüft, Abbruch
-                break
-            q = n - p
-            if q in prime_set:
-                # Goldbach-Zerlegung gefunden: n = p + q
-                return (n, p, q)
-        # Keine Zerlegung gefunden (würde die Goldbach-Vermutung widerlegen!)
-        return None
-
     # Parallele Berechnung: min(CPU-Kerne, 4) Worker-Prozesse
+    # Lokale Funktionen sind nicht picklebar → Modullfunktion _check_goldbach_worker nutzen
     n_workers = min(mp.cpu_count(), 4)
+    # Primzahlmenge als sortierte Liste übergeben (picklebar)
+    args = [(n, primes, prime_set) for n in even_numbers]
     with mp.Pool(processes=n_workers) as pool:
-        # Jede gerade Zahl wird von einem Worker-Prozess geprüft
-        results = pool.map(check_goldbach, even_numbers)
+        results = pool.map(_check_goldbach_worker, args)
 
     # Ergebnisse auswerten: None = keine Zerlegung gefunden (Gegenbeispiel!)
     failed = [r for r in results if r is None]

@@ -17,7 +17,6 @@
 """
 
 import math
-from typing import List
 
 
 # =============================================================================
@@ -34,7 +33,7 @@ class Vector:
     @lastModified 2026-03-10
     """
 
-    def __init__(self, components: list):
+    def __init__(self, components: list[float]) -> None:
         """
         @brief Erstellt einen Vektor aus einer Komponentenliste.
         @param components Liste der Vektorkomponenten.
@@ -154,6 +153,23 @@ class Vector:
         """@brief Skalarmultiplikation s * v (rechtsseitig). @date 2026-03-05"""
         return self.__mul__(scalar)
 
+    def __len__(self) -> int:
+        """
+        @brief Gibt die Dimension des Vektors zurück.
+        @return Anzahl der Komponenten.
+        @date 2026-03-10
+        """
+        return self.dim
+
+    def __getitem__(self, idx: int) -> float:
+        """
+        @brief Gibt die Komponente am Index idx zurück.
+        @param idx 0-basierter Index der Komponente.
+        @return Komponentenwert.
+        @date 2026-03-10
+        """
+        return self.components[idx]
+
     def __repr__(self) -> str:
         return f"Vector({self.components})"
 
@@ -162,7 +178,7 @@ class Vector:
 # GRAM-SCHMIDT-ORTHOGONALISIERUNG
 # =============================================================================
 
-def gram_schmidt(vectors: List[Vector], normalize: bool = False) -> List[Vector]:
+def gram_schmidt(vectors: list['Vector'], normalize: bool = False) -> list['Vector']:
     """
     @brief Gram-Schmidt-Orthogonalisierung einer Menge von Vektoren.
     @description

@@ -1,0 +1,597 @@
+{% extends "base.html" %}
+<!--
+    @file topology.html
+    @brief Topologie-Seite: Metriken, parametrische Kurven, Euler-Charakteristik, Fraktale.
+    @description
+        Interaktive Werkzeuge für topologische Berechnungen:
+        - Metrik-Rechner (Euklidisch, Manhattan, Chebyshev, p-Norm)
+        - Parametrische Kurven (Kreis, Lissajous, Helix) mit Bogenlänge
+        - Euler-Charakteristik χ = V - E + F und Geschlecht
+        - Fraktale Dimensionen (Cantor, Sierpinski, Box-Counting)
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+{% block title %}Topologie – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><span>∞</span> Topologie &amp; Geometrie</h1>
+    <p class="page-subtitle">
+        Metrische Räume, parametrische Kurven, Euler-Charakteristik und fraktale Dimensionen.
+    </p>
+</div>
+
+<!-- ===== Formelübersicht ===== -->
+<div class="card">
+    <h2>Grundformeln</h2>
+    <div class="formula-grid">
+        <div class="formula-item">
+            <div class="formula-label">Euklidische Metrik</div>
+            <div class="formula-display" id="formula-euclid"></div>
+        </div>
+        <div class="formula-item">
+            <div class="formula-label">Euler-Charakteristik</div>
+            <div class="formula-display" id="formula-euler"></div>
+        </div>
+        <div class="formula-item">
+            <div class="formula-label">Fraktale Dimension</div>
+            <div class="formula-display" id="formula-fractal"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Metrik-Rechner ===== -->
+<div class="card">
+    <h2>Metrik-Rechner</h2>
+    <p style="color: var(--subtext0); font-size: 0.85rem; margin-bottom: 1rem;">
+        Gib zwei Punkte als JSON-Arrays ein und wähle die gewünschte Metrik.
+        Beispiel: <code>[1, 2]</code> und <code>[4, 6]</code>
+    </p>
+
+    <div class="form-row">
+        <div class="form-group" style="flex: 2;">
+            <label class="form-label">Metrik</label>
+            <select class="form-select" id="metric-type" onchange="onMetricChange()">
+                <option value="euclidean">Euklidisch (L²-Norm)</option>
+                <option value="manhattan">Manhattan (L¹-Norm, Taxicab)</option>
+                <option value="chebyshev">Chebyshev (L∞-Norm, Schachbrett)</option>
+                <option value="p_norm">p-Norm (allgemein)</option>
+            </select>
+        </div>
+        <div class="form-group" id="p-input-group" style="display: none;">
+            <label class="form-label">p-Wert</label>
+            <input class="form-input" id="metric-p" type="number" value="3" min="1" step="0.5">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">Punkt 1 (JSON-Array)</label>
+            <input class="form-input" id="metric-p1" type="text" value="[1, 2]" placeholder="[x, y, ...]">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Punkt 2 (JSON-Array)</label>
+            <input class="form-input" id="metric-p2" type="text" value="[4, 6]" placeholder="[x, y, ...]">
+        </div>
+    </div>
+
+    <!-- Beispiel-Buttons -->
+    <div style="margin-bottom: 0.75rem;">
+        <span style="font-size: 0.8rem; color: var(--subtext0);">Beispiele: </span>
+        <span class="example-btn" onclick="setMetricExample('[0,0]','[3,4]')">Pythagoras 3-4-5</span>
+        <span class="example-btn" onclick="setMetricExample('[1,2,3]','[4,6,8]')">3D-Punkt</span>
+        <span class="example-btn" onclick="setMetricExample('[0,0]','[1,1]')">Einheitsdiagonale</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="calcMetric()">▶ Distanz berechnen</button>
+    <div class="result-box" id="metric-result"></div>
+</div>
+
+<!-- ===== Parametrische Kurven ===== -->
+<div class="card">
+    <h2>Parametrische Kurven</h2>
+    <p style="color: var(--subtext0); font-size: 0.85rem; margin-bottom: 1rem;">
+        Berechne Bogenlänge und Abgeschlossenheit einer parametrischen Kurve.
+    </p>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">Kurventyp</label>
+            <select class="form-select" id="curve-type" onchange="onCurveChange()">
+                <option value="circle">Kreis: (r·cos(t), r·sin(t))</option>
+                <option value="lissajous">Lissajous: (sin(at+δ), sin(bt))</option>
+                <option value="helix">Helix: (r·cos(t), r·sin(t), p·t/2π)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Kreis-Parameter -->
+    <div id="params-circle">
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Radius r</label>
+                <input class="form-input" id="circle-radius" type="number" value="1.0" min="0.1" step="0.5">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Mittelpunkt cx</label>
+                <input class="form-input" id="circle-cx" type="number" value="0">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Mittelpunkt cy</label>
+                <input class="form-input" id="circle-cy" type="number" value="0">
+            </div>
+        </div>
+    </div>
+
+    <!-- Lissajous-Parameter -->
+    <div id="params-lissajous" style="display: none;">
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Frequenz a (x)</label>
+                <input class="form-input" id="liss-a" type="number" value="3" min="1" max="20">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Frequenz b (y)</label>
+                <input class="form-input" id="liss-b" type="number" value="2" min="1" max="20">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Phasenversatz δ</label>
+                <input class="form-input" id="liss-delta" type="number" value="0.785398" step="0.1">
+            </div>
+        </div>
+    </div>
+
+    <!-- Helix-Parameter -->
+    <div id="params-helix" style="display: none;">
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Radius r</label>
+                <input class="form-input" id="helix-radius" type="number" value="1.0" min="0.1" step="0.5">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Steigung (pitch)</label>
+                <input class="form-input" id="helix-pitch" type="number" value="1.0" step="0.5">
+            </div>
+        </div>
+    </div>
+
+    <!-- Beispiel-Buttons -->
+    <div style="margin-bottom: 0.75rem;">
+        <span class="example-btn" onclick="setCurveExample('circle', {radius: 2})">Kreis r=2</span>
+        <span class="example-btn" onclick="setCurveExample('lissajous', {a:3, b:2, delta:0.785})">Lissajous 3:2</span>
+        <span class="example-btn" onclick="setCurveExample('lissajous', {a:5, b:4, delta:1.0})">Lissajous 5:4</span>
+        <span class="example-btn" onclick="setCurveExample('helix', {radius:1, pitch:2})">Helix r=1</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="calcCurve()">▶ Bogenlänge berechnen</button>
+    <div class="result-box" id="curve-result"></div>
+</div>
+
+<!-- ===== Euler-Charakteristik ===== -->
+<div class="card">
+    <h2>Euler-Charakteristik &amp; Geschlecht</h2>
+    <p style="color: var(--subtext0); font-size: 0.85rem; margin-bottom: 1rem;">
+        Für ein Polyeder oder eine Fläche: χ = V − E + F, Geschlecht g = (2 − χ) / 2.
+    </p>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">V – Ecken (Vertices)</label>
+            <input class="form-input" id="euler-v" type="number" value="8" min="0">
+        </div>
+        <div class="form-group">
+            <label class="form-label">E – Kanten (Edges)</label>
+            <input class="form-input" id="euler-e" type="number" value="12" min="0">
+        </div>
+        <div class="form-group">
+            <label class="form-label">F – Flächen (Faces)</label>
+            <input class="form-input" id="euler-f" type="number" value="6" min="0">
+        </div>
+    </div>
+
+    <!-- Bekannte Polyeder als Beispiele -->
+    <div style="margin-bottom: 0.75rem;">
+        <span style="font-size: 0.8rem; color: var(--subtext0);">Bekannte Körper: </span>
+        <span class="example-btn" onclick="setEuler(8,12,6)">Würfel (V=8, E=12, F=6)</span>
+        <span class="example-btn" onclick="setEuler(4,6,4)">Tetraeder (V=4, E=6, F=4)</span>
+        <span class="example-btn" onclick="setEuler(6,12,8)">Oktaeder (V=6, E=12, F=8)</span>
+        <span class="example-btn" onclick="setEuler(20,30,12)">Dodekaeder</span>
+        <span class="example-btn" onclick="setEuler(12,30,20)">Ikosaeder</span>
+        <span class="example-btn" onclick="setEuler(1,1,1)">Torus</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="calcEuler()">▶ Charakteristik berechnen</button>
+    <div class="result-box" id="euler-result"></div>
+</div>
+
+<!-- ===== Fraktale Dimensionen ===== -->
+<div class="card">
+    <h2>Fraktale Dimensionen</h2>
+    <p style="color: var(--subtext0); font-size: 0.85rem; margin-bottom: 1rem;">
+        Bekannte Fraktale haben nicht-ganzzahlige (Hausdorff-)Dimensionen.
+        Eigene Punktmengen können per Box-Counting-Algorithmus analysiert werden.
+    </p>
+
+    <!-- Bekannte Fraktale (Direktberechnung im Browser) -->
+    <div style="margin-bottom: 1rem;">
+        <span style="font-size: 0.85rem; color: var(--subtext0); display: block; margin-bottom: 0.5rem;">Bekannte Fraktale:</span>
+        <button class="btn" style="margin-right: 0.5rem;" onclick="showKnownFractal('cantor')">Cantor-Menge</button>
+        <button class="btn" style="margin-right: 0.5rem;" onclick="showKnownFractal('sierpinski')">Sierpinski-Dreieck</button>
+        <button class="btn" onclick="showKnownFractal('koch')">Koch-Kurve</button>
+    </div>
+    <div id="known-fractal-result"></div>
+
+    <!-- Box-Counting für eigene Punktmengen -->
+    <hr style="border-color: var(--surface1); margin: 1rem 0;">
+    <div style="margin-bottom: 0.5rem; font-size: 0.85rem; color: var(--subtext0);">
+        Eigene Punktmenge (JSON-Array von [x,y]-Paaren):
+    </div>
+    <div class="form-group">
+        <textarea class="form-input" id="fractal-points" rows="3"
+            placeholder="[[0,0],[1,0],[0.5,0.866],[0.25,0.433],[0.75,0.433]]"
+            style="font-family: monospace; resize: vertical;">[[0,0],[1,0],[0.5,0.866],[0.25,0.433],[0.75,0.433],[0.125,0.217],[0.375,0.217],[0.625,0.217],[0.875,0.217]]</textarea>
+    </div>
+    <button class="btn btn-primary" onclick="calcBoxCounting()">▶ Box-Counting berechnen</button>
+    <div class="result-box" id="fractal-result"></div>
+</div>
+
+<script>
+// ============================================================
+// INITIALISIERUNG: Formeln rendern
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+    // Euklidische Metrik: d(x,y) = sqrt(Σ(x_i - y_i)²)
+    renderLatex('d(x,y) = \\sqrt{\\sum_{i=1}^{n}(x_i - y_i)^2}',
+        document.getElementById('formula-euclid'), true);
+
+    // Euler-Charakteristik: χ = V - E + F
+    renderLatex('\\chi = V - E + F',
+        document.getElementById('formula-euler'), true);
+
+    // Fraktale Dimension: d = log N(ε) / log(1/ε)
+    renderLatex('d = \\dfrac{\\log N(\\varepsilon)}{\\log(1/\\varepsilon)}',
+        document.getElementById('formula-fractal'), true);
+});
+
+// ============================================================
+// METRIK-RECHNER
+// ============================================================
+
+/** Zeigt oder versteckt das p-Wert-Eingabefeld je nach Metrik-Auswahl */
+function onMetricChange() {
+    const type = document.getElementById('metric-type').value;
+    // p-Eingabe nur bei p-Norm anzeigen
+    document.getElementById('p-input-group').style.display =
+        type === 'p_norm' ? 'block' : 'none';
+}
+
+/** Setzt Beispiel-Punkte in die Eingabefelder */
+function setMetricExample(p1, p2) {
+    document.getElementById('metric-p1').value = p1;
+    document.getElementById('metric-p2').value = p2;
+}
+
+/** Berechnet den Abstand zwischen zwei Punkten via API */
+async function calcMetric() {
+    const metricType = document.getElementById('metric-type').value;
+    const result = document.getElementById('metric-result');
+
+    // Punkte als JSON parsen
+    let point1, point2;
+    try {
+        point1 = JSON.parse(document.getElementById('metric-p1').value);
+        point2 = JSON.parse(document.getElementById('metric-p2').value);
+    } catch (e) {
+        showError(result, 'Ungültiges JSON-Format. Beispiel: [1, 2]');
+        return;
+    }
+
+    if (!Array.isArray(point1) || !Array.isArray(point2)) {
+        showError(result, 'Punkte müssen JSON-Arrays sein, z.B. [1, 2].');
+        return;
+    }
+    if (point1.length !== point2.length) {
+        showError(result, `Punkte müssen gleiche Dimension haben (${point1.length} vs ${point2.length}).`);
+        return;
+    }
+
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne...</div>';
+
+    // API-Anfrage zusammenstellen
+    const body = { metric: metricType, point1, point2 };
+    if (metricType === 'p_norm') {
+        body.p = parseFloat(document.getElementById('metric-p').value) || 3;
+    }
+
+    try {
+        const data = await apiPost('/api/topology/metric', body);
+
+        // Metrik-Namen für die Anzeige
+        const metricNames = {
+            euclidean: 'Euklidisch (L²)',
+            manhattan: 'Manhattan (L¹)',
+            chebyshev: 'Chebyshev (L∞)',
+            p_norm: `p-Norm (p=${body.p || 3})`
+        };
+
+        const html = `<table class="result-table">
+            <tr><td>Metrik</td><td>${metricNames[metricType] || metricType}</td></tr>
+            <tr><td>Punkt 1</td><td><code>[${point1.join(', ')}]</code></td></tr>
+            <tr><td>Punkt 2</td><td><code>[${point2.join(', ')}]</code></td></tr>
+            <tr><td>Distanz</td><td style="font-size: 1.2em; color: var(--green); font-weight: 700;">
+                ${data.distance.toFixed(8)}</td></tr>
+            <tr><td>Dimension</td><td>${data.dimension}D</td></tr>
+        </table>
+        <div class="formula-display" id="metric-latex" style="margin-top: 0.5rem;"></div>`;
+        showResult(result, html);
+
+        // LaTeX-Formel des Ergebnisses rendern
+        setTimeout(() => {
+            const el = document.getElementById('metric-latex');
+            if (el) renderLatex(data.latex, el, false);
+        }, 50);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+// ============================================================
+// PARAMETRISCHE KURVEN
+// ============================================================
+
+/** Blendet Parametergruppen je nach Kurventyp ein/aus */
+function onCurveChange() {
+    const type = document.getElementById('curve-type').value;
+    document.getElementById('params-circle').style.display   = type === 'circle'    ? 'block' : 'none';
+    document.getElementById('params-lissajous').style.display = type === 'lissajous' ? 'block' : 'none';
+    document.getElementById('params-helix').style.display    = type === 'helix'     ? 'block' : 'none';
+}
+
+/** Setzt Kurvenbeispiel in die Formularfelder */
+function setCurveExample(type, params) {
+    document.getElementById('curve-type').value = type;
+    onCurveChange();
+    if (type === 'circle' && params.radius !== undefined) {
+        document.getElementById('circle-radius').value = params.radius;
+    }
+    if (type === 'lissajous') {
+        if (params.a !== undefined) document.getElementById('liss-a').value = params.a;
+        if (params.b !== undefined) document.getElementById('liss-b').value = params.b;
+        if (params.delta !== undefined) document.getElementById('liss-delta').value = params.delta;
+    }
+    if (type === 'helix') {
+        if (params.radius !== undefined) document.getElementById('helix-radius').value = params.radius;
+        if (params.pitch !== undefined) document.getElementById('helix-pitch').value = params.pitch;
+    }
+}
+
+/** Berechnet Bogenlänge und Abgeschlossenheit der gewählten Kurve via API */
+async function calcCurve() {
+    const type = document.getElementById('curve-type').value;
+    const result = document.getElementById('curve-result');
+
+    // Parameter je nach Kurventyp einsammeln
+    let params = {};
+    if (type === 'circle') {
+        params = {
+            radius: parseFloat(document.getElementById('circle-radius').value) || 1.0,
+            center: [
+                parseFloat(document.getElementById('circle-cx').value) || 0,
+                parseFloat(document.getElementById('circle-cy').value) || 0
+            ]
+        };
+    } else if (type === 'lissajous') {
+        params = {
+            a:     parseInt(document.getElementById('liss-a').value) || 3,
+            b:     parseInt(document.getElementById('liss-b').value) || 2,
+            delta: parseFloat(document.getElementById('liss-delta').value) || 0
+        };
+    } else if (type === 'helix') {
+        params = {
+            radius: parseFloat(document.getElementById('helix-radius').value) || 1.0,
+            pitch:  parseFloat(document.getElementById('helix-pitch').value) || 1.0
+        };
+    }
+
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne Bogenlänge...</div>';
+
+    try {
+        const data = await apiPost('/api/topology/curve', { type, params });
+
+        // Anzeige-Name der Kurve
+        const curveNames = {
+            circle: 'Kreis',
+            lissajous: 'Lissajous-Figur',
+            helix: 'Helix (Schraubenlinie)'
+        };
+
+        const closedIcon = data.is_closed
+            ? '<span style="color: var(--green);">✓ geschlossen</span>'
+            : '<span style="color: var(--peach);">✗ offen</span>';
+
+        // Parameter-String für Anzeige
+        let paramStr = Object.entries(params)
+            .map(([k, v]) => `${k}=${Array.isArray(v) ? '['+v.join(',')+']' : v}`)
+            .join(', ');
+
+        const html = `<table class="result-table">
+            <tr><td>Kurventyp</td><td>${curveNames[type] || type}</td></tr>
+            <tr><td>Parameter</td><td><code>${paramStr}</code></td></tr>
+            <tr><td>Bogenlänge L</td><td style="font-size: 1.2em; color: var(--green); font-weight: 700;">
+                ${data.arc_length.toFixed(8)}</td></tr>
+            <tr><td>Geschlossen?</td><td>${closedIcon}</td></tr>
+            <tr><td>Dimension</td><td>${data.dimension}D-Kurve im ℝ${data.ambient_dim}</td></tr>
+        </table>
+        <div class="formula-display" id="curve-latex" style="margin-top: 0.5rem;"></div>`;
+        showResult(result, html);
+
+        // Bogenlängen-Formel rendern
+        setTimeout(() => {
+            const el = document.getElementById('curve-latex');
+            if (el) renderLatex(`L = \\int_a^b |\\gamma'(t)|\\, dt \\approx ${data.arc_length.toFixed(6)}`, el, false);
+        }, 50);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+// ============================================================
+// EULER-CHARAKTERISTIK
+// ============================================================
+
+/** Setzt Beispielwerte für bekannte Polyeder */
+function setEuler(v, e, f) {
+    document.getElementById('euler-v').value = v;
+    document.getElementById('euler-e').value = e;
+    document.getElementById('euler-f').value = f;
+}
+
+/** Berechnet Euler-Charakteristik und Geschlecht via API */
+async function calcEuler() {
+    const v = parseInt(document.getElementById('euler-v').value) || 0;
+    const e = parseInt(document.getElementById('euler-e').value) || 0;
+    const f = parseInt(document.getElementById('euler-f').value) || 0;
+    const result = document.getElementById('euler-result');
+
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne...</div>';
+
+    try {
+        const data = await apiPost('/api/topology/euler', { vertices: v, edges: e, faces: f });
+
+        // Flächen-Bezeichnung aus Euler-Charakteristik ableiten
+        let surfaceName = '';
+        if (data.chi === 2)  surfaceName = '(Sphäre / konvexes Polyeder)';
+        else if (data.chi === 0 && data.genus === 1) surfaceName = '(Torus)';
+        else if (data.chi === -2) surfaceName = '(Doppel-Torus)';
+        else if (data.chi === 1)  surfaceName = '(projektive Ebene)';
+
+        // Farbe je nach Euler-Charakteristik
+        const chiColor = data.chi === 2 ? 'var(--green)' : (data.chi === 0 ? 'var(--yellow)' : 'var(--blue)');
+
+        const html = `<table class="result-table">
+            <tr><td>Ecken (V)</td><td>${data.vertices}</td></tr>
+            <tr><td>Kanten (E)</td><td>${data.edges}</td></tr>
+            <tr><td>Flächen (F)</td><td>${data.faces}</td></tr>
+            <tr><td>χ = V − E + F</td>
+                <td style="font-size: 1.2em; color: ${chiColor}; font-weight: 700;">
+                    ${data.chi} ${surfaceName}</td></tr>
+            <tr><td>Geschlecht g</td><td>${data.genus} ${data.genus === 0 ? '(Sphäre)' : data.genus === 1 ? '(Torus)' : ''}</td></tr>
+        </table>
+        <div class="formula-display" id="euler-latex" style="margin-top: 0.5rem;"></div>`;
+        showResult(result, html);
+
+        setTimeout(() => {
+            const el = document.getElementById('euler-latex');
+            if (el) renderLatex(
+                `\\chi = ${data.vertices} - ${data.edges} + ${data.faces} = ${data.chi},\\quad g = ${data.genus}`,
+                el, false);
+        }, 50);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+// ============================================================
+// FRAKTALE DIMENSIONEN
+// ============================================================
+
+/** Zeigt bekannte Fraktal-Dimensionen direkt (ohne API) */
+function showKnownFractal(type) {
+    const container = document.getElementById('known-fractal-result');
+
+    // Bekannte Fraktale mit ihren Dimensionen (mathematisch exakt)
+    const fractals = {
+        cantor: {
+            name: 'Cantor-Menge',
+            dim: Math.log(2) / Math.log(3),
+            latex: 'd = \\frac{\\log 2}{\\log 3} \\approx 0.6309',
+            info: '2 Selbstähnlichkeitsteile, Skalierung 1/3. Lebesgue-Maß = 0, aber überabzählbar.',
+            construction: 'Starte mit [0,1], entferne immer das mittlere Drittel.'
+        },
+        sierpinski: {
+            name: 'Sierpinski-Dreieck',
+            dim: Math.log(3) / Math.log(2),
+            latex: 'd = \\frac{\\log 3}{\\log 2} \\approx 1.585',
+            info: '3 Selbstähnlichkeitsteile, Skalierung 1/2. Fläche = 0 (im 2D-Sinne).',
+            construction: 'Starte mit Dreieck, entferne immer das mittlere Teildreieck.'
+        },
+        koch: {
+            name: 'Koch-Kurve',
+            dim: Math.log(4) / Math.log(3),
+            latex: 'd = \\frac{\\log 4}{\\log 3} \\approx 1.2619',
+            info: '4 Selbstähnlichkeitsteile, Skalierung 1/3. Länge = ∞ (Kurve unendlich lang).',
+            construction: 'Ersetze jedes Segment durch 4 Teile der Länge 1/3.'
+        }
+    };
+
+    const f = fractals[type];
+    if (!f) return;
+
+    container.innerHTML = `<div class="result-success">
+        <table class="result-table">
+            <tr><td>Fraktal</td><td style="font-weight: 700;">${f.name}</td></tr>
+            <tr><td>Dimension d</td>
+                <td style="font-size: 1.2em; color: var(--mauve); font-weight: 700;">
+                    ${f.dim.toFixed(6)}</td></tr>
+            <tr><td>Beschreibung</td><td>${f.info}</td></tr>
+            <tr><td>Konstruktion</td><td>${f.construction}</td></tr>
+        </table>
+        <div class="formula-display" id="known-fractal-latex" style="margin-top: 0.5rem;"></div>
+    </div>`;
+
+    // LaTeX-Formel rendern
+    setTimeout(() => {
+        const el = document.getElementById('known-fractal-latex');
+        if (el) renderLatex(f.latex, el, true);
+    }, 50);
+}
+
+/** Berechnet Box-Counting-Dimension für eigene Punktmenge */
+async function calcBoxCounting() {
+    const result = document.getElementById('fractal-result');
+
+    // Punkte aus Textarea parsen
+    let points;
+    try {
+        points = JSON.parse(document.getElementById('fractal-points').value);
+    } catch (e) {
+        showError(result, 'Ungültiges JSON-Format. Beispiel: [[0,0],[1,0],[0.5,0.866]]');
+        return;
+    }
+
+    if (!Array.isArray(points) || points.length < 3) {
+        showError(result, 'Mindestens 3 Punkte erforderlich.');
+        return;
+    }
+
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne Box-Counting-Dimension...</div>';
+
+    try {
+        // Box-Counting-Dimensionen werden serverseitig berechnet
+        // Wir senden Punkte und erhalten die geschätzte Dimension zurück
+        const data = await apiPost('/api/topology/fractal', { points });
+
+        const html = `<table class="result-table">
+            <tr><td>Punkte</td><td>${points.length}</td></tr>
+            <tr><td>Box-Counting-Dimension</td>
+                <td style="font-size: 1.2em; color: var(--mauve); font-weight: 700;">
+                    ${data.dimension.toFixed(6)}</td></tr>
+            <tr><td>Deutung</td><td>${data.interpretation}</td></tr>
+            <tr><td>Epsilon-Werte</td><td>${data.epsilon_values.join(', ')}</td></tr>
+        </table>
+        <div class="formula-display" id="fractal-latex" style="margin-top: 0.5rem;"></div>`;
+        showResult(result, html);
+
+        setTimeout(() => {
+            const el = document.getElementById('fractal-latex');
+            if (el) renderLatex(
+                `d_{box} \\approx ${data.dimension.toFixed(4)}`,
+                el, false);
+        }, 50);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+</script>
+{% endblock %}

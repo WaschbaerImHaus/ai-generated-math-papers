@@ -20,6 +20,19 @@
         POST /api/ode/solve             → ODE lösen
         POST /api/complex/zeta          → Riemann-Zeta-Funktion
         POST /api/visualization/plot    → Funktionsplot als PNG
+        GET  /topology                  → Topologie-Seite
+        GET  /graph_theory              → Graphentheorie-Seite
+        GET  /millennium                → Millennium-Probleme-Seite
+        POST /api/topology/metric       → Metriken berechnen
+        POST /api/topology/curve        → Parametrische Kurven
+        POST /api/topology/euler        → Euler-Charakteristik
+        POST /api/topology/fractal      → Box-Counting-Dimension
+        POST /api/graph/analyze         → Graphen analysieren
+        POST /api/graph/dijkstra        → Dijkstra kürzeste Wege
+        POST /api/graph/combinatorics   → Kombinatorische Formeln
+        POST /api/millennium/zeros      → Riemann-Nullstellen
+        POST /api/millennium/goldbach   → Goldbach-Zerlegungen
+        POST /api/millennium/complexity → Komplexitätsvergleich
 
 @author Kurt Ingwer
 @date 2026-03-10
@@ -60,6 +73,20 @@ from statistics_math import mean, median, mode, variance, std_dev
 from ode import euler_method, runge_kutta4
 from complex_analysis import riemann_zeta, riemann_zeta_mpmath
 from visualization import plot_function_2d
+from topology import (
+    euclidean_metric, manhattan_metric, chebyshev_metric, p_norm_metric,
+    circle_curve, lissajous_curve, helix_curve,
+    euler_characteristic_polygon, genus_from_euler,
+    box_counting_dimension, hausdorff_dimension_cantor, sierpinski_dimension
+)
+from graph_theory import (
+    Graph, dijkstra, is_eulerian,
+    binomial_coefficient, catalan_number, bell_numbers, derangements, partition_count
+)
+from millennium_problems import (
+    riemann_zeros_mpmath, hardy_littlewood_goldbach_density, complexity_comparison
+)
+from proof_theory import goldbach_all_decompositions
 
 
 # ===========================================================================
@@ -234,7 +261,7 @@ def health():
     @return JSON {"status": "ok", "build": 11}
     @date 2026-03-10
     """
-    return jsonify({"status": "ok", "build": 12})
+    return jsonify({"status": "ok", "build": 13})
 
 
 # ===========================================================================
@@ -905,6 +932,813 @@ def api_number_theory_info():
 
 
 # ===========================================================================
+# ROUTEN: NEUE SEITEN (GET)
+# ===========================================================================
+
+@app.route('/topology')
+def topology():
+    """
+    @brief Topologie-Seite: Metriken, Kurven, Euler-Charakteristik, Fraktale.
+    @return Gerendertes HTML-Template
+    @date 2026-03-10
+    """
+    return render_template('topology.html')
+
+
+@app.route('/graph_theory')
+def graph_theory_page():
+    """
+    @brief Graphentheorie-Seite: Graphanalyse, Dijkstra, Kombinatorik.
+    @return Gerendertes HTML-Template
+    @date 2026-03-10
+    """
+    return render_template('graph_theory.html')
+
+
+@app.route('/millennium')
+def millennium():
+    """
+    @brief Millennium-Probleme-Seite: Riemann, Goldbach, P vs NP, Komplexität.
+    @return Gerendertes HTML-Template
+    @date 2026-03-10
+    """
+    return render_template('millennium.html')
+
+
+# ===========================================================================
+# HILFSFUNKTIONEN: KANTENLISTEN-PARSER
+# ===========================================================================
+
+def parse_edge_list(edge_string: str, weighted: bool = False) -> list:
+    """
+    @brief Parst eine Kantenliste wie '1-2, 2-3:5, 3-1:2'.
+    @description
+        Unterstützt zwei Formate:
+        - Ungewichtet: 'A-B, B-C, C-A'  → Liste von (u, v)
+        - Gewichtet:   'A-B:5, B-C:3'   → Liste von (u, v, weight)
+        Leerzeichen und leere Einträge werden ignoriert.
+        Knoten können Strings oder Zahlen sein.
+    @param edge_string Kantenliste als String.
+    @param weighted True wenn Gewichte erwartet werden (Format 'u-v:w').
+    @return Liste von (u, v) oder (u, v, weight) Tupeln.
+    @raises ValueError bei ungültigem Format.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    """
+    edges = []
+    # Kantenliste an Kommas aufteilen und jede Kante einzeln verarbeiten
+    for part in edge_string.split(','):
+        part = part.strip()
+        if not part:
+            continue  # Leerzeichen-Token ignorieren
+
+        # Prüfen ob Gewicht angegeben (Format: 'u-v:w')
+        weight = 1.0  # Standardgewicht
+        if ':' in part:
+            edge_part, weight_str = part.rsplit(':', 1)
+            try:
+                weight = float(weight_str.strip())
+            except ValueError:
+                raise ValueError(f"Ungültiges Kantengewicht: '{weight_str.strip()}'")
+            part = edge_part.strip()
+
+        # Kante an Bindestrich aufteilen: 'u-v'
+        # Sonderfall: negative Zahlen wie '-3-5' → nur ein Bindestrich als Trennzeichen
+        if '-' not in part:
+            raise ValueError(f"Ungültiges Kantenformat: '{part}' (erwartet 'u-v')")
+
+        # Letzten Bindestrich als Trennzeichen verwenden
+        dash_idx = part.rfind('-')
+        if dash_idx == 0:
+            raise ValueError(f"Ungültiges Kantenformat: '{part}'")
+
+        u_str = part[:dash_idx].strip()
+        v_str = part[dash_idx + 1:].strip()
+
+        if not u_str or not v_str:
+            raise ValueError(f"Leerer Knoten in Kante: '{part}'")
+
+        # Knoten als Integer versuchen, sonst String
+        def parse_node(s):
+            try:
+                return int(s)
+            except ValueError:
+                return s
+
+        u = parse_node(u_str)
+        v = parse_node(v_str)
+
+        if weighted:
+            edges.append((u, v, weight))
+        else:
+            edges.append((u, v))
+
+    return edges
+
+
+# ===========================================================================
+# ROUTEN: TOPOLOGIE API
+# ===========================================================================
+
+@app.route('/api/topology/metric', methods=['POST'])
+def topology_metric():
+    """
+    @brief Berechnet den Abstand zwischen zwei Punkten mit einer wählbaren Metrik.
+    @description
+        Erwartet JSON:
+            {"metric": "euclidean"|"manhattan"|"chebyshev"|"p_norm",
+             "point1": [x1, y1, ...],
+             "point2": [x2, y2, ...],
+             "p": float (nur für p_norm)}
+        Unterstützte Metriken:
+        - euclidean:  d = sqrt(Σ(xᵢ-yᵢ)²)
+        - manhattan:  d = Σ|xᵢ-yᵢ|
+        - chebyshev:  d = max|xᵢ-yᵢ|
+        - p_norm:     d = (Σ|xᵢ-yᵢ|^p)^(1/p)
+    @return JSON mit Distanz, Dimension und LaTeX-Formel
+    @author Kurt Ingwer
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    if not data:
+        return error_response("Kein JSON-Body übergeben.")
+
+    metric_type = data.get('metric', 'euclidean')
+    point1 = data.get('point1', [])
+    point2 = data.get('point2', [])
+    p_val = float(data.get('p', 2.0))
+
+    # Eingaben validieren
+    if not point1 or not point2:
+        return error_response("'point1' und 'point2' müssen nicht-leere Arrays sein.")
+    if len(point1) != len(point2):
+        return error_response(
+            f"Punkte müssen gleiche Dimension haben: {len(point1)} vs {len(point2)}.")
+
+    try:
+        # Punkte in float-Listen umwandeln
+        p1 = [float(x) for x in point1]
+        p2 = [float(x) for x in point2]
+
+        # Gewählte Metrik anwenden
+        if metric_type == 'euclidean':
+            dist = euclidean_metric(p1, p2)
+            latex = f"d_{{2}} = \\sqrt{{\\sum_i(x_i-y_i)^2}} = {dist:.8f}"
+        elif metric_type == 'manhattan':
+            dist = manhattan_metric(p1, p2)
+            latex = f"d_{{1}} = \\sum_i|x_i-y_i| = {dist:.8f}"
+        elif metric_type == 'chebyshev':
+            dist = chebyshev_metric(p1, p2)
+            latex = f"d_{{\\infty}} = \\max_i|x_i-y_i| = {dist:.8f}"
+        elif metric_type == 'p_norm':
+            if p_val < 1:
+                return error_response("p muss >= 1 sein für eine gültige Metrik.")
+            dist = p_norm_metric(p1, p2, p_val)
+            latex = f"d_{{{p_val}}} = \\left(\\sum_i|x_i-y_i|^{{{p_val}}}\\right)^{{1/{p_val}}} = {dist:.8f}"
+        else:
+            return error_response(
+                f"Unbekannte Metrik '{metric_type}'. Erlaubt: euclidean, manhattan, chebyshev, p_norm.")
+
+        return jsonify({
+            "metric": metric_type,
+            "point1": p1,
+            "point2": p2,
+            "distance": dist,
+            "dimension": len(p1),
+            "latex": latex
+        })
+    except Exception as e:
+        return error_response(f"Fehler bei Metrik-Berechnung: {str(e)}")
+
+
+@app.route('/api/topology/curve', methods=['POST'])
+def topology_curve():
+    """
+    @brief Berechnet Bogenlänge und Abgeschlossenheit einer parametrischen Kurve.
+    @description
+        Erwartet JSON:
+            {"type": "circle"|"lissajous"|"helix",
+             "params": {... kurvenspezifische Parameter ...}}
+        Kreis:     params = {"radius": float, "center": [cx, cy]}
+        Lissajous: params = {"a": int, "b": int, "delta": float}
+        Helix:     params = {"radius": float, "pitch": float}
+    @return JSON mit arc_length, is_closed, dimension, ambient_dim
+    @author Kurt Ingwer
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    if not data:
+        return error_response("Kein JSON-Body übergeben.")
+
+    curve_type = data.get('type', 'circle')
+    params = data.get('params', {})
+
+    try:
+        if curve_type == 'circle':
+            # Kreisparameter aus JSON lesen (mit Standardwerten)
+            radius = float(params.get('radius', 1.0))
+            center = params.get('center', [0.0, 0.0])
+            center = [float(c) for c in center]
+            if radius <= 0:
+                return error_response("Radius muss positiv sein.")
+            curve = circle_curve(radius=radius, center=center)
+            ambient_dim = 2
+
+        elif curve_type == 'lissajous':
+            # Lissajous-Parameter: Frequenzen a, b und Phasenversatz delta
+            a = int(params.get('a', 3))
+            b = int(params.get('b', 2))
+            delta = float(params.get('delta', 0.0))
+            if a <= 0 or b <= 0:
+                return error_response("Frequenzen a und b müssen positiv sein.")
+            curve = lissajous_curve(a=a, b=b, delta=delta)
+            ambient_dim = 2
+
+        elif curve_type == 'helix':
+            # Helix-Parameter: Radius und Steigung
+            radius = float(params.get('radius', 1.0))
+            pitch = float(params.get('pitch', 1.0))
+            if radius <= 0:
+                return error_response("Radius muss positiv sein.")
+            curve = helix_curve(radius=radius, pitch=pitch)
+            ambient_dim = 3
+
+        else:
+            return error_response(
+                f"Unbekannter Kurventyp '{curve_type}'. Erlaubt: circle, lissajous, helix.")
+
+        # Bogenlänge und Abgeschlossenheit berechnen
+        arc = curve.arc_length(n=2000)
+        closed = curve.is_closed()
+
+        return jsonify({
+            "type": curve_type,
+            "params": params,
+            "arc_length": arc,
+            "is_closed": closed,
+            "dimension": 1,          # Kurve ist 1-dimensional (Linie)
+            "ambient_dim": ambient_dim
+        })
+    except Exception as e:
+        return error_response(f"Fehler bei Kurvenberechnung: {str(e)}")
+
+
+@app.route('/api/topology/euler', methods=['POST'])
+def topology_euler():
+    """
+    @brief Berechnet die Euler-Charakteristik χ = V - E + F und das Geschlecht.
+    @description
+        Erwartet JSON: {"vertices": int, "edges": int, "faces": int}
+        Euler-Formel für konvexe Polyeder: χ = 2 (Sphäre).
+        Geschlecht: g = (2 - χ) / 2 für orientierbare Flächen.
+        Beispiele:
+            Würfel:    V=8, E=12, F=6  → χ=2, g=0
+            Torus:     V=1, E=1,  F=1  → χ=0 (ohne Rand), g=1
+    @return JSON mit chi, genus, vertices, edges, faces
+    @author Kurt Ingwer
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    if not data:
+        return error_response("Kein JSON-Body übergeben.")
+
+    try:
+        v = int(data.get('vertices', 0))
+        e = int(data.get('edges', 0))
+        f = int(data.get('faces', 0))
+
+        if v < 0 or e < 0 or f < 0:
+            return error_response("V, E, F müssen nicht-negative ganze Zahlen sein.")
+
+        # Euler-Charakteristik berechnen: χ = V - E + F
+        chi = euler_characteristic_polygon(v, e, f)
+        # Geschlecht aus Euler-Charakteristik ableiten
+        genus = genus_from_euler(chi, orientable=True)
+
+        return jsonify({
+            "vertices": v,
+            "edges": e,
+            "faces": f,
+            "chi": chi,
+            "genus": max(0, genus)  # Negatives Geschlecht physikalisch nicht sinnvoll
+        })
+    except Exception as e:
+        return error_response(f"Fehler bei Euler-Berechnung: {str(e)}")
+
+
+@app.route('/api/topology/fractal', methods=['POST'])
+def topology_fractal():
+    """
+    @brief Berechnet die Box-Counting-Dimension einer Punktmenge.
+    @description
+        Erwartet JSON: {"points": [[x1,y1], [x2,y2], ...]}
+        Mindestens 3 Punkte erforderlich.
+        Die Box-Counting-Dimension ist ein Maß für die fraktale Komplexität
+        einer Punktmenge: d = log(N(ε)) / log(1/ε).
+    @return JSON mit dimension, interpretation, epsilon_values
+    @author Kurt Ingwer
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    if not data:
+        return error_response("Kein JSON-Body übergeben.")
+
+    points = data.get('points', [])
+
+    if not points or len(points) < 3:
+        return error_response("Mindestens 3 Punkte als [[x,y],...] erforderlich.")
+
+    try:
+        # Punkte in float-Listen umwandeln
+        pts = [[float(coord) for coord in pt] for pt in points]
+
+        # Koordinatenbereich bestimmen um sinnvolle Epsilon-Werte zu wählen
+        all_x = [pt[0] for pt in pts]
+        all_y = [pt[1] if len(pt) > 1 else 0 for pt in pts]
+        x_range = max(all_x) - min(all_x) if len(all_x) > 1 else 1.0
+        y_range = max(all_y) - min(all_y) if len(all_y) > 1 else 1.0
+        scale = max(x_range, y_range, 0.01)
+
+        # Epsilon-Werte logarithmisch gleichverteilt über 4 Dekaden
+        epsilons = [scale / (2 ** k) for k in range(1, 8)]
+
+        # Box-Counting-Dimension berechnen (nur 2D-Koordinaten verwenden)
+        pts_2d = [[pt[0], pt[1] if len(pt) > 1 else 0.0] for pt in pts]
+        dim = box_counting_dimension(pts_2d, epsilons)
+
+        # Dimension interpretieren
+        if dim < 0.1:
+            interpretation = "Punktmenge (0-dimensional)"
+        elif dim < 1.1:
+            interpretation = "Kurve/eindimensionale Struktur"
+        elif dim < 1.5:
+            interpretation = "Fraktal zwischen Linie und Fläche (schwach fraktal)"
+        elif dim < 1.9:
+            interpretation = "Fraktal (z.B. Sierpinski-ähnlich)"
+        elif dim < 2.1:
+            interpretation = "Flächenfüllendes Fraktal / 2-dimensionale Menge"
+        else:
+            interpretation = "Höherdimensionale Struktur"
+
+        return jsonify({
+            "dimension": dim,
+            "n_points": len(pts),
+            "interpretation": interpretation,
+            "epsilon_values": [round(e, 6) for e in epsilons]
+        })
+    except Exception as e:
+        return error_response(f"Fehler bei Box-Counting: {str(e)}")
+
+
+# ===========================================================================
+# ROUTEN: GRAPHENTHEORIE API
+# ===========================================================================
+
+@app.route('/api/graph/analyze', methods=['POST'])
+def graph_analyze():
+    """
+    @brief Analysiert einen Graphen aus einer Kantenliste.
+    @description
+        Erwartet JSON:
+            {"edges": "1-2, 2-3, 3-1", "directed": false}
+        Berechnet:
+        - Knotenanzahl, Kantenanzahl
+        - Knotengrade (degree)
+        - Zusammenhang (connected)
+        - Bipartitheit
+        - Euler-Kreis-Status (alle Knoten gerader Grad)
+    @return JSON mit Grapheigenschaften
+    @author Kurt Ingwer
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    if not data:
+        return error_response("Kein JSON-Body übergeben.")
+
+    edge_string = data.get('edges', '')
+    directed = data.get('directed', False)
+    if isinstance(directed, str):
+        directed = directed.lower() == 'true'
+
+    if not edge_string.strip():
+        return error_response("Kantenliste darf nicht leer sein.")
+
+    try:
+        # Kantenliste parsen (ungewichtet)
+        edges = parse_edge_list(edge_string, weighted=False)
+
+        # Graph aufbauen
+        g = Graph(directed=directed)
+        for u, v in edges:
+            g.add_edge(u, v)
+
+        # Knotengrade berechnen
+        degrees = {str(node): g.degree(node) for node in g.vertices()}
+
+        # Zusammenhang prüfen via BFS (alle Knoten von einem aus erreichbar?)
+        vertices = list(g.vertices())
+        is_connected_flag = False
+        if vertices:
+            # BFS vom ersten Knoten
+            visited = set()
+            queue = [vertices[0]]
+            visited.add(vertices[0])
+            while queue:
+                curr = queue.pop(0)
+                for nb in g.neighbors(curr):
+                    if nb not in visited:
+                        visited.add(nb)
+                        queue.append(nb)
+            is_connected_flag = len(visited) == len(vertices)
+
+        # Bipartitheit via 2-Färbbarkeit prüfen (BFS mit 2 Farben)
+        is_bipartite_flag = True
+        if vertices:
+            color = {}
+            for start in vertices:
+                if start in color:
+                    continue
+                color[start] = 0
+                queue = [start]
+                while queue:
+                    curr = queue.pop(0)
+                    for nb in g.neighbors(curr):
+                        if nb not in color:
+                            color[nb] = 1 - color[curr]
+                            queue.append(nb)
+                        elif color[nb] == color[curr]:
+                            is_bipartite_flag = False
+                            break
+
+        # Euler-Status berechnen
+        euler_raw = is_eulerian(g)
+        # Rückgabe vereinheitlichen: intern heißen die Felder 'euler_circuit' und 'euler_path'
+        euler_info = {
+            "has_euler_circuit": euler_raw.get('euler_circuit', False),
+            "has_euler_path": euler_raw.get('euler_path', False),
+            "odd_degree_vertices": [str(v) for v in euler_raw.get('odd_degree_vertices', [])],
+            "reason": (
+                "Alle Knoten haben geraden Grad → Euler-Kreis existiert."
+                if euler_raw.get('euler_circuit')
+                else "Genau 2 Knoten mit ungeradem Grad → Euler-Pfad existiert."
+                if euler_raw.get('euler_path')
+                else f"{len(euler_raw.get('odd_degree_vertices', []))} Knoten mit ungeradem Grad."
+            )
+        }
+
+        return jsonify({
+            "num_vertices": len(vertices),
+            "num_edges": len(edges),
+            "directed": directed,
+            "is_connected": is_connected_flag,
+            "is_bipartite": is_bipartite_flag,
+            "degrees": degrees,
+            "is_eulerian": euler_info
+        })
+    except ValueError as e:
+        return error_response(f"Fehler beim Parsen der Kantenliste: {str(e)}")
+    except Exception as e:
+        return error_response(f"Fehler bei Graphenanalyse: {str(e)}")
+
+
+@app.route('/api/graph/dijkstra', methods=['POST'])
+def graph_dijkstra():
+    """
+    @brief Berechnet kürzeste Wege mit dem Dijkstra-Algorithmus.
+    @description
+        Erwartet JSON:
+            {"edges": "1-2:5, 2-3:3, 1-3:10", "start": "1"}
+        Format der Kantenliste: 'u-v:gewicht'
+        Gibt Distanzen und Pfade von Startknoten zu allen anderen Knoten zurück.
+    @return JSON mit distances (dict) und paths (dict)
+    @author Kurt Ingwer
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    if not data:
+        return error_response("Kein JSON-Body übergeben.")
+
+    edge_string = data.get('edges', '')
+    start_str = data.get('start', '')
+
+    if not edge_string.strip():
+        return error_response("Kantenliste darf nicht leer sein.")
+    if not start_str.strip():
+        return error_response("Startknoten ('start') ist erforderlich.")
+
+    try:
+        # Gewichtete Kantenliste parsen
+        edges = parse_edge_list(edge_string, weighted=True)
+
+        # Ungerichteten gewichteten Graphen aufbauen
+        g = Graph(directed=False)
+        for u, v, w in edges:
+            g.add_edge(u, v, weight=w)
+
+        # Startknoten parsen (int oder str)
+        def parse_node(s):
+            try:
+                return int(s)
+            except ValueError:
+                return s
+
+        start = parse_node(start_str.strip())
+
+        # Startknoten muss im Graphen existieren
+        if start not in g.vertices():
+            return error_response(
+                f"Startknoten '{start}' nicht im Graphen. "
+                f"Vorhandene Knoten: {sorted(str(v) for v in g.vertices())}")
+
+        # Dijkstra-Algorithmus ausführen
+        result = dijkstra(g, start)
+
+        # Distanzen serialisieren (None und inf → -1 für JSON)
+        distances_serializable = {}
+        paths_serializable = {}
+        for node in g.vertices():
+            node_key = str(node)
+            dist = result.get('distances', {}).get(node)
+            distances_serializable[node_key] = (
+                float(dist) if dist is not None and dist != float('inf') else -1
+            )
+            # Dijkstra gibt 'path' (nicht 'paths') zurück
+            path = result.get('path', {}).get(node, [])
+            paths_serializable[node_key] = [str(p) for p in path]
+
+        return jsonify({
+            "start": str(start),
+            "distances": distances_serializable,
+            "paths": paths_serializable,
+            "num_vertices": len(list(g.vertices()))
+        })
+    except ValueError as e:
+        return error_response(f"Fehler beim Parsen: {str(e)}")
+    except Exception as e:
+        return error_response(f"Fehler bei Dijkstra: {str(e)}")
+
+
+@app.route('/api/graph/combinatorics', methods=['POST'])
+def graph_combinatorics():
+    """
+    @brief Berechnet kombinatorische Formeln.
+    @description
+        Erwartet JSON:
+            {"function": "binomial"|"catalan"|"bell"|"derangements"|"partition",
+             "n": int,
+             "k": int}
+        Funktionen:
+        - binomial:     C(n,k) = n! / (k! * (n-k)!)
+        - catalan:      C_n = C(2n,n) / (n+1)
+        - bell:         B_n = Summe der Stirling-Zahlen 2. Art
+        - derangements: D_n = n! * Σ(-1)^k / k!
+        - partition:    p(n) = Anzahl additive Zerlegungen von n
+    @return JSON mit result, function_name, latex
+    @author Kurt Ingwer
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    if not data:
+        return error_response("Kein JSON-Body übergeben.")
+
+    func = data.get('function', 'binomial')
+    n = data.get('n', 0)
+    k = data.get('k', 0)
+
+    try:
+        n = int(n)
+        k = int(k)
+    except (TypeError, ValueError):
+        return error_response("'n' und 'k' müssen ganze Zahlen sein.")
+
+    if n < 0:
+        return error_response("n muss nicht-negativ sein.")
+
+    try:
+        if func == 'binomial':
+            # Binomialkoeffizient C(n,k): n über k
+            if k < 0 or k > n:
+                return error_response(f"k muss zwischen 0 und n={n} liegen.")
+            result = binomial_coefficient(n, k)
+            func_name = f"C({n}, {k})"
+            latex = f"\\binom{{{n}}}{{{k}}} = \\frac{{{n}!}}{{{k}!\\cdot({n}-{k})!}} = {result}"
+
+        elif func == 'catalan':
+            # Catalan-Zahl C_n
+            result = catalan_number(n)
+            func_name = f"Catalan C_{n}"
+            latex = f"C_{{{n}}} = \\frac{{1}}{{{n}+1}}\\binom{{2\\cdot{n}}}{{{n}}} = {result}"
+
+        elif func == 'bell':
+            # Bell-Zahlen: bell_numbers(n) gibt Liste B_0, ..., B_n zurück
+            bell_list = bell_numbers(n)
+            result = bell_list[n] if n < len(bell_list) else bell_list[-1]
+            func_name = f"Bell B_{n}"
+            latex = f"B_{{{n}}} = {result}"
+
+        elif func == 'derangements':
+            # Derangements D_n: Permutationen ohne Fixpunkte
+            result = derangements(n)
+            func_name = f"Derangements D_{n}"
+            latex = f"D_{{{n}}} = {n}! \\sum_{{k=0}}^{{{n}}} \\frac{{(-1)^k}}{{k!}} = {result}"
+
+        elif func == 'partition':
+            # Partitionszahl p(n)
+            if n > 200:
+                return error_response("n > 200 zu groß für Partitionsberechnung.")
+            result = partition_count(n)
+            func_name = f"Partition p({n})"
+            latex = f"p({n}) = {result}"
+
+        else:
+            return error_response(
+                f"Unbekannte Funktion '{func}'. "
+                f"Erlaubt: binomial, catalan, bell, derangements, partition.")
+
+        return jsonify({
+            "function": func,
+            "function_name": func_name,
+            "n": n,
+            "k": k,
+            "result": result,
+            "latex": latex
+        })
+    except Exception as e:
+        return error_response(f"Fehler bei kombinatorischer Berechnung: {str(e)}")
+
+
+# ===========================================================================
+# ROUTEN: MILLENNIUM-PROBLEME API
+# ===========================================================================
+
+@app.route('/api/millennium/zeros', methods=['POST'])
+def millennium_zeros():
+    """
+    @brief Berechnet die ersten n nicht-trivialen Riemann-Nullstellen.
+    @description
+        Erwartet JSON: {"n_zeros": int (1-20)}
+        Nutzt mpmath.zetazero() für hochgenaue Berechnung.
+        Alle bekannten Nullstellen liegen auf Re(s) = 1/2 (krit. Gerade).
+    @return JSON mit Liste von Nullstellen {real, imag}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    if not data:
+        return error_response("Kein JSON-Body übergeben.")
+
+    n_zeros = data.get('n_zeros', 10)
+
+    try:
+        n_zeros = int(n_zeros)
+        if n_zeros < 1 or n_zeros > 20:
+            return error_response("n_zeros muss zwischen 1 und 20 liegen.")
+
+        # Nullstellen via mpmath berechnen (hochgenau)
+        zeros_raw = riemann_zeros_mpmath(n_zeros=n_zeros, dps=30)
+
+        # Nullstellen serialisieren: jede als {real, imag}
+        # riemann_zeros_mpmath gibt Dicts mit 'n', 're', 'im', 'on_line' zurück
+        zeros_serializable = []
+        for z in zeros_raw:
+            if isinstance(z, dict):
+                # Felder umbenennen auf 'real'/'imag' für Frontend-Einheitlichkeit
+                zeros_serializable.append({
+                    "real": float(z.get('re', z.get('real', 0.5))),
+                    "imag": float(z.get('im', z.get('imag', 0.0))),
+                    "n": z.get('n', 0),
+                    "on_line": z.get('on_line', True)
+                })
+            elif hasattr(z, 'real') and hasattr(z, 'imag'):
+                zeros_serializable.append({
+                    "real": float(z.real),
+                    "imag": float(z.imag)
+                })
+            else:
+                zeros_serializable.append({"real": 0.5, "imag": float(z)})
+
+        return jsonify({
+            "n_zeros": n_zeros,
+            "zeros": zeros_serializable
+        })
+    except Exception as e:
+        return error_response(f"Fehler bei Nullstellen-Berechnung: {str(e)}")
+
+
+@app.route('/api/millennium/goldbach', methods=['POST'])
+def millennium_goldbach():
+    """
+    @brief Berechnet alle Goldbach-Zerlegungen einer geraden Zahl.
+    @description
+        Erwartet JSON: {"n": int}
+        n muss gerade und >= 4 sein.
+        Gibt alle Zerlegungen n = p + q (p,q prim) zurück,
+        sowie die Hardy-Littlewood-Schätzung der Anzahl.
+    @return JSON mit decompositions, hl_estimate, hl_accuracy
+    @author Kurt Ingwer
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    if not data:
+        return error_response("Kein JSON-Body übergeben.")
+
+    n = data.get('n', 100)
+
+    try:
+        n = int(n)
+        if n < 4:
+            return error_response("n muss mindestens 4 sein.")
+        if n % 2 != 0:
+            return error_response("n muss gerade sein (Goldbach: jede gerade Zahl > 2).")
+        if n > 100000:
+            return error_response("n > 100.000 zu groß (Berechnungsdauer).")
+
+        # Alle Goldbach-Zerlegungen berechnen
+        decomps = goldbach_all_decompositions(n)
+
+        # Hardy-Littlewood-Schätzung der Anzahl der Zerlegungen
+        # Rückgabe: {'estimate_r2': float, 'actual_r2': int, ...}
+        hl_result = hardy_littlewood_goldbach_density(n)
+        hl_estimate = hl_result.get('estimate_r2', 0) if isinstance(hl_result, dict) else 0
+
+        # Genauigkeit der Schätzung (falls Zerlegungen vorhanden)
+        hl_accuracy = None
+        if len(decomps) > 0 and hl_estimate > 0:
+            hl_accuracy = min(len(decomps), hl_estimate) / max(len(decomps), hl_estimate)
+
+        return jsonify({
+            "n": n,
+            "decompositions": list(decomps),
+            "count": len(decomps),
+            "hl_estimate": hl_estimate,
+            "hl_accuracy": hl_accuracy
+        })
+    except Exception as e:
+        return error_response(f"Fehler bei Goldbach-Berechnung: {str(e)}")
+
+
+@app.route('/api/millennium/complexity', methods=['POST'])
+def millennium_complexity():
+    """
+    @brief Vergleicht verschiedene Algorithmus-Komplexitätsklassen für Eingabegröße n.
+    @description
+        Erwartet JSON: {"n": int}
+        Gibt für jede Komplexitätsklasse die Anzahl der Operationen zurück:
+        O(1), O(log n), O(sqrt n), O(n), O(n log n), O(n²), O(n³), O(2^n), O(n!)
+        Für n > 30 werden O(2^n) und O(n!) als Infinity zurückgegeben.
+    @return JSON mit Operationszahlen pro Komplexitätsklasse
+    @author Kurt Ingwer
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    if not data:
+        return error_response("Kein JSON-Body übergeben.")
+
+    n = data.get('n', 20)
+
+    try:
+        n = int(n)
+        if n < 1:
+            return error_response("n muss mindestens 1 sein.")
+        if n > 60:
+            return error_response("n > 60 zu groß (astronomische Werte für O(2^n) und O(n!)).")
+
+        # Komplexitätsklassen via Millennium-Modul berechnen
+        # Rückgabe: {'n': n, 'complexities': {'O(1)': 1, 'O(n)': n, ...}, ...}
+        comp_data = complexity_comparison(n)
+        result = comp_data.get('complexities', {})
+
+        # Alle Werte JSON-serialisierbar machen (inf → None für JSON)
+        import math
+        clean_result = {}
+        for k, v in result.items():
+            try:
+                fv = float(v)
+                clean_result[k] = fv if fv < 1e308 else None
+            except (TypeError, ValueError):
+                clean_result[k] = None
+
+        # Sicherstellen dass alle benötigten Klassen vorhanden sind
+        if 'O(1)' not in clean_result:       clean_result['O(1)'] = 1
+        if 'O(log n)' not in clean_result:   clean_result['O(log n)'] = round(math.log2(n), 4) if n > 0 else 0
+        if 'O(sqrt n)' not in clean_result:  clean_result['O(sqrt n)'] = round(math.sqrt(n), 4)
+        if 'O(n)' not in clean_result:       clean_result['O(n)'] = n
+        if 'O(n log n)' not in clean_result: clean_result['O(n log n)'] = round(n * math.log2(n), 4) if n > 1 else 0
+        if 'O(n^2)' not in clean_result:     clean_result['O(n^2)'] = n * n
+        if 'O(n^3)' not in clean_result:     clean_result['O(n^3)'] = n * n * n
+        if 'O(2^n)' not in clean_result:     clean_result['O(2^n)'] = 2 ** n if n <= 60 else None
+        if 'O(n!)' not in clean_result:
+            clean_result['O(n!)'] = math.factorial(n) if n <= 20 else None
+
+        # TSP-spezifischer Schlüssel für das Frontend (Brute-Force = n!)
+        clean_result['factorial'] = clean_result.get('O(n!)')
+
+        return jsonify(clean_result)
+    except Exception as e:
+        return error_response(f"Fehler bei Komplexitätsberechnung: {str(e)}")
+
+
+# ===========================================================================
 # HAUPTPROGRAMM
 # ===========================================================================
 
@@ -913,7 +1747,7 @@ if __name__ == '__main__':
     # Port 8080, debug=True für Entwicklung (zeigt Fehler im Browser)
     print("=" * 60)
     print("  Mathematik-Spezialist Web-Interface")
-    print("  Build 12 | Port 8080")
+    print("  Build 13 | Port 8080")
     print("  URL: http://localhost:8080")
     print("=" * 60)
     app.run(host='0.0.0.0', port=8080, debug=True)

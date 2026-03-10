@@ -240,3 +240,39 @@
 - Hauptbottleneck: bernoulli_number() mit 15 µs/Aufruf (aber 359× Cache-Speedup)
 - research/PERFORMANCE_REPORT.md erstellt mit Bottleneck-Analyse und Empfehlungen
 
+
+---
+
+2026-03-10 17:30:00 - Build 13/14: 3 neue Web-Interface-Seiten + API-Routen
+
+## Neue Features
+
+### Topologie-Seite (topology.html)
+- Metrik-Rechner: Euklidisch, Manhattan, Chebyshev, p-Norm
+- Parametrische Kurven: Kreis, Lissajous, Helix (Bogenlänge, Abgeschlossenheit)
+- Euler-Charakteristik χ = V - E + F + Geschlecht
+- Fraktale Dimensionen: Cantor (0.6309), Sierpinski (1.585), Koch, Box-Counting
+
+### Graphentheorie-Seite (graph_theory.html)
+- Graph-Analyse aus Kantenliste: Grade, Zusammenhang, Bipartität, Euler-Status
+- Dijkstra kürzeste Wege (gewichtete Kantenliste)
+- Kombinatorik-Rechner: C(n,k), Catalan, Bell, Derangements, Partitionen
+- Bekannte Graphen: K4, K3,3, Petersen, K5, C6, Q3 mit Eigenschaften
+
+### Millennium-Probleme-Seite (millennium.html)
+- Status-Tabelle aller 7 Millennium-Probleme
+- Riemann-Nullstellen (1-20 Stück, mpmath, hochgenau)
+- Goldbach-Zerlegungen + Hardy-Littlewood-Schätzung
+- P vs NP TSP-Demo: Brute-Force vs Greedy Vergleich
+- Komplexitäts-Vergleich O(1) bis O(n!) mit Balken-Visualisierung
+
+### app.py Erweiterungen
+- 3 neue GET-Seiten-Routen: /topology, /graph_theory, /millennium
+- 9 neue POST-API-Routen: /api/topology/*, /api/graph/*, /api/millennium/*
+- Hilfsfunktion parse_edge_list(): Parser für gewichtete/ungewichtete Kantenlisten
+- Navigations-Einträge in base.html ergänzt
+
+## Änderungen
+- build.txt: 13 → 14
+- app.py: Build 12 → Build 13 (API-health)
+- base.html: Build 12 → Build 13

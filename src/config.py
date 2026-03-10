@@ -76,7 +76,7 @@ SIMPSON_N: int = 1000
 # Quelle: Bach & Sorenson (1993), erweitert durch Pomerance et al.
 # Für n < 3.215.031.751 reichen: [2, 3, 5, 7]
 # Für n < 3.317.044.064.679.887.385.961.981: vollständige Liste unten
-PRIME_MILLER_RABIN_WITNESSES: list = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]
+PRIME_MILLER_RABIN_WITNESSES: list[int] = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]
 
 # ===========================================================================
 # TAYLOR-REIHEN
@@ -109,7 +109,7 @@ ZETA_EULER_MACLAURIN_TERMS: int = 200
 #   Γ(z+1) ≈ √(2π) · [(z+g+0.5)/(e)]^(z+0.5) · A_g(z)
 #   wobei A_g(z) = c_0 + Σ_{k=1}^{g} c_k / (z+k)
 # Koeffizienten aus: Lanczos (1964), "A precision approximation of the gamma function"
-LANCZOS_COEFFICIENTS: dict = {
+LANCZOS_COEFFICIENTS: dict[str, int | list[float]] = {
     'g': 7,
     'coefficients': [
         0.99999999999980993,

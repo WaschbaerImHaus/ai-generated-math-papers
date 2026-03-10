@@ -23,7 +23,7 @@
 """
 
 
-class MathematicalError(Exception):
+class MathematicalError(ValueError):
     """
     @brief Basisklasse aller mathematischen Ausnahmen im specialist-maths Projekt.
     @description

@@ -28,7 +28,6 @@
 """
 
 import math
-from typing import Optional
 
 # Abhängigkeiten aus den Kernmodulen importieren
 from algebra_core import gcd, extended_gcd, mod_inverse
@@ -39,7 +38,7 @@ from algebra_numbertheory import is_prime
 # DIOPHANTISCHE GLEICHUNGEN
 # ===========================================================================
 
-def solve_linear_diophantine(a: int, b: int, c: int) -> Optional[tuple]:
+def solve_linear_diophantine(a: int, b: int, c: int) -> tuple[int, int, int] | None:
     """
     @brief Löst die lineare Diophantische Gleichung ax + by = c in ganzen Zahlen.
     @description
@@ -83,7 +82,7 @@ def solve_linear_diophantine(a: int, b: int, c: int) -> Optional[tuple]:
     return (x0, y0, g)
 
 
-def solve_quadratic_diophantine_pell(D: int, n_solutions: int = 5) -> list:
+def solve_quadratic_diophantine_pell(D: int, n_solutions: int = 5) -> list[tuple[int, int]]:
     """
     @brief Löst die Pell-Gleichung x² - D·y² = 1 (D kein perfektes Quadrat).
     @description
@@ -158,7 +157,7 @@ def solve_quadratic_diophantine_pell(D: int, n_solutions: int = 5) -> list:
     return solutions
 
 
-def solve_pythagorean_triples(n: int) -> list:
+def solve_pythagorean_triples(n: int) -> list[tuple[int, int, int]]:
     """
     @brief Findet alle primitiven Pythagoräischen Tripel (a, b, c) mit c ≤ n.
     @description
@@ -215,7 +214,7 @@ def solve_pythagorean_triples(n: int) -> list:
     return triples
 
 
-def solve_diophantine_two_squares(n: int) -> list:
+def solve_diophantine_two_squares(n: int) -> list[tuple[int, int]]:
     """
     @brief Schreibt n als Summe zweier Quadrate: n = a² + b².
     @description
@@ -258,7 +257,7 @@ def solve_diophantine_two_squares(n: int) -> list:
     return representations
 
 
-def markov_numbers(n_terms: int = 20) -> list:
+def markov_numbers(n_terms: int = 20) -> list[int]:
     """
     @brief Berechnet Markov-Zahlen (Lösungen der Markov-Gleichung x² + y² + z² = 3xyz).
     @description
@@ -349,7 +348,7 @@ def is_quadratic_residue(a: int, p: int) -> bool:
     return pow(a, (p - 1) // 2, p) == 1
 
 
-def quadratic_residues(p: int) -> list:
+def quadratic_residues(p: int) -> list[int]:
     """
     @brief Gibt alle quadratischen Reste modulo p zurück.
     @description
@@ -375,7 +374,7 @@ def quadratic_residues(p: int) -> list:
     return sorted(residues)
 
 
-def quadratic_reciprocity(p: int, q: int) -> dict:
+def quadratic_reciprocity(p: int, q: int) -> dict[str, int | bool]:
     """
     @brief Wendet das Quadratische Reziprozitätsgesetz an.
     @description
@@ -428,7 +427,7 @@ def quadratic_reciprocity(p: int, q: int) -> dict:
     }
 
 
-def tonelli_shanks(n: int, p: int) -> Optional[int]:
+def tonelli_shanks(n: int, p: int) -> int | None:
     """
     @brief Berechnet √n (mod p) via Tonelli-Shanks-Algorithmus.
     @description
@@ -506,7 +505,7 @@ def tonelli_shanks(n: int, p: int) -> Optional[int]:
         R = (R * b) % p
 
 
-def cipolla_algorithm(n: int, p: int) -> Optional[int]:
+def cipolla_algorithm(n: int, p: int) -> int | None:
     """
     @brief Berechnet √n (mod p) via Cipolla-Algorithmus.
     @description
@@ -557,7 +556,7 @@ def cipolla_algorithm(n: int, p: int) -> Optional[int]:
     # Elemente der Form (x, y) entsprechen x + y*ω in GF(p²)
     # Multiplikation: (x1+y1·ω)·(x2+y2·ω) = (x1x2 + y1y2·ω²) + (x1y2+x2y1)·ω
 
-    def mul_gf(x1: int, y1: int, x2: int, y2: int) -> tuple:
+    def mul_gf(x1: int, y1: int, x2: int, y2: int) -> tuple[int, int]:
         """Multiplikation in GF(p²)."""
         real = (x1 * x2 + y1 * y2 * omega_sq) % p
         imag = (x1 * y2 + x2 * y1) % p

@@ -1,0 +1,540 @@
+{% extends "base.html" %}
+<!--
+    @file millennium.html
+    @brief Millennium-Probleme-Seite: Status, Riemann-Hypothese, Goldbach, P vs NP, Komplexität.
+    @description
+        Interaktive Werkzeuge für die 7 Millennium-Probleme des Clay Mathematics Institute:
+        - Status-Übersicht aller 7 Probleme
+        - Riemann-Hypothese: nicht-triviale Nullstellen ζ(s) berechnen und anzeigen
+        - Goldbach-Vermutung: Zerlegungen gerader Zahlen und Hardy-Littlewood-Schätzung
+        - P vs NP Demo: Brute-Force vs. Greedy (TSP-Problem)
+        - Komplexitäts-Vergleich: O(1) bis O(2^n) für gegebene n
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+{% block title %}Millennium-Probleme – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><span>M</span> Millennium-Probleme</h1>
+    <p class="page-subtitle">
+        Die 7 großen ungelösten Probleme der Mathematik – je $1.000.000 Preisgeld.
+        Clay Mathematics Institute, Jahr 2000.
+    </p>
+</div>
+
+<!-- ===== Formelübersicht ===== -->
+<div class="card">
+    <h2>Schlüsselformeln</h2>
+    <div class="formula-grid">
+        <div class="formula-item">
+            <div class="formula-label">Riemann-Zeta-Funktion</div>
+            <div class="formula-display" id="formula-zeta"></div>
+        </div>
+        <div class="formula-item">
+            <div class="formula-label">Kritische Gerade</div>
+            <div class="formula-display" id="formula-critical"></div>
+        </div>
+        <div class="formula-item">
+            <div class="formula-label">Hardy-Littlewood (Goldbach)</div>
+            <div class="formula-display" id="formula-goldbach"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Status-Übersicht ===== -->
+<div class="card">
+    <h2>Status der 7 Millennium-Probleme</h2>
+    <p style="color: var(--subtext0); font-size: 0.85rem; margin-bottom: 1rem;">
+        Stand 2026. Nur die Poincaré-Vermutung wurde bisher gelöst (Perelman, 2003).
+    </p>
+    <div class="result-box" style="display: block;">
+        <div class="result-success">
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Problem</th>
+                    <th>Bereich</th>
+                    <th>Status</th>
+                    <th>Preisgeld</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td><strong>P vs NP</strong></td>
+                    <td>Komplexitätstheorie</td>
+                    <td><span style="color: var(--red);">● Offen</span></td>
+                    <td>$1.000.000</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td><strong>Hodge-Vermutung</strong></td>
+                    <td>Algebraische Geometrie</td>
+                    <td><span style="color: var(--red);">● Offen</span></td>
+                    <td>$1.000.000</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td><strong>Poincaré-Vermutung</strong></td>
+                    <td>Topologie</td>
+                    <td><span style="color: var(--green);">✓ Gelöst (Perelman 2003)</span></td>
+                    <td>$1.000.000 <em>(abgelehnt)</em></td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td><strong>Riemann-Hypothese</strong></td>
+                    <td>Analytische Zahlentheorie</td>
+                    <td><span style="color: var(--red);">● Offen</span></td>
+                    <td>$1.000.000</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td><strong>Yang-Mills &amp; Massenlücke</strong></td>
+                    <td>Mathematische Physik</td>
+                    <td><span style="color: var(--red);">● Offen</span></td>
+                    <td>$1.000.000</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td><strong>Navier-Stokes (Existenz &amp; Glattheit)</strong></td>
+                    <td>Partielle Differentialgleichungen</td>
+                    <td><span style="color: var(--red);">● Offen</span></td>
+                    <td>$1.000.000</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td><strong>Birch und Swinnerton-Dyer</strong></td>
+                    <td>Zahlentheorie (Elliptische Kurven)</td>
+                    <td><span style="color: var(--red);">● Offen</span></td>
+                    <td>$1.000.000</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Riemann-Hypothese: Nullstellen ===== -->
+<div class="card">
+    <h2>Riemann-Hypothese: Nicht-triviale Nullstellen</h2>
+    <p style="color: var(--subtext0); font-size: 0.85rem; margin-bottom: 1rem;">
+        Alle bekannten nicht-trivialen Nullstellen der Riemann-Zeta-Funktion liegen auf der
+        kritischen Geraden Re(s) = 1/2. Mehr als 10¹³ Nullstellen wurden verifiziert.
+        Die Hypothese behauptet, dass ALLE nicht-trivialen Nullstellen dort liegen.
+    </p>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">Anzahl der Nullstellen (1–20)</label>
+            <input class="form-input" id="rh-zeros" type="number" value="10" min="1" max="20">
+        </div>
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+        <span class="example-btn" onclick="document.getElementById('rh-zeros').value=5">Erste 5</span>
+        <span class="example-btn" onclick="document.getElementById('rh-zeros').value=10">Erste 10</span>
+        <span class="example-btn" onclick="document.getElementById('rh-zeros').value=20">Erste 20</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="calcRiemannZeros()">▶ Nullstellen berechnen</button>
+    <div class="result-box" id="rh-result"></div>
+</div>
+
+<!-- ===== Goldbach-Vermutung ===== -->
+<div class="card">
+    <h2>Goldbach-Vermutung</h2>
+    <p style="color: var(--subtext0); font-size: 0.85rem; margin-bottom: 1rem;">
+        <strong>Goldbach (1742):</strong> Jede gerade Zahl &gt; 2 ist Summe zweier Primzahlen.
+        Verifiziert für alle geraden Zahlen bis 4 × 10¹⁸ (noch nicht bewiesen).
+    </p>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">Gerade Zahl n</label>
+            <input class="form-input" id="goldbach-n" type="number" value="100" min="4" step="2">
+        </div>
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+        <span class="example-btn" onclick="document.getElementById('goldbach-n').value=28">28</span>
+        <span class="example-btn" onclick="document.getElementById('goldbach-n').value=100">100</span>
+        <span class="example-btn" onclick="document.getElementById('goldbach-n').value=1000">1000</span>
+        <span class="example-btn" onclick="document.getElementById('goldbach-n').value=9998">9998</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="calcGoldbach()">▶ Zerlegungen berechnen</button>
+    <div class="result-box" id="goldbach-result"></div>
+</div>
+
+<!-- ===== P vs NP Demo ===== -->
+<div class="card">
+    <h2>P vs NP – Demo: Travelling Salesman Problem</h2>
+    <p style="color: var(--subtext0); font-size: 0.85rem; margin-bottom: 1rem;">
+        Das Travelling Salesman Problem (TSP) ist NP-schwer. Hier wird der exponentielle
+        Aufwand von Brute-Force gegenüber dem polynomialen Aufwand von Greedy verglichen.
+        <br>
+        <strong>P ≠ NP?</strong> Fast alle Informatiker glauben daran, aber bewiesen ist es nicht.
+    </p>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">Anzahl Städte n</label>
+            <input class="form-input" id="pvsnp-n" type="number" value="12" min="3" max="30">
+        </div>
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+        <span class="example-btn" onclick="document.getElementById('pvsnp-n').value=5">5 Städte</span>
+        <span class="example-btn" onclick="document.getElementById('pvsnp-n').value=10">10 Städte</span>
+        <span class="example-btn" onclick="document.getElementById('pvsnp-n').value=15">15 Städte</span>
+        <span class="example-btn" onclick="document.getElementById('pvsnp-n').value=20">20 Städte</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="calcPvsNP()">▶ Vergleich berechnen</button>
+    <div class="result-box" id="pvsnp-result"></div>
+</div>
+
+<!-- ===== Komplexitäts-Vergleich ===== -->
+<div class="card">
+    <h2>Komplexitäts-Vergleich: O-Notation</h2>
+    <p style="color: var(--subtext0); font-size: 0.85rem; margin-bottom: 1rem;">
+        Für eine gegebene Eingabegröße n: Wie viele Operationen benötigt ein Algorithmus
+        in den verschiedenen Komplexitätsklassen?
+    </p>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">Eingabegröße n</label>
+            <input class="form-input" id="complexity-n" type="number" value="20" min="1" max="60">
+        </div>
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+        <span class="example-btn" onclick="document.getElementById('complexity-n').value=10">n=10</span>
+        <span class="example-btn" onclick="document.getElementById('complexity-n').value=20">n=20</span>
+        <span class="example-btn" onclick="document.getElementById('complexity-n').value=30">n=30</span>
+        <span class="example-btn" onclick="document.getElementById('complexity-n').value=50">n=50</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="calcComplexity()">▶ Vergleich berechnen</button>
+    <div class="result-box" id="complexity-result"></div>
+</div>
+
+<script>
+// ============================================================
+// INITIALISIERUNG: Formeln rendern
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+    // Riemann-Zeta-Funktion
+    renderLatex('\\zeta(s) = \\sum_{n=1}^{\\infty} \\frac{1}{n^s} = \\prod_{p\\,\\text{prim}} \\frac{1}{1-p^{-s}}',
+        document.getElementById('formula-zeta'), true);
+
+    // Kritische Gerade
+    renderLatex('\\rho_n = \\tfrac{1}{2} + i\\,t_n \\quad \\text{(Riemann-Hypothese)}',
+        document.getElementById('formula-critical'), true);
+
+    // Hardy-Littlewood für Goldbach
+    renderLatex('r(n) \\sim 2\\,C_2 \\prod_{p|n,\\,p>2} \\frac{p-1}{p-2} \\cdot \\frac{n}{(\\ln n)^2}',
+        document.getElementById('formula-goldbach'), true);
+});
+
+// ============================================================
+// RIEMANN-HYPOTHESE: NULLSTELLEN
+// ============================================================
+
+/** Berechnet die ersten n nicht-trivialen Riemann-Nullstellen via API */
+async function calcRiemannZeros() {
+    const nZeros = parseInt(document.getElementById('rh-zeros').value);
+    const result = document.getElementById('rh-result');
+
+    if (isNaN(nZeros) || nZeros < 1 || nZeros > 20) {
+        showError(result, 'Bitte Anzahl zwischen 1 und 20 eingeben.');
+        return;
+    }
+
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne Nullstellen (mpmath)...</div>';
+
+    try {
+        const data = await apiPost('/api/millennium/zeros', { n_zeros: nZeros });
+
+        // Tabelle der Nullstellen aufbauen
+        let rows = data.zeros.map((z, idx) => {
+            const reStr = parseFloat(z.real).toFixed(10);
+            const imStr = parseFloat(z.imag).toFixed(10);
+            const onLine = Math.abs(parseFloat(z.real) - 0.5) < 1e-6;
+            const checkIcon = onLine
+                ? '<span style="color: var(--green);">✓ Re(ρ) = 1/2</span>'
+                : '<span style="color: var(--red);">✗ VERLETZUNG!</span>';
+
+            return `<tr>
+                <td style="text-align: center;">${idx + 1}</td>
+                <td><code>${reStr}</code></td>
+                <td><code>${imStr}</code></td>
+                <td>${checkIcon}</td>
+            </tr>`;
+        }).join('');
+
+        const html = `<table class="result-table">
+            <thead>
+                <tr>
+                    <th>n</th>
+                    <th>Re(ρₙ)</th>
+                    <th>Im(ρₙ) = tₙ</th>
+                    <th>Auf krit. Geraden?</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+        <p style="margin-top: 0.75rem; color: var(--subtext0); font-size: 0.82rem;">
+            Alle ${data.zeros.length} berechneten Nullstellen liegen auf Re(s) = 1/2.
+            Die Riemann-Hypothese besagt, dass das für ALLE gilt.
+            Bisher verifiziert: &gt; 10¹³ Nullstellen.
+        </p>`;
+        showResult(result, html);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+// ============================================================
+// GOLDBACH-VERMUTUNG
+// ============================================================
+
+/** Berechnet alle Goldbach-Zerlegungen einer geraden Zahl via API */
+async function calcGoldbach() {
+    const n = parseInt(document.getElementById('goldbach-n').value);
+    const result = document.getElementById('goldbach-result');
+
+    if (isNaN(n) || n < 4) {
+        showError(result, 'n muss eine gerade Zahl ≥ 4 sein.');
+        return;
+    }
+    if (n % 2 !== 0) {
+        showError(result, 'n muss gerade sein (Goldbach gilt nur für gerade Zahlen).');
+        return;
+    }
+
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne Zerlegungen...</div>';
+
+    try {
+        const data = await apiPost('/api/millennium/goldbach', { n });
+
+        // Alle Zerlegungen anzeigen (maximal 20 für übersichtliche Darstellung)
+        const decomps = data.decompositions || [];
+        const showCount = Math.min(decomps.length, 20);
+        let decompsHtml = '';
+        for (let i = 0; i < showCount; i++) {
+            const [p, q] = decomps[i];
+            decompsHtml += `<span style="display: inline-block; margin: 2px 4px; background: var(--surface1);
+                padding: 2px 8px; border-radius: 4px; font-family: monospace; font-size: 0.85rem;">
+                ${p} + ${q}</span>`;
+        }
+        if (decomps.length > 20) {
+            decompsHtml += `<span style="color: var(--subtext0); font-size: 0.85rem;">
+                ... und ${decomps.length - 20} weitere</span>`;
+        }
+
+        const html = `<table class="result-table">
+            <tr><td>Zahl n</td><td style="font-weight: 700; font-size: 1.1em;">${data.n}</td></tr>
+            <tr><td>Gerade?</td><td><span style="color: var(--green);">✓ Ja</span></td></tr>
+            <tr><td>Anzahl Zerlegungen</td>
+                <td style="font-size: 1.2em; color: var(--green); font-weight: 700;">${decomps.length}</td></tr>
+            ${data.hl_estimate !== undefined ? `
+            <tr><td>Hardy-Littlewood-Schätzung</td>
+                <td style="color: var(--blue);">${parseFloat(data.hl_estimate).toFixed(2)}</td></tr>` : ''}
+            ${data.hl_accuracy !== undefined ? `
+            <tr><td>Genauigkeit</td>
+                <td>${parseFloat(data.hl_accuracy * 100).toFixed(1)}%</td></tr>` : ''}
+        </table>
+        ${decompsHtml ? `<div style="margin-top: 0.75rem;">
+            <div style="color: var(--subtext0); font-size: 0.82rem; margin-bottom: 0.5rem;">
+                Zerlegungen (p + q mit p,q prim):
+            </div>
+            <div style="line-height: 2;">${decompsHtml}</div>
+        </div>` : ''}`;
+        showResult(result, html);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+// ============================================================
+// P VS NP DEMO
+// ============================================================
+
+/** Berechnet und vergleicht TSP-Komplexität via API */
+async function calcPvsNP() {
+    const n = parseInt(document.getElementById('pvsnp-n').value);
+    const result = document.getElementById('pvsnp-result');
+
+    if (isNaN(n) || n < 3) {
+        showError(result, 'Mindestens 3 Städte erforderlich.');
+        return;
+    }
+
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne...</div>';
+
+    try {
+        const data = await apiPost('/api/millennium/complexity', { n });
+
+        // TSP-spezifische Berechnung (Brute-Force = n! Permutationen)
+        // Greedy = O(n²) Vergleiche
+        const brute = data.factorial || data['O(n!)'] || 0;
+        const greedy = data['O(n^2)'] || n * n;
+
+        // Formatierung sehr großer Zahlen
+        function formatBig(x) {
+            if (!isFinite(x) || x > 1e300) return '∞ (astronomisch groß)';
+            if (x > 1e15) return x.toExponential(3);
+            return x.toLocaleString('de-DE');
+        }
+
+        // Alle Komplexitätsklassen anzeigen
+        const classes = [
+            { label: 'O(1)', key: 'O(1)', class: 'Konstant', color: 'var(--green)' },
+            { label: 'O(log n)', key: 'O(log n)', class: 'Logarithmisch', color: 'var(--green)' },
+            { label: 'O(n)', key: 'O(n)', class: 'Linear', color: 'var(--blue)' },
+            { label: 'O(n log n)', key: 'O(n log n)', class: 'Quasilinear', color: 'var(--blue)' },
+            { label: 'O(n²)', key: 'O(n^2)', class: 'Quadratisch (P)', color: 'var(--yellow)' },
+            { label: 'O(n³)', key: 'O(n^3)', class: 'Kubisch (P)', color: 'var(--yellow)' },
+            { label: 'O(2ⁿ)', key: 'O(2^n)', class: 'Exponentiell (NP)', color: 'var(--peach)' },
+            { label: 'O(n!)', key: 'O(n!)', class: 'Faktoriell (NP-hart)', color: 'var(--red)' },
+        ];
+
+        let rows = classes.map(c => {
+            const val = data[c.key] !== undefined ? data[c.key] : '—';
+            return `<tr>
+                <td><code style="color: ${c.color};">${c.label}</code></td>
+                <td>${c.class}</td>
+                <td style="font-family: monospace;">${formatBig(val)}</td>
+            </tr>`;
+        }).join('');
+
+        // TSP-Vergleich
+        const speedup = (brute > 0 && isFinite(brute) && greedy > 0)
+            ? (brute / greedy).toExponential(2)
+            : '∞';
+
+        const html = `<div style="margin-bottom: 1rem; padding: 0.75rem; background: var(--surface0);
+            border-radius: 8px; border-left: 3px solid var(--blue);">
+            <strong>TSP mit n = ${n} Städten:</strong><br>
+            <span style="color: var(--red);">Brute-Force O(n!) = ${formatBig(brute)} Permutationen</span><br>
+            <span style="color: var(--green);">Greedy O(n²) = ${formatBig(greedy)} Schritte</span><br>
+            <span style="color: var(--subtext0); font-size: 0.85rem;">
+                Greedy ist ca. ${speedup}× schneller (aber oft nicht optimal).
+            </span>
+        </div>
+        <table class="result-table">
+            <thead>
+                <tr><th>Klasse</th><th>Bezeichnung</th><th>Operationen für n = ${n}</th></tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+        <p style="margin-top: 0.75rem; color: var(--subtext0); font-size: 0.82rem;">
+            <strong>P:</strong> Polynomiale Algorithmen (O(n^k)) – effizient lösbar.<br>
+            <strong>NP:</strong> Lösungen können in polynomialer Zeit <em>verifiziert</em>, aber nicht
+            notwendigerweise <em>gefunden</em> werden.<br>
+            <strong>P vs NP:</strong> Ist P = NP? D.h. kann jedes in NP vorifizierbare Problem
+            auch in P gelöst werden?
+        </p>`;
+        showResult(result, html);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+// ============================================================
+// KOMPLEXITÄTS-VERGLEICH
+// ============================================================
+
+/**
+ * Berechnet Komplexitätswerte via API.
+ * Nutzt denselben /api/millennium/complexity Endpunkt.
+ */
+async function calcComplexity() {
+    const n = parseInt(document.getElementById('complexity-n').value);
+    const result = document.getElementById('complexity-result');
+
+    if (isNaN(n) || n < 1) {
+        showError(result, 'n muss eine positive ganze Zahl sein.');
+        return;
+    }
+    if (n > 60) {
+        showError(result, 'n > 60 ist für O(2^n) und O(n!) zu groß (astronomische Zahlen).');
+        return;
+    }
+
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne...</div>';
+
+    try {
+        const data = await apiPost('/api/millennium/complexity', { n });
+
+        // Formatierung sehr großer Zahlen
+        function formatNum(x) {
+            if (x === null || x === undefined) return '—';
+            if (!isFinite(x) || x > 1e100) return '<span style="color: var(--red);">∞</span>';
+            if (x > 1e15) return `<span style="color: var(--peach);">${x.toExponential(3)}</span>`;
+            if (x > 1e9) return `<span style="color: var(--yellow);">${x.toLocaleString('de-DE')}</span>`;
+            return `<span style="color: var(--green);">${x.toLocaleString('de-DE')}</span>`;
+        }
+
+        // Visualisierungsbalken (logarithmisch)
+        function makeBar(x) {
+            if (!x || !isFinite(x) || x > 1e50) return '██████████████████████ (∞)';
+            const logVal = Math.log10(x + 1);
+            const maxLog = 20; // bis 10^20
+            const barLen = Math.min(22, Math.round((logVal / maxLog) * 22));
+            return '█'.repeat(barLen) + '░'.repeat(Math.max(0, 22 - barLen));
+        }
+
+        const classes = [
+            { label: 'O(1)',       key: 'O(1)',       color: '#a6e3a1' },
+            { label: 'O(log n)',   key: 'O(log n)',   color: '#a6e3a1' },
+            { label: 'O(√n)',      key: 'O(sqrt n)',  color: '#94e2d5' },
+            { label: 'O(n)',       key: 'O(n)',        color: '#89dceb' },
+            { label: 'O(n log n)', key: 'O(n log n)', color: '#89b4fa' },
+            { label: 'O(n²)',      key: 'O(n^2)',      color: '#cba6f7' },
+            { label: 'O(n³)',      key: 'O(n^3)',      color: '#f38ba8' },
+            { label: 'O(2ⁿ)',      key: 'O(2^n)',      color: '#fab387' },
+            { label: 'O(n!)',      key: 'O(n!)',        color: '#f38ba8' },
+        ];
+
+        let rows = classes.map(c => {
+            const val = data[c.key];
+            return `<tr>
+                <td><code style="color: ${c.color}; font-size: 1em;">${c.label}</code></td>
+                <td>${formatNum(val)}</td>
+                <td style="font-family: monospace; font-size: 0.75rem; color: ${c.color};">
+                    ${makeBar(val)}</td>
+            </tr>`;
+        }).join('');
+
+        const html = `<table class="result-table">
+            <thead>
+                <tr>
+                    <th>Komplexitätsklasse</th>
+                    <th>Operationen für n = ${n}</th>
+                    <th>Visualisierung (logarithmisch)</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+        <div class="formula-display" id="complexity-latex" style="margin-top: 0.75rem;"></div>`;
+        showResult(result, html);
+
+        // Anmerkung mit LaTeX
+        setTimeout(() => {
+            const el = document.getElementById('complexity-latex');
+            if (el) renderLatex(
+                `n = ${n}: \\quad n! = ${data['O(n!)'] > 1e50 ? '\\infty' : data['O(n!)']?.toExponential(2) || '?'}`,
+                el, false);
+        }, 50);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+</script>
+{% endblock %}
