@@ -305,7 +305,7 @@ def gauss_elimination_steps(matrix: list[list[float]], b: list[float]) -> dict:
         größten Element als Pivotzeile gewählt → vermeidet Division durch sehr
         kleine Zahlen (numerische Instabilität).
 
-        KaTeX-Formel: A \mathbf{x} = \mathbf{b}
+        KaTeX-Formel: A \\mathbf{x} = \\mathbf{b}
 
     @param matrix: Koeffizientenmatrix A als 2D-Liste (n×n)
     @param b: Rechte-Seite-Vektor als Liste (Länge n)
@@ -455,7 +455,7 @@ def euclidean_algorithm_steps(a: int, b: int) -> dict:
         Jeder Schritt hat die Form: a = b·q + r
         wobei q = a // b (ganzzahlige Division) und r = a mod b (Rest).
 
-        KaTeX-Formel: \gcd(a, b) = \gcd(b, a \bmod b)
+        KaTeX-Formel: \\gcd(a, b) = \\gcd(b, a \\bmod b)
 
     @param a: Erste ganze Zahl (positiv)
     @param b: Zweite ganze Zahl (positiv)
@@ -534,10 +534,10 @@ def rsa_steps(p: int, q: int, message: int) -> dict:
         6. Entschlüsseln: m = c^d mod n
 
         KaTeX-Formeln:
-            n = p \cdot q
-            \phi(n) = (p-1)(q-1)
-            c \equiv m^e \pmod{n}
-            m \equiv c^d \pmod{n}
+            n = p \\cdot q
+            \\phi(n) = (p-1)(q-1)
+            c \\equiv m^e \\pmod{n}
+            m \\equiv c^d \\pmod{n}
 
     @param p: Erste Primzahl
     @param q: Zweite Primzahl
@@ -701,7 +701,7 @@ def rsa_steps(p: int, q: int, message: int) -> dict:
             'success': decrypted == message
         },
         'method': 'RSA-Kryptographie',
-        'formula': r'c \equiv m^e \pmod{n},\quad m \equiv c^d \pmod{n}'
+        'formula': r'c \\equiv m^e \\pmod{n},\quad m \\equiv c^d \\pmod{n}'
     }
 
 
@@ -717,7 +717,7 @@ def prime_factorization_steps(n: int) -> dict:
 
         Beispiel: 360 = 2³ × 3² × 5
 
-        KaTeX-Formel: n = \prod_{i} p_i^{e_i}
+        KaTeX-Formel: n = \\prod_{i} p_i^{e_i}
 
     @param n: Positive ganze Zahl, die zerlegt werden soll
     @return Dict mit 'steps', 'result' (Liste der Primfaktoren), 'method'
@@ -1096,10 +1096,11 @@ def format_steps_html(steps_dict: dict) -> str:
             f'</div>'
         )
 
-        # Operation als Code
-        if operation:
+        # Operation oder Erklärung als Code (Fallback: explanation)
+        code_content = operation or explanation
+        if code_content:
             # Sonderzeichen für HTML escapen
-            op_escaped = operation.replace('<', '&lt;').replace('>', '&gt;')
+            op_escaped = code_content.replace('<', '&lt;').replace('>', '&gt;')
             html_parts.append(
                 f'      <div class="step-operation">'
                 f'<code>{op_escaped}</code>'
