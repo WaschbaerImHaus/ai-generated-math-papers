@@ -486,3 +486,41 @@
   - Navigation in base.html um 'Elliptische Kurven' und 'Tensor-Geometrie' erweitert
   - API-Endpunkte: /api/elliptic/analyze, /api/elliptic/hasse, /api/tensor/curvature
   - 26 neue Tests → Gesamt 84/84 grün
+
+2026-03-10 19:23:22 - Build 22: L-Funktionen-Infrastruktur (Dirichlet, Hecke, BSD)
+
+## Neue Datei: src/l_functions.py
+
+### Dirichlet-Charaktere (Modul 1)
+- dirichlet_characters(q): Konstruiert alle φ(q) Charaktere mod q via Primitivwurzel
+- chi_value(n, q, idx): Einzelner Charakterwert χ_idx(n)
+- is_primitive_character(): Gauß-Summen-Kriterium |τ(χ)|² = q
+- _construct_characters_mod_q(): Zyklische Gruppe via Exponentialtabelle
+
+### Dirichlet L-Funktionen (Modul 2)
+- dirichlet_l_function(): L(s,χ) = Σ χ(n)/n^s; Euler-Knopp für Re(s)≤1
+- dirichlet_l_function_zeros(): Nullstellensuche auf Re(s)=1/2 via Vorzeichenwechsel
+- _dirichlet_l_euler_accelerated(): Euler-E-Transformation für bedingte Konvergenz
+
+### Gauß-Summen (Modul 3)
+- gauss_sum(q, idx): τ(χ) = Σ χ(n)·e^{2πin/q}
+- Verifiziert: |τ(χ₋₄)|² = 4 (primitiver Charakter mod 4)
+
+### Analytische Eigenschaften (Modul 4)
+- l_function_conductor(): Führer via Kleinster-Teiler-Suche
+- l_function_special_values(): L(1,χ), L(0,χ), is_odd/is_even
+- functional_equation_check(): Λ(s,χ) = ε(χ)·Λ(1-s,χ̄) mit Root Number
+
+### Hecke L-Funktionen (Modul 5)
+- hecke_l_function(): L(s,f) = Σ a_n/n^s für Modulformen
+- completed_l_function(): Λ(s,f) = (2π)^{-s}Γ(s)L(s,f)
+- Verifiziert: L(Δ, 100) ≈ 1 (Ramanujan τ(1)=1 dominiert)
+
+### BSD-Verbindung (Modul 6)
+- elliptic_l_function_approx(): Euler-Produkt L(E,s) = ∏_p L_p(E,p^{-s})^{-1}
+- bsd_rank_from_zeros(): Analytischer Rang via L(E,1) ≈ 0 Kriterium
+- _count_points_mod_p(): #E(F_p) via Legendre-Symbol (Euler-Kriterium)
+
+## Neue Testdatei: tests/test_l_functions_dirichlet.py
+- 72 Tests, alle grün
+- Getestet: Leibniz-Reihe L(1,χ₋₄)=π/4, |τ(χ)|²=q, Euler-Produkt, BSD-Rang

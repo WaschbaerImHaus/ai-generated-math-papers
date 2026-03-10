@@ -178,5 +178,22 @@
 - [x] POST /api/steps/{newton,bisection,gauss,gcd,rsa,prime_factorization}
 - [x] Navigationseintrag "Schritt-für-Schritt" in Sidebar
 
+### L-Funktionen-Infrastruktur (src/l_functions.py) - Build 22
+- [x] dirichlet_characters(q): Alle φ(q) Dirichlet-Charaktere mod q (Primitivwurzel-Methode)
+- [x] chi_value(n, q, idx): Einzelner Charakterwert χ_idx(n)
+- [x] is_primitive_character(): Gauß-Summen-Kriterium |τ(χ)|² = q
+- [x] dirichlet_l_function(): L(s,χ) = Σ χ(n)/n^s mit Euler-Knopp für Re(s)≤1
+- [x] dirichlet_l_function_zeros(): Nullstellensuche auf Re(s)=1/2 (GRH-Streifen)
+- [x] gauss_sum(q, idx): τ(χ) = Σ_{n=1}^q χ(n)·e^{2πin/q}
+- [x] l_function_conductor(): Führer f(χ) als kleinster induzierender Teiler
+- [x] l_function_special_values(): L(1,χ), L(0,χ), gerade/ungerade Klassifikation
+- [x] functional_equation_check(): Λ(s,χ) = ε(χ)·Λ(1-s,χ̄) mit Root Number ε
+- [x] hecke_l_function(): L(s,f) = Σ a_n/n^s für Modulformen (Ramanujan-Delta)
+- [x] completed_l_function(): Λ(s,f) = (2π)^{-s}Γ(s)L(s,f) (Funktionalgleichung)
+- [x] elliptic_l_function_approx(): L(E,s) via Euler-Produkt, Frobenius-Spur a_p
+- [x] bsd_rank_from_zeros(): BSD-Rang-Schätzung via L(E,1)≈0 Kriterium
+- [x] 72 Tests in tests/test_l_functions_dirichlet.py, alle grün
+- [x] Dokumentiert: Leibniz-Reihe L(1,χ₋₄)=π/4, |τ|²=q, BSD-Vermutung
+
 ## Offene Aufgaben
 _(keine bekannten offenen Features mehr)_
