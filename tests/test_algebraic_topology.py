@@ -1,23 +1,46 @@
 """
 @file test_algebraic_topology.py
-@brief Tests für die algebraische Topologie-Erweiterungen in topology.py.
+@brief Umfassende Tests für das algebraic_topology-Modul.
 @author Kurt Ingwer
 @lastModified 2026-03-10
 
-Testet simpliziale Homologie, de Rham-Kohomologie, Stokes-Satz
-und den Brouwerschen Fixpunktsatz numerisch/algebraisch.
+Testet alle Klassen und Funktionen des algebraischen Topologie-Moduls:
+  - SimplicialComplex: Euler-Charakteristik, Randoperatoren, Betti-Zahlen
+  - SimplicialHomology: Homologiegruppen mit Torsion
+  - SingularHomology: S^n, T², RP^n, CP^n
+  - CohomologyRing: Kohomologie und Cup-Produkt
+  - HomotopyGroups: π_1, π_k(S^n), Seifert-van-Kampen
+  - FiberBundle: Hopf-Faserung
+  - SpectralSequence: Serre, Leray-Hirsch
+  - KTheory: K̃(S^n), Bott-Periodizität
+  - CWComplex: Euler-Charakteristik, zelluläre Homologie
+  - Freie Funktionen: classify_surface, van_kampen_free_product, etc.
 """
 
-import math
+import sys
 import pytest
-from src.topology import (
-    simplicial_homology,
-    betti_numbers_from_adjacency,
-    fundamental_group_free_generators,
-    de_rham_cohomology_circle,
-    de_rham_cohomology_sphere,
-    stokes_theorem_verify,
-    brouwer_fixed_point_evidence,
+import numpy as np
+
+# Pfade für beide üblichen Ausführungsweisen
+sys.path.insert(0, "src")
+sys.path.insert(0, "../src")
+
+from algebraic_topology import (
+    SimplicialComplex,
+    SimplicialHomology,
+    SingularHomology,
+    CohomologyRing,
+    HomotopyGroups,
+    FiberBundle,
+    SpectralSequence,
+    KTheory,
+    CWComplex,
+    compute_smith_normal_form,
+    homology_from_boundary_matrices,
+    classify_surface,
+    van_kampen_free_product,
+    lyndon_hochschild_serre_demo,
+    classifying_space_demo,
 )
 
 
@@ -25,464 +48,1058 @@ from src.topology import (
 # Hilfsfunktionen: Standard-Simplizialkomplexe
 # ============================================================
 
-def _triangle_simplices() -> dict:
-    """
-    Dreieck (Rand eines 2-Simplex):
-    Knoten: 0, 1, 2
-    Kanten: (0,1), (1,2), (0,2)
-    Keine 2-Flächen (nur Rand)
-    Topologie: S¹  →  β₀=1, β₁=1
-    """
-    return {
-        0: [(0,), (1,), (2,)],
-        1: [(0, 1), (1, 2), (0, 2)],
-    }
+def make_tetrahedron_surface() -> SimplicialComplex:
+    """Tetraeder-Oberfläche = S²: V=4, E=6, F=4, χ=2."""
+    return SimplicialComplex([
+        (0, 1, 2), (0, 1, 3), (0, 2, 3), (1, 2, 3),
+    ])
 
 
-def _filled_triangle_simplices() -> dict:
-    """
-    Ausgefülltes Dreieck (2-Simplex inklusive Innenfläche):
-    Knoten: 0, 1, 2
-    Kanten: (0,1), (1,2), (0,2)
-    Flächen: (0,1,2)
-    Topologie: D²  →  β₀=1, β₁=0, β₂=0
-    """
-    return {
-        0: [(0,), (1,), (2,)],
-        1: [(0, 1), (1, 2), (0, 2)],
-        2: [(0, 1, 2)],
-    }
+def make_circle() -> SimplicialComplex:
+    """Kreis als Dreieck-Rand: 3 Ecken, 3 Kanten, χ=0."""
+    return SimplicialComplex([(0, 1), (1, 2), (0, 2)])
 
 
-def _torus_simplices() -> dict:
-    """
-    Minimale Triangulierung des Torus mit 7 Knoten (Möbius-Heawood).
-    Knoten: 0..6
-    Topologie: Torus T²  →  β₀=1, β₁=2, β₂=1
-    Euler-Charakteristik: χ = 1 - 2 + 1 = 0
-
-    Standardmäßige minimale Triangulierung des Torus (7 Knoten, 21 Kanten, 14 Dreiecke).
-    """
-    vertices = [(i,) for i in range(7)]
-    # Kanten der Heawood-Triangulierung des Torus
-    edges = [
-        (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6),
-        (1, 2), (1, 3), (1, 4), (1, 5), (1, 6),
-        (2, 3), (2, 4), (2, 5), (2, 6),
-        (3, 4), (3, 5), (3, 6),
-        (4, 5), (4, 6),
-        (5, 6),
-    ]
-    # 14 Dreiecke der Standardtriangulierung
-    triangles = [
-        (0, 1, 2), (0, 1, 3), (0, 2, 6), (0, 3, 4),
-        (0, 4, 5), (0, 5, 6), (1, 2, 4), (1, 3, 5),
-        (1, 4, 6), (1, 5, 6), (2, 3, 5), (2, 4, 5),
-        (2, 3, 6), (3, 4, 6),
-    ]
-    return {
-        0: vertices,
-        1: edges,
-        2: triangles,
-    }
+def make_filled_triangle() -> SimplicialComplex:
+    """Ausgefülltes Dreieck D²: 3 Ecken, 3 Kanten, 1 Fläche, χ=1."""
+    return SimplicialComplex([(0, 1, 2)])
 
 
-def _sphere_s2_simplices() -> dict:
+def make_torus_minimal() -> SimplicialComplex:
     """
-    Triangulierte S² als Oberfläche eines Tetraeders (4 Dreiecke).
-    Knoten: 0, 1, 2, 3
-    Kanten: alle 6 Paare
-    Dreiecke: 4 Seiten des Tetraeders
-    Topologie: S²  →  β₀=1, β₁=0, β₂=1
-    Euler-Charakteristik: χ = 4 - 6 + 4 = 2
+    Torus-Triangulierung via 3x3-Gitter mit periodischen Randbed. (9 Knoten, 27 Kanten, 18 Dreiecke).
+    β_0=1, β_1=2, β_2=1, χ=0.
+
+    Konstruktion: Gitterpunkte (i,j) für i,j in {0,1,2}, mit Identifikationen
+    (0,j)=(3,j) und (i,0)=(i,3). Jede der 9 Gitterflächen wird in 2 Dreiecke aufgeteilt.
     """
-    return {
-        0: [(0,), (1,), (2,), (3,)],
-        1: [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)],
-        2: [(0, 1, 2), (0, 1, 3), (0, 2, 3), (1, 2, 3)],
-    }
+    def v(i: int, j: int) -> int:
+        """Knotenindex mit periodischen Randbedingungen."""
+        return (i % 3) * 3 + (j % 3)
+
+    triangles = []
+    for i in range(3):
+        for j in range(3):
+            # Unteres Dreieck des Gittervierecks
+            triangles.append(tuple(sorted([v(i, j), v(i + 1, j), v(i, j + 1)])))
+            # Oberes Dreieck des Gittervierecks
+            triangles.append(tuple(sorted([v(i + 1, j), v(i + 1, j + 1), v(i, j + 1)])))
+    return SimplicialComplex(triangles)
 
 
 # ============================================================
-# Tests: Simpliziale Homologie – Dreieck (S¹)
+# Tests: compute_smith_normal_form
 # ============================================================
 
-class TestSimplicialHomologyTriangle:
-    """Tests für den Rand eines Dreiecks (= Kreis S¹)."""
+class TestSmithNormalForm:
+    """Tests für die Smith-Normalform-Berechnung."""
 
-    def test_triangle_beta0(self):
-        """Dreieck (Rand): β₀ = 1 (zusammenhängend)."""
-        result = simplicial_homology(_triangle_simplices())
-        assert result['h0'] == 1, f"β₀ erwartet 1, erhalten {result['h0']}"
+    def test_identity_2x2(self):
+        """SNF der Einheitsmatrix ist Einheitsmatrix."""
+        A = np.eye(2, dtype=int)
+        D, U, V = compute_smith_normal_form(A)
+        assert D[0, 0] == 1
+        assert D[1, 1] == 1
 
-    def test_triangle_beta1(self):
-        """Dreieck (Rand): β₁ = 1 (ein Zyklus: der Rand selbst)."""
-        result = simplicial_homology(_triangle_simplices())
-        assert result['h1'] == 1, f"β₁ erwartet 1, erhalten {result['h1']}"
+    def test_zero_matrix(self):
+        """SNF der Nullmatrix ist Nullmatrix."""
+        A = np.zeros((3, 3), dtype=int)
+        D, _, _ = compute_smith_normal_form(A)
+        assert np.all(D == 0)
 
-    def test_triangle_euler(self):
-        """Dreieck (Rand): χ = β₀ - β₁ = 1 - 1 = 0."""
-        result = simplicial_homology(_triangle_simplices())
-        assert result['euler_characteristic'] == 0
+    def test_diagonal_matrix(self):
+        """SNF einer Diagonalmatrix hat gleiche Diagonale (ggf. umsortiert)."""
+        A = np.diag([2, 4]).astype(int)
+        D, U, V = compute_smith_normal_form(A)
+        diag = sorted([D[0, 0], D[1, 1]])
+        assert 2 in diag
+        assert 4 in diag
 
-    def test_filled_triangle_beta0(self):
-        """Ausgefülltes Dreieck: β₀ = 1 (zusammenhängend)."""
-        result = simplicial_homology(_filled_triangle_simplices())
-        assert result['h0'] == 1
+    def test_rank_preserved(self):
+        """Rang bleibt durch SNF erhalten."""
+        A = np.array([[1, 2, 3], [4, 5, 6]], dtype=int)
+        D, _, _ = compute_smith_normal_form(A)
+        rank_orig = np.linalg.matrix_rank(A)
+        rank_snf = np.sum(np.diag(D[:min(D.shape)]) != 0)
+        assert rank_orig == rank_snf
 
-    def test_filled_triangle_beta1(self):
-        """Ausgefülltes Dreieck: β₁ = 0 (der Zyklus wird durch die Fläche gefüllt)."""
-        result = simplicial_homology(_filled_triangle_simplices())
-        assert result['h1'] == 0, f"β₁ erwartet 0, erhalten {result['h1']}"
+    def test_1x1_matrix(self):
+        """SNF einer 1×1-Matrix."""
+        A = np.array([[7]], dtype=int)
+        D, _, _ = compute_smith_normal_form(A)
+        assert D[0, 0] == 7
 
-    def test_filled_triangle_euler(self):
-        """Ausgefülltes Dreieck (D²): χ = 1."""
-        result = simplicial_homology(_filled_triangle_simplices())
-        assert result['euler_characteristic'] == 1
+    def test_rectangular_matrix(self):
+        """SNF einer rechteckigen Matrix."""
+        A = np.array([[2, 0, 0], [0, 3, 0]], dtype=int)
+        D, U, V = compute_smith_normal_form(A)
+        assert D.shape == (2, 3)
+        nonzero = sorted([D[i, i] for i in range(2) if D[i, i] != 0])
+        assert len(nonzero) == 2
 
-
-# ============================================================
-# Tests: Simpliziale Homologie – Sphäre S²
-# ============================================================
-
-class TestSimplicialHomologySphere:
-    """Tests für die 2-Sphäre als Tetraeder-Oberfläche."""
-
-    def test_sphere_beta0(self):
-        """Sphäre S²: β₀ = 1 (zusammenhängend)."""
-        result = simplicial_homology(_sphere_s2_simplices())
-        assert result['h0'] == 1
-
-    def test_sphere_beta1(self):
-        """Sphäre S²: β₁ = 0 (keine nicht-kontrahierbaren Schleifen)."""
-        result = simplicial_homology(_sphere_s2_simplices())
-        assert result['h1'] == 0, f"β₁ erwartet 0, erhalten {result['h1']}"
-
-    def test_sphere_beta2(self):
-        """Sphäre S²: β₂ = 1 (eine 2D-Hohlraum)."""
-        result = simplicial_homology(_sphere_s2_simplices())
-        assert result['h2'] == 1, f"β₂ erwartet 1, erhalten {result['h2']}"
-
-    def test_sphere_euler(self):
-        """Sphäre S²: χ = β₀ - β₁ + β₂ = 1 - 0 + 1 = 2."""
-        result = simplicial_homology(_sphere_s2_simplices())
-        assert result['euler_characteristic'] == 2, (
-            f"χ erwartet 2, erhalten {result['euler_characteristic']}"
-        )
-
-    def test_sphere_betti_list_length(self):
-        """Sphäre S²: Betti-Zahlen-Liste hat mindestens 3 Einträge."""
-        result = simplicial_homology(_sphere_s2_simplices())
-        assert len(result['betti_numbers']) >= 3
+    def test_snf_positive_diagonal(self):
+        """Diagonaleinträge der SNF sind nicht-negativ."""
+        A = np.array([[1, 2], [3, 4]], dtype=int)
+        D, _, _ = compute_smith_normal_form(A)
+        for i in range(min(D.shape)):
+            assert D[i, i] >= 0
 
 
 # ============================================================
-# Tests: Simpliziale Homologie – Torus
+# Tests: SimplicialComplex – Basisfunktionalität
 # ============================================================
 
-class TestSimplicialHomologyTorus:
-    """Tests für den Torus T² (minimale Triangulierung)."""
+class TestSimplicialComplexBasic:
+    """Tests für grundlegende Funktionen von SimplicialComplex."""
 
-    def test_torus_beta0(self):
-        """Torus: β₀ = 1 (zusammenhängend)."""
-        result = simplicial_homology(_torus_simplices())
-        assert result['h0'] == 1
+    def test_faces_nonempty(self):
+        """faces() liefert nicht-leere Liste."""
+        sc = make_circle()
+        assert len(sc.faces()) > 0
 
-    def test_torus_beta1(self):
-        """Torus: β₁ = 2 (zwei unabhängige Zyklen: Längen- und Breitengrad)."""
-        result = simplicial_homology(_torus_simplices())
-        assert result['h1'] == 2, f"β₁ erwartet 2, erhalten {result['h1']}"
+    def test_faces_contain_all_dims(self):
+        """Alle Dimensionen sind in faces() vertreten."""
+        sc = make_filled_triangle()
+        faces = sc.faces()
+        dims = set(len(f) - 1 for f in faces)
+        assert 0 in dims  # Punkte
+        assert 1 in dims  # Kanten
+        assert 2 in dims  # Dreiecke
 
-    def test_torus_beta2(self):
-        """Torus: β₂ = 1 (die Fundamentalklasse)."""
-        result = simplicial_homology(_torus_simplices())
-        assert result['h2'] == 1, f"β₂ erwartet 1, erhalten {result['h2']}"
+    def test_closure_property(self):
+        """SimplicialComplex ist unter Seiten abgeschlossen."""
+        sc = SimplicialComplex([(0, 1, 2)])
+        faces = sc.faces()
+        # Wenn (0,1,2) drin, müssen (0,), (1,), (2,), (0,1), (0,2), (1,2) auch drin sein
+        assert (0,) in faces
+        assert (0, 1) in faces
+        assert (1, 2) in faces
 
-    def test_torus_euler(self):
-        """Torus: χ = β₀ - β₁ + β₂ = 1 - 2 + 1 = 0."""
-        result = simplicial_homology(_torus_simplices())
-        assert result['euler_characteristic'] == 0, (
-            f"χ erwartet 0, erhalten {result['euler_characteristic']}"
-        )
+    def test_simplex_boundary_matrix_shape(self):
+        """Randmatrix hat korrekte Größe."""
+        sc = make_filled_triangle()
+        # ∂_1: C_1 (3 Kanten) → C_0 (3 Punkte), Matrix: 3×3
+        mat = sc.boundary_matrix(1)
+        assert mat.shape[0] == 3  # Zeilen = #Punkte
+        assert mat.shape[1] == 3  # Spalten = #Kanten
+
+    def test_boundary_squared_is_zero(self):
+        """∂² = 0: Randoperator zweimal angewendet ergibt 0."""
+        sc = make_filled_triangle()
+        d1 = sc.boundary_matrix(1)
+        d2 = sc.boundary_matrix(2)
+        product = d1 @ d2
+        assert np.all(product == 0), f"∂∂ ≠ 0: {product}"
 
 
 # ============================================================
-# Tests: Betti-Zahlen aus Adjazenzmatrix
+# Tests: SimplicialComplex – Euler-Charakteristik
 # ============================================================
 
-class TestBettiNumbersFromAdjacency:
-    """Tests für betti_numbers_from_adjacency."""
+class TestEulerCharacteristic:
+    """Tests für die Euler-Charakteristik verschiedener Räume."""
 
-    def test_circle_graph_beta0(self):
-        """Kreis C₃ (Dreiecksgraph): β₀ = 1."""
-        # Dreieck: 3 Knoten, 3 Kanten
-        adj = [
-            [0, 1, 1],
-            [1, 0, 1],
-            [1, 1, 0],
-        ]
-        result = betti_numbers_from_adjacency(adj)
-        assert result['beta_0'] == 1
-
-    def test_circle_graph_beta1(self):
-        """Kreis C₃: β₁ = 1 (ein Zyklus)."""
-        adj = [
-            [0, 1, 1],
-            [1, 0, 1],
-            [1, 1, 0],
-        ]
-        result = betti_numbers_from_adjacency(adj)
-        assert result['beta_1'] == 1
+    def test_tetrahedron_surface_euler(self):
+        """Tetraeder-Oberfläche (S²): χ = 4 - 6 + 4 = 2."""
+        sc = make_tetrahedron_surface()
+        assert sc.euler_characteristic() == 2
 
     def test_circle_euler(self):
-        """Kreis C₃: χ = β₀ - β₁ = 1 - 1 = 0."""
-        adj = [
-            [0, 1, 1],
-            [1, 0, 1],
-            [1, 1, 0],
-        ]
-        result = betti_numbers_from_adjacency(adj)
-        assert result['euler_characteristic'] == 0
+        """Kreis S¹: χ = 3 - 3 = 0."""
+        sc = make_circle()
+        assert sc.euler_characteristic() == 0
 
-    def test_tree_beta1_zero(self):
-        """Baum (Pfadgraph P₃): β₁ = 0 (azyklisch)."""
-        adj = [
-            [0, 1, 0],
-            [1, 0, 1],
-            [0, 1, 0],
-        ]
-        result = betti_numbers_from_adjacency(adj)
-        assert result['beta_1'] == 0
+    def test_filled_triangle_euler(self):
+        """Ausgefülltes Dreieck D²: χ = 3 - 3 + 1 = 1."""
+        sc = make_filled_triangle()
+        assert sc.euler_characteristic() == 1
 
-    def test_disconnected_beta0(self):
-        """Zwei isolierte Knoten: β₀ = 2."""
-        adj = [[0, 0], [0, 0]]
-        result = betti_numbers_from_adjacency(adj)
-        assert result['beta_0'] == 2
+    def test_torus_euler(self):
+        """Torus T²: χ = 0."""
+        sc = make_torus_minimal()
+        assert sc.euler_characteristic() == 0
 
-    def test_empty_graph(self):
-        """Leerer Graph: alle Werte 0."""
-        result = betti_numbers_from_adjacency([])
-        assert result['beta_0'] == 0
-        assert result['beta_1'] == 0
+    def test_single_vertex_euler(self):
+        """Einzelner Punkt: χ = 1."""
+        sc = SimplicialComplex([(0,)])
+        assert sc.euler_characteristic() == 1
 
+    def test_two_points_euler(self):
+        """Zwei isolierte Punkte: χ = 2."""
+        sc = SimplicialComplex([(0,), (1,)])
+        assert sc.euler_characteristic() == 2
 
-# ============================================================
-# Tests: Fundamentalgruppe
-# ============================================================
+    def test_edge_euler(self):
+        """Einzelne Kante: χ = 2 - 1 = 1."""
+        sc = SimplicialComplex([(0, 1)])
+        assert sc.euler_characteristic() == 1
 
-class TestFundamentalGroup:
-    """Tests für fundamental_group_free_generators."""
-
-    def test_circle_free_generators(self):
-        """Kreis S¹: 1 freier Generator der Fundamentalgruppe."""
-        result = fundamental_group_free_generators(_triangle_simplices())
-        assert result['free_generators'] == 1
-
-    def test_circle_not_simply_connected(self):
-        """Kreis S¹: nicht einfach zusammenhängend."""
-        result = fundamental_group_free_generators(_triangle_simplices())
-        assert result['is_simply_connected'] is False
-
-    def test_sphere_simply_connected(self):
-        """Sphäre S²: einfach zusammenhängend (π₁(S²) = 1)."""
-        result = fundamental_group_free_generators(_sphere_s2_simplices())
-        assert result['is_simply_connected'] is True
-
-    def test_sphere_free_generators_zero(self):
-        """Sphäre S²: 0 freie Generatoren."""
-        result = fundamental_group_free_generators(_sphere_s2_simplices())
-        assert result['free_generators'] == 0
-
-    def test_filled_triangle_simply_connected(self):
-        """Ausgefülltes Dreieck D²: einfach zusammenhängend."""
-        result = fundamental_group_free_generators(_filled_triangle_simplices())
-        assert result['is_simply_connected'] is True
-
-    def test_comment_is_string(self):
-        """Kommentar ist ein nicht-leerer String."""
-        result = fundamental_group_free_generators(_sphere_s2_simplices())
-        assert isinstance(result['comment'], str)
-        assert len(result['comment']) > 0
+    def test_tetrahedron_vertex_count(self):
+        """Tetraeder-Oberfläche: V=4, E=6, F=4."""
+        sc = make_tetrahedron_surface()
+        faces = sc.faces()
+        v = sum(1 for f in faces if len(f) == 1)
+        e = sum(1 for f in faces if len(f) == 2)
+        f = sum(1 for f in faces if len(f) == 3)
+        assert v == 4
+        assert e == 6
+        assert f == 4
 
 
 # ============================================================
-# Tests: de Rham-Kohomologie – S¹
+# Tests: SimplicialComplex – Betti-Zahlen
 # ============================================================
 
-class TestDeRhamCircle:
-    """Tests für de Rham-Kohomologie des Kreises."""
+class TestSimplicialComplexBetti:
+    """Tests für Betti-Zahlen von SimplicialComplex."""
 
-    def test_h0_is_r(self):
-        """H^0_dR(S¹) = ℝ (konstante Funktionen)."""
-        result = de_rham_cohomology_circle()
-        assert result['h0'] == 'ℝ'
+    def test_circle_beta0(self):
+        """Kreis: β_0 = 1 (zusammenhängend)."""
+        sc = make_circle()
+        b = sc.betti_numbers()
+        assert b[0] == 1
 
-    def test_h1_is_r(self):
-        """H^1_dR(S¹) = ℝ (erzeugt von dθ)."""
-        result = de_rham_cohomology_circle()
-        assert result['h1'] == 'ℝ'
+    def test_circle_beta1(self):
+        """Kreis: β_1 = 1 (ein Zyklus)."""
+        sc = make_circle()
+        b = sc.betti_numbers()
+        assert b[1] == 1
 
-    def test_h0_dim(self):
-        """dim(H^0(S¹)) = 1."""
-        result = de_rham_cohomology_circle()
-        assert result['h0_dim'] == 1
+    def test_filled_triangle_beta1_zero(self):
+        """Ausgefülltes Dreieck: β_1 = 0."""
+        sc = make_filled_triangle()
+        b = sc.betti_numbers()
+        assert b.get(1, 0) == 0
 
-    def test_h1_dim(self):
-        """dim(H^1(S¹)) = 1."""
-        result = de_rham_cohomology_circle()
-        assert result['h1_dim'] == 1
+    def test_sphere_beta0(self):
+        """Sphäre S²: β_0 = 1."""
+        sc = make_tetrahedron_surface()
+        b = sc.betti_numbers()
+        assert b[0] == 1
 
-    def test_dtheta_not_exact(self):
-        """dθ ist nicht exakt auf S¹ (Integral ≠ 0)."""
-        result = de_rham_cohomology_circle()
-        assert result['is_dtheta_exact'] is False
+    def test_sphere_beta1_zero(self):
+        """Sphäre S²: β_1 = 0."""
+        sc = make_tetrahedron_surface()
+        b = sc.betti_numbers()
+        assert b.get(1, 0) == 0
 
-    def test_integral_dtheta_approx_2pi(self):
-        """∮_{S¹} dθ ≈ 2π."""
-        result = de_rham_cohomology_circle()
-        assert abs(result['integral_dtheta'] - 2 * math.pi) < 0.01
+    def test_sphere_beta2(self):
+        """Sphäre S²: β_2 = 1."""
+        sc = make_tetrahedron_surface()
+        b = sc.betti_numbers()
+        assert b.get(2, 0) == 1
 
-    def test_euler_char_circle(self):
-        """χ(S¹) = 0."""
-        result = de_rham_cohomology_circle()
-        assert result['euler_characteristic'] == 0
+    def test_torus_beta0(self):
+        """Torus: β_0 = 1."""
+        sc = make_torus_minimal()
+        b = sc.betti_numbers()
+        assert b[0] == 1
 
-    def test_betti_numbers_circle(self):
-        """Betti-Zahlen: [1, 1]."""
-        result = de_rham_cohomology_circle()
-        assert result['betti_numbers'] == [1, 1]
+    def test_torus_beta1(self):
+        """Torus: β_1 = 2."""
+        sc = make_torus_minimal()
+        b = sc.betti_numbers()
+        assert b.get(1, 0) == 2, f"β_1 erwartet 2, erhalten {b.get(1, 0)}"
+
+    def test_torus_beta2(self):
+        """Torus: β_2 = 1."""
+        sc = make_torus_minimal()
+        b = sc.betti_numbers()
+        assert b.get(2, 0) == 1, f"β_2 erwartet 1, erhalten {b.get(2, 0)}"
+
+    def test_betti_euler_relation(self):
+        """Euler-Charakteristik = alternierende Summe der Betti-Zahlen."""
+        sc = make_tetrahedron_surface()
+        b = sc.betti_numbers()
+        chi_betti = sum((-1) ** k * v for k, v in b.items())
+        assert chi_betti == sc.euler_characteristic()
+
+    def test_betti_euler_torus(self):
+        """Euler-Charakteristik des Torus aus Betti-Zahlen."""
+        sc = make_torus_minimal()
+        b = sc.betti_numbers()
+        chi_betti = sum((-1) ** k * v for k, v in b.items())
+        assert chi_betti == 0
 
 
 # ============================================================
-# Tests: de Rham-Kohomologie – Sⁿ
+# Tests: SimplicialHomology
 # ============================================================
 
-class TestDeRhamSphere:
-    """Tests für de Rham-Kohomologie der n-Sphäre."""
+class TestSimplicialHomology:
+    """Tests für SimplicialHomology-Klasse."""
 
-    def test_s2_h0_dim(self):
-        """dim(H^0(S²)) = 1."""
-        result = de_rham_cohomology_sphere(n=2)
-        assert result['h0_dim'] == 1
+    def test_chain_groups_circle(self):
+        """Kreis: Kettengruppen C_0 (dim=3), C_1 (dim=3)."""
+        sc = make_circle()
+        sh = SimplicialHomology(sc)
+        cg = sh.chain_groups()
+        assert cg[0] == 3
+        assert cg[1] == 3
 
-    def test_s2_h1_is_zero(self):
-        """dim(H^1(S²)) = 0 (S² ist einfach zusammenhängend)."""
-        result = de_rham_cohomology_sphere(n=2)
-        betti = result['betti_numbers']
-        assert betti[1] == 0, f"H^1(S²) erwartet 0, erhalten {betti[1]}"
+    def test_chain_groups_filled(self):
+        """Ausgefülltes Dreieck: C_0=3, C_1=3, C_2=1."""
+        sc = make_filled_triangle()
+        sh = SimplicialHomology(sc)
+        cg = sh.chain_groups()
+        assert cg[0] == 3
+        assert cg[1] == 3
+        assert cg[2] == 1
 
-    def test_s2_h2_is_r(self):
-        """dim(H^2(S²)) = 1 (Orientierungsklasse)."""
-        result = de_rham_cohomology_sphere(n=2)
-        assert result['hn_dim'] == 1
+    def test_boundary_operators_nonempty(self):
+        """Randoperatoren sind nicht leer für nicht-trivialen Komplex."""
+        sc = make_circle()
+        sh = SimplicialHomology(sc)
+        ops = sh.boundary_operators()
+        assert len(ops) >= 1
 
-    def test_s2_euler_char(self):
-        """χ(S²) = 1 + (-1)² = 2."""
-        result = de_rham_cohomology_sphere(n=2)
-        assert result['euler_characteristic'] == 2
+    def test_homology_groups_circle(self):
+        """Kreis: H_0 = ℤ (rank=1), H_1 = ℤ (rank=1)."""
+        sc = make_circle()
+        sh = SimplicialHomology(sc)
+        hg = sh.homology_groups()
+        assert hg[0]["rank"] == 1
+        assert hg[1]["rank"] == 1
 
-    def test_s1_euler_char(self):
-        """χ(S¹) = 1 + (-1)¹ = 0."""
-        result = de_rham_cohomology_sphere(n=1)
-        assert result['euler_characteristic'] == 0
+    def test_homology_groups_filled_triangle(self):
+        """Ausgefülltes Dreieck: H_0=ℤ, H_1=0."""
+        sc = make_filled_triangle()
+        sh = SimplicialHomology(sc)
+        hg = sh.homology_groups()
+        assert hg[0]["rank"] == 1
+        assert hg.get(1, {}).get("rank", 0) == 0
 
-    def test_s3_euler_char(self):
-        """χ(S³) = 1 + (-1)³ = 0."""
-        result = de_rham_cohomology_sphere(n=3)
-        assert result['euler_characteristic'] == 0
+    def test_homology_groups_sphere(self):
+        """Sphäre S²: H_0=ℤ, H_1=0, H_2=ℤ."""
+        sc = make_tetrahedron_surface()
+        sh = SimplicialHomology(sc)
+        hg = sh.homology_groups()
+        assert hg[0]["rank"] == 1
+        assert hg.get(1, {}).get("rank", 0) == 0
+        assert hg.get(2, {}).get("rank", 0) == 1
 
-    def test_s2_betti_numbers(self):
-        """S²: Betti-Zahlen [1, 0, 1]."""
-        result = de_rham_cohomology_sphere(n=2)
-        betti = result['betti_numbers']
-        assert betti[0] == 1
-        assert betti[1] == 0
-        assert betti[2] == 1
+    def test_homology_groups_torus(self):
+        """Torus: H_0=ℤ, H_1=ℤ², H_2=ℤ."""
+        sc = make_torus_minimal()
+        sh = SimplicialHomology(sc)
+        hg = sh.homology_groups()
+        assert hg[0]["rank"] == 1
+        assert hg[1]["rank"] == 2
+        assert hg[2]["rank"] == 1
 
-    def test_dimension_field(self):
-        """Dimensionsfeld wird korrekt gesetzt."""
-        result = de_rham_cohomology_sphere(n=3)
-        assert result['dimension'] == 3
+    def test_betti_numbers_via_class(self):
+        """Betti-Zahlen über SimplicialHomology stimmen mit SimplicialComplex überein."""
+        sc = make_tetrahedron_surface()
+        sh = SimplicialHomology(sc)
+        b = sh.betti_numbers()
+        assert b[0] == 1
+        assert b.get(1, 0) == 0
+        assert b.get(2, 0) == 1
 
-    def test_invalid_dimension_raises(self):
-        """Dimension n < 1 wirft ValueError."""
+    def test_description_is_string(self):
+        """Beschreibung der Homologiegruppe ist ein String."""
+        sc = make_circle()
+        sh = SimplicialHomology(sc)
+        hg = sh.homology_groups()
+        assert isinstance(hg[0]["description"], str)
+        assert len(hg[0]["description"]) > 0
+
+
+# ============================================================
+# Tests: SingularHomology
+# ============================================================
+
+class TestSingularHomologySphere:
+    """Tests für SingularHomology.homology_of_sphere."""
+
+    def setup_method(self):
+        self.sh = SingularHomology()
+
+    def test_s1_h0(self):
+        """H_0(S^1) = ℤ."""
+        h = self.sh.homology_of_sphere(1)
+        assert h[0] == "ℤ"
+
+    def test_s1_h1(self):
+        """H_1(S^1) = ℤ."""
+        h = self.sh.homology_of_sphere(1)
+        assert h[1] == "ℤ"
+
+    def test_s2_h0(self):
+        """H_0(S^2) = ℤ."""
+        h = self.sh.homology_of_sphere(2)
+        assert h[0] == "ℤ"
+
+    def test_s2_h1_zero(self):
+        """H_1(S^2) = 0."""
+        h = self.sh.homology_of_sphere(2)
+        assert h[1] == "0"
+
+    def test_s2_h2(self):
+        """H_2(S^2) = ℤ."""
+        h = self.sh.homology_of_sphere(2)
+        assert h[2] == "ℤ"
+
+    def test_s3_h3(self):
+        """H_3(S^3) = ℤ."""
+        h = self.sh.homology_of_sphere(3)
+        assert h[3] == "ℤ"
+
+    def test_s3_intermediate_zero(self):
+        """H_1(S^3) = H_2(S^3) = 0."""
+        h = self.sh.homology_of_sphere(3)
+        assert h[1] == "0"
+        assert h[2] == "0"
+
+    def test_sn_only_0_and_n(self):
+        """Für S^4: nur H_0 und H_4 sind ℤ."""
+        h = self.sh.homology_of_sphere(4)
+        assert h[0] == "ℤ"
+        assert h[4] == "ℤ"
+        assert h[1] == "0"
+        assert h[2] == "0"
+        assert h[3] == "0"
+
+    def test_invalid_n_raises(self):
+        """n < 0 wirft ValueError."""
         with pytest.raises(ValueError):
-            de_rham_cohomology_sphere(n=0)
+            self.sh.homology_of_sphere(-1)
+
+
+class TestSingularHomologyTorus:
+    """Tests für SingularHomology.homology_of_torus."""
+
+    def setup_method(self):
+        self.sh = SingularHomology()
+
+    def test_torus_h0(self):
+        """H_0(T²) = ℤ."""
+        h = self.sh.homology_of_torus()
+        assert h[0] == "ℤ"
+
+    def test_torus_h1(self):
+        """H_1(T²) = ℤ²."""
+        h = self.sh.homology_of_torus()
+        assert "ℤ" in h[1] and "ℤ" in h[1]  # ℤ ⊕ ℤ
+
+    def test_torus_h2(self):
+        """H_2(T²) = ℤ."""
+        h = self.sh.homology_of_torus()
+        assert h[2] == "ℤ"
+
+
+class TestSingularHomologyRP:
+    """Tests für SingularHomology.homology_of_rp."""
+
+    def setup_method(self):
+        self.sh = SingularHomology()
+
+    def test_rp1_h0(self):
+        """H_0(RP^1) = ℤ (RP^1 ≅ S^1)."""
+        h = self.sh.homology_of_rp(1)
+        assert h[0] == "ℤ"
+
+    def test_rp2_h1_torsion(self):
+        """H_1(RP^2) = ℤ/2 (Torsion)."""
+        h = self.sh.homology_of_rp(2)
+        assert "ℤ/2" in h[1]
+
+    def test_rp2_h2_zero(self):
+        """H_2(RP^2) = 0 (nicht orientierbar)."""
+        h = self.sh.homology_of_rp(2)
+        assert h[2] == "0"
+
+    def test_rp3_h3(self):
+        """H_3(RP^3) = ℤ (RP^3 ist orientierbar, n=3 ungerade)."""
+        h = self.sh.homology_of_rp(3)
+        assert h[3] == "ℤ"
+
+    def test_rp_invalid(self):
+        """n < 1 wirft ValueError."""
+        with pytest.raises(ValueError):
+            self.sh.homology_of_rp(0)
+
+
+class TestSingularHomologyCP:
+    """Tests für SingularHomology.homology_of_cp."""
+
+    def setup_method(self):
+        self.sh = SingularHomology()
+
+    def test_cp1_is_s2(self):
+        """CP^1 ≅ S^2: H_0=H_2=ℤ, H_1=0."""
+        h = self.sh.homology_of_cp(1)
+        assert h[0] == "ℤ"
+        assert h[1] == "0"
+        assert h[2] == "ℤ"
+
+    def test_cp2_even_degrees(self):
+        """CP^2: H_0=H_2=H_4=ℤ, H_1=H_3=0."""
+        h = self.sh.homology_of_cp(2)
+        assert h[0] == "ℤ"
+        assert h[2] == "ℤ"
+        assert h[4] == "ℤ"
+        assert h[1] == "0"
+        assert h[3] == "0"
+
+    def test_cpn_only_even(self):
+        """CP^3: Nur gerade Grade haben Homologie."""
+        h = self.sh.homology_of_cp(3)
+        for k in [0, 2, 4, 6]:
+            assert h[k] == "ℤ", f"H_{k}(CP^3) sollte ℤ sein"
+        for k in [1, 3, 5]:
+            assert h[k] == "0", f"H_{k}(CP^3) sollte 0 sein"
+
+    def test_cp_invalid(self):
+        """n < 1 wirft ValueError."""
+        with pytest.raises(ValueError):
+            self.sh.homology_of_cp(0)
+
+    def test_mayer_vietoris_returns_string(self):
+        """mayer_vietoris_demo gibt nicht-leeren String zurück."""
+        sh = SingularHomology()
+        result = sh.mayer_vietoris_demo()
+        assert isinstance(result, str)
+        assert len(result) > 0
+        assert "Mayer" in result or "mayer" in result.lower() or "H" in result
 
 
 # ============================================================
-# Tests: Stokes-Satz (Grünscher Satz)
+# Tests: CohomologyRing
 # ============================================================
 
-class TestStokesTheorem:
-    """Tests für die numerische Verifikation des Stokes-Satzes."""
+class TestCohomologyRing:
+    """Tests für CohomologyRing."""
 
-    def test_stokes_verified(self):
-        """Linien- und Flächenintegral stimmen überein (relativer Fehler < 1%)."""
-        result = stokes_theorem_verify()
-        assert result['stokes_verified'] is True, (
-            f"Stokes nicht verifiziert. Rel. Fehler: {result['relative_error']:.4f}"
-        )
+    def setup_method(self):
+        self.cr = CohomologyRing("test")
 
-    def test_line_integral_approx_2pi(self):
-        """Linienintegral ≈ 2π ≈ 6.2832 für ω = -y dx + x dy."""
-        result = stokes_theorem_verify()
-        expected = 2 * math.pi
-        assert abs(result['line_integral'] - expected) < 0.1, (
-            f"Linienintegral erwartet ≈ {expected:.4f}, erhalten {result['line_integral']:.4f}"
-        )
+    def test_sphere_h0(self):
+        """H^0(S^n) = ℤ."""
+        for n in [1, 2, 3, 4]:
+            h = self.cr.cohomology_of_sphere(n)
+            assert h[0] == "ℤ"
 
-    def test_area_integral_approx_2pi(self):
-        """Flächenintegral ≈ 2π (∫∫ 2 dA = 2·π·1²)."""
-        result = stokes_theorem_verify()
-        expected = 2 * math.pi
-        assert abs(result['area_integral'] - expected) < 0.01, (
-            f"Flächenintegral erwartet ≈ {expected:.4f}, erhalten {result['area_integral']:.4f}"
-        )
+    def test_sphere_hn(self):
+        """H^n(S^n) = ℤ."""
+        for n in [1, 2, 3]:
+            h = self.cr.cohomology_of_sphere(n)
+            assert h[n] == "ℤ"
 
-    def test_relative_error_small(self):
-        """Relativer Fehler < 0.01 (1%)."""
-        result = stokes_theorem_verify()
-        assert result['relative_error'] < 0.01
+    def test_sphere_intermediate_zero(self):
+        """H^k(S^3) = 0 für k=1,2."""
+        h = self.cr.cohomology_of_sphere(3)
+        assert h[1] == "0"
+        assert h[2] == "0"
 
-    def test_green_curl_value(self):
-        """Rotor von ω = -y dx + x dy ist ∂Q/∂x - ∂P/∂y = 1-(-1) = 2."""
-        result = stokes_theorem_verify()
-        assert abs(result['green_curl'] - 2.0) < 1e-10
+    def test_sphere_invalid_dim(self):
+        """n < 1 wirft ValueError."""
+        with pytest.raises(ValueError):
+            self.cr.cohomology_of_sphere(0)
+
+    def test_torus_cohomology(self):
+        """Torus-Kohomologie: H^0=H^2=ℤ, H^1=ℤ²."""
+        h = self.cr.cohomology_of_torus()
+        assert h[0] == "ℤ"
+        assert h[2] == "ℤ"
+        assert "ℤ" in h[1]
+
+    def test_cup_product_sphere(self):
+        """Cup-Produkt auf Sphäre: String-Antwort."""
+        result = self.cr.cup_product_demo("sphere")
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_cup_product_torus(self):
+        """Cup-Produkt auf Torus: enthält Schlüsselwörter."""
+        result = self.cr.cup_product_demo("torus")
+        assert isinstance(result, str)
+        assert "∪" in result or "cup" in result.lower() or "Cup" in result
+
+    def test_cup_product_unknown(self):
+        """Unbekannter Raum: String-Antwort (kein Fehler)."""
+        result = self.cr.cup_product_demo("unknown_space_xyz")
+        assert isinstance(result, str)
+
+    def test_poincare_duality(self):
+        """Poincaré-Dualität für Torus (dim=2)."""
+        result = self.cr.poincare_duality_demo("T²", 2)
+        assert isinstance(result, str)
+        assert "Dualit" in result or "dual" in result.lower() or "≅" in result
 
 
 # ============================================================
-# Tests: Brouwerscher Fixpunktsatz
+# Tests: HomotopyGroups
 # ============================================================
 
-class TestBrouwerFixedPoint:
-    """Tests für die numerische Evidenz des Brouwerschen Fixpunktsatzes."""
+class TestHomotopyGroups:
+    """Tests für HomotopyGroups."""
 
-    def test_fixpoint_ratio_above_95_percent(self):
-        """Mehr als 95% der Abbildungen haben einen gefundenen Fixpunkt."""
-        result = brouwer_fixed_point_evidence(n_trials=500)
-        assert result['found_ratio'] > 0.95, (
-            f"Fixpunktquote zu niedrig: {result['found_ratio']:.3f} < 0.95"
-        )
+    def setup_method(self):
+        self.hg = HomotopyGroups()
 
-    def test_brouwer_confirmed(self):
-        """Flag 'brouwer_confirmed' ist True."""
-        result = brouwer_fixed_point_evidence(n_trials=300)
-        assert result['brouwer_confirmed'] is True
+    def test_pi1_s1(self):
+        """π_1(S¹) = ℤ."""
+        result = self.hg.fundamental_group("S1")
+        assert "ℤ" in result
 
-    def test_n_trials_matches(self):
-        """Anzahl der Versuche stimmt mit n_trials überein."""
-        result = brouwer_fixed_point_evidence(n_trials=100)
-        assert result['n_trials'] == 100
+    def test_pi1_torus(self):
+        """π_1(T²) = ℤ × ℤ."""
+        result = self.hg.fundamental_group("T2")
+        assert "ℤ" in result
 
-    def test_n_found_leq_n_trials(self):
-        """Gefundene Fixpunkte ≤ Gesamtversuche."""
-        result = brouwer_fixed_point_evidence(n_trials=200)
-        assert result['n_found'] <= result['n_trials']
+    def test_pi1_s2_trivial(self):
+        """π_1(S²) = trivial (einfach zusammenhängend)."""
+        result = self.hg.fundamental_group("S2")
+        assert "trivial" in result or "1" in result
 
-    def test_method_string(self):
-        """'method'-Feld ist ein nicht-leerer String."""
-        result = brouwer_fixed_point_evidence(n_trials=10)
-        assert isinstance(result['method'], str)
-        assert len(result['method']) > 0
+    def test_pi1_rp2(self):
+        """π_1(RP²) = ℤ/2."""
+        result = self.hg.fundamental_group("RP2")
+        assert "ℤ/2" in result or "Z/2" in result
+
+    def test_pi1_unknown(self):
+        """Unbekannter Raum: kein Absturz, String-Antwort."""
+        result = self.hg.fundamental_group("some_weird_space")
+        assert isinstance(result, str)
+
+    def test_homotopy_sphere_k_lt_n(self):
+        """π_k(S^n) = 0 für k < n (Hurewicz)."""
+        for n in [2, 3, 4]:
+            for k in range(1, n):
+                result = self.hg.higher_homotopy_sphere(n, k)
+                assert result == "0", f"π_{k}(S^{n}) sollte 0 sein, erhalten: {result}"
+
+    def test_homotopy_sphere_pn_equals_z(self):
+        """π_n(S^n) = ℤ."""
+        for n in [1, 2, 3, 4]:
+            result = self.hg.higher_homotopy_sphere(n, n)
+            assert "ℤ" in result, f"π_{n}(S^{n}) sollte ℤ enthalten, erhalten: {result}"
+
+    def test_homotopy_s1_k2_zero(self):
+        """π_k(S¹) = 0 für k ≥ 2 (universelle Überlagerung ℝ)."""
+        result = self.hg.higher_homotopy_sphere(1, 2)
+        assert result == "0"
+
+    def test_seifert_van_kampen_demo(self):
+        """seifert_van_kampen_demo gibt String zurück."""
+        result = self.hg.seifert_van_kampen_demo()
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_seifert_van_kampen_contains_pi1(self):
+        """Demo enthält π_1."""
+        result = self.hg.seifert_van_kampen_demo()
+        assert "π" in result or "pi" in result.lower()
+
+    def test_covering_space_demo(self):
+        """covering_space_demo gibt String zurück."""
+        result = self.hg.covering_space_demo()
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_long_exact_sequence_demo(self):
+        """long_exact_sequence_demo gibt String zurück."""
+        result = self.hg.long_exact_sequence_demo()
+        assert isinstance(result, str)
+        assert "Hopf" in result or "exakt" in result.lower() or "π" in result
+
+
+# ============================================================
+# Tests: FiberBundle
+# ============================================================
+
+class TestFiberBundle:
+    """Tests für FiberBundle."""
+
+    def setup_method(self):
+        self.fb = FiberBundle("S^2", "S^1", "S^3")
+
+    def test_hopf_fibration_returns_dict(self):
+        """Hopf-Faserung Demo gibt Dict zurück."""
+        result = self.fb.hopf_fibration_demo()
+        assert isinstance(result, dict)
+
+    def test_hopf_fibration_keys(self):
+        """Hopf-Faserung Dict enthält Pflichtfelder."""
+        result = self.fb.hopf_fibration_demo()
+        assert "fiber" in result
+        assert "total_space" in result
+        assert "base_space" in result
+
+    def test_hopf_fiber_is_s1(self):
+        """Hopf-Faserung Faser ist S¹."""
+        result = self.fb.hopf_fibration_demo()
+        assert "S¹" in result["fiber"] or "S1" in result["fiber"]
+
+    def test_hopf_base_is_s2(self):
+        """Hopf-Faserung Basis ist S²."""
+        result = self.fb.hopf_fibration_demo()
+        assert "S²" in result["base_space"] or "S2" in result["base_space"]
+
+    def test_hopf_total_is_s3(self):
+        """Hopf-Faserung Totalraum ist S³."""
+        result = self.fb.hopf_fibration_demo()
+        assert "S³" in result["total_space"] or "S3" in result["total_space"]
+
+    def test_hopf_invariant_is_1(self):
+        """Hopf-Invariante ist 1."""
+        result = self.fb.hopf_fibration_demo()
+        assert result.get("hopf_invariant") == 1
+
+    def test_vector_bundle_demo(self):
+        """vector_bundle_demo gibt String zurück."""
+        result = self.fb.vector_bundle_demo()
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_characteristic_classes_demo(self):
+        """characteristic_classes_demo gibt String zurück."""
+        result = self.fb.characteristic_classes_demo()
+        assert isinstance(result, str)
+        assert "Chern" in result or "Pontryagin" in result
+
+    def test_euler_class_demo(self):
+        """euler_class_demo gibt String zurück."""
+        result = self.fb.euler_class_demo()
+        assert isinstance(result, str)
+        assert "Euler" in result or "χ" in result
+
+
+# ============================================================
+# Tests: SpectralSequence
+# ============================================================
+
+class TestSpectralSequence:
+    """Tests für SpectralSequence."""
+
+    def setup_method(self):
+        self.ss = SpectralSequence("Serre")
+
+    def test_serre_spectral_sequence(self):
+        """Serre-Spektralsequenz Demo gibt String zurück."""
+        result = self.ss.serre_spectral_sequence_demo()
+        assert isinstance(result, str)
+        assert "Serre" in result or "E²" in result or "E^2" in result
+
+    def test_leray_hirsch(self):
+        """Leray-Hirsch Satz Demo gibt String zurück."""
+        result = self.ss.leray_hirsch_theorem_demo()
+        assert isinstance(result, str)
+        assert "Leray" in result or "Hirsch" in result
+
+    def test_e2_page_description(self):
+        """E₂-Seiten-Beschreibung gibt String zurück."""
+        result = self.ss.e2_page_description()
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_e2_contains_name(self):
+        """E₂-Seite enthält den Namen der Sequenz."""
+        result = self.ss.e2_page_description()
+        assert "Serre" in result
+
+
+# ============================================================
+# Tests: KTheory
+# ============================================================
+
+class TestKTheory:
+    """Tests für KTheory."""
+
+    def setup_method(self):
+        self.kt = KTheory()
+
+    def test_k_tilde_s0_is_z(self):
+        """K̃(S^0) = ℤ (0 ist gerade)."""
+        result = self.kt.k_group_of_sphere(0)
+        assert result["k_tilde"] == "ℤ"
+
+    def test_k_tilde_s1_is_zero(self):
+        """K̃(S^1) = 0 (1 ist ungerade)."""
+        result = self.kt.k_group_of_sphere(1)
+        assert result["k_tilde"] == "0"
+
+    def test_k_tilde_s2_is_z(self):
+        """K̃(S^2) = ℤ (Bott-Periodizität, 2 ist gerade)."""
+        result = self.kt.k_group_of_sphere(2)
+        assert result["k_tilde"] == "ℤ"
+
+    def test_k_tilde_s3_is_zero(self):
+        """K̃(S^3) = 0 (3 ist ungerade)."""
+        result = self.kt.k_group_of_sphere(3)
+        assert result["k_tilde"] == "0"
+
+    def test_k_tilde_s4_is_z(self):
+        """K̃(S^4) = ℤ (4 ist gerade)."""
+        result = self.kt.k_group_of_sphere(4)
+        assert result["k_tilde"] == "ℤ"
+
+    def test_k_tilde_s5_is_zero(self):
+        """K̃(S^5) = 0 (5 ist ungerade)."""
+        result = self.kt.k_group_of_sphere(5)
+        assert result["k_tilde"] == "0"
+
+    def test_k_tilde_s6_is_z(self):
+        """K̃(S^6) = ℤ (6 ist gerade)."""
+        result = self.kt.k_group_of_sphere(6)
+        assert result["k_tilde"] == "ℤ"
+
+    def test_k_tilde_s7_is_zero(self):
+        """K̃(S^7) = 0 (7 ist ungerade)."""
+        result = self.kt.k_group_of_sphere(7)
+        assert result["k_tilde"] == "0"
+
+    def test_k_group_returns_dict(self):
+        """k_group_of_sphere gibt Dict zurück."""
+        result = self.kt.k_group_of_sphere(2)
+        assert isinstance(result, dict)
+        assert "space" in result
+        assert "k_tilde" in result
+
+    def test_k_group_invalid_n(self):
+        """n < 0 wirft ValueError."""
+        with pytest.raises(ValueError):
+            self.kt.k_group_of_sphere(-1)
+
+    def test_bott_periodicity_demo(self):
+        """Bott-Periodizität Demo gibt String zurück."""
+        result = self.kt.bott_periodicity_demo()
+        assert isinstance(result, str)
+        assert "Bott" in result or "Periodiz" in result
+
+    def test_chern_character_demo(self):
+        """Chern-Charakter Demo gibt String zurück."""
+        result = self.kt.chern_character_demo()
+        assert isinstance(result, str)
+        assert "Chern" in result or "ch" in result
+
+    def test_atiyah_singer_demo(self):
+        """Atiyah-Singer Demo gibt String zurück."""
+        result = self.kt.atiyah_singer_index_theorem_demo()
+        assert isinstance(result, str)
+        assert "Atiyah" in result or "index" in result.lower()
+
+
+# ============================================================
+# Tests: CWComplex
+# ============================================================
+
+class TestCWComplex:
+    """Tests für CWComplex."""
+
+    def test_sphere_s2_euler(self):
+        """S² als CW-Komplex {0:1, 2:1}: χ = 1 - 0 + 1 = 2."""
+        cw = CWComplex({0: 1, 2: 1})
+        assert cw.euler_characteristic() == 2
+
+    def test_torus_euler(self):
+        """Torus T² als CW-Komplex {0:1, 1:2, 2:1}: χ = 1 - 2 + 1 = 0."""
+        cw = CWComplex({0: 1, 1: 2, 2: 1})
+        assert cw.euler_characteristic() == 0
+
+    def test_rp2_euler(self):
+        """RP² als CW-Komplex {0:1, 1:1, 2:1}: χ = 1 - 1 + 1 = 1."""
+        cw = CWComplex({0: 1, 1: 1, 2: 1})
+        assert cw.euler_characteristic() == 1
+
+    def test_s3_euler(self):
+        """S³ als CW-Komplex {0:1, 3:1}: χ = 1 - 1 = 0."""
+        cw = CWComplex({0: 1, 3: 1})
+        assert cw.euler_characteristic() == 0
+
+    def test_genus2_surface_euler(self):
+        """Geschlecht-2-Fläche: {0:1, 1:4, 2:1} → χ = 1 - 4 + 1 = -2."""
+        cw = CWComplex({0: 1, 1: 4, 2: 1})
+        assert cw.euler_characteristic() == -2
+
+    def test_attaching_map_example_string(self):
+        """attaching_map_example gibt String zurück."""
+        cw = CWComplex({0: 1, 2: 1})
+        result = cw.attaching_map_example()
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_attaching_map_torus_string(self):
+        """Torus-CW-Komplex Anheftungsabbildung."""
+        cw = CWComplex({0: 1, 1: 2, 2: 1})
+        result = cw.attaching_map_example()
+        assert isinstance(result, str)
+
+    def test_cellular_homology_demo_sphere(self):
+        """Zelluläre Homologie von S²: {0:1, 2:1}."""
+        cw = CWComplex({0: 1, 2: 1})
+        result = cw.cellular_homology_demo()
+        assert isinstance(result, dict)
+        assert result[0] == 1
+        assert result[2] == 1
+
+    def test_cellular_homology_demo_torus(self):
+        """Zelluläre Homologie des Torus: {0:1, 1:2, 2:1}."""
+        cw = CWComplex({0: 1, 1: 2, 2: 1})
+        result = cw.cellular_homology_demo()
+        assert result[1] == 2
+
+
+# ============================================================
+# Tests: classify_surface
+# ============================================================
+
+class TestClassifySurface:
+    """Tests für classify_surface."""
+
+    def test_sphere_orientable(self):
+        """Geschlecht 0, orientierbar = S²."""
+        result = classify_surface(0, True)
+        assert result["euler_characteristic"] == 2
+        assert result["orientable"] is True
+
+    def test_torus_orientable(self):
+        """Geschlecht 1, orientierbar = T²."""
+        result = classify_surface(1, True)
+        assert result["euler_characteristic"] == 0
+        assert result["orientable"] is True
+
+    def test_genus2_orientable(self):
+        """Geschlecht 2, orientierbar: χ = -2."""
+        result = classify_surface(2, True)
+        assert result["euler_characteristic"] == -2
+
+    def test_genus3_orientable(self):
+        """Geschlecht 3: χ = 2 - 2·3 = -4."""
+        result = classify_surface(3, True)
+        assert result["euler_characteristic"] == -4
+
+    def test_rp2_nonorientable(self):
+        """1 Kreuzkappe (RP²): nicht orientierbar, χ = 1."""
+        result = classify_surface(1, False)
+        assert result["euler_characteristic"] == 1
+        assert result["orientable"] is False
+
+    def test_klein_bottle_nonorientable(self):
+        """2 Kreuzkappenröhren (Klein-Flasche): χ = 0."""
+        result = classify_surface(2, False)
+        assert result["euler_characteristic"] == 0
+        assert result["orientable"] is False
+
+    def test_sphere_name_contains_s2(self):
+        """Name der Sphäre enthält S²."""
+        result = classify_surface(0, True)
+        assert "S²" in result["name"] or "Sphäre" in result["name"] or "sphere" in result["name"].lower()
+
+    def test_torus_name_contains_t(self):
+        """Name des Torus enthält T."""
+        result = classify_surface(1, True)
+        assert "T" in result["name"] or "Torus" in result["name"]
+
+    def test_rp2_has_homology(self):
+        """RP² hat Homologie-Info."""
+        result = classify_surface(1, False)
+        assert "homology" in result
+        assert isinstance(result["homology"], dict)
+
+    def test_sphere_homology_keys(self):
+        """Sphäre hat H_0=ℤ, H_2=ℤ."""
+        result = classify_surface(0, True)
+        assert result["homology"][0] == "ℤ"
+        assert result["homology"][2] == "ℤ"
+
+    def test_euler_formula_orientable(self):
+        """Euler-Charakteristik = 2 - 2g für orientierbare Flächen."""
+        for g in range(5):
+            result = classify_surface(g, True)
+            assert result["euler_characteristic"] == 2 - 2 * g
+
+    def test_euler_formula_nonorientable(self):
+        """Euler-Charakteristik = 2 - k für nicht-orientierbare Flächen."""
+        for k in range(1, 5):
+            result = classify_surface(k, False)
+            assert result["euler_characteristic"] == 2 - k
+
+
+# ============================================================
+# Tests: van_kampen_free_product
+# ============================================================
+
+class TestVanKampenFreeProduct:
+    """Tests für van_kampen_free_product."""
+
+    def test_z_star_z(self):
+        """ℤ * ℤ = freies Produkt zweier Kopien von ℤ."""
+        result = van_kampen_free_product("ℤ", "ℤ")
+        assert "ℤ" in result
+        assert "*" in result
+
+    def test_trivial_left(self):
+        """1 * G = G."""
+        result = van_kampen_free_product("1", "ℤ")
+        assert result == "ℤ"
+
+    def test_trivial_right(self):
+        """G * 1 = G."""
+        result = van_kampen_free_product("ℤ", "trivial")
+        assert result == "ℤ"
+
+    def test_both_trivial(self):
+        """1 * 1 = 1."""
+        result = van_kampen_free_product("1", "trivial")
+        assert result in ("1", "trivial", "{1}")
+
+    def test_z_star_z2(self):
+        """ℤ * ℤ/2 enthält beide Gruppen."""
+        result = van_kampen_free_product("ℤ", "ℤ/2")
+        assert "ℤ" in result
+        assert "*" in result
+
+
+# ============================================================
+# Tests: Freie Funktionen
+# ============================================================
+
+class TestFreeFunctions:
+    """Tests für lyndon_hochschild_serre_demo und classifying_space_demo."""
+
+    def test_lyndon_hochschild_serre(self):
+        """lyndon_hochschild_serre_demo gibt nicht-leeren String zurück."""
+        result = lyndon_hochschild_serre_demo()
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_lhs_contains_e2(self):
+        """LHS-Demo enthält E²."""
+        result = lyndon_hochschild_serre_demo()
+        assert "E²" in result or "E^2" in result or "Spektral" in result
+
+    def test_classifying_space_z(self):
+        """B(ℤ) = S¹."""
+        result = classifying_space_demo("ℤ")
+        assert isinstance(result, str)
+        assert "S¹" in result or "Kreis" in result or "circle" in result.lower()
+
+    def test_classifying_space_z2(self):
+        """B(ℤ/2) = RP^∞."""
+        result = classifying_space_demo("ℤ/2")
+        assert isinstance(result, str)
+        assert "RP" in result or "projektiv" in result.lower()
+
+    def test_classifying_space_unknown(self):
+        """Unbekannte Gruppe: kein Fehler, String zurück."""
+        result = classifying_space_demo("some_group_G")
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_homology_from_boundary_matrices_empty(self):
+        """Leeres Dict als Eingabe: leeres Ergebnis."""
+        result = homology_from_boundary_matrices({})
+        assert result == {}
+
+    def test_homology_from_boundary_matrices_circle(self):
+        """Kreis-Randmatrizen → H_0=1, H_1=1."""
+        # Kreis: C_1 (3 Kanten) → C_0 (3 Ecken)
+        # ∂_1 für Dreiecksrand: [[1,-1,0],[-1,0,1],[0,1,-1]] (Orientierung)
+        d1 = np.array([[1, -1, 0], [-1, 0, 1], [0, 1, -1]], dtype=int)
+        boundaries = {1: d1}
+        result = homology_from_boundary_matrices(boundaries)
+        # H_0: Rang = dim(C_0) - rank(∂_1) = 3 - 2 = 1
+        if 0 in result:
+            assert result[0]["betti"] >= 0

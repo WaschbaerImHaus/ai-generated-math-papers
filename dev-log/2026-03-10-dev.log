@@ -1974,3 +1974,38 @@ liefert falsche Ergebnisse (Kettensubstitution).
   - Bugfix: Hyperbolische Winkelsumme via Möbius-Transformation (vorher
     immer = π wegen euklidischer Berechnung)
   - Dokumentation: classical_geometry.md angelegt
+
+2026-03-10 23:00:00 - Build 37: algebraic_topology.py implementiert
+
+## algebraic_topology.py – Algebraische Topologie-Modul (Build 37)
+
+### Neue Dateien
+- `src/algebraic_topology.py` (ca. 780 Zeilen)
+- `tests/test_algebraic_topology.py` (142 Tests, alle grün)
+
+### Implementierte Klassen
+- `SimplicialComplex`: faces(), euler_characteristic(), boundary_matrix(p), betti_numbers()
+- `SimplicialHomology`: chain_groups(), boundary_operators(), homology_groups(), betti_numbers()
+- `SingularHomology`: homology_of_sphere(n), homology_of_torus(), homology_of_rp(n), homology_of_cp(n), mayer_vietoris_demo()
+- `CohomologyRing`: cohomology_of_sphere(n), cohomology_of_torus(), cup_product_demo(space), poincare_duality_demo(space, dim)
+- `HomotopyGroups`: fundamental_group(space), higher_homotopy_sphere(n,k), seifert_van_kampen_demo(), covering_space_demo(), long_exact_sequence_demo()
+- `FiberBundle`: hopf_fibration_demo(), vector_bundle_demo(), characteristic_classes_demo(), euler_class_demo()
+- `SpectralSequence`: serre_spectral_sequence_demo(), leray_hirsch_theorem_demo(), e2_page_description()
+- `KTheory`: k_group_of_sphere(n), bott_periodicity_demo(), chern_character_demo(), atiyah_singer_index_theorem_demo()
+- `CWComplex`: euler_characteristic(), attaching_map_example(), cellular_homology_demo()
+
+### Freie Funktionen
+- `compute_smith_normal_form(A)`: SNF für ganzzahlige Matrizen
+- `homology_from_boundary_matrices(boundaries)`: Homologie aus Randmatrizen
+- `classify_surface(genus, orientable)`: Klassifikation kompakter Flächen
+- `van_kampen_free_product(g1, g2)`: Freies Produkt (Seifert-van-Kampen)
+- `lyndon_hochschild_serre_demo()`: LHS-Spektralsequenz-Demo
+- `classifying_space_demo(group)`: Klassifizierender Raum BG
+
+### Wichtige numerische Erkenntnisse
+- Torus-Triangulierung: 9-Knoten-Gitterkonstruktion (3x3 mit Periodizität) korrekt; 7-Knoten-Heawood-Triangulierung erfordert spezifische Flächenauswahl
+- SNF-Algorithmus: Iteratives Eliminieren mit Pivot-Tausch; korrekt für alle getesteten Fälle
+- β_k = dim(ker ∂_k) - dim(im ∂_{k+1}), berechnet via Smith-Normalform-Diagonalränge
+
+### Teststatistik
+- 142 Tests, alle grün (0 failed)
