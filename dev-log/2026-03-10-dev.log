@@ -1,3 +1,74 @@
+2026-03-10 20:51:38 - Neues Modul implementiert: src/set_theory.py (kein Build-Increment, kein Commit)
+
+## set_theory.py – Mengenlehre-Modul
+
+### Implementierte Klassen und Funktionen
+
+#### MathSet (intern frozenset, hashbar)
+- Grundoperationen: union, intersection, difference, symmetric_difference, complement
+- Erweiterte Operationen: power_set (2^n Elemente), cartesian_product (A×B als Menge von Tupeln)
+- Eigenschaften: is_subset, is_proper_subset, is_disjoint, cardinality
+- Magische Methoden: |, &, -, ^, <=, <, in, len, iter, ==, hash, repr
+- Alle Gesetze der Mengenalgebra (Kommutativität, Assoziativität, Distributivität, De Morgan) getestet
+
+#### Relation (binäre Relation R ⊆ A×B)
+- Eigenschaften: is_reflexive, is_symmetric, is_antisymmetric, is_transitive
+- Abgeleitete: is_equivalence, is_partial_order, is_total_order
+- Äquivalenzklassen: equivalence_classes(), quotient_set()
+- Abschlüsse: transitive_closure (Floyd-Warshall), reflexive_closure, symmetric_closure
+- Operationen: composition (S∘R), inverse (R⁻¹)
+- Validierung: Paare außerhalb A×B werden abgelehnt
+
+#### MathFunction (f: A→B als spezielle Relation)
+- Eigenschaften: is_injective, is_surjective, is_bijective, is_identity
+- Operationen: inverse_function (nur bijektiv), composition (g∘f), image (f(A) oder f(S)), preimage (f⁻¹(T))
+- Validierung: Linkstotalität und Bildbereich geprüft beim Erstellen
+
+#### Kardinalitätstheorie
+- are_equinumerous: Gleichmächtigkeit für endliche Mengen
+- cantor_schroeder_bernstein: Bijektion aus zwei Injektionen (CSB-Konstruktion mit Kette C)
+- is_countable: Erklärungen für N, Z, Q, R, R^2, P(N)
+- cantors_diagonal_argument: Explizite Konstruktion der Diagonalmenge D
+- beth_numbers, aleph_numbers: Beschreibungen ℶ_n und ℵ_n
+
+#### Ordinal (Ordinalzahlen)
+- Endlich (int) und transfinit ('omega', 'omega+1', 'omega*2', 'omega^2')
+- successor(), is_limit_ordinal(), is_successor_ordinal()
+- Nicht-kommutative Arithmetik: +, *, ** mit korrekten Regeln
+  - 1+ω = ω ≠ ω+1 (endliches n links wird geschluckt)
+  - 2·ω = ω ≠ ω·2 (endliches n als Faktor links wird zu ω)
+- is_well_ordered, ordinal_arithmetic_demo
+
+#### ZFC-Axiome
+- zfc_axioms(): 10 Axiome mit 'name', 'formal', 'description'
+- axiom_of_choice_equivalents(): Zorn, Wohlordnung, Tychonoff, Hamel-Basis, Ultrafilter
+- continuum_hypothesis(): Erklärung + Unabhängigkeitsresultat (Gödel/Cohen)
+
+#### SetFamily und σ-Algebren
+- union (⋃A_i), intersection (⋂A_i)
+- is_partition: paarweise disjunkt + Überdeckung + keine leeren Mengen
+- is_cover, is_sigma_algebra (∅, U, Komplement-, Vereinigungs-Abschluss)
+- generated_sigma_algebra: iterativer Abschluss bis Fixpunkt
+
+#### Filter
+- is_filter: ∅∉F + Aufwärtsabschluss + Schnitt-Abschluss
+- is_ultrafilter: ∀A⊆U: A∈F oder A^c∈F
+- principal_filter(B, U): Hauptfilter {A⊆U : B⊆A}
+
+### Tests: tests/test_set_theory.py
+- 138 Tests in 9 Testklassen, alle grün (0.21s)
+- TestMathSetBasic (9), TestMathSetOperations (18), TestMathSetProperties (9)
+- TestRelation (17), TestMathFunction (15)
+- TestCardinalityTheory (13), TestOrdinals (17)
+- TestZFCAxioms (9), TestSetFamily (13), TestFilter (6), TestSetAlgebraLaws (10)
+
+### Dokumentation: src/set_theory.md
+- KaTeX-Formeln für alle Hauptkonzepte
+- ZFC-Axiome Tabelle, CSB-Konstruktion, Diagonalargument, Ordinalzahlarithmetik
+- Verwendungsbeispiele und Komplexitätstabelle
+
+---
+
 2026-03-10 20:33:12 - Optimierungen (kein Build-Increment): 6 Code-Qualitäts-Verbesserungen umgesetzt
 
 ## Änderungen
@@ -1083,3 +1154,107 @@
 ## Testergebnis
 - Neue Tests: 80 (alle grün)
 - Gesamt: 2948 Tests grün (0 Fehler, 17 Warnings)
+
+## 2026-03-10 – Modul: Mathematische Logik / Formale Logik
+
+### 2026-03-10 – Neue Dateien
+- `src/mathematical_logic.py` (ca. 950 Zeilen): Vollständige Implementierung
+- `tests/test_mathematical_logic.py`: 131 Tests (alle grün)
+- `src/mathematical_logic.md`: Dokumentation mit KaTeX-Formeln
+
+### Implementierte Komponenten
+
+#### Aussagenlogik
+- `Proposition`: Atomare Aussage mit Name und Wahrheitswert
+- `LogicFormula`: Zusammengesetzte Formel (AND, OR, NOT, IMPLIES, IFF, XOR, NAND, NOR, ATOM)
+  - `evaluate(assignment)`: Wertet Formel unter Belegung aus
+  - `to_cnf()`: Konjunktive Normalform via NNF + Distributivität
+  - `to_dnf()`: Disjunktive Normalform
+  - `simplify()`: Algebraische Vereinfachung (Doppelnegation etc.)
+  - `get_variables()`: Extrahiert alle Variablennamen
+- `truth_table()`, `is_tautology()`, `is_satisfiable()`, `is_contradiction()`
+- `logical_consequence()`, `logical_equivalence()`
+
+#### Resolution und SAT
+- `resolution_step()`: Einzelner Resolutionsschritt (Literale als Strings)
+- `resolution_refutation()`: Vollständige Resolutionswiderlegung
+- `dpll()`: DPLL SAT-Solver mit Unit-Propagation und Backtracking
+- `tseitin_transform()`: Tseitin-Transformation in equisatisfiable CNF
+
+#### Prädikatenlogik (FOL)
+- `Term`: Variable, Konstante, Funktionsanwendung
+- `Predicate`: Prädikatsymbol mit Arität
+- `FOLFormula`: ∀, ∃, Prädikate, Konnektive; `free_variables()`, `is_closed()`, `substitute()`
+- `prenex_normal_form()`: PNF-Konversion
+- `skolemize()`: Skolemisierung (Existenzquantoren → Skolem-Funktionen)
+- `herbrand_universe()`: Herbrand-Universum bis gegebener Tiefe
+
+#### Beweiskalküle
+- `NaturalDeductionProof`: Gentzen-Kalkül (assume, apply_rule, discharge, is_valid)
+- `HilbertSystem`: K, S, DN-Axiome + Modus Ponens
+- `modus_ponens()`: A→B, A ⊢ B
+- `modus_tollens()`: A→B, ¬B ⊢ ¬A
+
+#### Modallogik
+- `KripkeFrame`: Welten + Erreichbarkeitsrelation; is_reflexive/symmetric/transitive/serial/euclidean
+- `ModalFormula`: □ (BOX), ◇ (DIAMOND), evaluate() in Kripke-Modell
+- `modal_system()`: Axiombeschreibungen für K, D, T, B, S4, S5
+
+#### Gödel
+- `godel_numbering()`: Primzahl-Kodierung von Formeln
+- `godel_decode()`: Dekodierung via Primfaktorzerlegung
+- `incompleteness_demonstration()`: Konzeptuelle Demo des 1. und 2. Unvollständigkeitssatzes
+
+### Testergebnis
+- 131/131 Tests grün (0.20s)
+- Kein Commit, keine Build-Nummer-Erhöhung
+
+---
+
+2026-03-10 20:59:24 - Webserver-Integration: mathematical_logic.py und set_theory.py (kein Commit)
+
+## Webserver-Integration: Logik und Mengenlehre
+
+### Änderungen in src/webapp/app.py
+- Imports bereits vorhanden (mathematical_logic, set_theory) – keine Änderung nötig
+- GET-Routen /logic und /set_theory bereits vorhanden – keine Änderung nötig
+- API-Endpunkte bereits vorhanden:
+  - POST /api/logic/truth_table
+  - POST /api/logic/dpll
+  - POST /api/logic/godel
+  - POST /api/sets/operations
+  - POST /api/sets/cantor
+  - GET  /api/sets/zfc
+- error_response() bereits vorhanden – keine Änderung nötig
+
+### Neue Templates erstellt
+#### src/webapp/templates/logic.html
+- Sektion 1: Wahrheitstabelle mit Variablen- und Formeleingabe
+  - Formel-Syntax: AND, OR, NOT, IMPLIES, IFF, XOR
+  - Farbige Tabelle (grün=Wahr, rot=Falsch)
+  - Badges für Tautologie / Kontradiktion / Erfüllbar
+- Sektion 2: DPLL SAT-Solver
+  - Klauseln als JSON-Array eingeben
+  - Zeigt Erfüllbarkeit und Variablenbelegung
+- Sektion 3: Gödel-Nummerierung
+  - Formel-String → Gödel-Zahl → Dekodierung
+  - Unvollständigkeits-Demo aus API
+
+#### src/webapp/templates/set_theory.html
+- Sektion 1: Mengenoperationen
+  - Eingabe zweier Mengen als kommagetrennte Zahlen
+  - Zeigt: ∪, ∩, A\B, B\A, △, ⊆, |A|, |P(A)|
+- Sektion 2: Cantors Diagonalargument
+  - Demo mit n Zeilen (max. 10)
+  - Matrix mit hervorgehobener Diagonale (lila)
+  - Neue konstruierte Zahl wird angezeigt
+- Sektion 3: ZFC-Axiome
+  - Lädt alle Axiome per GET /api/sets/zfc
+  - Flexible Darstellung (Array- oder Objekt-Form)
+
+### Navigation (base.html)
+- Links für /logic und /set_theory bereits vorhanden
+- checked-Attribut für Grundlagen-Gruppe bereits korrekt
+
+### Import-Test
+- python3 -c "import webapp.app" → OK (kein Fehler)

@@ -117,7 +117,7 @@
         <!-- === Gruppe: Grundlagen === -->
         <div class="nav-group">
             <input type="checkbox" id="nav-grundlagen"
-                {% if request.path in ['/', '/proofs', '/steps'] %}checked{% endif %}>
+                {% if request.path in ['/', '/proofs', '/steps', '/logic', '/set_theory'] %}checked{% endif %}>
             <label class="nav-group-label" for="nav-grundlagen">Grundlagen</label>
             <div class="nav-group-content">
                 <ul class="nav-list">
@@ -129,6 +129,12 @@
                     </a></li>
                     <li><a href="/steps" class="nav-link {% if '/steps' in request.path %}active{% endif %}">
                         &#8721; Schritt-für-Schritt
+                    </a></li>
+                    <li><a href="/logic" class="nav-link {% if request.path == '/logic' %}active{% endif %}">
+                        &#8870; Logik
+                    </a></li>
+                    <li><a href="/set_theory" class="nav-link {% if request.path == '/set_theory' %}active{% endif %}">
+                        &#8712; Mengenlehre
                     </a></li>
                 </ul>
             </div>

@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+{% block title %}Mengenlehre – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file set_theory.html
+    @brief Template für die Mengenlehre-Seite.
+    @description
+        Bietet drei interaktive Sektionen:
+        1. Mengenoperationen (Vereinigung, Schnitt, Differenz, Potenzmenge)
+        2. Cantors Diagonalargument (Überabzählbarkeit der reellen Zahlen)
+        3. ZFC-Axiome (Zermelo-Fraenkel mit Auswahlaxiom)
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+<div class="page-header">
+    <h1>Mengenlehre</h1>
+    <p class="page-desc">
+        Die Mengenlehre ist die Grundlage der modernen Mathematik.
+        Georg Cantor entwickelte Ende des 19. Jahrhunderts die Theorie unendlicher Mengen.
+        Das ZFC-Axiomensystem (Zermelo–Fraenkel + Auswahlaxiom) bildet das Standardfundament
+        der heutigen Mathematik. Cantors Diagonalargument beweist: $|\mathbb{R}| > |\mathbb{N}|$.
+    </p>
+</div>
+
+<!-- === Sektion 1: Mengenoperationen === -->
+<div class="card">
+    <h2>Mengenoperationen</h2>
+    <p>
+        Für zwei Mengen $A$ und $B$ stehen folgende Operationen zur Verfügung:
+    </p>
+    <ul style="margin: 8px 0 12px 20px; line-height: 1.8;">
+        <li>$A \cup B$ – Vereinigung: alle Elemente in $A$ oder $B$</li>
+        <li>$A \cap B$ – Schnittmenge: gemeinsame Elemente</li>
+        <li>$A \setminus B$ – Differenz: Elemente in $A$, nicht in $B$</li>
+        <li>$A \triangle B$ – Symmetrische Differenz: $(A \setminus B) \cup (B \setminus A)$</li>
+        <li>$\mathcal{P}(A)$ – Potenzmenge: Menge aller Teilmengen (Größe $2^{|A|}$)</li>
+    </ul>
+
+    <div class="input-row">
+        <label for="set-A">Menge $A$ (kommagetrennte Zahlen):</label>
+        <input type="text" id="set-A" class="input-field" value="1,2,3,4" style="width:200px;">
+    </div>
+    <div class="input-row">
+        <label for="set-B">Menge $B$ (kommagetrennte Zahlen):</label>
+        <input type="text" id="set-B" class="input-field" value="3,4,5,6" style="width:200px;">
+    </div>
+    <button class="btn" onclick="calcSetOps()">Operationen berechnen</button>
+    <div id="set-result" class="result-area"></div>
+</div>
+
+<!-- === Sektion 2: Cantors Diagonalargument === -->
+<div class="card">
+    <h2>Cantors Diagonalargument</h2>
+    <p>
+        Cantor bewies 1891, dass die Menge der reellen Zahlen <em>überabzählbar</em> ist:
+        Es gibt keine bijektive Abbildung $f: \mathbb{N} \to \mathbb{R}$.
+    </p>
+    <p>
+        Beweis-Idee: Angenommen, alle reellen Zahlen in $[0,1]$ seien als Folge aufzählbar.
+        Dann konstruieren wir eine neue Zahl, die sich von der $n$-ten Zahl an der $n$-ten Stelle
+        unterscheidet – ein Widerspruch zur Vollständigkeit der Aufzählung.
+    </p>
+
+    <div class="input-row">
+        <label for="cantor-n">Anzahl Zeilen $n$ (Demo-Größe, max. 10):</label>
+        <input type="number" id="cantor-n" class="input-field" value="5" min="2" max="10">
+    </div>
+    <button class="btn" onclick="calcCantor()">Diagonalargument demonstrieren</button>
+    <div id="cantor-result" class="result-area"></div>
+</div>
+
+<!-- === Sektion 3: ZFC-Axiome === -->
+<div class="card">
+    <h2>ZFC-Axiome</h2>
+    <p>
+        Das <em>Zermelo–Fraenkel-Axiomensystem mit Auswahlaxiom</em> (ZFC) ist das
+        meistverwendete Fundament der Mathematik. Es besteht aus 10 Axiomen,
+        die grundlegende Eigenschaften von Mengen festlegen und Paradoxien
+        (wie Russells Paradoxon) vermeiden.
+    </p>
+    <button class="btn" onclick="loadZFC()">&#8712; ZFC-Axiome laden</button>
+    <div id="zfc-result" class="result-area"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * @file set_theory.html (scripts)
+ * @brief JavaScript-Logik für die Mengenlehre-Seite.
+ * @author Kurt Ingwer
+ * @date 2026-03-10
+ */
+
+/**
+ * Berechnet alle Mengenoperationen für die eingegebenen Mengen A und B.
+ * Sendet die Elemente an die API und zeigt alle Ergebnisse tabellarisch an.
+ */
+async function calcSetOps() {
+    const aRaw = document.getElementById('set-A').value;
+    const bRaw = document.getElementById('set-B').value;
+    const resultDiv = document.getElementById('set-result');
+
+    // Eingaben parsen: kommagetrennte Zahlen → Arrays
+    let A, B;
+    try {
+        A = aRaw.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
+        B = bRaw.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
+    } catch (e) {
+        showError(resultDiv, 'Ungültige Eingabe: Bitte kommagetrennte Zahlen eingeben.');
+        return;
+    }
+
+    if (A.length === 0 || B.length === 0) {
+        showError(resultDiv, 'Bitte mindestens eine Zahl pro Menge eingeben.');
+        return;
+    }
+
+    try {
+        const data = await apiPost('/api/sets/operations', { A: A, B: B });
+
+        // Hilfsfunktion: Array als Mengenschreibweise formatieren
+        const fmt = arr => arr.length > 0
+            ? '{' + arr.join(', ') + '}'
+            : '&#8709; (leere Menge)';
+
+        let html = `<table class="data-table">
+            <thead>
+                <tr><th>Operation</th><th>Symbol</th><th>Ergebnis</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Menge A</td><td>$A$</td>
+                    <td><code>${fmt(data.A)}</code></td></tr>
+                <tr><td>Menge B</td><td>$B$</td>
+                    <td><code>${fmt(data.B)}</code></td></tr>
+                <tr><td>Vereinigung</td><td>$A \\cup B$</td>
+                    <td><code>${fmt(data.union)}</code></td></tr>
+                <tr><td>Schnittmenge</td><td>$A \\cap B$</td>
+                    <td><code>${fmt(data.intersection)}</code></td></tr>
+                <tr><td>Differenz A \\ B</td><td>$A \\setminus B$</td>
+                    <td><code>${fmt(data.difference_AB)}</code></td></tr>
+                <tr><td>Differenz B \\ A</td><td>$B \\setminus A$</td>
+                    <td><code>${fmt(data.difference_BA)}</code></td></tr>
+                <tr><td>Sym. Differenz</td><td>$A \\triangle B$</td>
+                    <td><code>${fmt(data.symmetric_difference)}</code></td></tr>
+                <tr><td>$A \\subseteq B$?</td><td>$A \\subseteq B$</td>
+                    <td style="color:${data.A_subset_B ? '#a6e3a1' : '#f38ba8'}">
+                        ${data.A_subset_B ? '&#10003; Ja' : '&#10007; Nein'}
+                    </td></tr>
+                <tr><td>$|A|$</td><td>Kardinalität</td>
+                    <td>${data.cardinality_A}</td></tr>
+                <tr><td>$|B|$</td><td>Kardinalität</td>
+                    <td>${data.cardinality_B}</td></tr>
+                <tr><td>$|\\mathcal{P}(A)|$</td><td>Potenzmenge</td>
+                    <td>${data.power_set_size !== null
+                        ? data.power_set_size + ' Teilmengen'
+                        : '(zu groß für Anzeige)'}</td></tr>
+            </tbody>
+        </table>`;
+
+        showResult(resultDiv, html);
+    } catch (e) {
+        showError(resultDiv, e.message);
+    }
+}
+
+/**
+ * Demonstriert Cantors Diagonalargument für n Zeilen.
+ * Zeigt die konstruierte Matrix und die Diagonalzahl an.
+ */
+async function calcCantor() {
+    const n = parseInt(document.getElementById('cantor-n').value);
+    const resultDiv = document.getElementById('cantor-result');
+
+    try {
+        const data = await apiPost('/api/sets/cantor', { n: n });
+
+        let html = '<h3>Cantors Diagonalkonstruktion</h3>';
+
+        // Ergebnis-Felder flexibel ausgeben (Struktur von API abhängig)
+        if (data.matrix) {
+            html += '<p>Angenommene Aufzählung (jede Zeile = eine reelle Zahl in $[0,1]$):</p>';
+            html += '<table class="data-table"><thead><tr><th>#</th><th>Binäre Darstellung</th></tr></thead><tbody>';
+            data.matrix.forEach((row, i) => {
+                const rowStr = Array.isArray(row) ? '0.' + row.join('') : row;
+                // Diagonalelemente hervorheben
+                html += `<tr><td>$r_${i+1}$</td><td><code>`;
+                if (Array.isArray(row)) {
+                    row.forEach((bit, j) => {
+                        if (j === i) {
+                            html += `<span style="color:#cba6f7; font-weight:bold;">[${bit}]</span>`;
+                        } else {
+                            html += bit;
+                        }
+                    });
+                } else {
+                    html += rowStr;
+                }
+                html += `</code></td></tr>`;
+            });
+            html += '</tbody></table>';
+        }
+
+        if (data.diagonal) {
+            html += `<p style="margin-top:12px;">Diagonale: <code>${data.diagonal}</code></p>`;
+        }
+        if (data.new_number) {
+            html += `<p style="color:#cba6f7; font-weight:600;">
+                Neue Zahl (unterscheidet sich an jeder Position von allen Zeilen):
+                <code>${data.new_number}</code>
+            </p>`;
+        }
+        if (data.conclusion) {
+            html += `<p style="border-left:3px solid #a6e3a1; padding-left:10px; color:#a6e3a1;">
+                ${data.conclusion}
+            </p>`;
+        }
+
+        // Alle übrigen Felder ausgeben
+        const known = new Set(['matrix', 'diagonal', 'new_number', 'conclusion']);
+        for (const [key, val] of Object.entries(data)) {
+            if (!known.has(key)) {
+                html += `<p><strong>${key}:</strong> <code>${JSON.stringify(val)}</code></p>`;
+            }
+        }
+
+        showResult(resultDiv, html);
+    } catch (e) {
+        showError(resultDiv, e.message);
+    }
+}
+
+/**
+ * Lädt die ZFC-Axiome über die GET-API und stellt sie als Tabelle dar.
+ */
+async function loadZFC() {
+    const resultDiv = document.getElementById('zfc-result');
+    resultDiv.innerHTML = '<p>Lade ZFC-Axiome...</p>';
+
+    try {
+        const response = await fetch('/api/sets/zfc');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+
+        if (data.error) throw new Error(data.error);
+
+        const axioms = data.axioms;
+        let html = '<h3>Die 10 ZFC-Axiome</h3>';
+        html += '<table class="data-table">';
+        html += '<thead><tr><th>#</th><th>Name</th><th>Bedeutung</th></tr></thead><tbody>';
+
+        if (Array.isArray(axioms)) {
+            // Array-Form: jedes Element ist ein Objekt oder String
+            axioms.forEach((ax, i) => {
+                if (typeof ax === 'object' && ax !== null) {
+                    const name = ax.name || ax.axiom || `Axiom ${i+1}`;
+                    const desc = ax.description || ax.meaning || ax.formal || JSON.stringify(ax);
+                    html += `<tr>
+                        <td>${i+1}</td>
+                        <td><strong>${name}</strong></td>
+                        <td>${desc}</td>
+                    </tr>`;
+                } else {
+                    html += `<tr><td>${i+1}</td><td colspan="2">${ax}</td></tr>`;
+                }
+            });
+        } else if (typeof axioms === 'object') {
+            // Objekt-Form: Name → Beschreibung
+            let i = 1;
+            for (const [name, desc] of Object.entries(axioms)) {
+                html += `<tr>
+                    <td>${i++}</td>
+                    <td><strong>${name}</strong></td>
+                    <td>${desc}</td>
+                </tr>`;
+            }
+        }
+
+        html += '</tbody></table>';
+        html += `<p style="margin-top:10px; color:#a6adc8; font-size:0.9rem;">
+            ZFC = Zermelo–Fraenkel-Axiomensystem + Auswahlaxiom (Axiom of Choice).
+            Alle 10 Axiome zusammen bilden das Standardfundament der modernen Mathematik.
+        </p>`;
+
+        showResult(resultDiv, html);
+    } catch (e) {
+        showError(resultDiv, e.message);
+    }
+}
+</script>
+{% endblock %}

@@ -212,6 +212,29 @@ except Exception as _e:
     _numerical_ok = False
     print(f"[WARN] numerical_methods nicht ladbar: {_e}")
 
+try:
+    from mathematical_logic import (
+        Proposition, LogicFormula, truth_table,
+        is_tautology, is_satisfiable, is_contradiction,
+        logical_equivalence, resolution_refutation, dpll,
+        godel_numbering, godel_decode, incompleteness_demonstration
+    )
+    _logic_ok = True
+except Exception as _e:
+    _logic_ok = False
+    print(f"[WARN] mathematical_logic nicht ladbar: {_e}")
+
+try:
+    from set_theory import (
+        MathSet, Relation, MathFunction, Ordinal,
+        zfc_axioms, cantors_diagonal_argument, is_countable,
+        cantor_schroeder_bernstein
+    )
+    _set_theory_ok = True
+except Exception as _e:
+    _set_theory_ok = False
+    print(f"[WARN] set_theory nicht ladbar: {_e}")
+
 
 # ===========================================================================
 # FLASK-APP INITIALISIEREN
@@ -448,6 +471,17 @@ def page_numerical():
     return render_template('numerical.html')
 
 
+@app.route('/logic')
+def page_logic():
+    """@brief Mathematische-Logik-Seite. @date 2026-03-10"""
+    return render_template('logic.html')
+
+@app.route('/set_theory')
+def page_set_theory():
+    """@brief Mengenlehre-Seite. @date 2026-03-10"""
+    return render_template('set_theory.html')
+
+
 # ===========================================================================
 # ROUTE: SYSTEMSTATUS
 # ===========================================================================
@@ -492,8 +526,8 @@ def api_algebra_solve():
                 return error_response("Lineare Gleichung erfordert [a, b].")
             a, b = float(coeffs[0]), float(coeffs[1])
             result = solve_linear(a, b)
-            # solve_linear gibt Zahl oder None zurück
-            solutions = [result] if result is not None else []
+            # solve_linear gibt Zahl oder None zurück; als {real, imag}-Dict normalisieren
+            solutions = [{"real": float(result), "imag": 0.0}] if result is not None else []
             return jsonify({
                 "type": "linear",
                 "equation": f"{a}·x + {b} = 0",
@@ -4084,6 +4118,180 @@ def api_numerical_golden():
         })
     except Exception as e:
         return jsonify({"error": str(e)})
+
+
+# ===========================================================================
+# ROUTEN: MATHEMATISCHE LOGIK API
+# ===========================================================================
+
+@app.route('/api/logic/truth_table', methods=['POST'])
+def api_logic_truth_table():
+    """
+    @brief Wahrheitstabelle für eine Formel.
+    @description
+        Nimmt eine Liste von Variablen und eine Formel als String entgegen.
+        Die Formel wird mit eval und einer Whitelist geparst.
+        Gibt Wahrheitstabelle sowie logische Eigenschaften zurück.
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        # Formel aus String aufbauen: z.B. "AND(p,OR(q,NOT(p)))"
+        # Einfacher: Variablen und Formel als Text
+        vars_list = data.get('variables', ['p', 'q'])
+        formula_str = data.get('formula', 'AND(p,q)')
+
+        # Propositions erstellen
+        props = {v: Proposition(v) for v in vars_list}
+
+        # Formel parsen (einfache eval mit Whitelist)
+        allowed = {
+            **props,
+            'AND': lambda a, b: LogicFormula('AND', a, b),
+            'OR': lambda a, b: LogicFormula('OR', a, b),
+            'NOT': lambda a: LogicFormula('NOT', a),
+            'IMPLIES': lambda a, b: LogicFormula('IMPLIES', a, b),
+            'IFF': lambda a, b: LogicFormula('IFF', a, b),
+            'XOR': lambda a, b: LogicFormula('XOR', a, b),
+        }
+        formula = eval(formula_str, {"__builtins__": {}}, allowed)
+
+        table = truth_table(formula, vars_list)
+        taut = is_tautology(formula, vars_list)
+        sat = is_satisfiable(formula, vars_list)
+        contra = is_contradiction(formula, vars_list)
+
+        return jsonify({
+            'variables': vars_list,
+            'formula': formula_str,
+            'table': [
+                {**row, 'result': row['result']}
+                for row in table
+            ],
+            'is_tautology': taut,
+            'is_satisfiable': sat,
+            'is_contradiction': contra
+        })
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/logic/dpll', methods=['POST'])
+def api_logic_dpll():
+    """
+    @brief DPLL SAT-Solver.
+    @description
+        Nimmt Klauseln als Liste von Listen entgegen.
+        Positive Zahlen = Variable i, negative = Negation von Variable i.
+        Gibt Erfüllbarkeit und Belegung zurück.
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        # clauses: Liste von Listen, z.B. [[1, -2], [2, 3], [-1, -3]]
+        # positive Zahl = Variable i, negative = Negation
+        raw_clauses = data.get('clauses', [[1, -2], [2, 3]])
+        clauses = [frozenset(c) for c in raw_clauses]
+        result = dpll(clauses)
+        return jsonify({
+            'satisfiable': result is not None,
+            'assignment': result if result else {}
+        })
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/logic/godel', methods=['POST'])
+def api_logic_godel():
+    """
+    @brief Gödel-Nummerierung.
+    @description
+        Wandelt einen Formel-String in eine Gödel-Zahl um und dekodiert diese
+        wieder. Gibt zusätzlich eine Demo des Unvollständigkeitssatzes zurück.
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        formula_str = data.get('formula', 'P(x)')
+        number = godel_numbering(formula_str)
+        decoded = godel_decode(number)
+        demo = incompleteness_demonstration()
+        return jsonify({
+            'formula': formula_str,
+            'godel_number': number,
+            'decoded': decoded,
+            'incompleteness': demo
+        })
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# ROUTEN: MENGENLEHRE API
+# ===========================================================================
+
+@app.route('/api/sets/operations', methods=['POST'])
+def api_sets_operations():
+    """
+    @brief Mengenoperationen.
+    @description
+        Berechnet Vereinigung, Schnittmenge, Differenzen, symmetrische Differenz
+        und Teilmengenrelation für zwei Mengen A und B.
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        A = MathSet(data.get('A', [1, 2, 3, 4]))
+        B = MathSet(data.get('B', [3, 4, 5, 6]))
+
+        return jsonify({
+            'A': sorted(list(A._elements)) if hasattr(A, '_elements') else sorted(list(A.elements if hasattr(A, 'elements') else [])),
+            'B': sorted(list(B._elements)) if hasattr(B, '_elements') else sorted(list([])),
+            'union': sorted(list((A | B))),
+            'intersection': sorted(list((A & B))),
+            'difference_AB': sorted(list((A - B))),
+            'difference_BA': sorted(list((B - A))),
+            'symmetric_difference': sorted(list((A ^ B))),
+            'A_subset_B': A <= B,
+            'cardinality_A': len(A),
+            'cardinality_B': len(B),
+            'power_set_size': 2 ** len(A) if len(A) <= 6 else None
+        })
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/sets/cantor', methods=['POST'])
+def api_sets_cantor():
+    """
+    @brief Cantors Diagonalargument Demo.
+    @description
+        Demonstriert, warum die reellen Zahlen nicht abzählbar sind,
+        indem gezeigt wird, dass jede Aufzählung unvollständig ist.
+    @date 2026-03-10
+    """
+    data = request.get_json()
+    try:
+        n = min(int(data.get('n', 5)), 10)
+        result = cantors_diagonal_argument(n)
+        return jsonify(result)
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/sets/zfc', methods=['GET'])
+def api_sets_zfc():
+    """
+    @brief ZFC-Axiome abrufen.
+    @description
+        Gibt alle Zermelo-Fraenkel-Axiome mit Auswahlaxiom zurück.
+    @date 2026-03-10
+    """
+    try:
+        axioms = zfc_axioms()
+        return jsonify({'axioms': axioms})
+    except Exception as e:
+        return error_response(str(e))
 
 
 # ===========================================================================

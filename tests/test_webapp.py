@@ -165,7 +165,7 @@ class TestAlgebra:
         data = resp.get_json()
         assert 'solutions' in data
         assert len(data['solutions']) == 1
-        assert abs(data['solutions'][0] - 3.0) < 1e-8
+        assert abs(data['solutions'][0]['real'] - 3.0) < 1e-8
 
     def test_solve_linear_2x_minus_8(self, client):
         """Lineare Gleichung 2x - 8 = 0 muss Lösung 4.0 ergeben."""
@@ -175,7 +175,7 @@ class TestAlgebra:
         })
         assert resp.status_code == 200
         data = resp.get_json()
-        assert abs(data['solutions'][0] - 4.0) < 1e-8
+        assert abs(data['solutions'][0]['real'] - 4.0) < 1e-8
 
     def test_solve_quadratic_two_real_roots(self, client):
         """x² - 5x + 6 = 0 muss Lösungen 2.0 und 3.0 ergeben."""

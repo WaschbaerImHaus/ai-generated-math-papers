@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% block title %}Mathematische Logik – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file logic.html
+    @brief Template für die Mathematische-Logik-Seite.
+    @description
+        Bietet drei interaktive Sektionen:
+        1. Wahrheitstabelle für aussagenlogische Formeln
+        2. DPLL SAT-Solver für KNF-Klauselmengen
+        3. Gödel-Nummerierung und Unvollständigkeitsdemo
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+<div class="page-header">
+    <h1>Mathematische Logik</h1>
+    <p class="page-desc">
+        Die mathematische Logik untersucht formale Systeme, Beweisbarkeit und Wahrheit.
+        Kernthemen: Aussagenlogik, Prädikatenlogik, SAT-Probleme und Gödels Unvollständigkeitssätze.
+        Gödels erster Unvollständigkeitssatz: In jedem hinreichend starken konsistenten formalen System
+        gibt es wahre Aussagen, die nicht beweisbar sind.
+    </p>
+</div>
+
+<!-- === Sektion 1: Wahrheitstabelle === -->
+<div class="card">
+    <h2>Wahrheitstabelle</h2>
+    <p>
+        Eine Wahrheitstabelle listet alle möglichen Wahrheitswertbelegungen der Variablen
+        und das Ergebnis der Formel auf. Eine <em>Tautologie</em> ist bei allen Belegungen
+        wahr, eine <em>Kontradiktion</em> immer falsch.
+    </p>
+    <p>
+        Formel-Syntax: <code>AND(p,q)</code>, <code>OR(p,q)</code>, <code>NOT(p)</code>,
+        <code>IMPLIES(p,q)</code>, <code>IFF(p,q)</code>, <code>XOR(p,q)</code>
+    </p>
+
+    <div class="input-row">
+        <label for="tt-vars">Variablen (kommagetrennt):</label>
+        <input type="text" id="tt-vars" class="input-field" value="p,q" placeholder="p,q,r">
+    </div>
+    <div class="input-row">
+        <label for="tt-formula">Formel:</label>
+        <input type="text" id="tt-formula" class="input-field"
+               value="AND(p,OR(q,NOT(p)))" style="width:320px;"
+               placeholder="z.B. IMPLIES(AND(p,q),OR(p,NOT(q)))">
+    </div>
+    <button class="btn" onclick="calcTruthTable()">Wahrheitstabelle berechnen</button>
+    <div id="tt-result" class="result-area"></div>
+</div>
+
+<!-- === Sektion 2: DPLL SAT-Solver === -->
+<div class="card">
+    <h2>DPLL SAT-Solver</h2>
+    <p>
+        Der <em>Davis–Putnam–Logemann–Loveland</em>-Algorithmus entscheidet,
+        ob eine Formel in konjunktiver Normalform (KNF) erfüllbar ist.
+        Klauseln werden als Listen von Literalen angegeben: positive Zahlen = Variable,
+        negative Zahlen = negierte Variable.
+    </p>
+    <p>
+        Beispiel: <code>[[1, -2], [2, 3], [-1, -3]]</code> bedeutet
+        $(x_1 \lor \neg x_2) \land (x_2 \lor x_3) \land (\neg x_1 \lor \neg x_3)$
+    </p>
+
+    <div class="input-row">
+        <label for="dpll-clauses">Klauseln (JSON-Array):</label>
+        <input type="text" id="dpll-clauses" class="input-field"
+               value="[[1, -2], [2, 3], [-1, -3]]" style="width:360px;">
+    </div>
+    <button class="btn" onclick="calcDpll()">SAT prüfen</button>
+    <div id="dpll-result" class="result-area"></div>
+</div>
+
+<!-- === Sektion 3: Gödel-Nummerierung === -->
+<div class="card">
+    <h2>Gödel-Nummerierung</h2>
+    <p>
+        Die Gödel-Nummerierung codiert Formeln als natürliche Zahlen.
+        Jedem Symbol $s_i$ wird eine Zahl $k_i$ zugeordnet,
+        die Formel $(s_1, s_2, \ldots, s_n)$ erhält die Gödel-Zahl
+        $$g = 2^{k_1} \cdot 3^{k_2} \cdot 5^{k_3} \cdots p_n^{k_n}$$
+        wobei $p_i$ die $i$-te Primzahl ist.
+    </p>
+    <p>
+        Gödels erster Unvollständigkeitssatz (1931): Jedes hinreichend starke,
+        konsistente und rekursiv aufzählbare formale System enthält unentscheidbare Sätze.
+    </p>
+
+    <div class="input-row">
+        <label for="godel-formula">Formel-String:</label>
+        <input type="text" id="godel-formula" class="input-field"
+               value="P(x)" placeholder="z.B. FORALL(x, P(x))">
+    </div>
+    <button class="btn" onclick="calcGodel()">Gödel-Zahl berechnen</button>
+    <div id="godel-result" class="result-area"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * @file logic.html (scripts)
+ * @brief JavaScript-Logik für die Mathematische-Logik-Seite.
+ * @author Kurt Ingwer
+ * @date 2026-03-10
+ */
+
+/**
+ * Berechnet die Wahrheitstabelle für eine Formel.
+ * Sendet Variablen und Formel an die API und zeigt das Ergebnis als HTML-Tabelle an.
+ */
+async function calcTruthTable() {
+    // Eingaben auslesen und aufbereiten
+    const varsRaw = document.getElementById('tt-vars').value;
+    const formula = document.getElementById('tt-formula').value.trim();
+    const vars = varsRaw.split(',').map(v => v.trim()).filter(v => v.length > 0);
+    const resultDiv = document.getElementById('tt-result');
+
+    if (vars.length === 0 || !formula) {
+        showError(resultDiv, 'Bitte Variablen und Formel eingeben.');
+        return;
+    }
+
+    try {
+        const data = await apiPost('/api/logic/truth_table', {
+            variables: vars,
+            formula: formula
+        });
+
+        // Tabellenkopf aus den Variablen + "Ergebnis" aufbauen
+        let html = `<h3>Formel: <code>${data.formula}</code></h3>`;
+        html += '<div style="overflow-x:auto;"><table class="data-table">';
+        html += '<thead><tr>';
+        for (const v of data.variables) {
+            html += `<th>${v}</th>`;
+        }
+        html += '<th>Ergebnis</th></tr></thead>';
+        html += '<tbody>';
+
+        // Jede Zeile der Wahrheitstabelle darstellen
+        for (const row of data.table) {
+            html += '<tr>';
+            for (const v of data.variables) {
+                const val = row[v];
+                html += `<td style="color:${val ? '#a6e3a1' : '#f38ba8'}">
+                            ${val ? '&#9745; W' : '&#9744; F'}
+                         </td>`;
+            }
+            const res = row.result;
+            html += `<td style="color:${res ? '#a6e3a1' : '#f38ba8'}; font-weight:700;">
+                        ${res ? '&#9745; W' : '&#9744; F'}
+                     </td>`;
+            html += '</tr>';
+        }
+        html += '</tbody></table></div>';
+
+        // Eigenschaften anzeigen
+        html += '<div style="margin-top:12px; display:flex; gap:16px; flex-wrap:wrap;">';
+        if (data.is_tautology) {
+            html += '<span class="badge badge-green">&#10003; Tautologie</span>';
+        }
+        if (data.is_contradiction) {
+            html += '<span class="badge badge-red">&#10007; Kontradiktion</span>';
+        }
+        if (data.is_satisfiable && !data.is_tautology) {
+            html += '<span class="badge badge-yellow">~ Erfüllbar (nicht Tautologie)</span>';
+        }
+        if (!data.is_satisfiable) {
+            html += '<span class="badge badge-red">&#10007; Unerfüllbar</span>';
+        }
+        html += '</div>';
+
+        showResult(resultDiv, html);
+    } catch (e) {
+        showError(resultDiv, e.message);
+    }
+}
+
+/**
+ * Führt den DPLL SAT-Solver für die eingegebenen Klauseln aus.
+ * Zeigt Erfüllbarkeit und Variablenbelegung an.
+ */
+async function calcDpll() {
+    const clausesStr = document.getElementById('dpll-clauses').value.trim();
+    const resultDiv = document.getElementById('dpll-result');
+
+    let clauses;
+    try {
+        clauses = JSON.parse(clausesStr);
+    } catch (e) {
+        showError(resultDiv, 'Ungültiges JSON-Format für Klauseln.');
+        return;
+    }
+
+    try {
+        const data = await apiPost('/api/logic/dpll', { clauses: clauses });
+
+        let html = '';
+        if (data.satisfiable) {
+            html += '<p style="color:#a6e3a1; font-size:1.1rem;">&#10003; <strong>ERFÜLLBAR</strong></p>';
+            html += '<p>Erfüllende Belegung:</p>';
+            html += '<table class="data-table"><thead><tr><th>Variable</th><th>Wert</th></tr></thead><tbody>';
+            for (const [varId, val] of Object.entries(data.assignment)) {
+                html += `<tr><td>$x_{${varId}}$</td>
+                             <td style="color:${val ? '#a6e3a1' : '#f38ba8'}">
+                                 ${val ? 'Wahr' : 'Falsch'}
+                             </td></tr>`;
+            }
+            html += '</tbody></table>';
+        } else {
+            html += '<p style="color:#f38ba8; font-size:1.1rem;">&#10007; <strong>UNERFÜLLBAR</strong></p>';
+            html += '<p>Kein Modell existiert – die Formelmenge ist inkonsistent.</p>';
+        }
+
+        showResult(resultDiv, html);
+    } catch (e) {
+        showError(resultDiv, e.message);
+    }
+}
+
+/**
+ * Berechnet die Gödel-Zahl einer Formel und zeigt die Unvollständigkeits-Demo an.
+ */
+async function calcGodel() {
+    const formula = document.getElementById('godel-formula').value.trim();
+    const resultDiv = document.getElementById('godel-result');
+
+    if (!formula) {
+        showError(resultDiv, 'Bitte eine Formel eingeben.');
+        return;
+    }
+
+    try {
+        const data = await apiPost('/api/logic/godel', { formula: formula });
+
+        let html = `<table class="data-table">
+            <tr><td><strong>Formel</strong></td><td><code>${data.formula}</code></td></tr>
+            <tr><td><strong>Gödel-Zahl</strong></td><td><code>${data.godel_number}</code></td></tr>
+            <tr><td><strong>Dekodiert</strong></td><td><code>${data.decoded}</code></td></tr>
+        </table>`;
+
+        // Unvollständigkeits-Demonstration anzeigen
+        if (data.incompleteness) {
+            html += '<h3 style="margin-top:16px;">Gödels Unvollständigkeitssätze</h3>';
+            html += '<div style="background:#1e1e2e; border-radius:8px; padding:12px;">';
+            if (typeof data.incompleteness === 'object') {
+                for (const [key, val] of Object.entries(data.incompleteness)) {
+                    html += `<p><strong>${key}:</strong> ${val}</p>`;
+                }
+            } else {
+                html += `<p>${data.incompleteness}</p>`;
+            }
+            html += '</div>';
+        }
+
+        showResult(resultDiv, html);
+    } catch (e) {
+        showError(resultDiv, e.message);
+    }
+}
+</script>
+
+<style>
+/* Badges für Tautologie/Kontradiktion/Erfüllbar */
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.badge-green { background: #1e3a2e; color: #a6e3a1; border: 1px solid #a6e3a1; }
+.badge-red   { background: #3a1e1e; color: #f38ba8; border: 1px solid #f38ba8; }
+.badge-yellow{ background: #3a351e; color: #f9e2af; border: 1px solid #f9e2af; }
+</style>
+{% endblock %}
