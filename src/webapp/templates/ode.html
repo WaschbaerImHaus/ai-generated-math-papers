@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+<!--
+    @file ode.html
+    @brief Differentialgleichungen: Numerische ODE-Lösung mit Plot.
+    @author Kurt Ingwer
+    @date 2026-03-10
+-->
+{% block title %}Differentialgleichungen – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><span>∂</span> Differentialgleichungen</h1>
+    <p class="page-subtitle">
+        Numerische Lösung gewöhnlicher Differentialgleichungen (ODE) mit Runge-Kutta (RK4).
+    </p>
+</div>
+
+<div class="card">
+    <h2>ODE lösen</h2>
+    <div id="ode-formula" class="formula-display"></div>
+
+    <div class="form-row" style="margin-top: 1rem;">
+        <div class="form-group" style="flex: 2;">
+            <label class="form-label">Gleichungstyp</label>
+            <select class="form-select" id="ode-type" onchange="updateOdeFormula()">
+                <option value="exponential">Exponentieller Zerfall: y' = -y</option>
+                <option value="harmonic">Harmonischer Oszillator: y'' + y = 0</option>
+                <option value="logistic">Logistisches Wachstum: y' = ry(1-y/K)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Anfangswert y(0)</label>
+            <input class="form-input" id="ode-y0" type="number" value="1.0" step="0.5">
+        </div>
+        <div class="form-group">
+            <label class="form-label">t_end</label>
+            <input class="form-input" id="ode-tend" type="number" value="10" step="1" min="1" max="100">
+        </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="solveODE()">▶ Lösen & Plotten</button>
+    <div class="result-box" id="ode-result"></div>
+
+    <!-- Canvas für den ODE-Plot -->
+    <div id="ode-plot-container" style="display:none; margin-top: 1rem;">
+        <canvas id="ode-canvas" style="width: 100%; border-radius: 8px; border: 1px solid var(--surface1);"></canvas>
+    </div>
+</div>
+
+<script>
+// ODE-Formeln für jeden Typ
+const ODE_FORMULAS = {
+    'exponential': "y' = -y, \\quad y(0) = y_0 \\implies y(t) = y_0 e^{-t}",
+    'harmonic':    "y'' + y = 0, \\quad y(0) = 1, y'(0) = 0 \\implies y(t) = \\cos(t)",
+    'logistic':    "y' = r y \\left(1 - \\frac{y}{K}\\right)"
+};
+
+function updateOdeFormula() {
+    const type = document.getElementById('ode-type').value;
+    const formulaEl = document.getElementById('ode-formula');
+    renderLatex(ODE_FORMULAS[type], formulaEl, true);
+}
+
+async function solveODE() {
+    const equation = document.getElementById('ode-type').value;
+    const y0 = parseFloat(document.getElementById('ode-y0').value);
+    const t_end = parseFloat(document.getElementById('ode-tend').value);
+    const result = document.getElementById('ode-result');
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Löse ODE...</div>';
+    try {
+        const data = await apiPost('/api/ode/solve', {
+            equation,
+            y0: [y0, 0.0],  // zweiten Startwert (Geschwindigkeit) für harmonischen Oszi
+            t_end
+        });
+
+        const html = `<table class="result-table">
+            <tr><td>Gleichung</td><td>${data.description}</td></tr>
+            <tr><td>Anzahl Punkte</td><td>${data.t.length}</td></tr>
+            <tr><td>t ∈ [0, ${data.t_end}]</td><td>Runge-Kutta 4</td></tr>
+        </table>`;
+        showResult(result, html);
+
+        // Plot zeichnen
+        drawOdePlot(data.t, data.y, data.description);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+/** Zeichnet den ODE-Lösungsgraphen auf dem Canvas */
+function drawOdePlot(t, y, title) {
+    document.getElementById('ode-plot-container').style.display = 'block';
+    const canvas = document.getElementById('ode-canvas');
+    const container = canvas.parentElement;
+    const W = container.clientWidth;
+    const H = 250;
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    const padL = 50, padR = 20, padT = 30, padB = 30;
+    const plotW = W - padL - padR;
+    const plotH = H - padT - padB;
+
+    const tMin = Math.min(...t), tMax = Math.max(...t);
+    const yMin = Math.min(...y), yMax = Math.max(...y);
+    const yRange = yMax - yMin || 1;
+
+    // Hintergrund
+    ctx.fillStyle = '#11111b';
+    ctx.fillRect(0, 0, W, H);
+
+    // Gitter
+    ctx.strokeStyle = '#313244';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i <= 5; i++) {
+        const xG = padL + (i / 5) * plotW;
+        const yG = padT + (i / 5) * plotH;
+        ctx.beginPath(); ctx.moveTo(xG, padT); ctx.lineTo(xG, padT + plotH); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(padL, yG); ctx.lineTo(padL + plotW, yG); ctx.stroke();
+    }
+
+    // Nulllinie
+    if (yMin < 0 && yMax > 0) {
+        const y0Screen = padT + plotH - ((0 - yMin) / yRange) * plotH;
+        ctx.strokeStyle = '#45475a';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(padL, y0Screen); ctx.lineTo(padL + plotW, y0Screen); ctx.stroke();
+    }
+
+    // Kurve zeichnen
+    const gradient = ctx.createLinearGradient(padL, padT, padL + plotW, padT);
+    gradient.addColorStop(0, '#89b4fa');
+    gradient.addColorStop(1, '#cba6f7');
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    t.forEach((ti, i) => {
+        const px = padL + ((ti - tMin) / (tMax - tMin)) * plotW;
+        const py = padT + plotH - ((y[i] - yMin) / yRange) * plotH;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+
+    // Achsenbeschriftungen
+    ctx.fillStyle = '#a6adc8';
+    ctx.font = '11px monospace';
+    ctx.fillText('y', 5, padT + plotH / 2);
+    ctx.fillText('t', padL + plotW / 2, H - 5);
+    ctx.fillText(yMax.toFixed(2), padL + 2, padT + 10);
+    ctx.fillText(yMin.toFixed(2), padL + 2, padT + plotH);
+    ctx.fillText(tMin.toFixed(1), padL, H - 8);
+    ctx.fillText(tMax.toFixed(1), padL + plotW - 20, H - 8);
+
+    // Titel
+    ctx.fillStyle = '#cdd6f4';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(title, W / 2, 18);
+    ctx.textAlign = 'left';
+}
+
+window.addEventListener('DOMContentLoaded', updateOdeFormula);
+</script>
+{% endblock %}

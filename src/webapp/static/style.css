@@ -1,0 +1,612 @@
+/*
+ * @file style.css
+ * @brief Stylesheet für den Mathematik-Spezialisten (Catppuccin Mocha Farbpalette).
+ * @description
+ *     Dunkles Theme mit modernem Design:
+ *     - Catppuccin Mocha Farbpalette (https://github.com/catppuccin/catppuccin)
+ *     - Responsive Grid-Layout (Sidebar + Content)
+ *     - KaTeX-kompatible Formel-Darstellung
+ *     - Kartenbasiertes UI für Module
+ * @author Kurt Ingwer
+ * @date 2026-03-10
+ */
+
+/* ===== CATPPUCCIN MOCHA FARBVARIABLEN ===== */
+:root {
+    --base:    #1e1e2e;   /* Hintergrund */
+    --mantle:  #181825;   /* Dunklerer Hintergrund */
+    --crust:   #11111b;   /* Dunkelster Hintergrund */
+    --surface0: #313244;  /* Karten-Hintergrund */
+    --surface1: #45475a;  /* Hover-Zustand */
+    --surface2: #585b70;  /* Deaktiviert */
+    --overlay0: #6c7086;  /* Subtile Texte */
+    --overlay1: #7f849c;  /* Muted Text */
+    --overlay2: #9399b2;  /* Kommentare */
+    --text:    #cdd6f4;   /* Haupttext */
+    --subtext0: #a6adc8;  /* Sekundärtext */
+    --subtext1: #bac2de;  /* Tertiärtext */
+    --blue:    #89b4fa;   /* Akzentfarbe Blau */
+    --lavender: #b4befe;  /* Akzentfarbe Lavendel */
+    --sapphire: #74c7ec;  /* Akzentfarbe Saphir */
+    --sky:     #89dceb;   /* Akzentfarbe Himmel */
+    --teal:    #94e2d5;   /* Akzentfarbe Petrol */
+    --green:   #a6e3a1;   /* Erfolg */
+    --yellow:  #f9e2af;   /* Warnung */
+    --peach:   #fab387;   /* Warnung 2 */
+    --red:     #f38ba8;   /* Fehler */
+    --mauve:   #cba6f7;   /* Violet */
+    --pink:    #f5c2e7;   /* Pink */
+    --flamingo: #f2cdcd;  /* Flamingo */
+    --rosewater: #f5e0dc; /* Rosewater */
+}
+
+/* ===== RESET & GRUNDSTILE ===== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--base);
+    color: var(--text);
+    font-family: 'Segoe UI', 'Inter', 'Roboto', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== HEADER ===== */
+.site-header {
+    background-color: var(--mantle);
+    border-bottom: 1px solid var(--surface0);
+    padding: 0.75rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: var(--text);
+}
+
+.logo-icon {
+    font-size: 1.8rem;
+    color: var(--blue);
+    line-height: 1;
+}
+
+.logo-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--blue), var(--mauve));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header-badge {
+    background: var(--surface0);
+    color: var(--overlay2);
+    border: 1px solid var(--surface1);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-family: monospace;
+}
+
+/* ===== LAYOUT (Sidebar + Content) ===== */
+.layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    flex: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    gap: 0;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    background-color: var(--mantle);
+    border-right: 1px solid var(--surface0);
+    padding: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 60px);
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+}
+
+.nav-section-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--overlay0);
+    padding: 0 1rem 0.5rem;
+}
+
+.nav-list {
+    list-style: none;
+    flex: 1;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 1rem;
+    text-decoration: none;
+    color: var(--subtext0);
+    font-size: 0.9rem;
+    transition: background 0.15s, color 0.15s;
+    border-left: 3px solid transparent;
+}
+
+.nav-link:hover {
+    background: var(--surface0);
+    color: var(--text);
+}
+
+.nav-link.active {
+    background: var(--surface0);
+    color: var(--blue);
+    border-left-color: var(--blue);
+    font-weight: 600;
+}
+
+.nav-icon {
+    width: 1.4rem;
+    text-align: center;
+    font-size: 1rem;
+}
+
+/* Statusanzeige unten in der Sidebar */
+.nav-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--surface0);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--overlay1);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--overlay0);
+    flex-shrink: 0;
+}
+
+.status-dot.online  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.status-dot.offline { background: var(--red);   box-shadow: 0 0 6px var(--red);   }
+
+/* ===== HAUPTINHALT ===== */
+.main-content {
+    padding: 2rem;
+    overflow-x: hidden;
+}
+
+/* ===== SEITEN-HEADER ===== */
+.page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--surface0);
+}
+
+.page-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+}
+
+.page-subtitle {
+    color: var(--subtext0);
+    font-size: 0.95rem;
+}
+
+/* ===== KARTEN ===== */
+.card {
+    background: var(--surface0);
+    border: 1px solid var(--surface1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: border-color 0.2s;
+}
+
+.card:hover {
+    border-color: var(--surface2);
+}
+
+.card h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--blue);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.card h2::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 1.1rem;
+    background: var(--blue);
+    border-radius: 2px;
+}
+
+/* ===== GRID FÜR MODUL-KARTEN AUF DER STARTSEITE ===== */
+.module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.2rem;
+}
+
+.module-card {
+    background: var(--surface0);
+    border: 1px solid var(--surface1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.module-card:hover {
+    border-color: var(--blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(137, 180, 250, 0.15);
+}
+
+.module-card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.8rem;
+    display: block;
+}
+
+.module-card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+}
+
+.module-card-desc {
+    font-size: 0.85rem;
+    color: var(--subtext0);
+    line-height: 1.5;
+}
+
+.module-card-badge {
+    display: inline-block;
+    margin-top: 0.8rem;
+    background: var(--mantle);
+    border: 1px solid var(--surface1);
+    color: var(--overlay2);
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-family: monospace;
+}
+
+/* ===== FORMULARE ===== */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--subtext1);
+    margin-bottom: 0.35rem;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    background: var(--mantle);
+    border: 1px solid var(--surface1);
+    border-radius: 8px;
+    padding: 0.55rem 0.85rem;
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.15s;
+    outline: none;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(137, 180, 250, 0.15);
+}
+
+/* Kleinere Eingabefelder nebeneinander */
+.form-row {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.form-row .form-group {
+    flex: 1;
+    min-width: 80px;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    font-family: inherit;
+}
+
+.btn:active {
+    transform: scale(0.97);
+}
+
+.btn-primary {
+    background: var(--blue);
+    color: var(--base);
+}
+
+.btn-primary:hover {
+    background: var(--sapphire);
+}
+
+.btn-secondary {
+    background: var(--surface1);
+    color: var(--text);
+}
+
+.btn-secondary:hover {
+    background: var(--surface2);
+}
+
+/* Beispiel-Buttons (kleine Tags) */
+.example-btn {
+    display: inline-block;
+    background: var(--mantle);
+    border: 1px solid var(--surface1);
+    color: var(--blue);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    margin: 0.15rem;
+    transition: background 0.15s, border-color 0.15s;
+    font-family: monospace;
+}
+
+.example-btn:hover {
+    background: var(--surface0);
+    border-color: var(--blue);
+}
+
+/* ===== ERGEBNISANZEIGE ===== */
+.result-box {
+    margin-top: 1rem;
+    min-height: 40px;
+}
+
+.result-success {
+    background: var(--mantle);
+    border: 1px solid var(--teal);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--text);
+}
+
+.result-error {
+    background: var(--mantle);
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    color: var(--red);
+    font-size: 0.9rem;
+}
+
+/* Ergebnis-Tabellen */
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin-top: 0.5rem;
+}
+
+.result-table td {
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--surface1);
+}
+
+.result-table td:first-child {
+    color: var(--subtext0);
+    font-weight: 600;
+    width: 45%;
+}
+
+.result-table td:last-child {
+    color: var(--green);
+    font-family: monospace;
+}
+
+/* KaTeX-Formel Anzeige */
+.formula-display {
+    padding: 0.75rem;
+    background: var(--crust);
+    border-radius: 6px;
+    text-align: center;
+    margin: 0.5rem 0;
+    overflow-x: auto;
+}
+
+/* ===== PLOT-ANZEIGE ===== */
+.plot-img {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--surface1);
+    display: block;
+    margin-top: 1rem;
+}
+
+/* ===== LADEINDIKATOR ===== */
+.loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--overlay1);
+    font-size: 0.9rem;
+}
+
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--surface1);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===== ODE-PLOT ===== */
+.ode-plot-area {
+    width: 100%;
+    height: 250px;
+    background: var(--crust);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.ode-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+/* ===== CODE-BLÖCKE ===== */
+code, pre {
+    font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.85rem;
+}
+
+pre {
+    background: var(--crust);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+    border: 1px solid var(--surface0);
+    color: var(--text);
+}
+
+/* ===== FOOTER ===== */
+.site-footer {
+    background: var(--mantle);
+    border-top: 1px solid var(--surface0);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--overlay0);
+}
+
+/* ===== RESPONSIVE (Mobile) ===== */
+@media (max-width: 768px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: static;
+        height: auto;
+        min-height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--surface0);
+    }
+
+    .nav-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        padding: 0.5rem;
+    }
+
+    .nav-link {
+        border-left: none;
+        border-radius: 8px;
+        padding: 0.4rem 0.7rem;
+        font-size: 0.8rem;
+    }
+
+    .nav-link.active {
+        border-left: none;
+        background: var(--blue);
+        color: var(--base);
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
+
+    .module-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .site-footer {
+        flex-direction: column;
+        gap: 0.25rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .module-grid {
+        grid-template-columns: 1fr;
+    }
+}

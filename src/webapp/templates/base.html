@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<!--
+    @file base.html
+    @brief Basis-Layout für alle Seiten des Mathematik-Spezialisten.
+    @description
+        Definiert das gemeinsame Layout (Navigation, Header, Footer) aller Seiten.
+        Dunkles Theme (Catppuccin Mocha Farbpalette).
+        KaTeX für mathematische Formeln, Fetch-API für API-Aufrufe.
+    @author Kurt Ingwer
+    @date 2026-03-10
+-->
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mathematik-Spezialist{% endblock %}</title>
+
+    <!-- KaTeX: LaTeX-Formelrendering im Browser -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+            onload="renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });"></script>
+
+    <!-- Eigenes Stylesheet -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header">
+    <div class="header-inner">
+        <a href="/" class="logo">
+            <span class="logo-icon">∑</span>
+            <span class="logo-text">Mathematik-Spezialist</span>
+        </a>
+        <div class="header-badge">Build 12</div>
+    </div>
+</header>
+
+<!-- ===== LAYOUT: Sidebar + Hauptinhalt ===== -->
+<div class="layout">
+
+    <!-- Seitennavigation mit allen Modulen -->
+    <nav class="sidebar">
+        <div class="nav-section-title">Module</div>
+        <ul class="nav-list">
+            <li><a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                <span class="nav-icon">🏠</span> Übersicht
+            </a></li>
+            <li><a href="/algebra" class="nav-link {% if '/algebra' in request.path %}active{% endif %}">
+                <span class="nav-icon">α</span> Algebra
+            </a></li>
+            <li><a href="/analysis" class="nav-link {% if '/analysis' in request.path %}active{% endif %}">
+                <span class="nav-icon">∫</span> Analysis
+            </a></li>
+            <li><a href="/linear_algebra" class="nav-link {% if '/linear_algebra' in request.path %}active{% endif %}">
+                <span class="nav-icon">▦</span> Lineare Algebra
+            </a></li>
+            <li><a href="/statistics" class="nav-link {% if '/statistics' in request.path %}active{% endif %}">
+                <span class="nav-icon">σ</span> Statistik
+            </a></li>
+            <li><a href="/ode" class="nav-link {% if '/ode' in request.path %}active{% endif %}">
+                <span class="nav-icon">∂</span> Differentialgl.
+            </a></li>
+            <li><a href="/complex" class="nav-link {% if '/complex' in request.path %}active{% endif %}">
+                <span class="nav-icon">ℂ</span> Komplexe Analysis
+            </a></li>
+            <li><a href="/number_theory" class="nav-link {% if '/number_theory' in request.path %}active{% endif %}">
+                <span class="nav-icon">ℤ</span> Zahlentheorie
+            </a></li>
+            <li><a href="/visualization" class="nav-link {% if '/visualization' in request.path %}active{% endif %}">
+                <span class="nav-icon">📈</span> Visualisierung
+            </a></li>
+        </ul>
+
+        <!-- Systemstatus-Anzeige -->
+        <div class="nav-footer">
+            <div class="status-dot" id="status-dot"></div>
+            <span id="status-text">Prüfe Server...</span>
+        </div>
+    </nav>
+
+    <!-- Hauptinhalt der jeweiligen Seite -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+    <span>Mathematik-Spezialist &mdash; Build 12 &mdash; Python 3.13 | SymPy | NumPy | SciPy</span>
+    <span>@author Kurt Ingwer</span>
+</footer>
+
+<!-- ===== GLOBALE JAVASCRIPT-HILFSFUNKTIONEN ===== -->
+<script>
+    /**
+     * Rendert einen LaTeX-Ausdruck in ein DOM-Element.
+     * @param {string} latex - LaTeX-Formel (ohne $ $)
+     * @param {HTMLElement} element - Ziel-Element
+     * @param {boolean} displayMode - true für Block-Darstellung
+     */
+    function renderLatex(latex, element, displayMode = false) {
+        if (typeof katex === 'undefined') {
+            // KaTeX noch nicht geladen → einfachen Text anzeigen
+            element.textContent = latex;
+            return;
+        }
+        try {
+            katex.render(latex, element, {
+                throwOnError: false,
+                displayMode: displayMode
+            });
+        } catch (e) {
+            element.textContent = latex;
+        }
+    }
+
+    /**
+     * Sendet eine POST-Anfrage an die Flask-API.
+     * @param {string} url - API-Endpunkt
+     * @param {object} body - Anfrage-Body als JavaScript-Objekt
+     * @returns {Promise<object>} - Antwort-JSON
+     */
+    async function apiPost(url, body) {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || `HTTP ${response.status}`);
+        }
+        return data;
+    }
+
+    /**
+     * Zeigt eine Fehlermeldung in einem Ergebnis-Container an.
+     * @param {HTMLElement} container - Ziel-Element
+     * @param {string} message - Fehlermeldung
+     */
+    function showError(container, message) {
+        container.innerHTML = `<div class="result-error">⚠ ${message}</div>`;
+    }
+
+    /**
+     * Zeigt eine Erfolgsmeldung in einem Ergebnis-Container an.
+     * @param {HTMLElement} container - Ziel-Element
+     * @param {string} html - HTML-Inhalt
+     */
+    function showResult(container, html) {
+        container.innerHTML = `<div class="result-success">${html}</div>`;
+    }
+
+    // Serversstatus beim Laden prüfen
+    window.addEventListener('load', async () => {
+        const dot = document.getElementById('status-dot');
+        const text = document.getElementById('status-text');
+        try {
+            const res = await fetch('/api/health');
+            const data = await res.json();
+            if (data.status === 'ok') {
+                dot.classList.add('online');
+                text.textContent = `Online (Build ${data.build})`;
+            }
+        } catch (e) {
+            dot.classList.add('offline');
+            text.textContent = 'Offline';
+        }
+    });
+</script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+<!--
+    @file visualization.html
+    @brief Visualisierungs-Seite: Interaktiver Funktionsplotter mit matplotlib.
+    @author Kurt Ingwer
+    @date 2026-03-10
+-->
+{% block title %}Visualisierung – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><span>📈</span> Visualisierung</h1>
+    <p class="page-subtitle">
+        Mathematische Funktionen als Plot darstellen. matplotlib rendert serverseitig ein PNG.
+    </p>
+</div>
+
+<div class="card">
+    <h2>Funktionsplot erstellen</h2>
+
+    <div class="form-row">
+        <div class="form-group" style="flex: 2;">
+            <label class="form-label">Ausdruck f(x)</label>
+            <input class="form-input" id="plot-expr" type="text" value="sin(x)" placeholder="z.B. x**2, sin(x)*exp(-x)">
+        </div>
+        <div class="form-group">
+            <label class="form-label">x_min</label>
+            <input class="form-input" id="plot-xmin" type="number" value="-6.28" step="0.5">
+        </div>
+        <div class="form-group">
+            <label class="form-label">x_max</label>
+            <input class="form-input" id="plot-xmax" type="number" value="6.28" step="0.5">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Titel (optional)</label>
+        <input class="form-input" id="plot-title" type="text" placeholder="Wird automatisch gesetzt wenn leer">
+    </div>
+
+    <!-- Beispiel-Ausdrücke -->
+    <div style="margin-bottom: 0.75rem;">
+        <span style="font-size: 0.8rem; color: var(--subtext0);">Schnellauswahl: </span>
+        <span class="example-btn" onclick="setPlot('sin(x)', -7, 7, '')">sin(x)</span>
+        <span class="example-btn" onclick="setPlot('cos(x)', -7, 7, '')">cos(x)</span>
+        <span class="example-btn" onclick="setPlot('tan(x)', -1.5, 1.5, '')">tan(x)</span>
+        <span class="example-btn" onclick="setPlot('x**2', -4, 4, 'Parabel')">x²</span>
+        <span class="example-btn" onclick="setPlot('x**3 - x', -2, 2, '')">x³-x</span>
+        <span class="example-btn" onclick="setPlot('exp(-x**2)', -3, 3, 'Gaußglocke')">e^(-x²)</span>
+        <span class="example-btn" onclick="setPlot('sin(x)/x', -10, 10, 'sinc(x)')">sin(x)/x</span>
+        <span class="example-btn" onclick="setPlot('1/(1+exp(-x))', -6, 6, 'Sigmoid')">Sigmoid</span>
+        <span class="example-btn" onclick="setPlot('sin(1/x)', 0.05, 1, '')">sin(1/x)</span>
+        <span class="example-btn" onclick="setPlot('log(x)', 0.1, 5, 'Logarithmus')">ln(x)</span>
+        <span class="example-btn" onclick="setPlot('sqrt(1 - x**2)', -1, 1, 'Halbkreis')">√(1-x²)</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="createPlot()">▶ Plot erstellen</button>
+    <div class="result-box" id="plot-status"></div>
+</div>
+
+<!-- Plot-Anzeige -->
+<div id="plot-output-card" class="card" style="display: none;">
+    <h2>Ergebnis</h2>
+    <div class="formula-display" id="plot-formula-display" style="margin-bottom: 1rem;"></div>
+    <img id="plot-img" class="plot-img" alt="Funktionsplot" src="">
+    <div style="margin-top: 0.75rem; color: var(--subtext0); font-size: 0.8rem;" id="plot-meta"></div>
+</div>
+
+<script>
+function setPlot(expr, xmin, xmax, title) {
+    document.getElementById('plot-expr').value = expr;
+    document.getElementById('plot-xmin').value = xmin;
+    document.getElementById('plot-xmax').value = xmax;
+    document.getElementById('plot-title').value = title;
+}
+
+async function createPlot() {
+    const expr = document.getElementById('plot-expr').value.trim();
+    const x_min = parseFloat(document.getElementById('plot-xmin').value);
+    const x_max = parseFloat(document.getElementById('plot-xmax').value);
+    let title = document.getElementById('plot-title').value.trim();
+    if (!title) title = `f(x) = ${expr}`;
+
+    const status = document.getElementById('plot-status');
+    status.innerHTML = '<div class="loading"><div class="spinner"></div> Erstelle Plot...</div>';
+
+    try {
+        const data = await apiPost('/api/visualization/plot', { expr, x_min, x_max, title });
+
+        // Bild anzeigen
+        const img = document.getElementById('plot-img');
+        img.src = `data:image/png;base64,${data.image_base64}`;
+        img.alt = title;
+
+        // Formel anzeigen
+        const formulaEl = document.getElementById('plot-formula-display');
+        // Versuche SymPy-Ausdruck als LaTeX darzustellen (vereinfacht)
+        let latexExpr = expr
+            .replace(/\*\*/g, '^')
+            .replace(/\*/g, '\\cdot ')
+            .replace(/sqrt\((.+?)\)/g, '\\sqrt{$1}')
+            .replace(/sin\(/g, '\\sin(')
+            .replace(/cos\(/g, '\\cos(')
+            .replace(/tan\(/g, '\\tan(')
+            .replace(/exp\((.+?)\)/g, 'e^{$1}')
+            .replace(/log\(/g, '\\ln(');
+        renderLatex(`f(x) = ${latexExpr}`, formulaEl, false);
+
+        document.getElementById('plot-meta').textContent =
+            `Bereich: x ∈ [${x_min}, ${x_max}] | 800 Auswertungspunkte | PNG 120 dpi`;
+
+        document.getElementById('plot-output-card').style.display = 'block';
+        status.innerHTML = '<div class="result-success">✓ Plot erstellt</div>';
+    } catch (e) {
+        showError(status, e.message);
+    }
+}
+</script>
+{% endblock %}

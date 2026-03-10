@@ -112,3 +112,29 @@
 - Build 11-12 Erkenntnisse eingetragen
 - Neue Brainstorming-Abschnitte (Montgomery-Odlyzko ↔ GUE, BSD ↔ Modulformen)
 - Nächste Entwicklungsschritte aktualisiert
+
+2026-03-10 (Build 12): Web-Interface implementiert
+  - src/webapp/app.py: Flask-App auf Port 8080 mit 16 Routen
+    - GET /              → Startseite
+    - GET /algebra, /analysis, /linear_algebra, /statistics, /ode, /complex, /number_theory, /visualization
+    - GET /api/health    → {"status": "ok", "build": 12}
+    - POST /api/algebra/solve, /polynomial, /primes
+    - POST /api/analysis/derivative, /integral, /roots
+    - POST /api/linear_algebra/matrix (det, inv, eigenvalues)
+    - POST /api/statistics/describe
+    - POST /api/ode/solve (exponential, harmonic, logistic)
+    - POST /api/complex/zeta
+    - POST /api/visualization/plot (Base64-PNG via matplotlib)
+  - src/webapp/templates/: 9 HTML-Templates (base.html + 8 Modul-Seiten)
+    - Catppuccin Mocha Theme (dunkles Design)
+    - KaTeX für LaTeX-Formeln via CDN
+    - Fetch-API für asynchrone Berechnungen (kein Seiten-Reload)
+    - Responsive Grid-Layout (Sidebar + Content)
+  - src/webapp/static/style.css: 450+ Zeilen CSS
+  - build/start_webapp.sh: Startet Webapp (PID-Datei in build/)
+  - build/stop_webapp.sh: Stoppt Webapp über PID-Datei
+  - tests/test_webapp.py: 43 Tests für alle API-Endpunkte
+  - Bugs korrigiert:
+    - Matrix.det() → Matrix.determinant()
+    - Matrix.inv() → Matrix.inverse() + ._data statt .data
+    - runge_kutta4(f, t0, y0, ...) Parameterreihenfolge korrigiert

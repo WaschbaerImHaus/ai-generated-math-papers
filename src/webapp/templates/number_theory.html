@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+<!--
+    @file number_theory.html
+    @brief Zahlentheorie: Primzahlen, Faktorisierung, Euler-Phi.
+    @author Kurt Ingwer
+    @date 2026-03-10
+-->
+{% block title %}Zahlentheorie – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><span>ℤ</span> Zahlentheorie</h1>
+    <p class="page-subtitle">
+        Primzahltests, Primfaktorzerlegung, Euler-Phi-Funktion und mehr.
+    </p>
+</div>
+
+<div class="card">
+    <h2>Zahlentheorie-Analyse</h2>
+    <div class="formula-display" id="nt-formula"></div>
+
+    <div class="form-row" style="margin-top: 1rem;">
+        <div class="form-group">
+            <label class="form-label">Zahl n</label>
+            <input class="form-input" id="nt-n" type="number" value="720" min="1">
+        </div>
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+        <span class="example-btn" onclick="setN(12)">12</span>
+        <span class="example-btn" onclick="setN(97)">97 (Primzahl)</span>
+        <span class="example-btn" onclick="setN(720)">720 = 6!</span>
+        <span class="example-btn" onclick="setN(1024)">1024 = 2¹⁰</span>
+        <span class="example-btn" onclick="setN(9999)">9999</span>
+        <span class="example-btn" onclick="setN(104729)">104729 (Primzahl)</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="analyzeNumber()">▶ Analysieren</button>
+    <div class="result-box" id="nt-result"></div>
+</div>
+
+<!-- Primzahlen bis N -->
+<div class="card">
+    <h2>Primzahlen bis N (Sieb des Eratosthenes)</h2>
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">Obergrenze N (max. 500)</label>
+            <input class="form-input" id="sieve-n" type="number" value="100" min="2" max="500">
+        </div>
+    </div>
+    <button class="btn btn-primary" onclick="sieveOfEratosthenes()">▶ Primzahlen berechnen</button>
+    <div class="result-box" id="sieve-result"></div>
+</div>
+
+<script>
+function setN(n) {
+    document.getElementById('nt-n').value = n;
+}
+
+async function analyzeNumber() {
+    const n = parseInt(document.getElementById('nt-n').value);
+    const result = document.getElementById('nt-result');
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Analysiere...</div>';
+    try {
+        const data = await apiPost('/api/algebra/primes', { n });
+        const primeColor = data.is_prime ? 'var(--green)' : 'var(--peach)';
+        const html = `<table class="result-table">
+            <tr><td>n</td><td><strong>${data.n}</strong></td></tr>
+            <tr><td>Primzahl?</td><td style="color: ${primeColor}; font-weight: 700;">
+                ${data.is_prime ? '✓ Primzahl' : '✗ Keine Primzahl'}</td></tr>
+            <tr><td>Primfaktorzerlegung</td><td><code>${data.factorization_str}</code></td></tr>
+            <tr><td>φ(n) – Euler-Phi</td><td>${data.euler_phi}</td></tr>
+        </table>
+        <div class="formula-display" id="nt-latex-result" style="margin-top: 0.5rem;"></div>`;
+        showResult(result, html);
+        setTimeout(() => {
+            const el = document.getElementById('nt-latex-result');
+            if (el) {
+                const phi_latex = `\\varphi(${data.n}) = ${data.euler_phi}`;
+                renderLatex(phi_latex, el, false);
+            }
+        }, 50);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+/** Lokaler Sieb-Algorithmus (kein API-Aufruf nötig) */
+function sieveOfEratosthenes() {
+    const N = parseInt(document.getElementById('sieve-n').value);
+    const result = document.getElementById('sieve-result');
+    if (N < 2) { showError(result, 'N muss mindestens 2 sein.'); return; }
+    if (N > 500) { showError(result, 'N darf maximal 500 sein.'); return; }
+
+    // Sieb initialisieren (true = potentiell prim)
+    const sieve = new Array(N + 1).fill(true);
+    sieve[0] = sieve[1] = false;
+
+    // Vielfache aussieben
+    for (let i = 2; i * i <= N; i++) {
+        if (sieve[i]) {
+            for (let j = i * i; j <= N; j += i) {
+                sieve[j] = false;
+            }
+        }
+    }
+
+    // Primzahlen sammeln
+    const primes = [];
+    for (let i = 2; i <= N; i++) {
+        if (sieve[i]) primes.push(i);
+    }
+
+    // Als farbige Badges anzeigen
+    let html = `<div style="margin-bottom: 0.5rem; color: var(--subtext0); font-size: 0.85rem;">
+        ${primes.length} Primzahlen ≤ ${N}:
+    </div><div style="line-height: 2;">`;
+    primes.forEach(p => {
+        html += `<span style="display: inline-block; background: var(--mantle); border: 1px solid var(--surface1);
+            color: var(--blue); padding: 0.1rem 0.4rem; border-radius: 4px; font-family: monospace;
+            font-size: 0.85rem; margin: 0.1rem;">${p}</span>`;
+    });
+    html += '</div>';
+    showResult(result, html);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    renderLatex('n = p_1^{e_1} \\cdot p_2^{e_2} \\cdots p_k^{e_k}',
+        document.getElementById('nt-formula'), true);
+});
+</script>
+{% endblock %}

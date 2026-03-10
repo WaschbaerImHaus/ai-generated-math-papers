@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+<!--
+    @file index.html
+    @brief Startseite des Mathematik-Spezialisten.
+    @description
+        Zeigt eine Übersicht aller mathematischen Module als anklickbare Karten.
+        Jede Karte führt zur entsprechenden Detailseite.
+    @author Kurt Ingwer
+    @date 2026-03-10
+-->
+
+{% block title %}Mathematik-Spezialist – Übersicht{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">
+        <span>∑</span> Mathematik-Spezialist
+    </h1>
+    <p class="page-subtitle">
+        Interaktive mathematische Berechnungen – von Grundlagen bis zu fortgeschrittenen Themen.
+        Build 12 &middot; Python 3.13 &middot; SymPy 1.13 &middot; NumPy 2.2
+    </p>
+</div>
+
+<!-- Schnellzugriff-Formel -->
+<div class="card" style="margin-bottom: 2rem;">
+    <h2>Euler-Identität</h2>
+    <div class="formula-display" id="euler-formula"></div>
+    <p style="margin-top: 0.6rem; color: var(--subtext0); font-size: 0.85rem;">
+        Die schönste Formel der Mathematik verbindet fünf fundamentale Konstanten: $e$, $i$, $\pi$, 1 und 0.
+    </p>
+</div>
+
+<!-- Modul-Karten -->
+<div class="module-grid">
+
+    <a href="/algebra" class="module-card">
+        <span class="module-card-icon">α</span>
+        <div class="module-card-title">Algebra</div>
+        <div class="module-card-desc">
+            Lineare & quadratische Gleichungen, Polynomauswertung,
+            Primzahlzerlegung, Euler-Phi-Funktion.
+        </div>
+        <span class="module-card-badge">solve · polynomial · primes</span>
+    </a>
+
+    <a href="/analysis" class="module-card">
+        <span class="module-card-icon">∫</span>
+        <div class="module-card-title">Analysis</div>
+        <div class="module-card-desc">
+            Numerische Ableitung & Integration, Nullstellensuche
+            (Newton-Raphson, Bisektionsverfahren).
+        </div>
+        <span class="module-card-badge">derivative · integral · roots</span>
+    </a>
+
+    <a href="/linear_algebra" class="module-card">
+        <span class="module-card-icon">▦</span>
+        <div class="module-card-title">Lineare Algebra</div>
+        <div class="module-card-desc">
+            Determinante, Inverse, Eigenwerte für beliebige Matrizen.
+            LU-, QR-Zerlegung, SVD.
+        </div>
+        <span class="module-card-badge">det · inv · eigenvalues</span>
+    </a>
+
+    <a href="/statistics" class="module-card">
+        <span class="module-card-icon">σ</span>
+        <div class="module-card-title">Statistik</div>
+        <div class="module-card-desc">
+            Deskriptive Statistik: Mittelwert, Median, Modus,
+            Varianz, Standardabweichung.
+        </div>
+        <span class="module-card-badge">mean · median · variance</span>
+    </a>
+
+    <a href="/ode" class="module-card">
+        <span class="module-card-icon">∂</span>
+        <div class="module-card-title">Differentialgleichungen</div>
+        <div class="module-card-desc">
+            Numerische Lösung gewöhnlicher DGLs:
+            harmonischer Oszillator, exponentieller Zerfall, logistisches Wachstum.
+        </div>
+        <span class="module-card-badge">RK4 · Euler · ODE-Systeme</span>
+    </a>
+
+    <a href="/complex" class="module-card">
+        <span class="module-card-icon">ℂ</span>
+        <div class="module-card-title">Komplexe Analysis</div>
+        <div class="module-card-desc">
+            Riemann-Zeta-Funktion $\zeta(s)$ für beliebige komplexe $s$,
+            analytische Fortsetzung, kritische Gerade.
+        </div>
+        <span class="module-card-badge">ζ(s) · Gamma · analytisch</span>
+    </a>
+
+    <a href="/number_theory" class="module-card">
+        <span class="module-card-icon">ℤ</span>
+        <div class="module-card-title">Zahlentheorie</div>
+        <div class="module-card-desc">
+            Primfaktorzerlegung, Euler-Phi, Primzahltest,
+            Miller-Rabin, Sieb des Eratosthenes.
+        </div>
+        <span class="module-card-badge">primes · φ(n) · factorization</span>
+    </a>
+
+    <a href="/visualization" class="module-card">
+        <span class="module-card-icon">📈</span>
+        <div class="module-card-title">Visualisierung</div>
+        <div class="module-card-desc">
+            Mathematische Funktionen interaktiv plotten.
+            Ausdruck eingeben, Bereich wählen, Plot ansehen.
+        </div>
+        <span class="module-card-badge">plot · 2D · PNG · KaTeX</span>
+    </a>
+
+</div>
+
+<!-- Beispielformel -->
+<div class="card" style="margin-top: 2rem;">
+    <h2>Formelbeispiele (KaTeX)</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
+        <div>
+            <div style="color: var(--subtext0); font-size: 0.8rem; margin-bottom: 0.3rem;">Gaußsche Summenformel</div>
+            <div class="formula-display">$$\sum_{k=1}^{n} k = \frac{n(n+1)}{2}$$</div>
+        </div>
+        <div>
+            <div style="color: var(--subtext0); font-size: 0.8rem; margin-bottom: 0.3rem;">Fourier-Transformation</div>
+            <div class="formula-display">$$\hat{f}(\xi) = \int_{-\infty}^{\infty} f(x)\, e^{-2\pi i x \xi}\, dx$$</div>
+        </div>
+        <div>
+            <div style="color: var(--subtext0); font-size: 0.8rem; margin-bottom: 0.3rem;">Riemann-Zeta-Funktion</div>
+            <div class="formula-display">$$\zeta(s) = \sum_{n=1}^{\infty} \frac{1}{n^s}, \quad \text{Re}(s) > 1$$</div>
+        </div>
+        <div>
+            <div style="color: var(--subtext0); font-size: 0.8rem; margin-bottom: 0.3rem;">Normalverteilung</div>
+            <div class="formula-display">$$f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$$</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Euler-Identität als KaTeX rendern
+    window.addEventListener('DOMContentLoaded', () => {
+        const el = document.getElementById('euler-formula');
+        renderLatex('e^{i\\pi} + 1 = 0', el, true);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+<!--
+    @file analysis.html
+    @brief Analysis-Modul: Ableitung, Integral, Nullstellen.
+    @author Kurt Ingwer
+    @date 2026-03-10
+-->
+{% block title %}Analysis – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><span>∫</span> Analysis</h1>
+    <p class="page-subtitle">
+        Numerische Ableitung, bestimmte Integrale und Nullstellensuche.
+        Ausdrücke werden mit SymPy geparst (z.B. <code>sin(x)</code>, <code>x**2 + 1</code>).
+    </p>
+</div>
+
+<!-- ===== Ableitung ===== -->
+<div class="card">
+    <h2>Numerische Ableitung f'(x)</h2>
+    <div class="formula-display" id="deriv-formula"></div>
+
+    <div class="form-row" style="margin-top: 1rem;">
+        <div class="form-group" style="flex: 2;">
+            <label class="form-label">Ausdruck f(x)</label>
+            <input class="form-input" id="deriv-expr" type="text" value="sin(x)" placeholder="z.B. sin(x)**2">
+        </div>
+        <div class="form-group">
+            <label class="form-label">x</label>
+            <input class="form-input" id="deriv-x" type="number" value="1.0" step="0.1">
+        </div>
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+        <span class="example-btn" onclick="setDerivExample('sin(x)', 1.5708)">sin(x) bei π/2</span>
+        <span class="example-btn" onclick="setDerivExample('x**3', 2)">x³ bei x=2</span>
+        <span class="example-btn" onclick="setDerivExample('exp(x)', 0)">e^x bei x=0</span>
+        <span class="example-btn" onclick="setDerivExample('log(x)', 1)">ln(x) bei x=1</span>
+        <span class="example-btn" onclick="setDerivExample('x**2 + 3*x - 5', 2)">x²+3x-5 bei x=2</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="calcDerivative()">▶ Ableiten</button>
+    <div class="result-box" id="deriv-result"></div>
+</div>
+
+<!-- ===== Integral ===== -->
+<div class="card">
+    <h2>Bestimmtes Integral ∫ f(x) dx</h2>
+
+    <div class="form-row">
+        <div class="form-group" style="flex: 2;">
+            <label class="form-label">Ausdruck f(x)</label>
+            <input class="form-input" id="int-expr" type="text" value="x**2" placeholder="z.B. sin(x)">
+        </div>
+        <div class="form-group">
+            <label class="form-label">a (untere Grenze)</label>
+            <input class="form-input" id="int-a" type="number" value="0" step="0.5">
+        </div>
+        <div class="form-group">
+            <label class="form-label">b (obere Grenze)</label>
+            <input class="form-input" id="int-b" type="number" value="1" step="0.5">
+        </div>
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+        <span class="example-btn" onclick="setIntExample('x**2', 0, 1)">∫₀¹ x² dx</span>
+        <span class="example-btn" onclick="setIntExample('sin(x)', 0, 3.14159)">∫₀^π sin(x) dx</span>
+        <span class="example-btn" onclick="setIntExample('exp(-x**2)', 0, 1)">∫₀¹ e^(-x²) dx</span>
+        <span class="example-btn" onclick="setIntExample('1/x', 1, 2.71828)">∫₁^e 1/x dx</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="calcIntegral()">▶ Integrieren</button>
+    <div class="result-box" id="int-result"></div>
+</div>
+
+<!-- ===== Nullstellen ===== -->
+<div class="card">
+    <h2>Nullstellensuche f(x) = 0</h2>
+
+    <div class="form-row">
+        <div class="form-group" style="flex: 2;">
+            <label class="form-label">Ausdruck f(x)</label>
+            <input class="form-input" id="root-expr" type="text" value="x**2 - 2" placeholder="z.B. x**3 - x - 2">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Startwert x₀</label>
+            <input class="form-input" id="root-x0" type="number" value="1.5" step="0.5">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Methode</label>
+            <select class="form-select" id="root-method">
+                <option value="newton">Newton-Raphson</option>
+                <option value="bisection">Bisektionsverfahren</option>
+            </select>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+        <span class="example-btn" onclick="setRootExample('x**2 - 2', 1.5)">√2 (x²-2=0)</span>
+        <span class="example-btn" onclick="setRootExample('x**3 - x - 2', 1.5)">x³-x-2=0</span>
+        <span class="example-btn" onclick="setRootExample('cos(x) - x', 0.7)">cos(x)=x</span>
+        <span class="example-btn" onclick="setRootExample('exp(x) - 3', 1.0)">e^x=3</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="findRoot()">▶ Nullstelle finden</button>
+    <div class="result-box" id="root-result"></div>
+</div>
+
+<script>
+// ===== ABLEITUNG =====
+
+function setDerivExample(expr, x) {
+    document.getElementById('deriv-expr').value = expr;
+    document.getElementById('deriv-x').value = x;
+}
+
+async function calcDerivative() {
+    const expr = document.getElementById('deriv-expr').value.trim();
+    const x = parseFloat(document.getElementById('deriv-x').value);
+    const result = document.getElementById('deriv-result');
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne...</div>';
+    try {
+        const data = await apiPost('/api/analysis/derivative', { expr, x });
+        const html = `<table class="result-table">
+            <tr><td>f(x)</td><td><code>${data.expr}</code></td></tr>
+            <tr><td>x</td><td>${data.x}</td></tr>
+            <tr><td>f'(x)</td><td><strong>${data.derivative.toFixed(8)}</strong></td></tr>
+        </table>
+        <div class="formula-display" id="deriv-latex-result" style="margin-top: 0.5rem;"></div>`;
+        showResult(result, html);
+        setTimeout(() => {
+            const el = document.getElementById('deriv-latex-result');
+            if (el) renderLatex(`f'(${data.x}) \\approx ${data.derivative.toFixed(6)}`, el, false);
+        }, 50);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+// ===== INTEGRAL =====
+
+function setIntExample(expr, a, b) {
+    document.getElementById('int-expr').value = expr;
+    document.getElementById('int-a').value = a;
+    document.getElementById('int-b').value = b;
+}
+
+async function calcIntegral() {
+    const expr = document.getElementById('int-expr').value.trim();
+    const a = parseFloat(document.getElementById('int-a').value);
+    const b = parseFloat(document.getElementById('int-b').value);
+    const result = document.getElementById('int-result');
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne...</div>';
+    try {
+        const data = await apiPost('/api/analysis/integral', { expr, a, b });
+        const html = `<table class="result-table">
+            <tr><td>f(x)</td><td><code>${data.expr}</code></td></tr>
+            <tr><td>Intervall [a, b]</td><td>[${data.a}, ${data.b}]</td></tr>
+            <tr><td>∫ f(x) dx</td><td><strong>${data.integral.toFixed(10)}</strong></td></tr>
+        </table>
+        <div class="formula-display" id="int-latex-result" style="margin-top: 0.5rem;"></div>`;
+        showResult(result, html);
+        setTimeout(() => {
+            const el = document.getElementById('int-latex-result');
+            if (el) renderLatex(`\\int_{${data.a}}^{${data.b}} ${data.expr}\\, dx \\approx ${data.integral.toFixed(6)}`, el, false);
+        }, 50);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+// ===== NULLSTELLEN =====
+
+function setRootExample(expr, x0) {
+    document.getElementById('root-expr').value = expr;
+    document.getElementById('root-x0').value = x0;
+}
+
+async function findRoot() {
+    const expr = document.getElementById('root-expr').value.trim();
+    const x0 = parseFloat(document.getElementById('root-x0').value);
+    const method = document.getElementById('root-method').value;
+    const result = document.getElementById('root-result');
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Suche Nullstelle...</div>';
+    try {
+        const data = await apiPost('/api/analysis/roots', { expr, x0, method });
+        const verifyColor = Math.abs(data.verification) < 1e-6 ? 'var(--green)' : 'var(--yellow)';
+        const html = `<table class="result-table">
+            <tr><td>f(x)</td><td><code>${data.expr}</code></td></tr>
+            <tr><td>Methode</td><td>${data.method}</td></tr>
+            <tr><td>Nullstelle x*</td><td><strong>${data.root.toFixed(10)}</strong></td></tr>
+            <tr><td>f(x*) ≈</td><td style="color: ${verifyColor};">${data.verification.toExponential(3)}</td></tr>
+        </table>`;
+        showResult(result, html);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+// Formel initialisieren
+window.addEventListener('DOMContentLoaded', () => {
+    renderLatex("f'(x) \\approx \\frac{f(x+h) - f(x-h)}{2h}", document.getElementById('deriv-formula'), true);
+});
+</script>
+{% endblock %}

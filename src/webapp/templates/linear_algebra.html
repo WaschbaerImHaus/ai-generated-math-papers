@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+<!--
+    @file linear_algebra.html
+    @brief Lineare Algebra: Determinante, Inverse, Eigenwerte.
+    @author Kurt Ingwer
+    @date 2026-03-10
+-->
+{% block title %}Lineare Algebra – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><span>▦</span> Lineare Algebra</h1>
+    <p class="page-subtitle">
+        Matrixoperationen: Determinante, Inverse, Eigenwerte.
+        Matrix als kommagetrennte Zeilen eingeben (Zeilen durch Semikolon trennen).
+    </p>
+</div>
+
+<div class="card">
+    <h2>Matrix-Operationen</h2>
+    <div class="formula-display" id="mat-formula"></div>
+
+    <div class="form-group" style="margin-top: 1rem;">
+        <label class="form-label">Matrix (Zeilen durch Semikolon, Werte durch Komma)</label>
+        <textarea class="form-textarea" id="matrix-input" rows="4" placeholder="1,2,3&#10;4,5,6&#10;7,8,9">2,1;1,3</textarea>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Operation</label>
+        <select class="form-select" id="mat-operation">
+            <option value="det">Determinante det(A)</option>
+            <option value="inv">Inverse A⁻¹</option>
+            <option value="eigenvalues">Eigenwerte λ</option>
+        </select>
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+        <span style="font-size: 0.8rem; color: var(--subtext0);">Beispiele:</span>
+        <span class="example-btn" onclick="setMatExample('2,1;1,3', 'det')">2×2 Determinante</span>
+        <span class="example-btn" onclick="setMatExample('1,2;3,4', 'inv')">2×2 Inverse</span>
+        <span class="example-btn" onclick="setMatExample('2,-1;-1,2', 'eigenvalues')">Eigenwerte</span>
+        <span class="example-btn" onclick="setMatExample('1,2,3;4,5,6;7,8,10', 'det')">3×3 Determinante</span>
+        <span class="example-btn" onclick="setMatExample('1,0,0;0,2,0;0,0,3', 'eigenvalues')">Diagonalmatrix</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="matrixOp()">▶ Berechnen</button>
+    <div class="result-box" id="mat-result"></div>
+</div>
+
+<!-- Visualisierung der eingegebenen Matrix -->
+<div class="card">
+    <h2>Matrix-Vorschau</h2>
+    <div id="mat-preview" style="color: var(--subtext0); font-size: 0.9rem;">
+        Matrix oben eingeben und Operation starten...
+    </div>
+</div>
+
+<script>
+function setMatExample(matStr, op) {
+    document.getElementById('matrix-input').value = matStr.replace(/;/g, '\n');
+    document.getElementById('mat-operation').value = op;
+    updateMatPreview();
+}
+
+/** Parst den Matrixtexteingabe in ein 2D-Array */
+function parseMatrix(input) {
+    return input.trim().split(/[\n;]+/).map(row =>
+        row.split(',').map(v => {
+            const n = parseFloat(v.trim());
+            if (isNaN(n)) throw new Error(`Ungültiger Wert: '${v.trim()}'`);
+            return n;
+        })
+    );
+}
+
+/** Zeigt die Matrix als HTML-Tabelle an */
+function updateMatPreview() {
+    const preview = document.getElementById('mat-preview');
+    try {
+        const mat = parseMatrix(document.getElementById('matrix-input').value);
+        let html = '<table style="border-collapse: collapse; font-family: monospace; font-size: 0.9rem;">';
+        mat.forEach(row => {
+            html += '<tr>';
+            row.forEach(val => {
+                html += `<td style="padding: 0.3rem 0.6rem; border: 1px solid var(--surface1); color: var(--text);">${val}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</table>';
+        html += `<div style="margin-top: 0.5rem; color: var(--overlay1); font-size: 0.8rem;">${mat.length}×${mat[0].length} Matrix</div>`;
+        preview.innerHTML = html;
+    } catch (e) {
+        preview.innerHTML = `<span style="color: var(--red);">Parsing-Fehler: ${e.message}</span>`;
+    }
+}
+
+async function matrixOp() {
+    const matInput = document.getElementById('matrix-input').value;
+    const operation = document.getElementById('mat-operation').value;
+    const result = document.getElementById('mat-result');
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne...</div>';
+    updateMatPreview();
+    try {
+        const matrix = parseMatrix(matInput);
+        const data = await apiPost('/api/linear_algebra/matrix', { matrix, operation });
+
+        let html = '';
+        if (operation === 'det') {
+            html = `<table class="result-table">
+                <tr><td>Operation</td><td>Determinante</td></tr>
+                <tr><td>det(A)</td><td><strong>${data.result.toFixed(8)}</strong></td></tr>
+            </table>
+            <div class="formula-display" id="mat-latex" style="margin-top: 0.5rem;"></div>`;
+            showResult(result, html);
+            setTimeout(() => {
+                const el = document.getElementById('mat-latex');
+                if (el) renderLatex(`\\det(A) = ${data.result.toFixed(4)}`, el, false);
+            }, 50);
+        } else if (operation === 'inv') {
+            html = '<div style="color: var(--subtext0); margin-bottom: 0.5rem; font-size: 0.85rem;">Inverse Matrix A⁻¹:</div>';
+            html += '<table style="border-collapse: collapse; font-family: monospace; font-size: 0.9rem;">';
+            data.result.forEach(row => {
+                html += '<tr>';
+                row.forEach(val => {
+                    html += `<td style="padding: 0.3rem 0.7rem; border: 1px solid var(--surface1); color: var(--teal);">${val.toFixed(5)}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</table>';
+            showResult(result, html);
+        } else if (operation === 'eigenvalues') {
+            html = '<table class="result-table"><tr><td colspan="2" style="color: var(--subtext0); font-size: 0.8rem;">Eigenwerte:</td></tr>';
+            data.result.forEach((ev, i) => {
+                if (Math.abs(ev.imag) > 1e-10) {
+                    const sign = ev.imag >= 0 ? '+' : '-';
+                    html += `<tr><td>λ<sub>${i+1}</sub></td><td>${ev.real.toFixed(6)} ${sign} ${Math.abs(ev.imag).toFixed(6)}i</td></tr>`;
+                } else {
+                    html += `<tr><td>λ<sub>${i+1}</sub></td><td>${ev.real.toFixed(8)}</td></tr>`;
+                }
+            });
+            html += '</table>';
+            showResult(result, html);
+        }
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+// Event-Listener für Live-Vorschau
+document.addEventListener('DOMContentLoaded', () => {
+    renderLatex('\\det(A), \\quad A^{-1}, \\quad A\\mathbf{v} = \\lambda \\mathbf{v}',
+        document.getElementById('mat-formula'), true);
+    document.getElementById('matrix-input').addEventListener('input', updateMatPreview);
+    updateMatPreview();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+<!--
+    @file complex.html
+    @brief Komplexe Analysis: Riemann-Zeta-Funktion.
+    @author Kurt Ingwer
+    @date 2026-03-10
+-->
+{% block title %}Komplexe Analysis – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><span>ℂ</span> Komplexe Analysis</h1>
+    <p class="page-subtitle">
+        Riemann-Zeta-Funktion $\zeta(s)$ für beliebige komplexe Argumente.
+        Analytische Fortsetzung über die gesamte komplexe Ebene (außer $s = 1$).
+    </p>
+</div>
+
+<!-- Zeta-Berechnung -->
+<div class="card">
+    <h2>Riemann-Zeta-Funktion ζ(s)</h2>
+    <div class="formula-display" id="zeta-formula"></div>
+
+    <div class="form-row" style="margin-top: 1rem;">
+        <div class="form-group">
+            <label class="form-label">Re(s) – Realteil</label>
+            <input class="form-input" id="zeta-real" type="number" value="0.5" step="0.1">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Im(s) – Imaginärteil</label>
+            <input class="form-input" id="zeta-imag" type="number" value="14.134725" step="0.1">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Präzision (Terme)</label>
+            <input class="form-input" id="zeta-prec" type="number" value="50" min="10" max="200">
+        </div>
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+        <span style="font-size: 0.8rem; color: var(--subtext0);">Bekannte Werte:</span>
+        <span class="example-btn" onclick="setZeta(2, 0)">ζ(2) = π²/6</span>
+        <span class="example-btn" onclick="setZeta(4, 0)">ζ(4) = π⁴/90</span>
+        <span class="example-btn" onclick="setZeta(0, 0)">ζ(0) = -1/2</span>
+        <span class="example-btn" onclick="setZeta(-1, 0)">ζ(-1) = -1/12</span>
+        <span class="example-btn" onclick="setZeta(0.5, 14.134725)">1. Nullstelle</span>
+        <span class="example-btn" onclick="setZeta(0.5, 21.022040)">2. Nullstelle</span>
+        <span class="example-btn" onclick="setZeta(0.5, 25.010858)">3. Nullstelle</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="calcZeta()">▶ Berechnen</button>
+    <div class="result-box" id="zeta-result"></div>
+</div>
+
+<!-- Erklärung -->
+<div class="card">
+    <h2>Hintergrund: Riemann-Hypothese</h2>
+    <p style="color: var(--subtext0); font-size: 0.9rem; line-height: 1.7;">
+        Die Riemann-Zeta-Funktion ist für Re(s) &gt; 1 definiert als:
+    </p>
+    <div class="formula-display">$$\zeta(s) = \sum_{n=1}^{\infty} \frac{1}{n^s}, \quad \text{Re}(s) > 1$$</div>
+    <p style="color: var(--subtext0); font-size: 0.9rem; line-height: 1.7; margin-top: 0.8rem;">
+        Durch analytische Fortsetzung gilt $\zeta(s)$ für alle $s \in \mathbb{C} \setminus \{1\}$.
+        Die Funktionalgleichung (Riemann, 1859):
+    </p>
+    <div class="formula-display">$$\zeta(s) = 2^s \pi^{s-1} \sin\!\left(\frac{\pi s}{2}\right) \Gamma(1-s)\, \zeta(1-s)$$</div>
+    <p style="color: var(--subtext0); font-size: 0.9rem; line-height: 1.7; margin-top: 0.8rem;">
+        Die <strong style="color: var(--mauve);">Riemann-Hypothese</strong> besagt: Alle nicht-trivialen Nullstellen
+        von $\zeta(s)$ haben Realteil $\frac{1}{2}$ (kritische Gerade).
+        Sie ist eines der <em>Millennium-Probleme</em> (Clay Mathematics Institute).
+    </p>
+</div>
+
+<script>
+function setZeta(re, im) {
+    document.getElementById('zeta-real').value = re;
+    document.getElementById('zeta-imag').value = im;
+}
+
+async function calcZeta() {
+    const s_real = parseFloat(document.getElementById('zeta-real').value);
+    const s_imag = parseFloat(document.getElementById('zeta-imag').value);
+    const precision = parseInt(document.getElementById('zeta-prec').value);
+    const result = document.getElementById('zeta-result');
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne ζ(s)...</div>';
+    try {
+        const data = await apiPost('/api/complex/zeta', { s_real, s_imag, precision });
+
+        const isNearZero = data.abs < 1e-4;
+        const absColor = isNearZero ? 'var(--green)' : 'var(--text)';
+
+        const sign = data.zeta_imag >= 0 ? '+' : '-';
+        const latex = `\\zeta(${s_real} + ${s_imag}i) = ${data.zeta_real.toFixed(6)} ${sign} ${Math.abs(data.zeta_imag).toFixed(6)}i`;
+
+        const html = `<table class="result-table">
+            <tr><td>s</td><td>${s_real} + ${s_imag}i</td></tr>
+            <tr><td>Re[ζ(s)]</td><td>${data.zeta_real.toFixed(10)}</td></tr>
+            <tr><td>Im[ζ(s)]</td><td>${data.zeta_imag.toFixed(10)}</td></tr>
+            <tr><td>|ζ(s)|</td><td style="color: ${absColor}; font-weight: ${isNearZero ? '700' : 'normal'};">
+                ${data.abs.toExponential(6)} ${isNearZero ? '← nahe Nullstelle!' : ''}</td></tr>
+        </table>
+        <div class="formula-display" id="zeta-latex-result" style="margin-top: 0.5rem;"></div>`;
+        showResult(result, html);
+        setTimeout(() => {
+            const el = document.getElementById('zeta-latex-result');
+            if (el) renderLatex(latex, el, false);
+        }, 50);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    renderLatex('\\zeta(s) = \\sum_{n=1}^{\\infty} \\frac{1}{n^s}',
+        document.getElementById('zeta-formula'), true);
+});
+</script>
+{% endblock %}

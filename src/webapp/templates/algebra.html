@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+<!--
+    @file algebra.html
+    @brief Algebra-Modul-Seite: Gleichungen, Polynome, Primzahlen.
+    @author Kurt Ingwer
+    @date 2026-03-10
+-->
+{% block title %}Algebra – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><span>α</span> Algebra</h1>
+    <p class="page-subtitle">
+        Gleichungen lösen, Polynome auswerten, Primzahl-Eigenschaften berechnen.
+    </p>
+</div>
+
+<!-- ===== Gleichungen lösen ===== -->
+<div class="card">
+    <h2>Gleichungen lösen</h2>
+    <div class="formula-display" id="eq-formula"></div>
+
+    <div class="form-group" style="margin-top: 1rem;">
+        <label class="form-label">Gleichungstyp</label>
+        <select class="form-select" id="eq-type" onchange="updateEquationType()">
+            <option value="linear">Linear: ax + b = 0</option>
+            <option value="quadratic">Quadratisch: ax² + bx + c = 0</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">a</label>
+            <input class="form-input" id="coeff-a" type="number" value="2" placeholder="a">
+        </div>
+        <div class="form-group">
+            <label class="form-label">b</label>
+            <input class="form-input" id="coeff-b" type="number" value="-6" placeholder="b">
+        </div>
+        <div class="form-group" id="coeff-c-group">
+            <label class="form-label">c (quadratisch)</label>
+            <input class="form-input" id="coeff-c" type="number" value="0" placeholder="c">
+        </div>
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+        <span style="font-size: 0.8rem; color: var(--subtext0);">Beispiele: </span>
+        <span class="example-btn" onclick="setLinearExample(1, -3)">x - 3 = 0</span>
+        <span class="example-btn" onclick="setLinearExample(2, -8)">2x - 8 = 0</span>
+        <span class="example-btn" onclick="setQuadraticExample(1, -5, 6)">x² - 5x + 6 = 0</span>
+        <span class="example-btn" onclick="setQuadraticExample(1, 0, -2)">x² - 2 = 0</span>
+        <span class="example-btn" onclick="setQuadraticExample(1, 2, 5)">x² + 2x + 5 = 0</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="solveEquation()">▶ Lösen</button>
+    <div class="result-box" id="eq-result"></div>
+</div>
+
+<!-- ===== Polynom auswerten ===== -->
+<div class="card">
+    <h2>Polynom auswerten</h2>
+    <p style="color: var(--subtext0); font-size: 0.85rem; margin-bottom: 1rem;">
+        Koeffizienten kommagetrennt eingeben (höchster Grad zuerst).
+        Beispiel: <code>1,0,-2</code> → x² - 2
+    </p>
+    <div class="form-row">
+        <div class="form-group" style="flex: 2;">
+            <label class="form-label">Koeffizienten (a_n, ..., a_1, a_0)</label>
+            <input class="form-input" id="poly-coeffs" type="text" value="1,0,-2,0,1" placeholder="1,-3,2">
+        </div>
+        <div class="form-group">
+            <label class="form-label">x</label>
+            <input class="form-input" id="poly-x" type="number" value="2" placeholder="x">
+        </div>
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+        <span class="example-btn" onclick="setPolyExample('1,-3,2', 2)">x²-3x+2 bei x=2</span>
+        <span class="example-btn" onclick="setPolyExample('1,0,-1', 1.5)">x²-1 bei x=1.5</span>
+        <span class="example-btn" onclick="setPolyExample('1,0,0,0,-1', 2)">x⁴-1 bei x=2</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="evalPolynomial()">▶ Auswerten</button>
+    <div class="result-box" id="poly-result"></div>
+</div>
+
+<!-- ===== Primzahl-Eigenschaften ===== -->
+<div class="card">
+    <h2>Primzahl-Eigenschaften</h2>
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">Zahl n</label>
+            <input class="form-input" id="prime-n" type="number" value="360" min="1" placeholder="n">
+        </div>
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+        <span class="example-btn" onclick="setPrime(7)">7</span>
+        <span class="example-btn" onclick="setPrime(12)">12</span>
+        <span class="example-btn" onclick="setPrime(97)">97</span>
+        <span class="example-btn" onclick="setPrime(360)">360</span>
+        <span class="example-btn" onclick="setPrime(1024)">1024</span>
+        <span class="example-btn" onclick="setPrime(9973)">9973</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="checkPrime()">▶ Analysieren</button>
+    <div class="result-box" id="prime-result"></div>
+</div>
+
+<script>
+// ===== GLEICHUNGEN LÖSEN =====
+
+/** Gleichungstyp wechseln: c-Feld ein-/ausblenden */
+function updateEquationType() {
+    const type = document.getElementById('eq-type').value;
+    const cGroup = document.getElementById('coeff-c-group');
+    cGroup.style.display = type === 'quadratic' ? 'block' : 'none';
+    // Formel aktualisieren
+    const formulaEl = document.getElementById('eq-formula');
+    if (type === 'linear') {
+        renderLatex('ax + b = 0', formulaEl, true);
+    } else {
+        renderLatex('ax^2 + bx + c = 0', formulaEl, true);
+    }
+}
+
+function setLinearExample(a, b) {
+    document.getElementById('eq-type').value = 'linear';
+    document.getElementById('coeff-a').value = a;
+    document.getElementById('coeff-b').value = b;
+    updateEquationType();
+}
+
+function setQuadraticExample(a, b, c) {
+    document.getElementById('eq-type').value = 'quadratic';
+    document.getElementById('coeff-a').value = a;
+    document.getElementById('coeff-b').value = b;
+    document.getElementById('coeff-c').value = c;
+    updateEquationType();
+}
+
+async function solveEquation() {
+    const type = document.getElementById('eq-type').value;
+    const a = parseFloat(document.getElementById('coeff-a').value) || 0;
+    const b = parseFloat(document.getElementById('coeff-b').value) || 0;
+    const c = parseFloat(document.getElementById('coeff-c').value) || 0;
+    const result = document.getElementById('eq-result');
+
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne...</div>';
+
+    try {
+        const coeffs = type === 'linear' ? [a, b] : [a, b, c];
+        const data = await apiPost('/api/algebra/solve', { type, coefficients: coeffs });
+
+        let html = `<div style="margin-bottom: 0.5rem; color: var(--subtext0); font-size: 0.85rem;">
+            Gleichung: <code>${data.equation}</code>
+        </div>`;
+
+        if (data.solutions.length === 0) {
+            html += '<div style="color: var(--yellow);">Keine reellen Lösungen.</div>';
+        } else {
+            html += '<table class="result-table">';
+            data.solutions.forEach((sol, i) => {
+                if (sol.imag && Math.abs(sol.imag) > 1e-10) {
+                    // Komplexe Lösung
+                    const sign = sol.imag >= 0 ? '+' : '-';
+                    html += `<tr><td>x<sub>${i+1}</sub></td>
+                        <td>${sol.real.toFixed(6)} ${sign} ${Math.abs(sol.imag).toFixed(6)}i</td></tr>`;
+                } else {
+                    html += `<tr><td>x<sub>${i+1}</sub></td><td>${sol.real.toFixed(8)}</td></tr>`;
+                }
+            });
+            html += '</table>';
+        }
+        showResult(result, html);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+// ===== POLYNOM =====
+
+function setPolyExample(coeffs, x) {
+    document.getElementById('poly-coeffs').value = coeffs;
+    document.getElementById('poly-x').value = x;
+}
+
+async function evalPolynomial() {
+    const coeffsStr = document.getElementById('poly-coeffs').value;
+    const x = parseFloat(document.getElementById('poly-x').value);
+    const result = document.getElementById('poly-result');
+
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne...</div>';
+
+    try {
+        const coeffs = coeffsStr.split(',').map(s => parseFloat(s.trim()));
+        const data = await apiPost('/api/algebra/polynomial', { coefficients: coeffs, x });
+
+        const html = `<table class="result-table">
+            <tr><td>Polynom</td><td><code>${data.polynomial}</code></td></tr>
+            <tr><td>x</td><td>${data.x}</td></tr>
+            <tr><td>f(x)</td><td>${data.result}</td></tr>
+        </table>`;
+        showResult(result, html);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+// ===== PRIMZAHLEN =====
+
+function setPrime(n) {
+    document.getElementById('prime-n').value = n;
+}
+
+async function checkPrime() {
+    const n = parseInt(document.getElementById('prime-n').value);
+    const result = document.getElementById('prime-result');
+
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne...</div>';
+
+    try {
+        const data = await apiPost('/api/algebra/primes', { n });
+
+        const primeColor = data.is_prime ? 'var(--green)' : 'var(--peach)';
+        const primeText = data.is_prime ? '✓ Ja, Primzahl' : '✗ Keine Primzahl';
+
+        const html = `<table class="result-table">
+            <tr><td>n</td><td>${data.n}</td></tr>
+            <tr><td>Primzahl?</td><td style="color: ${primeColor}; font-weight: 700;">${primeText}</td></tr>
+            <tr><td>Primfaktorzerlegung</td><td><code>${data.factorization_str}</code></td></tr>
+            <tr><td>Euler-Phi φ(${data.n})</td><td>${data.euler_phi}</td></tr>
+        </table>
+        <div class="formula-display" id="prime-formula-display" style="margin-top: 0.5rem;"></div>`;
+        showResult(result, html);
+
+        // Formel anzeigen
+        setTimeout(() => {
+            const fEl = document.getElementById('prime-formula-display');
+            if (fEl) renderLatex(`\\varphi(${data.n}) = ${data.euler_phi}`, fEl, false);
+        }, 50);
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+// Initialisierung: Formel anzeigen, c-Feld ausblenden
+window.addEventListener('DOMContentLoaded', () => {
+    renderLatex('ax + b = 0', document.getElementById('eq-formula'), true);
+    document.getElementById('coeff-c-group').style.display = 'none';
+});
+</script>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+<!--
+    @file statistics.html
+    @brief Statistik-Modul: Deskriptive Statistik für Datensätze.
+    @author Kurt Ingwer
+    @date 2026-03-10
+-->
+{% block title %}Statistik – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><span>σ</span> Statistik</h1>
+    <p class="page-subtitle">
+        Deskriptive Statistik: Lagemaße, Streuungsmaße und grafische Übersicht.
+    </p>
+</div>
+
+<div class="card">
+    <h2>Deskriptive Statistik</h2>
+
+    <div class="form-group">
+        <label class="form-label">Datensatz (kommagetrennte Zahlen)</label>
+        <input class="form-input" id="stats-data" type="text" value="2, 4, 4, 4, 5, 5, 7, 9" placeholder="1, 2, 3, 4, 5">
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+        <span class="example-btn" onclick="setData('2,4,4,4,5,5,7,9')">Klassisches Beispiel</span>
+        <span class="example-btn" onclick="setData('1,2,3,4,5,6,7,8,9,10')">1 bis 10</span>
+        <span class="example-btn" onclick="setData('100,200,300,400,500')">100er Schritte</span>
+        <span class="example-btn" onclick="setData('3,1,4,1,5,9,2,6,5,3,5')">Zufallsfolge</span>
+        <span class="example-btn" onclick="generateRandom()">Zufallsdaten (20 Werte)</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="calcStats()">▶ Auswerten</button>
+    <div class="result-box" id="stats-result"></div>
+</div>
+
+<!-- Mini-Balkendiagramm -->
+<div class="card" id="chart-card" style="display: none;">
+    <h2>Datensatz-Visualisierung</h2>
+    <canvas id="stats-chart" height="120"></canvas>
+</div>
+
+<script>
+function setData(d) {
+    document.getElementById('stats-data').value = d;
+}
+
+function generateRandom() {
+    const vals = Array.from({length: 20}, () => Math.round(Math.random() * 100));
+    document.getElementById('stats-data').value = vals.join(', ');
+}
+
+async function calcStats() {
+    const dataStr = document.getElementById('stats-data').value;
+    const result = document.getElementById('stats-result');
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne...</div>';
+    try {
+        const data_arr = dataStr.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+        if (data_arr.length === 0) throw new Error('Keine gültigen Zahlen gefunden.');
+        const data = await apiPost('/api/statistics/describe', { data: data_arr });
+
+        const html = `<table class="result-table">
+            <tr><td>Anzahl n</td><td>${data.n}</td></tr>
+            <tr><td>Mittelwert μ</td><td>${data.mean.toFixed(6)}</td></tr>
+            <tr><td>Median</td><td>${data.median.toFixed(6)}</td></tr>
+            <tr><td>Modus</td><td>${Array.isArray(data.mode) ? data.mode.join(', ') : data.mode}</td></tr>
+            <tr><td>Varianz σ²</td><td>${data.variance.toFixed(6)}</td></tr>
+            <tr><td>Standardabw. σ</td><td>${data.std_dev.toFixed(6)}</td></tr>
+            <tr><td>Minimum</td><td>${data.min}</td></tr>
+            <tr><td>Maximum</td><td>${data.max}</td></tr>
+            <tr><td>Spannweite</td><td>${data.range.toFixed(4)}</td></tr>
+        </table>
+        <div class="formula-display" id="stats-latex" style="margin-top: 0.5rem;"></div>`;
+        showResult(result, html);
+
+        setTimeout(() => {
+            const el = document.getElementById('stats-latex');
+            if (el) renderLatex(`\\bar{x} = ${data.mean.toFixed(3)}, \\quad \\sigma = ${data.std_dev.toFixed(3)}`, el, false);
+        }, 50);
+
+        // Mini-Chart zeichnen
+        drawChart(data_arr);
+
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+
+/** Zeichnet ein einfaches Balkendiagramm auf dem Canvas */
+function drawChart(data) {
+    document.getElementById('chart-card').style.display = 'block';
+    const canvas = document.getElementById('stats-chart');
+    const ctx = canvas.getContext('2d');
+
+    // Canvas-Größe an Container anpassen
+    canvas.width = canvas.parentElement.clientWidth - 48;
+    canvas.height = 120;
+
+    const W = canvas.width, H = canvas.height;
+    const pad = 10;
+    const max = Math.max(...data);
+    const min = Math.min(...data);
+    const range = max - min || 1;
+    const barW = (W - 2 * pad) / data.length;
+
+    // Hintergrund
+    ctx.fillStyle = '#11111b';
+    ctx.fillRect(0, 0, W, H);
+
+    // Balken zeichnen
+    data.forEach((val, i) => {
+        const barH = ((val - min) / range) * (H - 2 * pad);
+        const x = pad + i * barW;
+        const y = H - pad - barH;
+
+        // Gradient für jeden Balken
+        const gradient = ctx.createLinearGradient(0, y, 0, H - pad);
+        gradient.addColorStop(0, '#89b4fa');
+        gradient.addColorStop(1, '#74c7ec');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x + 1, y, barW - 2, barH);
+    });
+}
+</script>
+{% endblock %}
