@@ -479,9 +479,10 @@ class TestFractalDimensions:
 
     def test_box_counting_plane(self):
         """Punkte auf einem 2D-Gitter haben Dimension ≈ 2."""
-        # Punkte auf einem Quadratgitter
+        # Punkte auf einem Quadratgitter mit Abstand 0.1 (Bereich 0..1.9)
+        # Epsilon-Werte müssen >= Gitterabstand sein, damit Skalierung sichtbar ist
         points = [[i * 0.1, j * 0.1] for i in range(20) for j in range(20)]
-        eps_values = [0.5, 0.3, 0.2, 0.1, 0.05]
+        eps_values = [1.0, 0.5, 0.25, 0.2, 0.1]
         d = box_counting_dimension(points, eps_values)
         # Dimension eines 2D-Gitters ≈ 2
         assert 1.5 < d < 2.5

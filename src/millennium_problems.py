@@ -716,14 +716,8 @@ def navier_stokes_2d_simple(
         i = slice(1, ny - 1)
         j = slice(1, nx - 1)
 
-        # Advektionsterm (Upwind-Schema für Stabilität)
-        # ∂u/∂x via Upwind: wenn u>0, benutze rückwärtige Differenz
-        du_dx = np.where(
-            u_old[i, j] > 0,
-            (u_old[i, j] - u_old[i, 1:nx-1-1]) / dx if nx > 3 else np.zeros_like(u_old[i, j]),
-            (u_old[i, 2:] - u_old[i, j]) / dx
-        )
-        # Vereinfacht: zentrale Differenzen (für moderate Re-Zahlen stabil)
+        # Advektionsterm: zentrale Differenzen (stabil für moderate Re-Zahlen)
+        # u_old[i, 2:] und u_old[i, :-2] haben die gleiche Shape wie u_old[i, j]
         adv_u = (
             u_old[i, j] * (u_old[i, 2:] - u_old[i, :-2]) / (2 * dx) +
             v_old[i, j] * (u_old[2:, j] - u_old[:-2, j]) / (2 * dy)
@@ -854,8 +848,8 @@ def check_navier_stokes_energy(u: np.ndarray, v: np.ndarray) -> dict:
     # |u|² = u² + v²
     speed_squared = u ** 2 + v ** 2
 
-    # Numerische Integration (Trapezregel in 2D via np.trapz)
-    energy = 0.5 * float(np.trapz(np.trapz(speed_squared, dx=dx, axis=1), dx=dy))
+    # Numerische Integration (Trapezregel in 2D via np.trapezoid)
+    energy = 0.5 * float(np.trapezoid(np.trapezoid(speed_squared, dx=dx, axis=1), dx=dy))
 
     # Maximale Geschwindigkeit
     max_vel = float(np.max(np.sqrt(speed_squared)))
@@ -866,7 +860,7 @@ def check_navier_stokes_energy(u: np.ndarray, v: np.ndarray) -> dict:
         dv_dx = np.gradient(v, dx, axis=1)
         du_dy = np.gradient(u, dy, axis=0)
         vorticity = dv_dx - du_dy
-        enstrophy = 0.5 * float(np.trapz(np.trapz(vorticity ** 2, dx=dx, axis=1), dx=dy))
+        enstrophy = 0.5 * float(np.trapezoid(np.trapezoid(vorticity ** 2, dx=dx, axis=1), dx=dy))
     else:
         vorticity = np.zeros_like(u)
         enstrophy = 0.0

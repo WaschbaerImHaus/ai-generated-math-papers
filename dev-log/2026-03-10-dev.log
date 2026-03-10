@@ -170,3 +170,27 @@
     - Matrix.det() → Matrix.determinant()
     - Matrix.inv() → Matrix.inverse() + ._data statt .data
     - runge_kutta4(f, t0, y0, ...) Parameterreihenfolge korrigiert
+
+2026-03-10 16:20:00 - Build 12: Web-Interface, neue Module, Performance-Optimierungen (1464 Tests grün)
+
+## Web-Interface (Port 8080)
+- Flask-App unter src/webapp/app.py mit 16 Routen
+- Dark Theme (Catppuccin Mocha), KaTeX-Formeln, matplotlib-Plots als Base64-PNG
+- Templates für alle 8 Themengebiete: Algebra, Analysis, LinAlg, Statistik, ODE, Komplex, Zahlentheorie, Visualisierung
+- Start: bash build/start_webapp.sh
+
+## Neue Module
+- src/topology.py: MetricSpace, ParametricCurve, Euler-Charakteristik, Box-Counting-Dimension, Hausdorff-Abstand
+- src/graph_theory.py: Graph-Klasse, BFS/DFS, Dijkstra, Bellman-Ford, Floyd-Warshall, Kruskal, Prim, Kombinatorik
+- src/millennium_problems.py: Werkzeuge für alle 7 Millennium-Probleme (Riemann, Goldbach, P vs NP, Navier-Stokes, Yang-Mills, BSD)
+
+## Performance-Optimierungen
+- lru_cache für is_prime, prime_factorization, euler_phi, bernoulli_number, p_adic_valuation, collatz_sequence
+- Magic Numbers in analysis.py durch config.py-Konstanten ersetzt
+- debugging/profile_performance.py erstellt
+
+## Bugfixes
+- np.trapz → np.trapezoid (NumPy 2.x Kompatibilität)
+- Navier-Stokes Shape-Mismatch in Advektionsterm behoben
+- Box-Counting-Test: Epsilon-Werte ≥ Gitterabstand korrigiert
+- Gamma-Test: |Γ(1+i)| korrekter Wert 0.5216 statt 0.498
