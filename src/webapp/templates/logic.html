@@ -244,15 +244,42 @@ async function calcGodel() {
 
         // Unvollständigkeits-Demonstration anzeigen
         if (data.incompleteness) {
+            const inc = data.incompleteness;
             html += '<h3 style="margin-top:16px;">Gödels Unvollständigkeitssätze</h3>';
-            html += '<div style="background:#1e1e2e; border-radius:8px; padding:12px;">';
-            if (typeof data.incompleteness === 'object') {
-                for (const [key, val] of Object.entries(data.incompleteness)) {
-                    html += `<p><strong>${key}:</strong> ${val}</p>`;
+            html += '<div style="background:#1e1e2e; border-radius:8px; padding:12px; line-height:1.7;">';
+
+            // Satz + Aussage
+            if (inc.theorem)    html += `<p><strong>${inc.theorem}</strong></p>`;
+            if (inc.statement)  html += `<p>${inc.statement}</p>`;
+
+            // Konstruktion (verschachteltes Objekt → Schritt für Schritt)
+            if (inc.construction && typeof inc.construction === 'object') {
+                html += '<p><strong>Konstruktion:</strong></p><ol>';
+                for (const [k, v] of Object.entries(inc.construction)) {
+                    html += `<li style="margin-bottom:6px; white-space:pre-wrap;">${v}</li>`;
                 }
-            } else {
-                html += `<p>${data.incompleteness}</p>`;
+                html += '</ol>';
             }
+
+            // 2. Unvollständigkeitssatz
+            if (inc.second_incompleteness && typeof inc.second_incompleteness === 'object') {
+                const s2 = inc.second_incompleteness;
+                html += `<p><strong>${s2.statement || 'Zweiter Unvollständigkeitssatz'}</strong></p>`;
+                if (s2.note) html += `<p style="color:var(--subtext0); font-size:0.9em;">${s2.note}</p>`;
+            }
+
+            // Folgerungen
+            if (Array.isArray(inc.implications)) {
+                html += '<p><strong>Folgerungen:</strong></p><ul>';
+                inc.implications.forEach(i => { html += `<li>${i}</li>`; });
+                html += '</ul>';
+            }
+
+            // Beispiel-Satz
+            if (inc.goedel_sentence_example) {
+                html += `<p style="font-style:italic; color:var(--blue);">${inc.goedel_sentence_example}</p>`;
+            }
+
             html += '</div>';
         }
 

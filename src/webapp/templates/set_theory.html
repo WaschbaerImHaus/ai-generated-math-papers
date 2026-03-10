@@ -267,13 +267,16 @@ async function loadZFC() {
                 }
             });
         } else if (typeof axioms === 'object') {
-            // Objekt-Form: Name → Beschreibung
+            // Objekt-Form: Schlüssel → {name, formal, description} oder String
             let i = 1;
-            for (const [name, desc] of Object.entries(axioms)) {
+            for (const [key, val] of Object.entries(axioms)) {
+                const axName = (typeof val === 'object' && val !== null) ? (val.name || key) : key;
+                const formal = (typeof val === 'object' && val !== null && val.formal) ? `<code style="font-size:0.85em; display:block; color:var(--blue)">${val.formal}</code>` : '';
+                const axDesc = (typeof val === 'object' && val !== null) ? (val.description || '') : String(val);
                 html += `<tr>
                     <td>${i++}</td>
-                    <td><strong>${name}</strong></td>
-                    <td>${desc}</td>
+                    <td><strong>${axName}</strong>${formal}</td>
+                    <td>${axDesc}</td>
                 </tr>`;
             }
         }

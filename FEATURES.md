@@ -218,3 +218,24 @@
 
 ## Offene Aufgaben
 _(keine bekannten offenen Features mehr)_
+
+### Algebra Vertiefung (Build 33-34)
+- [x] Darstellungstheorie (src/representation_theory.py): Charaktertafeln, Schur-Orthogonalität, irreduzible Darstellungen
+- [x] Verbandstheorie (src/lattice_theory.py): Halbverbände, Verbände, distributive/modulare Verbände, Boolesche Algebren
+- [x] Multilineare Algebra (src/multilinear_algebra.py): Tensorprodukte, äußere Algebra, symmetrische Algebra, Tensorkomponenten
+- [x] Homologische Algebra (src/homological_algebra.py): Kettenkomplexe, Homologiegruppen, exakte Sequenzen, Ext/Tor
+- [x] Algebraische Strukturen (src/algebraic_structures.py): Magma/Halbgruppe/Monoid/Gruppe-Hierarchie, freie Strukturen
+- [x] Invariantentheorie (src/invariant_theory.py): Reynolds-Operator, Molien-Reihe, Hilbert-Basis, Newton-Identitäten
+- [x] Universelle Algebra (src/universal_algebra.py): Signaturen, Varietäten, freie Algebren, Birkhoff-Theorem
+
+### Logische Grundlagen (Build 33-34)
+- [x] Modelltheorie (src/model_theory.py): Strukturen, Interpretationen, Elementar-Äquivalenz, Compactness-Theorem
+- [x] Formale Beweistheorie (src/proof_theory_formal.py): Sequenzenkalkül LK, Natürliches Schließen, Hilbert-Kalkül, Schnittelimination
+- [x] Rekursionstheorie (src/recursion_theory.py): Turing-Maschinen, μ-rekursive Funktionen, Halteproblem, Arithmetische Hierarchie
+
+### Analysis Vertiefung (Build 34)
+- [x] Maßtheorie (src/measure_theory.py): σ-Algebren, Lebesgue-Maß, Lebesgue-Integral, Konvergenzsätze, Cantor-Funktion
+- [x] Spezielle Funktionen (src/special_functions.py): Bessel, Legendre, Airy, Hypergeometrisch, Orthogonalpolynome
+- [x] Funktionalanalysis (src/functional_analysis.py): Banach/Hilbert-Räume, lineare Operatoren, Spektraltheorie, Fixpunktsätze
+- [x] Partielle DGL (src/pde.py): Wärmegleichung, Wellengleichung, Laplace/Poisson, Schrödinger, FEM, Charakteristiken
+- [x] Operatoralgebren (src/operator_algebras.py): C*-Algebren, Von-Neumann-Algebren, Gelfand-Darstellung, K-Theorie

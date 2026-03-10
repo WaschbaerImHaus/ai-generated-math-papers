@@ -4191,7 +4191,12 @@ def api_logic_dpll():
         # clauses: Liste von Listen, z.B. [[1, -2], [2, 3], [-1, -3]]
         # positive Zahl = Variable i, negative = Negation
         raw_clauses = data.get('clauses', [[1, -2], [2, 3]])
-        clauses = [frozenset(c) for c in raw_clauses]
+
+        # dpll() erwartet String-Literale ("v1", "-v1") statt Integers
+        def int_to_lit(n: int) -> str:
+            return f"v{n}" if n > 0 else f"-v{-n}"
+
+        clauses = [frozenset(int_to_lit(lit) for lit in c) for c in raw_clauses]
         result = dpll(clauses)
         return jsonify({
             'satisfiable': result is not None,
@@ -4274,7 +4279,16 @@ def api_sets_cantor():
     try:
         n = min(int(data.get('n', 5)), 10)
         result = cantors_diagonal_argument(n)
-        return jsonify(result)
+        # Python-sets sind nicht JSON-serialisierbar → in sortierte Listen umwandeln
+        def serialize(obj):
+            if isinstance(obj, (set, frozenset)):
+                return sorted(list(obj))
+            if isinstance(obj, dict):
+                return {k: serialize(v) for k, v in obj.items()}
+            if isinstance(obj, list):
+                return [serialize(x) for x in obj]
+            return obj
+        return jsonify(serialize(result))
     except Exception as e:
         return error_response(str(e))
 
