@@ -59,10 +59,10 @@ class ModularGroup:
 
     @author Kurt Ingwer
     @since 2026-03-08
-    @lastModified 2026-03-08
+    @lastModified 2026-03-10
     """
 
-    def __init__(self, a: int, b: int, c: int, d: int):
+    def __init__(self, a: int, b: int, c: int, d: int) -> None:
         """
         Initialisiert ein Element der modularen Gruppe.
 
@@ -71,7 +71,7 @@ class ModularGroup:
         @param c: Eintrag unten links
         @param d: Eintrag unten rechts
         @raises ValueError: Wenn ad - bc ≠ 1
-        @lastModified: 2026-03-08
+        @lastModified: 2026-03-10
         """
         # Determinante prüfen: muss exakt 1 sein
         det = a * d - b * c
@@ -96,7 +96,7 @@ class ModularGroup:
         @param z: Komplexe Zahl mit Im(z) > 0 (Punkt in der oberen Halbebene)
         @return: Transformierter Punkt (aτ+b)/(cτ+d)
         @raises ZeroDivisionError: Wenn cz + d = 0
-        @lastModified: 2026-03-08
+        @lastModified: 2026-03-10
         """
         nenner = self.c * z + self.d
         if abs(nenner) < 1e-15:
@@ -112,7 +112,7 @@ class ModularGroup:
 
         @param other: Zweites SL(2,Z)-Element
         @return: Produkt als neues ModularGroup-Element
-        @lastModified: 2026-03-08
+        @lastModified: 2026-03-10
         """
         # Standardmäßige Matrixmultiplikation 2x2
         a_new = self.a * other.a + self.b * other.c
@@ -129,7 +129,7 @@ class ModularGroup:
             [[a,b],[c,d]]^{-1} = [[d,-b],[-c,a]]
 
         @return: Inverse Matrix als ModularGroup
-        @lastModified: 2026-03-08
+        @lastModified: 2026-03-10
         """
         return ModularGroup(self.d, -self.b, -self.c, self.a)
 
@@ -148,7 +148,7 @@ class ModularGroup:
 
         @param z: Komplexe Zahl in der oberen Halbebene
         @return: True wenn z im Fundamentalbereich liegt
-        @lastModified: 2026-03-08
+        @lastModified: 2026-03-10
         """
         # Im(z) > 0 vorausgesetzt (obere Halbebene)
         abs_z = abs(z)
@@ -162,7 +162,7 @@ class ModularGroup:
     def __str__(self) -> str:
         return f"[[{self.a}, {self.b}], [{self.c}, {self.d}]]"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Vergleich zweier SL(2,Z)-Elemente (bis auf Vorzeichen, da ±I wirken gleich)."""
         if not isinstance(other, ModularGroup):
             return False
@@ -198,7 +198,7 @@ def eisenstein_series(k: int, z: complex, n_terms: int = 50) -> complex:
     @param n_terms: Halbbreite des Gitters (-n_terms ≤ m,n ≤ n_terms)
     @return: Wert G_k(τ) als komplexe Zahl
     @raises ValueError: Wenn k ungerade oder k < 4
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     if k < 4 or k % 2 != 0:
         raise ValueError(f"k muss gerade und ≥ 4 sein, erhalten: k = {k}")
@@ -305,7 +305,7 @@ def normalized_eisenstein_E4(z: complex, n_terms: int = 50) -> complex:
     @param z: Punkt τ in der oberen Halbebene
     @param n_terms: Gittergröße für Eisenstein-Reihe
     @return: Wert E_4(τ)
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     # G_4 normieren: 2ζ(4) = 2·π⁴/90 = π⁴/45
     G4 = eisenstein_series(4, z, n_terms)
@@ -329,7 +329,7 @@ def normalized_eisenstein_E6(z: complex, n_terms: int = 50) -> complex:
     @param z: Punkt τ in der oberen Halbebene
     @param n_terms: Gittergröße für Eisenstein-Reihe
     @return: Wert E_6(τ)
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     # G_6 normieren: 2ζ(6) = 2·π⁶/945
     G6 = eisenstein_series(6, z, n_terms)
@@ -363,7 +363,7 @@ def delta_function(z: complex, n_terms: int = 100) -> complex:
     @param z: Punkt τ in der oberen Halbebene (Im(z) > 0)
     @param n_terms: Anzahl der Produktterme (mehr = genauer)
     @return: Wert Δ(τ)
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     if z.imag <= 0:
         raise ValueError(f"τ muss in der oberen Halbebene liegen (Im(τ) > 0)")
@@ -415,7 +415,7 @@ def j_invariant(z: complex, n_terms: int = 100) -> complex:
     @param z: Punkt τ in der oberen Halbebene (Im(z) > 0)
     @param n_terms: Anzahl der Produktterme für Δ
     @return: Wert j(τ) als komplexe Zahl
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     # E_4 berechnen (normiert)
     E4 = normalized_eisenstein_E4(z, n_terms=min(n_terms, 50))
@@ -464,7 +464,7 @@ def fourier_coefficients_delta(n_max: int) -> list[int]:
 
     @param n_max: Maximales n für die Berechnung
     @return: Liste [τ(1), τ(2), ..., τ(n_max)] als ganze Zahlen
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     # Wir berechnen die Koeffizienten des formalen Produkts
     # p(q) = Π_{n=1}^{n_max} (1-q^n)^24
@@ -517,7 +517,7 @@ def modular_form_check(
     f: Callable[[complex], complex],
     k: int,
     z: complex,
-    gamma: ModularGroup,
+    gamma: 'ModularGroup',
     tol: float = 1e-6
 ) -> bool:
     """
@@ -537,7 +537,7 @@ def modular_form_check(
     @param gamma: Element der modularen Gruppe
     @param tol: Toleranz für numerischen Vergleich
     @return: True wenn |f(γτ) - (cτ+d)^k · f(τ)| < tol
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     # Berechne γτ (transformierter Punkt)
     gamma_z = gamma.apply(z)
@@ -560,7 +560,7 @@ def modular_form_check(
 # HECKE-OPERATOREN
 # ===========================================================================
 
-def hecke_operator(coefficients: list, p: int, k: int = 12) -> list:
+def hecke_operator(coefficients: list[float | int], p: int, k: int = 12) -> list[float]:
     """
     Wendet den Hecke-Operator T_p auf eine Modulform an.
 
@@ -586,7 +586,7 @@ def hecke_operator(coefficients: list, p: int, k: int = 12) -> list:
     @param p: Primzahl p ≥ 2 (Hecke-Operator T_p)
     @param k: Gewicht der Modulform (Standard: 12 für Δ)
     @return: Liste [b(0), b(1), ..., b(M)] der transformierten Koeffizienten
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     N = len(coefficients)
     # Ausgabelänge: T_p erhöht den Index um p, daher brauchen wir weniger Koeffizienten
@@ -616,10 +616,10 @@ def hecke_operator(coefficients: list, p: int, k: int = 12) -> list:
 # ===========================================================================
 
 def shimura_taniyama_check(
-    a_p_elliptic: dict,
-    a_p_modular: dict,
-    primes: list
-) -> dict:
+    a_p_elliptic: dict[int, float | int],
+    a_p_modular: dict[int, float | int],
+    primes: list[int],
+) -> dict[str, object]:
     """
     Vergleicht a_p-Koeffizienten einer elliptischen Kurve mit einer Modulform.
 
@@ -645,7 +645,7 @@ def shimura_taniyama_check(
              'agreement_ratio': float – Anteil der übereinstimmenden Primzahlen
              'max_discrepancy': float – Größte Abweichung
              'is_modular_candidate': bool – Vermutung: E ist modular
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     matches = {}
     discrepancies = []
@@ -715,7 +715,7 @@ def cusp_form_dimension(k: int, level: int = 1) -> int:
     @param level: Niveau N ≥ 1 (Standard: 1 = volle Modulgruppe)
     @return: Dimension des Cusp-Formen-Raums (nicht-negative ganze Zahl)
     @raises ValueError: Wenn k ungerade oder k < 2
-    @lastModified: 2026-03-09
+    @lastModified: 2026-03-10
     """
     # Nur gerade Gewichte für holomorphe Cusp-Formen
     if k < 2 or k % 2 != 0:
@@ -774,7 +774,7 @@ def is_cusp_form_basis(k: int, z: complex, n_terms: int = 100) -> bool:
     @param z: Punkt in der oberen Halbebene (für numerische Verifikation)
     @param n_terms: Anzahl Terme für Produktformel
     @return: True wenn dim S_k ≥ 1 (d.h. Cusp-Form-Raum nicht trivial)
-    @lastModified: 2026-03-09
+    @lastModified: 2026-03-10
     """
     # Nur gerade Gewichte zulässig
     if k < 2 or k % 2 != 0:
@@ -785,7 +785,7 @@ def is_cusp_form_basis(k: int, z: complex, n_terms: int = 100) -> bool:
     return dim >= 1
 
 
-def ramanujan_tau_properties(n: int) -> dict:
+def ramanujan_tau_properties(n: int) -> dict[str, object]:
     """
     Überprüft bekannte Eigenschaften der Ramanujan-Tau-Funktion τ(n).
 
@@ -807,7 +807,7 @@ def ramanujan_tau_properties(n: int) -> dict:
                                           oder bei n = p·q geprüft
              'ramanujan_bound_ok': True wenn |τ(n)| ≤ 2·n^{11/2} (für n prim)
     @raises ValueError: Wenn n < 1
-    @lastModified: 2026-03-09
+    @lastModified: 2026-03-10
     """
     if n < 1:
         raise ValueError(f"n muss ≥ 1 sein, erhalten: {n}")
@@ -877,7 +877,7 @@ def theta_function(z: complex, n_max: int = 50) -> complex:
     @param n_max: Maximaler Summationsindex (symmetrisch: -n_max bis n_max)
     @return: Wert der Theta-Funktion als komplexe Zahl
     @raises ValueError: Wenn Im(z) ≤ 0
-    @lastModified: 2026-03-09
+    @lastModified: 2026-03-10
     """
     if z.imag <= 0:
         raise ValueError(f"τ muss in der oberen Halbebene liegen (Im(τ) > 0), erhalten: {z}")
@@ -900,7 +900,7 @@ def theta_function(z: complex, n_max: int = 50) -> complex:
     return total
 
 
-def theta_transformation(z: complex) -> dict:
+def theta_transformation(z: complex) -> dict[str, object]:
     """
     Verifiziert die Jacobi-Theta-Transformationsformel numerisch.
 
@@ -921,7 +921,7 @@ def theta_transformation(z: complex) -> dict:
              'transformation_ratio': θ(-1/τ) / θ(τ)
              'expected': sqrt(-iτ) (erwartetes Verhältnis)
              'verified': True wenn |ratio - expected| / |expected| < 1e-6
-    @lastModified: 2026-03-09
+    @lastModified: 2026-03-10
     """
     # Berechne θ(τ)
     theta_z = theta_function(z)
@@ -982,7 +982,7 @@ def sum_of_squares_theta(n: int, k: int = 2) -> int:
     @param k: Anzahl der Quadrate (Standard: 2)
     @return: r_k(n) als nicht-negative ganze Zahl
     @raises ValueError: Wenn n < 0 oder k < 1
-    @lastModified: 2026-03-09
+    @lastModified: 2026-03-10
     """
     if n < 0:
         raise ValueError(f"n muss ≥ 0 sein, erhalten: {n}")
@@ -1042,7 +1042,7 @@ def jacobi_triple_product(z: complex, q: complex, n_terms: int = 20) -> complex:
     @param n_terms: Anzahl der Produktterme
     @return: Wert des Dreifachprodukts (Produktseite)
     @raises ValueError: Wenn |q| ≥ 1 oder z = 0
-    @lastModified: 2026-03-09
+    @lastModified: 2026-03-10
     """
     if abs(q) >= 1.0:
         raise ValueError(f"|q| muss < 1 sein, erhalten: |q| = {abs(q)}")
@@ -1093,7 +1093,7 @@ def _is_prime_simple(n: int) -> bool:
     return True
 
 
-def _primes_up_to(n: int) -> list:
+def _primes_up_to(n: int) -> list[int]:
     """
     Gibt alle Primzahlen bis n zurück (Sieb des Eratosthenes).
 
@@ -1136,7 +1136,7 @@ def dedekind_eta(z: complex, n_terms: int = 100) -> complex:
     @param n_terms: Anzahl der Produktterme (mehr = genauer)
     @return: Wert η(τ) als komplexe Zahl
     @raises ValueError: Wenn Im(z) ≤ 0
-    @lastModified: 2026-03-09
+    @lastModified: 2026-03-10
     """
     if z.imag <= 0:
         raise ValueError(f"τ muss in der oberen Halbebene liegen (Im(τ) > 0), erhalten: {z}")
@@ -1164,7 +1164,7 @@ def dedekind_eta(z: complex, n_terms: int = 100) -> complex:
 # HECKE-ALGEBRA VERTIEFUNG
 # ===========================================================================
 
-def hecke_algebra_structure(k: int, level: int = 1) -> dict:
+def hecke_algebra_structure(k: int, level: int = 1) -> dict[str, object]:
     """
     Untersucht die Struktur der Hecke-Algebra für Modulformen vom Gewicht k.
 
@@ -1254,7 +1254,7 @@ def hecke_algebra_structure(k: int, level: int = 1) -> dict:
     }
 
 
-def hecke_eigenform(coefficients: list, primes: list) -> dict:
+def hecke_eigenform(coefficients: list[float], primes: list[int]) -> dict[str, object]:
     """
     Prüft, ob eine Modulform (gegeben durch Fourier-Koeffizienten) eine Hecke-Eigenform ist.
 
@@ -1361,7 +1361,7 @@ def hecke_eigenform(coefficients: list, primes: list) -> dict:
     }
 
 
-def petersson_inner_product_estimate(f_coeffs: list, g_coeffs: list, k: int) -> complex:
+def petersson_inner_product_estimate(f_coeffs: list[float], g_coeffs: list[float], k: int) -> complex:
     """
     Schätzt das Petersson-Skalarprodukt ⟨f, g⟩ numerisch.
 
@@ -1425,7 +1425,7 @@ def petersson_inner_product_estimate(f_coeffs: list, g_coeffs: list, k: int) -> 
 # L-FUNKTIONEN ELLIPTISCHER KURVEN
 # ===========================================================================
 
-def elliptic_curve_points_over_fp(a: int, b: int, p: int) -> list:
+def elliptic_curve_points_over_fp(a: int, b: int, p: int) -> list[tuple[int, int]]:
     """
     Berechnet alle affinen Punkte einer elliptischen Kurve E: y² = x³ + ax + b über F_p.
 
@@ -1616,7 +1616,7 @@ def l_function_elliptic_curve(a: int, b: int, s: complex, terms: int = 100) -> c
     return result
 
 
-def birch_swinnerton_dyer_bsd_estimate(a: int, b: int, primes: list) -> dict:
+def birch_swinnerton_dyer_bsd_estimate(a: int, b: int, primes: list[int]) -> dict[str, object]:
     """
     Empirische Schätzung der BSD-Vermutung (Birch und Swinnerton-Dyer).
 
@@ -1697,7 +1697,7 @@ def birch_swinnerton_dyer_bsd_estimate(a: int, b: int, primes: list) -> dict:
     }
 
 
-def l_function_modular_form(coefficients: list, s: complex, k: int) -> complex:
+def l_function_modular_form(coefficients: list[float], s: complex, k: int) -> complex:
     """
     Berechnet die L-Funktion einer Modulform f = Σ a_n q^n.
 
@@ -1734,7 +1734,7 @@ def l_function_modular_form(coefficients: list, s: complex, k: int) -> complex:
     return result
 
 
-def functional_equation_l_function(coefficients: list, k: int, N: int, s: complex) -> dict:
+def functional_equation_l_function(coefficients: list[float], k: int, N: int, s: complex) -> dict[str, object]:
     """
     Berechnet die vollständige L-Funktion und verifiziert die Funktionalgleichung.
 

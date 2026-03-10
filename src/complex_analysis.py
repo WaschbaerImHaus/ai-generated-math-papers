@@ -14,13 +14,13 @@ Mathematischer Hintergrund:
 @author: Kurt Ingwer
 @version: 1.0
 @since: 2026-03-08
-@lastModified: 2026-03-08
+@lastModified: 2026-03-10
 """
 
 import cmath
 import math
 import numpy as np
-from typing import Optional
+from typing import Callable
 
 
 # ===========================================================================
@@ -45,7 +45,7 @@ def gamma_lanczos(z: complex) -> complex:
     @param z: Komplexe Zahl (z ∉ {0, -1, -2, ...})
     @return: Γ(z)
     @raises ValueError: Wenn z eine nicht-positive ganze Zahl ist
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     # Pol-Prüfung: Γ hat Pole bei z = 0, -1, -2, ...
     if z.real <= 0 and abs(z.imag) < 1e-12 and abs(z.real - round(z.real)) < 1e-12:
@@ -90,7 +90,7 @@ def log_gamma(z: complex) -> complex:
 
     @param z: Komplexe Zahl mit Re(z) > 0
     @return: ln(Γ(z))
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     if z.real <= 0:
         raise ValueError(f"log_gamma: Re(z) muss positiv sein, erhalten: {z.real}")
@@ -135,7 +135,7 @@ def riemann_zeta(s: complex, precision: int = 200) -> complex:
     @param precision: Anzahl der Summanden (mehr = genauer, aber langsamer)
     @return: ζ(s)
     @raises ValueError: Wenn s = 1 (Pol)
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     if abs(s - 1) < 1e-10:
         raise ValueError("ζ(s) hat einen einfachen Pol bei s = 1 (Residuum = 1)")
@@ -206,7 +206,7 @@ def _eta_euler_accelerated(s: complex, n: int = 60) -> complex:
     @param s: Komplexe Zahl mit Re(s) > 0
     @param n: Anzahl der Euler-Transformations-Terme (60 gibt Maschinengenauigkeit)
     @return: η(s)
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     # Korrekte Euler-Knopp-E₁-Transformation für Σ_{n=0}^∞ (-1)^n c_n:
     #
@@ -248,7 +248,7 @@ def _zeta_euler_maclaurin(s: complex, terms: int = 200) -> complex:
     @param s: Komplexe Zahl mit Re(s) > 0.5
     @param terms: Anzahl der direkten Summanden N
     @return: Näherungswert von ζ(s)
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     N = terms
     # Direkte Summe: Σ_{n=1}^{N} n^{-s}
@@ -293,7 +293,7 @@ def xi_function(s: complex) -> complex:
 
     @param s: Komplexe Zahl
     @return: ξ(s)
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     if abs(s) < 1e-12 or abs(s - 1) < 1e-12:
         return complex(0.5)  # ξ(0) = ξ(1) = 1/2
@@ -314,7 +314,7 @@ def xi_function(s: complex) -> complex:
     return 0.5 * s * (s - 1) * (cmath.pi ** (-s / 2)) * gamma_half_s * zeta_s
 
 
-def xi_symmetry_check(s: complex) -> dict:
+def xi_symmetry_check(s: complex) -> dict[str, object]:
     """
     Verifiziert die Symmetrie ξ(s) = ξ(1-s) numerisch.
 
@@ -323,7 +323,7 @@ def xi_symmetry_check(s: complex) -> dict:
 
     @param s: Testpunkt
     @return: Dictionary mit xi(s), xi(1-s) und dem Fehler
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     xi_s = xi_function(s)
     xi_mirror = xi_function(1 - s)
@@ -352,7 +352,7 @@ def zeta_on_critical_line(t: float, precision: int = 300) -> complex:
     @param t: Imaginärteil des Punktes auf der kritischen Geraden
     @param precision: Anzahl der Euler-Maclaurin-Terme
     @return: Komplexer Wert ζ(1/2 + it)
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     s = complex(0.5, t)
     return riemann_zeta(s, precision=precision)
@@ -376,7 +376,7 @@ def riemann_siegel_z(t: float) -> float:
 
     @param t: Reelle Zahl t > 0
     @return: Z(t) ∈ ℝ
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     s = complex(0.5, t)
 
@@ -394,7 +394,7 @@ def riemann_siegel_z(t: float) -> float:
     return z_val.real  # Z(t) ist reell
 
 
-def find_zeta_zeros(t_min: float, t_max: float, steps: int = 1000) -> list[dict]:
+def find_zeta_zeros(t_min: float, t_max: float, steps: int = 1000) -> list[dict[str, object]]:
     """
     Sucht Nullstellen der Riemann-Zeta-Funktion via Vorzeichenwechsel von Z(t).
 
@@ -414,7 +414,7 @@ def find_zeta_zeros(t_min: float, t_max: float, steps: int = 1000) -> list[dict]
     @param t_max: Obere Grenze
     @param steps: Anzahl der Gitterpunkte für Vorzeichensuche
     @return: Liste der gefundenen Nullstellen mit Genauigkeitsinfo
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     t_values = np.linspace(t_min, t_max, steps)
     z_values = [riemann_siegel_z(t) for t in t_values]
@@ -457,7 +457,7 @@ def N_count_formula(T: float) -> float:
 
     @param T: Obere Grenze des Imaginärteils
     @return: Geschätzte Anzahl N(T)
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     if T <= 2 * math.pi:
         return 0.0
@@ -482,7 +482,7 @@ def functional_equation_chi(s: complex) -> complex:
 
     @param s: Komplexe Zahl s
     @return: χ(s)
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     try:
         gamma_1ms = gamma_lanczos(1 - s)
@@ -497,13 +497,13 @@ def functional_equation_chi(s: complex) -> complex:
     )
 
 
-def verify_functional_equation(s: complex) -> dict:
+def verify_functional_equation(s: complex) -> dict[str, object]:
     """
     Prüft die Funktionalgleichung ζ(s) = χ(s)·ζ(1-s) numerisch.
 
     @param s: Testpunkt
     @return: Verifikationsergebnis mit Fehler
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     try:
         zeta_s = riemann_zeta(s)
@@ -542,7 +542,7 @@ def residue_at_pole(f_coeffs: list[complex], order: int) -> complex:
                      Indexierung: f_coeffs[order-1] ist der a_{-1}-Term
     @param order: Ordnung des Pols (Anzahl der negativen Potenzen)
     @return: Residuum = Koeffizient von z^{-1}
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     if order <= 0 or order > len(f_coeffs):
         raise ValueError(f"Ordnung muss zwischen 1 und {len(f_coeffs)} liegen")
@@ -551,7 +551,7 @@ def residue_at_pole(f_coeffs: list[complex], order: int) -> complex:
 
 
 def cauchy_integral_numerical(
-    f: callable,
+    f: Callable[[complex], complex],
     center: complex,
     radius: float,
     n_points: int = 1000
@@ -574,7 +574,7 @@ def cauchy_integral_numerical(
     @param radius: Radius r des Kreises
     @param n_points: Anzahl der Quadraturpunkte
     @return: Approximation von f(z₀)
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     # Cauchy-Integralsatz via Mittelwerteigenschaft holomorpher Funktionen:
     #
@@ -662,7 +662,7 @@ def find_zeta_zeros_mpmath(
     t_max: float,
     dps: int = 50,
     steps: int = 1000
-) -> list:
+) -> list[dict[str, object]]:
     """
     Sucht Riemann-Nullstellen auf der kritischen Geraden s = 1/2 + it
     mit beliebiger Genauigkeit via mpmath.
@@ -813,7 +813,7 @@ def gamma_mpmath(z: complex, dps: int = 50) -> complex:
 def verify_riemann_hypothesis_range_mpmath(
     n_zeros: int = 10,
     dps: int = 50
-) -> dict:
+) -> dict[str, object]:
     """
     Verifiziert die ersten n Riemann-Nullstellen auf der kritischen Geraden.
 
