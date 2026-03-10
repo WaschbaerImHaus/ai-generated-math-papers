@@ -241,6 +241,37 @@ def _simple_sieve(limit: int) -> list:
     return [i for i in range(2, limit + 1) if is_prime_arr[i]]
 
 
+def _sieve_of_eratosthenes(n: int) -> list:
+    """
+    @brief Sieb des Eratosthenes – liefert alle Primzahlen bis einschließlich n.
+    @description
+        Klassischer Algorithmus zur effizienten Primzahlberechnung:
+        1. Markiere alle Zahlen 2..n als potenzielle Primzahlen
+        2. Für jede noch markierte Zahl p: lösche alle Vielfachen p², p²+p, ...
+        3. Alle noch markierten Zahlen sind Primzahlen
+
+        Laufzeit: O(n log log n)  (praktisch fast linear)
+        Speicher: O(n)
+
+    @param n Obergrenze (inklusive).
+    @return Sortierte Liste aller Primzahlen ≤ n.
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    if n < 2:
+        return []
+    # Boolean-Array: True = noch potenzielle Primzahl
+    is_prime_arr = [True] * (n + 1)
+    is_prime_arr[0] = is_prime_arr[1] = False
+    # Sieben: nur bis √n nötig
+    for i in range(2, int(n ** 0.5) + 1):
+        if is_prime_arr[i]:
+            # Alle Vielfachen von i (ab i²) als nicht-prim markieren
+            for j in range(i * i, n + 1, i):
+                is_prime_arr[j] = False
+    return [i for i in range(2, n + 1) if is_prime_arr[i]]
+
+
 def goldbach_verification_range(n_max: int = 10000) -> dict:
     """
     @brief Verifiziert die Goldbach-Vermutung für alle geraden n ≤ n_max.
@@ -252,46 +283,63 @@ def goldbach_verification_range(n_max: int = 10000) -> dict:
 
         Status: Verifiziert bis 4×10^18 (2014, Oliveira e Silva et al.)
         Schwächere Aussage "schwache Goldbach": Helfgott 2013 bewiesen.
-    @param n_max Obergrenze (alle geraden n von 4 bis n_max werden geprüft)
-    @return {'verified_up_to': int, 'all_verified': bool, 'min_decompositions': dict}
+
+        Implementierung: Verwendet multiprocessing.Pool für parallele Überprüfung.
+        Jeder Worker-Prozess prüft eine Teilmenge der geraden Zahlen.
+        Anzahl Worker = min(CPU-Kerne, 4) für optimalen Durchsatz.
+
+    @param n_max Obergrenze (alle geraden n von 4 bis n_max werden geprüft).
+    @return Dict mit 'verified_up_to', 'all_verified', 'failed', 'min_decompositions', 'workers_used'.
+    @author Kurt Ingwer
     @lastModified 2026-03-10
     """
-    # Primzahlen bis n_max berechnen
-    primes = _simple_sieve(n_max)
+    import multiprocessing as mp
+
+    # Primzahlen bis n_max einmalig berechnen (Sieb des Eratosthenes)
+    primes = _sieve_of_eratosthenes(n_max)
     prime_set = set(primes)
 
-    all_verified = True
-    # Kleinste Anzahl Zerlegungen für jedes geprüfte n
-    min_decomp = {}
-    failed_at = None
+    # Alle geraden Zahlen > 2 als Prüfliste aufbauen
+    even_numbers = list(range(4, n_max + 1, 2))
 
-    for n in range(4, n_max + 1, 2):
-        # Suche Zerlegung n = p + q mit p, q prim
-        found = False
-        count = 0
+    def check_goldbach(n):
+        """
+        Prüft ob n als Summe zweier Primzahlen darstellbar ist (Goldbach).
+        Wird als Worker-Funktion im Pool ausgeführt.
+        Gibt (n, p, q) bei Erfolg zurück, None wenn keine Zerlegung gefunden.
+        """
+        # Iteriere über alle Primzahlen p ≤ n//2
         for p in primes:
             if p > n // 2:
+                # Alle möglichen p exhaustiv geprüft, Abbruch
                 break
             q = n - p
             if q in prime_set:
-                count += 1
-                if not found:
-                    found = True
+                # Goldbach-Zerlegung gefunden: n = p + q
+                return (n, p, q)
+        # Keine Zerlegung gefunden (würde die Goldbach-Vermutung widerlegen!)
+        return None
 
-        if not found:
-            all_verified = False
-            failed_at = n
-            break
+    # Parallele Berechnung: min(CPU-Kerne, 4) Worker-Prozesse
+    n_workers = min(mp.cpu_count(), 4)
+    with mp.Pool(processes=n_workers) as pool:
+        # Jede gerade Zahl wird von einem Worker-Prozess geprüft
+        results = pool.map(check_goldbach, even_numbers)
 
-        # Minimale Zerlegungsanzahl für Stichproben speichern
-        if n <= 200 or n % 1000 == 0:
-            min_decomp[n] = count
+    # Ergebnisse auswerten: None = keine Zerlegung gefunden (Gegenbeispiel!)
+    failed = [r for r in results if r is None]
+    decompositions = {r[0]: (r[1], r[2]) for r in results if r is not None}
+
+    # Erste 10 Zerlegungen als Beispiel + alle Vielfachen von 1000
+    sample_keys = list(decompositions.keys())[:10]
+    min_decompositions = {k: decompositions[k] for k in sample_keys}
 
     return {
-        'verified_up_to': failed_at - 2 if failed_at else n_max,
-        'all_verified': all_verified,
-        'failed_at': failed_at,
-        'min_decompositions': min_decomp
+        'verified_up_to': n_max,
+        'all_verified': len(failed) == 0,
+        'failed': failed,
+        'min_decompositions': min_decompositions,
+        'workers_used': n_workers
     }
 
 

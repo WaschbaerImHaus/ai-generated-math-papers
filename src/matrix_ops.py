@@ -23,6 +23,9 @@ import numpy as np
 # Vector-Klasse aus dem vectors-Submodul importieren
 from vectors import Vector
 
+# Spezifische mathematische Ausnahmen importieren
+from exceptions import SingularMatrixError
+
 
 # =============================================================================
 # KLASSE: Matrix
@@ -223,7 +226,8 @@ class Matrix:
             # Pivotzeile suchen
             max_row = max(range(col, n), key=lambda r: abs(aug[r][col]))
             if abs(aug[max_row][col]) < 1e-15:
-                raise ValueError("Matrix ist singulär (nicht invertierbar)")
+                # Pivot nahe 0 bedeutet singuläre Matrix → keine Inverse berechenbar
+                raise SingularMatrixError("Gauss-Jordan Inversion")
             aug[col], aug[max_row] = aug[max_row], aug[col]
 
             # Pivot normieren (Pivot-Element auf 1 setzen)
@@ -265,7 +269,8 @@ class Matrix:
         for col in range(n):
             max_row = max(range(col, n), key=lambda r: abs(aug[r][col]))
             if abs(aug[max_row][col]) < 1e-15:
-                raise ValueError("Matrix ist singulär, LGS hat keine eindeutige Lösung")
+                # Singuläre Matrix → LGS hat keine eindeutige Lösung
+                raise SingularMatrixError("LGS-Lösung (Gauss-Elimination)")
             aug[col], aug[max_row] = aug[max_row], aug[col]
 
             pivot = aug[col][col]

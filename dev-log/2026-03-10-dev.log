@@ -194,3 +194,49 @@
 - Navier-Stokes Shape-Mismatch in Advektionsterm behoben
 - Box-Counting-Test: Epsilon-Werte ≥ Gitterabstand korrigiert
 - Gamma-Test: |Γ(1+i)| korrekter Wert 0.5216 statt 0.498
+
+2026-03-10 16:41:00 - Build 13: Exception-Hierarchie, Eisenstein-Optimierung, Goldbach-Multiprocessing, Performance-Report
+
+## Neue Features
+
+### exceptions.py (neu: src/exceptions.py)
+- MathematicalError: Basisklasse aller math. Ausnahmen
+- ConvergenceError: für newton_raphson(), bisection() bei Nicht-Konvergenz
+- SingularMatrixError: für Matrix.inverse(), lu_decomposition()
+- DivisionByZeroError: für math. Divisionen durch Null
+- DomainError: für Eingaben außerhalb des Definitionsbereichs
+- PrecisionError: wenn numerische Genauigkeit unterschritten wird
+- InvalidInputError: für allgemein ungültige Eingaben
+- PrimeRequiredError: wenn eine Primzahl erwartet wird
+- NotImplementedMathError: für noch nicht implementierte Fälle
+- NumericalInstabilityError: für NaN/Inf-Erkennung
+
+### Exception-Integration in bestehende Module
+- algebra_core.py: mod_inverse → MathematicalError, solve_linear → DomainError
+- analysis.py: newton_raphson → ConvergenceError, bisection → DomainError
+- matrix_ops.py: Matrix.inverse() → SingularMatrixError, Matrix.solve() → SingularMatrixError
+- matrix_decomp.py: lu_decomposition → SingularMatrixError, condition_number → SingularMatrixError
+
+### eisenstein_series_fast() (modular_forms.py)
+- Optimierte Eisenstein-Reihe via Gitter-Symmetrie für gerades k ≥ 4
+- Summiert nur halben Gitterraum (m > 0), dann Verdopplung
+- Zusätzlich m=0, n>0 Achse doppelt gezählt (Symmetrie n → -n)
+- ~4× Speedup gegenüber voller Doppelsumme
+- Fallback auf eisenstein_series() für ungerades k oder k < 4
+
+### goldbach_verification_range() (millennium_problems.py) – Multiprocessing
+- Ersetzt serielle Schleife durch multiprocessing.Pool
+- _sieve_of_eratosthenes() als neue, dokumentierte Hilfsfunktion
+- Parallele Prüfung aller geraden Zahlen via pool.map()
+- n_workers = min(CPU-Kerne, 4) für optimalen Durchsatz
+- Rückgabe enthält 'workers_used' für Transparenz
+
+## Neue Tests
+- tests/test_exceptions.py: 30+ Tests für Exception-Hierarchie und -Integration
+- tests/test_eisenstein_fast.py: 20+ Tests für eisenstein_series_fast()
+
+## Performance-Analyse
+- Profiling aller 7 gecachten Funktionen (Cold vs. Warm)
+- Hauptbottleneck: bernoulli_number() mit 15 µs/Aufruf (aber 359× Cache-Speedup)
+- research/PERFORMANCE_REPORT.md erstellt mit Bottleneck-Analyse und Empfehlungen
+

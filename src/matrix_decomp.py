@@ -27,12 +27,15 @@ import numpy as np
 from vectors import Vector
 from matrix_ops import Matrix
 
+# Spezifische mathematische Ausnahmen importieren
+from exceptions import SingularMatrixError
+
 
 # =============================================================================
 # LU-ZERLEGUNG (Doolittle mit Teilpivotisierung)
 # =============================================================================
 
-def lu_decomposition(matrix: 'Matrix') -> tuple:
+def lu_decomposition(matrix: 'Matrix') -> tuple['Matrix', 'Matrix', 'Matrix', int]:
     """
     LU-Zerlegung mit Teilpivotisierung (Doolittle-Algorithmus).
 
@@ -55,7 +58,7 @@ def lu_decomposition(matrix: 'Matrix') -> tuple:
     @return: (L, U, P, n_swaps) – untere/obere Dreiecksmatrix, Permutation, Anzahl Tausche
     @raises ValueError: Wenn Matrix nicht quadratisch oder singulär
     @author Kurt Ingwer
-    @lastModified 2026-03-08
+    @lastModified 2026-03-10
     """
     n = matrix.rows
     if n != matrix.cols:
@@ -83,7 +86,8 @@ def lu_decomposition(matrix: 'Matrix') -> tuple:
             n_swaps += 1
 
         if abs(A[k][k]) < 1e-14:
-            raise ValueError("Matrix ist singulär (LU-Zerlegung nicht möglich)")
+            # Pivot nahe 0 bedeutet singuläre Matrix → LU-Zerlegung nicht möglich
+            raise SingularMatrixError("LU-Zerlegung (Doolittle)")
 
         # Elimination: L[i,k] = A[i,k] / A[k,k], dann A[i,:] -= L[i,k] * A[k,:]
         for i in range(k + 1, n):
@@ -117,7 +121,7 @@ def lu_decomposition(matrix: 'Matrix') -> tuple:
 # QR-ZERLEGUNG (Householder-Reflexionen)
 # =============================================================================
 
-def qr_decomposition(matrix: 'Matrix') -> tuple:
+def qr_decomposition(matrix: 'Matrix') -> tuple['Matrix', 'Matrix']:
     """
     QR-Zerlegung via Householder-Reflexionen.
 
@@ -143,7 +147,7 @@ def qr_decomposition(matrix: 'Matrix') -> tuple:
     @return: (Q, R) – orthogonale Matrix und obere Dreiecksmatrix
     @raises ValueError: Wenn m < n (zu wenig Zeilen)
     @author Kurt Ingwer
-    @lastModified 2026-03-08
+    @lastModified 2026-03-10
     """
     m = matrix.rows
     n = matrix.cols
@@ -188,7 +192,7 @@ def qr_decomposition(matrix: 'Matrix') -> tuple:
 # SINGULÄRWERTZERLEGUNG (SVD) via numpy
 # =============================================================================
 
-def svd(matrix: 'Matrix') -> tuple:
+def svd(matrix: 'Matrix') -> tuple['Matrix', list[float], 'Matrix']:
     """
     Singulärwertzerlegung (Singular Value Decomposition, SVD).
 
@@ -216,7 +220,7 @@ def svd(matrix: 'Matrix') -> tuple:
     @param matrix: Beliebige Matrix A (m×n)
     @return: (U, sigma, Vt) – linke Vektoren, Singulärwerte, rechte Vektoren transponiert
     @author Kurt Ingwer
-    @lastModified 2026-03-08
+    @lastModified 2026-03-10
     """
     # Numpy-Array aus Matrix-Daten
     A = np.array([[matrix._data[i][j] for j in range(matrix.cols)]
@@ -244,7 +248,7 @@ def matrix_rank(matrix: 'Matrix', tol: float = 1e-10) -> int:
     @param tol: Toleranz für "Null" (Standard: 1e-10)
     @return: Rang der Matrix
     @author Kurt Ingwer
-    @lastModified 2026-03-08
+    @lastModified 2026-03-10
     """
     _, sigma, _ = svd(matrix)
     return sum(1 for s in sigma if s > tol)
@@ -265,11 +269,12 @@ def condition_number(matrix: 'Matrix') -> float:
     @return: Konditionszahl κ ≥ 1
     @raises ValueError: Wenn Matrix singulär (σ_min = 0)
     @author Kurt Ingwer
-    @lastModified 2026-03-08
+    @lastModified 2026-03-10
     """
     _, sigma, _ = svd(matrix)
     if len(sigma) == 0 or sigma[-1] < 1e-15:
-        raise ValueError("Matrix ist singulär (Konditionszahl = ∞)")
+        # σ_min = 0 bedeutet singuläre Matrix → Konditionszahl unendlich
+        raise SingularMatrixError("Konditionszahl-Berechnung (Matrix singulär, σ_min = 0)")
     return sigma[0] / sigma[-1]
 
 
@@ -304,7 +309,7 @@ def givens_rotation_matrix(n: int, i: int, j: int, theta: float) -> 'Matrix':
     @return: n×n Givens-Rotationsmatrix als Matrix-Objekt
     @raises ValueError: Wenn i, j ungültig oder i == j
     @author Kurt Ingwer
-    @lastModified 2026-03-08
+    @lastModified 2026-03-10
     """
     if i < 0 or j < 0 or i >= n or j >= n:
         raise ValueError(f"Ungültige Indizes i={i}, j={j} für n={n}")
@@ -326,7 +331,7 @@ def givens_rotation_matrix(n: int, i: int, j: int, theta: float) -> 'Matrix':
     return Matrix(data)
 
 
-def givens_qr_decomposition(A: 'Matrix') -> tuple:
+def givens_qr_decomposition(A: 'Matrix') -> tuple['Matrix', 'Matrix']:
     """
     @brief QR-Zerlegung via Givens-Rotationen (Alternative zu Householder).
     @description
@@ -356,7 +361,7 @@ def givens_qr_decomposition(A: 'Matrix') -> tuple:
     @return: Tupel (Q, R) als Matrix-Objekte
     @raises ValueError: Wenn m < n
     @author Kurt Ingwer
-    @lastModified 2026-03-08
+    @lastModified 2026-03-10
     """
     m = A.rows
     n = A.cols
@@ -413,7 +418,7 @@ def givens_qr_decomposition(A: 'Matrix') -> tuple:
     return Q_matrix, R_matrix
 
 
-def givens_solve_least_squares(A: 'Matrix', b: list) -> list:
+def givens_solve_least_squares(A: 'Matrix', b: list[float]) -> list[float]:
     """
     @brief Löst das Kleinste-Quadrate-Problem min||Ax - b||₂ via Givens-QR.
     @description
@@ -434,7 +439,7 @@ def givens_solve_least_squares(A: 'Matrix', b: list) -> list:
     @return: Lösungsvektor x als Liste der Länge n
     @raises ValueError: Wenn Dimensionen nicht passen oder System singulär
     @author Kurt Ingwer
-    @lastModified 2026-03-08
+    @lastModified 2026-03-10
     """
     m = A.rows
     n = A.cols

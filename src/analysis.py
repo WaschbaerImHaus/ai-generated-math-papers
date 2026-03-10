@@ -20,7 +20,7 @@
 
 import math
 import sympy as sp
-from typing import Callable, Optional
+from typing import Callable
 from sympy.parsing.sympy_parser import (
     parse_expr,
     standard_transformations,
@@ -38,8 +38,11 @@ from config import (
     MAX_ITERATIONS,    # Maximale Iterationszahl (1000)
 )
 
+# Spezifische mathematische Ausnahmen importieren
+from exceptions import ConvergenceError, DomainError
 
-def _safe_parse(expr_str: str, local_vars: dict = None) -> sp.Expr:
+
+def _safe_parse(expr_str: str, local_vars: dict | None = None) -> sp.Expr:
     """
     @brief Sicheres Parsing von mathematischen Ausdrücken via SymPy.
     @description
@@ -82,7 +85,7 @@ def _safe_parse(expr_str: str, local_vars: dict = None) -> sp.Expr:
         return sp.sympify(expr_str)
 
 
-def numerical_derivative(f: Callable, x: float, h: float = None, order: int = 1) -> float:
+def numerical_derivative(f: Callable[[float], float], x: float, h: float | None = None, order: int = 1) -> float:
     """
     @brief Berechnet die numerische Ableitung einer Funktion im Punkt x.
     @description
@@ -130,7 +133,7 @@ def numerical_derivative(f: Callable, x: float, h: float = None, order: int = 1)
         raise ValueError(f"Ableitungsordnung {order} nicht unterstützt (nur 1 oder 2)")
 
 
-def numerical_integral(f: Callable, a: float, b: float, n: int = SIMPSON_N) -> float:
+def numerical_integral(f: Callable[[float], float], a: float, b: float, n: int = SIMPSON_N) -> float:
     """
     @brief Berechnet das bestimmte Integral ∫_a^b f(x) dx mit der Simpson-Regel.
     @description
@@ -171,7 +174,7 @@ def numerical_integral(f: Callable, a: float, b: float, n: int = SIMPSON_N) -> f
     return result * h / 3
 
 
-def newton_raphson(f: Callable, x0: float, tol: float = NEWTON_TOL,
+def newton_raphson(f: Callable[[float], float], x0: float, tol: float = NEWTON_TOL,
                    max_iter: int = MAX_ITERATIONS, h: float = 1e-7) -> float:
     """
     @brief Newton-Raphson-Verfahren zur Nullstellensuche.
@@ -213,15 +216,21 @@ def newton_raphson(f: Callable, x0: float, tol: float = NEWTON_TOL,
 
         # Division durch Null abfangen (Tangente ist waagerecht)
         if abs(fpx) < 1e-15:
-            raise RuntimeError(f"Newton-Raphson: f'(x) ≈ 0 bei x={x}, Verfahren divergiert")
+            # f'(x) ≈ 0 bedeutet, die Tangente ist waagerecht → kein Newton-Schritt möglich
+            raise ConvergenceError(
+                "Newton-Raphson (f'(x)≈0, Tangente waagerecht)",
+                i + 1,
+                last_value=float(x)
+            )
 
         # Newton-Schritt
         x = x - fx / fpx
 
-    raise RuntimeError(f"Newton-Raphson: Keine Konvergenz nach {max_iter} Iterationen")
+    # Maximale Iterationszahl erreicht ohne Konvergenz
+    raise ConvergenceError("Newton-Raphson", max_iter, last_value=float(x))
 
 
-def bisection(f: Callable, a: float, b: float, tol: float = BISECTION_TOL,
+def bisection(f: Callable[[float], float], a: float, b: float, tol: float = BISECTION_TOL,
               max_iter: int = MAX_ITERATIONS) -> float:
     """
     @brief Bisektionsverfahren zur Nullstellensuche im Intervall [a, b].
@@ -256,9 +265,11 @@ def bisection(f: Callable, a: float, b: float, tol: float = BISECTION_TOL,
 
     # Vorzeichenwechsel prüfen (Voraussetzung des Zwischenwertsatzes)
     if fa * fb > 0:
-        raise ValueError(
-            f"Bisektionsverfahren: Kein Vorzeichenwechsel in [{a}, {b}]. "
-            f"f({a})={fa:.4f}, f({b})={fb:.4f}"
+        # Ohne Vorzeichenwechsel kann das Bisektionsverfahren keine Nullstelle garantieren
+        raise DomainError(
+            "bisection",
+            f"[{a}, {b}]",
+            f"(Kein Vorzeichenwechsel: f({a})={fa:.4f}, f({b})={fb:.4f})"
         )
 
     for _ in range(max_iter):
@@ -283,7 +294,7 @@ def bisection(f: Callable, a: float, b: float, tol: float = BISECTION_TOL,
     return (a + b) / 2
 
 
-def taylor_series(f: Callable, center: float, degree: int, evaluate_at: float) -> float:
+def taylor_series(f: Callable[[float], float], center: float, degree: int, evaluate_at: float) -> float:
     """
     @brief Berechnet die Taylor-Reihe einer Funktion symbolisch via SymPy.
     @description
@@ -347,7 +358,7 @@ def taylor_series(f: Callable, center: float, degree: int, evaluate_at: float) -
     return result
 
 
-def is_continuous(f: Callable, x: float, delta: float = 1e-6) -> bool:
+def is_continuous(f: Callable[[float], float], x: float, delta: float = 1e-6) -> bool:
     """
     @brief Heuristischer Test ob f an der Stelle x stetig ist.
     @description
@@ -382,7 +393,7 @@ def is_continuous(f: Callable, x: float, delta: float = 1e-6) -> bool:
 # GRENZWERTBERECHNUNG (SYMBOLISCH)
 # ===========================================================================
 
-def symbolic_limit(expr_str: str, var: str, point, direction: str = '+-'):
+def symbolic_limit(expr_str: str, var: str, point: float | str, direction: str = '+-') -> sp.Expr:
     """
     @brief Berechnet den Grenzwert eines symbolischen Ausdrucks via SymPy.
     @description
@@ -430,7 +441,7 @@ def symbolic_limit(expr_str: str, var: str, point, direction: str = '+-'):
     return result
 
 
-def lhopital_applicable(numerator_str: str, denominator_str: str, var: str, point) -> dict:
+def lhopital_applicable(numerator_str: str, denominator_str: str, var: str, point: float | str) -> dict[str, object]:
     """
     @brief Prüft ob L'Hôpital anwendbar ist und berechnet den Grenzwert.
     @description
@@ -500,7 +511,7 @@ def lhopital_applicable(numerator_str: str, denominator_str: str, var: str, poin
     }
 
 
-def limit_comparison(f_str: str, g_str: str, var: str, point) -> dict:
+def limit_comparison(f_str: str, g_str: str, var: str, point: float | str) -> dict[str, object]:
     """
     @brief Grenzwert-Vergleichssatz: berechnet lim f/g.
     @description
@@ -568,7 +579,7 @@ def limit_comparison(f_str: str, g_str: str, var: str, point) -> dict:
 # PARTIALBRUCHZERLEGUNG
 # ===========================================================================
 
-def partial_fraction_decomposition(numerator_coeffs: list, denominator_coeffs: list) -> str:
+def partial_fraction_decomposition(numerator_coeffs: list[float], denominator_coeffs: list[float]) -> str:
     """
     @brief Partialbruchzerlegung eines rationalen Ausdrucks N(x)/D(x).
     @description
@@ -614,7 +625,7 @@ def partial_fraction_decomposition(numerator_coeffs: list, denominator_coeffs: l
     return str(decomposed)
 
 
-def partial_fraction_symbolic(expr_str: str, var: str = 'x') -> dict:
+def partial_fraction_symbolic(expr_str: str, var: str = 'x') -> dict[str, str | list[str]]:
     """
     @brief Symbolische Partialbruchzerlegung eines SymPy-Ausdrucks.
     @description
@@ -654,8 +665,8 @@ def partial_fraction_symbolic(expr_str: str, var: str = 'x') -> dict:
 # UNEIGENTLICHE INTEGRALE
 # ===========================================================================
 
-def improper_integral_numerical(f: Callable, a: float, b: float,
-                                 singularities: list = None,
+def improper_integral_numerical(f: Callable[[float], float], a: float, b: float,
+                                 singularities: list[float] | None = None,
                                  eps: float = 1e-6) -> float:
     """
     @brief Numerisches uneigentliches Integral mit möglichen Singularitäten.
@@ -737,7 +748,7 @@ def improper_integral_numerical(f: Callable, a: float, b: float,
         return result
 
 
-def improper_integral_symbolic(expr_str: str, var: str, a, b) -> dict:
+def improper_integral_symbolic(expr_str: str, var: str, a: float | str, b: float | str) -> dict[str, object]:
     """
     @brief Symbolisches uneigentliches Integral via SymPy.
     @description
@@ -813,7 +824,7 @@ def improper_integral_symbolic(expr_str: str, var: str, a, b) -> dict:
     }
 
 
-def cauchy_principal_value(f: Callable, a: float, b: float,
+def cauchy_principal_value(f: Callable[[float], float], a: float, b: float,
                             singularity: float, eps: float = 1e-8) -> float:
     """
     @brief Cauchyscher Hauptwert P.V. ∫_a^b f(x) dx bei einer Singularität.

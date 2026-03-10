@@ -21,7 +21,9 @@
 import math
 import cmath
 import functools
-from typing import Union, Optional
+
+# Spezifische mathematische Ausnahmen importieren
+from exceptions import DomainError, MathematicalError
 
 
 # =============================================================================
@@ -46,7 +48,7 @@ class Polynomial:
     @lastModified 2026-03-10
     """
 
-    def __init__(self, coefficients: list):
+    def __init__(self, coefficients: list[float]) -> None:
         """
         @brief Erstellt ein Polynom aus einer Koeffizientenliste.
         @param coefficients Liste von Koeffizienten (höchster Grad zuerst).
@@ -76,6 +78,15 @@ class Polynomial:
         if len(self.coefficients) == 1 and self.coefficients[0] == 0:
             return 0  # Nullpolynom
         return len(self.coefficients) - 1
+
+    def __call__(self, x: float) -> float:
+        """
+        @brief Wertet das Polynom an der Stelle x aus (Kurzform via Aufruf-Operator).
+        @param x Der Auswertungspunkt.
+        @return Wert des Polynoms an der Stelle x.
+        @date 2026-03-10
+        """
+        return self.evaluate(x)
 
     def evaluate(self, x: float) -> float:
         """
@@ -217,7 +228,7 @@ class Polynomial:
 # GLEICHUNGSLÖSER
 # =============================================================================
 
-def solve_linear(a: float, b: float) -> float:
+def solve_linear(a: float, b: float) -> float | str:
     """
     @brief Löst eine lineare Gleichung ax + b = 0.
     @description
@@ -236,13 +247,23 @@ def solve_linear(a: float, b: float) -> float:
     """
     if a == 0:
         if b == 0:
-            raise ValueError("unendlich viele Lösungen: 0 = 0 ist immer wahr")
+            # Bei a=0, b=0: 0·x + 0 = 0 ist für alle x wahr → kein Definitionsbereich möglich
+            raise DomainError(
+                "solve_linear",
+                f"a={a}, b={b}",
+                "(unendlich viele Lösungen: 0 = 0 ist immer wahr)"
+            )
         else:
-            raise ValueError(f"keine Lösung: {b} = 0 ist ein Widerspruch")
+            # Bei a=0, b≠0: b = 0 ist ein Widerspruch → keine Lösung
+            raise DomainError(
+                "solve_linear",
+                f"a={a}",
+                f"(keine Lösung: {b} = 0 ist ein Widerspruch)"
+            )
     return -b / a
 
 
-def solve_quadratic(a: float, b: float, c: float) -> list:
+def solve_quadratic(a: float, b: float, c: float) -> list[complex]:
     """
     @brief Löst eine quadratische Gleichung ax^2 + bx + c = 0.
     @description
@@ -337,7 +358,7 @@ def lcm(a: int, b: int) -> int:
     return abs(a) // gcd(a, b) * abs(b)
 
 
-def extended_gcd(a: int, b: int) -> tuple:
+def extended_gcd(a: int, b: int) -> tuple[int, int, int]:
     """
     @brief Erweiterter Euklidischer Algorithmus: findet x, y mit ax + by = ggT(a,b).
     @description
@@ -388,6 +409,10 @@ def mod_inverse(a: int, m: int) -> int:
     """
     g, x, _ = extended_gcd(a % m, m)
     if g != 1:
-        raise ValueError(f"Kein modulares Inverses: ggT({a}, {m}) = {g} ≠ 1")
+        # Modulares Inverses existiert nur wenn ggT(a, m) = 1 (teilerfremd)
+        raise MathematicalError(
+            f"Kein modulares Inverses: ggT({a}, {m}) = {g} ≠ 1 "
+            f"(a und m müssen teilerfremd sein)"
+        )
     # x könnte negativ sein, auf positiven Bereich normieren
     return x % m
