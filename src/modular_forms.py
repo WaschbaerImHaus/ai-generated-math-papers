@@ -31,6 +31,7 @@
 
 import math
 import cmath
+import functools
 import numpy as np
 from typing import Callable
 from math import gcd
@@ -560,6 +561,44 @@ def modular_form_check(
 # HECKE-OPERATOREN
 # ===========================================================================
 
+@functools.lru_cache(maxsize=512)
+def _hecke_operator_cached(coefficients_tuple: tuple, p: int, k: int) -> tuple:
+    """
+    Gecachte interne Implementierung des Hecke-Operators.
+
+    Nimmt ein unveränderliches Tupel statt einer Liste an (hashbar, damit
+    lru_cache den Aufruf als Schlüssel verwenden kann).
+
+    lru_cache: Hecke-Operatoren sind deterministisch – gleiche Koeffizienten,
+    gleiches p und k ergeben immer dasselbe Ergebnis. Der Cache vermeidet
+    Neuberechnungen bei wiederholtem Aufruf mit identischen Parametern.
+
+    @param coefficients_tuple: Fourier-Koeffizienten als hashbares Tupel
+    @param p: Primzahl p ≥ 2
+    @param k: Gewicht der Modulform
+    @return: Transformierte Koeffizienten als Tupel
+    @lastModified 2026-03-10
+    """
+    N = len(coefficients_tuple)
+    M = max(1, N // p)
+    b = []
+
+    for n in range(M):
+        idx_pn = p * n
+        a_pn = coefficients_tuple[idx_pn] if idx_pn < N else 0
+
+        if n % p == 0:
+            idx_np = n // p
+            a_np = coefficients_tuple[idx_np] if idx_np < N else 0
+            bn = a_pn + (p ** (k - 1)) * a_np
+        else:
+            bn = a_pn
+
+        b.append(bn)
+
+    return tuple(b)
+
+
 def hecke_operator(coefficients: list[float | int], p: int, k: int = 12) -> list[float]:
     """
     Wendet den Hecke-Operator T_p auf eine Modulform an.
@@ -582,33 +621,19 @@ def hecke_operator(coefficients: list[float | int], p: int, k: int = 12) -> list
         - Multiplizität-Eins-Satz: Eigenformen sind durch ihre Eigenwerte bestimmt
         - Verbindung zu L-Funktionen: L(f, s) = Π_p (1 - a(p)p^{-s} + p^{k-1-2s})^{-1}
 
+    Caching: Da Hecke-Operatoren deterministisch sind, werden Ergebnisse via
+    lru_cache (in _hecke_operator_cached) gespeichert. Die Liste wird für den
+    Cache zu einem Tupel konvertiert.
+
     @param coefficients: Liste [a(0), a(1), ..., a(N)] der Fourier-Koeffizienten
     @param p: Primzahl p ≥ 2 (Hecke-Operator T_p)
     @param k: Gewicht der Modulform (Standard: 12 für Δ)
     @return: Liste [b(0), b(1), ..., b(M)] der transformierten Koeffizienten
     @lastModified: 2026-03-10
     """
-    N = len(coefficients)
-    # Ausgabelänge: T_p erhöht den Index um p, daher brauchen wir weniger Koeffizienten
-    M = max(1, N // p)
-    b = []
-
-    for n in range(M):
-        # Terme: a(pn)
-        idx_pn = p * n
-        a_pn = coefficients[idx_pn] if idx_pn < N else 0
-
-        # Terme: p^{k-1} · a(n/p) falls p | n
-        if n % p == 0:
-            idx_np = n // p
-            a_np = coefficients[idx_np] if idx_np < N else 0
-            bn = a_pn + (p ** (k - 1)) * a_np
-        else:
-            bn = a_pn
-
-        b.append(bn)
-
-    return b
+    # Liste → Tupel für lru_cache-Kompatibilität (Listen sind nicht hashbar)
+    result_tuple = _hecke_operator_cached(tuple(coefficients), p, k)
+    return list(result_tuple)
 
 
 # ===========================================================================

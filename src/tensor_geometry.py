@@ -23,6 +23,7 @@
 """
 
 import math
+import functools
 import numpy as np
 from typing import Callable
 
@@ -561,12 +562,21 @@ def riemann_tensor(
     g = metric_func(point)
     n = g.shape[0]
 
-    # Hilfsfunktion: Christoffel-Symbole an einem verschobenen Punkt
+    # Manueller Cache für Christoffel-Symbole: gleiche Punkte werden nicht neu berechnet.
+    # Schlüssel: Tupel aus Punkt-Koordinaten (hashbar), Wert: numpy-Array Gamma[k,i,j].
+    # Spart bei der numerischen Ableitung (2*n zusätzliche Aufrufe pro Riemann-Tensor)
+    # erheblich Rechenzeit, wenn metric_func teuer ist.
+    _gamma_cache: dict[tuple, np.ndarray] = {}
+
     def Gamma_at(pt: "list[float]") -> np.ndarray:
-        return christoffel_symbols(metric_func, pt, h=h * 0.1)
+        """Christoffel-Symbole am Punkt pt, gecacht nach Koordinaten-Tupel."""
+        key = tuple(round(c, 15) for c in pt)   # Tupel ist hashbar, auf 15 Stellen runden
+        if key not in _gamma_cache:
+            _gamma_cache[key] = christoffel_symbols(metric_func, list(pt), h=h * 0.1)
+        return _gamma_cache[key]
 
     # Christoffel-Symbole und ihre Ableitungen
-    Gamma = Gamma_at(point)
+    Gamma = Gamma_at(list(point))
 
     # Numerische Ableitungen ∂_i Γ^l_{jk} via zentralem Differenzenquotienten
     # dGamma[i, l, j, k] = ∂_i Γ^l_{jk}

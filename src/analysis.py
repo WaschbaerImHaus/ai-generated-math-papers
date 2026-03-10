@@ -41,6 +41,12 @@ from config import (
 # Spezifische mathematische Ausnahmen importieren
 from exceptions import ConvergenceError, DomainError
 
+# Zentrales Logging-System importieren
+from math_logger import get_logger
+
+# Modul-Logger für analysis.py erstellen
+_logger = get_logger("analysis")
+
 
 def _safe_parse(expr_str: str, local_vars: dict | None = None) -> sp.Expr:
     """
@@ -80,8 +86,14 @@ def _safe_parse(expr_str: str, local_vars: dict | None = None) -> sp.Expr:
         safe_locals.update(local_vars)
     try:
         return parse_expr(expr_str, local_dict=safe_locals, transformations=transformations)
-    except Exception:
+    except Exception as parse_err:
         # Fallback auf sympify für SymPy-interne Ausdrücke (z.B. bereits geparste Symbole)
+        # Warnung loggen: parse_expr scheiterte, sympify wird als unsicherere Alternative genutzt
+        _logger._logger.warning(
+            f"_safe_parse: parse_expr schlug fehl für Ausdruck '{expr_str}' "
+            f"({type(parse_err).__name__}: {parse_err}). "
+            f"Fallback auf sp.sympify() – Bitte Eingabe prüfen."
+        )
         return sp.sympify(expr_str)
 
 

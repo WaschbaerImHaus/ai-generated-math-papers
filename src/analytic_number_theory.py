@@ -21,6 +21,7 @@ Mathematisches Fernziel:
 
 import math
 import cmath
+import functools
 from typing import Optional
 import numpy as np
 
@@ -28,6 +29,37 @@ import numpy as np
 # ===========================================================================
 # PRIMZAHLZÄHLFUNKTION UND LOGARITHMISCHES INTEGRAL
 # ===========================================================================
+
+@functools.lru_cache(maxsize=512)
+def _prime_counting_cached(n: int) -> int:
+    """
+    Gecachte interne Implementierung von π(x) für ganzzahlige Argumente.
+
+    lru_cache speichert bis zu 512 verschiedene n-Werte. Bei wiederholtem
+    Aufruf mit gleichem n wird das Ergebnis direkt aus dem Cache zurückgegeben,
+    ohne den teuren Sieb-Algorithmus erneut auszuführen.
+
+    Warum interne Funktion?
+        prime_counting_function() nimmt float entgegen. Da float nicht hashbar
+        für lru_cache in allen Fällen zuverlässig ist (z.B. 1e3 vs 1000.0),
+        konvertieren wir zuerst zu int und cachen die int-Version.
+
+    @param n: Ganzzahlige obere Schranke n ≥ 0
+    @return: π(n) = Anzahl der Primzahlen ≤ n
+    @lastModified 2026-03-10
+    """
+    if n < 2:
+        return 0
+    # Sieb des Eratosthenes – O(n log log n) Zeit, O(n) Speicher
+    is_prime = bytearray([1]) * (n + 1)
+    is_prime[0] = is_prime[1] = 0
+    p = 2
+    while p * p <= n:
+        if is_prime[p]:
+            is_prime[p * p::p] = bytearray(len(is_prime[p * p::p]))
+        p += 1
+    return sum(is_prime)
+
 
 def prime_counting_function(x: float) -> int:
     """
@@ -40,27 +72,16 @@ def prime_counting_function(x: float) -> int:
         π(x) ≈ Li(x) = ∫₂ˣ dt/ln(t)
 
     Exakte Berechnung via Sieb des Eratosthenes: O(x log log x).
+    Wiederholte Aufrufe mit demselben (ganzzahligen) x werden gecacht (lru_cache).
 
     @param x: Obere Schranke
     @return: Exakte Anzahl der Primzahlen ≤ x
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     if x < 2:
         return 0
-
-    n = int(x)
-    # Sieb des Eratosthenes
-    is_prime = bytearray([1]) * (n + 1)  # bytearray für Speichereffizienz
-    is_prime[0] = is_prime[1] = 0
-
-    p = 2
-    while p * p <= n:
-        if is_prime[p]:
-            # Alle Vielfachen ab p² markieren
-            is_prime[p * p::p] = bytearray(len(is_prime[p * p::p]))
-        p += 1
-
-    return sum(is_prime)
+    # Konvertierung zu int für Cache-Kompatibilität (float ist nicht sicher hashbar)
+    return _prime_counting_cached(int(x))
 
 
 def logarithmic_integral(x: float, terms: int = 100) -> float:
@@ -146,6 +167,7 @@ def prime_number_theorem_comparison(x_values: list[float]) -> list[dict]:
 # TSCHEBYSCHOW-FUNKTIONEN (wichtig für Riemanns Explizite Formel)
 # ===========================================================================
 
+@functools.lru_cache(maxsize=512)
 def von_mangoldt_function(n: int) -> float:
     """
     Berechnet die von-Mangoldt-Funktion Λ(n).
@@ -159,9 +181,12 @@ def von_mangoldt_function(n: int) -> float:
         Sie ist das "natürliche" Gewicht in Riemanns expliziter Formel.
         ψ(x) = Σ_{n≤x} Λ(n) = Σ_{p^k≤x} ln(p)
 
+    lru_cache: Da Λ(n) deterministisch und rein funktional ist (kein globaler Zustand),
+    können Ergebnisse sicher gecacht werden. maxsize=512 speichert die 512 häufigsten Werte.
+
     @param n: Positive ganze Zahl n ≥ 1
     @return: Λ(n) ≥ 0
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-10
     """
     if n <= 1:
         return 0.0

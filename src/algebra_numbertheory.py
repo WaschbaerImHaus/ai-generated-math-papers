@@ -168,24 +168,17 @@ def euler_phi(n: int) -> int:
     if n == 1:
         return 1
 
-    # Primfaktoren bestimmen (eindeutig, ohne Exponenten)
+    # Primfaktorzerlegung über prime_factorization() wiederverwenden (gecacht!)
+    # Spart doppelte Traversierung und profitiert vom lru_cache
+    factors = prime_factorization(n)
+
+    # Euler-Phi-Formel: phi(n) = n * prod(1 - 1/p) für alle distinkten Primfaktoren p
+    # Äquivalent: result = result * (p-1) // p für jeden Primfaktor p
     result = n
-    temp = n
-
-    # Für jeden Primfaktor p: result = result * (1 - 1/p) = result * (p-1)/p
-    p = 2
-    while p * p <= temp:
-        if temp % p == 0:
-            # p ist ein Primfaktor
-            while temp % p == 0:
-                temp //= p
-            # phi-Formel anwenden
-            result -= result // p
-        p += 1
-
-    # Letzter verbleibender Primfaktor > sqrt(n)
-    if temp > 1:
-        result -= result // temp
+    for p in factors:
+        # Multiplikation mit (p-1)/p: erst durch p dividieren (ganzzahlig), dann mal (p-1)
+        # Reihenfolge wichtig: result ist immer durch p teilbar wegen Primfaktorzerlegung
+        result = result // p * (p - 1)
 
     return result
 

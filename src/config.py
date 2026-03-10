@@ -22,6 +22,8 @@
 """
 
 import math
+import sympy as sp
+from typing import Union
 
 # ===========================================================================
 # MASCHINENGENAUIGKEIT UND SCHRITTWEITEN
@@ -156,3 +158,141 @@ AUTHOR: str = "Kurt Ingwer"
 
 # Aktuelle Versionsnummer des Projekts (entspricht Build-Nummer)
 VERSION: str = "11.0"
+
+
+# ===========================================================================
+# HILFSFUNKTIONEN – SYMBOLISCHE VEREINFACHUNG
+# ===========================================================================
+
+def smart_simplify(expr) -> "sp.Expr":
+    """
+    @brief Vereinfacht einen SymPy-Ausdruck intelligent mit mehreren Strategien.
+    @description
+        Wendet nacheinander sp.simplify() und sp.nsimplify() an, um den Ausdruck
+        in seine einfachste Form zu bringen:
+
+        1. sp.simplify(expr): Allgemeine algebraische und trigonometrische Vereinfachung.
+           Beispiel: sin²(x) + cos²(x) → 1
+        2. sp.nsimplify(expr, rational=True): Erkennt einfache rationale Zahlen und
+           bekannte Konstanten (π, √2, e) aus Gleitkomma-Näherungen.
+           Beispiel: 3.14159... → π
+
+        Bei Fehler (z.B. nicht-symbolischer Ausdruck) wird der Ausdruck unverändert zurückgegeben.
+
+        Anwendung: Alle Funktionen, die SymPy-Objekte zurückgeben, können das Ergebnis
+        durch smart_simplify() lesbarer und kompakter machen.
+
+    @param expr: SymPy-Ausdruck oder konvertierbarer Wert.
+    @return: Vereinfachter SymPy-Ausdruck (oder unveränderter Eingabe bei Fehler).
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+
+    Beispiele:
+        >>> import sympy as sp
+        >>> x = sp.Symbol('x')
+        >>> smart_simplify(sp.sin(x)**2 + sp.cos(x)**2)
+        1
+        >>> smart_simplify(sp.Rational(6, 4))
+        3/2
+        >>> smart_simplify(3.141592653589793)
+        pi
+    """
+    try:
+        # Schritt 1: Allgemeine Vereinfachung (Algebra, Trigonometrie, Logarithmen)
+        simplified = sp.simplify(expr)
+
+        # Schritt 2: Rationale Vereinfachung (erkennt π, √n, e aus Floats)
+        # rational=True: versucht Brüche statt Dezimalzahlen darzustellen
+        simplified = sp.nsimplify(simplified, rational=True)
+
+        return simplified
+    except Exception:
+        # Bei Fehler: unveränderter Ausdruck zurückgeben (z.B. für Nicht-SymPy-Typen)
+        return expr
+
+
+# ===========================================================================
+# HEURISTIK-SCHWELLWERTE FÜR AUTO_COMPUTE
+# ===========================================================================
+
+# Maximaler Polynomgrad für symbolische Auswertung.
+# Oberhalb dieses Werts wird auf numerische Berechnung umgeschaltet.
+AUTO_COMPUTE_MAX_DEGREE: int = 10
+
+# Maximale Anzahl symbolischer Operationen (SymPy count_ops) für symbolische Auswertung.
+# Komplexere Ausdrücke (viele Operationen) werden numerisch ausgewertet.
+AUTO_COMPUTE_MAX_OPS: int = 50
+
+
+def auto_compute(expr, x_val: float) -> Union[float, complex]:
+    """
+    Wählt automatisch zwischen symbolischer (SymPy) und numerischer (numpy) Auswertung.
+
+    Heuristik:
+        - Wenige Variablen UND niedriger Grad (≤ AUTO_COMPUTE_MAX_DEGREE)
+          UND wenige Operationen (≤ AUTO_COMPUTE_MAX_OPS) → SymPy symbolisch
+        - Sonst → numpy numerisch (schneller für hochdimensionale/komplexe Ausdrücke)
+
+    Warum diese Unterscheidung?
+        - SymPy ist exakt, aber langsam für große Ausdrücke (symbolische Vereinfachung)
+        - numpy.float64 ist ~1000× schneller, aber akkumuliert Rundungsfehler
+        - Für Polynome kleinen Grades lohnt sich der Exaktheits-Vorteil von SymPy
+
+    Beispiel:
+        >>> import sympy as sp
+        >>> x = sp.Symbol('x')
+        >>> auto_compute(x**2 + 3*x + 1, 2.0)   # symbolisch (Grad 2 ≤ 10)
+        (11+0j)
+        >>> auto_compute(x**15, 2.0)              # numerisch (Grad 15 > 10)
+        32768.0
+
+    @param expr: SymPy-Ausdruck oder Callable (f(x_val))
+    @param x_val: Auswertungspunkt (reelle Zahl)
+    @return: Numerischer Wert als float oder complex
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    import numpy as np
+
+    # Prüfe ob expr ein SymPy-Ausdruck ist
+    if not isinstance(expr, sp.Expr):
+        # Callable: direkt numerisch auswerten
+        return float(expr(x_val))
+
+    # Variablenmenge bestimmen
+    free_vars = expr.free_symbols
+
+    if len(free_vars) == 0:
+        # Konstanter Ausdruck: symbolisch auswerten, kein x_val benötigt
+        return complex(expr.evalf())
+
+    if len(free_vars) > 1:
+        # Mehrere Variablen: nur erste Variable mit x_val belegen, numerisch auswerten
+        x_sym = list(free_vars)[0]
+        return float(expr.subs(x_sym, x_val).evalf())
+
+    # Genau eine Variable: Grad und Operationszahl prüfen
+    x_sym = list(free_vars)[0]
+
+    # Grad des Ausdrucks bestimmen (nur sinnvoll für Polynome)
+    try:
+        deg = sp.degree(expr, x_sym)
+        if deg == sp.oo:
+            # Nicht-Polynome (sin, exp, …) als "hohen Grad" behandeln
+            deg = AUTO_COMPUTE_MAX_DEGREE + 1
+    except Exception:
+        deg = AUTO_COMPUTE_MAX_DEGREE + 1  # Unbekannter Grad → numerisch
+
+    # Operationsanzahl messen (Komplexitätsmaß für SymPy-Ausdruck)
+    ops = sp.count_ops(expr)
+
+    # Entscheidung: symbolisch oder numerisch?
+    if deg <= AUTO_COMPUTE_MAX_DEGREE and ops <= AUTO_COMPUTE_MAX_OPS:
+        # Symbolisch: exakte Auswertung via SymPy-Substitution
+        result = expr.subs(x_sym, x_val).evalf()
+        return complex(result)
+    else:
+        # Numerisch: schnelle Auswertung via numpy lambdify
+        # lambdify erzeugt eine reine Python/numpy-Funktion aus dem SymPy-Ausdruck
+        f_num = sp.lambdify(x_sym, expr, modules=['numpy'])
+        return float(f_num(x_val))

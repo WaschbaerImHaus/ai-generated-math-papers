@@ -1608,3 +1608,527 @@ def mandelbrot_smooth(
             break
 
     return smooth_count
+
+
+# ===========================================================================
+# HILFSFUNKTION: Universeller Figure-Export (PNG/SVG/PDF)
+# ===========================================================================
+
+def export_figure(fig: plt.Figure, path: str) -> str:
+    """
+    @brief Exportiert eine matplotlib-Figure in das durch die Dateiendung
+           bestimmte Format (PNG, SVG oder PDF).
+    @description
+        Erkennt das Zielformat automatisch anhand der Dateiendung:
+            .png  → Rastergrafik (150 dpi)
+            .svg  → Vektorgrafik (XML)
+            .pdf  → PDF-Vektorgrafik für Publikationen
+
+        Das Ausgabeverzeichnis wird automatisch angelegt, falls es nicht
+        existiert. Gibt den absoluten Pfad der gespeicherten Datei zurück.
+
+        Beispiel:
+            fig, ax = plt.subplots()
+            ax.plot([0, 1], [0, 1])
+            export_figure(fig, '/tmp/ausgabe.svg')
+
+    @param fig: matplotlib Figure-Objekt, das exportiert werden soll
+    @param path: Ausgabepfad inkl. Dateiname und Endung (.png/.svg/.pdf)
+    @return: Absoluter Pfad der gespeicherten Datei
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    import os  # noqa: F811 – lokaler Import für Klarheit
+    abs_path = os.path.abspath(path)
+    # Verzeichnis anlegen falls nötig
+    dir_name = os.path.dirname(abs_path)
+    if dir_name:
+        os.makedirs(dir_name, exist_ok=True)
+    # Format aus Dateiendung bestimmen
+    ext = os.path.splitext(abs_path)[1].lower().lstrip('.')
+    if ext == 'pdf':
+        # PDF: verlustfreies Vektorformat
+        fig.savefig(abs_path, format='pdf', bbox_inches='tight')
+    elif ext == 'svg':
+        # SVG: XML-basiertes Vektorformat
+        fig.savefig(abs_path, format='svg', dpi=300, bbox_inches='tight')
+    else:
+        # Standard: PNG mit hoher Auflösung (auch für unbekannte Endungen)
+        fig.savefig(abs_path, format='png', dpi=150, bbox_inches='tight')
+    return abs_path
+
+
+# ===========================================================================
+# 3D-VISUALISIERUNG: GAUẞSCHE KRÜMMUNG
+# ===========================================================================
+
+def plot_gaussian_curvature_3d(
+    surface_name: str,
+    param_range: Tuple[float, float] = (-2.0, 2.0),
+    resolution: int = 50
+) -> plt.Figure:
+    """
+    @brief Visualisiert die Gaußsche Krümmung K einer parametrischen Fläche
+           als farbkodierten 3D-Surface-Plot.
+    @description
+        Die Gaußsche Krümmung K = κ₁ · κ₂ ist das Produkt der beiden
+        Hauptkrümmungen einer Fläche:
+            K > 0: elliptischer Punkt (z.B. Sphäre → K = 1/R²)
+            K = 0: parabolischer Punkt (z.B. Zylinder)
+            K < 0: hyperbolischer Punkt (z.B. Sattel)
+
+        Unterstützte Flächen:
+            'sphere':               Einheitssphäre, K = 1 überall
+            'torus':                Torus (R=2, r=1), K variiert zwischen -1 und positiv
+            'saddle':               z = x² - y², K = -4/(1 + 4x² + 4y²)²
+            'hyperbolic_paraboloid': z = x·y, K = -1/(1+x²+y²)²
+
+        Die Krümmung wird numerisch über die zweiten partiellen Ableitungen
+        (diskrete Differenzen) und die erste Fundamentalform berechnet.
+
+    @param surface_name: Name der Fläche ('sphere','torus','saddle','hyperbolic_paraboloid')
+    @param param_range: (min, max) Parameterbereich für u und v
+    @param resolution: Anzahl Gitterpunkte pro Parameterachse (Standard: 50)
+    @return: matplotlib Figure-Objekt mit 3D-Surface-Plot
+    @raises ValueError: wenn surface_name unbekannt ist
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # Parameterwerte gleichmäßig verteilen
+    u = np.linspace(param_range[0], param_range[1], resolution)
+    v = np.linspace(param_range[0], param_range[1], resolution)
+    U, V = np.meshgrid(u, v)
+
+    # --- Fläche in kartesischen Koordinaten berechnen ---
+    if surface_name == 'sphere':
+        # Einheitssphäre: (u,v) = (θ, φ) ∈ [0,π] × [0,2π]
+        # Für allgemeinen param_range normieren wir auf [0,π] × [0,2π]
+        t1 = np.pi * (U - param_range[0]) / (param_range[1] - param_range[0])
+        t2 = 2 * np.pi * (V - param_range[0]) / (param_range[1] - param_range[0])
+        X = np.sin(t1) * np.cos(t2)
+        Y = np.sin(t1) * np.sin(t2)
+        Z = np.cos(t1)
+        # Gaußsche Krümmung der Einheitssphäre: K = 1 überall
+        K = np.ones_like(X)
+
+    elif surface_name == 'torus':
+        # Torus mit großem Radius R=2 und kleinem Radius r=1
+        # x(u,v) = (R + r·cos(u))·cos(v), u,v ∈ [0, 2π]
+        R_torus, r_torus = 2.0, 1.0
+        # Normieren auf [0, 2π]
+        t1 = 2 * np.pi * (U - param_range[0]) / (param_range[1] - param_range[0])
+        t2 = 2 * np.pi * (V - param_range[0]) / (param_range[1] - param_range[0])
+        X = (R_torus + r_torus * np.cos(t1)) * np.cos(t2)
+        Y = (R_torus + r_torus * np.cos(t1)) * np.sin(t2)
+        Z = r_torus * np.sin(t1)
+        # Gaußsche Krümmung des Torus:
+        #   K(u,v) = cos(u) / (r · (R + r·cos(u)))
+        K = np.cos(t1) / (r_torus * (R_torus + r_torus * np.cos(t1)))
+
+    elif surface_name == 'saddle':
+        # Affines Sattelflächenparaboloid: z = x² - y²
+        X = U
+        Y = V
+        Z = U**2 - V**2
+        # Gaußsche Krümmung des Sattelparaboloids z = f(x,y) mit f=x²-y²:
+        #   K = (f_xx·f_yy - f_xy²) / (1 + f_x² + f_y²)²
+        #   f_x = 2x, f_y = -2y, f_xx = 2, f_yy = -2, f_xy = 0
+        f_x = 2 * U
+        f_y = -2 * V
+        f_xx = np.full_like(U, 2.0)
+        f_yy = np.full_like(V, -2.0)
+        f_xy = np.zeros_like(U)
+        denom = (1 + f_x**2 + f_y**2)**2
+        K = (f_xx * f_yy - f_xy**2) / denom
+
+    elif surface_name == 'hyperbolic_paraboloid':
+        # Hyperbolisches Paraboloid: z = x·y
+        X = U
+        Y = V
+        Z = U * V
+        # Gaußsche Krümmung: f_x = y, f_y = x, f_xx = 0, f_yy = 0, f_xy = 1
+        #   K = (0·0 - 1²) / (1 + y² + x²)² = -1 / (1 + x² + y²)²
+        f_x = V   # ∂(x·y)/∂x = y
+        f_y = U   # ∂(x·y)/∂y = x
+        denom = (1 + f_x**2 + f_y**2)**2
+        K = -1.0 / denom
+
+    else:
+        raise ValueError(
+            f"Unbekannte Fläche: '{surface_name}'. "
+            "Unterstützt: 'sphere', 'torus', 'saddle', 'hyperbolic_paraboloid'"
+        )
+
+    # --- Plot erstellen ---
+    fig = plt.figure(figsize=(11, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Krümmungswerte für Farbkodierung normieren (NaN-sicher)
+    K_clean = np.where(np.isfinite(K), K, np.nan)
+
+    # Surface-Plot mit Gaußscher Krümmung als Farbkodierung
+    surf = ax.plot_surface(
+        X, Y, Z,
+        facecolors=plt.cm.RdYlBu(
+            (K_clean - np.nanmin(K_clean)) /
+            max(np.nanmax(K_clean) - np.nanmin(K_clean), 1e-12)
+        ),
+        alpha=0.85,
+        linewidth=0,
+        antialiased=True
+    )
+    # Farbskala als separates Mappable
+    sm = plt.cm.ScalarMappable(
+        cmap='RdYlBu',
+        norm=plt.Normalize(vmin=float(np.nanmin(K_clean)),
+                           vmax=float(np.nanmax(K_clean)))
+    )
+    sm.set_array([])
+    fig.colorbar(sm, ax=ax, shrink=0.5, label='Gaußsche Krümmung K')
+
+    ax.set_title(f'Gaußsche Krümmung: {surface_name}', fontsize=13)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+
+    return fig
+
+
+# ===========================================================================
+# GEODÄTEN-VISUALISIERUNG
+# ===========================================================================
+
+def plot_geodesic_on_sphere(
+    start_angle: Tuple[float, float],
+    direction: Tuple[float, float],
+    n_steps: int = 200
+) -> plt.Figure:
+    """
+    @brief Visualisiert eine Geodäte (Großkreis) auf der Einheitssphäre.
+    @description
+        Eine Geodäte auf der Einheitssphäre ist ein Großkreis.
+        Die Geodätengleichung auf S² lautet:
+            θ'' = sin(θ)·cos(θ)·(φ')²
+            φ'' = -2·cos(θ)/sin(θ) · θ'·φ'
+
+        Diese wird mit Runge-Kutta 4. Ordnung numerisch integriert.
+        Der Pfad wird als rote Kurve auf der halbtransparenten Sphäre gezeichnet.
+
+        Koordinaten: sphärische Polarkoordinaten (θ, φ) mit
+            x = sin(θ)·cos(φ)
+            y = sin(θ)·sin(φ)
+            z = cos(θ)
+
+    @param start_angle: (θ₀, φ₀) Startwinkel in Bogenmaß (Polar-, Azimutwinkel)
+    @param direction: (dθ/dt, dφ/dt) Anfangsgeschwindigkeit im Parameterraum
+    @param n_steps: Anzahl Integrationsschritte (Standard: 200)
+    @return: matplotlib Figure-Objekt mit 3D-Sphäre und Geodäten-Pfad
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # --- Geodätengleichung auf S² als System 1. Ordnung ---
+    def geodaeten_rhs(state: np.ndarray) -> np.ndarray:
+        """
+        @brief Rechte Seite der Geodäten-DGL auf S².
+        @param state: [θ, φ, θ', φ'] – aktueller Zustand
+        @return: Zeitableitung [θ', φ', θ'', φ'']
+        """
+        theta, phi, dtheta, dphi = state
+        # Regularisierung: sin(θ) != 0 vermeiden (Pol-Singularität)
+        sin_theta = np.sin(theta)
+        if abs(sin_theta) < 1e-8:
+            sin_theta = 1e-8
+        # θ'' = sin(θ)·cos(θ)·(φ')²
+        ddtheta = np.sin(theta) * np.cos(theta) * dphi**2
+        # φ'' = -2·cos(θ)/sin(θ) · θ'·φ'
+        ddphi = -2.0 * (np.cos(theta) / sin_theta) * dtheta * dphi
+        return np.array([dtheta, dphi, ddtheta, ddphi])
+
+    # Gesamtlänge des Pfades: ein vollständiger Großkreis bei Einheitsgeschwindigkeit
+    t_end = 2.0 * math.pi / max(
+        math.sqrt(direction[0]**2 + direction[1]**2), 1e-8
+    )
+    dt = t_end / n_steps
+
+    # Anfangszustand
+    state = np.array([
+        float(start_angle[0]),
+        float(start_angle[1]),
+        float(direction[0]),
+        float(direction[1])
+    ])
+
+    # --- Runge-Kutta 4 Integration ---
+    thetas = [state[0]]
+    phis = [state[1]]
+    for _ in range(n_steps):
+        k1 = geodaeten_rhs(state)
+        k2 = geodaeten_rhs(state + 0.5 * dt * k1)
+        k3 = geodaeten_rhs(state + 0.5 * dt * k2)
+        k4 = geodaeten_rhs(state + dt * k3)
+        state = state + (dt / 6.0) * (k1 + 2 * k2 + 2 * k3 + k4)
+        thetas.append(state[0])
+        phis.append(state[1])
+
+    # Sphärische Koordinaten → kartesisch
+    thetas = np.array(thetas)
+    phis = np.array(phis)
+    gx = np.sin(thetas) * np.cos(phis)
+    gy = np.sin(thetas) * np.sin(phis)
+    gz = np.cos(thetas)
+
+    # --- Sphäre zeichnen ---
+    u_sph = np.linspace(0, 2 * np.pi, 40)
+    v_sph = np.linspace(0, np.pi, 20)
+    Xs = np.outer(np.cos(u_sph), np.sin(v_sph))
+    Ys = np.outer(np.sin(u_sph), np.sin(v_sph))
+    Zs = np.outer(np.ones(40), np.cos(v_sph))
+
+    fig = plt.figure(figsize=(8, 8))
+    ax = fig.add_subplot(111, projection='3d')
+    # Halbtransparente Sphäre
+    ax.plot_surface(Xs, Ys, Zs, color='lightblue', alpha=0.3, linewidth=0)
+    # Geodätenpfad als rote Kurve
+    ax.plot(gx, gy, gz, 'r-', linewidth=2.5, label='Geodäte')
+    # Startpunkt markieren
+    ax.scatter([gx[0]], [gy[0]], [gz[0]], color='green', s=60, zorder=5, label='Start')
+
+    ax.set_title('Geodäte auf der Einheitssphäre', fontsize=13)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    ax.legend()
+
+    return fig
+
+
+def plot_geodesic_on_torus(
+    R: float = 2.0,
+    r: float = 1.0,
+    start_params: Tuple[float, float] = (0.0, 0.0),
+    direction: Tuple[float, float] = (1.0, 0.3),
+    n_steps: int = 500
+) -> plt.Figure:
+    """
+    @brief Visualisiert eine Geodäte auf einem Torus.
+    @description
+        Ein Torus mit großem Radius R und kleinem Radius r wird durch die
+        Parametrisierung beschrieben:
+            x(u,v) = (R + r·cos(u))·cos(v)
+            y(u,v) = (R + r·cos(u))·sin(v)
+            z(u,v) = r·sin(u)
+
+        Die Geodätengleichungen auf dem Torus (Christoffel-Symbole):
+            u'' = sin(u)·cos(u)·(v')²·(R + r·cos(u))/r
+            v'' = -2·sin(u)·u'·v' / (R + r·cos(u)) · r
+
+        Integration per Runge-Kutta 4. Ordnung.
+
+    @param R: Großer Torusradius (Mittelpunkt des Rohres vom Zentrum)
+    @param r: Kleiner Torusradius (Rohrquerschnitt)
+    @param start_params: (u₀, v₀) Startparameter in Bogenmaß
+    @param direction: (du/dt₀, dv/dt₀) Anfangsgeschwindigkeit im Parameterraum
+    @param n_steps: Anzahl Integrationsschritte (Standard: 500)
+    @return: matplotlib Figure-Objekt mit 3D-Torus und Geodäten-Pfad
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # --- Geodätengleichung auf dem Torus als System 1. Ordnung ---
+    def torus_geodaete_rhs(state: np.ndarray) -> np.ndarray:
+        """
+        @brief Rechte Seite der Geodäten-DGL auf dem Torus.
+        @param state: [u, v, u', v'] – aktueller Zustand
+        @return: Zeitableitung [u', v', u'', v'']
+        """
+        u, v, du, dv = state
+        cos_u = np.cos(u)
+        sin_u = np.sin(u)
+        denom = R + r * cos_u
+        # Regularisierung: Nenner != 0
+        if abs(denom) < 1e-8:
+            denom = 1e-8
+        # u'' = sin(u)·cos(u)·(v')² · (R + r·cos(u)) / r
+        ddu = sin_u * cos_u * dv**2 * denom / r
+        # v'' = -2·r·sin(u)·u'·v' / (R + r·cos(u))
+        ddv = -2.0 * r * sin_u * du * dv / denom
+        return np.array([du, dv, ddu, ddv])
+
+    # Zeitschritt
+    t_end = 4.0 * math.pi / max(
+        math.sqrt(direction[0]**2 + direction[1]**2), 1e-8
+    )
+    dt = t_end / n_steps
+
+    # Anfangszustand
+    state = np.array([
+        float(start_params[0]),
+        float(start_params[1]),
+        float(direction[0]),
+        float(direction[1])
+    ])
+
+    # --- Runge-Kutta 4 ---
+    us = [state[0]]
+    vs = [state[1]]
+    for _ in range(n_steps):
+        k1 = torus_geodaete_rhs(state)
+        k2 = torus_geodaete_rhs(state + 0.5 * dt * k1)
+        k3 = torus_geodaete_rhs(state + 0.5 * dt * k2)
+        k4 = torus_geodaete_rhs(state + dt * k3)
+        state = state + (dt / 6.0) * (k1 + 2 * k2 + 2 * k3 + k4)
+        us.append(state[0])
+        vs.append(state[1])
+
+    us = np.array(us)
+    vs = np.array(vs)
+
+    # Torus-Parametrisierung → kartesisch
+    gx = (R + r * np.cos(us)) * np.cos(vs)
+    gy = (R + r * np.cos(us)) * np.sin(vs)
+    gz = r * np.sin(us)
+
+    # --- Torus-Oberfläche zeichnen ---
+    u_surf = np.linspace(0, 2 * np.pi, 40)
+    v_surf = np.linspace(0, 2 * np.pi, 40)
+    U_s, V_s = np.meshgrid(u_surf, v_surf)
+    Xt = (R + r * np.cos(U_s)) * np.cos(V_s)
+    Yt = (R + r * np.cos(U_s)) * np.sin(V_s)
+    Zt = r * np.sin(U_s)
+
+    fig = plt.figure(figsize=(9, 8))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(Xt, Yt, Zt, color='lightcyan', alpha=0.3, linewidth=0)
+    ax.plot(gx, gy, gz, 'r-', linewidth=2.0, label='Geodäte')
+    ax.scatter([gx[0]], [gy[0]], [gz[0]], color='green', s=60, zorder=5, label='Start')
+
+    ax.set_title(f'Geodäte auf dem Torus (R={R}, r={r})', fontsize=13)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    ax.legend()
+
+    return fig
+
+
+# ===========================================================================
+# ADAPTIVES GITTER FÜR 2D-PLOTS
+# ===========================================================================
+
+def plot_function_2d_adaptive(
+    func_str: str,
+    x_range: Tuple[float, float] = (-5.0, 5.0),
+    base_points: int = 200,
+    refinement_levels: int = 3,
+    return_points: bool = False
+):
+    """
+    @brief Plottet eine Funktion mit adaptivem Gitter: In Regionen hoher
+           Krümmung werden automatisch mehr Auswertungspunkte eingefügt.
+    @description
+        Algorithmus:
+            1. base_points gleichmäßig verteilt → Basispunkte x₀
+            2. Zweite numerische Ableitung |f''(x)| schätzen (diskrete Differenz)
+            3. Punkte mit |f''| > threshold werden verfeinert
+            4. Rekursiv bis refinement_levels Iterationen
+
+        Dadurch wird der Plot in "glatten" Regionen mit weniger Punkten
+        dargestellt und in stark gekrümmten Regionen (Sattelpunkte, Extrema,
+        steile Anstiege) mit mehr Punkten, was Aliasing verhindert.
+
+        Unterstützte Ausdrücke in func_str (per eval):
+            'sin(x)', 'cos(x)', 'exp(x)', 'log(x)', '1/x', 'x**2', etc.
+            (Alle numpy-Funktionen sind per 'np.' erreichbar)
+            Kurzformen sin/cos/exp/log werden automatisch auf np.sin etc. gemappt.
+
+    @param func_str: Funktionsausdruck als String, z.B. 'sin(x)' oder 'x**2'
+    @param x_range: (x_min, x_max) Plot-Intervall
+    @param base_points: Anzahl äquidistanter Startpunkte (Standard: 200)
+    @param refinement_levels: Maximale Verfeinerungstiefe (Standard: 3)
+    @param return_points: Falls True, werden (x_array, y_array) zurückgegeben
+                          statt einer Figure (für Tests)
+    @return: matplotlib Figure-Objekt ODER (x_array, y_array) wenn return_points=True
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # Sichere Auswertungsumgebung mit numpy-Funktionen
+    _eval_env = {
+        'sin': np.sin, 'cos': np.cos, 'tan': np.tan,
+        'exp': np.exp, 'log': np.log, 'log2': np.log2, 'log10': np.log10,
+        'sqrt': np.sqrt, 'abs': np.abs, 'pi': np.pi, 'e': np.e,
+        'arcsin': np.arcsin, 'arccos': np.arccos, 'arctan': np.arctan,
+        'sinh': np.sinh, 'cosh': np.cosh, 'tanh': np.tanh,
+        'np': np,
+    }
+
+    def _eval_func(x_val: np.ndarray) -> np.ndarray:
+        """Wertet func_str an einem numpy-Array x_val aus."""
+        env = dict(_eval_env)
+        env['x'] = x_val
+        try:
+            result = eval(func_str, {"__builtins__": {}}, env)  # noqa: S307
+            return np.asarray(result, dtype=float)
+        except Exception:
+            return np.full_like(x_val, np.nan, dtype=float)
+
+    # --- Schritt 1: Basispunkte erzeugen ---
+    x_pts = np.linspace(x_range[0], x_range[1], base_points)
+    y_pts = _eval_func(x_pts)
+
+    # --- Schritte 2–4: Iterative Verfeinerung ---
+    for _level in range(refinement_levels):
+        if len(x_pts) < 3:
+            break
+
+        # Zweite Ableitung (diskrete Differenz zweiter Ordnung) schätzen
+        # f''(x) ≈ (f(x+h) - 2f(x) + f(x-h)) / h²
+        # Hier approximiert über benachbarte Punkte im Array
+        y_clean = np.where(np.isfinite(y_pts), y_pts, 0.0)
+        d2y = np.abs(np.diff(y_clean, n=2))  # Länge: n-2
+
+        # Threshold: 95. Perzentil der Krümmungswerte → obere 5% verfeinern
+        if d2y.max() < 1e-12:
+            break  # Funktion ist perfekt linear, keine Verfeinerung nötig
+        threshold = np.percentile(d2y, 95)
+
+        # Indizes der hochgekrümmten Segmente (Index bezieht sich auf Mittelpunkte)
+        hoch_indices = np.where(d2y > threshold)[0] + 1  # +1: Versatz auf x_pts
+
+        # Neue Punkte zwischen hochgekrümmten Nachbarn einfügen
+        neue_x = []
+        for idx in hoch_indices:
+            if idx < len(x_pts) - 1:
+                # Mittelpunkt zwischen x[idx] und x[idx+1]
+                neue_x.append(0.5 * (x_pts[idx] + x_pts[idx + 1]))
+            if idx > 0:
+                # Mittelpunkt zwischen x[idx-1] und x[idx]
+                neue_x.append(0.5 * (x_pts[idx - 1] + x_pts[idx]))
+
+        if not neue_x:
+            break
+
+        # Neue Punkte zum Array hinzufügen und sortieren
+        alle_x = np.unique(np.concatenate([x_pts, np.array(neue_x)]))
+        alle_y = _eval_func(alle_x)
+        x_pts = alle_x
+        y_pts = alle_y
+
+    # Nur gültige Werte behalten
+    mask = np.isfinite(y_pts)
+    x_final = x_pts[mask]
+    y_final = y_pts[mask]
+
+    # Falls nur Rohdaten gewünscht (für Tests)
+    if return_points:
+        return x_final, y_final
+
+    # --- Plot erzeugen ---
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.plot(x_final, y_final, 'b-', linewidth=1.5)
+    ax.set_title(f'f(x) = {func_str} (adaptiv, {len(x_final)} Punkte)', fontsize=13)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.grid(True, alpha=0.3)
+    ax.axhline(0, color='k', linewidth=0.5)
+    ax.axvline(0, color='k', linewidth=0.5)
+
+    return fig

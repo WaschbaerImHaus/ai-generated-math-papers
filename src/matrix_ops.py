@@ -26,6 +26,17 @@ from vectors import Vector
 # Spezifische mathematische Ausnahmen importieren
 from exceptions import SingularMatrixError
 
+# Zentrales Logging-System importieren
+from math_logger import get_logger
+
+# Modul-Logger für matrix_ops.py erstellen
+_logger = get_logger("matrix_ops")
+
+# Schwellenwert für Warnung bei schlecht konditionierten Matrizen.
+# Konditionszahl > 1e10 bedeutet: Ergebnisfehler können um Faktor 10^10 verstärkt werden.
+# Bei IEEE 754 double precision (eps ≈ 2.2e-16) verliert man dann ~10 signifikante Stellen.
+_CONDITION_WARNING_THRESHOLD: float = 1e10
+
 
 # =============================================================================
 # KLASSE: Matrix
@@ -54,6 +65,51 @@ class Matrix:
         self.cols = len(data[0])
         # Tiefe Kopie um ungewollte Seiteneffekte zu vermeiden
         self._data = [list(row) for row in data]
+
+    def _check_condition(self, operation: str = "Operation") -> float:
+        """
+        @brief Berechnet und loggt die Konditionszahl der Matrix.
+        @description
+            Die Konditionszahl κ(A) = ||A|| · ||A⁻¹|| misst, wie sensitiv das
+            Ergebnis von Ax=b gegenüber kleinen Perturbationen in A oder b ist.
+
+            Interpretation:
+            - κ ≈ 1: gut konditioniert (numerisch stabil)
+            - κ ≈ 1e8: 8 Stellen Genauigkeit verloren
+            - κ > 1e10: schlecht konditioniert → Ergebnis unzuverlässig
+
+            Berechnung über numpy.linalg.cond() (2-Norm, d.h. σ_max / σ_min der SVD).
+
+        @param operation: Name der aufrufenden Operation (für Log-Ausgabe).
+        @return Konditionszahl (float).
+        @author Kurt Ingwer
+        @lastModified 2026-03-10
+        """
+        # Nur für quadratische Matrizen sinnvoll
+        if self.rows != self.cols:
+            return 1.0
+
+        # numpy-Array aus internen Daten aufbauen
+        arr = np.array(self._data, dtype=float)
+        try:
+            cond = float(np.linalg.cond(arr))
+        except Exception:
+            # Bei numerischen Fehlern (z.B. NaN/Inf) keine Warnung ausgeben
+            return 1.0
+
+        # Warnung bei schlecht konditionierter Matrix ausgeben
+        if cond > _CONDITION_WARNING_THRESHOLD:
+            _logger._logger.warning(
+                f"{operation}: Schlecht konditionierte Matrix! "
+                f"Konditionszahl κ = {cond:.3e} > {_CONDITION_WARNING_THRESHOLD:.0e}. "
+                f"Numerische Ergebnisse können stark fehlerbehaftet sein."
+            )
+        else:
+            # Auf DEBUG-Level nur informationshalber ausgeben
+            _logger._logger.debug(
+                f"{operation}: Konditionszahl κ = {cond:.3e}"
+            )
+        return cond
 
     def get(self, row: int, col: int) -> float:
         """@brief Gibt den Wert an Position (row, col) zurück. @date 2026-03-05"""
@@ -167,6 +223,9 @@ class Matrix:
         if self.rows != self.cols:
             raise ValueError("Determinante nur für quadratische Matrizen definiert")
 
+        # Konditionszahl prüfen und bei schlecht konditionierter Matrix warnen
+        self._check_condition("determinant()")
+
         n = self.rows
         # Arbeitskopie erstellen
         m = [list(row) for row in self._data]
@@ -216,6 +275,9 @@ class Matrix:
         if self.rows != self.cols:
             raise ValueError("Inverse nur für quadratische Matrizen definiert")
 
+        # Konditionszahl prüfen: schlecht konditionierte Matrix → ungenaue Inverse
+        self._check_condition("inverse()")
+
         n = self.rows
         # Erweiterte Matrix [A | I] erstellen
         aug = [list(self._data[i]) + [1.0 if i == j else 0.0 for j in range(n)]
@@ -260,6 +322,9 @@ class Matrix:
             raise ValueError("Gauss-Elimination nur für quadratische Matrizen")
         if self.rows != b.dim:
             raise ValueError(f"Dimension passt nicht: Matrix {self.rows}×{self.cols}, Vektor {b.dim}")
+
+        # Konditionszahl prüfen: schlecht konditioniertes System → ungenaue Lösung
+        self._check_condition("solve()")
 
         n = self.rows
         # Erweiterte Matrix [A | b]

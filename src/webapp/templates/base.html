@@ -376,6 +376,18 @@
      */
     function showResult(container, html) {
         container.innerHTML = `<div class="result-success">${html}</div>`;
+        // KaTeX neu rendern, da dynamisch eingefügter HTML nicht automatisch verarbeitet wird
+        if (typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(container, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                throwOnError: false
+            });
+        }
     }
 
     // Serverstatus beim Laden prüfen

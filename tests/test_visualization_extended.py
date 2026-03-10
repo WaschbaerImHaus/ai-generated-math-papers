@@ -23,9 +23,13 @@
 """
 
 import os
+import sys
 import math
 import tempfile
 import shutil
+
+# src-Verzeichnis zum Suchpfad hinzufügen (damit visualization importierbar ist)
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 import numpy as np
 import matplotlib
@@ -45,6 +49,11 @@ from visualization import (
     plot_and_export,
     export_all_formats,
     mandelbrot_smooth,
+    plot_gaussian_curvature_3d,
+    plot_geodesic_on_sphere,
+    plot_geodesic_on_torus,
+    plot_function_2d_adaptive,
+    export_figure,
 )
 
 
@@ -520,3 +529,240 @@ class TestMandelbrotSmooth:
             assert hat_fraktionsanteile, (
                 "Smooth Coloring sollte nicht-ganzzahlige Werte liefern"
             )
+
+
+# ===========================================================================
+# TESTS: export_figure (Hilfsfunktion für PNG/SVG/PDF-Export)
+# ===========================================================================
+
+class TestExportFigure:
+    """Tests für die universelle Export-Hilfsfunktion export_figure()."""
+
+    def test_png_export_erstellt_datei(self):
+        """export_figure() mit .png-Endung muss PNG-Datei erzeugen."""
+        tmpdir = _make_temp_dir()
+        try:
+            png_path = os.path.join(tmpdir, 'export_test.png')
+            fig, ax = plt.subplots()
+            ax.plot([0, 1], [0, 1])
+
+            export_figure(fig, png_path)
+            plt.close(fig)
+
+            assert os.path.exists(png_path), "PNG-Datei muss existieren"
+            assert os.path.getsize(png_path) > 0, "PNG-Datei darf nicht leer sein"
+        finally:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+
+    def test_svg_export_erstellt_datei(self):
+        """export_figure() mit .svg-Endung muss SVG-Datei erzeugen."""
+        tmpdir = _make_temp_dir()
+        try:
+            svg_path = os.path.join(tmpdir, 'export_test.svg')
+            fig, ax = plt.subplots()
+            ax.plot([0, 1, 2], [0, 1, 0])
+
+            export_figure(fig, svg_path)
+            plt.close(fig)
+
+            assert os.path.exists(svg_path), "SVG-Datei muss existieren"
+            # SVG ist XML-basiert
+            with open(svg_path, 'r', encoding='utf-8') as f:
+                inhalt = f.read(200)
+            assert '<?xml' in inhalt or '<svg' in inhalt, (
+                "Exportierte Datei muss gültiges SVG-Format sein"
+            )
+        finally:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+
+    def test_pdf_export_erstellt_datei(self):
+        """export_figure() mit .pdf-Endung muss PDF-Datei erzeugen."""
+        tmpdir = _make_temp_dir()
+        try:
+            pdf_path = os.path.join(tmpdir, 'export_test.pdf')
+            fig, ax = plt.subplots()
+            ax.set_title('PDF Export Test')
+
+            export_figure(fig, pdf_path)
+            plt.close(fig)
+
+            assert os.path.exists(pdf_path), "PDF-Datei muss existieren"
+            # PDF-Magic-Bytes prüfen
+            with open(pdf_path, 'rb') as f:
+                magic = f.read(4)
+            assert magic == b'%PDF', "Datei muss gültiges PDF sein"
+        finally:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+# ===========================================================================
+# TESTS: plot_gaussian_curvature_3d
+# ===========================================================================
+
+class TestGaussianCurvature3D:
+    """Tests für die Gaußsche-Krümmungs-3D-Visualisierung."""
+
+    def test_sphäre_gibt_figure_zurück(self):
+        """plot_gaussian_curvature_3d('sphere') muss Figure zurückgeben."""
+        fig = plot_gaussian_curvature_3d('sphere', param_range=(-1.5, 1.5), resolution=10)
+        assert isinstance(fig, plt.Figure), (
+            "Rückgabewert muss matplotlib.Figure sein"
+        )
+        plt.close(fig)
+
+    def test_torus_gibt_figure_zurück(self):
+        """plot_gaussian_curvature_3d('torus') muss Figure zurückgeben."""
+        fig = plot_gaussian_curvature_3d('torus', param_range=(-math.pi, math.pi), resolution=10)
+        assert isinstance(fig, plt.Figure), (
+            "Rückgabewert für Torus muss Figure sein"
+        )
+        plt.close(fig)
+
+    def test_sattel_gibt_figure_zurück(self):
+        """plot_gaussian_curvature_3d('saddle') muss Figure zurückgeben."""
+        fig = plot_gaussian_curvature_3d('saddle', param_range=(-2, 2), resolution=10)
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+    def test_hyperbolisches_paraboloid_gibt_figure_zurück(self):
+        """plot_gaussian_curvature_3d('hyperbolic_paraboloid') muss Figure zurückgeben."""
+        fig = plot_gaussian_curvature_3d(
+            'hyperbolic_paraboloid', param_range=(-2, 2), resolution=10
+        )
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+    def test_unbekannte_fläche_wirft_fehler(self):
+        """Unbekannte Fläche soll ValueError auslösen."""
+        with pytest.raises((ValueError, KeyError)):
+            plot_gaussian_curvature_3d('unbekannte_fläche', resolution=5)
+
+
+# ===========================================================================
+# TESTS: plot_geodesic_on_sphere
+# ===========================================================================
+
+class TestGeodesicOnSphere:
+    """Tests für Geodäten auf der Einheitssphäre."""
+
+    def test_gibt_figure_zurück(self):
+        """plot_geodesic_on_sphere() muss Figure zurückgeben."""
+        fig = plot_geodesic_on_sphere(
+            start_angle=(0.0, 0.0), direction=(1.0, 0.5), n_steps=20
+        )
+        assert isinstance(fig, plt.Figure), (
+            "Rückgabewert muss matplotlib.Figure sein"
+        )
+        plt.close(fig)
+
+    def test_verschiedene_startwinkel(self):
+        """Verschiedene Startwinkel produzieren Figure ohne Fehler."""
+        for theta, phi in [(0.0, 0.0), (math.pi / 4, math.pi / 3), (math.pi / 2, math.pi)]:
+            fig = plot_geodesic_on_sphere(
+                start_angle=(theta, phi), direction=(1.0, 0.3), n_steps=15
+            )
+            assert isinstance(fig, plt.Figure)
+            plt.close(fig)
+
+    def test_viele_schritte(self):
+        """Auch bei n_steps=100 funktioniert die Funktion korrekt."""
+        fig = plot_geodesic_on_sphere(
+            start_angle=(0.5, 0.5), direction=(1.0, -0.5), n_steps=100
+        )
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+
+# ===========================================================================
+# TESTS: plot_geodesic_on_torus
+# ===========================================================================
+
+class TestGeodesicOnTorus:
+    """Tests für Geodäten auf dem Torus."""
+
+    def test_gibt_figure_zurück(self):
+        """plot_geodesic_on_torus() muss Figure zurückgeben."""
+        fig = plot_geodesic_on_torus(
+            R=2.0, r=1.0, start_params=(0.0, 0.0), direction=(1.0, 0.3), n_steps=50
+        )
+        assert isinstance(fig, plt.Figure), (
+            "Rückgabewert muss matplotlib.Figure sein"
+        )
+        plt.close(fig)
+
+    def test_verschiedene_r_parameter(self):
+        """Unterschiedliche R und r Werte funktionieren korrekt."""
+        fig = plot_geodesic_on_torus(
+            R=3.0, r=0.5, start_params=(0.0, 0.0), direction=(1.0, 0.5), n_steps=30
+        )
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+    def test_verschiedene_richtungen(self):
+        """Verschiedene Richtungsvektoren erzeugen Figure ohne Fehler."""
+        for richtung in [(1.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, -0.3)]:
+            fig = plot_geodesic_on_torus(direction=richtung, n_steps=30)
+            assert isinstance(fig, plt.Figure)
+            plt.close(fig)
+
+
+# ===========================================================================
+# TESTS: plot_function_2d_adaptive
+# ===========================================================================
+
+class TestAdaptivePlot:
+    """Tests für das adaptive Gitter-Plotting."""
+
+    def test_gibt_figure_zurück(self):
+        """plot_function_2d_adaptive() muss Figure zurückgeben."""
+        fig = plot_function_2d_adaptive('sin(x)', x_range=(-math.pi, math.pi), base_points=30)
+        assert isinstance(fig, plt.Figure), (
+            "Rückgabewert muss matplotlib.Figure sein"
+        )
+        plt.close(fig)
+
+    def test_glatte_funktion(self):
+        """Bei glatter Funktion (x²) wird korrekt geplottet."""
+        fig = plot_function_2d_adaptive('x**2', x_range=(-2, 2), base_points=20)
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+    def test_springende_funktion_mehr_punkte(self):
+        """Bei stark gekrümmter Funktion (1/x²) werden Regionen verfeinert."""
+        # 1/(x²+0.01) hat starke Krümmung nahe x=0
+        x_pts, y_pts = plot_function_2d_adaptive(
+            '1/(x**2+0.01)',
+            x_range=(-1, 1),
+            base_points=20,
+            refinement_levels=2,
+            return_points=True
+        )
+        # Mit Verfeinerung muss mehr Punkte vorhanden sein als base_points
+        assert len(x_pts) > 20, (
+            f"Adaptive Verfeinerung muss mehr als base_points=20 Punkte liefern, erhalten: {len(x_pts)}"
+        )
+
+    def test_refinement_levels_null(self):
+        """Mit refinement_levels=0 werden genau base_points Punkte verwendet."""
+        x_pts, y_pts = plot_function_2d_adaptive(
+            'x',
+            x_range=(0, 1),
+            base_points=50,
+            refinement_levels=0,
+            return_points=True
+        )
+        # Keine Verfeinerung → genau base_points Punkte
+        assert len(x_pts) == 50, (
+            f"Ohne Verfeinerung müssen genau 50 Punkte vorhanden sein, erhalten: {len(x_pts)}"
+        )
+
+    def test_sinus_funktioniert(self):
+        """sin(x) kann korrekt geplottet werden."""
+        fig = plot_function_2d_adaptive(
+            'sin(x)',
+            x_range=(-2 * math.pi, 2 * math.pi),
+            base_points=40,
+            refinement_levels=1
+        )
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)

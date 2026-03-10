@@ -1,0 +1,10 @@
+{
+  "prime_counting_function_1000": 9.089999366551638e-07,
+  "fourier_coefficients_delta_30": 0.0001221570128109306,
+  "riemann_zeta_2": 2.4531007511541247e-05,
+  "von_mangoldt_loop_500": 0.0001860859920270741,
+  "numpy_fft_4096": 0.000170462008100003,
+  "auto_compute_symbolic_deg5": 0.0008373990131076425,
+  "auto_compute_numeric_deg15": 0.0031195160117931664,
+  "parallel_integrate_3": 0.01626524201128632
+}
