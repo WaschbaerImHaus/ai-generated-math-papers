@@ -15,7 +15,7 @@
 
 @author Kurt Ingwer
 @date 2026-03-05
-@lastModified 2026-03-09
+@lastModified 2026-03-10
 """
 
 import math
@@ -407,7 +407,12 @@ def symbolic_limit(expr_str: str, var: str, point, direction: str = '+-'):
     elif point == '-oo' or point == float('-inf'):
         sym_point = -sp.oo
     else:
-        sym_point = sp.sympify(point)
+        # Sicherheitsgehärtete Konvertierung: numerische Typen direkt, Strings sicher parsen
+        # sp.sympify() auf beliebigen Strings entspricht einem eval() und ist unsicher
+        if isinstance(point, (int, float, complex)):
+            sym_point = sp.sympify(point)
+        else:
+            sym_point = _safe_parse(str(point))
 
     # Grenzwert berechnen
     result = sp.limit(expr, sym_var, sym_point, direction)
@@ -446,7 +451,12 @@ def lhopital_applicable(numerator_str: str, denominator_str: str, var: str, poin
     elif point == '-oo':
         sym_point = -sp.oo
     else:
-        sym_point = sp.sympify(point)
+        # Sicherheitsgehärtete Konvertierung: numerische Typen direkt, Strings sicher parsen
+        # sp.sympify() auf beliebigen Strings entspricht einem eval() und ist unsicher
+        if isinstance(point, (int, float, complex)):
+            sym_point = sp.sympify(point)
+        else:
+            sym_point = _safe_parse(str(point))
 
     # Grenzwerte von Zähler und Nenner berechnen
     lim_num = sp.limit(num_expr, sym_var, sym_point)
@@ -515,7 +525,12 @@ def limit_comparison(f_str: str, g_str: str, var: str, point) -> dict:
     elif point == '-oo':
         sym_point = -sp.oo
     else:
-        sym_point = sp.sympify(point)
+        # Sicherheitsgehärtete Konvertierung: numerische Typen direkt, Strings sicher parsen
+        # sp.sympify() auf beliebigen Strings entspricht einem eval() und ist unsicher
+        if isinstance(point, (int, float, complex)):
+            sym_point = sp.sympify(point)
+        else:
+            sym_point = _safe_parse(str(point))
 
     # Verhältnis-Grenzwert berechnen
     try:
@@ -740,13 +755,20 @@ def improper_integral_symbolic(expr_str: str, var: str, a, b) -> dict:
 
     # Grenzen konvertieren
     def convert_bound(bound):
-        """Konvertiert Grenzwert in SymPy-Ausdruck."""
+        """Konvertiert Grenzwert in SymPy-Ausdruck.
+        Sicherheitsgehärtet: numerische Typen direkt konvertieren,
+        Strings über _safe_parse() leiten (verhindert Code-Injection).
+        """
         if bound == 'oo' or bound == float('inf'):
             return sp.oo
         elif bound == '-oo' or bound == float('-inf'):
             return -sp.oo
-        else:
+        elif isinstance(bound, (int, float, complex)):
+            # Numerische Werte sind sicher direkt zu konvertieren
             return sp.sympify(bound)
+        else:
+            # Strings werden über den sicheren Parser geleitet (kein eval)
+            return _safe_parse(str(bound))
 
     sym_a = convert_bound(a)
     sym_b = convert_bound(b)

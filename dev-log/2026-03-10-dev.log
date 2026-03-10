@@ -1,0 +1,46 @@
+# Development Log - 2026-03-10
+
+## 2026-03-10 00:00 - Build 11: config.py, __init__.py, sympify()-Härtung
+
+### Neue Dateien
+- **src/config.py**: Zentrale Konfigurationskonstanten
+  - EPSILON, H_DERIVATIVE_1, H_DERIVATIVE_2 (Maschinengenauigkeit + Schrittweiten)
+  - MAX_ITERATIONS, NEWTON_TOL, BISECTION_TOL (Iterationsparameter)
+  - SIMPSON_N, TAYLOR_DEFAULT_TERMS (Algorithmus-Parameter)
+  - PRIME_MILLER_RABIN_WITNESSES: [2,3,5,7,11,13,17,19,23,29,31,37]
+  - ZETA_EULER_KNOPP_TERMS=60, ZETA_EULER_MACLAURIN_TERMS=200
+  - LANCZOS_COEFFICIENTS: g=7, 9 Koeffizienten für Gamma-Lanczos
+  - MPMATH_DEFAULT_DPS=50
+  - GOLDEN_RATIO, INV_GOLDEN_RATIO (mathematische Konstanten)
+  - AUTHOR="Kurt Ingwer", VERSION="11.0"
+
+- **src/__init__.py**: Paket-Initialisierungsdatei
+  - Macht src/ zu einem importierbaren Python-Package
+  - Exportiert alle wichtigen Klassen/Funktionen aus allen 12 Modulen
+  - safe_parse_expr als Alias für analysis._safe_parse
+  - Korrekte Benennung: NewtonInterpolation (Klasse, nicht Funktion)
+
+- **tests/test_config.py**: 93 Unit-Tests für config.py
+  - TestEpsilonAndStepSizes: 10 Tests (Maschinengenauigkeit, h-Werte)
+  - TestIterationParameters: 10 Tests (MAX_ITERATIONS, Toleranzen)
+  - TestIntegrationParameters: 5 Tests (SIMPSON_N)
+  - TestTaylorParameters: 4 Tests
+  - TestZetaParameters: 7 Tests
+  - TestMillerRabinWitnesses: 8 Tests (inkl. Primzahlcheck aller Zeugen)
+  - TestLanczosCoefficients: 8 Tests
+  - TestMpmathConfig: 4 Tests
+  - TestMathematicalConstants: 9 Tests (φ·(1/φ)=1, φ²=φ+1)
+  - TestMetadata: 7 Tests
+  - TestCompleteness: 17 parametrisierte Tests (alle Konstanten vorhanden)
+  - Ergebnis: 93/93 grün
+
+### Geänderte Dateien
+- **src/analysis.py**: sympify()-Härtung (4 Stellen)
+  - Zeile 410 (symbolic_limit): isinstance-Guard + _safe_parse für Strings
+  - Zeile 449 (lhopital_applicable): isinstance-Guard + _safe_parse für Strings
+  - Zeile 518 (limit_comparison): isinstance-Guard + _safe_parse für Strings
+  - Zeile 749 (improper_integral_symbolic/convert_bound): isinstance-Guard + _safe_parse
+  - Alle sp.sympify(point/bound) bei String-Eingaben jetzt Code-Injection-sicher
+  - @lastModified auf 2026-03-10 aktualisiert
+
+- **src/build.txt**: 10 → 11
