@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Gruppentheorie – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file group_theory.html
+    @brief Template für die Gruppentheorie-Seite.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+<div class="page-header">
+    <h1>Gruppentheorie</h1>
+    <p class="page-desc">
+        Die Gruppentheorie untersucht algebraische Strukturen mit einer binären Verknüpfung,
+        die Assoziativität, neutrales Element und Inverse besitzt.
+        Zentrale Konzepte: zyklische Gruppen $\mathbb{Z}/n\mathbb{Z}$, Sylow-Sätze,
+        Normalteiler, Isomorphiesätze.
+    </p>
+</div>
+
+<!-- === Berechnung 1: Zyklische Gruppe === -->
+<div class="card">
+    <h2>Zyklische Gruppe $\mathbb{Z}/n\mathbb{Z}$</h2>
+    <p>
+        Eine zyklische Gruppe der Ordnung $n$ wird von einem einzigen Element erzeugt.
+        Alle zyklischen Gruppen der gleichen Ordnung sind isomorph.
+    </p>
+    <div class="input-row">
+        <label for="cyclic-n">Gruppenordnung $n$:</label>
+        <input type="number" id="cyclic-n" class="input-field" value="6" min="1" max="50">
+    </div>
+    <button class="btn" onclick="calcCyclic()">Gruppe analysieren</button>
+    <div id="cyclic-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 2: Sylow-Sätze === -->
+<div class="card">
+    <h2>Sylow-Sätze</h2>
+    <p>
+        Für eine Gruppe $G$ der Ordnung $|G| = p^k \cdot m$ (mit $\gcd(p,m)=1$)
+        garantieren die Sylow-Sätze die Existenz von Untergruppen der Ordnung $p^k$.
+    </p>
+    <div class="input-row">
+        <label for="sylow-n">Gruppenordnung $|G|$:</label>
+        <input type="number" id="sylow-n" class="input-field" value="12" min="2" max="200">
+    </div>
+    <div class="input-row">
+        <label for="sylow-p">Primzahl $p$:</label>
+        <input type="number" id="sylow-p" class="input-field" value="2" min="2" max="50">
+    </div>
+    <button class="btn" onclick="calcSylow()">Sylow-Theorie anwenden</button>
+    <div id="sylow-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 3: Diedergruppe === -->
+<div class="card">
+    <h2>Diedergruppe $D_n$</h2>
+    <p>
+        Die Diedergruppe $D_n$ beschreibt die Symmetrien eines regulären $n$-Ecks
+        (Drehungen und Spiegelungen). Sie hat Ordnung $2n$.
+    </p>
+    <div class="input-row">
+        <label for="dihedral-n">$n$ (reguläres $n$-Eck):</label>
+        <input type="number" id="dihedral-n" class="input-field" value="4" min="2" max="20">
+    </div>
+    <button class="btn" onclick="calcDihedral()">Diedergruppe analysieren</button>
+    <div id="dihedral-result" class="result-area"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /** Analysiert eine zyklische Gruppe Z/nZ via API. */
+    async function calcCyclic() {
+        const n = parseInt(document.getElementById('cyclic-n').value);
+        const res = document.getElementById('cyclic-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/group/cyclic', { n });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Zyklische Gruppe $\\mathbb{Z}/${n}\\mathbb{Z}$</strong><br>
+                Ordnung: <code>${data.order}</code><br>
+                Elemente: <code>[${data.elements.join(', ')}]</code><br>
+                Generatoren: <code>[${data.generators.join(', ')}]</code><br>
+                Abelsch: <code>${data.is_abelian ? 'Ja' : 'Nein'}</code><br>
+                Zyklisch: <code>${data.is_cyclic ? 'Ja' : 'Nein'}</code>
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Wendet Sylow-Sätze auf eine Gruppe an. */
+    async function calcSylow() {
+        const n = parseInt(document.getElementById('sylow-n').value);
+        const p = parseInt(document.getElementById('sylow-p').value);
+        const res = document.getElementById('sylow-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/group/sylow', { n, p });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Sylow-$${p}$-Untergruppen von Gruppe der Ordnung $${n}$</strong><br>
+                $p$-Anteil: <code>${data.p_part}</code><br>
+                Sylow-Untergruppen-Ordnung: <code>${data.sylow_order}</code><br>
+                Anzahl Sylow-$p$-Untergruppen $n_p$: <code>${data.num_sylow}</code><br>
+                ${data.details ? '<br>' + data.details : ''}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Analysiert eine Diedergruppe. */
+    async function calcDihedral() {
+        const n = parseInt(document.getElementById('dihedral-n').value);
+        const res = document.getElementById('dihedral-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/group/dihedral', { n });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Diedergruppe $D_{${n}}$ (Symmetrien des $${n}$-Ecks)</strong><br>
+                Ordnung: <code>${data.order}</code><br>
+                Abelsch: <code>${data.is_abelian ? 'Ja' : 'Nein'}</code><br>
+                Elemente: <code>${data.elements}</code><br>
+                Drehungen: <code>${data.rotations}</code><br>
+                Spiegelungen: <code>${data.reflections}</code>
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+</script>
+{% endblock %}

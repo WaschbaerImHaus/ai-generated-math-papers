@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Spinoren – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file spinors.html
+    @brief Template für die Spinoren-Seite.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+<div class="page-header">
+    <h1>Spinoren &amp; Clifford-Algebren</h1>
+    <p class="page-desc">
+        Spinoren sind Elemente von Darstellungsräumen der Spin-Gruppe $\text{Spin}(n)$
+        (doppelte Überlagerung von $\text{SO}(n)$). In der Physik beschreiben Spin-$\frac{1}{2}$-
+        Teilchen wie Elektronen durch die Dirac-Gleichung
+        $(i\gamma^\mu \partial_\mu - m)\psi = 0$.
+        Die Clifford-Algebra $\text{Cl}(n)$ wird durch $\{\gamma^\mu, \gamma^\nu\} = 2\eta^{\mu\nu}$
+        definiert.
+    </p>
+</div>
+
+<!-- === Berechnung 1: Gamma-Matrizen === -->
+<div class="card">
+    <h2>Gamma-Matrizen $\gamma^\mu$</h2>
+    <p>
+        Die Dirac-Gamma-Matrizen erfüllen die Clifford-Algebra-Relation:
+        $\{\gamma^\mu, \gamma^\nu\} = \gamma^\mu\gamma^\nu + \gamma^\nu\gamma^\mu = 2\eta^{\mu\nu}\mathbf{1}$.
+        In 4D gibt es 4 Matrizen der Dimension $4 \times 4$.
+    </p>
+    <div class="input-row">
+        <label for="gamma-dim">Dimension (2, 4 oder 8):</label>
+        <select id="gamma-dim" class="input-field">
+            <option value="2">2 (2×2 Pauli-Matrizen)</option>
+            <option value="4" selected>4 (4×4 Dirac-Matrizen)</option>
+        </select>
+    </div>
+    <button class="btn" onclick="calcGamma()">Gamma-Matrizen berechnen</button>
+    <div id="gamma-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 2: Clifford-Algebra-Check === -->
+<div class="card">
+    <h2>Clifford-Algebra-Verifikation</h2>
+    <p>
+        Prüft, ob die berechneten Gamma-Matrizen wirklich die Clifford-Algebra-Relationen
+        $\{\gamma^\mu, \gamma^\nu\} = 2\eta^{\mu\nu}\mathbf{1}$ erfüllen.
+        Wichtig für numerische Stabilität.
+    </p>
+    <div class="input-row">
+        <label for="cliff-dim">Dimension:</label>
+        <select id="cliff-dim" class="input-field">
+            <option value="2">2D (Euklidisch)</option>
+            <option value="4" selected>4D (Minkowski)</option>
+        </select>
+    </div>
+    <button class="btn" onclick="calcClifford()">Clifford-Algebra prüfen</button>
+    <div id="cliff-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 3: Dirac-Gleichung (freies Teilchen) === -->
+<div class="card">
+    <h2>Dirac-Gleichung: Ebene Wellen</h2>
+    <p>
+        Für ein freies Teilchen mit Masse $m$ und Impuls $p$ hat die Dirac-Gleichung
+        plane-wave Lösungen $\psi = u(p) e^{ipx}$ (Teilchen) und
+        $v(p) e^{-ipx}$ (Antiteilchen). Die Energie $E = \sqrt{p^2 c^2 + m^2c^4}$.
+    </p>
+    <div class="input-row">
+        <label for="dirac-m">Masse $m$ (in Einheiten $c = \hbar = 1$):</label>
+        <input type="number" id="dirac-m" class="input-field" value="1.0" step="0.1" min="0">
+    </div>
+    <div class="input-row">
+        <label for="dirac-pz">Impuls $p_z$:</label>
+        <input type="number" id="dirac-pz" class="input-field" value="0.5" step="0.1">
+    </div>
+    <button class="btn" onclick="calcDirac()">Dirac-Spinor berechnen</button>
+    <div id="dirac-result" class="result-area"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /** Berechnet Gamma-Matrizen einer gegebenen Dimension. */
+    async function calcGamma() {
+        const dim = parseInt(document.getElementById('gamma-dim').value);
+        const res = document.getElementById('gamma-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/spinors/gamma', { dim });
+            if (data.error) { showError(res, data.error); return; }
+            const mats = data.matrices.map((mat, mu) => {
+                const rows = mat.map(row =>
+                    '[' + row.map(c => `${c.re.toFixed(1)}+${c.im.toFixed(1)}i`).join(', ') + ']'
+                ).join('<br>');
+                return `<strong>$\\gamma^{${mu}}$:</strong><br><code>${rows}</code>`;
+            }).join('<br><br>');
+            showResult(res, `
+                <strong>Gamma-Matrizen in ${dim}D</strong><br><br>
+                ${mats}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Prüft Clifford-Algebra-Relationen. */
+    async function calcClifford() {
+        const dim = parseInt(document.getElementById('cliff-dim').value);
+        const res = document.getElementById('cliff-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/spinors/clifford', { dim });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Clifford-Algebra-Verifikation (${dim}D)</strong><br>
+                Alle Antikommutatoren korrekt: <code>${data.all_correct ? 'Ja' : 'Nein'}</code><br>
+                Max. numerischer Fehler: <code>${data.max_error.toExponential(3)}</code><br>
+                Getestete Paare $\\{\\mu,\\nu\\}$: <code>${data.pairs_tested}</code><br>
+                ${data.details ? data.details : ''}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Berechnet Dirac-Spinor für freies Teilchen. */
+    async function calcDirac() {
+        const m = parseFloat(document.getElementById('dirac-m').value);
+        const pz = parseFloat(document.getElementById('dirac-pz').value);
+        const res = document.getElementById('dirac-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/spinors/dirac', { m, pz });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Dirac-Spinor: $m = ${m}$, $p_z = ${pz}$</strong><br>
+                Energie $E = \\sqrt{p^2 + m^2}$ = <code>${data.energy.toFixed(6)}</code><br>
+                Spinor $u_\\uparrow(p)$ = <code>[${data.spinor_up.map(c => `${c.toFixed(4)}`).join(', ')}]</code><br>
+                Spinor $u_\\downarrow(p)$ = <code>[${data.spinor_down.map(c => `${c.toFixed(4)}`).join(', ')}]</code><br>
+                ${data.note ? '<em>' + data.note + '</em>' : ''}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+</script>
+{% endblock %}

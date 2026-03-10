@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %}Fourier-Analysis – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file fourier.html
+    @brief Template für die Fourier-Analysis-Seite.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+<div class="page-header">
+    <h1>Fourier-Analysis</h1>
+    <p class="page-desc">
+        Die Fourier-Analysis zerlegt Signale in ihre Frequenzanteile.
+        Die diskrete Fourier-Transformation (DFT) transformiert eine endliche Folge
+        $x_0, \ldots, x_{N-1}$ in Frequenzkomponenten $X_k = \sum_{n=0}^{N-1} x_n e^{-2\pi i kn/N}$.
+        Der FFT-Algorithmus berechnet dies in $O(N \log N)$ statt $O(N^2)$.
+    </p>
+</div>
+
+<!-- === Berechnung 1: DFT / FFT === -->
+<div class="card">
+    <h2>Diskrete Fourier-Transformation (DFT/FFT)</h2>
+    <p>
+        Gib eine Zahlenfolge ein. Die DFT liefert komplexe Frequenzkoeffizienten.
+        Das Betragsquadrat $|X_k|^2$ ist das Leistungsspektrum.
+    </p>
+    <div class="input-row">
+        <label for="dft-values">Signalwerte (kommagetrennt):</label>
+        <input type="text" id="dft-values" class="input-field"
+               value="1,0,-1,0,1,0,-1,0"
+               placeholder="z.B. 1,0,-1,0">
+    </div>
+    <button class="btn" onclick="calcDFT()">FFT berechnen</button>
+    <div id="dft-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 2: Fourier-Reihenkoeffizienten === -->
+<div class="card">
+    <h2>Fourier-Reihen-Koeffizienten</h2>
+    <p>
+        Für eine periodische Funktion $f$ mit Periode $T$ berechnet sich der $n$-te
+        Fourier-Koeffizient als $c_n = \frac{1}{T}\int_0^T f(t) e^{-2\pi int/T} dt$.
+        Die Funktion wird numerisch ausgewertet.
+    </p>
+    <div class="input-row">
+        <label for="fs-func">Funktion $f(x)$ (Python-Syntax):</label>
+        <input type="text" id="fs-func" class="input-field"
+               value="sin(x)" placeholder="z.B. sin(x), x*(pi-x)">
+    </div>
+    <div class="input-row">
+        <label for="fs-period">Periode $T$:</label>
+        <input type="number" id="fs-period" class="input-field"
+               value="6.283185" step="0.001" min="0.001">
+    </div>
+    <div class="input-row">
+        <label for="fs-terms">Anzahl Terme $N$:</label>
+        <input type="number" id="fs-terms" class="input-field" value="5" min="1" max="20">
+    </div>
+    <button class="btn" onclick="calcFourier()">Koeffizienten berechnen</button>
+    <div id="fs-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 3: Dominante Frequenz === -->
+<div class="card">
+    <h2>Dominante Frequenz im Signal</h2>
+    <p>
+        Bestimmt die dominante Frequenzkomponente eines Signals via FFT.
+        Nützlich für Signalanalyse und Erkennung periodischer Muster.
+    </p>
+    <div class="input-row">
+        <label for="dom-values">Signalwerte (kommagetrennt):</label>
+        <input type="text" id="dom-values" class="input-field"
+               value="0,1,0,-1,0,1,0,-1,0,1,0,-1,0,1,0,-1"
+               placeholder="Zeitreihenwerte">
+    </div>
+    <div class="input-row">
+        <label for="dom-fs">Abtastrate $f_s$ (Hz):</label>
+        <input type="number" id="dom-fs" class="input-field" value="16" min="1">
+    </div>
+    <button class="btn" onclick="calcDominantFreq()">Frequenz bestimmen</button>
+    <div id="dom-result" class="result-area"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /** Berechnet FFT einer Signalfolge. */
+    async function calcDFT() {
+        const valStr = document.getElementById('dft-values').value;
+        const values = valStr.split(',').map(s => parseFloat(s.trim()));
+        const res = document.getElementById('dft-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/fourier/dft', { values });
+            if (data.error) { showError(res, data.error); return; }
+            // Frequenzkomponenten anzeigen
+            const components = data.frequencies.slice(0, 8).map((c, i) =>
+                `k=${i}: |X| = ${c.magnitude.toFixed(4)}, arg = ${c.phase.toFixed(3)} rad`
+            ).join('<br>');
+            showResult(res, `
+                <strong>FFT-Ergebnis (${data.n} Punkte)</strong><br>
+                <code>${components}</code><br>
+                Dominante Frequenz: k = <code>${data.dominant_k}</code>
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Berechnet Fourier-Reihenkoeffizienten. */
+    async function calcFourier() {
+        const func = document.getElementById('fs-func').value.trim();
+        const period = parseFloat(document.getElementById('fs-period').value);
+        const n_terms = parseInt(document.getElementById('fs-terms').value);
+        const res = document.getElementById('fs-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/fourier/series', { func, period, n_terms });
+            if (data.error) { showError(res, data.error); return; }
+            const aCoeffs = data.a_coeffs.map((v, i) => `a_${i} = ${v.toFixed(6)}`).join('<br>');
+            const bCoeffs = data.b_coeffs.map((v, i) => `b_${i+1} = ${v.toFixed(6)}`).join('<br>');
+            showResult(res, `
+                <strong>Fourier-Koeffizienten (Periode $T = ${period.toFixed(4)}$)</strong><br>
+                Kosinus-Koeffizienten:<br><code>${aCoeffs}</code><br><br>
+                Sinus-Koeffizienten:<br><code>${bCoeffs}</code>
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Bestimmt die dominante Frequenz im Signal. */
+    async function calcDominantFreq() {
+        const valStr = document.getElementById('dom-values').value;
+        const values = valStr.split(',').map(s => parseFloat(s.trim()));
+        const fs = parseFloat(document.getElementById('dom-fs').value);
+        const res = document.getElementById('dom-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/fourier/dominant', { values, sample_rate: fs });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Dominante Frequenz</strong><br>
+                Frequenz: <code>${data.dominant_frequency.toFixed(4)} Hz</code><br>
+                Frequenz-Index k: <code>${data.dominant_k}</code><br>
+                Amplitude: <code>${data.amplitude.toFixed(6)}</code>
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+</script>
+{% endblock %}

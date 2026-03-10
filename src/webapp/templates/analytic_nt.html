@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Analytische Zahlentheorie – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file analytic_nt.html
+    @brief Template für die Analytische Zahlentheorie-Seite.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+<div class="page-header">
+    <h1>Analytische Zahlentheorie</h1>
+    <p class="page-desc">
+        Die analytische Zahlentheorie verwendet Methoden der Analysis zur Untersuchung
+        ganzer Zahlen. Das Herzstück ist der Primzahlsatz:
+        $\pi(x) \sim \frac{x}{\ln x}$, verfeinert durch den Logarithmischen Integral
+        $\text{Li}(x) = \int_2^x \frac{dt}{\ln t}$.
+        Dirichlet-L-Funktionen verallgemeinern die Riemann-Zeta-Funktion.
+    </p>
+</div>
+
+<!-- === Berechnung 1: Primzählfunktion π(x) === -->
+<div class="card">
+    <h2>Primzählfunktion $\pi(x)$</h2>
+    <p>
+        $\pi(x)$ zählt die Anzahl der Primzahlen $\leq x$.
+        Vergleich mit Approximationen: $\frac{x}{\ln x}$ und $\text{Li}(x)$.
+    </p>
+    <div class="input-row">
+        <label for="pi-x">$x$:</label>
+        <input type="number" id="pi-x" class="input-field" value="100" min="2" max="1000000">
+    </div>
+    <button class="btn" onclick="calcPiX()">$\pi(x)$ berechnen</button>
+    <div id="pi-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 2: Logarithmisches Integral Li(x) === -->
+<div class="card">
+    <h2>Logarithmisches Integral $\text{Li}(x)$</h2>
+    <p>
+        $\text{Li}(x) = \int_2^x \frac{dt}{\ln t}$ approximiert $\pi(x)$ sehr genau.
+        Der Fehler $|\pi(x) - \text{Li}(x)|$ ist deutlich kleiner als $x/\ln x$.
+    </p>
+    <div class="input-row">
+        <label for="li-x">$x$:</label>
+        <input type="number" id="li-x" class="input-field" value="1000" min="3" max="1000000">
+    </div>
+    <button class="btn" onclick="calcLi()">$\text{Li}(x)$ berechnen</button>
+    <div id="li-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 3: Von-Mangoldt-Funktion === -->
+<div class="card">
+    <h2>Von-Mangoldt-Funktion $\Lambda(n)$</h2>
+    <p>
+        $\Lambda(n) = \ln p$ wenn $n = p^k$ für eine Primzahl $p$, sonst $0$.
+        Sie spielt eine zentrale Rolle in der expliziten Formel für $\psi(x) = \sum_{n \leq x} \Lambda(n)$.
+    </p>
+    <div class="input-row">
+        <label for="vm-n">$n$ (obere Grenze):</label>
+        <input type="number" id="vm-n" class="input-field" value="30" min="2" max="200">
+    </div>
+    <button class="btn" onclick="calcVonMangoldt()">$\Lambda$ berechnen</button>
+    <div id="vm-result" class="result-area"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /** Berechnet pi(x) und Vergleichswerte. */
+    async function calcPiX() {
+        const x = parseFloat(document.getElementById('pi-x').value);
+        const res = document.getElementById('pi-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/analytic_nt/pi', { x });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Primzählfunktion $\\pi(${x})$</strong><br>
+                $\\pi(x)$ = <code>${data.pi_x}</code><br>
+                Approximation $x/\\ln x$ = <code>${data.approx_log.toFixed(2)}</code><br>
+                Logarithmisches Integral $\\text{Li}(x)$ = <code>${data.li_x.toFixed(4)}</code><br>
+                Relativer Fehler $x/\\ln x$: <code>${data.relative_error_log.toFixed(4)}%</code>
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Berechnet Li(x). */
+    async function calcLi() {
+        const x = parseFloat(document.getElementById('li-x').value);
+        const res = document.getElementById('li-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/analytic_nt/li', { x });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Logarithmisches Integral $\\text{Li}(${x})$</strong><br>
+                $\\text{Li}(x)$ = <code>${data.li_x.toFixed(6)}</code><br>
+                $\\pi(x)$ = <code>${data.pi_x}</code><br>
+                Differenz $\\text{Li}(x) - \\pi(x)$ = <code>${data.difference.toFixed(4)}</code>
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Berechnet Von-Mangoldt-Funktion bis n. */
+    async function calcVonMangoldt() {
+        const n = parseInt(document.getElementById('vm-n').value);
+        const res = document.getElementById('vm-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/analytic_nt/von_mangoldt', { n });
+            if (data.error) { showError(res, data.error); return; }
+            const entries = data.values.map(v =>
+                v.lambda > 0 ? `$\\Lambda(${v.n}) = \\ln ${v.prime} \\approx ${v.lambda.toFixed(4)}$` : null
+            ).filter(Boolean).join('<br>');
+            showResult(res, `
+                <strong>Von-Mangoldt-Funktion $\\Lambda(n)$ für $n \\leq ${n}$</strong><br>
+                Tschebyschow-Funktion $\\psi(${n})$ = <code>${data.psi.toFixed(4)}</code><br><br>
+                Nicht-Null-Werte:<br>${entries}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+</script>
+{% endblock %}

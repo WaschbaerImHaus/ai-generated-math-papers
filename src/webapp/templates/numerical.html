@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Numerische Methoden – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file numerical.html
+    @brief Template für die Numerischen Methoden-Seite.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+<div class="page-header">
+    <h1>Numerische Methoden</h1>
+    <p class="page-desc">
+        Numerische Methoden lösen mathematische Probleme durch Approximationsalgorithmen.
+        Interpolation (Lagrange, Newton, Splines) approximiert Funktionen durch endlich viele
+        Stützstellen. Optimierungsverfahren (Gradientenabstieg, Golden-Section-Suche)
+        minimieren Zielfunktionen iterativ.
+    </p>
+</div>
+
+<!-- === Berechnung 1: Lagrange-Interpolation === -->
+<div class="card">
+    <h2>Lagrange-Interpolation</h2>
+    <p>
+        Das Lagrange-Interpolationspolynom $L(x) = \sum_{i} y_i \prod_{j \neq i} \frac{x-x_j}{x_i-x_j}$
+        ist das eindeutige Polynom vom Grad $\leq n-1$ durch die $n$ Stützpunkte $(x_i, y_i)$.
+    </p>
+    <div class="input-row">
+        <label for="lag-x">Stützstellen $x_i$ (kommagetrennt):</label>
+        <input type="text" id="lag-x" class="input-field" value="0,1,2,3,4"
+               placeholder="z.B. 0,1,2,3">
+    </div>
+    <div class="input-row">
+        <label for="lag-y">Stützwerte $y_i$ (kommagetrennt):</label>
+        <input type="text" id="lag-y" class="input-field" value="0,1,4,9,16"
+               placeholder="z.B. 0,1,4,9">
+    </div>
+    <div class="input-row">
+        <label for="lag-eval">Auswertungspunkt $x$:</label>
+        <input type="number" id="lag-eval" class="input-field" value="1.5" step="0.1">
+    </div>
+    <button class="btn" onclick="calcLagrange()">Interpolieren</button>
+    <div id="lag-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 2: Gradientenabstieg === -->
+<div class="card">
+    <h2>Gradientenabstieg (Gradient Descent)</h2>
+    <p>
+        Der Gradientenabstieg minimiert eine Funktion $f: \mathbb{R}^n \to \mathbb{R}$
+        iterativ: $x_{k+1} = x_k - \alpha \nabla f(x_k)$.
+        Hier für $f(x,y) = x^2 + y^2$ (einfaches Beispiel).
+    </p>
+    <div class="input-row">
+        <label for="gd-x0">Startpunkt $x_0$:</label>
+        <input type="number" id="gd-x0" class="input-field" value="3.0" step="0.5">
+    </div>
+    <div class="input-row">
+        <label for="gd-y0">Startpunkt $y_0$:</label>
+        <input type="number" id="gd-y0" class="input-field" value="4.0" step="0.5">
+    </div>
+    <div class="input-row">
+        <label for="gd-lr">Lernrate $\alpha$:</label>
+        <input type="number" id="gd-lr" class="input-field" value="0.1" step="0.01" min="0.001" max="1">
+    </div>
+    <button class="btn" onclick="calcGradient()">Minimierung starten</button>
+    <div id="gd-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 3: Golden-Section-Suche === -->
+<div class="card">
+    <h2>Golden-Section-Suche (Einminimierung)</h2>
+    <p>
+        Die Golden-Section-Suche minimiert eine unimodale Funktion $f$ auf $[a, b]$
+        ohne Ableitungen. Sie nutzt das goldene Verhältnis $\phi = \frac{1+\sqrt{5}}{2}$
+        für optimale Bracket-Verkleinerung.
+    </p>
+    <div class="input-row">
+        <label for="gs-func">Funktion $f(x)$ (Python-Syntax):</label>
+        <input type="text" id="gs-func" class="input-field"
+               value="(x-2)**2 + 1" placeholder="z.B. (x-2)**2 + sin(x)">
+    </div>
+    <div class="input-row">
+        <label for="gs-a">Intervall $a$:</label>
+        <input type="number" id="gs-a" class="input-field" value="0" step="0.5">
+    </div>
+    <div class="input-row">
+        <label for="gs-b">Intervall $b$:</label>
+        <input type="number" id="gs-b" class="input-field" value="4" step="0.5">
+    </div>
+    <button class="btn" onclick="calcGoldenSection()">Minimum suchen</button>
+    <div id="gs-result" class="result-area"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /** Führt Lagrange-Interpolation durch. */
+    async function calcLagrange() {
+        const xStr = document.getElementById('lag-x').value;
+        const yStr = document.getElementById('lag-y').value;
+        const x_eval = parseFloat(document.getElementById('lag-eval').value);
+        const x_vals = xStr.split(',').map(s => parseFloat(s.trim()));
+        const y_vals = yStr.split(',').map(s => parseFloat(s.trim()));
+        const res = document.getElementById('lag-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/numerical/interpolate', { x_vals, y_vals, x_eval });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Lagrange-Interpolation an $x = ${x_eval}$</strong><br>
+                $L(${x_eval})$ = <code>${data.result.toFixed(8)}</code><br>
+                Grad des Polynoms: <code>${data.degree}</code><br>
+                ${data.note ? '<em>' + data.note + '</em>' : ''}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Führt Gradientenabstieg für f(x,y)=x²+y² durch. */
+    async function calcGradient() {
+        const x0 = parseFloat(document.getElementById('gd-x0').value);
+        const y0 = parseFloat(document.getElementById('gd-y0').value);
+        const learning_rate = parseFloat(document.getElementById('gd-lr').value);
+        const res = document.getElementById('gd-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/numerical/optimize', { x0, y0, learning_rate });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Gradientenabstieg für $f(x,y) = x^2 + y^2$</strong><br>
+                Start: <code>(${x0}, ${y0})</code>, $f$ = <code>${(x0*x0+y0*y0).toFixed(4)}</code><br>
+                Minimum: <code>(${data.x_min.toFixed(8)}, ${data.y_min.toFixed(8)})</code><br>
+                $f(x^*, y^*)$ = <code>${data.f_min.toFixed(10)}</code><br>
+                Iterationen: <code>${data.iterations}</code><br>
+                Konvergiert: <code>${data.converged ? 'Ja' : 'Nein'}</code>
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Führt Golden-Section-Suche durch. */
+    async function calcGoldenSection() {
+        const func = document.getElementById('gs-func').value.trim();
+        const a = parseFloat(document.getElementById('gs-a').value);
+        const b = parseFloat(document.getElementById('gs-b').value);
+        const res = document.getElementById('gs-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/numerical/golden_section', { func, a, b });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Golden-Section-Suche auf $[${a}, ${b}]$</strong><br>
+                Minimum bei $x^*$ = <code>${data.x_min.toFixed(10)}</code><br>
+                $f(x^*)$ = <code>${data.f_min.toFixed(10)}</code><br>
+                Iterationen: <code>${data.iterations}</code>
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+</script>
+{% endblock %}

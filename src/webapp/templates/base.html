@@ -6,8 +6,10 @@
         Definiert das gemeinsame Layout (Navigation, Header, Footer) aller Seiten.
         Dunkles Theme (Catppuccin Mocha Farbpalette).
         KaTeX für mathematische Formeln, Fetch-API für API-Aufrufe.
+        Navigationsmenü nach Teilgebieten strukturiert (klappbar, kein JS nötig).
     @author Kurt Ingwer
     @date 2026-03-10
+    @lastModified 2026-03-10
 -->
 <html lang="de">
 <head>
@@ -28,6 +30,70 @@
 
     <!-- Eigenes Stylesheet -->
     <link rel="stylesheet" href="/static/style.css">
+
+    <!-- Zusätzliche CSS für strukturierte Navigation -->
+    <style>
+        /* Klappbares Navigationsmenü ohne JavaScript */
+        .nav-group {
+            margin-bottom: 4px;
+        }
+
+        /* Unsichtbare Checkbox steuert den Auf/Zu-Zustand der Gruppe */
+        .nav-group input[type="checkbox"] {
+            display: none;
+        }
+
+        /* Label als klickbarer Bereich für die Gruppe */
+        .nav-group-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 12px;
+            cursor: pointer;
+            color: #a6adc8;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-radius: 6px;
+            user-select: none;
+            transition: background 0.15s;
+        }
+
+        .nav-group-label:hover {
+            background: #313244;
+            color: #cdd6f4;
+        }
+
+        /* Pfeil-Indikator */
+        .nav-group-label::after {
+            content: "▶";
+            font-size: 0.6rem;
+            transition: transform 0.2s;
+        }
+
+        /* Wenn Checkbox aktiviert (= aufgeklappt): Pfeil dreht sich */
+        .nav-group input[type="checkbox"]:checked + .nav-group-label::after {
+            transform: rotate(90deg);
+        }
+
+        /* Untermenü standardmäßig versteckt */
+        .nav-group-content {
+            display: none;
+            padding-left: 8px;
+        }
+
+        /* Untermenü sichtbar wenn Checkbox aktiviert */
+        .nav-group input[type="checkbox"]:checked ~ .nav-group-content {
+            display: block;
+        }
+
+        /* Aktive Gruppe automatisch aufgeklappt – über checked-Attribut im Template */
+        .nav-group-content .nav-link {
+            font-size: 0.85rem;
+            padding: 5px 12px;
+        }
+    </style>
 </head>
 <body>
 
@@ -35,69 +101,201 @@
 <header class="site-header">
     <div class="header-inner">
         <a href="/" class="logo">
-            <span class="logo-icon">∑</span>
+            <span class="logo-icon">&#8721;</span>
             <span class="logo-text">Mathematik-Spezialist</span>
         </a>
-        <div class="header-badge">Build 15</div>
+        <div class="header-badge">Build 30</div>
     </div>
 </header>
 
 <!-- ===== LAYOUT: Sidebar + Hauptinhalt ===== -->
 <div class="layout">
 
-    <!-- Seitennavigation mit allen Modulen -->
+    <!-- Seitennavigation nach Teilgebieten strukturiert -->
     <nav class="sidebar">
-        <div class="nav-section-title">Module</div>
-        <ul class="nav-list">
-            <li><a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
-                <span class="nav-icon">🏠</span> Übersicht
-            </a></li>
-            <li><a href="/algebra" class="nav-link {% if '/algebra' in request.path %}active{% endif %}">
-                <span class="nav-icon">α</span> Algebra
-            </a></li>
-            <li><a href="/analysis" class="nav-link {% if '/analysis' in request.path %}active{% endif %}">
-                <span class="nav-icon">∫</span> Analysis
-            </a></li>
-            <li><a href="/linear_algebra" class="nav-link {% if '/linear_algebra' in request.path %}active{% endif %}">
-                <span class="nav-icon">▦</span> Lineare Algebra
-            </a></li>
-            <li><a href="/statistics" class="nav-link {% if '/statistics' in request.path %}active{% endif %}">
-                <span class="nav-icon">σ</span> Statistik
-            </a></li>
-            <li><a href="/ode" class="nav-link {% if '/ode' in request.path %}active{% endif %}">
-                <span class="nav-icon">∂</span> Differentialgl.
-            </a></li>
-            <li><a href="/complex" class="nav-link {% if '/complex' in request.path %}active{% endif %}">
-                <span class="nav-icon">ℂ</span> Komplexe Analysis
-            </a></li>
-            <li><a href="/number_theory" class="nav-link {% if '/number_theory' in request.path %}active{% endif %}">
-                <span class="nav-icon">ℤ</span> Zahlentheorie
-            </a></li>
-            <li><a href="/visualization" class="nav-link {% if '/visualization' in request.path %}active{% endif %}">
-                <span class="nav-icon">📈</span> Visualisierung
-            </a></li>
-            <li><a href="/topology" class="nav-link {% if '/topology' in request.path %}active{% endif %}">
-                <span class="nav-icon">∞</span> Topologie
-            </a></li>
-            <li><a href="/graph_theory" class="nav-link {% if '/graph_theory' in request.path %}active{% endif %}">
-                <span class="nav-icon">G</span> Graphentheorie
-            </a></li>
-            <li><a href="/millennium" class="nav-link {% if '/millennium' in request.path %}active{% endif %}">
-                <span class="nav-icon">M</span> Millennium-Probleme
-            </a></li>
-            <li><a href="/steps" class="nav-link {% if '/steps' in request.path %}active{% endif %}">
-                <span class="nav-icon">∑</span> Schritt-für-Schritt
-            </a></li>
-            <li><a href="/proofs" class="nav-link {% if '/proofs' in request.path %}active{% endif %}">
-                <span class="nav-icon">⊢</span> Beweise
-            </a></li>
-            <li><a href="/elliptic" class="nav-link {% if '/elliptic' in request.path %}active{% endif %}">
-                <span class="nav-icon">𝓔</span> Elliptische Kurven
-            </a></li>
-            <li><a href="/tensor" class="nav-link {% if '/tensor' in request.path %}active{% endif %}">
-                <span class="nav-icon">g</span> Tensor-Geometrie
-            </a></li>
-        </ul>
+
+        <!-- === Gruppe: Grundlagen === -->
+        <div class="nav-group">
+            <input type="checkbox" id="nav-grundlagen"
+                {% if request.path in ['/', '/proofs', '/steps'] %}checked{% endif %}>
+            <label class="nav-group-label" for="nav-grundlagen">Grundlagen</label>
+            <div class="nav-group-content">
+                <ul class="nav-list">
+                    <li><a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                        &#8962; Übersicht
+                    </a></li>
+                    <li><a href="/proofs" class="nav-link {% if '/proofs' in request.path %}active{% endif %}">
+                        &#8866; Beweise
+                    </a></li>
+                    <li><a href="/steps" class="nav-link {% if '/steps' in request.path %}active{% endif %}">
+                        &#8721; Schritt-für-Schritt
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- === Gruppe: Algebra === -->
+        <div class="nav-group">
+            <input type="checkbox" id="nav-algebra"
+                {% if request.path in ['/algebra', '/linear_algebra', '/group_theory', '/ring_theory', '/galois_theory', '/modules_algebra'] %}checked{% endif %}>
+            <label class="nav-group-label" for="nav-algebra">Algebra</label>
+            <div class="nav-group-content">
+                <ul class="nav-list">
+                    <li><a href="/algebra" class="nav-link {% if request.path == '/algebra' %}active{% endif %}">
+                        &#945; Algebra
+                    </a></li>
+                    <li><a href="/linear_algebra" class="nav-link {% if '/linear_algebra' in request.path %}active{% endif %}">
+                        &#9638; Lineare Algebra
+                    </a></li>
+                    <li><a href="/group_theory" class="nav-link {% if '/group_theory' in request.path %}active{% endif %}">
+                        G Gruppentheorie
+                    </a></li>
+                    <li><a href="/ring_theory" class="nav-link {% if '/ring_theory' in request.path %}active{% endif %}">
+                        R Ringtheorie
+                    </a></li>
+                    <li><a href="/galois_theory" class="nav-link {% if '/galois_theory' in request.path %}active{% endif %}">
+                        &#120018; Galois-Theorie
+                    </a></li>
+                    <li><a href="/modules_algebra" class="nav-link {% if '/modules_algebra' in request.path %}active{% endif %}">
+                        M Moduln &amp; Komm. Algebra
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- === Gruppe: Analysis & Differentialgleichungen === -->
+        <div class="nav-group">
+            <input type="checkbox" id="nav-analysis"
+                {% if request.path in ['/analysis', '/ode', '/complex', '/fourier'] %}checked{% endif %}>
+            <label class="nav-group-label" for="nav-analysis">Analysis &amp; Differentialgl.</label>
+            <div class="nav-group-content">
+                <ul class="nav-list">
+                    <li><a href="/analysis" class="nav-link {% if request.path == '/analysis' %}active{% endif %}">
+                        &#8747; Analysis
+                    </a></li>
+                    <li><a href="/ode" class="nav-link {% if request.path == '/ode' %}active{% endif %}">
+                        &#8706; Differentialgleichungen
+                    </a></li>
+                    <li><a href="/complex" class="nav-link {% if '/complex' in request.path %}active{% endif %}">
+                        &#8450; Komplexe Analysis
+                    </a></li>
+                    <li><a href="/fourier" class="nav-link {% if '/fourier' in request.path %}active{% endif %}">
+                        &#8767; Fourier-Analysis
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- === Gruppe: Zahlentheorie === -->
+        <div class="nav-group">
+            <input type="checkbox" id="nav-zahlen"
+                {% if request.path in ['/number_theory', '/analytic_nt', '/modular_forms', '/elliptic', '/l_functions', '/p_adic', '/iwasawa'] %}checked{% endif %}>
+            <label class="nav-group-label" for="nav-zahlen">Zahlentheorie</label>
+            <div class="nav-group-content">
+                <ul class="nav-list">
+                    <li><a href="/number_theory" class="nav-link {% if request.path == '/number_theory' %}active{% endif %}">
+                        &#8484; Zahlentheorie
+                    </a></li>
+                    <li><a href="/analytic_nt" class="nav-link {% if '/analytic_nt' in request.path %}active{% endif %}">
+                        &#960; Analytische ZT
+                    </a></li>
+                    <li><a href="/modular_forms" class="nav-link {% if '/modular_forms' in request.path %}active{% endif %}">
+                        &#964; Modulformen
+                    </a></li>
+                    <li><a href="/elliptic" class="nav-link {% if '/elliptic' in request.path %}active{% endif %}">
+                        &#120024; Elliptische Kurven
+                    </a></li>
+                    <li><a href="/l_functions" class="nav-link {% if '/l_functions' in request.path %}active{% endif %}">
+                        L L-Funktionen
+                    </a></li>
+                    <li><a href="/p_adic" class="nav-link {% if '/p_adic' in request.path %}active{% endif %}">
+                        p p-adische Zahlen
+                    </a></li>
+                    <li><a href="/iwasawa" class="nav-link {% if '/iwasawa' in request.path %}active{% endif %}">
+                        &#923; Iwasawa-Theorie
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- === Gruppe: Geometrie & Topologie === -->
+        <div class="nav-group">
+            <input type="checkbox" id="nav-geo"
+                {% if request.path in ['/topology', '/tensor', '/spinors'] %}checked{% endif %}>
+            <label class="nav-group-label" for="nav-geo">Geometrie &amp; Topologie</label>
+            <div class="nav-group-content">
+                <ul class="nav-list">
+                    <li><a href="/topology" class="nav-link {% if '/topology' in request.path %}active{% endif %}">
+                        &#8734; Topologie
+                    </a></li>
+                    <li><a href="/tensor" class="nav-link {% if '/tensor' in request.path %}active{% endif %}">
+                        g Tensor-Geometrie
+                    </a></li>
+                    <li><a href="/spinors" class="nav-link {% if '/spinors' in request.path %}active{% endif %}">
+                        &#963; Spinoren
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- === Gruppe: Diskrete Mathematik & Numerik === -->
+        <div class="nav-group">
+            <input type="checkbox" id="nav-diskret"
+                {% if request.path in ['/graph_theory', '/numerical'] %}checked{% endif %}>
+            <label class="nav-group-label" for="nav-diskret">Diskrete Mathematik &amp; Numerik</label>
+            <div class="nav-group-content">
+                <ul class="nav-list">
+                    <li><a href="/graph_theory" class="nav-link {% if '/graph_theory' in request.path %}active{% endif %}">
+                        G Graphentheorie
+                    </a></li>
+                    <li><a href="/numerical" class="nav-link {% if '/numerical' in request.path %}active{% endif %}">
+                        ~ Numerische Methoden
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- === Gruppe: Statistik === -->
+        <div class="nav-group">
+            <input type="checkbox" id="nav-statistik"
+                {% if request.path == '/statistics' %}checked{% endif %}>
+            <label class="nav-group-label" for="nav-statistik">Statistik</label>
+            <div class="nav-group-content">
+                <ul class="nav-list">
+                    <li><a href="/statistics" class="nav-link {% if '/statistics' in request.path %}active{% endif %}">
+                        &#963; Statistik
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- === Gruppe: Visualisierung === -->
+        <div class="nav-group">
+            <input type="checkbox" id="nav-visual"
+                {% if request.path == '/visualization' %}checked{% endif %}>
+            <label class="nav-group-label" for="nav-visual">Visualisierung</label>
+            <div class="nav-group-content">
+                <ul class="nav-list">
+                    <li><a href="/visualization" class="nav-link {% if '/visualization' in request.path %}active{% endif %}">
+                        &#128200; Visualisierung
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- === Gruppe: Millennium-Probleme === -->
+        <div class="nav-group">
+            <input type="checkbox" id="nav-millennium"
+                {% if request.path == '/millennium' %}checked{% endif %}>
+            <label class="nav-group-label" for="nav-millennium">Millennium-Probleme</label>
+            <div class="nav-group-content">
+                <ul class="nav-list">
+                    <li><a href="/millennium" class="nav-link {% if '/millennium' in request.path %}active{% endif %}">
+                        M Millennium-Probleme
+                    </a></li>
+                </ul>
+            </div>
+        </div>
 
         <!-- Systemstatus-Anzeige -->
         <div class="nav-footer">
@@ -115,7 +313,7 @@
 
 <!-- ===== FOOTER ===== -->
 <footer class="site-footer">
-    <span>Mathematik-Spezialist &mdash; Build 15 &mdash; Python 3.13 | SymPy | NumPy | SciPy</span>
+    <span>Mathematik-Spezialist &mdash; Build 30 &mdash; Python 3.13 | SymPy | NumPy | SciPy</span>
     <span>@author Kurt Ingwer</span>
 </footer>
 
@@ -129,7 +327,7 @@
      */
     function renderLatex(latex, element, displayMode = false) {
         if (typeof katex === 'undefined') {
-            // KaTeX noch nicht geladen → einfachen Text anzeigen
+            // KaTeX noch nicht geladen -> einfachen Text anzeigen
             element.textContent = latex;
             return;
         }
@@ -168,7 +366,7 @@
      * @param {string} message - Fehlermeldung
      */
     function showError(container, message) {
-        container.innerHTML = `<div class="result-error">⚠ ${message}</div>`;
+        container.innerHTML = `<div class="result-error">&#9888; ${message}</div>`;
     }
 
     /**
@@ -180,7 +378,7 @@
         container.innerHTML = `<div class="result-success">${html}</div>`;
     }
 
-    // Serversstatus beim Laden prüfen
+    // Serverstatus beim Laden prüfen
     window.addEventListener('load', async () => {
         const dot = document.getElementById('status-dot');
         const text = document.getElementById('status-text');

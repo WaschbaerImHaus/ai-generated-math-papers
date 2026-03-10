@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Galois-Theorie – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file galois_theory.html
+    @brief Template für die Galois-Theorie-Seite.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+<div class="page-header">
+    <h1>Galois-Theorie</h1>
+    <p class="page-desc">
+        Die Galois-Theorie verbindet Körpererweiterungen mit Gruppentheorie.
+        Die Galois-Gruppe $\text{Gal}(L/K)$ besteht aus den Automorphismen von $L$,
+        die $K$ festlassen. Ein Polynom ist genau dann durch Wurzeln lösbar,
+        wenn seine Galois-Gruppe auflösbar ist – das erklärt, warum es keine
+        allgemeine Formel für Grad $\geq 5$ gibt.
+    </p>
+</div>
+
+<!-- === Berechnung 1: Galois-Gruppe eines Polynoms === -->
+<div class="card">
+    <h2>Galois-Gruppe eines Polynoms</h2>
+    <p>
+        Für ein Polynom $f \in \mathbb{Q}[x]$ bestimmt die Galois-Gruppe
+        die Symmetrien der Wurzeln. Koeffizienten: höchster Grad zuerst.
+    </p>
+    <div class="input-row">
+        <label for="galois-coeffs">Koeffizienten (kommagetrennt):</label>
+        <input type="text" id="galois-coeffs" class="input-field" value="1,0,-2"
+               placeholder="z.B. 1,0,-2 für x²-2">
+    </div>
+    <button class="btn" onclick="calcGaloisGroup()">Galois-Gruppe berechnen</button>
+    <div id="galois-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 2: Auflösbarkeit durch Radikale === -->
+<div class="card">
+    <h2>Auflösbarkeit durch Wurzeln</h2>
+    <p>
+        Ein Polynom ist durch Radikale lösbar $\Leftrightarrow$ seine Galois-Gruppe
+        ist auflösbar. Grad $\leq 4$: immer lösbar. Grad $\geq 5$: im Allgemeinen nicht.
+    </p>
+    <div class="input-row">
+        <label for="solvable-coeffs">Koeffizienten:</label>
+        <input type="text" id="solvable-coeffs" class="input-field" value="1,0,0,0,0,-1"
+               placeholder="z.B. 1,0,0,0,0,-1 für x⁵-1">
+    </div>
+    <button class="btn" onclick="calcSolvable()">Auflösbarkeit prüfen</button>
+    <div id="solvable-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 3: Endlicher Körper GF(p^n) === -->
+<div class="card">
+    <h2>Endlicher Körper $\mathbb{F}_{p^n}$</h2>
+    <p>
+        Für jede Primzahlpotenz $p^n$ existiert (bis auf Isomorphie) genau ein
+        endlicher Körper $\mathbb{F}_{p^n} = \text{GF}(p^n)$.
+    </p>
+    <div class="input-row">
+        <label for="gf-p">Primzahl $p$:</label>
+        <input type="number" id="gf-p" class="input-field" value="2" min="2" max="23">
+    </div>
+    <div class="input-row">
+        <label for="gf-n">Exponent $n$:</label>
+        <input type="number" id="gf-n" class="input-field" value="3" min="1" max="8">
+    </div>
+    <button class="btn" onclick="calcFiniteField()">Körper analysieren</button>
+    <div id="gf-result" class="result-area"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /** Berechnet die Galois-Gruppe eines Polynoms. */
+    async function calcGaloisGroup() {
+        const coeffsStr = document.getElementById('galois-coeffs').value;
+        const coeffs = coeffsStr.split(',').map(s => parseInt(s.trim()));
+        const res = document.getElementById('galois-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/galois/group', { coefficients: coeffs });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Galois-Gruppe</strong><br>
+                Gruppe: <code>${data.galois_group}</code><br>
+                Ordnung: <code>${data.order}</code><br>
+                Auflösbar: <code>${data.is_solvable ? 'Ja' : 'Nein'}</code><br>
+                Diskriminante: <code>${data.discriminant}</code>
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Prüft Auflösbarkeit durch Radikale. */
+    async function calcSolvable() {
+        const coeffsStr = document.getElementById('solvable-coeffs').value;
+        const coeffs = coeffsStr.split(',').map(s => parseInt(s.trim()));
+        const res = document.getElementById('solvable-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/galois/solvable', { coefficients: coeffs });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Auflösbarkeit durch Radikale</strong><br>
+                Lösbar: <code>${data.solvable ? 'Ja' : 'Nein'}</code><br>
+                Galois-Gruppe: <code>${data.galois_group}</code><br>
+                Begründung: ${data.reason}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Analysiert einen endlichen Körper GF(p^n). */
+    async function calcFiniteField() {
+        const p = parseInt(document.getElementById('gf-p').value);
+        const n = parseInt(document.getElementById('gf-n').value);
+        const res = document.getElementById('gf-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/galois/finite_field', { p, n });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Endlicher Körper $\\mathbb{F}_{${p}^{${n}}} = \\mathbb{F}_{${Math.pow(p,n)}}$</strong><br>
+                Ordnung: <code>${data.order}</code><br>
+                Charakteristik: <code>${data.characteristic}</code><br>
+                ${data.description ? data.description : ''}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+</script>
+{% endblock %}

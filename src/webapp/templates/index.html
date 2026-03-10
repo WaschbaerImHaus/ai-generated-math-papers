@@ -18,7 +18,7 @@
     </h1>
     <p class="page-subtitle">
         Interaktive mathematische Berechnungen – von Grundlagen bis zu fortgeschrittenen Themen.
-        Build 12 &middot; Python 3.13 &middot; SymPy 1.13 &middot; NumPy 2.2
+        Build 30 &middot; Python 3.13 &middot; SymPy 1.13 &middot; NumPy 2.2
     </p>
 </div>
 
@@ -31,31 +31,263 @@
     </p>
 </div>
 
+<!-- Übersichtstabelle aller Module nach Teilgebiet -->
+<div class="card" style="margin-bottom: 2rem;">
+    <h2>Alle Module – Übersicht</h2>
+    <table style="width:100%; border-collapse: collapse; font-size: 0.88rem;">
+        <thead>
+            <tr style="background: var(--surface1); color: var(--subtext0);">
+                <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--surface2);">Teilgebiet</th>
+                <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--surface2);">Modul</th>
+                <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--surface2);">Kernthemen</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="background: var(--surface0);">
+                <td rowspan="3" style="padding: 8px 12px; border-bottom: 1px solid var(--surface2); font-weight: 700; color: var(--mauve); vertical-align: top;">Grundlagen</td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/proofs" class="nav-link">Beweise</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Collatz, Goldbach, Sieb, Miller-Rabin</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/steps" class="nav-link">Schritt-für-Schritt</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Newton-Raphson, Bisektionsverfahren, Gauss-Elimination</td>
+            </tr>
+            <tr style="background: var(--surface0);">
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/visualization" class="nav-link">Visualisierung</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">2D/3D Plot, Vektorfeld, Fraktale, Phasenporträt</td>
+            </tr>
+            <tr>
+                <td rowspan="6" style="padding: 8px 12px; border-bottom: 1px solid var(--surface2); font-weight: 700; color: var(--blue); vertical-align: top;">Algebra</td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/algebra" class="nav-link">Algebra</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Polynome, Gleichungen, GCD/LCM, Euler-Phi</td>
+            </tr>
+            <tr style="background: var(--surface0);">
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/linear_algebra" class="nav-link">Lineare Algebra</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Matrizen, LU/QR/SVD, Eigenwerte, Gram-Schmidt</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/group_theory" class="nav-link">Gruppentheorie</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Zyklische Gruppen, Sylow-Sätze, Diedergruppen</td>
+            </tr>
+            <tr style="background: var(--surface0);">
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/ring_theory" class="nav-link">Ringtheorie</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Ringe, Ideale, Irreduzibilität, F_p[x]</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/galois_theory" class="nav-link">Galois-Theorie</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Galois-Gruppe, Auflösbarkeit, endliche Körper GF(p^n)</td>
+            </tr>
+            <tr style="background: var(--surface0);">
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/modules_algebra" class="nav-link">Moduln &amp; Komm. Algebra</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Smith-Normalform, Klassifikation abelscher Gruppen, Primspektrum</td>
+            </tr>
+            <tr>
+                <td rowspan="4" style="padding: 8px 12px; border-bottom: 1px solid var(--surface2); font-weight: 700; color: var(--green); vertical-align: top;">Analysis &amp; DGL</td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/analysis" class="nav-link">Analysis</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Ableitungen, Integrale, Taylor-Reihen, Grenzwerte</td>
+            </tr>
+            <tr style="background: var(--surface0);">
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/ode" class="nav-link">Differentialgleichungen</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Euler, RK4, RK45, Laplace-Transformation</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/complex" class="nav-link">Komplexe Analysis</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Riemann-Zeta, Gamma-Funktion, Cauchy-Integral</td>
+            </tr>
+            <tr style="background: var(--surface0);">
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/fourier" class="nav-link">Fourier-Analysis</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">DFT, FFT, Fourier-Reihen, Fensterfunktionen, STFT</td>
+            </tr>
+            <tr>
+                <td rowspan="7" style="padding: 8px 12px; border-bottom: 1px solid var(--surface2); font-weight: 700; color: var(--yellow); vertical-align: top;">Zahlentheorie</td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/number_theory" class="nav-link">Zahlentheorie</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Primzahlen, Diophantische Gl., Pell, quadratische Reste</td>
+            </tr>
+            <tr style="background: var(--surface0);">
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/analytic_nt" class="nav-link">Analytische ZT</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">π(x), Li(x), von-Mangoldt Λ, Tschebyschow ψ</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/modular_forms" class="nav-link">Modulformen</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Eisenstein-Reihen, Δ-Funktion, j-Invariante, Hecke-Operatoren</td>
+            </tr>
+            <tr style="background: var(--surface0);">
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/elliptic" class="nav-link">Elliptische Kurven</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Kurvenanalyse, Punktarithmetik, Hasse-Schranke</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/l_functions" class="nav-link">L-Funktionen</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Dirichlet-L, Charaktere, Spezialwerte, Birch-Swinnerton-Dyer</td>
+            </tr>
+            <tr style="background: var(--surface0);">
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/p_adic" class="nav-link">p-adische Zahlen</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">p-adische Bewertung, Norm, Entwicklung, Hensel-Lifting</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/iwasawa" class="nav-link">Iwasawa-Theorie</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Kummer-Kongruenzen, Iwasawa-Polynom, Kubota-Leopoldt</td>
+            </tr>
+            <tr style="background: var(--surface0);">
+                <td rowspan="3" style="padding: 8px 12px; border-bottom: 1px solid var(--surface2); font-weight: 700; color: var(--peach); vertical-align: top;">Geometrie &amp; Topologie</td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/topology" class="nav-link">Topologie</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Metriken, Euler-Charakteristik, Box-Counting, Fraktale</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/tensor" class="nav-link">Tensor-Geometrie</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Metriktensoren, Ricci-Skalar, Gaußsche Krümmung</td>
+            </tr>
+            <tr style="background: var(--surface0);">
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/spinors" class="nav-link">Spinoren</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Clifford-Algebra, Dirac-Matrizen, Dirac-Gleichung</td>
+            </tr>
+            <tr>
+                <td rowspan="2" style="padding: 8px 12px; border-bottom: 1px solid var(--surface2); font-weight: 700; color: var(--teal); vertical-align: top;">Diskrete Math. &amp; Numerik</td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/graph_theory" class="nav-link">Graphentheorie</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Dijkstra, Euler-Kreis, Kombinatorik</td>
+            </tr>
+            <tr style="background: var(--surface0);">
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/numerical" class="nav-link">Numerische Methoden</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Lagrange-Interpolation, Gradientenabstieg, Golden Section</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2); font-weight: 700; color: var(--red);">Statistik</td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);"><a href="/statistics" class="nav-link">Statistik</a></td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid var(--surface2);">Deskriptive Statistik, Normalverteilung, t-Test, Bayes</td>
+            </tr>
+            <tr style="background: var(--surface0);">
+                <td style="padding: 8px 12px; font-weight: 700; color: var(--flamingo);">Millennium-Probleme</td>
+                <td style="padding: 8px 12px;"><a href="/millennium" class="nav-link">Millennium-Probleme</a></td>
+                <td style="padding: 8px 12px;">Riemann-Nullstellen, Goldbach-Zerlegungen, Komplexitätstheorie</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
 <!-- Modul-Karten -->
 <div class="module-grid">
 
     <a href="/algebra" class="module-card">
-        <span class="module-card-icon">α</span>
+        <span class="module-card-icon">&#945;</span>
         <div class="module-card-title">Algebra</div>
         <div class="module-card-desc">
-            Lineare & quadratische Gleichungen, Polynomauswertung,
+            Lineare &amp; quadratische Gleichungen, Polynomauswertung,
             Primzahlzerlegung, Euler-Phi-Funktion.
         </div>
         <span class="module-card-badge">solve · polynomial · primes</span>
     </a>
 
+    <a href="/group_theory" class="module-card">
+        <span class="module-card-icon">G</span>
+        <div class="module-card-title">Gruppentheorie</div>
+        <div class="module-card-desc">
+            Zyklische Gruppen $\mathbb{Z}/n\mathbb{Z}$, Sylow-Sätze,
+            Diedergruppen, Normalteiler.
+        </div>
+        <span class="module-card-badge">cyclic · sylow · dihedral</span>
+    </a>
+
+    <a href="/ring_theory" class="module-card">
+        <span class="module-card-icon">R</span>
+        <div class="module-card-title">Ringtheorie</div>
+        <div class="module-card-desc">
+            Ringe $\mathbb{Z}/n\mathbb{Z}$, Einheiten, Nullteiler,
+            Polynomfaktorisierung in $\mathbb{F}_p[x]$.
+        </div>
+        <span class="module-card-badge">ring · ideal · F_p[x]</span>
+    </a>
+
+    <a href="/galois_theory" class="module-card">
+        <span class="module-card-icon">&#120018;</span>
+        <div class="module-card-title">Galois-Theorie</div>
+        <div class="module-card-desc">
+            Galois-Gruppe von Polynomen, Auflösbarkeit durch Radikale,
+            endliche Körper $\mathbb{F}_{p^n}$.
+        </div>
+        <span class="module-card-badge">galois · solvable · GF(p^n)</span>
+    </a>
+
     <a href="/analysis" class="module-card">
-        <span class="module-card-icon">∫</span>
+        <span class="module-card-icon">&#8747;</span>
         <div class="module-card-title">Analysis</div>
         <div class="module-card-desc">
-            Numerische Ableitung & Integration, Nullstellensuche
-            (Newton-Raphson, Bisektionsverfahren).
+            Numerische Ableitung &amp; Integration, Nullstellensuche,
+            Taylor-Reihen, Grenzwerte.
         </div>
         <span class="module-card-badge">derivative · integral · roots</span>
     </a>
 
+    <a href="/fourier" class="module-card">
+        <span class="module-card-icon">&#8767;</span>
+        <div class="module-card-title">Fourier-Analysis</div>
+        <div class="module-card-desc">
+            Diskrete Fourier-Transformation (DFT/FFT),
+            Fourier-Reihen, Spektralanalyse.
+        </div>
+        <span class="module-card-badge">DFT · FFT · Fourier-Reihen</span>
+    </a>
+
+    <a href="/analytic_nt" class="module-card">
+        <span class="module-card-icon">&#960;</span>
+        <div class="module-card-title">Analytische Zahlentheorie</div>
+        <div class="module-card-desc">
+            Primzählfunktion $\pi(x)$, Logarithmisches Integral $\text{Li}(x)$,
+            von-Mangoldt-Funktion $\Lambda(n)$.
+        </div>
+        <span class="module-card-badge">π(x) · Li(x) · Λ(n)</span>
+    </a>
+
+    <a href="/modular_forms" class="module-card">
+        <span class="module-card-icon">&#964;</span>
+        <div class="module-card-title">Modulformen</div>
+        <div class="module-card-desc">
+            Eisenstein-Reihen $E_k$, Ramanujan-$\Delta$, $j$-Invariante,
+            Hecke-Operatoren.
+        </div>
+        <span class="module-card-badge">E_k · Delta · j-Invariante</span>
+    </a>
+
+    <a href="/l_functions" class="module-card">
+        <span class="module-card-icon">L</span>
+        <div class="module-card-title">L-Funktionen</div>
+        <div class="module-card-desc">
+            Dirichlet-L-Funktionen $L(s,\chi)$, Charaktere,
+            Spezialwerte, Birch-Swinnerton-Dyer.
+        </div>
+        <span class="module-card-badge">L(s,χ) · Charaktere · BSD</span>
+    </a>
+
+    <a href="/p_adic" class="module-card">
+        <span class="module-card-icon">p</span>
+        <div class="module-card-title">p-adische Zahlen</div>
+        <div class="module-card-desc">
+            $p$-adische Bewertung $v_p$, Norm $|\cdot|_p$,
+            Entwicklung, Hensel-Lifting.
+        </div>
+        <span class="module-card-badge">v_p · |·|_p · Hensel</span>
+    </a>
+
+    <a href="/spinors" class="module-card">
+        <span class="module-card-icon">&#947;</span>
+        <div class="module-card-title">Spinoren</div>
+        <div class="module-card-desc">
+            Clifford-Algebren, Dirac-$\gamma$-Matrizen,
+            Dirac-Gleichung, Spinor-Lösungen.
+        </div>
+        <span class="module-card-badge">Clifford · Gamma · Dirac</span>
+    </a>
+
+    <a href="/numerical" class="module-card">
+        <span class="module-card-icon">~</span>
+        <div class="module-card-title">Numerische Methoden</div>
+        <div class="module-card-desc">
+            Lagrange-Interpolation, Gradientenabstieg,
+            Golden-Section-Suche, Splines.
+        </div>
+        <span class="module-card-badge">Lagrange · Gradient · Golden</span>
+    </a>
+
     <a href="/linear_algebra" class="module-card">
-        <span class="module-card-icon">▦</span>
+        <span class="module-card-icon">&#9638;</span>
         <div class="module-card-title">Lineare Algebra</div>
         <div class="module-card-desc">
             Determinante, Inverse, Eigenwerte für beliebige Matrizen.
@@ -65,7 +297,7 @@
     </a>
 
     <a href="/statistics" class="module-card">
-        <span class="module-card-icon">σ</span>
+        <span class="module-card-icon">&#963;</span>
         <div class="module-card-title">Statistik</div>
         <div class="module-card-desc">
             Deskriptive Statistik: Mittelwert, Median, Modus,
@@ -74,44 +306,24 @@
         <span class="module-card-badge">mean · median · variance</span>
     </a>
 
-    <a href="/ode" class="module-card">
-        <span class="module-card-icon">∂</span>
-        <div class="module-card-title">Differentialgleichungen</div>
-        <div class="module-card-desc">
-            Numerische Lösung gewöhnlicher DGLs:
-            harmonischer Oszillator, exponentieller Zerfall, logistisches Wachstum.
-        </div>
-        <span class="module-card-badge">RK4 · Euler · ODE-Systeme</span>
-    </a>
-
-    <a href="/complex" class="module-card">
-        <span class="module-card-icon">ℂ</span>
-        <div class="module-card-title">Komplexe Analysis</div>
-        <div class="module-card-desc">
-            Riemann-Zeta-Funktion $\zeta(s)$ für beliebige komplexe $s$,
-            analytische Fortsetzung, kritische Gerade.
-        </div>
-        <span class="module-card-badge">ζ(s) · Gamma · analytisch</span>
-    </a>
-
-    <a href="/number_theory" class="module-card">
-        <span class="module-card-icon">ℤ</span>
-        <div class="module-card-title">Zahlentheorie</div>
-        <div class="module-card-desc">
-            Primfaktorzerlegung, Euler-Phi, Primzahltest,
-            Miller-Rabin, Sieb des Eratosthenes.
-        </div>
-        <span class="module-card-badge">primes · φ(n) · factorization</span>
-    </a>
-
     <a href="/visualization" class="module-card">
-        <span class="module-card-icon">📈</span>
+        <span class="module-card-icon">&#128200;</span>
         <div class="module-card-title">Visualisierung</div>
         <div class="module-card-desc">
             Mathematische Funktionen interaktiv plotten.
             Ausdruck eingeben, Bereich wählen, Plot ansehen.
         </div>
-        <span class="module-card-badge">plot · 2D · PNG · KaTeX</span>
+        <span class="module-card-badge">plot · 2D · 3D · Fraktale</span>
+    </a>
+
+    <a href="/millennium" class="module-card">
+        <span class="module-card-icon">M</span>
+        <div class="module-card-title">Millennium-Probleme</div>
+        <div class="module-card-desc">
+            Riemann-Nullstellen, Goldbach-Zerlegungen,
+            P-vs-NP Komplexitätsvergleich.
+        </div>
+        <span class="module-card-badge">Riemann · Goldbach · P vs NP</span>
     </a>
 
 </div>

@@ -747,3 +747,67 @@
 - 55/55 Tests grün
 - Abdeckung: cyclic, dihedral, quaternion, symmetric, alternating, Lagrange, Sylow,
   Burnside, Klassifikation, Isomorphismus, Homomorphismus, Vorzeichen-Homo S3→ℤ2
+
+---
+
+## 2026-03-10 20:25:49 – Build 31: Webserver-Erweiterung auf alle mathematischen Module
+
+### Änderungen: src/webapp/app.py
+- Build-Nummer auf 30 aktualisiert (health-Endpunkt und Startbanner)
+- 12 neue try/except-geschützte Modul-Imports hinzugefügt:
+  - group_theory, ring_theory, galois_theory, modules_algebra, commutative_algebra
+  - fourier, analytic_number_theory, modular_forms, l_functions
+  - p_adic, iwasawa_theory, spinors, numerical_methods
+- 12 neue GET-Routen für Seiten:
+  /group_theory, /ring_theory, /galois_theory, /modules_algebra,
+  /fourier, /analytic_nt, /modular_forms, /l_functions,
+  /p_adic, /iwasawa, /spinors, /numerical
+- 36 neue POST API-Endpunkte:
+  - Gruppentheorie: /api/group/cyclic, /api/group/sylow, /api/group/dihedral
+  - Ringtheorie: /api/ring/properties, /api/ring/factorize, /api/ring/irreducible
+  - Galois: /api/galois/group, /api/galois/solvable, /api/galois/finite_field
+  - Moduln: /api/modules/smith, /api/modules/classify_abelian, /api/modules/spectrum
+  - Fourier: /api/fourier/dft, /api/fourier/series, /api/fourier/dominant
+  - Analytische ZT: /api/analytic_nt/pi, /api/analytic_nt/li, /api/analytic_nt/von_mangoldt
+  - Modulformen: /api/modular/eisenstein, /api/modular/j_invariant, /api/modular/delta
+  - L-Funktionen: /api/lfunc/dirichlet, /api/lfunc/characters, /api/lfunc/special_values
+  - p-adisch: /api/padic/valuation, /api/padic/expansion, /api/padic/hensel
+  - Iwasawa: /api/iwasawa/kummer, /api/iwasawa/polynomial, /api/iwasawa/kubota_leopoldt
+  - Spinoren: /api/spinors/gamma, /api/spinors/clifford, /api/spinors/dirac
+  - Numerik: /api/numerical/interpolate, /api/numerical/optimize, /api/numerical/golden_section
+- Gesamt 102 Routen registriert (vorher ca. 66)
+
+### Änderungen: src/webapp/templates/base.html
+- Build auf "30" aktualisiert (Header und Footer)
+- Navigationsmenü komplett neu strukturiert: 9 klappbare Sektionen ohne JavaScript
+  - CSS-only Klapp-Mechanismus via Checkbox + label + display:none/block
+  - Gruppen: Grundlagen, Algebra, Analysis & DGL, Zahlentheorie,
+    Geometrie & Topologie, Diskrete Math. & Numerik, Statistik,
+    Visualisierung, Millennium-Probleme
+  - Aktive Sektion wird automatisch aufgeklappt via Jinja2 checked-Attribut
+
+### Neue Templates erstellt (alle in src/webapp/templates/):
+- group_theory.html: Zyklische Gruppe, Sylow-Sätze, Diedergruppe
+- ring_theory.html: Ring-Eigenschaften, Polynom-Faktorisierung mod p, Irreduzibilität
+- galois_theory.html: Galois-Gruppe, Auflösbarkeit, endliche Körper GF(p^n)
+- modules_algebra.html: Smith-Normalform, Klassifikation abelscher Gruppen, Primspektrum
+- fourier.html: DFT/FFT, Fourier-Reihen, dominante Frequenz
+- analytic_nt.html: π(x), Li(x), von-Mangoldt Λ(n)
+- modular_forms.html: Eisenstein E_k, j-Invariante, Ramanujan τ
+- l_functions.html: Dirichlet-L(s,χ), Charaktere, Spezialwerte
+- p_adic.html: p-adische Bewertung, Entwicklung, Hensel-Lifting
+- iwasawa.html: Kummer-Kongruenzen, Iwasawa-Polynom, Kubota-Leopoldt
+- spinors.html: Gamma-Matrizen, Clifford-Algebra-Check, Dirac-Spinor
+- numerical.html: Lagrange-Interpolation, Gradientenabstieg, Golden-Section
+
+### Änderungen: src/webapp/templates/index.html
+- Build auf "30" aktualisiert
+- Neue Übersichtstabelle aller 20+ Module nach Teilgebiet gruppiert
+- Neue Modul-Karten für alle 12 neuen Seiten hinzugefügt (Emoji-Icons entfernt)
+
+### Änderungen: src/build.txt
+- Build-Nummer auf 31 hochgezählt
+
+### Testergebnis
+- `python3 -c "import sys; sys.path.insert(0,'src'); sys.path.insert(0,'src/webapp'); import app"` → kein Fehler
+- 102 Routen total registriert, alle neuen Routen vorhanden

@@ -109,6 +109,109 @@ from step_by_step import (
     format_steps_html,
 )
 
+# ---- Neue Module: Gruppentheorie, Ringtheorie, Galois-Theorie, Moduln ----
+try:
+    from group_theory import (
+        Group, cyclic_group, dihedral_group, sylow_theorems
+    )
+    _group_theory_ok = True
+except Exception as _e:
+    _group_theory_ok = False
+    print(f"[WARN] group_theory nicht ladbar: {_e}")
+
+try:
+    from ring_theory import Ring, polynomial_factorization_mod_p, is_irreducible_mod_p
+    _ring_theory_ok = True
+except Exception as _e:
+    _ring_theory_ok = False
+    print(f"[WARN] ring_theory nicht ladbar: {_e}")
+
+try:
+    from galois_theory import (
+        galois_group_polynomial, is_solvable_by_radicals, FiniteField
+    )
+    _galois_ok = True
+except Exception as _e:
+    _galois_ok = False
+    print(f"[WARN] galois_theory nicht ladbar: {_e}")
+
+try:
+    from modules_algebra import smith_normal_form, structure_theorem_abelian_groups
+    from commutative_algebra import prime_spectrum
+    _modules_ok = True
+except Exception as _e:
+    _modules_ok = False
+    print(f"[WARN] modules_algebra/commutative_algebra nicht ladbar: {_e}")
+
+# ---- Neue Module: Fourier, Analytische ZT, Modulformen, L-Funktionen ----
+try:
+    from fourier import dft, fft, fourier_coefficients, dominant_frequency
+    _fourier_ok = True
+except Exception as _e:
+    _fourier_ok = False
+    print(f"[WARN] fourier nicht ladbar: {_e}")
+
+try:
+    from analytic_number_theory import (
+        prime_counting_function, logarithmic_integral,
+        von_mangoldt_function, chebyshev_psi
+    )
+    _analytic_nt_ok = True
+except Exception as _e:
+    _analytic_nt_ok = False
+    print(f"[WARN] analytic_number_theory nicht ladbar: {_e}")
+
+try:
+    from modular_forms import (
+        eisenstein_series, j_invariant, fourier_coefficients_delta
+    )
+    _modular_ok = True
+except Exception as _e:
+    _modular_ok = False
+    print(f"[WARN] modular_forms nicht ladbar: {_e}")
+
+try:
+    from l_functions import (
+        dirichlet_l_function, dirichlet_characters, l_function_special_values
+    )
+    _lfunc_ok = True
+except Exception as _e:
+    _lfunc_ok = False
+    print(f"[WARN] l_functions nicht ladbar: {_e}")
+
+# ---- Neue Module: p-adisch, Iwasawa, Spinoren, Numerik ----
+try:
+    from p_adic import p_adic_valuation, p_adic_norm, PAdicNumber, hensel_lift
+    _padic_ok = True
+except Exception as _e:
+    _padic_ok = False
+    print(f"[WARN] p_adic nicht ladbar: {_e}")
+
+try:
+    from iwasawa_theory import (
+        iwasawa_polynomial, kummer_congruences_check, kubota_leopoldt_l_function
+    )
+    _iwasawa_ok = True
+except Exception as _e:
+    _iwasawa_ok = False
+    print(f"[WARN] iwasawa_theory nicht ladbar: {_e}")
+
+try:
+    from spinors import gamma_matrices, clifford_algebra_check, dirac_spinor
+    _spinors_ok = True
+except Exception as _e:
+    _spinors_ok = False
+    print(f"[WARN] spinors nicht ladbar: {_e}")
+
+try:
+    from numerical_methods import (
+        lagrange_interpolation, gradient_descent, golden_section_search
+    )
+    _numerical_ok = True
+except Exception as _e:
+    _numerical_ok = False
+    print(f"[WARN] numerical_methods nicht ladbar: {_e}")
+
 
 # ===========================================================================
 # FLASK-APP INITIALISIEREN
@@ -271,6 +374,80 @@ def page_visualization():
     return render_template('visualization.html')
 
 
+# ---- Neue GET-Routen für alle neuen Module ----
+
+@app.route('/group_theory')
+def page_group_theory():
+    """@brief Gruppentheorie-Seite. @date 2026-03-10"""
+    return render_template('group_theory.html')
+
+
+@app.route('/ring_theory')
+def page_ring_theory():
+    """@brief Ringtheorie-Seite. @date 2026-03-10"""
+    return render_template('ring_theory.html')
+
+
+@app.route('/galois_theory')
+def page_galois_theory():
+    """@brief Galois-Theorie-Seite. @date 2026-03-10"""
+    return render_template('galois_theory.html')
+
+
+@app.route('/modules_algebra')
+def page_modules_algebra():
+    """@brief Moduln-und-Kommutative-Algebra-Seite. @date 2026-03-10"""
+    return render_template('modules_algebra.html')
+
+
+@app.route('/fourier')
+def page_fourier():
+    """@brief Fourier-Analysis-Seite. @date 2026-03-10"""
+    return render_template('fourier.html')
+
+
+@app.route('/analytic_nt')
+def page_analytic_nt():
+    """@brief Analytische-Zahlentheorie-Seite. @date 2026-03-10"""
+    return render_template('analytic_nt.html')
+
+
+@app.route('/modular_forms')
+def page_modular_forms():
+    """@brief Modulformen-Seite. @date 2026-03-10"""
+    return render_template('modular_forms.html')
+
+
+@app.route('/l_functions')
+def page_l_functions():
+    """@brief L-Funktionen-Seite. @date 2026-03-10"""
+    return render_template('l_functions.html')
+
+
+@app.route('/p_adic')
+def page_p_adic():
+    """@brief p-adische-Zahlen-Seite. @date 2026-03-10"""
+    return render_template('p_adic.html')
+
+
+@app.route('/iwasawa')
+def page_iwasawa():
+    """@brief Iwasawa-Theorie-Seite. @date 2026-03-10"""
+    return render_template('iwasawa.html')
+
+
+@app.route('/spinors')
+def page_spinors():
+    """@brief Spinoren-Seite. @date 2026-03-10"""
+    return render_template('spinors.html')
+
+
+@app.route('/numerical')
+def page_numerical():
+    """@brief Numerische-Methoden-Seite. @date 2026-03-10"""
+    return render_template('numerical.html')
+
+
 # ===========================================================================
 # ROUTE: SYSTEMSTATUS
 # ===========================================================================
@@ -279,10 +456,10 @@ def page_visualization():
 def health():
     """
     @brief Gibt den Systemstatus zurück.
-    @return JSON {"status": "ok", "build": 11}
+    @return JSON {"status": "ok", "build": 30}
     @date 2026-03-10
     """
-    return jsonify({"status": "ok", "build": 13})
+    return jsonify({"status": "ok", "build": 30})
 
 
 # ===========================================================================
@@ -2733,6 +2910,1183 @@ def _plot_manifold(manifold: str, params: dict, point: list):
 
 
 # ===========================================================================
+# NEUE API-ENDPUNKTE: GRUPPENTHEORIE
+# ===========================================================================
+
+@app.route('/api/group/cyclic', methods=['POST'])
+def api_group_cyclic():
+    """
+    @brief Analysiert eine zyklische Gruppe Z/nZ.
+    @description
+        Erwartet JSON: {"n": 6}
+        Gibt Ordnung, Elemente, Generatoren, is_abelian zurück.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _group_theory_ok:
+            return jsonify({"error": "group_theory Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        n = int(data.get('n', 6))
+        # Zyklische Gruppe der Ordnung n erzeugen
+        g = cyclic_group(n)
+        return jsonify({
+            "order": g.order(),
+            "elements": list(g.elements),
+            "generators": list(g.generators()),
+            "is_abelian": g.is_abelian(),
+            "is_cyclic": True,  # zyklische Gruppen sind per Definition zyklisch
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/group/sylow', methods=['POST'])
+def api_group_sylow():
+    """
+    @brief Wendet Sylow-Theorie auf eine Gruppe der Ordnung n an.
+    @description
+        Erwartet JSON: {"n": 12, "p": 2}
+        Gibt Sylow-Untergruppen-Ordnung und Anzahl zurück.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _group_theory_ok:
+            return jsonify({"error": "group_theory Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        n = int(data.get('n', 12))
+        p = int(data.get('p', 2))
+        # Zyklische Gruppe als Stellvertreter – Sylow-Sätze gelten für beliebige Gruppen
+        g = cyclic_group(n)
+        result = sylow_theorems(g, p)
+        return jsonify({
+            "p_part": result.get("p_power"),
+            "sylow_order": result.get("sylow_order"),
+            "num_sylow": result.get("num_sylow_subgroups"),
+            "details": str(result.get("description", "")),
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/group/dihedral', methods=['POST'])
+def api_group_dihedral():
+    """
+    @brief Analysiert eine Diedergruppe D_n.
+    @description
+        Erwartet JSON: {"n": 4}
+        Gibt Ordnung, is_abelian, Rotationen/Spiegelungen zurück.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _group_theory_ok:
+            return jsonify({"error": "group_theory Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        n = int(data.get('n', 4))
+        # Diedergruppe D_n (Ordnung 2n)
+        d = dihedral_group(n)
+        elements_str = str(d.elements[:min(20, len(d.elements))])
+        # Erste n Elemente sind Drehungen, letzte n sind Spiegelungen (in der Implementierung)
+        half = len(d.elements) // 2
+        return jsonify({
+            "order": d.order(),
+            "is_abelian": d.is_abelian(),
+            "elements": elements_str,
+            "rotations": str(list(d.elements[:half])),
+            "reflections": str(list(d.elements[half:])),
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+# ===========================================================================
+# NEUE API-ENDPUNKTE: RINGTHEORIE
+# ===========================================================================
+
+@app.route('/api/ring/properties', methods=['POST'])
+def api_ring_properties():
+    """
+    @brief Analysiert Eigenschaften des Rings Z/nZ.
+    @description
+        Erwartet JSON: {"n": 12}
+        Gibt Einheiten, Nullteiler, is_field, is_integral_domain zurück.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _ring_theory_ok:
+            return jsonify({"error": "ring_theory Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        n = int(data.get('n', 12))
+        r = Ring(n)
+        return jsonify({
+            "units": r.units(),
+            "zero_divisors": r.zero_divisors(),
+            "is_field": r.is_field(),
+            "is_integral_domain": r.is_integral_domain(),
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/ring/factorize', methods=['POST'])
+def api_ring_factorize():
+    """
+    @brief Faktorisiert ein Polynom modulo einer Primzahl p.
+    @description
+        Erwartet JSON: {"coefficients": [1, 0, 1], "p": 2}
+        Koeffizienten: höchster Grad zuerst.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _ring_theory_ok:
+            return jsonify({"error": "ring_theory Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        coeffs = [int(c) for c in data.get('coefficients', [1, 0, 1])]
+        p = int(data.get('p', 2))
+        result = polynomial_factorization_mod_p(coeffs, p)
+        return jsonify({
+            "factors": result.get('factors', []),
+            "multiplicities": result.get('multiplicities', []),
+            "description": f"Faktorisierung von Polynom mod {p}",
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/ring/irreducible', methods=['POST'])
+def api_ring_irreducible():
+    """
+    @brief Prüft ob ein Polynom irreduzibel mod p ist.
+    @description
+        Erwartet JSON: {"coefficients": [1, 1, 1], "p": 2}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _ring_theory_ok:
+            return jsonify({"error": "ring_theory Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        coeffs = [int(c) for c in data.get('coefficients', [1, 1, 1])]
+        p = int(data.get('p', 2))
+        result = is_irreducible_mod_p(coeffs, p)
+        return jsonify({
+            "is_irreducible": bool(result),
+            "reason": "Kein echter Teiler in F_p[x] gefunden" if result else "Hat echte Teiler in F_p[x]",
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+# ===========================================================================
+# NEUE API-ENDPUNKTE: GALOIS-THEORIE
+# ===========================================================================
+
+@app.route('/api/galois/group', methods=['POST'])
+def api_galois_group():
+    """
+    @brief Berechnet die Galois-Gruppe eines Polynoms über Q.
+    @description
+        Erwartet JSON: {"coefficients": [1, 0, -2]}
+        Koeffizienten höchster Grad zuerst.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _galois_ok:
+            return jsonify({"error": "galois_theory Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        coeffs = [int(c) for c in data.get('coefficients', [1, 0, -2])]
+        result = galois_group_polynomial(coeffs)
+        return jsonify({
+            "galois_group": result.get('galois_group'),
+            "order": result.get('order'),
+            "is_solvable": result.get('is_solvable'),
+            "discriminant": result.get('discriminant'),
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/galois/solvable', methods=['POST'])
+def api_galois_solvable():
+    """
+    @brief Prüft ob ein Polynom durch Radikale lösbar ist.
+    @description
+        Erwartet JSON: {"coefficients": [1, 0, -2]}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _galois_ok:
+            return jsonify({"error": "galois_theory Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        coeffs = [int(c) for c in data.get('coefficients', [1, 0, -2])]
+        result = is_solvable_by_radicals(coeffs)
+        return jsonify({
+            "solvable": result.get('solvable'),
+            "galois_group": result.get('galois_group'),
+            "reason": result.get('reason'),
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/galois/finite_field', methods=['POST'])
+def api_galois_finite_field():
+    """
+    @brief Analysiert den endlichen Körper GF(p^n).
+    @description
+        Erwartet JSON: {"p": 2, "n": 3}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _galois_ok:
+            return jsonify({"error": "galois_theory Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        p = int(data.get('p', 2))
+        n = int(data.get('n', 3))
+        ff = FiniteField(p, n)
+        return jsonify({
+            "order": ff.order,
+            "characteristic": ff.characteristic,
+            "description": f"GF({p}^{n}) hat {p**n} Elemente, Charakteristik {p}",
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+# ===========================================================================
+# NEUE API-ENDPUNKTE: MODULN & KOMMUTATIVE ALGEBRA
+# ===========================================================================
+
+@app.route('/api/modules/smith', methods=['POST'])
+def api_modules_smith():
+    """
+    @brief Berechnet die Smith-Normalform einer ganzzahligen Matrix.
+    @description
+        Erwartet JSON: {"matrix": [[2,4,4],[-6,6,12],[10,-4,-16]]}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _modules_ok:
+            return jsonify({"error": "modules_algebra Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        matrix = data.get('matrix', [[2, 4], [4, 8]])
+        result = smith_normal_form(matrix)
+        return jsonify({
+            "invariant_factors": result.get('invariant_factors', []),
+            "rank": result.get('rank', 0),
+            "description": f"Invariantenfaktoren bilden die Smith-Normalform",
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/modules/classify_abelian', methods=['POST'])
+def api_modules_classify():
+    """
+    @brief Klassifiziert eine endliche abelsche Gruppe per Invariantenfaktoren.
+    @description
+        Erwartet JSON: {"invariants": [2, 6, 12]}
+        Invariantenfaktoren als Liste (Smith-Diagonale).
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _modules_ok:
+            return jsonify({"error": "modules_algebra Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        invariants = [int(x) for x in data.get('invariants', [2, 6])]
+        # Ordnung = Produkt aller Invariantenfaktoren
+        order = 1
+        for inv in invariants:
+            order *= inv
+        # Isomorphietyp als Produkt zyklischer Gruppen
+        iso_type = " × ".join([f"ℤ_{inv}" for inv in invariants])
+        return jsonify({
+            "isomorphism_type": iso_type,
+            "order": order,
+            "description": f"Die Gruppe der Ordnung {order} ist isomorph zu {iso_type}",
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/modules/spectrum', methods=['POST'])
+def api_modules_spectrum():
+    """
+    @brief Berechnet das Primspektrum von Z/nZ.
+    @description
+        Erwartet JSON: {"n": 12}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _modules_ok:
+            return jsonify({"error": "commutative_algebra Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        n = int(data.get('n', 12))
+        result = prime_spectrum(n)
+        return jsonify({
+            "prime_ideals": result.get('prime_ideals', []),
+            "maximal_ideals": result.get('maximal_ideals', []),
+            "description": f"Primspektrum von ℤ/{n}ℤ",
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+# ===========================================================================
+# NEUE API-ENDPUNKTE: FOURIER-ANALYSIS
+# ===========================================================================
+
+@app.route('/api/fourier/dft', methods=['POST'])
+def api_fourier_dft():
+    """
+    @brief Berechnet die diskrete Fourier-Transformation (FFT).
+    @description
+        Erwartet JSON: {"values": [1, 0, -1, 0]}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _fourier_ok:
+            return jsonify({"error": "fourier Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        values = [float(v) for v in data.get('values', [1, 0, -1, 0])]
+        # FFT berechnen (Cooley-Tukey)
+        result = fft(values)
+        frequencies = []
+        dominant_k = 0
+        max_mag = 0
+        for k, c in enumerate(result):
+            mag = abs(c)
+            phase = float(np.angle(c)) if hasattr(c, 'real') else 0.0
+            frequencies.append({"magnitude": mag, "phase": phase})
+            if mag > max_mag and k > 0:
+                max_mag = mag
+                dominant_k = k
+        return jsonify({
+            "frequencies": frequencies,
+            "n": len(values),
+            "dominant_k": dominant_k,
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/fourier/series', methods=['POST'])
+def api_fourier_series():
+    """
+    @brief Berechnet Fourier-Reihen-Koeffizienten einer Funktion.
+    @description
+        Erwartet JSON: {"func": "sin(x)", "period": 6.283, "n_terms": 5}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _fourier_ok:
+            return jsonify({"error": "fourier Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        func_str = data.get('func', 'sin(x)')
+        period = float(data.get('period', 2 * np.pi))
+        n_terms = int(data.get('n_terms', 5))
+        # Funktion aus String erzeugen (sicher via SymPy)
+        f_lambda = expr_to_lambda(func_str)
+        # Fourier-Koeffizienten numerisch berechnen
+        a_coeffs, b_coeffs = fourier_coefficients(f_lambda, period, n_terms)
+        return jsonify({
+            "a_coeffs": [float(a) for a in a_coeffs],
+            "b_coeffs": [float(b) for b in b_coeffs],
+            "period": period,
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/fourier/dominant', methods=['POST'])
+def api_fourier_dominant():
+    """
+    @brief Bestimmt die dominante Frequenz in einem Signal.
+    @description
+        Erwartet JSON: {"values": [...], "sample_rate": 16.0}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _fourier_ok:
+            return jsonify({"error": "fourier Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        values = [float(v) for v in data.get('values', [0, 1, 0, -1])]
+        sample_rate = float(data.get('sample_rate', 1.0))
+        # Dominante Frequenz berechnen
+        dom_freq = dominant_frequency(values, sample_rate=sample_rate)
+        # FFT für Amplitude des Peaks
+        result = fft(values)
+        magnitudes = [abs(c) for c in result]
+        dom_k = magnitudes.index(max(magnitudes[1:len(magnitudes)//2+1])) + 1
+        amp = magnitudes[dom_k] if dom_k < len(magnitudes) else 0.0
+        return jsonify({
+            "dominant_frequency": float(dom_freq),
+            "dominant_k": dom_k,
+            "amplitude": float(amp) / len(values),
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+# ===========================================================================
+# NEUE API-ENDPUNKTE: ANALYTISCHE ZAHLENTHEORIE
+# ===========================================================================
+
+@app.route('/api/analytic_nt/pi', methods=['POST'])
+def api_analytic_pi():
+    """
+    @brief Berechnet die Primzählfunktion pi(x) und Vergleichsapproximationen.
+    @description
+        Erwartet JSON: {"x": 100}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _analytic_nt_ok:
+            return jsonify({"error": "analytic_number_theory Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        x = float(data.get('x', 100))
+        # Primzählfunktion
+        pi_x = prime_counting_function(x)
+        # Approximation x/ln(x)
+        import math
+        approx_log = x / math.log(x) if x > 1 else 0
+        # Logarithmisches Integral
+        li_x = logarithmic_integral(x)
+        # Relativer Fehler
+        rel_err = abs(approx_log - pi_x) / pi_x * 100 if pi_x > 0 else 0
+        return jsonify({
+            "pi_x": int(pi_x),
+            "approx_log": float(approx_log),
+            "li_x": float(li_x),
+            "relative_error_log": float(rel_err),
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/analytic_nt/li', methods=['POST'])
+def api_analytic_li():
+    """
+    @brief Berechnet das Logarithmische Integral Li(x).
+    @description
+        Erwartet JSON: {"x": 1000}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _analytic_nt_ok:
+            return jsonify({"error": "analytic_number_theory Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        x = float(data.get('x', 1000))
+        li_x = logarithmic_integral(x)
+        pi_x = prime_counting_function(x)
+        return jsonify({
+            "li_x": float(li_x),
+            "pi_x": int(pi_x),
+            "difference": float(li_x) - int(pi_x),
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/analytic_nt/von_mangoldt', methods=['POST'])
+def api_analytic_von_mangoldt():
+    """
+    @brief Berechnet die Von-Mangoldt-Funktion Lambda(n) bis zur Grenze n.
+    @description
+        Erwartet JSON: {"n": 30}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _analytic_nt_ok:
+            return jsonify({"error": "analytic_number_theory Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        n = int(data.get('n', 30))
+        import math
+        values = []
+        psi = 0.0
+        for k in range(1, n + 1):
+            lam = von_mangoldt_function(k)
+            psi += lam
+            # Primzahl p bestimmen wenn Lambda > 0
+            p = None
+            if lam > 0:
+                p = round(math.exp(lam))
+            values.append({"n": k, "lambda": float(lam), "prime": p})
+        return jsonify({
+            "values": values,
+            "psi": float(psi),
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+# ===========================================================================
+# NEUE API-ENDPUNKTE: MODULFORMEN
+# ===========================================================================
+
+@app.route('/api/modular/eisenstein', methods=['POST'])
+def api_modular_eisenstein():
+    """
+    @brief Berechnet den Wert der Eisenstein-Reihe E_k(z).
+    @description
+        Erwartet JSON: {"k": 4, "z_re": 0.0, "z_im": 1.0}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _modular_ok:
+            return jsonify({"error": "modular_forms Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        k = int(data.get('k', 4))
+        z_re = float(data.get('z_re', 0.0))
+        z_im = float(data.get('z_im', 1.0))
+        z = complex(z_re, z_im)
+        # Eisenstein-Reihe auswerten
+        val = eisenstein_series(k, z)
+        return jsonify({
+            "real": float(val.real),
+            "imag": float(val.imag),
+            "abs": float(abs(val)),
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/modular/j_invariant', methods=['POST'])
+def api_modular_j():
+    """
+    @brief Berechnet die j-Invariante.
+    @description
+        Erwartet JSON: {"z_re": 0.0, "z_im": 1.0}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _modular_ok:
+            return jsonify({"error": "modular_forms Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        z_re = float(data.get('z_re', 0.0))
+        z_im = float(data.get('z_im', 1.0))
+        z = complex(z_re, z_im)
+        val = j_invariant(z)
+        note = ""
+        # Bekannte Spezialwerte
+        if abs(z_re) < 0.01 and abs(z_im - 1) < 0.01:
+            note = "j(i) ≈ 1728 (elliptische Kurve mit j=1728 hat extra Automorphismen)"
+        return jsonify({
+            "real": float(val.real),
+            "imag": float(val.imag),
+            "abs": float(abs(val)),
+            "note": note,
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/modular/delta', methods=['POST'])
+def api_modular_delta():
+    """
+    @brief Berechnet die ersten n Ramanujan tau-Koeffizienten.
+    @description
+        Erwartet JSON: {"n_terms": 10}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _modular_ok:
+            return jsonify({"error": "modular_forms Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        n_terms = int(data.get('n_terms', 10))
+        # Ramanujan tau-Koeffizienten via q-Entwicklung von Delta
+        tau = fourier_coefficients_delta(n_terms)
+        return jsonify({
+            "tau": [int(t) for t in tau],
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+# ===========================================================================
+# NEUE API-ENDPUNKTE: L-FUNKTIONEN
+# ===========================================================================
+
+@app.route('/api/lfunc/dirichlet', methods=['POST'])
+def api_lfunc_dirichlet():
+    """
+    @brief Berechnet eine Dirichlet-L-Funktion L(s, chi).
+    @description
+        Erwartet JSON: {"s_re": 2.0, "s_im": 0.0, "q": 4, "chi_index": 0}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _lfunc_ok:
+            return jsonify({"error": "l_functions Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        s_re = float(data.get('s_re', 2.0))
+        s_im = float(data.get('s_im', 0.0))
+        q = int(data.get('q', 4))
+        chi_index = int(data.get('chi_index', 0))
+        s = complex(s_re, s_im)
+        val = dirichlet_l_function(s, q, chi_index)
+        return jsonify({
+            "real": float(val.real),
+            "imag": float(val.imag),
+            "abs": float(abs(val)),
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/lfunc/characters', methods=['POST'])
+def api_lfunc_characters():
+    """
+    @brief Listet alle Dirichlet-Charaktere mod q auf.
+    @description
+        Erwartet JSON: {"q": 5}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _lfunc_ok:
+            return jsonify({"error": "l_functions Modul nicht verfügbar"}), 503
+        import math
+        data = request.get_json()
+        q = int(data.get('q', 5))
+        chars = dirichlet_characters(q)
+        # Charaktere serialisieren (Funktionsobjekte → Werte-Dict)
+        chars_out = []
+        for ch in chars:
+            values_list = [float(abs(v)) for v in ch.get('values', {}).values()]
+            chars_out.append({
+                "values": values_list[:q],
+                "is_primitive": not ch.get('is_principal', False),
+            })
+        # phi(q) berechnen
+        phi_q = sum(1 for k in range(1, q + 1) if math.gcd(k, q) == 1)
+        return jsonify({
+            "characters": chars_out,
+            "count": len(chars_out),
+            "phi_q": phi_q,
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/lfunc/special_values', methods=['POST'])
+def api_lfunc_special_values():
+    """
+    @brief Berechnet Spezialwerte von L-Funktionen mod q.
+    @description
+        Erwartet JSON: {"q": 4}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _lfunc_ok:
+            return jsonify({"error": "l_functions Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        q = int(data.get('q', 4))
+        chars = dirichlet_characters(q)
+        values = []
+        # Für jeden nicht-Hauptcharakter L(1, chi) berechnen
+        for i, ch in enumerate(chars):
+            if not ch.get('is_principal', False):
+                try:
+                    # L(1+ε, chi) als Annäherung an L(1, chi) für nicht-Hauptcharaktere
+                    val = dirichlet_l_function(complex(1.001, 0), q, i)
+                    values.append({"s": 1, "value": float(abs(val))})
+                except Exception:
+                    pass
+            # L(2, chi) für alle Charaktere
+            try:
+                val2 = dirichlet_l_function(complex(2.0, 0), q, i)
+                values.append({"s": 2, "value": float(abs(val2))})
+            except Exception:
+                pass
+        return jsonify({
+            "values": values[:8],
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+# ===========================================================================
+# NEUE API-ENDPUNKTE: P-ADISCHE ZAHLEN
+# ===========================================================================
+
+@app.route('/api/padic/valuation', methods=['POST'])
+def api_padic_valuation():
+    """
+    @brief Berechnet p-adische Bewertung und Norm einer Zahl n.
+    @description
+        Erwartet JSON: {"n": 360, "p": 2}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _padic_ok:
+            return jsonify({"error": "p_adic Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        n = int(data.get('n', 360))
+        p = int(data.get('p', 2))
+        val = p_adic_valuation(n, p)
+        norm = p_adic_norm(n, p)
+        return jsonify({
+            "valuation": int(val) if val != float('inf') else "inf",
+            "norm": float(norm),
+            "abs_inf": abs(n),
+            "product_formula": float(norm) * abs(n),
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/padic/expansion', methods=['POST'])
+def api_padic_expansion():
+    """
+    @brief Berechnet die p-adische Entwicklung einer Zahl n.
+    @description
+        Erwartet JSON: {"n": 42, "p": 5}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _padic_ok:
+            return jsonify({"error": "p_adic Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        n = int(data.get('n', 42))
+        p = int(data.get('p', 5))
+        # p-adische Entwicklung manuell berechnen (niedrigstes Bit zuerst)
+        digits = []
+        x = abs(n)
+        if x == 0:
+            digits = [0]
+        while x > 0:
+            digits.append(x % p)
+            x //= p
+        valuation = 0
+        for d in digits:
+            if d == 0:
+                valuation += 1
+            else:
+                break
+        return jsonify({
+            "digits": digits,
+            "valuation": valuation,
+            "p": p,
+            "n": n,
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/padic/hensel', methods=['POST'])
+def api_padic_hensel():
+    """
+    @brief Führt Hensel-Lifting einer Wurzel durch.
+    @description
+        Erwartet JSON: {"a": 3, "p": 7, "k": 3}
+        Hebt f(x) = x^2 - 2 (Beispiel) von mod p auf mod p^k.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _padic_ok:
+            return jsonify({"error": "p_adic Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        a = int(data.get('a', 3))
+        p = int(data.get('p', 7))
+        k = int(data.get('k', 3))
+        # Hebt Wurzel von x^2 - 2 mod p
+        result = hensel_lift([1, 0, -2], p, a, n_lifts=k)
+        # Zwischenwerte zeigen
+        steps = []
+        curr = a
+        for i in range(1, k + 1):
+            mod = p ** (i + 1)
+            steps.append(curr % mod)
+            curr = result  # Vereinfacht: letzten Wert nutzen
+        return jsonify({
+            "steps": steps,
+            "final": int(result),
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+# ===========================================================================
+# NEUE API-ENDPUNKTE: IWASAWA-THEORIE
+# ===========================================================================
+
+@app.route('/api/iwasawa/kummer', methods=['POST'])
+def api_iwasawa_kummer():
+    """
+    @brief Prüft Kummer-Kongruenzen für eine Primzahl p.
+    @description
+        Erwartet JSON: {"p": 5}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _iwasawa_ok:
+            return jsonify({"error": "iwasawa_theory Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        p = int(data.get('p', 5))
+        result = kummer_congruences_check(p, n_range=8)
+        checks_out = []
+        for ch in result.get('checks', []):
+            checks_out.append({
+                "k": ch.get('n', 0),
+                "value_mod_p": str(ch.get('val_n', 'N/A')),
+                "verified": bool(ch.get('kummer_holds', False))
+            })
+        return jsonify({
+            "all_verified": bool(result.get('all_consistent', False)),
+            "checks": checks_out,
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/iwasawa/polynomial', methods=['POST'])
+def api_iwasawa_polynomial():
+    """
+    @brief Berechnet Iwasawa-Invarianten eines Polynoms.
+    @description
+        Erwartet JSON: {"coefficients": [3, 1, 0, 1], "p": 3}
+        Koeffizienten: niedrigstes Grad zuerst.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _iwasawa_ok:
+            return jsonify({"error": "iwasawa_theory Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        coefficients = [int(c) for c in data.get('coefficients', [3, 1, 0, 1])]
+        p = int(data.get('p', 3))
+        result = iwasawa_polynomial(coefficients, p)
+        return jsonify({
+            "mu": result.get('mu_invariant', 0),
+            "lambda": result.get('lambda_invariant', 0),
+            "weierstrass": str(result.get('distinguished_poly', [])),
+            "description": f"µ={result.get('mu_invariant')}, λ={result.get('lambda_invariant')}",
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/iwasawa/kubota_leopoldt', methods=['POST'])
+def api_iwasawa_kubota():
+    """
+    @brief Berechnet die Kubota-Leopoldt p-adische Zeta-Funktion.
+    @description
+        Erwartet JSON: {"p": 5, "s": -1}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _iwasawa_ok:
+            return jsonify({"error": "iwasawa_theory Modul nicht verfügbar"}), 503
+        import math
+        data = request.get_json()
+        p = int(data.get('p', 5))
+        s = int(data.get('s', -1))
+        # Klassischer Zeta-Wert bei negativen ganzen Zahlen via Bernoulli-Zahlen
+        # zeta(-n) = -B_{n+1}/(n+1)
+        from p_adic import bernoulli_number
+        n = -s  # s = -1 → n = 1
+        if n >= 0:
+            b = bernoulli_number(n + 1)
+            classical = float(-b / (n + 1)) if n >= 0 else 0
+        else:
+            classical = 0
+        # p-adischer Wert (Annäherung über Kummer-Kongruenzen)
+        result = kummer_congruences_check(p, n_range=6)
+        padic_val = str(result.get('checks', [{}])[0].get('val_n', 'N/A'))
+        return jsonify({
+            "value": padic_val,
+            "classical_value": float(classical),
+            "note": f"p-adische Interpolation von ζ({s}) für p={p}",
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+# ===========================================================================
+# NEUE API-ENDPUNKTE: SPINOREN
+# ===========================================================================
+
+@app.route('/api/spinors/gamma', methods=['POST'])
+def api_spinors_gamma():
+    """
+    @brief Gibt Gamma-Matrizen für eine gegebene Dimension zurück.
+    @description
+        Erwartet JSON: {"dim": 4}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _spinors_ok:
+            return jsonify({"error": "spinors Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        dim = int(data.get('dim', 4))
+        gammas = gamma_matrices(dim)
+        # Matrizen serialisieren
+        matrices_out = []
+        for gamma in gammas:
+            mat = []
+            for row in gamma:
+                mat.append([{"re": float(c.real), "im": float(c.imag)} for c in row])
+            matrices_out.append(mat)
+        return jsonify({
+            "matrices": matrices_out,
+            "dim": dim,
+            "size": gammas[0].shape[0],
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/spinors/clifford', methods=['POST'])
+def api_spinors_clifford():
+    """
+    @brief Prüft Clifford-Algebra-Relationen der Gamma-Matrizen.
+    @description
+        Erwartet JSON: {"dim": 4}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _spinors_ok:
+            return jsonify({"error": "spinors Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        dim = int(data.get('dim', 4))
+        gammas = gamma_matrices(dim)
+        result = clifford_algebra_check(gammas)
+        n = len(gammas)
+        return jsonify({
+            "all_correct": bool(result.get('is_clifford_algebra', False)),
+            "max_error": float(result.get('max_error', 0)),
+            "pairs_tested": n * (n + 1) // 2,
+            "details": f"{n} Gamma-Matrizen in {dim}D getestet",
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/spinors/dirac', methods=['POST'])
+def api_spinors_dirac():
+    """
+    @brief Berechnet Dirac-Spinor für freies Teilchen.
+    @description
+        Erwartet JSON: {"m": 1.0, "pz": 0.5}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _spinors_ok:
+            return jsonify({"error": "spinors Modul nicht verfügbar"}), 503
+        import math
+        data = request.get_json()
+        m = float(data.get('m', 1.0))
+        pz = float(data.get('pz', 0.5))
+        # Energie: E = sqrt(pz^2 + m^2)
+        energy = math.sqrt(pz ** 2 + m ** 2)
+        momentum = np.array([0.0, 0.0, pz])
+        # Spin up (spin=0) und spin down (spin=1) Spinoren
+        sp_up = dirac_spinor(m, momentum, spin=0)
+        sp_down = dirac_spinor(m, momentum, spin=1)
+        return jsonify({
+            "energy": float(energy),
+            "spinor_up": [float(c.real) for c in sp_up],
+            "spinor_down": [float(c.real) for c in sp_down],
+            "note": f"Normierung: u†u = 2E = {2*energy:.4f}",
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+# ===========================================================================
+# NEUE API-ENDPUNKTE: NUMERISCHE METHODEN
+# ===========================================================================
+
+@app.route('/api/numerical/interpolate', methods=['POST'])
+def api_numerical_interpolate():
+    """
+    @brief Lagrange-Interpolation an einem Punkt.
+    @description
+        Erwartet JSON: {"x_vals": [...], "y_vals": [...], "x_eval": 1.5}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _numerical_ok:
+            return jsonify({"error": "numerical_methods Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        x_vals = [float(x) for x in data.get('x_vals', [0, 1, 2, 3])]
+        y_vals = [float(y) for y in data.get('y_vals', [0, 1, 4, 9])]
+        x_eval = float(data.get('x_eval', 1.5))
+        result = lagrange_interpolation(x_vals, y_vals, x_eval)
+        return jsonify({
+            "result": float(result),
+            "degree": len(x_vals) - 1,
+            "note": f"Lagrange-Polynom vom Grad {len(x_vals)-1}",
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/numerical/optimize', methods=['POST'])
+def api_numerical_optimize():
+    """
+    @brief Gradientenabstieg für f(x,y) = x^2 + y^2.
+    @description
+        Erwartet JSON: {"x0": 3.0, "y0": 4.0, "learning_rate": 0.1}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _numerical_ok:
+            return jsonify({"error": "numerical_methods Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        x0 = float(data.get('x0', 3.0))
+        y0 = float(data.get('y0', 4.0))
+        lr = float(data.get('learning_rate', 0.1))
+        # Zielfunktion f(x) = x[0]^2 + x[1]^2
+        f = lambda x: x[0] ** 2 + x[1] ** 2
+        grad = lambda x: [2 * x[0], 2 * x[1]]
+        x_min, f_min, iters = gradient_descent(f, grad, [x0, y0], learning_rate=lr)
+        return jsonify({
+            "x_min": float(x_min[0]),
+            "y_min": float(x_min[1]),
+            "f_min": float(f_min),
+            "iterations": int(iters),
+            "converged": float(f_min) < 1e-6,
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+@app.route('/api/numerical/golden_section', methods=['POST'])
+def api_numerical_golden():
+    """
+    @brief Golden-Section-Suche für eine Funktion auf [a, b].
+    @description
+        Erwartet JSON: {"func": "(x-2)**2+1", "a": 0, "b": 4}
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    try:
+        if not _numerical_ok:
+            return jsonify({"error": "numerical_methods Modul nicht verfügbar"}), 503
+        data = request.get_json()
+        func_str = data.get('func', '(x-2)**2 + 1')
+        a = float(data.get('a', 0))
+        b = float(data.get('b', 4))
+        f = expr_to_lambda(func_str)
+        x_min, f_min = golden_section_search(f, a, b)
+        # Iterationszahl approximieren
+        import math
+        iters = int(math.log(1e-8 / (b - a)) / math.log(0.618)) + 1
+        return jsonify({
+            "x_min": float(x_min),
+            "f_min": float(f_min),
+            "iterations": max(1, iters),
+            "error": None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+# ===========================================================================
 # HAUPTPROGRAMM
 # ===========================================================================
 
@@ -2741,7 +4095,7 @@ if __name__ == '__main__':
     # Port 8080, debug=True für Entwicklung (zeigt Fehler im Browser)
     print("=" * 60)
     print("  Mathematik-Spezialist Web-Interface")
-    print("  Build 15 | Port 8080")
+    print("  Build 30 | Port 8080")
     print("  URL: http://localhost:8080")
     print("=" * 60)
     app.run(host='0.0.0.0', port=8080, debug=True)

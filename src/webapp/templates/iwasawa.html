@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Iwasawa-Theorie – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file iwasawa.html
+    @brief Template für die Iwasawa-Theorie-Seite.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+<div class="page-header">
+    <h1>Iwasawa-Theorie</h1>
+    <p class="page-desc">
+        Die Iwasawa-Theorie untersucht das Verhalten algebraischer Invarianten
+        (Klassengruppen, Selmer-Gruppen) in $\mathbb{Z}_p$-Türmen von Körpern
+        $\mathbb{Q}(\zeta_{p^n})$. Das Hauptresultat: Eine charakteristische Potenzreihe
+        $f(T) \in \mathbb{Z}_p[[T]]$ (Iwasawa-Polynom) beschreibt das asymptotische
+        Wachstum der Klassengruppen. Kummersche Kongruenzen verknüpfen Bernoulli-Zahlen
+        mit der $p$-adischen Zeta-Funktion.
+    </p>
+</div>
+
+<!-- === Berechnung 1: Kummer-Kongruenzen === -->
+<div class="card">
+    <h2>Kummer-Kongruenzen</h2>
+    <p>
+        Kummer-Kongruenzen: $\frac{B_{2k}}{2k} \equiv \frac{B_{2j}}{2j} \pmod{p}$
+        falls $2k \equiv 2j \pmod{(p-1)}$.
+        Sie sind die Grundlage für die $p$-adische L-Funktion (Kubota-Leopoldt).
+    </p>
+    <div class="input-row">
+        <label for="kummer-p">Primzahl $p$:</label>
+        <input type="number" id="kummer-p" class="input-field" value="5" min="2">
+    </div>
+    <button class="btn" onclick="calcKummer()">Kummer-Kongruenzen prüfen</button>
+    <div id="kummer-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 2: Iwasawa-Polynom === -->
+<div class="card">
+    <h2>Iwasawa-Polynom $f(T) \in \mathbb{Z}_p[T]$</h2>
+    <p>
+        Das Iwasawa-Polynom beschreibt die Struktur des Iwasawa-Moduls als
+        $\mathbb{Z}_p[[T]]$-Modul. Die $\mu$- und $\lambda$-Invarianten geben an,
+        wie schnell die Klassengruppen-Ordnungen $|A_n|$ wachsen.
+    </p>
+    <div class="input-row">
+        <label for="iw-coeffs">Koeffizienten $f(T)$ (kommagetrennt, niedrigstes Grad zuerst):</label>
+        <input type="text" id="iw-coeffs" class="input-field" value="3,1,0,1"
+               placeholder="z.B. 3,1,0,1 für 3+T+T³">
+    </div>
+    <div class="input-row">
+        <label for="iw-p">Primzahl $p$:</label>
+        <input type="number" id="iw-p" class="input-field" value="3" min="2">
+    </div>
+    <button class="btn" onclick="calcIwasawa()">Invarianten berechnen</button>
+    <div id="iw-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 3: p-adische Zeta-Funktion === -->
+<div class="card">
+    <h2>$p$-adische $L$-Funktion (Kubota-Leopoldt)</h2>
+    <p>
+        Die Kubota-Leopoldt $p$-adische Zeta-Funktion $\zeta_p(s)$ interpoliert
+        die speziellen Werte der klassischen Zeta-Funktion an negativen geraden Zahlen
+        $p$-adisch stetig.
+    </p>
+    <div class="input-row">
+        <label for="kl-p">Primzahl $p$:</label>
+        <input type="number" id="kl-p" class="input-field" value="5" min="2">
+    </div>
+    <div class="input-row">
+        <label for="kl-s">Auswertungspunkt $s$ (ganze Zahl $\leq 0$):</label>
+        <input type="number" id="kl-s" class="input-field" value="-1" max="0">
+    </div>
+    <button class="btn" onclick="calcKubotaLeopoldt()">$\zeta_p(s)$ berechnen</button>
+    <div id="kl-result" class="result-area"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /** Prüft Kummer-Kongruenzen für eine Primzahl. */
+    async function calcKummer() {
+        const p = parseInt(document.getElementById('kummer-p').value);
+        const res = document.getElementById('kummer-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/iwasawa/kummer', { p });
+            if (data.error) { showError(res, data.error); return; }
+            const checks = data.checks.map(c =>
+                `$k=${c.k}$: $B_{${c.k}}/${c.k} \\equiv$ <code>${c.value_mod_p}</code> $\\pmod{${p}}$ – ${c.verified ? 'OK' : 'FEHLER'}`
+            ).join('<br>');
+            showResult(res, `
+                <strong>Kummer-Kongruenzen $\\bmod ${p}$</strong><br>
+                Alle erfüllt: <code>${data.all_verified ? 'Ja' : 'Nein'}</code><br><br>
+                ${checks}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Berechnet Iwasawa-Invarianten eines Polynoms. */
+    async function calcIwasawa() {
+        const coeffsStr = document.getElementById('iw-coeffs').value;
+        const coefficients = coeffsStr.split(',').map(s => parseInt(s.trim()));
+        const p = parseInt(document.getElementById('iw-p').value);
+        const res = document.getElementById('iw-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/iwasawa/polynomial', { coefficients, p });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Iwasawa-Invarianten $\\bmod p = ${p}$</strong><br>
+                $\\mu$-Invariante: <code>${data.mu}</code><br>
+                $\\lambda$-Invariante: <code>${data.lambda}</code><br>
+                Weierstraß-Polynom: <code>${data.weierstrass}</code><br>
+                ${data.description ? data.description : ''}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Berechnet die Kubota-Leopoldt p-adische Zeta-Funktion. */
+    async function calcKubotaLeopoldt() {
+        const p = parseInt(document.getElementById('kl-p').value);
+        const s = parseInt(document.getElementById('kl-s').value);
+        const res = document.getElementById('kl-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/iwasawa/kubota_leopoldt', { p, s });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Kubota-Leopoldt: $\\zeta_{${p}}(${s})$</strong><br>
+                Wert: <code>${data.value}</code><br>
+                Klassischer Wert $\\zeta(${s})$: <code>${data.classical_value}</code><br>
+                ${data.note ? '<em>' + data.note + '</em>' : ''}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+</script>
+{% endblock %}

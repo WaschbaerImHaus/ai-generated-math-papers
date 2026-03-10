@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Moduln &amp; Kommutative Algebra – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file modules_algebra.html
+    @brief Template für Moduln und Kommutative Algebra.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+<div class="page-header">
+    <h1>Moduln &amp; Kommutative Algebra</h1>
+    <p class="page-desc">
+        Ein Modul ist eine Verallgemeinerung des Vektorraumkonzepts über einen Ring statt
+        über einen Körper. Der Struktursatz für endlich erzeugte Moduln über Hauptidealringen
+        (Smith-Normalform) klassifiziert endliche abelsche Gruppen.
+        Die kommutative Algebra untersucht kommutative Ringe, Primspektren und lokale Ringe.
+    </p>
+</div>
+
+<!-- === Berechnung 1: Smith-Normalform === -->
+<div class="card">
+    <h2>Smith-Normalform einer Matrix</h2>
+    <p>
+        Die Smith-Normalform einer ganzzahligen Matrix $A$ ist eine Diagonalmatrix
+        $\text{diag}(d_1, d_2, \ldots)$ mit $d_i \mid d_{i+1}$.
+        Sie klassifiziert den zugehörigen $\mathbb{Z}$-Modul.
+    </p>
+    <div class="input-row">
+        <label for="smith-matrix">Matrix (Zeilen semikolongetrennt, Elemente kommagetrennt):</label>
+        <input type="text" id="smith-matrix" class="input-field"
+               value="2,4,4;-6,6,12;10,-4,-16"
+               placeholder="z.B. 2,4;4,8">
+    </div>
+    <button class="btn" onclick="calcSmith()">Smith-Normalform berechnen</button>
+    <div id="smith-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 2: Klassifikation abelscher Gruppen === -->
+<div class="card">
+    <h2>Klassifikation endlicher abelscher Gruppen</h2>
+    <p>
+        Jede endliche abelsche Gruppe ist isomorph zu einem Produkt zyklischer Gruppen.
+        Gib die Invariantenfaktoren (Smith-Diagonale) als Liste ein.
+    </p>
+    <div class="input-row">
+        <label for="abelian-invariants">Invariantenfaktoren (kommagetrennt):</label>
+        <input type="text" id="abelian-invariants" class="input-field"
+               value="2,6,12"
+               placeholder="z.B. 2,6,12">
+    </div>
+    <button class="btn" onclick="calcAbelian()">Gruppe klassifizieren</button>
+    <div id="abelian-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 3: Primspektrum Spec(Z/nZ) === -->
+<div class="card">
+    <h2>Primspektrum $\text{Spec}(\mathbb{Z}/n\mathbb{Z})$</h2>
+    <p>
+        Das Primspektrum eines Rings besteht aus allen Primidealen.
+        Für $\mathbb{Z}/n\mathbb{Z}$ entsprechen diese den Primteilern von $n$.
+    </p>
+    <div class="input-row">
+        <label for="spec-n">Modulus $n$:</label>
+        <input type="number" id="spec-n" class="input-field" value="12" min="2" max="200">
+    </div>
+    <button class="btn" onclick="calcSpectrum()">Primspektrum berechnen</button>
+    <div id="spec-result" class="result-area"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /** Berechnet die Smith-Normalform einer ganzzahligen Matrix. */
+    async function calcSmith() {
+        const matStr = document.getElementById('smith-matrix').value;
+        const rows = matStr.split(';').map(row =>
+            row.split(',').map(s => parseInt(s.trim()))
+        );
+        const res = document.getElementById('smith-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/modules/smith', { matrix: rows });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Smith-Normalform</strong><br>
+                Invariantenfaktoren: <code>[${data.invariant_factors.join(', ')}]</code><br>
+                Rang: <code>${data.rank}</code><br>
+                ${data.description ? data.description : ''}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Klassifiziert eine endliche abelsche Gruppe. */
+    async function calcAbelian() {
+        const invStr = document.getElementById('abelian-invariants').value;
+        const invariants = invStr.split(',').map(s => parseInt(s.trim()));
+        const res = document.getElementById('abelian-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/modules/classify_abelian', { invariants });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>Klassifikation</strong><br>
+                Isomorph zu: <code>${data.isomorphism_type}</code><br>
+                Ordnung: <code>${data.order}</code><br>
+                ${data.description ? data.description : ''}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Berechnet das Primspektrum von Z/nZ. */
+    async function calcSpectrum() {
+        const n = parseInt(document.getElementById('spec-n').value);
+        const res = document.getElementById('spec-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/modules/spectrum', { n });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>$\\text{Spec}(\\mathbb{Z}/${n}\\mathbb{Z})$</strong><br>
+                Primideale: <code>[${data.prime_ideals.join(', ')}]</code><br>
+                Maximale Ideale: <code>[${data.maximal_ideals.join(', ')}]</code><br>
+                ${data.description ? data.description : ''}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Modulformen – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file modular_forms.html
+    @brief Template für die Modulformen-Seite.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+<div class="page-header">
+    <h1>Modulformen</h1>
+    <p class="page-desc">
+        Modulformen sind komplexe Funktionen auf der oberen Halbebene $\mathcal{H}$,
+        die unter der Modulgruppe $\text{SL}_2(\mathbb{Z})$ transformieren:
+        $f\!\left(\frac{az+b}{cz+d}\right) = (cz+d)^k f(z)$.
+        Eisenstein-Reihen $E_k$, die Diskriminantfunktion $\Delta = \sum \tau(n)q^n$
+        und die $j$-Invariante sind fundamentale Beispiele.
+        Der Shimura-Taniyama-Vermutung (bewiesen durch Wiles) verbindet sie mit
+        elliptischen Kurven.
+    </p>
+</div>
+
+<!-- === Berechnung 1: Eisenstein-Reihe === -->
+<div class="card">
+    <h2>Eisenstein-Reihe $E_k(z)$</h2>
+    <p>
+        $E_k(z) = 1 - \frac{2k}{B_k} \sum_{n=1}^\infty \sigma_{k-1}(n) q^n$,
+        $q = e^{2\pi i z}$, ist eine Modulform des Gewichts $k$ für gerades $k \geq 4$.
+    </p>
+    <div class="input-row">
+        <label for="eis-k">Gewicht $k$ (gerade, $\geq 4$):</label>
+        <input type="number" id="eis-k" class="input-field" value="4" min="4" max="12" step="2">
+    </div>
+    <div class="input-row">
+        <label for="eis-re">$\text{Re}(z)$:</label>
+        <input type="number" id="eis-re" class="input-field" value="0" step="0.1">
+    </div>
+    <div class="input-row">
+        <label for="eis-im">$\text{Im}(z)$ ($> 0$):</label>
+        <input type="number" id="eis-im" class="input-field" value="1.0" min="0.01" step="0.1">
+    </div>
+    <button class="btn" onclick="calcEisenstein()">$E_k(z)$ berechnen</button>
+    <div id="eis-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 2: j-Invariante === -->
+<div class="card">
+    <h2>$j$-Invariante</h2>
+    <p>
+        Die $j$-Invariante ist ein Isomorphieinvariant elliptischer Kurven:
+        $j(z) = 1728 \cdot \frac{E_4(z)^3}{E_4(z)^3 - E_6(z)^2}$.
+        Sie parametrisiert isomorphe Klassen elliptischer Kurven über $\mathbb{C}$.
+    </p>
+    <div class="input-row">
+        <label for="j-re">$\text{Re}(z)$:</label>
+        <input type="number" id="j-re" class="input-field" value="0" step="0.1">
+    </div>
+    <div class="input-row">
+        <label for="j-im">$\text{Im}(z)$ ($> 0$):</label>
+        <input type="number" id="j-im" class="input-field" value="1.0" min="0.01" step="0.1">
+    </div>
+    <button class="btn" onclick="calcJInvariant()">$j(z)$ berechnen</button>
+    <div id="j-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 3: Ramanujan Delta-Funktion === -->
+<div class="card">
+    <h2>Ramanujan-$\Delta$-Funktion (erste Koeffizienten)</h2>
+    <p>
+        $\Delta(z) = q \prod_{n=1}^\infty (1-q^n)^{24} = \sum_{n=1}^\infty \tau(n) q^n$
+        ist die einzige Spitzenform des Gewichts 12.
+        Ramanujan vermutete $|\tau(p)| \leq 2p^{11/2}$ (Deligne bewiesen 1974).
+    </p>
+    <div class="input-row">
+        <label for="delta-terms">Anzahl Koeffizienten:</label>
+        <input type="number" id="delta-terms" class="input-field" value="10" min="1" max="30">
+    </div>
+    <button class="btn" onclick="calcDelta()">$\tau(n)$ berechnen</button>
+    <div id="delta-result" class="result-area"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /** Berechnet den Wert der Eisenstein-Reihe E_k(z). */
+    async function calcEisenstein() {
+        const k = parseInt(document.getElementById('eis-k').value);
+        const z_re = parseFloat(document.getElementById('eis-re').value);
+        const z_im = parseFloat(document.getElementById('eis-im').value);
+        const res = document.getElementById('eis-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/modular/eisenstein', { k, z_re, z_im });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>$E_{${k}}(${z_re} + ${z_im}i)$</strong><br>
+                Realteil: <code>${data.real.toFixed(8)}</code><br>
+                Imaginärteil: <code>${data.imag.toFixed(8)}</code><br>
+                Betrag: <code>${data.abs.toFixed(8)}</code>
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Berechnet die j-Invariante. */
+    async function calcJInvariant() {
+        const z_re = parseFloat(document.getElementById('j-re').value);
+        const z_im = parseFloat(document.getElementById('j-im').value);
+        const res = document.getElementById('j-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/modular/j_invariant', { z_re, z_im });
+            if (data.error) { showError(res, data.error); return; }
+            showResult(res, `
+                <strong>$j(${z_re} + ${z_im}i)$</strong><br>
+                Realteil: <code>${data.real.toFixed(6)}</code><br>
+                Imaginärteil: <code>${data.imag.toFixed(6)}</code><br>
+                Betrag: <code>${data.abs.toFixed(6)}</code><br>
+                ${data.note ? '<em>' + data.note + '</em>' : ''}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /** Berechnet Ramanujan tau-Koeffizienten. */
+    async function calcDelta() {
+        const n_terms = parseInt(document.getElementById('delta-terms').value);
+        const res = document.getElementById('delta-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+        try {
+            const data = await apiPost('/api/modular/delta', { n_terms });
+            if (data.error) { showError(res, data.error); return; }
+            const tauStr = data.tau.map((v, i) =>
+                `$\\tau(${i+1}) = ${v}$`
+            ).join(', ');
+            showResult(res, `
+                <strong>Ramanujan-$\\tau$-Funktion (erste ${n_terms} Werte)</strong><br>
+                ${tauStr}
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+</script>
+{% endblock %}
