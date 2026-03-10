@@ -993,3 +993,618 @@ def newton_fractal(
     ax.set_ylabel('Im(z₀)')
 
     _save_or_show(fig, save_path)
+
+
+# ===========================================================================
+# ODE-TRAJEKTORIE ANIMATIONEN
+# ===========================================================================
+
+import matplotlib.animation as animation  # noqa: E402  – nach matplotlib.use('Agg')
+from scipy.integrate import solve_ivp     # noqa: E402
+import os                                  # noqa: E402
+
+
+def animate_ode_trajectory(
+    f: Callable,
+    y0: list,
+    t_span: tuple,
+    n_frames: int = 100,
+    output_path: str = None,
+    interval: int = 50,
+    title: str = "ODE-Trajektorie"
+) -> 'animation.FuncAnimation':
+    """
+    @brief Erstellt eine matplotlib-Animation einer ODE-Trajektorie.
+    @description
+        Löst eine gewöhnliche Differentialgleichung y' = f(t, y) und
+        animiert die Lösung Frame für Frame.
+
+        Wenn output_path angegeben:
+        - .gif  → Pillow-Writer (immer verfügbar)
+        - sonst → ffmpeg (falls nicht installiert: Warnung, kein Fehler)
+
+        Unterstützt Systeme beliebiger Dimension (len(y0) bestimmt die
+        Anzahl der dargestellten Komponenten).
+
+    @param f: Funktion f(t, y) → dy/dt (rechte Seite der ODE)
+    @param y0: Anfangswert-Vektor (Liste von Anfangswerten)
+    @param t_span: (t_start, t_end) Zeitintervall
+    @param n_frames: Anzahl Animationsframes (Standard: 100)
+    @param output_path: Optionaler Pfad zum Speichern (.gif empfohlen)
+    @param interval: Millisekunden zwischen Frames (Standard: 50)
+    @param title: Animationstitel
+    @return: FuncAnimation-Objekt
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # ODE lösen: t_eval liefert n_frames äquidistante Zeitpunkte
+    t_eval = np.linspace(t_span[0], t_span[1], n_frames)
+    sol = solve_ivp(f, t_span, y0, t_eval=t_eval, method='RK45', dense_output=True)
+
+    t_vals = sol.t
+    y_vals = sol.y  # Shape: (n_komponenten, n_frames)
+
+    n_comp = y_vals.shape[0]  # Anzahl Zustandsvariablen
+
+    # Figure und Achse erstellen
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.set_title(title, fontsize=14)
+    ax.set_xlabel('t')
+    ax.set_ylabel('y(t)')
+
+    # Achsengrenzen aus der vollständigen Lösung bestimmen
+    y_min_val = float(y_vals.min())
+    y_max_val = float(y_vals.max())
+    y_margin = max(0.1 * (y_max_val - y_min_val), 0.1)
+    ax.set_xlim(t_vals[0], t_vals[-1])
+    ax.set_ylim(y_min_val - y_margin, y_max_val + y_margin)
+
+    # Linienserie für jede Komponente anlegen
+    farben = ['b', 'r', 'g', 'c', 'm', 'y']
+    lines = []
+    for i in range(n_comp):
+        farbe = farben[i % len(farben)]
+        linie, = ax.plot([], [], farbe + '-', linewidth=1.5, label=f'y{i}(t)')
+        lines.append(linie)
+
+    # Senkrechte Linie als Zeitmarkierung
+    time_line = ax.axvline(x=t_vals[0], color='gray', linestyle='--', alpha=0.5)
+
+    if n_comp > 1:
+        ax.legend()
+
+    ax.grid(True, alpha=0.3)
+
+    def init():
+        """Initialisierung: leere Linien, Zeitmarkierung am Startpunkt."""
+        for linie in lines:
+            linie.set_data([], [])
+        time_line.set_xdata([t_vals[0]])
+        return lines + [time_line]
+
+    def update(frame):
+        """Aktualisierung pro Frame: Trajektorie bis zum aktuellen Zeitpunkt."""
+        idx = min(frame, len(t_vals) - 1)
+        for i, linie in enumerate(lines):
+            linie.set_data(t_vals[:idx + 1], y_vals[i, :idx + 1])
+        time_line.set_xdata([t_vals[idx]])
+        return lines + [time_line]
+
+    # FuncAnimation erstellen
+    anim = animation.FuncAnimation(
+        fig, update,
+        frames=n_frames,
+        init_func=init,
+        interval=interval,
+        blit=True
+    )
+
+    # Speichern falls Pfad angegeben
+    if output_path is not None:
+        if output_path.endswith('.gif'):
+            writer = animation.PillowWriter(fps=max(1, 1000 // interval))
+            anim.save(output_path, writer=writer)
+        else:
+            try:
+                anim.save(output_path, writer='ffmpeg')
+            except Exception as e:
+                import warnings
+                warnings.warn(f"ffmpeg nicht verfügbar oder Fehler: {e}. GIF-Export verwenden.")
+
+    plt.close(fig)
+    return anim
+
+
+def animate_phase_portrait(
+    f: Callable,
+    x_range: tuple,
+    y_range: tuple,
+    n_trajectories: int = 5,
+    output_path: str = None,
+    title: str = "Phasenporträt-Animation"
+) -> 'animation.FuncAnimation':
+    """
+    @brief Animiertes Phasenporträt: Zeigt wie Trajektorien sich über Zeit entwickeln.
+    @description
+        Für ein 2D-System dx/dt = f(t, [x, y])[0], dy/dt = f(t, [x, y])[1]
+        werden mehrere Trajektorien von verschiedenen Startpunkten aus
+        gleichzeitig animiert.
+
+        Hintergrund: statisches Quiver-Vektorfeld.
+        Vordergrund: animierte Trajektorien.
+
+        Startpunkte werden auf einem gleichmäßigen Gitter über den
+        inneren 70% des Phasenraums verteilt.
+
+    @param f: Funktion f(t, [x, y]) → [dx/dt, dy/dt]
+    @param x_range: (x_min, x_max) Bereich der x-Achse
+    @param y_range: (y_min, y_max) Bereich der y-Achse
+    @param n_trajectories: Anzahl der Starttrajektorien (gerundet auf nächste Quadratzahl)
+    @param output_path: Optionaler Speicherpfad (.gif)
+    @param title: Animationstitel
+    @return: FuncAnimation-Objekt
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    x_min, x_max = x_range
+    y_min, y_max = y_range
+
+    # Startpunkte: Gitter über innere 70% des Phasenraums
+    n_sqrt = max(2, int(n_trajectories ** 0.5))
+    xs = np.linspace(x_min * 0.7, x_max * 0.7, n_sqrt)
+    ys = np.linspace(y_min * 0.7, y_max * 0.7, n_sqrt)
+    start_points = [(x, y) for x in xs for y in ys][:n_trajectories]
+
+    # Alle Trajektorien vorberechnen
+    t_max_sim = 10.0
+    n_frames = 80
+    t_span = (0.0, t_max_sim)
+    t_eval = np.linspace(0.0, t_max_sim, n_frames)
+
+    trajs = []
+    for x0, y0 in start_points:
+        try:
+            sol = solve_ivp(f, t_span, [x0, y0], t_eval=t_eval,
+                            method='RK45', max_step=0.1)
+            # Nur Punkte innerhalb des Plotbereichs
+            mask = (
+                (sol.y[0] >= x_min) & (sol.y[0] <= x_max) &
+                (sol.y[1] >= y_min) & (sol.y[1] <= y_max)
+            )
+            if mask.any():
+                # Ersten zusammenhängenden gültigen Block behalten
+                end_idx = int(np.argmax(~mask)) if not mask.all() else len(mask)
+                trajs.append((sol.t[:end_idx], sol.y[0, :end_idx], sol.y[1, :end_idx]))
+            else:
+                trajs.append((sol.t[:1], sol.y[0, :1], sol.y[1, :1]))
+        except Exception:
+            trajs.append((np.array([0.0]), np.array([x0]), np.array([y0])))
+
+    # Figure erstellen
+    fig, ax = plt.subplots(figsize=(8, 7))
+    ax.set_xlim(x_min, x_max)
+    ax.set_ylim(y_min, y_max)
+    ax.set_title(title, fontsize=14)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.grid(True, alpha=0.3)
+
+    # Hintergrund: statisches Vektorfeld
+    n_grid = 15
+    xg = np.linspace(x_min, x_max, n_grid)
+    yg = np.linspace(y_min, y_max, n_grid)
+    XG, YG = np.meshgrid(xg, yg)
+    U_bg = np.zeros_like(XG)
+    V_bg = np.zeros_like(YG)
+    for i in range(n_grid):
+        for j in range(n_grid):
+            try:
+                res = f(0.0, [XG[i, j], YG[i, j]])
+                U_bg[i, j] = float(res[0])
+                V_bg[i, j] = float(res[1])
+            except Exception:
+                pass
+    mag = np.sqrt(U_bg**2 + V_bg**2)
+    with np.errstate(invalid='ignore', divide='ignore'):
+        U_n = np.where(mag > 0, U_bg / mag, 0.0)
+        V_n = np.where(mag > 0, V_bg / mag, 0.0)
+    ax.quiver(XG, YG, U_n, V_n, mag, cmap='Blues', alpha=0.4, scale=n_grid * 1.5)
+
+    # Dynamische Linien und Punkte für jede Trajektorie
+    farben = plt.cm.Set1(np.linspace(0, 1, max(len(trajs), 1)))
+    traj_lines = []
+    traj_dots = []
+    for i in range(len(trajs)):
+        linie, = ax.plot([], [], '-', color=farben[i], linewidth=1.5, alpha=0.8)
+        punkt, = ax.plot([], [], 'o', color=farben[i], markersize=6)
+        traj_lines.append(linie)
+        traj_dots.append(punkt)
+
+    def init_pp():
+        """Initialisierung: alle Linien und Punkte leer."""
+        for linie in traj_lines:
+            linie.set_data([], [])
+        for punkt in traj_dots:
+            punkt.set_data([], [])
+        return traj_lines + traj_dots
+
+    def update_pp(frame):
+        """Aktualisierung: Trajektorien bis zum aktuellen Frame."""
+        for i, (t_t, x_t, y_t) in enumerate(trajs):
+            idx = min(frame, len(x_t) - 1)
+            traj_lines[i].set_data(x_t[:idx + 1], y_t[:idx + 1])
+            traj_dots[i].set_data([x_t[idx]], [y_t[idx]])
+        return traj_lines + traj_dots
+
+    anim = animation.FuncAnimation(
+        fig, update_pp,
+        frames=n_frames,
+        init_func=init_pp,
+        interval=60,
+        blit=True
+    )
+
+    if output_path is not None:
+        if output_path.endswith('.gif'):
+            writer = animation.PillowWriter(fps=15)
+            anim.save(output_path, writer=writer)
+        else:
+            try:
+                anim.save(output_path, writer='ffmpeg')
+            except Exception as e:
+                import warnings
+                warnings.warn(f"ffmpeg nicht verfügbar: {e}")
+
+    plt.close(fig)
+    return anim
+
+
+def animate_wave_equation(
+    k: float = 1.0,
+    omega: float = 1.0,
+    x_range: tuple = (-5, 5),
+    t_max: float = 2 * math.pi,
+    n_frames: int = 60,
+    output_path: str = None
+) -> 'animation.FuncAnimation':
+    """
+    @brief Animation der Wellengleichung u(x,t) = sin(k·x - ω·t).
+    @description
+        Zeigt die Ausbreitung einer harmonischen ebenen Welle.
+
+        Die 1D-Wellengleichung (partielle DGL):
+            ∂²u/∂t² = c² · ∂²u/∂x²  mit  c = ω/k (Phasengeschwindigkeit)
+
+        Hat als Lösung u(x,t) = A · sin(k·x - ω·t + φ).
+
+        Physikalische Bedeutung der Parameter:
+            k = 2π/λ   (Wellenzahl, λ = Wellenlänge)
+            ω = 2π/T   (Kreisfrequenz, T = Periodendauer)
+            c = ω/k    (Phasengeschwindigkeit)
+
+    @param k: Wellenzahl (räumliche Frequenz, Standard: 1.0)
+    @param omega: Kreisfrequenz (zeitliche Frequenz, Standard: 1.0)
+    @param x_range: (x_min, x_max) Raumbereich
+    @param t_max: Animationsdauer in Zeiteinheiten (Standard: 2π)
+    @param n_frames: Anzahl der Frames (Standard: 60)
+    @param output_path: Optionaler Speicherpfad (.gif)
+    @return: FuncAnimation-Objekt
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    x_min, x_max = x_range
+    n_points = 500  # Räumliche Auflösung
+    x = np.linspace(x_min, x_max, n_points)
+
+    # Zeitpunkte für Animation
+    t_values = np.linspace(0.0, t_max, n_frames)
+
+    # Phasengeschwindigkeit c = ω/k
+    c_phase = omega / k if k != 0.0 else 1.0
+
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.set_xlim(x_min, x_max)
+    ax.set_ylim(-1.5, 1.5)  # Amplitude der Welle = 1
+    ax.set_title(
+        f'Wellengleichung: u(x,t) = sin({k:.1f}·x − {omega:.1f}·t)  '
+        f'[Phasengeschw. c = {c_phase:.2f}]',
+        fontsize=11
+    )
+    ax.set_xlabel('x (Ort)')
+    ax.set_ylabel('u(x, t) (Auslenkung)')
+    ax.axhline(0, color='k', linewidth=0.5)
+    ax.grid(True, alpha=0.3)
+
+    # Wellenlinie und Zeitanzeige
+    linie, = ax.plot([], [], 'b-', linewidth=2.0)
+    zeittext = ax.text(0.02, 0.90, '', transform=ax.transAxes, fontsize=11)
+
+    def init_wave():
+        """Initialisierung: leere Linie."""
+        linie.set_data([], [])
+        zeittext.set_text('')
+        return linie, zeittext
+
+    def update_wave(frame):
+        """Frame-Update: harmonische Welle zum Zeitpunkt t_values[frame]."""
+        t = t_values[frame]
+        # Harmonische Welle: u(x,t) = sin(k·x - ω·t)
+        u = np.sin(k * x - omega * t)
+        linie.set_data(x, u)
+        zeittext.set_text(f't = {t:.3f}')
+        return linie, zeittext
+
+    anim = animation.FuncAnimation(
+        fig, update_wave,
+        frames=n_frames,
+        init_func=init_wave,
+        interval=50,
+        blit=True
+    )
+
+    if output_path is not None:
+        if output_path.endswith('.gif'):
+            writer = animation.PillowWriter(fps=20)
+            anim.save(output_path, writer=writer)
+        else:
+            try:
+                anim.save(output_path, writer='ffmpeg')
+            except Exception as e:
+                import warnings
+                warnings.warn(f"ffmpeg nicht verfügbar: {e}")
+
+    plt.close(fig)
+    return anim
+
+
+# ===========================================================================
+# SVG/PDF-EXPORT
+# ===========================================================================
+
+def save_figure_svg(fig: plt.Figure, filepath: str, dpi: int = 300) -> str:
+    """
+    @brief Speichert eine matplotlib-Figure als SVG-Datei.
+    @description
+        SVG (Scalable Vector Graphics) ist ein verlustfreies Vektorformat,
+        das in jedem Maßstab gestochen scharf bleibt.
+
+        Eigenschaften:
+        - XML-basiertes Format (lesbar und bearbeitbar)
+        - Beliebig skalierbar ohne Qualitätsverlust
+        - Kann in Inkscape, Adobe Illustrator etc. nachbearbeitet werden
+        - Ideal für Webseiten und Präsentationen
+
+        Der Parameter dpi betrifft nur eingebettete Rasterelemente.
+
+    @param fig: matplotlib Figure-Objekt
+    @param filepath: Ausgabepfad (sollte auf .svg enden)
+    @param dpi: Auflösung für Rasterelemente innerhalb der SVG (Standard: 300)
+    @return: Absoluter Pfad der gespeicherten Datei
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # Absoluten Pfad auflösen
+    abs_path = os.path.abspath(filepath)
+    # Ausgabeverzeichnis anlegen falls nötig
+    dir_name = os.path.dirname(abs_path)
+    if dir_name:
+        os.makedirs(dir_name, exist_ok=True)
+    # SVG speichern (bbox_inches='tight' schneidet überschüssige Ränder ab)
+    fig.savefig(abs_path, format='svg', dpi=dpi, bbox_inches='tight')
+    return abs_path
+
+
+def save_figure_pdf(fig: plt.Figure, filepath: str) -> str:
+    """
+    @brief Speichert eine matplotlib-Figure als PDF-Datei.
+    @description
+        PDF ist das Standard-Format für wissenschaftliche Publikationen.
+
+        Eigenschaften:
+        - Matplotlib erzeugt echte Vektorgrafiken (keine Rasterisierung)
+        - Gestochen scharf in jeder Druckgröße
+        - Kann direkt in LaTeX eingebunden werden: \\includegraphics{...}
+        - Unterstützt eingebettete Schriften (keine Zeichensatzprobleme)
+
+    @param fig: matplotlib Figure-Objekt
+    @param filepath: Ausgabepfad (sollte auf .pdf enden)
+    @return: Absoluter Pfad der gespeicherten Datei
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    abs_path = os.path.abspath(filepath)
+    dir_name = os.path.dirname(abs_path)
+    if dir_name:
+        os.makedirs(dir_name, exist_ok=True)
+    # PDF speichern (format='pdf' für echte Vektorgrafik ohne Rasterisierung)
+    fig.savefig(abs_path, format='pdf', bbox_inches='tight')
+    return abs_path
+
+
+def plot_and_export(
+    func: Callable,
+    x_range: tuple,
+    filepath: str,
+    title: str = "",
+    format: str = "svg"
+) -> str:
+    """
+    @brief Kombiniert plot_function_2d() und Export in einem Schritt.
+    @description
+        Plottet eine Funktion und speichert sie direkt als SVG oder PDF,
+        ohne interaktive Anzeige.
+
+        Typische Verwendung:
+            import math
+            path = plot_and_export(
+                math.sin, (-3.14, 3.14),
+                '/tmp/sinus.svg', 'Sinusfunktion', 'svg'
+            )
+
+    @param func: Funktion f(x) → float (skalare Auswertung)
+    @param x_range: (x_min, x_max) Plotintervall
+    @param filepath: Ausgabepfad (Dateiendung wird durch format bestimmt)
+    @param title: Diagrammtitel
+    @param format: Exportformat: 'svg' oder 'pdf'
+    @return: Absoluter Pfad der gespeicherten Datei
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # x-Werte erzeugen, Funktion auswerten, ungültige Werte maskieren
+    x = np.linspace(x_range[0], x_range[1], 500)
+    y = np.array([func(xi) for xi in x], dtype=float)
+    mask = np.isfinite(y)
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(x[mask], y[mask], 'b-', linewidth=1.5)
+    ax.set_title(title or 'f(x)', fontsize=14)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.grid(True, alpha=0.3)
+    ax.axhline(0, color='k', linewidth=0.5)
+    ax.axvline(0, color='k', linewidth=0.5)
+
+    # Export je nach gewähltem Format
+    if format.lower() == 'pdf':
+        result = save_figure_pdf(fig, filepath)
+    else:
+        # Standardmäßig SVG
+        result = save_figure_svg(fig, filepath)
+
+    plt.close(fig)
+    return result
+
+
+def export_all_formats(fig: plt.Figure, base_path: str) -> dict:
+    """
+    @brief Exportiert eine Figure in alle Standard-Formate: PNG, SVG, PDF.
+    @description
+        Speichert dieselbe Figure in drei verschiedenen Formaten.
+
+        Verwendungsszenarien:
+        - PNG: Schnelle Vorschau, Web-Thumbnails, Rasterformat (150 dpi)
+        - SVG: Skalierbare Web-Grafiken, Vektorgrafik-Bearbeitung
+        - PDF: LaTeX-Integration, Druckvorbereitung, Publikationen
+
+        Dateinamen werden automatisch erzeugt:
+            base_path = '/pfad/figur'
+            → Dateien: /pfad/figur.png, /pfad/figur.svg, /pfad/figur.pdf
+
+    @param fig: matplotlib Figure-Objekt
+    @param base_path: Basispfad OHNE Dateiendung
+    @return: Dictionary mit Format als Schlüssel und absolutem Pfad als Wert:
+             {'png': '/pfad/figur.png', 'svg': '/pfad/figur.svg', 'pdf': '/pfad/figur.pdf'}
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    abs_base = os.path.abspath(base_path)
+    dir_name = os.path.dirname(abs_base)
+    if dir_name:
+        os.makedirs(dir_name, exist_ok=True)
+
+    # PNG (Rasterformat, 150 dpi für gute Bildqualität)
+    png_path = abs_base + '.png'
+    fig.savefig(png_path, format='png', dpi=150, bbox_inches='tight')
+
+    # SVG (Vektorformat)
+    svg_path = save_figure_svg(fig, abs_base + '.svg')
+
+    # PDF (Vektorformat für Publikationen)
+    pdf_path = save_figure_pdf(fig, abs_base + '.pdf')
+
+    return {
+        'png': png_path,
+        'svg': svg_path,
+        'pdf': pdf_path
+    }
+
+
+# ===========================================================================
+# MANDELBROT SMOOTH (vollständig NumPy-vektorisiert, Smooth Iteration Count)
+# ===========================================================================
+
+def mandelbrot_smooth(
+    x_min: float = -2.5,
+    x_max: float = 1.0,
+    y_min: float = -1.25,
+    y_max: float = 1.25,
+    width: int = 800,
+    height: int = 600,
+    max_iter: int = 100
+) -> np.ndarray:
+    """
+    @brief Mandelbrot-Menge mit Smooth Iteration Count für weiche Farbverläufe.
+    @description
+        Berechnet für jeden Pixel c = x + iy die kontinuierliche Escape-Zeit
+        der Mandelbrot-Iteration z_{n+1} = z_n² + c (z_0 = 0).
+
+        Standard-Coloring hat Treppeneffekte (ganzzahlige Iteration).
+        Smooth Coloring berechnet einen kontinuierlichen Wert:
+
+            n_smooth = n + 1 - log₂(log(|z_n|))
+
+        Herleitung (Linas Vepstas, 2004):
+            Wenn |z| > 2: tatsächliche Escape-Zeit ≈ n + 1 - log(log|z|)/log(2)
+            Dieser Wert interpoliert glatt zwischen ganzzahligen Iterationen.
+
+        Vollständig NumPy-vektorisiert: Keine Python-Schleifen über Pixel,
+        nur eine äußere Schleife über max_iter Iterationsschritte.
+        Durch Maskenoperationen werden nur aktive (noch nicht divergierte)
+        Pixel pro Schritt aktualisiert.
+
+    @param x_min: Realteil-Minimum der komplexen Ebene (Standard: -2.5)
+    @param x_max: Realteil-Maximum (Standard: 1.0)
+    @param y_min: Imaginärteil-Minimum (Standard: -1.25)
+    @param y_max: Imaginärteil-Maximum (Standard: 1.25)
+    @param width: Pixelbreite des Ergebnisarrays (Standard: 800)
+    @param height: Pixelhöhe des Ergebnisarrays (Standard: 600)
+    @param max_iter: Maximale Iterationszahl (Standard: 100)
+    @return: 2D float-Array (height × width) mit Smooth-Escape-Werten.
+             Punkte in M (beschränkt) haben Wert max_iter.
+             Außerhalb liegende Pixel haben Werte in [0, max_iter).
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # Komplexe Ebene diskretisieren: C[i,j] = (x_j) + i·(y_i)
+    x = np.linspace(x_min, x_max, width)
+    y = np.linspace(y_min, y_max, height)
+    C = x[np.newaxis, :] + 1j * y[:, np.newaxis]  # (height × width)
+
+    # Z: Iterationszustand, startet bei 0 für alle Pixel
+    Z = np.zeros_like(C, dtype=complex)
+
+    # smooth_count: Ergebnis-Array, initialisiert mit max_iter (= "in M")
+    smooth_count = np.full(C.shape, float(max_iter), dtype=float)
+
+    # not_diverged: Maske der noch aktiven Pixel (True = noch nicht divergiert)
+    not_diverged = np.ones(C.shape, dtype=bool)
+
+    for i in range(max_iter):
+        # Iteration: z → z² + c (nur für noch aktive Pixel)
+        Z[not_diverged] = Z[not_diverged] ** 2 + C[not_diverged]
+
+        # Divergenzcheck: |z| > 2 (Escape-Radius = 2)
+        newly_diverged = not_diverged & (np.abs(Z) > 2.0)
+
+        if newly_diverged.any():
+            # Smooth Iteration Count für neu divergierte Pixel
+            abs_z = np.abs(Z[newly_diverged])
+            # Numerisch sicher: abs_z > 2 garantiert, also log(abs_z) > log(2) > 0
+            with np.errstate(divide='ignore', invalid='ignore'):
+                log_abs = np.log(np.maximum(abs_z, 1e-10))
+                log_log_abs = np.log(np.maximum(log_abs, 1e-10))
+            # n_smooth = (i+1) - log₂(log(|z|)) = (i+1) - log(log(|z|))/log(2)
+            smooth_count[newly_diverged] = (i + 1) - log_log_abs / math.log(2)
+            # Werte in [0, max_iter] clippen (numerische Ausreißer abfangen)
+            smooth_count[newly_diverged] = np.clip(
+                smooth_count[newly_diverged], 0.0, float(max_iter)
+            )
+
+        # Divergierte Pixel aus aktiver Menge entfernen
+        not_diverged[newly_diverged] = False
+
+        # Frühzeitig abbrechen wenn alle Pixel divergiert sind
+        if not not_diverged.any():
+            break
+
+    return smooth_count

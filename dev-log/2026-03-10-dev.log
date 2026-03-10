@@ -44,3 +44,71 @@
   - @lastModified auf 2026-03-10 aktualisiert
 
 - **src/build.txt**: 10 → 11
+
+---
+
+## 2026-03-10 15:50 - Build 11 (Erweiterung): Hecke-Algebra, L-Funktionen, p-adische L-Funktionen
+
+### Neue Funktionen in src/modular_forms.py
+- **_is_prime_simple(n)**: Interner Primzahltest (Hilfsfunktion)
+- **_primes_up_to(n)**: Sieb des Eratosthenes (Hilfsfunktion)
+- **hecke_algebra_structure(k, level)**: Hecke-Algebra-Struktur (Kommutativität, Multiplikativität, Ramanujan-Tau-Eigenwerte)
+- **hecke_eigenform(coefficients, primes)**: Prüft ob Modulform eine Hecke-Eigenform ist (T_p f = λ_p f)
+- **petersson_inner_product_estimate(f, g, k)**: Rankin-Selberg-Schätzung des Petersson-Skalarprodukts
+- **elliptic_curve_points_over_fp(a, b, p)**: Alle affinen Punkte E(F_p) via Brute-Force (Euler-Kriterium, Quadratwurzeln mod p)
+- **trace_of_frobenius(a, b, p)**: Frobenius-Spur a_p = p+1-#E(F_p), Hasse-Schranke |a_p| ≤ 2√p
+- **l_function_elliptic_curve(a, b, s, terms)**: L-Funktion L(E,s) als Dirichlet-Reihe mit Multiplikativität
+- **birch_swinnerton_dyer_bsd_estimate(a, b, primes)**: Empirische BSD-Schätzung Π(N_p/p) ~ C*(log X)^r
+- **l_function_modular_form(coefficients, s, k)**: L(f,s) = Σ a_n/n^s (Dirichlet-Reihe)
+- **functional_equation_l_function(coefficients, k, N, s)**: Vollständige L-Funktion Λ(f,s) und Funktionalgleichung
+
+### Neue Funktionen in src/p_adic.py
+- **bernoulli_number(n)**: Bernoulli-Zahlen via Rekurrenz C(n+1,k) (B_0=1, B_1=-1/2, ...)
+- **generalized_bernoulli_numbers(chi_conductor, n_max)**: B_{n,chi} via Bernoulli-Polynome
+- **kubota_leopoldt_l_function(chi_conductor, s_padic, p, terms)**: p-adische L-Funktion L_p(s,chi) via Interpolationsformel
+- **p_adic_zeta_function(p, s, terms)**: ζ_p(s) = -(1-p^{n-1})·B_n/n (Kummer-Interpolation)
+- **kummer_congruence_check(p, n_values)**: Prüft Kummer-Kongruenzen als Grundlage der p-adischen L-Funktionen
+- **iwasawa_mu_lambda_invariants(p, chi_conductor, n_check)**: Schätzung der Iwasawa μ/λ-Invarianten
+
+### Neue Testdatei
+- **tests/test_l_functions.py**: 60+ Tests in 11 Testklassen
+  - TestEllipticCurvePointsOverFp (7 Tests)
+  - TestTraceOfFrobenius (5 Tests)
+  - TestLFunctionModularForm (4 Tests)
+  - TestLFunctionEllipticCurve (3 Tests)
+  - TestBirchSwinnertonDyerEstimate (6 Tests)
+  - TestHeckeAlgebraStructure (5 Tests)
+  - TestHeckeEigenform (4 Tests)
+  - TestPeterssonInnerProduct (3 Tests)
+  - TestFunctionalEquationLFunction (4 Tests)
+  - TestBernoulliNumber (10 Tests)
+  - TestGeneralizedBernoulliNumbers (6 Tests)
+  - TestKubotaLeopoldt (5 Tests)
+  - TestPAdicZetaFunction (6 Tests)
+  - TestKummerCongruenceCheck (5 Tests)
+  - TestIwasawaMuLambdaInvariants (6 Tests)
+  - TestIntegration (3 Tests)
+
+---
+
+## 2026-03-10 (Build 12) - Animationen, SVG/PDF-Export, mpmath-Erweiterungen
+
+### Neue Funktionen in src/visualization.py
+- **animate_ode_trajectory()**: FuncAnimation für ODE-Trajektorien via scipy.integrate.solve_ivp
+- **animate_phase_portrait()**: Animiertes Phasenporträt (mehrere Trajektorien, Quiver-Hintergrund)
+- **animate_wave_equation()**: Animation u(x,t) = sin(k*x - omega*t)
+- **save_figure_svg()**: Figure als SVG, gibt absoluten Pfad zurück
+- **save_figure_pdf()**: Figure als PDF (echte Vektorgrafik)
+- **plot_and_export()**: Kombinierter Plot-und-Export
+- **export_all_formats()**: Export in PNG, SVG, PDF gleichzeitig
+- **mandelbrot_smooth()**: Smooth Iteration Count, vollständig NumPy-vektorisiert
+
+### Neue Funktionen in src/complex_analysis.py (mpmath)
+- riemann_zeta_mpmath(), gamma_mpmath(), riemann_siegel_z_mpmath()
+- find_zeta_zeros_mpmath(), verify_riemann_hypothesis_range_mpmath(), li_function_mpmath()
+
+### Neue Testdateien
+- tests/test_visualization_extended.py: 23 Tests
+- tests/test_mpmath.py: 30 Tests
+
+### build.txt: 11 -> 12

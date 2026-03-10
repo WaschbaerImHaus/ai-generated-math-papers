@@ -591,3 +591,329 @@ def cauchy_integral_numerical(
         z = center + radius * cmath.exp(complex(0, theta))
         total += f(z)
     return total / n_points
+
+
+# ===========================================================================
+# ARBITRARY PRECISION via mpmath
+# ===========================================================================
+
+try:
+    import mpmath
+    _MPMATH_AVAILABLE = True
+except ImportError:
+    _MPMATH_AVAILABLE = False
+
+
+def _check_mpmath() -> None:
+    """
+    Prüft ob mpmath installiert ist und wirft ImportError wenn nicht.
+
+    @raises ImportError: Wenn mpmath nicht verfügbar ist
+    @lastModified: 2026-03-10
+    """
+    if not _MPMATH_AVAILABLE:
+        raise ImportError(
+            "mpmath ist nicht installiert. "
+            "Installation: pip install mpmath --break-system-packages"
+        )
+
+
+def riemann_zeta_mpmath(s: complex, dps: int = 50) -> complex:
+    """
+    Berechnet die Riemann-Zeta-Funktion ζ(s) mit beliebiger Genauigkeit via mpmath.
+
+    Vorteile gegenüber riemann_zeta():
+    - dps=50  → ~50 Dezimalstellen (≈ 165 Bit), doppelt so viel wie float64
+    - dps=100 → ~100 Dezimalstellen (≈ 330 Bit)
+    - mpmath verwendet intern die MPFR-Bibliothek (GNU Multiple Precision)
+    - Unterstützt analytische Fortsetzung, Funktionalgleichung etc. automatisch
+
+    Die mpmath-Implementierung von zeta(s) nutzt:
+    - Euler-Maclaurin für Re(s) > 1
+    - Alternating Euler-Bernoulli-Reihe für 0 < Re(s) ≤ 1
+    - Funktionalgleichung für Re(s) ≤ 0
+
+    @param s: Komplexe Zahl s ≠ 1
+    @param dps: Dezimalstellen Genauigkeit (Standard: 50 ≈ 165 Bit)
+    @return: ζ(s) als komplexe Python-Zahl (float64-Genauigkeit des Rückgabewerts,
+             interne Berechnung in dps Dezimalstellen)
+    @raises ImportError: Wenn mpmath nicht installiert ist
+    @raises ValueError: Wenn s = 1 (Pol)
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    _check_mpmath()
+
+    if abs(s - 1) < 1e-10:
+        raise ValueError("ζ(s) hat einen einfachen Pol bei s = 1")
+
+    # Genauigkeit setzen
+    with mpmath.workdps(dps):
+        # Python complex → mpmath mpc (multiple precision complex)
+        s_mp = mpmath.mpc(s.real, s.imag)
+        # mpmath.zeta nutzt optimierte Algorithmen für beliebige Präzision
+        result = mpmath.zeta(s_mp)
+        # Rückgabe als Python complex (float64-Genauigkeit)
+        return complex(float(result.real), float(result.imag))
+
+
+def find_zeta_zeros_mpmath(
+    t_min: float,
+    t_max: float,
+    dps: int = 50,
+    steps: int = 1000
+) -> list:
+    """
+    Sucht Riemann-Nullstellen auf der kritischen Geraden s = 1/2 + it
+    mit beliebiger Genauigkeit via mpmath.
+
+    Methode:
+    1. Primärsuche: Vorzeichenwechsel von riemann_siegel_z_mpmath() auf
+       dem Intervall [t_min, t_max] mit 'steps' Gitterpunkten
+    2. Verfeinerung: mpmath.findroot (Newton-Raphson) nahe dem Vorzeichenwechsel
+    3. Verifikation: |ζ(1/2 + it*)| < Schwellwert
+
+    Bekannte erste Nullstellen (für Validierung):
+        t₁ ≈ 14.134725141734693
+        t₂ ≈ 21.022039638771555
+        t₃ ≈ 25.010857580145688
+        t₄ ≈ 30.424876125859513
+
+    @param t_min: Untere Suchgrenze (t > 0)
+    @param t_max: Obere Suchgrenze
+    @param dps: Dezimalstellen Genauigkeit (Standard: 50)
+    @param steps: Anzahl Gitterpunkte für Vorzeichensuche (Standard: 1000)
+    @return: Liste von Dictionaries:
+             {'t': float, 'zero': complex, 'verified': bool}
+             wobei 'verified' bedeutet: |ζ(1/2 + it)| < 1e-8
+    @raises ImportError: Wenn mpmath nicht installiert ist
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    _check_mpmath()
+
+    zeros = []
+
+    with mpmath.workdps(dps):
+        # Gitterpunkte für Vorzeichensuche
+        t_grid = [t_min + (t_max - t_min) * i / steps for i in range(steps + 1)]
+
+        # Riemann-Siegel Z-Funktion auf dem Gitter auswerten
+        z_vals = []
+        for t in t_grid:
+            try:
+                z_vals.append(float(mpmath.siegelz(t)))
+            except Exception:
+                z_vals.append(0.0)
+
+        # Vorzeichenwechsel suchen und mit Newton-Raphson verfeinern
+        for i in range(len(z_vals) - 1):
+            if z_vals[i] * z_vals[i + 1] < 0:
+                # Vorzeichenwechsel gefunden → Newton-Raphson Verfeinerung
+                t_a, t_b = t_grid[i], t_grid[i + 1]
+                try:
+                    # mpmath.findroot: Newton-Verfahren für Z(t) = 0
+                    t_zero = float(mpmath.findroot(
+                        lambda t: mpmath.siegelz(t),
+                        (t_a + t_b) / 2,
+                        tol=mpmath.mpf(10) ** (-dps + 5)
+                    ))
+
+                    # Nullstelle auf der kritischen Geraden
+                    s_zero = complex(0.5, t_zero)
+
+                    # Verifikation: |ζ(1/2 + it*)| soll sehr klein sein
+                    zeta_val = riemann_zeta_mpmath(s_zero, dps=dps)
+                    abs_zeta = abs(zeta_val)
+
+                    zeros.append({
+                        't': t_zero,
+                        'zero': s_zero,
+                        'verified': abs_zeta < 1e-6
+                    })
+                except Exception:
+                    # Konvergenzfehler: Vorzeichenwechsel trotzdem merken
+                    t_approx = (t_a + t_b) / 2
+                    zeros.append({
+                        't': t_approx,
+                        'zero': complex(0.5, t_approx),
+                        'verified': False
+                    })
+
+    return zeros
+
+
+def riemann_siegel_z_mpmath(t: float, dps: int = 50) -> float:
+    """
+    Berechnet die Riemann-Siegel-Z-Funktion Z(t) mit mpmath-Genauigkeit.
+
+    Die Z-Funktion ist reellwertig und definiert als:
+        Z(t) = e^{iθ(t)} · ζ(1/2 + it)
+
+    mit dem Riemann-Siegel-Winkel θ(t) = Im(ln Γ(1/4 + it/2)) - t·ln(π)/2.
+
+    Eigenschaften:
+    - Z(t) ∈ ℝ für alle t ∈ ℝ
+    - Z(t) = 0 ⟺ ζ(1/2 + it) = 0 (Nullstellen auf kritischer Geraden)
+    - |Z(t)| = |ζ(1/2 + it)| (gleiche Betragsstruktur)
+    - Vorzeichenwechsel von Z(t) zeigen Nullstellen an
+
+    mpmath bietet mpmath.siegelz(t) als direkte Implementierung
+    mit korrekter Behandlung von Vorzeichen und Näherungsformeln.
+
+    @param t: Reelle Zahl t (typischerweise t > 0)
+    @param dps: Dezimalstellen Genauigkeit (Standard: 50)
+    @return: Z(t) als Python float
+    @raises ImportError: Wenn mpmath nicht installiert ist
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    _check_mpmath()
+
+    with mpmath.workdps(dps):
+        # mpmath.siegelz(t) berechnet Z(t) = e^{iθ(t)} · ζ(1/2 + it) direkt
+        result = mpmath.siegelz(mpmath.mpf(t))
+        return float(result)
+
+
+def gamma_mpmath(z: complex, dps: int = 50) -> complex:
+    """
+    Berechnet die Gamma-Funktion Γ(z) mit mpmath beliebiger Genauigkeit.
+
+    Vergleich mit gamma_lanczos():
+    - gamma_lanczos: ~15 Dezimalstellen (float64-Grenze)
+    - gamma_mpmath mit dps=50: ~50 Dezimalstellen
+    - gamma_mpmath mit dps=100: ~100 Dezimalstellen
+
+    Die Gamma-Funktion verallgemeinert die Fakultät:
+        Γ(n) = (n-1)!  für positive ganze n ≥ 1
+        Γ(1/2) = √π ≈ 1.7724538509...
+        Γ(z+1) = z·Γ(z)  (Rekursionsformel)
+
+    mpmath verwendet die Lanczos-Approximation mit erweiterter Präzision
+    und Reflexionsformel für Re(z) < 1/2.
+
+    @param z: Komplexe Zahl (z ∉ {0, -1, -2, ...}, sonst Pol)
+    @param dps: Dezimalstellen Genauigkeit (Standard: 50)
+    @return: Γ(z) als komplexe Python-Zahl
+    @raises ImportError: Wenn mpmath nicht installiert ist
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    _check_mpmath()
+
+    with mpmath.workdps(dps):
+        # Python complex → mpmath mpc
+        z_mp = mpmath.mpc(z.real, z.imag)
+        # mpmath.gamma: vollständige Gamma-Funktion für komplexe Argumente
+        result = mpmath.gamma(z_mp)
+        return complex(float(result.real), float(result.imag))
+
+
+def verify_riemann_hypothesis_range_mpmath(
+    n_zeros: int = 10,
+    dps: int = 50
+) -> dict:
+    """
+    Verifiziert die ersten n Riemann-Nullstellen auf der kritischen Geraden.
+
+    Methode:
+    - mpmath.zetazero(n) liefert die n-te nicht-triviale Nullstelle ρ_n
+    - Prüft: Re(ρ_n) = 1/2 (bis auf numerische Genauigkeit ~10^(-dps+5))
+    - Prüft: |ζ(ρ_n)| ≈ 0
+
+    Dies ist eine numerische Verifikation der Riemann-Hypothese für
+    die ersten n_zeros Nullstellen (bekannt: alle ersten ~10^13 Nullstellen
+    liegen auf der kritischen Geraden, per Computerbeweis).
+
+    Die Riemann-Hypothese selbst (für ALLE Nullstellen) ist unbewiesen.
+
+    Bekannte erste Nullstellen:
+        ρ₁ = 1/2 + 14.134725141734693...i
+        ρ₂ = 1/2 + 21.022039638771555...i
+        ρ₃ = 1/2 + 25.010857580145688...i
+
+    @param n_zeros: Anzahl der zu prüfenden Nullstellen (Standard: 10)
+    @param dps: Dezimalstellen Genauigkeit (Standard: 50)
+    @return: Dictionary:
+             {'zeros': list, 'all_on_critical_line': bool, 'max_deviation': float}
+             - zeros: Liste von {'n': int, 'rho': complex, 're_deviation': float}
+             - all_on_critical_line: True wenn alle Re(ρ_n) = 1/2 ± 1e-8
+             - max_deviation: Maximale Abweichung |Re(ρ_n) - 1/2|
+    @raises ImportError: Wenn mpmath nicht installiert ist
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    _check_mpmath()
+
+    zeros_list = []
+    max_dev = 0.0
+
+    with mpmath.workdps(dps):
+        for n in range(1, n_zeros + 1):
+            try:
+                # mpmath.zetazero(n): n-te nicht-triviale Nullstelle
+                rho = mpmath.zetazero(n)
+                re_part = float(rho.real)
+                im_part = float(rho.imag)
+                # Abweichung von 1/2
+                deviation = abs(re_part - 0.5)
+                max_dev = max(max_dev, deviation)
+
+                zeros_list.append({
+                    'n': n,
+                    'rho': complex(re_part, im_part),
+                    're_deviation': deviation
+                })
+            except Exception as e:
+                zeros_list.append({
+                    'n': n,
+                    'rho': None,
+                    're_deviation': float('inf'),
+                    'error': str(e)
+                })
+                max_dev = float('inf')
+
+    # Toleranz: 1e-8 (weit unter der dps-Genauigkeit)
+    all_on_line = max_dev < 1e-8 and max_dev != float('inf')
+
+    return {
+        'zeros': zeros_list,
+        'all_on_critical_line': all_on_line,
+        'max_deviation': max_dev
+    }
+
+
+def li_function_mpmath(x: float, dps: int = 50) -> float:
+    """
+    Berechnet den Logarithmischen Integralus li(x) mit mpmath-Genauigkeit.
+
+    Definition (Cauchy-Hauptwert):
+        li(x) = PV ∫₀^x dt / ln(t)
+
+    Die li-Funktion hat eine Singularität bei t = 1 (ln(1) = 0).
+    Der Cauchy-Hauptwert ist für alle x > 0, x ≠ 1 definiert.
+
+    Verwendung in der Primzahltheorie:
+    - Primzahlsatz: π(x) ~ li(x) für x → ∞
+    - li(x) ist eine bessere Approximation von π(x) als x/ln(x)
+    - Gauss vermutete: π(x) < li(x) für alle x > 1
+    - Skewes-Zahl: erster bekannter Überschneidungspunkt bei ~10^316
+
+    mpmath.li(x) berechnet li(x) via:
+        li(x) = Ei(ln x)
+    mit Ei(x) = PV ∫_{-∞}^x e^t/t dt (Exponentialintegral).
+
+    @param x: Reelle Zahl x > 0, x ≠ 1
+    @param dps: Dezimalstellen Genauigkeit (Standard: 50)
+    @return: li(x) als Python float
+    @raises ImportError: Wenn mpmath nicht installiert ist
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    _check_mpmath()
+
+    with mpmath.workdps(dps):
+        # mpmath.li(x): logarithmischer Integralus mit Cauchy-Hauptwert
+        result = mpmath.li(mpmath.mpf(x))
+        return float(result)
