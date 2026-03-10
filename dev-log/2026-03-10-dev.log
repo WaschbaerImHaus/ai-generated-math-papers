@@ -428,3 +428,30 @@
   - webapp/app.py: 5 neue Routen (/proofs, /api/proof/gauss_sum, sqrt2, primes_infinite, rh_evidence, induction_check)
   - webapp/templates/proofs.html: Interaktives Beweise-Interface mit Induktions-Tester
   - webapp/templates/base.html: Navigations-Link "⊢ Beweise" eingefügt
+
+2026-03-10 18:39:13 - Build 16: Elliptische Kurven Modul implementiert
+
+## Neue Dateien
+- src/elliptic_curves.py: Vollständige elliptische Kurven Arithmetik
+- src/elliptic_curves.md: Dokumentation mit KaTeX-Formeln
+- tests/test_elliptic_curves.py: ~80 Tests (TDD)
+
+## Implementierte Klassen und Funktionen
+- ECPoint: Punkt auf elliptischer Kurve, Chord-and-Tangent, Double-and-Add
+- EllipticCurve: Weierstraß-Normalform über R, j-Invariante, Diskriminante, E(F_p)
+- EllipticCurveModP: Kurve über endlichem Körper F_p, BSGS, Generator-Test
+- ECCKeyExchange: ECDH-Schlüsselaustausch mit Demo
+- lenstra_ecm_factorization: Lenstra's ECM via projektive Koordinaten
+- nagell_lutz_theorem: Ganzzahlige Torsionspunkte
+- mordell_weil_rank_estimate: Schaetzung des Mordell-Weil-Rangs
+- l_function_rank_order: BSD L-Funktions Nullstellenordnung
+- is_supersingular / endomorphism_ring_type: Supersingularität
+- secp256k1(), curve25519(): Bekannte kryptographische Kurven
+- example_bsd_curve(), congruent_number_curve(n): Zahlentheoretische Beispiele
+
+## Theoretische Inhalte
+- Vollständige Chord-and-Tangent Additionsformeln
+- Hasse-Schranke, Frobenius-Spur
+- BSD-Vermutung (Mordell-Weil-Rang = L-Funktions-Nullstellenordnung)
+- Shimura-Taniyama-Wiles / Fermats Letzter Satz
+- Kongruente Zahlen / Tunnell-Theorem

@@ -135,6 +135,32 @@
 - [x] Binomialkoeffizient, Stirling-Zahlen (2. Art), Bell-Zahlen
 - [x] Catalan-Zahlen, Derangements, Ganzzahlpartitionen, Multinomialkoeffizient
 
+### Elliptische Kurven (src/elliptic_curves.py) - Build 16
+- [x] ECPoint: Punkt auf elliptischer Kurve (Weierstraß-Normalform)
+- [x] ECPoint.infinity(): Punkt im Unendlichen (Neutralelement)
+- [x] Chord-and-Tangent-Additionsgesetz (alle 5 Fälle)
+- [x] Double-and-Add Skalarmultiplikation O(log n)
+- [x] EllipticCurve: y² = x³ + ax + b über ℝ
+- [x] Diskriminante Δ = -16(4a³ + 27b²)
+- [x] j-Invariante: j = -1728·(4a)³/Δ
+- [x] Punktberechnung über E(F_p): Brute-Force + Tonelli-Shanks
+- [x] Gruppenordnung über F_p, Frobenius-Spur a_p
+- [x] Hasse-Schranke: |#E(F_p) - (p+1)| ≤ 2√p
+- [x] EllipticCurveModP: Arithmetik über endlichem Körper F_p
+- [x] Baby-Step Giant-Step für diskreten Logarithmus O(√n)
+- [x] Generator-Test für E(F_p)
+- [x] ECCKeyExchange: ECDH-Schlüsselaustausch Protokoll
+- [x] lenstra_ecm_factorization: ECM via projektive Koordinaten
+- [x] nagell_lutz_theorem: Ganzzahlige Torsionspunkte
+- [x] mordell_weil_rank_estimate: Schaetzung des Mordell-Weil-Rangs
+- [x] l_function_rank_order: BSD L-Funktions Nullstellenordnung
+- [x] is_supersingular / endomorphism_ring_type
+- [x] secp256k1(): Bitcoin-Kurve
+- [x] curve25519(): Bernstein-Kurve (Signal, WireGuard, TLS 1.3)
+- [x] example_bsd_curve(): y² = x³ - x (Rang 0)
+- [x] congruent_number_curve(n): Verbindung Geometrie-Zahlentheorie
+- [x] Dokumentation elliptic_curves.md mit KaTeX-Formeln, BSD, Shimura-Taniyama-Wiles
+
 ### Logging-System (src/math_logger.py) - Build 14
 - [x] MathLogger-Klasse mit konfigurierbaren Leveln (DEBUG/INFO/WARNING/ERROR)
 - [x] Ausgabe auf Konsole und/oder Datei (logs/-Verzeichnis)
