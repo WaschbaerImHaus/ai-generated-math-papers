@@ -236,15 +236,24 @@
         <!-- === Gruppe: Geometrie & Topologie === -->
         <div class="nav-group">
             <input type="checkbox" id="nav-geo"
-                {% if request.path in ['/topology', '/tensor', '/spinors', '/algebraic_geometry', '/differential_topology', '/lie_groups'] %}checked{% endif %}>
+                {% if request.path in ['/topology', '/tensor', '/spinors', '/algebraic_geometry', '/differential_topology', '/lie_groups', '/classical_geometry', '/differential_geometry', '/algebraic_topology'] %}checked{% endif %}>
             <label class="nav-group-label" for="nav-geo">Geometrie &amp; Topologie</label>
             <div class="nav-group-content">
                 <ul class="nav-list">
                     <li><a href="/topology" class="nav-link {% if request.path == '/topology' %}active{% endif %}">
                         &#8734; Topologie
                     </a></li>
+                    <li><a href="/algebraic_topology" class="nav-link {% if request.path == '/algebraic_topology' %}active{% endif %}">
+                        &#8855; Algebraische Topologie
+                    </a></li>
                     <li><a href="/differential_topology" class="nav-link {% if request.path == '/differential_topology' %}active{% endif %}">
                         &#8711; Differentialtopologie
+                    </a></li>
+                    <li><a href="/classical_geometry" class="nav-link {% if request.path == '/classical_geometry' %}active{% endif %}">
+                        &#9651; Klassische Geometrie
+                    </a></li>
+                    <li><a href="/differential_geometry" class="nav-link {% if request.path == '/differential_geometry' %}active{% endif %}">
+                        &#8750; Differentialgeometrie
                     </a></li>
                     <li><a href="/tensor" class="nav-link {% if '/tensor' in request.path %}active{% endif %}">
                         g Tensor-Geometrie
@@ -265,12 +274,18 @@
         <!-- === Gruppe: Diskrete Mathematik & Numerik === -->
         <div class="nav-group">
             <input type="checkbox" id="nav-diskret"
-                {% if request.path in ['/graph_theory', '/numerical'] %}checked{% endif %}>
+                {% if request.path in ['/graph_theory', '/numerical', '/combinatorics', '/coding_theory'] %}checked{% endif %}>
             <label class="nav-group-label" for="nav-diskret">Diskrete Mathematik &amp; Numerik</label>
             <div class="nav-group-content">
                 <ul class="nav-list">
                     <li><a href="/graph_theory" class="nav-link {% if '/graph_theory' in request.path %}active{% endif %}">
                         G Graphentheorie
+                    </a></li>
+                    <li><a href="/combinatorics" class="nav-link {% if request.path == '/combinatorics' %}active{% endif %}">
+                        &#8984; Kombinatorik
+                    </a></li>
+                    <li><a href="/coding_theory" class="nav-link {% if request.path == '/coding_theory' %}active{% endif %}">
+                        &#9670; Kodierungstheorie
                     </a></li>
                     <li><a href="/numerical" class="nav-link {% if '/numerical' in request.path %}active{% endif %}">
                         ~ Numerische Methoden
@@ -282,7 +297,7 @@
         <!-- === Gruppe: Statistik & Stochastik === -->
         <div class="nav-group">
             <input type="checkbox" id="nav-statistik"
-                {% if request.path in ['/statistics', '/stochastic'] %}checked{% endif %}>
+                {% if request.path in ['/statistics', '/stochastic', '/estimation_theory', '/information_theory', '/operations_research'] %}checked{% endif %}>
             <label class="nav-group-label" for="nav-statistik">Statistik &amp; Stochastik</label>
             <div class="nav-group-content">
                 <ul class="nav-list">
@@ -291,6 +306,15 @@
                     </a></li>
                     <li><a href="/stochastic" class="nav-link {% if request.path == '/stochastic' %}active{% endif %}">
                         &#126; Stochastik
+                    </a></li>
+                    <li><a href="/estimation_theory" class="nav-link {% if request.path == '/estimation_theory' %}active{% endif %}">
+                        &#956; Schätztheorie
+                    </a></li>
+                    <li><a href="/information_theory" class="nav-link {% if request.path == '/information_theory' %}active{% endif %}">
+                        H Informationstheorie
+                    </a></li>
+                    <li><a href="/operations_research" class="nav-link {% if request.path == '/operations_research' %}active{% endif %}">
+                        &#9874; Operations Research
                     </a></li>
                 </ul>
             </div>

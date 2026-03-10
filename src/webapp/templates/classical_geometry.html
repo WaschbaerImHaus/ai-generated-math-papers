@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+<!--
+    @file classical_geometry.html
+    @brief Klassische Geometrie: Euklidische, Hyperbolische und Projektive Geometrie.
+    @description
+        Interaktive Web-Seite für klassische Geometrie.
+        Euklidische Geometrie (Abstände, Mittelpunkte),
+        Hyperbolische Geometrie (Poincaré-Modell, Dreieckswinkel),
+        Projektive Geometrie (Doppelverhältnis, Satz von Desargues und Pappus).
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+
+{% block title %}Klassische Geometrie – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>&#9651; Klassische Geometrie</h1>
+    <p class="page-desc">
+        <strong>Euklidische Geometrie</strong> (Abstand, Mittelpunkt, Winkelmessung),
+        <strong>Hyperbolische Geometrie</strong> (Poincaré-Scheibenmodell, $d(z_1, z_2) = 2\,\mathrm{arctanh}\!\left|\frac{z_1-z_2}{1-\bar{z}_1 z_2}\right|$,
+        Winkelsumme $< \pi$) und
+        <strong>Projektive Geometrie</strong> (Doppelverhältnis, Satz von Desargues, Satz von Pappus).
+    </p>
+</div>
+
+<!-- ===== SECTION 1: EUKLIDISCHE GEOMETRIE ===== -->
+<section class="math-section">
+    <h2>&#9633; Euklidische Geometrie</h2>
+    <p>
+        Im <strong>euklidischen Raum</strong> $\mathbb{R}^n$ gilt der <em>Satz des Pythagoras</em>:
+        $$d(P_1, P_2) = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$$
+        Der <strong>Mittelpunkt</strong> zweier Punkte ist
+        $$M = \frac{P_1 + P_2}{2} = \left(\frac{x_1+x_2}{2},\, \frac{y_1+y_2}{2}\right).$$
+        Die Winkelsumme im euklidischen Dreieck beträgt stets $\pi$ (180°).
+    </p>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>Abstand und Mittelpunkt zweier Punkte</h3>
+            <p>
+                Berechnung des euklidischen Abstands $d(P_1, P_2)$ und des Mittelpunkts $M$
+                zwischen zwei Punkten $P_1 = (x_1, y_1)$ und $P_2 = (x_2, y_2)$.
+            </p>
+            <div class="input-row">
+                <label>Punkt $P_1$ als <code>[x, y]</code>:</label>
+                <input type="text" id="eucl-p1" value="[0, 0]" style="width:140px">
+                <label>Punkt $P_2$ als <code>[x, y]</code>:</label>
+                <input type="text" id="eucl-p2" value="[3, 4]" style="width:140px">
+            </div>
+            <button onclick="calcEuclidean()" class="btn-calc">Euklidisch berechnen</button>
+            <div id="eucl-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 2: HYPERBOLISCHE GEOMETRIE ===== -->
+<section class="math-section">
+    <h2>&#9675; Hyperbolische Geometrie</h2>
+    <p>
+        Die <strong>hyperbolische Geometrie</strong> (Lobatschewski/Bolyai) verletzt das
+        euklidische Parallelenpostulat: Durch einen Punkt außerhalb einer Geraden
+        verlaufen <em>unendlich viele</em> Parallelen.
+        Im <strong>Poincaré-Scheibenmodell</strong> $\mathbb{D} = \{z \in \mathbb{C} : |z| < 1\}$
+        lautet die Metrik:
+        $$d_{\mathbb{H}}(z_1, z_2) = 2\,\mathrm{arctanh}\!\left(\left|\frac{z_1 - z_2}{1 - \bar{z}_1 z_2}\right|\right)$$
+        <strong>Charakteristikum</strong>: Winkelsumme im hyperbolischen Dreieck $< \pi$,
+        Defekt $= \pi - (\alpha + \beta + \gamma) = $ Fläche (Gauß-Bonnet).
+    </p>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>Hyperbolischer Abstand (Poincaré-Modell)</h3>
+            <p>
+                Berechnung des hyperbolischen Abstands zwischen zwei Punkten
+                $z_1, z_2 \in \mathbb{D}$ (Einheitsscheibe: $|z| &lt; 1$)
+                sowie der Winkelsumme eines hyperbolischen Dreiecks.
+            </p>
+            <div class="input-row">
+                <label>$z_1$ als <code>[x, y]</code> (mit $x^2+y^2 &lt; 1$):</label>
+                <input type="text" id="hyp-z1" value="[0.0, 0.0]" style="width:140px">
+                <label>$z_2$ als <code>[x, y]</code>:</label>
+                <input type="text" id="hyp-z2" value="[0.5, 0.0]" style="width:140px">
+            </div>
+            <button onclick="calcHyperbolic()" class="btn-calc">Hyperbolisch berechnen</button>
+            <div id="hyp-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 3: PROJEKTIVE GEOMETRIE ===== -->
+<section class="math-section">
+    <h2>&#9671; Projektive Geometrie</h2>
+    <p>
+        Die <strong>projektive Ebene</strong> $\mathbb{P}^2$ ergänzt die euklidische Ebene um
+        <em>Fernpunkte</em> (homogene Koordinaten $[x:y:w]$).
+        Das <strong>Doppelverhältnis</strong> (projektive Invariante) von vier kollinearen Punkten:
+        $$(A,B;C,D) = \frac{AC \cdot BD}{BC \cdot AD}$$
+        <strong>Satz von Desargues</strong>: Zwei Dreiecke sind perspektiv bzgl. eines Punktes
+        genau dann, wenn sie perspektiv bzgl. einer Geraden sind.
+        <strong>Satz von Pappus</strong>: Sind $A,B,C$ auf einer Geraden und $A',B',C'$
+        auf einer anderen, so sind $AB' \cap A'B$, $AC' \cap A'C$, $BC' \cap B'C$ kollinear.
+    </p>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>Doppelverhältnis, Desargues und Pappus</h3>
+            <p>
+                Berechnung des Doppelverhältnisses $(A,B;C,D)$ und Überprüfung
+                der Sätze von Desargues und Pappus mit Standardkonfigurationen.
+            </p>
+            <button onclick="calcProjective()" class="btn-calc">Projektiv berechnen</button>
+            <div id="proj-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * @brief Euklidische Geometrie: Abstand und Mittelpunkt berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcEuclidean() {
+    const div = document.getElementById('eucl-result');
+    try {
+        // Punkte aus Eingabefeldern parsen
+        const p1 = JSON.parse(document.getElementById('eucl-p1').value);
+        const p2 = JSON.parse(document.getElementById('eucl-p2').value);
+        const data = await apiPost('/api/classical_geom/euclidean', { p1, p2 });
+        const r = data;
+        let html = '<strong>Euklidische Geometrie</strong><br>';
+        // Abstand anzeigen
+        if (r.distance !== undefined) {
+            html += `<br>Abstand $d(P_1, P_2) = ${typeof r.distance === 'number' ? r.distance.toFixed(6) : r.distance}$<br>`;
+        }
+        // Mittelpunkt anzeigen
+        if (r.midpoint !== undefined) {
+            const mp = r.midpoint;
+            const mpStr = Array.isArray(mp)
+                ? `\\left(${mp.map(v => typeof v === 'number' ? v.toFixed(4) : v).join(',\\, ')}\\right)`
+                : mp;
+            html += `Mittelpunkt $M = ${mpStr}$<br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Hyperbolische Geometrie: Poincaré-Abstand und Dreieckswinkel.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcHyperbolic() {
+    const div = document.getElementById('hyp-result');
+    try {
+        // Punkte aus den Eingabefeldern parsen
+        const z1 = JSON.parse(document.getElementById('hyp-z1').value);
+        const z2 = JSON.parse(document.getElementById('hyp-z2').value);
+        const data = await apiPost('/api/classical_geom/hyperbolic', { z1, z2 });
+        const r = data;
+        let html = '<strong>Hyperbolische Geometrie (Poincaré-Scheibe)</strong><br>';
+        // Poincaré-Abstand
+        if (r.poincare_distance !== undefined) {
+            html += `<br>Hyperbolischer Abstand: $d_{\\mathbb{H}}(z_1, z_2) = ${typeof r.poincare_distance === 'number' ? r.poincare_distance.toFixed(6) : r.poincare_distance}$<br>`;
+        }
+        // Winkelsumme des Dreiecks
+        if (r.triangle_angle_sum !== undefined) {
+            html += `Winkelsumme (Dreieck): $\\alpha + \\beta + \\gamma = ${typeof r.triangle_angle_sum === 'number' ? r.triangle_angle_sum.toFixed(6) : r.triangle_angle_sum}\\,\\mathrm{rad}$<br>`;
+        }
+        // Überprüfung: Winkelsumme < π
+        if (r.angle_sum_lt_pi !== undefined) {
+            html += `Winkelsumme $&lt; \\pi$: ${r.angle_sum_lt_pi ? '✓ (hyperbolisch korrekt)' : '✗ (Fehler)'}<br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Projektive Geometrie: Doppelverhältnis, Satz von Desargues und Pappus.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcProjective() {
+    const div = document.getElementById('proj-result');
+    try {
+        // API-Aufruf mit Standardkonfiguration (Server wählt Testpunkte)
+        const data = await apiPost('/api/classical_geom/projective', {});
+        const r = data;
+        let html = '<strong>Projektive Geometrie</strong><br>';
+        // Doppelverhältnis (Projektive Invariante)
+        if (r.cross_ratio !== undefined) {
+            html += `<br>Doppelverhältnis $(A,B;C,D) = ${typeof r.cross_ratio === 'number' ? r.cross_ratio.toFixed(6) : r.cross_ratio}$<br>`;
+        }
+        // Satz von Desargues
+        if (r.desargues !== undefined) {
+            html += `<br>Satz von Desargues: ${r.desargues ? '✓ erfüllt' : '✗ nicht erfüllt'}<br>`;
+            html += `<em>Zwei perspektiv-punktbezogene Dreiecke sind auch perspektiv-geraden bezogen.</em><br>`;
+        }
+        // Satz von Pappus
+        if (r.pappus !== undefined) {
+            html += `<br>Satz von Pappus: ${r.pappus ? '✓ erfüllt' : '✗ nicht erfüllt'}<br>`;
+            html += `<em>Schnittpunkte gegenüberliegender Seiten sind kollinear.</em><br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+</script>
+{% endblock %}

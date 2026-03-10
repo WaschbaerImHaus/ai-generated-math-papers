@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+<!--
+    @file operations_research.html
+    @brief Operations Research: Lineare Programmierung, Spieltheorie, Netzwerkflüsse.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+{% block title %}Operations Research – Mathematik-Spezialist{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>&#9874; Operations Research</h1>
+    <p class="page-desc">
+        Optimierung realer Entscheidungsprobleme: Lineare Programmierung (Simplex-Methode),
+        Spieltheorie (Nash-Gleichgewichte) und Netzwerk-Flüsse (Ford-Fulkerson).
+    </p>
+</div>
+<section class="math-section">
+    <h2>&#9654; Lineare Programmierung</h2>
+    <p>
+        Maximiere $c^T x$ unter $Ax \leq b$, $x \geq 0$.
+        $$\max\; 3x + 5y \quad \text{s.t.}\quad x \leq 4,\; 2y \leq 12,\; 3x+5y \leq 25$$
+    </p>
+    <div class="card-grid">
+        <div class="card">
+            <h3>Simplex-Methode</h3>
+            <button onclick="calcLP()" class="btn-calc">LP lösen</button>
+            <div id="lp-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+<section class="math-section">
+    <h2>&#9654; Spieltheorie</h2>
+    <p>Nash-Gleichgewicht: $u_i(s_i^*, s_{-i}^*) \geq u_i(s_i, s_{-i}^*)$ für alle $s_i$.</p>
+    <div class="card-grid">
+        <div class="card">
+            <h3>Spielanalyse</h3>
+            <div class="input-row">
+                <label>Spiel:</label>
+                <select id="game-type">
+                    <option value="prisoners_dilemma">Gefangenendilemma</option>
+                    <option value="minimax">Minimax</option>
+                </select>
+            </div>
+            <button onclick="calcGame()" class="btn-calc">Analysieren</button>
+            <div id="game-result" class="result-box"></div>
+        </div>
+        <div class="card">
+            <h3>Max-Flow (Ford-Fulkerson)</h3>
+            <p>Max-Flow = Min-Cut: $\max_{f} \text{val}(f) = \min_{(S,T)} \text{cap}(S,T)$</p>
+            <button onclick="calcFlow()" class="btn-calc">Max-Flow berechnen</button>
+            <div id="flow-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+<script>
+async function calcLP() {
+    const div = document.getElementById('lp-result');
+    div.innerHTML = '<span class="loading">Berechne...</span>';
+    try {
+        const data = await apiPost('/api/or/linear_programming', { problem: 'maximize' });
+        let html = `<strong>${data.title || 'LP-Lösung'}</strong><br>`;
+        for (const [k, v] of Object.entries(data)) {
+            if (k !== 'title') html += `<strong>${k}:</strong> ${JSON.stringify(v)}<br>`;
+        }
+        showResult(div, html); renderMathInElement(div);
+    } catch (e) { div.innerHTML = `<span class="error">${e.message}</span>`; }
+}
+async function calcGame() {
+    const div = document.getElementById('game-result');
+    div.innerHTML = '<span class="loading">Berechne...</span>';
+    const game_type = document.getElementById('game-type').value;
+    try {
+        const data = await apiPost('/api/or/game_theory', { game_type });
+        let html = `<strong>${data.title || 'Spieltheorie'}</strong><br>`;
+        for (const [k, v] of Object.entries(data)) {
+            if (k !== 'title') html += `<strong>${k}:</strong> ${JSON.stringify(v)}<br>`;
+        }
+        showResult(div, html); renderMathInElement(div);
+    } catch (e) { div.innerHTML = `<span class="error">${e.message}</span>`; }
+}
+async function calcFlow() {
+    const div = document.getElementById('flow-result');
+    div.innerHTML = '<span class="loading">Berechne...</span>';
+    try {
+        const data = await apiPost('/api/or/network_flow', {});
+        let html = `<strong>${data.title || 'Max-Flow'}</strong><br>`;
+        for (const [k, v] of Object.entries(data)) {
+            if (k !== 'title') html += `<strong>${k}:</strong> ${JSON.stringify(v)}<br>`;
+        }
+        showResult(div, html); renderMathInElement(div);
+    } catch (e) { div.innerHTML = `<span class="error">${e.message}</span>`; }
+}
+</script>
+{% endblock %}

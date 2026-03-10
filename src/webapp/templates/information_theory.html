@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+<!--
+    @file information_theory.html
+    @brief Informationstheorie: Shannon-Entropie, Kanalkapazität (BSC/BEC)
+           und Huffman-Kodierung (optimale Präfixcodes).
+    @description
+        Interaktive Web-Seite für Informationstheorie nach Claude Shannon.
+        Shannon-Entropie H(X), Kanalkapazität C (Binary Symmetric / Erasure Channel),
+        Huffman-Kodierung zur verlustfreien Datenkompression.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+
+{% block title %}Informationstheorie – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>&#8747; Informationstheorie</h1>
+    <p class="page-desc">
+        Informationstheorie nach Shannon: Entropie
+        $H(X) = -\sum_{i} p_i \log_2 p_i$ (Maß für Unsicherheit),
+        Kanalkapazität $C = \max_{p(x)} I(X;Y)$ (maximale störungsfreie Übertragungsrate),
+        und Huffman-Kodierung (optimale Präfixcodes, mittlere Codewortlänge
+        $\bar{L} \in [H(X), H(X)+1)$).
+    </p>
+</div>
+
+<!-- ===== SECTION 1: SHANNON-ENTROPIE ===== -->
+<section class="math-section">
+    <h2>&#8734; Shannon-Entropie</h2>
+    <p>
+        Die <strong>Shannon-Entropie</strong> einer diskreten Zufallsvariable $X$
+        mit Wahrscheinlichkeiten $p_1, \ldots, p_n$ ist:
+        $$H(X) = -\sum_{i=1}^{n} p_i \log_2 p_i \quad \text{(in Bit)}$$
+        Die <strong>maximale Entropie</strong> wird bei Gleichverteilung erreicht:
+        $H_{\max} = \log_2 n$ (für $n$ gleichwahrscheinliche Symbole).
+        Eigenschaften: $H(X) \geq 0$, $H(X) \leq \log_2 n$,
+        Konkavität in den Wahrscheinlichkeiten.
+        <strong>Gemeinsame Entropie</strong>: $H(X,Y) = H(X) + H(Y|X)$
+        (Kettenregel der Entropie).
+    </p>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>Shannon-Entropie $H(X)$ berechnen</h3>
+            <p>
+                Entropieberechnung für eine diskrete Wahrscheinlichkeitsverteilung.
+                Die Wahrscheinlichkeiten $p_i$ müssen sich zu 1 summieren
+                (werden ggf. automatisch normiert).
+            </p>
+            <div class="input-row">
+                <label>Wahrscheinlichkeiten $p_i$ (kommagetrennt):</label>
+            </div>
+            <input type="text" id="entropy-probs" value="0.5,0.25,0.125,0.125"
+                   style="width:100%;margin-bottom:8px">
+            <small>Beispiel: gleichverteilt 4 Symbole: <code>0.25,0.25,0.25,0.25</code></small>
+            <br><br>
+            <button onclick="calcEntropy()" class="btn-calc">Entropie berechnen</button>
+            <div id="entropy-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 2: KANALKAPAZITÄT ===== -->
+<section class="math-section">
+    <h2>&#8594; Kanalkapazität</h2>
+    <p>
+        Die <strong>Kanalkapazität</strong> ist die maximale Rate, mit der Information
+        fehlerfrei über einen gestörten Kanal übertragen werden kann (Shannon-Theorem):
+        $$C = \max_{p(x)} I(X;Y) \quad \text{(Bit/Kanalnutzung)}$$
+        <strong>Binary Symmetric Channel (BSC)</strong>: Mit Fehlerwahrscheinlichkeit $\epsilon$:
+        $$C_{\mathrm{BSC}} = 1 - H_b(\epsilon) = 1 + \epsilon\log_2\epsilon + (1-\epsilon)\log_2(1-\epsilon)$$
+        <strong>Binary Erasure Channel (BEC)</strong>: Mit Löschwahrscheinlichkeit $\delta$:
+        $$C_{\mathrm{BEC}} = 1 - \delta$$
+        Das <strong>Kanalkodierungstheorem</strong> (Shannon): Für jede Rate $R < C$
+        existieren Codes mit beliebig kleiner Fehlerwahrscheinlichkeit.
+    </p>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>Kanalkapazität $C$ (BSC / BEC)</h3>
+            <p>
+                Berechnung der Kanalkapazität für den Binary Symmetric Channel (BSC,
+                bitweiser Fehler mit Wahrscheinlichkeit $\epsilon$) oder den
+                Binary Erasure Channel (BEC, Löschung mit Wahrscheinlichkeit $\delta$).
+            </p>
+            <div class="input-row">
+                <label>Kanaltyp:</label>
+                <select id="channel-type">
+                    <option value="bsc">BSC (Binary Symmetric Channel)</option>
+                    <option value="bec">BEC (Binary Erasure Channel)</option>
+                </select>
+            </div>
+            <div class="input-row">
+                <label>Fehlerwahrscheinlichkeit $\epsilon$ (bzw. $\delta$):</label>
+                <input type="number" id="channel-error" value="0.1"
+                       min="0.0" max="1.0" step="0.01">
+            </div>
+            <button onclick="calcChannelCapacity()" class="btn-calc">Kanalkapazität berechnen</button>
+            <div id="channel-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 3: HUFFMAN-KODIERUNG ===== -->
+<section class="math-section">
+    <h2>&#9650; Huffman-Kodierung</h2>
+    <p>
+        Die <strong>Huffman-Kodierung</strong> konstruiert einen optimalen Präfixcode:
+        häufige Symbole erhalten kürzere Codewörter.
+        Der Huffman-Code ist <strong>optimal</strong> unter allen Präfixcodes:
+        $$H(X) \leq \bar{L} < H(X) + 1 \quad \text{(Quellenkodiersatz)}$$
+        Mittlere Codewortlänge: $\bar{L} = \sum_i p_i \cdot l_i$
+        (mit Codewortlänge $l_i$ für Symbol $i$).
+        <strong>Konstruktion</strong> (Bottom-Up-Greedy): Wiederholtes Zusammenfassen
+        der beiden Symbole mit kleinsten Wahrscheinlichkeiten im Binärbaum.
+    </p>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>Huffman-Code konstruieren</h3>
+            <p>
+                Konstruktion des optimalen Huffman-Präfixcodes für eine gegebene
+                Symbolmenge mit zugehörigen Auftrittswahrscheinlichkeiten.
+                Format: <code>Symbol:Wahrscheinlichkeit</code>, kommagetrennt.
+            </p>
+            <div class="input-row">
+                <label>Symbole mit Wahrscheinlichkeiten:</label>
+            </div>
+            <input type="text" id="huffman-symbols" value="A:0.4,B:0.3,C:0.2,D:0.1"
+                   style="width:100%;margin-bottom:8px">
+            <small>Format: <code>A:0.4,B:0.3,C:0.2,D:0.1</code></small>
+            <br><br>
+            <button onclick="calcHuffman()" class="btn-calc">Huffman-Code berechnen</button>
+            <div id="huffman-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * @brief Shannon-Entropie für eine diskrete Wahrscheinlichkeitsverteilung berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcEntropy() {
+    const div = document.getElementById('entropy-result');
+    // Kommagetrennte Wahrscheinlichkeiten parsen
+    const raw = document.getElementById('entropy-probs').value;
+    const probabilities = raw.split(',').map(s => parseFloat(s.trim())).filter(v => !isNaN(v));
+    try {
+        const data = await apiPost('/api/information/entropy', { probabilities });
+        const r = data;
+        let html = `<strong>Shannon-Entropie</strong><br>`;
+        html += `Wahrscheinlichkeiten: $[${probabilities.join(',\\, ')}]$<br>`;
+
+        // Shannon-Entropie H(X)
+        if (r.entropy !== undefined) {
+            const h = typeof r.entropy === 'number' ? r.entropy.toFixed(6) : r.entropy;
+            html += `<br><strong>Entropie:</strong> $H(X) = ${h}$ Bit<br>`;
+        }
+
+        // Maximale Entropie (Gleichverteilung)
+        if (r.max_entropy !== undefined) {
+            const hmax = typeof r.max_entropy === 'number' ? r.max_entropy.toFixed(6) : r.max_entropy;
+            html += `Maximale Entropie: $H_{\\max} = \\log_2(${probabilities.length}) = ${hmax}$ Bit<br>`;
+        }
+
+        // Redundanz = H_max - H
+        if (r.redundancy !== undefined) {
+            const red = typeof r.redundancy === 'number' ? r.redundancy.toFixed(6) : r.redundancy;
+            html += `Redundanz: $H_{\\max} - H = ${red}$ Bit<br>`;
+        }
+
+        // relative Entropie (Effizienz)
+        if (r.efficiency !== undefined) {
+            const eff = typeof r.efficiency === 'number' ? (r.efficiency * 100).toFixed(2) : r.efficiency;
+            html += `Effizienz: $\\eta = H/H_{\\max} = ${eff}\\%$<br>`;
+        }
+
+        // Beschreibung
+        if (r.description) html += `<br><em>${r.description}</em>`;
+
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Kanalkapazität für BSC oder BEC berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcChannelCapacity() {
+    const div = document.getElementById('channel-result');
+    const channel_type = document.getElementById('channel-type').value;
+    const error_prob = parseFloat(document.getElementById('channel-error').value);
+    try {
+        const data = await apiPost('/api/information/channel_capacity', {
+            channel_type,
+            error_prob
+        });
+        const r = data;
+        const channelName = (channel_type === 'bsc')
+            ? 'Binary Symmetric Channel (BSC)'
+            : 'Binary Erasure Channel (BEC)';
+        const paramName = (channel_type === 'bsc') ? '\\epsilon' : '\\delta';
+        let html = `<strong>Kanalkapazität: ${channelName}</strong><br>`;
+        html += `Fehlerwahrscheinlichkeit: $${paramName} = ${error_prob}$<br>`;
+
+        // Kanalkapazität C
+        if (r.capacity_bits !== undefined) {
+            const c = typeof r.capacity_bits === 'number'
+                ? r.capacity_bits.toFixed(6) : r.capacity_bits;
+            html += `<br><strong>Kanalkapazität:</strong> $C = ${c}$ Bit/Kanalnutzung<br>`;
+        }
+
+        // Binäre Entropie H_b(epsilon) für BSC
+        if (r.binary_entropy !== undefined) {
+            const hb = typeof r.binary_entropy === 'number'
+                ? r.binary_entropy.toFixed(6) : r.binary_entropy;
+            html += `Binäre Entropie: $H_b(${paramName}) = ${hb}$ Bit<br>`;
+        }
+
+        // Shannon-Theorem: maximale störungsfreie Rate
+        if (r.max_rate !== undefined) {
+            html += `Maximale störungsfreie Rate: $R < C = ${typeof r.max_rate === 'number' ? r.max_rate.toFixed(4) : r.max_rate}$ Bit/Symbol<br>`;
+        }
+
+        // Beschreibung
+        if (r.description) html += `<br><em>${r.description}</em>`;
+
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Huffman-Code für gegebene Symbole und Wahrscheinlichkeiten berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcHuffman() {
+    const div = document.getElementById('huffman-result');
+    // Symbol:Wahrscheinlichkeit-Paare parsen, z.B. "A:0.4,B:0.3"
+    const raw = document.getElementById('huffman-symbols').value;
+    const symbols = raw;
+    try {
+        const data = await apiPost('/api/information/huffman', { symbols });
+        const r = data;
+        let html = `<strong>Huffman-Kodierung</strong><br>`;
+
+        // Codewörter als Tabelle
+        if (r.codes) {
+            html += '<br><strong>Huffman-Code-Tabelle:</strong><br>';
+            html += '<table class="math-table"><thead><tr>';
+            html += '<th>Symbol</th><th>Wahrscheinlichkeit</th><th>Codeword</th><th>Länge $l_i$</th>';
+            html += '</tr></thead><tbody>';
+            for (const [sym, code] of Object.entries(r.codes)) {
+                const prob = r.probabilities ? (r.probabilities[sym] || '–') : '–';
+                const probStr = typeof prob === 'number' ? prob.toFixed(4) : prob;
+                html += `<tr><td><strong>${sym}</strong></td><td>${probStr}</td>`;
+                html += `<td><code>${code}</code></td><td>${code.length}</td></tr>`;
+            }
+            html += '</tbody></table>';
+        }
+
+        // Mittlere Codewortlänge L_bar
+        if (r.average_length !== undefined) {
+            const lavg = typeof r.average_length === 'number'
+                ? r.average_length.toFixed(6) : r.average_length;
+            html += `<br>Mittlere Codewortlänge: $\\bar{L} = ${lavg}$ Bit/Symbol<br>`;
+        }
+
+        // Entropie H(X)
+        if (r.entropy !== undefined) {
+            const h = typeof r.entropy === 'number' ? r.entropy.toFixed(6) : r.entropy;
+            html += `Entropie: $H(X) = ${h}$ Bit<br>`;
+        }
+
+        // Effizienz des Huffman-Codes
+        if (r.efficiency !== undefined) {
+            const eff = typeof r.efficiency === 'number'
+                ? (r.efficiency * 100).toFixed(2) : r.efficiency;
+            html += `Kodiereffizienz: $\\eta = H/\\bar{L} = ${eff}\\%$<br>`;
+        }
+
+        // Beschreibung
+        if (r.description) html += `<br><em>${r.description}</em>`;
+
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+</script>
+{% endblock %}

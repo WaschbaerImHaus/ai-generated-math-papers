@@ -403,6 +403,79 @@ except Exception as _e:
     _opalg_ok = False
     print(f"[WARN] operator_algebras nicht ladbar: {_e}")
 
+try:
+    from estimation_theory import (
+        MaximumLikelihoodEstimator, CramerRaoBound, ConfidenceIntervals,
+        HypothesisTesting, DecisionTheory, MethodOfMoments, SufficiencyTheory
+    )
+    _estim_ok = True
+except Exception as _e:
+    _estim_ok = False
+    print(f"[WARN] estimation_theory nicht ladbar: {_e}")
+
+try:
+    from information_theory import (
+        ShannonEntropy, KLDivergence, ChannelCapacity, SourceCoding,
+        ErrorCorrection, DifferentialEntropy, surprisal, entropy_rate_markov
+    )
+    _info_ok = True
+except Exception as _e:
+    _info_ok = False
+    print(f"[WARN] information_theory nicht ladbar: {_e}")
+
+try:
+    from operations_research import (
+        LinearProgramming, IntegerProgramming, NetworkFlows,
+        QueueingTheory, GameTheory, MarkovDecisionProcess, StochasticOptimization
+    )
+    _or_ok = True
+except Exception as _e:
+    _or_ok = False
+    print(f"[WARN] operations_research nicht ladbar: {_e}")
+
+try:
+    from classical_geometry import (
+        EuclideanGeometry, HyperbolicGeometry, ProjectiveGeometry,
+        EllipticGeometry, AffinGeometry, SyntheticGeometry,
+        euler_characteristic_polygon, pick_theorem, ptolemy_theorem_check,
+        nine_point_circle, morley_theorem_demo
+    )
+    _classgeom_ok = True
+except Exception as _e:
+    _classgeom_ok = False
+    print(f"[WARN] classical_geometry nicht ladbar: {_e}")
+
+try:
+    from differential_geometry import (
+        CurveTheory2D, ParametricSurface, RiemannianGeometry,
+        GeodesicComputation, ClassicalSurfaces, ParametricCurve
+    )
+    _diffgeom_ok = True
+except Exception as _e:
+    _diffgeom_ok = False
+    print(f"[WARN] differential_geometry nicht ladbar: {_e}")
+
+try:
+    from combinatorics import (
+        EnumerativeCombinatorics, GraphCombinatorics, RamseyTheory,
+        GeneratingFunctions, PermutationGroup, CombinatoricsOnWords
+    )
+    _comb_ok = True
+except Exception as _e:
+    _comb_ok = False
+    print(f"[WARN] combinatorics nicht ladbar: {_e}")
+
+try:
+    from coding_theory import (
+        LinearCode, HammingCode, CyclicCode, BCHCode,
+        GaloisField, DFA, NFA, ContextFreeGrammar,
+        FormalLanguages, ComputabilityTheory
+    )
+    _coding_ok = True
+except Exception as _e:
+    _coding_ok = False
+    print(f"[WARN] coding_theory nicht ladbar: {_e}")
+
 
 # ===========================================================================
 # FLASK-APP INITIALISIEREN
@@ -4551,8 +4624,533 @@ def page_differential_topology():
     return render_template('differential_topology.html')
 
 
+@app.route('/estimation_theory')
+def page_estimation_theory():
+    """@brief Schätztheorie und Entscheidungstheorie. @lastModified 2026-03-10"""
+    return render_template('estimation_theory.html')
+
+
+@app.route('/information_theory')
+def page_information_theory():
+    """@brief Informationstheorie: Entropie, Kanalkapazität, Kodierung. @lastModified 2026-03-10"""
+    return render_template('information_theory.html')
+
+
+@app.route('/operations_research')
+def page_operations_research():
+    """@brief Operations Research: LP, Netzwerke, Spieltheorie. @lastModified 2026-03-10"""
+    return render_template('operations_research.html')
+
+
+@app.route('/classical_geometry')
+def page_classical_geometry():
+    """@brief Klassische Geometrie: Euklidisch, Hyperbolisch, Projektiv. @lastModified 2026-03-10"""
+    return render_template('classical_geometry.html')
+
+
+@app.route('/differential_geometry')
+def page_differential_geometry():
+    """@brief Differentialgeometrie: Kurven, Flächen, Riemannsche Geometrie. @lastModified 2026-03-10"""
+    return render_template('differential_geometry.html')
+
+
+@app.route('/combinatorics')
+def page_combinatorics():
+    """@brief Kombinatorik: Abzählung, Graphen, Ramsey, erzeugende Funktionen. @lastModified 2026-03-10"""
+    return render_template('combinatorics.html')
+
+
+@app.route('/coding_theory')
+def page_coding_theory():
+    """@brief Kodierungstheorie und formale Sprachen. @lastModified 2026-03-10"""
+    return render_template('coding_theory.html')
+
+
+@app.route('/algebraic_topology')
+def page_algebraic_topology():
+    """@brief Algebraische Topologie: Homologie, Homotopie, K-Theorie. @lastModified 2026-03-10"""
+    return render_template('algebraic_topology.html')
+
+
 # ===========================================================================
-# API: Darstellungstheorie (representation_theory.py)
+# API: Schätztheorie (estimation_theory.py)
+# ===========================================================================
+
+@app.route('/api/estimation/mle', methods=['POST'])
+def api_estimation_mle():
+    """@brief Maximum-Likelihood-Schätzung. @lastModified 2026-03-10"""
+    if not _estim_ok:
+        return error_response('estimation_theory nicht verfügbar')
+    try:
+        import numpy as np
+        data = request.get_json()
+        dist = data.get('distribution', 'normal')
+        mle = MaximumLikelihoodEstimator()
+        np.random.seed(42)
+        if dist == 'normal':
+            samples = np.random.normal(5.0, 2.0, 100).tolist()
+            params = mle.mle_normal(samples)
+        elif dist == 'exponential':
+            samples = np.random.exponential(2.0, 100).tolist()
+            params = mle.mle_exponential(samples)
+        elif dist == 'poisson':
+            samples = list(np.random.poisson(3.0, 100))
+            params = mle.mle_poisson(samples)
+        else:
+            samples = np.random.normal(0, 1, 50).tolist()
+            params = mle.mle_normal(samples)
+        return jsonify({'title': f'MLE ({dist})', 'distribution': dist,
+                        'parameters': params, 'n_samples': len(samples)})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/estimation/cramer_rao', methods=['POST'])
+def api_estimation_crb():
+    """@brief Cramér-Rao-Schranke. @lastModified 2026-03-10"""
+    if not _estim_ok:
+        return error_response('estimation_theory nicht verfügbar')
+    try:
+        import numpy as np
+        data = request.get_json()
+        dist = data.get('distribution', 'normal')
+        n = int(data.get('n', 30))
+        sigma = float(data.get('sigma', 1.0))
+        crb = CramerRaoBound()
+        if dist == 'normal':
+            bound = crb.cramer_rao_normal_mean(n, sigma)
+        else:
+            bound = crb.cramer_rao_poisson(n)
+        return jsonify({'title': f'Cramér-Rao ({dist}, n={n})', 'distribution': dist,
+                        'n': n, 'cramer_rao_bound': round(float(bound), 8)})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/estimation/confidence_interval', methods=['POST'])
+def api_estimation_ci():
+    """@brief Konfidenzintervall berechnen. @lastModified 2026-03-10"""
+    if not _estim_ok:
+        return error_response('estimation_theory nicht verfügbar')
+    try:
+        import numpy as np
+        data = request.get_json()
+        method = data.get('method', 't_interval')
+        confidence = float(data.get('confidence', 0.95))
+        np.random.seed(0)
+        samples = np.random.normal(10.0, 3.0, 25).tolist()
+        ci = ConfidenceIntervals()
+        lo, hi, desc = ci.ci_normal_mean(samples, confidence)
+        return jsonify({'title': f'Konfidenzintervall ({confidence*100:.0f}%)',
+                        'method': 'ci_normal_mean', 'confidence': confidence,
+                        'lower': round(lo, 6), 'upper': round(hi, 6),
+                        'description': desc, 'n': len(samples)})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Informationstheorie (information_theory.py)
+# ===========================================================================
+
+@app.route('/api/information/entropy', methods=['POST'])
+def api_info_entropy():
+    """@brief Shannon-Entropie berechnen. @lastModified 2026-03-10"""
+    if not _info_ok:
+        return error_response('information_theory nicht verfügbar')
+    try:
+        data = request.get_json()
+        probs_str = data.get('probabilities', '0.5,0.5')
+        probs = [float(x.strip()) for x in probs_str.split(',')]
+        se = ShannonEntropy()
+        h = se.entropy(probs)
+        h_max = se.entropy_maximum(len(probs))
+        return jsonify({'title': 'Shannon-Entropie', 'probabilities': probs,
+                        'entropy': round(h, 6), 'max_entropy': round(h_max, 6),
+                        'efficiency': round(h / h_max if h_max > 0 else 0, 4)})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/information/channel_capacity', methods=['POST'])
+def api_info_channel():
+    """@brief Kanalkapazität (Shannon). @lastModified 2026-03-10"""
+    if not _info_ok:
+        return error_response('information_theory nicht verfügbar')
+    try:
+        data = request.get_json()
+        channel_type = data.get('channel_type', 'bsc')
+        p = float(data.get('error_prob', 0.1))
+        cc = ChannelCapacity()
+        if channel_type == 'bsc':
+            cap = cc.binary_symmetric_channel_capacity(p)
+        elif channel_type == 'bec':
+            cap = cc.binary_erasure_channel_capacity(p)
+        else:
+            cap = cc.binary_symmetric_channel_capacity(p)
+        return jsonify({'title': f'Kanalkapazität ({channel_type})', 'channel_type': channel_type,
+                        'error_prob': p, 'capacity_bits': round(cap, 6)})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/information/huffman', methods=['POST'])
+def api_info_huffman():
+    """@brief Huffman-Kodierung. @lastModified 2026-03-10"""
+    if not _info_ok:
+        return error_response('information_theory nicht verfügbar')
+    try:
+        data = request.get_json()
+        symbols_str = data.get('symbols', 'A:0.4,B:0.3,C:0.2,D:0.1')
+        symbols = {}
+        for item in symbols_str.split(','):
+            k, v = item.strip().split(':')
+            symbols[k.strip()] = float(v.strip())
+        sc = SourceCoding()
+        sym_list = list(symbols.keys())
+        prob_list = list(symbols.values())
+        codes = sc.huffman_code(sym_list, prob_list)
+        avg_len = sc.huffman_average_length(sym_list, prob_list, codes)
+        se = ShannonEntropy()
+        h = se.entropy(prob_list)
+        bound = sc.source_coding_theorem_bound(prob_list)
+        return jsonify({'title': 'Huffman-Kodierung', 'symbols': symbols,
+                        'codes': codes, 'average_length': round(avg_len, 4),
+                        'entropy': round(h, 4), 'lower_bound': round(bound, 4)})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Operations Research (operations_research.py)
+# ===========================================================================
+
+@app.route('/api/or/linear_programming', methods=['POST'])
+def api_or_lp():
+    """@brief Lineares Programm lösen. @lastModified 2026-03-10"""
+    if not _or_ok:
+        return error_response('operations_research nicht verfügbar')
+    try:
+        import numpy as np
+        data = request.get_json()
+        problem = data.get('problem', 'maximize')
+        lp = LinearProgramming()
+        # Standard-Beispiel: max 3x+5y s.t. x<=4, 2y<=12, 3x+5y<=25
+        c = [-3, -5]  # negiert für Minimierung (min -3x-5y)
+        A = [[1, 0], [0, 2], [3, 5]]
+        b = [4, 12, 25]
+        result = lp.simplex_method(c, A, b)
+        return jsonify({'title': 'LP: max 3x+5y', 'problem': problem, **result})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/or/game_theory', methods=['POST'])
+def api_or_game():
+    """@brief Spieltheorie: Nash-Gleichgewicht. @lastModified 2026-03-10"""
+    if not _or_ok:
+        return error_response('operations_research nicht verfügbar')
+    try:
+        import numpy as np
+        data = request.get_json()
+        game_type = data.get('game_type', 'prisoners_dilemma')
+        gt = GameTheory()
+        if game_type == 'prisoners_dilemma':
+            result = gt.prisoners_dilemma()
+        elif game_type == 'minimax':
+            result = gt.minimax_theorem()
+        else:
+            result = gt.prisoners_dilemma()
+        return jsonify({'title': f'Spieltheorie: {game_type}', 'game_type': game_type, **result})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/or/network_flow', methods=['POST'])
+def api_or_network():
+    """@brief Netzwerk-Fluss (Max-Flow). @lastModified 2026-03-10"""
+    if not _or_ok:
+        return error_response('operations_research nicht verfügbar')
+    try:
+        data = request.get_json()
+        nf = NetworkFlows()
+        # Beispiel-Graph: 4 Knoten, Quelle=0, Senke=3
+        graph = {0: {1: 10, 2: 10}, 1: {2: 2, 3: 4}, 2: {3: 9}, 3: {}}
+        result = nf.max_flow_ford_fulkerson(graph, source=0, sink=3)
+        return jsonify({'title': 'Max-Flow Ford-Fulkerson', **result})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Klassische Geometrie (classical_geometry.py)
+# ===========================================================================
+
+@app.route('/api/classical_geom/euclidean', methods=['POST'])
+def api_classgeom_euclidean():
+    """@brief Euklidische Geometrie: Abstände, Winkel. @lastModified 2026-03-10"""
+    if not _classgeom_ok:
+        return error_response('classical_geometry nicht verfügbar')
+    try:
+        data = request.get_json()
+        eg = EuclideanGeometry()
+        p1 = data.get('p1', [0, 0])
+        p2 = data.get('p2', [3, 4])
+        dist = eg.distance(p1, p2)
+        mid = eg.midpoint(p1, p2)
+        return jsonify({'title': 'Euklidische Geometrie', 'p1': p1, 'p2': p2,
+                        'distance': dist, 'midpoint': mid})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/classical_geom/hyperbolic', methods=['POST'])
+def api_classgeom_hyperbolic():
+    """@brief Hyperbolische Geometrie (Poincaré-Disk). @lastModified 2026-03-10"""
+    if not _classgeom_ok:
+        return error_response('classical_geometry nicht verfügbar')
+    try:
+        import math
+        data = request.get_json()
+        hg = HyperbolicGeometry()
+        z1 = complex(*data.get('z1', [0.3, 0.0]))
+        z2 = complex(*data.get('z2', [-0.2, 0.4]))
+        dist = hg.poincare_disk_distance(z1, z2)
+        tri = [complex(0.5, 0), complex(-0.4, 0.3), complex(0, -0.5)]
+        angle_sum = hg.hyperbolic_angle_sum(tri)
+        area = hg.hyperbolic_area(tri)
+        return jsonify({'title': 'Hyperbolische Geometrie', 'z1': [z1.real, z1.imag],
+                        'z2': [z2.real, z2.imag], 'poincare_distance': round(dist, 6),
+                        'triangle_angle_sum': round(angle_sum, 6),
+                        'triangle_area': round(area, 6),
+                        'angle_sum_lt_pi': bool(angle_sum < math.pi)})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/classical_geom/projective', methods=['POST'])
+def api_classgeom_projective():
+    """@brief Projektive Geometrie. @lastModified 2026-03-10"""
+    if not _classgeom_ok:
+        return error_response('classical_geometry nicht verfügbar')
+    try:
+        pg = ProjectiveGeometry()
+        # Doppelverhältnis für 4 Punkte auf der reellen Achse
+        cross = pg.cross_ratio(0.0, 1.0, 2.0, float('inf')) if False else pg.cross_ratio(0.0, 1.0, 3.0, 2.0)
+        desargues = pg.desargues_theorem_check()
+        pappus = pg.pappus_theorem_check()
+        return jsonify({'title': 'Projektive Geometrie',
+                        'cross_ratio': round(cross, 6),
+                        'desargues': desargues, 'pappus': pappus})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Differentialgeometrie (differential_geometry.py)
+# ===========================================================================
+
+@app.route('/api/diff_geom/curvature', methods=['POST'])
+def api_diffgeom_curvature():
+    """@brief Krümmung einer parametrischen Kurve. @lastModified 2026-03-10"""
+    if not _diffgeom_ok:
+        return error_response('differential_geometry nicht verfügbar')
+    try:
+        import sympy as sp
+        data = request.get_json()
+        x = sp.Symbol('x')
+        # Standardbeispiel: Parabel f(x)=x^2 hat Krümmung κ = 2/(1+4x^2)^(3/2)
+        f = x**2
+        ct = CurveTheory2D()
+        kappa_val = ct.curvature_from_cartesian(f, x, 0.0)
+        iso = ct.isoperimetric_inequality_check()
+        return jsonify({'title': 'Krümmung: Parabel y=x²',
+                        'curvature_at_x0': round(float(kappa_val), 6),
+                        'isoperimetric': iso,
+                        'four_vertex': ct.four_vertex_theorem_demo()})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/diff_geom/surface', methods=['POST'])
+def api_diffgeom_surface():
+    """@brief Gaußsche Krümmung einer Fläche. @lastModified 2026-03-10"""
+    if not _diffgeom_ok:
+        return error_response('differential_geometry nicht verfügbar')
+    try:
+        import numpy as np
+        data = request.get_json()
+        surface_type = data.get('surface_type', 'sphere')
+        u = float(data.get('u', 0.5))
+        v = float(data.get('v', 0.5))
+        cs = ClassicalSurfaces()
+        if surface_type == 'torus':
+            ps = cs.torus(R=2.0, r=1.0)
+        elif surface_type == 'cylinder':
+            ps = cs.cylinder(R=1.0)
+        else:
+            ps = cs.sphere(radius=1.0)
+        K = ps.gaussian_curvature(u, v)
+        H = ps.mean_curvature(u, v)
+        return jsonify({'title': f'Fläche: {surface_type}', 'surface': surface_type,
+                        'u': u, 'v': v,
+                        'gaussian_curvature': round(float(K), 6),
+                        'mean_curvature': round(float(H), 6)})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/diff_geom/geodesic', methods=['POST'])
+def api_diffgeom_geodesic():
+    """@brief Geodätische berechnen. @lastModified 2026-03-10"""
+    if not _diffgeom_ok:
+        return error_response('differential_geometry nicht verfügbar')
+    try:
+        data = request.get_json()
+        surface = data.get('surface', 'sphere')
+        gc = GeodesicComputation()
+        result = gc.geodesic_sphere(theta0=0.1, phi0=0.0, direction=[1.0, 0.0], t_max=2.0)
+        return jsonify({'title': f'Geodätische auf {surface}', 'surface': surface, **result})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Kombinatorik (combinatorics.py)
+# ===========================================================================
+
+@app.route('/api/combinatorics/enumerate', methods=['POST'])
+def api_comb_enumerate():
+    """@brief Kombinatorische Abzählung. @lastModified 2026-03-10"""
+    if not _comb_ok:
+        return error_response('combinatorics nicht verfügbar')
+    try:
+        data = request.get_json()
+        n = int(data.get('n', 5))
+        k = int(data.get('k', 2))
+        from math import comb, factorial
+        ec = EnumerativeCombinatorics()
+        return jsonify({'title': f'Kombinatorik n={n}, k={k}',
+                        'binomial': int(comb(n, k)),
+                        'permutations_nk': int(factorial(n) // factorial(n - k)) if n >= k else 0,
+                        'partition_number': ec.partition_number(n),
+                        'stirling2': ec.stirling_second(n, k),
+                        'motzkin': ec.motzkin_number(n)})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/combinatorics/ramsey', methods=['POST'])
+def api_comb_ramsey():
+    """@brief Ramsey-Theorie Demo. @lastModified 2026-03-10"""
+    if not _comb_ok:
+        return error_response('combinatorics nicht verfügbar')
+    try:
+        data = request.get_json()
+        s = int(data.get('s', 3))
+        t = int(data.get('t', 3))
+        rt = RamseyTheory()
+        r = rt.ramsey_number_R(s, t)
+        demo = rt.pigeonhole_principle()
+        return jsonify({'title': f'Ramsey R({s},{t})', 's': s, 't': t,
+                        'ramsey_number': r if r is not None else 'unbekannt',
+                        'pigeonhole': demo})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/combinatorics/generating', methods=['POST'])
+def api_comb_generating():
+    """@brief Erzeugende Funktionen. @lastModified 2026-03-10"""
+    if not _comb_ok:
+        return error_response('combinatorics nicht verfügbar')
+    try:
+        data = request.get_json()
+        n = int(data.get('n', 10))
+        gf = GeneratingFunctions()
+        # Fibonacci-EF als Beispiel
+        fib_coeffs = gf.fibonacci_gf(n)
+        catalan_coeffs = gf.catalan_gf(n)
+        return jsonify({'title': f'Erzeugende Funktionen (bis n={n})', 'n': n,
+                        'fibonacci_coefficients': fib_coeffs,
+                        'catalan_coefficients': catalan_coeffs})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Kodierungstheorie (coding_theory.py)
+# ===========================================================================
+
+@app.route('/api/coding/hamming', methods=['POST'])
+def api_coding_hamming():
+    """@brief Hamming-Code: Kodierung und Fehlerkorrektur. @lastModified 2026-03-10"""
+    if not _coding_ok:
+        return error_response('coding_theory nicht verfügbar')
+    try:
+        data = request.get_json()
+        r = int(data.get('r', 3))  # Hamming(2^r-1, 2^r-r-1)
+        hc = HammingCode(r)
+        n, k, d = hc.parameters()
+        # Beispiel: Kodiere die Nachricht 1011
+        msg = [1, 0, 1, 1] if k >= 4 else [1] * k
+        codeword = hc.encode(msg[:k]).tolist()
+        return jsonify({'title': f'Hamming({n},{k})', 'r': r,
+                        'n': n, 'k': k, 'd': d,
+                        'message': msg[:k], 'codeword': codeword,
+                        'generator_matrix': hc.generator_matrix().tolist()})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/coding/linear_code', methods=['POST'])
+def api_coding_linear():
+    """@brief Linearer Code: Generatormatrix, Distanz. @lastModified 2026-03-10"""
+    if not _coding_ok:
+        return error_response('coding_theory nicht verfügbar')
+    try:
+        import numpy as np
+        data = request.get_json()
+        # Beispiel: [7,4,3]-Hamming-Code Generatormatrix
+        G = np.array([[1,0,0,0,1,1,0],[0,1,0,0,1,0,1],
+                      [0,0,1,0,0,1,1],[0,0,0,1,1,1,1]], dtype=int)
+        lc = LinearCode(G)
+        H = lc.parity_check_matrix().tolist()
+        d = lc.minimum_distance()
+        msg = np.array([1, 0, 1, 1])
+        cw = lc.encode(msg).tolist()
+        return jsonify({'title': f'Linearer [{lc.n},{lc.k},{d}]-Code',
+                        'n': lc.n, 'k': lc.k, 'min_distance': d,
+                        'example_message': [1, 0, 1, 1],
+                        'example_codeword': cw})
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/coding/dfa', methods=['POST'])
+def api_coding_dfa():
+    """@brief Deterministischer Automat: Wörter akzeptieren. @lastModified 2026-03-10"""
+    if not _coding_ok:
+        return error_response('coding_theory nicht verfügbar')
+    try:
+        data = request.get_json()
+        word = data.get('word', '1010')
+        # DFA: akzeptiert Binärstrings mit gerader Anzahl von 1en
+        states = {'q0', 'q1'}
+        alphabet = {'0', '1'}
+        transitions = {('q0','0'):'q0', ('q0','1'):'q1',
+                       ('q1','0'):'q1', ('q1','1'):'q0'}
+        dfa = DFA(states, alphabet, transitions, 'q0', {'q0'})
+        accepted = dfa.accepts(word)
+        return jsonify({'title': f'DFA: "{word}"', 'word': word,
+                        'accepted': bool(accepted),
+                        'description': 'Akzeptiert Strings mit gerader Anzahl von 1en'})
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# Darstellungstheorie (representation_theory.py)
 # ===========================================================================
 
 @app.route('/api/representation/character_table', methods=['POST'])
@@ -7101,7 +7699,7 @@ if __name__ == '__main__':
     # Port 8080, debug=True für Entwicklung (zeigt Fehler im Browser)
     print("=" * 60)
     print("  Mathematik-Spezialist Web-Interface")
-    print("  Build 36 | Port 8080")
+    print("  Build 37 | Port 8080")
     print("  URL: http://localhost:8080")
     print("=" * 60)
     app.run(host='0.0.0.0', port=8080, debug=True)

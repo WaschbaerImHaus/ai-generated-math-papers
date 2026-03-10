@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+<!--
+    @file algebraic_topology.html
+    @brief Algebraische Topologie: Simplizialkomplexe, Euler-Charakteristik χ = V - E + F,
+           Homologiegruppen H_k bekannter Räume (Sphären, Torus), Homotopiegruppen π_n.
+           Rein statische mathematische Inhalte mit KaTeX – kein Backend erforderlich.
+    @description
+        Bildungsseite für algebraische Topologie. Erklärt Simplizialkomplexe und
+        Euler-Charakteristik χ = V - E + F, Homologiegruppen H_k (Sphären S^n, Torus T^2,
+        projektive Ebene), Fundamentalgruppe π_1, höhere Homotopiegruppen π_n(S^k).
+        Interaktiver Euler-Charakteristik-Rechner und Flächen-Klassifikation (client-seitig).
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+
+{% block title %}Algebraische Topologie – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>&#8855; Algebraische Topologie</h1>
+    <p class="page-desc">
+        Algebraische Topologie untersucht topologische Räume durch algebraische Invarianten:
+        Homologiegruppen $H_k$, Kohomologieringe $H^k$, Homotopiegruppen $\pi_k$
+        und K-Theorie-Gruppen. Emmy Noethers Idee: Studiere die algebraischen Objekte statt
+        numerischer Invarianten (Betti-Zahlen). Kernprinzip: Topologisch äquivalente Räume
+        besitzen isomorphe algebraische Invarianten.
+    </p>
+</div>
+
+<!-- ===== SECTION 1: SIMPLIZIALKOMPLEXE & EULER-CHARAKTERISTIK ===== -->
+<section class="math-section">
+    <h2>&#9651; Simplizialkomplexe &amp; Euler-Charakteristik</h2>
+    <p>
+        Ein <strong>$k$-Simplex</strong> ist die konvexe Hülle von $k+1$ affin unabhängigen Punkten:
+        $0$-Simplex = Punkt, $1$-Simplex = Kante, $2$-Simplex = Dreieck, $3$-Simplex = Tetraeder.
+        Ein <strong>Simplizialkomplex</strong> $K$ enthält mit jedem Simplex alle seine Randseiten.
+    </p>
+    <p>
+        Die <strong>Euler-Charakteristik</strong> für einen 2-Komplex (Ecken $V$, Kanten $E$, Flächen $F$):
+        $$\chi(K) = V - E + F$$
+        Allgemein (beliebige Dimension, $c_k$ = Anzahl der $k$-Simplizes):
+        $$\chi(K) = \sum_{k=0}^{n} (-1)^k c_k
+        = \sum_{k=0}^{n} (-1)^k \beta_k \quad \text{(Euler-Poincaré-Formel)}$$
+        wobei $\beta_k = \operatorname{rank} H_k$ die <strong>Betti-Zahlen</strong> sind.
+    </p>
+    <div class="card-grid">
+        <div class="card">
+            <h3>Euler-Theorem: $\chi = 2$ für konvexe Polyeder</h3>
+            <p>
+                Für jeden konvexen Polyeder gilt $\chi = V - E + F = 2$
+                (platonische Körper und alle homöomorphen Räume zur $S^2$):
+            </p>
+            <table class="math-table">
+                <thead>
+                    <tr>
+                        <th>Körper</th>
+                        <th>$V$</th><th>$E$</th><th>$F$</th>
+                        <th>$\chi$</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Tetraeder</td><td>4</td><td>6</td><td>4</td><td><strong>2</strong></td></tr>
+                    <tr><td>Würfel</td><td>8</td><td>12</td><td>6</td><td><strong>2</strong></td></tr>
+                    <tr><td>Oktaeder</td><td>6</td><td>12</td><td>8</td><td><strong>2</strong></td></tr>
+                    <tr><td>Dodekaeder</td><td>20</td><td>30</td><td>12</td><td><strong>2</strong></td></tr>
+                    <tr><td>Ikosaeder</td><td>12</td><td>30</td><td>20</td><td><strong>2</strong></td></tr>
+                    <tr><td>Torus $T^2$</td><td>1</td><td>2</td><td>1</td><td><strong>0</strong></td></tr>
+                    <tr><td>Projektive Ebene $\mathbb{R}P^2$</td><td>6</td><td>15</td><td>10</td><td><strong>1</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card">
+            <h3>Interaktiver Euler-Rechner $\chi = V - E + F$</h3>
+            <p>
+                Gib die Anzahl der Ecken $V$, Kanten $E$ und Flächen $F$
+                eines Polyeders ein und berechne die Euler-Charakteristik.
+                Für kompakte orientierbare Flächen vom Geschlecht $g$: $\chi = 2 - 2g$.
+            </p>
+            <div class="input-row">
+                <label>Ecken $V$:</label>
+                <input type="number" id="euler-V" value="8" min="0" step="1">
+                <label>Kanten $E$:</label>
+                <input type="number" id="euler-E" value="12" min="0" step="1">
+                <label>Flächen $F$:</label>
+                <input type="number" id="euler-F" value="6" min="0" step="1">
+            </div>
+            <button onclick="calcEuler()" class="btn-calc">$\chi = V - E + F$ berechnen</button>
+            <div id="euler-result" class="result-box"></div>
+            <br>
+            <h3 style="margin-top:12px">Flächen-Klassifikation nach Geschlecht $g$</h3>
+            <p>Für kompakte orientierbare Flächen: $\chi = 2 - 2g$, $H_1 = \mathbb{Z}^{2g}$.</p>
+            <div class="input-row">
+                <label>Geschlecht $g$:</label>
+                <input type="number" id="genus-g" value="1" min="0" max="10">
+            </div>
+            <button onclick="calcSurface()" class="btn-calc">Fläche klassifizieren</button>
+            <div id="surface-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 2: HOMOLOGIEGRUPPEN ===== -->
+<section class="math-section">
+    <h2>&#9632; Homologiegruppen $H_k(X;\mathbb{Z})$</h2>
+    <p>
+        Die <strong>simpliziale Homologie</strong> nutzt Kettengruppen $C_k$ und Randoperatoren
+        $\partial_k: C_k \to C_{k-1}$ mit $\partial_{k-1} \circ \partial_k = 0$:
+        $$H_k(X) = \ker \partial_k \,/\, \operatorname{im} \partial_{k+1}
+        = \{\text{Zyklen}\} / \{\text{Ränder}\}$$
+        Anschaulich: $H_0$ zählt Zusammenhangskomponenten, $H_1$ unausfüllbare Schleifen,
+        $H_2$ unausfüllbare Hohlräume usw.
+        Die <strong>Betti-Zahlen</strong> $\beta_k = \operatorname{rank} H_k$ zählen
+        $k$-dimensionale "Löcher".
+    </p>
+    <div class="card-grid">
+        <div class="card">
+            <h3>Homologie der Sphären $H_k(S^n)$</h3>
+            <p>
+                $$H_k(S^n;\mathbb{Z}) = \begin{cases}
+                    \mathbb{Z} & k = 0 \text{ oder } k = n \\
+                    0 & \text{sonst}
+                \end{cases}$$
+                $S^n$ hat genau ein $n$-dimensionales Loch und ist zusammenhängend.
+            </p>
+            <table class="math-table">
+                <thead>
+                    <tr><th>Raum</th><th>$H_0$</th><th>$H_1$</th><th>$H_2$</th><th>$H_3$</th><th>$\chi$</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Punkt $\{*\}$</td><td>$\mathbb{Z}$</td><td>$0$</td><td>$0$</td><td>$0$</td><td>$1$</td></tr>
+                    <tr><td>$S^1$</td><td>$\mathbb{Z}$</td><td>$\mathbb{Z}$</td><td>$0$</td><td>$0$</td><td>$0$</td></tr>
+                    <tr><td>$S^2$</td><td>$\mathbb{Z}$</td><td>$0$</td><td>$\mathbb{Z}$</td><td>$0$</td><td>$2$</td></tr>
+                    <tr><td>$S^3$</td><td>$\mathbb{Z}$</td><td>$0$</td><td>$0$</td><td>$\mathbb{Z}$</td><td>$0$</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card">
+            <h3>Homologie des Torus $T^2 = S^1 \times S^1$</h3>
+            <p>
+                Künneth-Formel: $H_k(X \times Y) \cong \bigoplus_{i+j=k} H_i(X) \otimes H_j(Y)$.
+                Damit für den Torus:
+                $$H_k(T^2) = \begin{cases}
+                    \mathbb{Z} & k = 0 \\
+                    \mathbb{Z}^2 & k = 1 \\
+                    \mathbb{Z} & k = 2 \\
+                    0 & k \geq 3
+                \end{cases}$$
+                $H_1(T^2) = \mathbb{Z}^2$: zwei unabhängige Schleifen (Längs- und Breitenkreis).
+            </p>
+            <table class="math-table">
+                <thead>
+                    <tr><th>Fläche</th><th>$H_0$</th><th>$H_1$</th><th>$H_2$</th><th>$\chi$</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>$S^2$</td><td>$\mathbb{Z}$</td><td>$0$</td><td>$\mathbb{Z}$</td><td>$2$</td></tr>
+                    <tr><td>$T^2$</td><td>$\mathbb{Z}$</td><td>$\mathbb{Z}^2$</td><td>$\mathbb{Z}$</td><td>$0$</td></tr>
+                    <tr><td>Doppeltorus $\Sigma_2$</td><td>$\mathbb{Z}$</td><td>$\mathbb{Z}^4$</td><td>$\mathbb{Z}$</td><td>$-2$</td></tr>
+                    <tr><td>$\mathbb{R}P^2$</td><td>$\mathbb{Z}$</td><td>$\mathbb{Z}/2$</td><td>$0$</td><td>$1$</td></tr>
+                    <tr><td>Kleinsche Flasche $K$</td><td>$\mathbb{Z}$</td><td>$\mathbb{Z}\oplus\mathbb{Z}/2$</td><td>$0$</td><td>$0$</td></tr>
+                    <tr><td>$\mathbb{C}P^n$</td><td>$\mathbb{Z}$</td><td>$0$</td><td>$\mathbb{Z}$</td><td>$n+1$</td></tr>
+                    <tr><td>Genus-$g$-Fläche</td><td>$\mathbb{Z}$</td><td>$\mathbb{Z}^{2g}$</td><td>$\mathbb{Z}$</td><td>$2-2g$</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-grid">
+        <div class="card">
+            <h3>Mayer-Vietoris-Sequenz &amp; universeller Koeffizientensatz</h3>
+            <p>
+                <strong>Mayer-Vietoris</strong>: Für $X = A \cup B$:
+                $$\cdots \to H_n(A \cap B) \to H_n(A) \oplus H_n(B) \to H_n(X)
+                \xrightarrow{\partial} H_{n-1}(A \cap B) \to \cdots$$
+                Topologisches Analogon zum Inklusions-Exklusions-Prinzip.
+            </p>
+            <p>
+                <strong>Universeller Koeffizientensatz</strong>:
+                $$H_n(X; G) \cong \bigl(H_n(X;\mathbb{Z}) \otimes G\bigr)
+                \oplus \operatorname{Tor}\bigl(H_{n-1}(X;\mathbb{Z}), G\bigr)$$
+                Ermöglicht die Berechnung von Homologie mit beliebigen Koeffizientengruppen $G$.
+            </p>
+            <p>
+                <strong>Brouwerscher Fixpunktsatz</strong>: Jede stetige Abbildung
+                $f: D^n \to D^n$ besitzt mindestens einen Fixpunkt.
+                Beweis: Annahme "kein Fixpunkt" liefert eine Retraktion $D^n \to S^{n-1}$,
+                was $H_{n-1}(S^{n-1}) \cong \mathbb{Z} \hookrightarrow H_{n-1}(D^n) = 0$ widerspricht.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 3: HOMOTOPIEGRUPPEN ===== -->
+<section class="math-section">
+    <h2>&#8635; Homotopiegruppen $\pi_n(X)$</h2>
+    <p>
+        Die <strong>Fundamentalgruppe</strong> $\pi_1(X, x_0)$ besteht aus Homotopieäquivalenzklassen
+        geschlossener Wege bei Basispunkt $x_0$. Die <strong>$n$-te Homotopiegruppe</strong>
+        $\pi_n(X, x_0) = [S^n, X]_{\mathrm{basiert}}$ ist für $n \geq 2$ stets <strong>abelsch</strong>.
+    </p>
+    <div class="card-grid">
+        <div class="card">
+            <h3>Fundamentalgruppe $\pi_1(X)$ – Beispiele</h3>
+            <p>
+                <strong>Van-Kampen-Theorem</strong>: Für $X = U \cup V$ mit $U, V, U \cap V$ wegzusammenhängend:
+                $$\pi_1(X) \cong \pi_1(U) *_{\pi_1(U \cap V)} \pi_1(V)$$
+            </p>
+            <table class="math-table">
+                <thead>
+                    <tr><th>Raum</th><th>$\pi_1$</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Punkt, $D^n$, $\mathbb{R}^n$</td><td>$0$ (trivial)</td></tr>
+                    <tr><td>$S^n$ für $n \geq 2$</td><td>$0$ (einfach zszhgd.)</td></tr>
+                    <tr><td>Kreis $S^1$</td><td>$\mathbb{Z}$ (Umlaufzahl)</td></tr>
+                    <tr><td>Torus $T^2$</td><td>$\mathbb{Z} \times \mathbb{Z}$ (abelsch)</td></tr>
+                    <tr><td>$\mathbb{R}P^2$</td><td>$\mathbb{Z}/2$</td></tr>
+                    <tr><td>$\mathbb{R}P^n$ ($n \geq 2$)</td><td>$\mathbb{Z}/2$</td></tr>
+                    <tr><td>$S^1 \vee S^1$</td><td>$\mathbb{Z} * \mathbb{Z}$ (frei, nicht-abelsch)</td></tr>
+                    <tr><td>Genus-$g$-Fläche</td><td>$\langle a_1,b_1,\ldots,a_g,b_g \mid [a_1,b_1]\cdots[a_g,b_g]=1 \rangle$</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card">
+            <h3>Höhere Homotopiegruppen $\pi_n(S^k)$</h3>
+            <p>
+                Homotopiegruppen der Sphären sind extrem schwer zu berechnen.
+                Allgemein gilt: $\pi_n(S^n) \cong \mathbb{Z}$ für alle $n \geq 1$
+                (Abbildungsgrad).
+                <strong>Hurewicz-Theorem</strong>: Für $(n-1)$-zusammenhängenden Raum $X$:
+                $\pi_n(X) \cong H_n(X)$.
+            </p>
+            <table class="math-table">
+                <thead>
+                    <tr>
+                        <th>$\pi_n(S^k)$</th>
+                        <th>$S^1$</th><th>$S^2$</th><th>$S^3$</th><th>$S^4$</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>$\pi_1$</td><td>$\mathbb{Z}$</td><td>$0$</td><td>$0$</td><td>$0$</td></tr>
+                    <tr><td>$\pi_2$</td><td>$0$</td><td>$\mathbb{Z}$</td><td>$0$</td><td>$0$</td></tr>
+                    <tr><td>$\pi_3$</td><td>$0$</td><td>$\mathbb{Z}$ (Hopf)</td><td>$\mathbb{Z}$</td><td>$0$</td></tr>
+                    <tr><td>$\pi_4$</td><td>$0$</td><td>$\mathbb{Z}/2$</td><td>$\mathbb{Z}/2$</td><td>$\mathbb{Z}$</td></tr>
+                    <tr><td>$\pi_5$</td><td>$0$</td><td>$\mathbb{Z}/2$</td><td>$\mathbb{Z}/2$</td><td>$\mathbb{Z}/2$</td></tr>
+                    <tr><td>$\pi_n(S^n)$</td><td>$\mathbb{Z}$</td><td>$\mathbb{Z}$</td><td>$\mathbb{Z}$</td><td>$\mathbb{Z}$</td></tr>
+                </tbody>
+            </table>
+            <p style="font-size:0.85em;margin-top:0.5em">
+                <strong>Hopf-Faserung</strong> $S^1 \hookrightarrow S^3 \twoheadrightarrow S^2$
+                erklärt $\pi_3(S^2) \cong \mathbb{Z}$.
+                Zugehörige lange exakte Sequenz:
+                $\cdots \to \pi_3(S^1) \to \pi_3(S^3) \to \pi_3(S^2) \to \pi_2(S^1) \to \cdots$
+            </p>
+        </div>
+    </div>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>Faserungen, K-Theorie &amp; Poincaré-Vermutung</h3>
+            <p>
+                <strong>Faserung</strong> $F \to E \xrightarrow{p} B$ mit Homotopy Lifting Property.
+                <strong>K-Theorie</strong> (Bott-Periodizität):
+                $$\tilde{K}(X) \cong \tilde{K}(\Sigma^2 X),\quad
+                \tilde{K}(S^{2n}) \cong \mathbb{Z},\quad \tilde{K}(S^{2n+1}) \cong 0$$
+            </p>
+            <p>
+                <strong>Poincaré-Vermutung</strong> (Perelman 2003, einziges gelöstes Millennium-Problem):
+                Jede kompakte einfach zusammenhängende 3-Mannigfaltigkeit ist homöomorph zu $S^3$.
+            </p>
+            <p>
+                <strong>Atiyah-Singer-Indexsatz</strong>: Für elliptischen Differentialoperator $D$:
+                $$\operatorname{ind}(D) = \operatorname{ch}(\sigma(D)) \cdot \hat{A}(M)\,[M]$$
+                Verbindet Analysis (Index), Topologie (char. Klassen) und K-Theorie.
+            </p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * @brief Euler-Charakteristik χ = V - E + F berechnen und topologisch interpretieren.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+function calcEuler() {
+    // Eingabewerte lesen
+    const div = document.getElementById('euler-result');
+    const V = parseInt(document.getElementById('euler-V').value) || 0;
+    const E = parseInt(document.getElementById('euler-E').value) || 0;
+    const F = parseInt(document.getElementById('euler-F').value) || 0;
+    const chi = V - E + F;
+
+    // Topologische Interpretation der Euler-Charakteristik
+    let interpretation = '';
+    if (chi === 2) {
+        interpretation = 'Homöomorph zur Sphäre $S^2$ (Euler-Theorem für konvexe Polyeder).';
+    } else if (chi === 0) {
+        interpretation = '$\\chi = 0$: Torus $T^2$, Kleinsche Flasche oder Genus-1-Fläche.';
+    } else if (chi === 1) {
+        interpretation = '$\\chi = 1$: Projektive Ebene $\\mathbb{R}P^2$.';
+    } else if (chi < 0 && (2 - chi) % 2 === 0) {
+        const g = (2 - chi) / 2;
+        interpretation = `$\\chi = ${chi}$: Orientierbare Fläche vom Geschlecht $g = ${g}$ ($g$-facher Torus).`;
+    } else {
+        interpretation = `Euler-Charakteristik $\\chi = ${chi}$.`;
+    }
+
+    let html = `<strong>Euler-Charakteristik</strong><br>`;
+    html += `$V = ${V}$, $E = ${E}$, $F = ${F}$<br>`;
+    html += `<br>$$\\chi = V - E + F = ${V} - ${E} + ${F} = ${chi}$$`;
+    html += `<em>${interpretation}</em>`;
+    showResult(div, html);
+    renderMathInElement(div);
+}
+
+/**
+ * @brief Homologiegruppen und Betti-Zahlen einer kompakten orientierbaren Fläche
+ *        vom Geschlecht g berechnen (client-seitig, kein Backend nötig).
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+function calcSurface() {
+    const div = document.getElementById('surface-result');
+    const g = parseInt(document.getElementById('genus-g').value) || 0;
+
+    // Formeln für kompakte orientierbare Flächen
+    const chi = 2 - 2 * g;
+    const b1 = 2 * g;
+
+    // Bezeichnung der Fläche
+    let name;
+    if (g === 0) name = 'Sphäre $S^2$';
+    else if (g === 1) name = 'Torus $T^2$';
+    else name = `Geschlecht-${g}-Fläche $\\Sigma_${g}$`;
+
+    // Fundamentalgruppen-Darstellung
+    let pi1;
+    if (g === 0) pi1 = '0 (einfach zusammenhängend)';
+    else if (g === 1) pi1 = '\\mathbb{Z} \\times \\mathbb{Z}';
+    else pi1 = `\\langle a_1, b_1, \\ldots, a_{${g}}, b_{${g}} \\mid [a_1,b_1]\\cdots[a_{${g}},b_{${g}}]=1 \\rangle`;
+
+    let html = `<strong>${name}</strong><br>`;
+    html += `<br>Euler-Charakteristik: $\\chi = 2 - 2 \\cdot ${g} = ${chi}$<br>`;
+    html += `<br><strong>Homologiegruppen:</strong><br>`;
+    html += `$H_0 = \\mathbb{Z}$ (zusammenhängend)<br>`;
+    html += `$H_1 = \\mathbb{Z}^{${b1}}$ ($\\beta_1 = ${b1}$ Schleifen)<br>`;
+    html += `$H_2 = \\mathbb{Z}$ (kompakte Fläche)<br>`;
+    html += `<br>Fundamentalgruppe: $\\pi_1 = ${pi1}$<br>`;
+    html += `<br>Betti-Zahlen: $\\beta_0 = 1$, $\\beta_1 = ${b1}$, $\\beta_2 = 1$`;
+
+    showResult(div, html);
+    renderMathInElement(div);
+}
+</script>
+{% endblock %}

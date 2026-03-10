@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+<!--
+    @file differential_geometry.html
+    @brief Differentialgeometrie: Kurventheorie, Flächentheorie und Geodätische.
+    @description
+        Interaktive Web-Seite für Differentialgeometrie.
+        Kurventheorie (Krümmung, Vier-Scheitel-Satz),
+        Flächentheorie (Gauß-Krümmung, mittlere Krümmung für Kugel/Torus/Zylinder),
+        Geodätische auf Mannigfaltigkeiten.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+
+{% block title %}Differentialgeometrie – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>&#8767; Differentialgeometrie</h1>
+    <p class="page-desc">
+        <strong>Kurventheorie</strong> (Frenet-Serret: Krümmung $\kappa = |\alpha'' \times \alpha'| / |\alpha'|^3$,
+        Torsion $\tau$, Vier-Scheitel-Satz),
+        <strong>Flächentheorie</strong> (Gauß-Krümmung $K = \kappa_1 \kappa_2$,
+        mittlere Krümmung $H = \frac{\kappa_1 + \kappa_2}{2}$, erste/zweite Fundamentalform) und
+        <strong>Geodätische</strong> (kürzeste Verbindungen auf Mannigfaltigkeiten,
+        $\ddot{\gamma}^k + \Gamma^k_{ij}\dot{\gamma}^i\dot{\gamma}^j = 0$).
+    </p>
+</div>
+
+<!-- ===== SECTION 1: KURVENTHEORIE ===== -->
+<section class="math-section">
+    <h2>&#8641; Kurventheorie</h2>
+    <p>
+        Für eine reguläre Kurve $\alpha : I \to \mathbb{R}^2$ (parametrisiert nach Bogenlänge)
+        definiert man die <strong>Krümmung</strong>:
+        $$\kappa(t) = \frac{|\alpha'(t) \times \alpha''(t)|}{|\alpha'(t)|^3}$$
+        Das <strong>Frenet-Serret-Begleitdreibein</strong> besteht aus Tangente $\mathbf{T}$,
+        Normalenvektor $\mathbf{N}$ und Binormale $\mathbf{B}$.
+        <strong>Vier-Scheitel-Satz</strong>: Jede einfach geschlossene glatte Kurve hat mindestens
+        vier Scheitelpunkte (lokale Extrema der Krümmung $\kappa' = 0$).
+    </p>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>Krümmung und Vier-Scheitel-Satz</h3>
+            <p>
+                Berechnung der Krümmung $\kappa(x_0)$ einer ebenen Kurve $y = f(x)$
+                an einem Punkt $x_0$ sowie Überprüfung des Vier-Scheitel-Satzes
+                (Anzahl lokaler Extrema der Krümmung).
+            </p>
+            <p><em>Standardkurve: Ellipse $x(t) = 2\cos t$, $y(t) = \sin t$ (analytisch lösbar).</em></p>
+            <button onclick="calcCurvature()" class="btn-calc">Krümmung berechnen</button>
+            <div id="curv-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 2: FLÄCHENTHEORIE ===== -->
+<section class="math-section">
+    <h2>&#9685; Flächentheorie</h2>
+    <p>
+        Eine reguläre Fläche $\mathbf{r}(u,v) : U \subset \mathbb{R}^2 \to \mathbb{R}^3$ trägt
+        die <strong>erste Fundamentalform</strong> (Metrik): $I = E\,du^2 + 2F\,du\,dv + G\,dv^2$.
+        Die <strong>Gauß-Krümmung</strong> $K$ und <strong>mittlere Krümmung</strong> $H$:
+        $$K = \kappa_1 \kappa_2 = \frac{LN - M^2}{EG - F^2}, \qquad H = \frac{\kappa_1 + \kappa_2}{2} = \frac{EN - 2FM + GL}{2(EG-F^2)}$$
+        <strong>Gauß-Bonnet</strong>: $\iint_S K\, dA = 2\pi \chi(S)$ (topologische Invariante).
+    </p>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>Gauß- und mittlere Krümmung</h3>
+            <p>
+                Berechnung der Gauß-Krümmung $K$ und mittleren Krümmung $H$
+                für verschiedene Flächen an einem Punkt $(u, v)$.
+            </p>
+            <div class="input-row">
+                <label>Flächentyp:</label>
+                <select id="surf-type">
+                    <option value="sphere">Kugel (sphere, Radius $R = 1$)</option>
+                    <option value="torus">Torus ($R = 2,\, r = 1$)</option>
+                    <option value="cylinder">Zylinder (cylinder, Radius $R = 1$)</option>
+                </select>
+            </div>
+            <div class="input-row">
+                <label>Parameter $u$:</label>
+                <input type="number" id="surf-u" value="0.5" step="0.1">
+                <label>Parameter $v$:</label>
+                <input type="number" id="surf-v" value="0.5" step="0.1">
+            </div>
+            <button onclick="calcSurface()" class="btn-calc">Krümmungen berechnen</button>
+            <div id="surf-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 3: GEODÄTISCHE ===== -->
+<section class="math-section">
+    <h2>&#8594; Geodätische</h2>
+    <p>
+        Eine <strong>Geodätische</strong> ist eine lokal kürzeste Kurve auf einer Mannigfaltigkeit,
+        die die Geodäten-Gleichung erfüllt:
+        $$\frac{d^2\gamma^k}{dt^2} + \Gamma^k_{ij}\frac{d\gamma^i}{dt}\frac{d\gamma^j}{dt} = 0$$
+        $\Gamma^k_{ij}$ sind die <em>Christoffel-Symbole</em>, bestimmt durch die Metrik $g_{ij}$.
+        Auf der <strong>Einheitskugel</strong> $S^2$ sind Geodätische Großkreise.
+        Der <strong>Gauß-Bonnet-Satz</strong> verbindet Krümmung und Geodätische mit der Topologie.
+    </p>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>Geodätischer Pfad auf einer Fläche</h3>
+            <p>
+                Numerische Berechnung einer Geodätischen auf einer Mannigfaltigkeit
+                (Standardfläche: Einheitskugel $S^2$) zwischen zwei Punkten.
+                Ausgabe des Pfads (Länge, Stützpunkte).
+            </p>
+            <button onclick="calcGeodesic()" class="btn-calc">Geodätische berechnen</button>
+            <div id="geod-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * @brief Kurventheorie: Krümmung und Vier-Scheitel-Satz berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcCurvature() {
+    const div = document.getElementById('curv-result');
+    try {
+        // Standardkurve wird serverseitig verwendet
+        const data = await apiPost('/api/diff_geom/curvature', {});
+        const r = data;
+        let html = '<strong>Kurventheorie: Krümmungsanalyse</strong><br>';
+        // Krümmung am angegebenen Punkt
+        if (r.curvature_at_x0 !== undefined) {
+            html += `<br>Krümmung bei $x_0$: $\\kappa(x_0) = ${typeof r.curvature_at_x0 === 'number' ? r.curvature_at_x0.toFixed(6) : r.curvature_at_x0}$<br>`;
+        }
+        // Vier-Scheitel-Satz
+        if (r.four_vertex !== undefined) {
+            html += `<br><strong>Vier-Scheitel-Satz:</strong> ${r.four_vertex ? '✓ (mindestens 4 Scheitelpunkte gefunden)' : '✗ (weniger als 4 Scheitelpunkte)'}<br>`;
+            html += `<em>Ein Scheitelpunkt ist ein lokales Extremum der Krümmung ($\\kappa' = 0$).</em><br>`;
+        }
+        // Zusätzliche Informationen
+        if (r.num_vertices !== undefined) {
+            html += `Anzahl Scheitelpunkte: ${r.num_vertices}<br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Flächentheorie: Gauß-Krümmung und mittlere Krümmung berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcSurface() {
+    const div = document.getElementById('surf-result');
+    // Eingaben aus Formular lesen
+    const surface_type = document.getElementById('surf-type').value;
+    const u = parseFloat(document.getElementById('surf-u').value);
+    const v = parseFloat(document.getElementById('surf-v').value);
+    try {
+        const data = await apiPost('/api/diff_geom/surface', { surface_type, u, v });
+        const r = data;
+        // Flächenname für die Ausgabe
+        const surfNames = { sphere: 'Kugel $S^2$', torus: 'Torus', cylinder: 'Zylinder' };
+        let html = `<strong>Flächentheorie: ${surfNames[surface_type] || surface_type}</strong><br>`;
+        html += `Parameter: $u = ${u}$, $v = ${v}$<br>`;
+        // Gauß-Krümmung
+        if (r.gaussian_curvature !== undefined) {
+            html += `<br>Gauß-Krümmung: $K = ${typeof r.gaussian_curvature === 'number' ? r.gaussian_curvature.toFixed(6) : r.gaussian_curvature}$<br>`;
+        }
+        // Mittlere Krümmung
+        if (r.mean_curvature !== undefined) {
+            html += `Mittlere Krümmung: $H = ${typeof r.mean_curvature === 'number' ? r.mean_curvature.toFixed(6) : r.mean_curvature}$<br>`;
+        }
+        // Theoretische Werte zur Referenz
+        if (surface_type === 'sphere') {
+            html += `<em>Theoretisch: $K = 1$ (Einheitskugel), $H = 1$.</em><br>`;
+        } else if (surface_type === 'cylinder') {
+            html += `<em>Theoretisch: $K = 0$ (abwickelbare Fläche), $H = \\tfrac{1}{2R}$.</em><br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Geodätische: Numerische Berechnung eines geodätischen Pfades.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcGeodesic() {
+    const div = document.getElementById('geod-result');
+    try {
+        // API-Aufruf mit Standardparametern (Kugel, Nordpol → Äquatorpunkt)
+        const data = await apiPost('/api/diff_geom/geodesic', {});
+        const r = data;
+        let html = '<strong>Geodätische auf der Einheitskugel $S^2$</strong><br>';
+        // Pfadlänge
+        if (r.path_length !== undefined) {
+            html += `<br>Geodätische Länge: $L = ${typeof r.path_length === 'number' ? r.path_length.toFixed(6) : r.path_length}$<br>`;
+        }
+        // Anzahl Stützpunkte
+        if (r.num_points !== undefined) {
+            html += `Anzahl Stützpunkte: ${r.num_points}<br>`;
+        }
+        // Start- und Endpunkt
+        if (r.start_point !== undefined) {
+            html += `Startpunkt: $(${Array.isArray(r.start_point) ? r.start_point.map(v => typeof v === 'number' ? v.toFixed(3) : v).join(', ') : r.start_point})$<br>`;
+        }
+        if (r.end_point !== undefined) {
+            html += `Endpunkt: $(${Array.isArray(r.end_point) ? r.end_point.map(v => typeof v === 'number' ? v.toFixed(3) : v).join(', ') : r.end_point})$<br>`;
+        }
+        // Pfadinformation (erste Stützpunkte anzeigen)
+        if (r.path && Array.isArray(r.path)) {
+            html += `<br><strong>Pfad (erste 5 Punkte):</strong><br>`;
+            html += '<table class="math-table"><tbody>';
+            const preview = r.path.slice(0, 5);
+            preview.forEach((pt, i) => {
+                const coords = Array.isArray(pt)
+                    ? pt.map(v => typeof v === 'number' ? v.toFixed(4) : v).join(', ')
+                    : pt;
+                html += `<tr><td>$p_{${i}}$</td><td>$(${coords})$</td></tr>`;
+            });
+            if (r.path.length > 5) html += `<tr><td colspan="2">... (${r.path.length - 5} weitere Punkte)</td></tr>`;
+            html += '</tbody></table>';
+        }
+        if (r.description) html += `<br><em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+</script>
+{% endblock %}

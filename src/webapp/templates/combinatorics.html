@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+<!--
+    @file combinatorics.html
+    @brief Kombinatorik: Abzählung, Ramsey-Theorie und Erzeugende Funktionen.
+    @description
+        Interaktive Web-Seite für Kombinatorik.
+        Kombinatorische Abzählung (Binomialkoeffizienten, Partitionen, Stirling-Zahlen,
+        Motzkin-Zahlen), Ramsey-Theorie (Ramsey-Zahlen, Taubenschlagprinzip),
+        Erzeugende Funktionen (Fibonacci, Catalan-Zahlen).
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+
+{% block title %}Kombinatorik – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>&#9670; Kombinatorik</h1>
+    <p class="page-desc">
+        <strong>Kombinatorische Abzählung</strong>
+        ($\binom{n}{k} = \frac{n!}{k!(n-k)!}$, Partitionszahlen $p(n)$, Stirling-Zahlen 2. Art $S(n,k)$,
+        Motzkin-Zahlen $M_n$),
+        <strong>Ramsey-Theorie</strong> (Ramsey-Zahlen $R(s,t)$, Schur-Zahlen,
+        Taubenschlagprinzip) und
+        <strong>Erzeugende Funktionen</strong>
+        (Fibonacci: $F(x) = \frac{x}{1-x-x^2}$, Catalan: $C(x) = \frac{1-\sqrt{1-4x}}{2x}$).
+    </p>
+</div>
+
+<!-- ===== SECTION 1: KOMBINATORISCHE ABZÄHLUNG ===== -->
+<section class="math-section">
+    <h2>&#9632; Kombinatorische Abzählung</h2>
+    <p>
+        <strong>Binomialkoeffizient</strong>: Anzahl der $k$-elementigen Teilmengen einer $n$-Menge:
+        $$\binom{n}{k} = \frac{n!}{k!\,(n-k)!}$$
+        <strong>Partitionszahlen</strong> $p(n)$: Anzahl der Zerlegungen von $n$ in positive Summanden
+        (ungeordnet). Eulersche Formel: $\sum_{n\geq 0} p(n)\,x^n = \prod_{k=1}^{\infty} \frac{1}{1-x^k}$.
+        <strong>Stirling-Zahlen 2. Art</strong> $S(n,k)$: Anzahl der Partitionen einer $n$-Menge
+        in genau $k$ nichtleere Blöcke. Rekursion: $S(n,k) = k\,S(n-1,k) + S(n-1,k-1)$.
+        <strong>Motzkin-Zahlen</strong> $M_n$: Anzahl der Pfade von $(0,0)$ nach $(n,0)$
+        mit Schritten $(1,1)$, $(1,0)$, $(1,-1)$, die $y \geq 0$ halten.
+    </p>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>Abzählung: $\binom{n}{k}$, $p(n)$, $S(n,k)$, $M_n$</h3>
+            <p>
+                Berechnung des Binomialkoeffizienten, der Partitionszahl, der Stirling-Zahl
+                2. Art und der Motzkin-Zahl für gegebene $n$ und $k$.
+            </p>
+            <div class="input-row">
+                <label>$n$:</label>
+                <input type="number" id="enum-n" value="6" min="0" max="100" step="1">
+                <label>$k$:</label>
+                <input type="number" id="enum-k" value="3" min="0" max="100" step="1">
+            </div>
+            <button onclick="calcEnumerate()" class="btn-calc">Abzählen</button>
+            <div id="enum-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 2: RAMSEY-THEORIE ===== -->
+<section class="math-section">
+    <h2>&#9670; Ramsey-Theorie</h2>
+    <p>
+        <strong>Ramseys Satz</strong>: Für alle $s, t \geq 2$ existiert eine Zahl $R(s,t)$
+        (Ramsey-Zahl), so dass jede 2-Färbung der Kanten des vollständigen Graphen $K_{R(s,t)}$
+        einen roten $K_s$ oder einen blauen $K_t$ enthält.
+        $$R(s,t) \leq \binom{s+t-2}{s-1}$$
+        <strong>Taubenschlagprinzip</strong> (Dirichlet): Werden $n$ Objekte auf $k < n$ Schachteln
+        verteilt, enthält mindestens eine Schachtel $\geq \lceil n/k \rceil$ Objekte.
+        Wichtige Werte: $R(3,3) = 6$, $R(4,4) = 18$, $R(3,5) = 14$.
+    </p>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>Ramsey-Zahl $R(s,t)$ und Taubenschlagprinzip</h3>
+            <p>
+                Berechnung/Abschätzung der Ramsey-Zahl $R(s,t)$ und Anwendung des
+                Taubenschlagprinzips. Für große $s, t$ werden obere Schranken angegeben.
+            </p>
+            <div class="input-row">
+                <label>$s$:</label>
+                <input type="number" id="ramsey-s" value="3" min="2" max="6" step="1">
+                <label>$t$:</label>
+                <input type="number" id="ramsey-t" value="3" min="2" max="6" step="1">
+            </div>
+            <button onclick="calcRamsey()" class="btn-calc">Ramsey-Analyse</button>
+            <div id="ramsey-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 3: ERZEUGENDE FUNKTIONEN ===== -->
+<section class="math-section">
+    <h2>&#8721; Erzeugende Funktionen</h2>
+    <p>
+        Eine <strong>Erzeugende Funktion</strong> $F(x) = \sum_{n=0}^{\infty} a_n x^n$
+        kodiert eine Folge $(a_n)$ als formale Potenzreihe.
+        <strong>Fibonacci-Zahlen</strong>: $F_n = F_{n-1} + F_{n-2}$, $F_0=0$, $F_1=1$.
+        Erzeugende Funktion:
+        $$F(x) = \frac{x}{1 - x - x^2} = \sum_{n=0}^{\infty} F_n\, x^n$$
+        <strong>Catalan-Zahlen</strong>: $C_n = \frac{1}{n+1}\binom{2n}{n}$, zählen z.B. korrekte
+        Klammerungen und planare Binärbäume.
+        $$C(x) = \frac{1 - \sqrt{1-4x}}{2x} = \sum_{n=0}^{\infty} C_n\, x^n$$
+    </p>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>Fibonacci- und Catalan-Koeffizienten</h3>
+            <p>
+                Berechnung der ersten $n+1$ Koeffizienten der erzeugenden Funktionen
+                für Fibonacci- und Catalan-Zahlen.
+            </p>
+            <div class="input-row">
+                <label>Anzahl Koeffizienten $n$:</label>
+                <input type="number" id="gen-n" value="10" min="1" max="30" step="1">
+            </div>
+            <button onclick="calcGenerating()" class="btn-calc">Erzeugende Funktion auswerten</button>
+            <div id="gen-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * @brief Kombinatorische Abzählung: Binomialkoeffizient, Partitionen, Stirling, Motzkin.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcEnumerate() {
+    const div = document.getElementById('enum-result');
+    // Eingaben lesen
+    const n = parseInt(document.getElementById('enum-n').value);
+    const k = parseInt(document.getElementById('enum-k').value);
+    try {
+        const data = await apiPost('/api/combinatorics/enumerate', { n, k });
+        const r = data;
+        let html = `<strong>Kombinatorische Abzählung: $n = ${n}$, $k = ${k}$</strong><br>`;
+        // Binomialkoeffizient
+        if (r.binomial !== undefined) {
+            html += `<br>Binomialkoeffizient: $\\binom{${n}}{${k}} = ${r.binomial}$<br>`;
+        }
+        // Partitionszahl
+        if (r.partition_number !== undefined) {
+            html += `Partitionszahl: $p(${n}) = ${r.partition_number}$<br>`;
+        }
+        // Stirling-Zahl 2. Art
+        if (r.stirling2 !== undefined) {
+            html += `Stirling 2. Art: $S(${n}, ${k}) = ${r.stirling2}$<br>`;
+        }
+        // Motzkin-Zahl
+        if (r.motzkin !== undefined) {
+            html += `Motzkin-Zahl: $M_{${n}} = ${r.motzkin}$<br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Ramsey-Theorie: Ramsey-Zahlen und Taubenschlagprinzip.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcRamsey() {
+    const div = document.getElementById('ramsey-result');
+    // Eingaben lesen
+    const s = parseInt(document.getElementById('ramsey-s').value);
+    const t = parseInt(document.getElementById('ramsey-t').value);
+    try {
+        const data = await apiPost('/api/combinatorics/ramsey', { s, t });
+        const r = data;
+        let html = `<strong>Ramsey-Theorie: $R(${s}, ${t})$</strong><br>`;
+        // Ramsey-Zahl
+        if (r.ramsey_number !== undefined) {
+            html += `<br>Ramsey-Zahl: $R(${s}, ${t}) = ${r.ramsey_number}$<br>`;
+            html += `<em>Jede 2-Färbung von $K_{R(${s},${t})}$ enthält einen roten $K_{${s}}$ oder blauen $K_{${t}}$.</em><br>`;
+        }
+        // Taubenschlagprinzip
+        if (r.pigeonhole !== undefined) {
+            html += `<br><strong>Taubenschlagprinzip:</strong><br>`;
+            html += `${r.pigeonhole}<br>`;
+        }
+        // Obere Schranke (falls nicht exakt bekannt)
+        if (r.upper_bound !== undefined) {
+            html += `Obere Schranke: $R(${s},${t}) \\leq \\binom{${s+t-2}}{${s-1}} = ${r.upper_bound}$<br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+
+/**
+ * @brief Erzeugende Funktionen: Fibonacci- und Catalan-Koeffizienten berechnen.
+ * @author Kurt Ingwer
+ * @lastModified 2026-03-10
+ */
+async function calcGenerating() {
+    const div = document.getElementById('gen-result');
+    // Anzahl der Koeffizienten
+    const n = parseInt(document.getElementById('gen-n').value);
+    try {
+        const data = await apiPost('/api/combinatorics/generating', { n });
+        const r = data;
+        let html = `<strong>Erzeugende Funktionen: erste ${n + 1} Koeffizienten</strong><br>`;
+        // Fibonacci-Koeffizienten
+        if (r.fibonacci_coefficients !== undefined) {
+            html += `<br><strong>Fibonacci $F(x) = \\frac{x}{1-x-x^2}$:</strong><br>`;
+            html += '$(F_0, F_1, \\ldots, F_n) = (' + r.fibonacci_coefficients.join(', ') + ')$<br>';
+        }
+        // Catalan-Koeffizienten
+        if (r.catalan_coefficients !== undefined) {
+            html += `<br><strong>Catalan $C(x) = \\frac{1-\\sqrt{1-4x}}{2x}$:</strong><br>`;
+            html += '$(C_0, C_1, \\ldots, C_n) = (' + r.catalan_coefficients.join(', ') + ')$<br>';
+            html += `<em>Catalan-Formel: $C_n = \\frac{1}{n+1}\\binom{2n}{n}$</em><br>`;
+        }
+        if (r.description) html += `<em>${r.description}</em>`;
+        showResult(div, html);
+        renderMathInElement(div);
+    } catch(e) { showError(div, e.message); }
+}
+</script>
+{% endblock %}

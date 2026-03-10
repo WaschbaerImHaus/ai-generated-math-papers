@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+<!--
+    @file coding_theory.html
+    @brief Kodierungstheorie: Lineare Codes, Hamming-Codes, DFA/NFA.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+{% block title %}Kodierungstheorie – Mathematik-Spezialist{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>&#9670; Kodierungstheorie &amp; Formale Sprachen</h1>
+    <p class="page-desc">
+        Fehlerkorrigierende Codes: Hamming-Code [n,k,d], lineare Codes über GF(2).
+        Automatentheorie: DFA, NFA, CFG und die Chomsky-Hierarchie.
+    </p>
+</div>
+<section class="math-section">
+    <h2>&#9654; Codes</h2>
+    <p>
+        Hamming-Schranke: $M \cdot \sum_{i=0}^{t} \binom{n}{i} \leq 2^n$.
+        Singleton-Schranke: $k \leq n - d + 1$ (MDS-Codes).
+    </p>
+    <div class="card-grid">
+        <div class="card">
+            <h3>Hamming($2^r-1, 2^r-r-1, 3$)-Code</h3>
+            <div class="input-row">
+                <label>Redundanz $r$ (2–5):</label>
+                <input type="number" id="hamming-r" value="3" min="2" max="5">
+            </div>
+            <button onclick="calcHamming()" class="btn-calc">Hamming-Code</button>
+            <div id="hamming-result" class="result-box"></div>
+        </div>
+        <div class="card">
+            <h3>Linearer [7,4,3]-Code</h3>
+            <button onclick="calcLinear()" class="btn-calc">Linearen Code analysieren</button>
+            <div id="linear-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+<section class="math-section">
+    <h2>&#9654; Formale Sprachen</h2>
+    <p>DFA: $L(A) = \{w \in \Sigma^* \mid \hat{\delta}(q_0, w) \in F\}$.</p>
+    <div class="card-grid">
+        <div class="card">
+            <h3>DFA: Gerade Anzahl von 1en</h3>
+            <div class="input-row">
+                <label>Eingabewort:</label>
+                <input type="text" id="dfa-word" value="1010" maxlength="20">
+            </div>
+            <button onclick="calcDFA()" class="btn-calc">DFA simulieren</button>
+            <div id="dfa-result" class="result-box"></div>
+        </div>
+    </div>
+</section>
+<script>
+async function calcHamming() {
+    const div = document.getElementById('hamming-result');
+    div.innerHTML = '<span class="loading">Berechne...</span>';
+    const r = parseInt(document.getElementById('hamming-r').value);
+    try {
+        const d = await apiPost('/api/coding/hamming', { r });
+        let html = `<strong>${d.title}</strong><br>n=${d.n}, k=${d.k}, d=${d.d}<br>`;
+        html += `Nachricht: [${d.message}]<br>Kodewort: [${d.codeword}]<br>`;
+        showResult(div, html); renderMathInElement(div);
+    } catch (e) { div.innerHTML = `<span class="error">${e.message}</span>`; }
+}
+async function calcLinear() {
+    const div = document.getElementById('linear-result');
+    div.innerHTML = '<span class="loading">Berechne...</span>';
+    try {
+        const d = await apiPost('/api/coding/linear_code', {});
+        let html = `<strong>${d.title}</strong><br>`;
+        html += `n=${d.n}, k=${d.k}, min. Distanz=${d.min_distance}<br>`;
+        html += `Nachricht: [${d.example_message}]<br>Kodewort: [${d.example_codeword}]<br>`;
+        showResult(div, html); renderMathInElement(div);
+    } catch (e) { div.innerHTML = `<span class="error">${e.message}</span>`; }
+}
+async function calcDFA() {
+    const div = document.getElementById('dfa-result');
+    div.innerHTML = '<span class="loading">Berechne...</span>';
+    const word = document.getElementById('dfa-word').value;
+    try {
+        const d = await apiPost('/api/coding/dfa', { word });
+        const status = d.accepted ? '✓ Akzeptiert' : '✗ Abgelehnt';
+        let html = `<strong>"${d.word}"</strong>: ${status}<br>${d.description}`;
+        showResult(div, html); renderMathInElement(div);
+    } catch (e) { div.innerHTML = `<span class="error">${e.message}</span>`; }
+}
+</script>
+{% endblock %}
