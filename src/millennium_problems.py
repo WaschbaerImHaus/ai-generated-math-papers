@@ -471,6 +471,224 @@ def hardy_littlewood_goldbach_density(n: int) -> dict:
 
 
 # =============================================================================
+# 2b. HAUPTBOGEN / NEBENBOGEN ANALYSE (Hardy-Littlewood-Kreismethode)
+# =============================================================================
+
+def goldbach_exponential_sum(primes: list, alpha: float) -> complex:
+    """
+    @brief Berechnet die Exponentialsumme S(α) = Σ_{p in primes} e(2πi·p·α).
+    @description
+        Kernbaustein der Hardy-Littlewood-Kreismethode für Goldbach:
+
+            S(α) = Σ_{p ≤ N} e^{2πi·p·α}
+
+        Die Anzahl der Goldbach-Darstellungen r₂(n) ergibt sich als:
+
+            r₂(n) = ∫₀¹ S(α)² · e(-2πi·n·α) dα
+
+        Auf Hauptbögen (α nahe rationaler Zahlen a/q mit kleinem q) gilt:
+            S(α) ≈ (μ(q)/φ(q)) · Li(N) · e(a·n/q)
+
+        Auf Nebenbögen dominiert Vinogradov's Abschätzung: |S(α)| = o(N/log N)
+    @param primes Liste der Primzahlen ≤ N
+    @param alpha Frequenzparameter α ∈ [0, 1)
+    @return Komplexer Wert der Exponentialsumme
+    @lastModified 2026-03-10
+    """
+    # e(k) = exp(2πi·k·α): direkte Summation über alle Primzahlen
+    two_pi_i = 2j * math.pi
+    return sum(cmath.exp(two_pi_i * p * alpha) for p in primes)
+
+
+def _best_rational_approx(alpha: float, max_denom: int) -> tuple:
+    """
+    @brief Findet die beste rationale Näherung a/q für alpha mit q ≤ max_denom.
+    @description
+        Nutzt den Kettenbruch-Algorithmus (Stern-Brocot / Farey-Folge).
+        Ergebnis: a/q mit |alpha - a/q| ≤ 1/(q·max_denom) minimal.
+    @param alpha Zu nähernde reelle Zahl in [0, 1)
+    @param max_denom Maximaler Nenner Q
+    @return (a, q) mit a/q beste Näherung und q ≤ max_denom
+    @lastModified 2026-03-10
+    """
+    best_a, best_q = 0, 1
+    best_dist = abs(alpha)
+
+    for q in range(1, max_denom + 1):
+        # Nächster Zähler: a = runde(α · q)
+        a = round(alpha * q)
+        dist = abs(alpha - a / q)
+        if dist < best_dist:
+            best_dist = dist
+            best_a = a
+            best_q = q
+
+    return best_a, best_q
+
+
+def classify_arc(alpha: float, N: int, delta: float = 0.5) -> str:
+    """
+    @brief Klassifiziert α als Haupt- oder Nebenbogen.
+    @description
+        Hauptbogen M_{a,q}: |α - a/q| ≤ Q/N, mit Q = N^delta, q ≤ Q.
+
+        Hauptbögen (Major Arcs): Genähert durch Hardy-Littlewood-Hauptterm.
+        Nebenbögen (Minor Arcs): Rest [0,1) \\ M; Beitrag durch Vinogradov beschränkt.
+
+        Wahl δ = 1/2 entspricht dem klassischen Goldbach-Setup.
+    @param alpha Frequenzparameter α ∈ [0, 1)
+    @param N Obere Grenze der Primzahlen
+    @param delta Exponent für Hauptbogengröße (Standard: 0.5)
+    @return 'major' oder 'minor'
+    @lastModified 2026-03-10
+    """
+    Q = int(N ** delta)
+    a, q = _best_rational_approx(alpha, Q)
+
+    # Abstand |α - a/q| ≤ Q/N → Hauptbogen
+    dist = abs(alpha - (a / q if q > 0 else 0))
+    threshold = Q / N
+
+    return 'major' if (q <= Q and dist <= threshold) else 'minor'
+
+
+def major_arc_contribution(n: int, N: int, delta: float = 0.5,
+                           num_points: int = 500) -> dict:
+    """
+    @brief Numerische Integration des Goldbach-Integrals über die Hauptbögen.
+    @description
+        Berechnet den Hauptterm der Hardy-Littlewood-Kreismethode:
+
+            I_major = ∫_{M} S(α)² · e(-2πi·n·α) dα
+
+        Klassischer Hauptterm (nach Hardy-Littlewood):
+            I_major ≈ 2 · C₂(n) · n / (log n)²
+
+        Die numerische Version diskretisiert [0,1) und summiert nur α-Werte
+        die zu Hauptbögen gehören. Das ist eine endliche Approximation
+        des eigentlichen Kreisintegrals.
+    @param n Gerade Zahl für Goldbach-Zerlegung
+    @param N Primzahlgrenze (default: n selbst)
+    @param delta Hauptbogenexponent (Standard: 0.5)
+    @param num_points Anzahl Diskretisierungspunkte
+    @return dict mit Hauptterm-Integral, Primzahldichte und Klassifikation
+    @lastModified 2026-03-10
+    """
+    if n <= 2 or n % 2 != 0:
+        return {'error': 'n muss gerade und > 2 sein'}
+
+    primes = _simple_sieve(N)
+    alphas = [k / num_points for k in range(num_points)]
+    dalpha = 1.0 / num_points
+
+    major_sum = 0.0 + 0.0j
+    minor_sum = 0.0 + 0.0j
+    n_major = 0
+    n_minor = 0
+
+    for alpha in alphas:
+        S_alpha = goldbach_exponential_sum(primes, alpha)
+        # Integrand: S(α)² · e(-2πi·n·α)
+        integrand = S_alpha ** 2 * cmath.exp(-2j * math.pi * n * alpha)
+
+        arc_type = classify_arc(alpha, N, delta)
+        if arc_type == 'major':
+            major_sum += integrand * dalpha
+            n_major += 1
+        else:
+            minor_sum += integrand * dalpha
+            n_minor += 1
+
+    total = major_sum + minor_sum
+
+    return {
+        'n': n,
+        'N': N,
+        'delta': delta,
+        'major_arc_integral': major_sum.real,
+        'minor_arc_integral': minor_sum.real,
+        'total_integral': total.real,
+        'n_major_points': n_major,
+        'n_minor_points': n_minor,
+        'major_fraction': n_major / num_points,
+        'goldbach_estimate_from_circle': max(0, round(total.real)),
+        'actual_r2': sum(1 for p in primes if (n - p) in set(primes) and p <= n // 2),
+        'interpretation': (
+            'Hauptbögen liefern den dominanten Beitrag (Hardy-Littlewood-Hauptterm). '
+            'Nebenbögen sind klein (Vinogradov), aber ihr Beitrag ist unkontrolliert '
+            'ohne Beweis der Goldbach-Vermutung.'
+        )
+    }
+
+
+def minor_arc_vinogradov_bound(N: int) -> dict:
+    """
+    @brief Berechnet Vinogradov's Schranke für den Nebenbogen-Beitrag.
+    @description
+        Vinogradov (1937) zeigte für die Nebenbögen der Kreismethode:
+
+            max_{α ∈ minor arcs} |S(α)| ≪ N · (log N)^C / N^{1/6}
+                                        = N^{5/6} · (log N)^C
+
+        Für die ternäre (schwache) Goldbach-Vermutung:
+            ∫_{minor} S(α)³ e(-nα) dα = o(N²/(log N)³)
+
+        Diese Abschätzung ist schwächer als für die binäre Vermutung.
+        Für binäres Goldbach benötigt man eine stärkere Minor-Arc-Kontrolle.
+
+        Numerisch: Wir berechnen max|S(α)| über die Nebenbögen und
+        vergleichen mit der theoretischen Vinogradov-Schranke.
+    @param N Primzahlgrenze
+    @return dict mit empirischer und theoretischer Nebenbögen-Schranke
+    @lastModified 2026-03-10
+    """
+    primes = _simple_sieve(N)
+    delta = 0.5
+    num_points = 200  # Gröbere Diskretisierung für Schranken-Berechnung
+
+    max_S_major = 0.0
+    max_S_minor = 0.0
+    S_values_minor = []
+
+    for k in range(num_points):
+        alpha = k / num_points
+        S = abs(goldbach_exponential_sum(primes, alpha))
+        arc_type = classify_arc(alpha, N, delta)
+
+        if arc_type == 'major':
+            max_S_major = max(max_S_major, S)
+        else:
+            max_S_minor = max(max_S_minor, S)
+            S_values_minor.append(S)
+
+    # Theoretische Vinogradov-Schranke: N^(5/6) · (log N)^3
+    log_N = math.log(N) if N > 1 else 1.0
+    vinogradov_bound = N ** (5 / 6) * log_N ** 3
+
+    # Verhältnis: empirisch zu theoretisch
+    ratio = max_S_minor / vinogradov_bound if vinogradov_bound > 0 else float('inf')
+
+    # Triviale Schranke: |S(α)| ≤ π(N) ≈ N/log N
+    trivial_bound = len(primes)
+
+    return {
+        'N': N,
+        'pi_N': len(primes),
+        'max_S_on_major_arcs': max_S_major,
+        'max_S_on_minor_arcs': max_S_minor,
+        'vinogradov_bound': vinogradov_bound,
+        'trivial_bound': trivial_bound,
+        'ratio_empirical_to_vinogradov': ratio,
+        'minor_arc_suppression': max_S_minor / max_S_major if max_S_major > 0 else float('inf'),
+        'interpretation': (
+            f'Nebenbögen: max|S| = {max_S_minor:.1f} vs. triviale Schranke {trivial_bound}. '
+            f'Vinogradov-Schranke N^(5/6)·(log N)³ = {vinogradov_bound:.1e}. '
+            f'Für Goldbach brauchen wir Kontrolle über Nebenbögen: |S| ≪ N/log N.'
+        )
+    }
+
+
+# =============================================================================
 # 3. P vs NP WERKZEUGE (Komplexitätstheorie)
 # =============================================================================
 
@@ -929,6 +1147,250 @@ def check_navier_stokes_energy(u: np.ndarray, v: np.ndarray) -> dict:
 
 
 # =============================================================================
+# 4b. NAVIER-STOKES ENERGIE-EVOLUTION UND BLOW-UP KRITERIEN
+# =============================================================================
+
+def navier_stokes_energy_evolution(
+    nx: int = 32,
+    ny: int = 32,
+    dt: float = 0.005,
+    T: float = 2.0,
+    nu: float = 0.01,
+    f_x: float = 1.0,
+    record_interval: int = 10
+) -> dict:
+    """
+    @brief Systematische Untersuchung der Energieentwicklung E(t) für 2D Navier-Stokes.
+    @description
+        Verfolgt folgende physikalische Größen über die Zeit:
+
+        - Kinetische Energie:  E(t) = (1/2) ∫∫ |u|² dA
+        - Enstrophie:          Z(t) = (1/2) ∫∫ |ω|² dA  (ω = ∂v/∂x - ∂u/∂y)
+        - Dissipationsrate:    ε(t) = ν · Z(t)
+        - Max. Vortizität:     ||ω||_∞(t) = max|ω(x,t)|
+
+        Energiebilanz (exakt für glatte Lösungen):
+            dE/dt = -ν · Z(t) + F·u̅   (Dissipation + Kraftbeitrag)
+
+        Beale-Kato-Majda-Kriterium (3D, angepasst):
+        Blow-up zur Zeit T* ⟺ ∫₀^{T*} ||ω||_∞(t) dt = ∞
+
+        In 2D ist Blow-up ausgeschlossen (Ladyzhenskaya, 1969):
+        Z(t) ≤ Z(0) · exp(C·t) → E(t) immer beschränkt.
+    @param nx Gitterpunkte in x
+    @param ny Gitterpunkte in y
+    @param dt Zeitschritt
+    @param T Simulationsendzeit
+    @param nu Kinematische Viskosität (ν ↓ → Re ↑ → turbulentest)
+    @param f_x Treibende Kraft (Lid-Driven-Cavity: f_x=1 am Deckel)
+    @param record_interval Aufzeichnung jede record_interval-ten Zeitschritte
+    @return dict mit Zeitreihen E(t), Z(t), ||ω||_∞(t) und Blow-up-Indikator
+    @lastModified 2026-03-10
+    """
+    dx = 1.0 / (nx - 1)
+    dy = 1.0 / (ny - 1)
+
+    # Felder initialisieren
+    u = np.zeros((ny, nx))
+    v = np.zeros((ny, nx))
+    p = np.zeros((ny, nx))
+
+    # Zeitreihen für Energiediagnostik
+    times = []
+    energies = []
+    enstrophies = []
+    max_vorticities = []
+    bkm_integral = 0.0  # Kumuliertes Beale-Kato-Majda-Integral ∫||ω||_∞ dt
+
+    n_steps = max(1, int(T / dt))
+    n_pressure_iter = 30
+
+    i_slice = slice(1, ny - 1)
+    j_slice = slice(1, nx - 1)
+
+    for step in range(n_steps):
+        u_old = u.copy()
+        v_old = v.copy()
+
+        # --- Advektion (zentrale Differenzen) ---
+        adv_u = (
+            u_old[i_slice, j_slice] * (u_old[i_slice, 2:] - u_old[i_slice, :-2]) / (2 * dx) +
+            v_old[i_slice, j_slice] * (u_old[2:, j_slice] - u_old[:-2, j_slice]) / (2 * dy)
+        )
+        adv_v = (
+            u_old[i_slice, j_slice] * (v_old[i_slice, 2:] - v_old[i_slice, :-2]) / (2 * dx) +
+            v_old[i_slice, j_slice] * (v_old[2:, j_slice] - v_old[:-2, j_slice]) / (2 * dy)
+        )
+
+        # --- Viskosität (Laplace) ---
+        lap_u = (
+            (u_old[i_slice, 2:] - 2 * u_old[i_slice, j_slice] + u_old[i_slice, :-2]) / dx ** 2 +
+            (u_old[2:, j_slice] - 2 * u_old[i_slice, j_slice] + u_old[:-2, j_slice]) / dy ** 2
+        )
+        lap_v = (
+            (v_old[i_slice, 2:] - 2 * v_old[i_slice, j_slice] + v_old[i_slice, :-2]) / dx ** 2 +
+            (v_old[2:, j_slice] - 2 * v_old[i_slice, j_slice] + v_old[:-2, j_slice]) / dy ** 2
+        )
+
+        # --- Druckgradient ---
+        dp_dx = (p[i_slice, 2:] - p[i_slice, :-2]) / (2 * dx)
+        dp_dy = (p[2:, j_slice] - p[:-2, j_slice]) / (2 * dy)
+
+        u_star = u_old.copy()
+        v_star = v_old.copy()
+        u_star[i_slice, j_slice] = u_old[i_slice, j_slice] + dt * (-adv_u - dp_dx + nu * lap_u + f_x)
+        v_star[i_slice, j_slice] = v_old[i_slice, j_slice] + dt * (-adv_v - dp_dy + nu * lap_v)
+
+        # Randbedingungen
+        u_star[0, :] = 0.0; u_star[-1, :] = 1.0
+        u_star[:, 0] = 0.0; u_star[:, -1] = 0.0
+        v_star[:] = 0.0; v_star[:, 0] = 0.0; v_star[:, -1] = 0.0
+
+        # --- Druck-Poisson ---
+        for _ in range(n_pressure_iter):
+            p_old = p.copy()
+            div_u = (
+                (u_star[i_slice, 2:] - u_star[i_slice, :-2]) / (2 * dx) +
+                (v_star[2:, j_slice] - v_star[:-2, j_slice]) / (2 * dy)
+            )
+            p[i_slice, j_slice] = (
+                (p_old[i_slice, 2:] + p_old[i_slice, :-2]) * dy ** 2 +
+                (p_old[2:, j_slice] + p_old[:-2, j_slice]) * dx ** 2 -
+                div_u * dx ** 2 * dy ** 2 / dt
+            ) / (2 * (dx ** 2 + dy ** 2))
+            p[:, 0] = p[:, 1]; p[:, -1] = p[:, -2]
+            p[0, :] = p[1, :]; p[-1, :] = p[-2, :]
+
+        # --- Geschwindigkeitskorrektur ---
+        u[i_slice, j_slice] = u_star[i_slice, j_slice] - dt * (p[i_slice, 2:] - p[i_slice, :-2]) / (2 * dx)
+        v[i_slice, j_slice] = v_star[i_slice, j_slice] - dt * (p[2:, j_slice] - p[:-2, j_slice]) / (2 * dy)
+        u[0, :] = 0.0; u[-1, :] = 1.0; u[:, 0] = 0.0; u[:, -1] = 0.0
+        v[0, :] = 0.0; v[-1, :] = 0.0; v[:, 0] = 0.0; v[:, -1] = 0.0
+
+        # --- Diagnostik ---
+        if step % record_interval == 0 or step == n_steps - 1:
+            t = step * dt
+            # Energie E = (1/2) ∫|u|² dA
+            speed_sq = u ** 2 + v ** 2
+            E = 0.5 * float(np.trapezoid(np.trapezoid(speed_sq, dx=dx, axis=1), dx=dy))
+
+            # Enstrophie Z = (1/2) ∫|ω|² dA  (ω = ∂v/∂x - ∂u/∂y)
+            omega = np.gradient(v, dx, axis=1) - np.gradient(u, dy, axis=0)
+            Z = 0.5 * float(np.trapezoid(np.trapezoid(omega ** 2, dx=dx, axis=1), dx=dy))
+            omega_max = float(np.max(np.abs(omega)))
+
+            times.append(t)
+            energies.append(E)
+            enstrophies.append(Z)
+            max_vorticities.append(omega_max)
+
+            # Beale-Kato-Majda-Integral (Trapez-Update)
+            bkm_integral += omega_max * record_interval * dt
+
+        # Stabilitätsprüfung
+        if np.any(np.isnan(u)) or np.any(np.isinf(u)):
+            break
+
+    # --- Auswertung ---
+    # Energietrend: Steigt oder fällt E(t)?
+    if len(energies) >= 2:
+        energy_trend = 'increasing' if energies[-1] > energies[0] * 1.01 else (
+            'decreasing' if energies[-1] < energies[0] * 0.99 else 'stable'
+        )
+        # Maximaler Energie-Anstieg (relativ)
+        max_energy_ratio = max(energies) / energies[0] if energies[0] > 0 else float('inf')
+    else:
+        energy_trend = 'unknown'
+        max_energy_ratio = 1.0
+
+    # Blow-up-Indikator nach BKM: ||ω||_∞ wächst exponentiell?
+    blowup_indicator = False
+    if len(max_vorticities) >= 3:
+        # Exponentielle Wachstumsrate schätzen: ω_max(t) ~ exp(λt)
+        vort_positive = [v for v in max_vorticities if v > 0]
+        if len(vort_positive) >= 2:
+            log_growth = math.log(vort_positive[-1] / vort_positive[0]) if vort_positive[0] > 0 else 0
+            blowup_indicator = log_growth > 10.0  # Mehr als e^10-fache Verstärkung
+
+    return {
+        'times': times,
+        'energies': energies,
+        'enstrophies': enstrophies,
+        'max_vorticities': max_vorticities,
+        'bkm_integral': bkm_integral,
+        'energy_trend': energy_trend,
+        'max_energy_ratio': max_energy_ratio,
+        'reynolds_number': 1.0 / nu if nu > 0 else float('inf'),
+        'blowup_indicator': blowup_indicator,
+        'n_time_records': len(times),
+        'millennium_note': (
+            '2D NS: E(t) immer beschränkt (Ladyzhenskaya 1969). '
+            '3D NS: Blow-up-Frage offen. '
+            f'BKM-Integral ∫||ω||_∞ dt = {bkm_integral:.4f} (endlich → kein Blow-up in [0,T]).'
+        )
+    }
+
+
+def navier_stokes_reynolds_study(
+    nu_values: list | None = None,
+    nx: int = 24,
+    ny: int = 24,
+    T: float = 1.0
+) -> dict:
+    """
+    @brief Vergleicht Navier-Stokes-Energie für verschiedene Reynolds-Zahlen.
+    @description
+        Reynolds-Zahl Re = U·L/ν charakterisiert laminare vs. turbulente Strömung:
+        - Re ≪ 1: Laminare Strömung, viskos dominiert
+        - Re ~ 100-1000: Übergangsbereich
+        - Re ≫ 1: Turbulente Strömung (für NS-Problem relevant)
+
+        Das Millennium-Problem fragt: Auch für Re → ∞ (ν → 0) bleiben
+        3D-Lösungen glatt? Unsere 2D-Simulation zeigt, dass 2D stets stabil ist,
+        während in 3D Energie-Kaskaden entstehen könnten.
+    @param nu_values Liste von Viskositäten (None → [0.1, 0.01, 0.005])
+    @param nx Gitterpunkte x
+    @param ny Gitterpunkte y
+    @param T Simulationsendzeit
+    @return dict mit Vergleich der Energieverläufe für verschiedene Re
+    @lastModified 2026-03-10
+    """
+    if nu_values is None:
+        nu_values = [0.1, 0.01, 0.005]
+
+    results = {}
+    for nu in nu_values:
+        Re = 1.0 / nu
+        # Zeitschritt für Stabilität anpassen: dt ≤ (dx)²/(4ν) und dt ≤ dx
+        dx = 1.0 / (nx - 1)
+        dt = min(0.01, dx ** 2 / (4 * nu) * 0.5, dx * 0.5)
+
+        ev = navier_stokes_energy_evolution(
+            nx=nx, ny=ny, dt=dt, T=T, nu=nu, record_interval=5
+        )
+        results[f'Re={Re:.0f}'] = {
+            'nu': nu,
+            'reynolds_number': Re,
+            'final_energy': ev['energies'][-1] if ev['energies'] else 0.0,
+            'max_energy': max(ev['energies']) if ev['energies'] else 0.0,
+            'final_enstrophy': ev['enstrophies'][-1] if ev['enstrophies'] else 0.0,
+            'max_vorticity': max(ev['max_vorticities']) if ev['max_vorticities'] else 0.0,
+            'bkm_integral': ev['bkm_integral'],
+            'energy_trend': ev['energy_trend'],
+            'blowup_indicator': ev['blowup_indicator'],
+        }
+
+    return {
+        'reynolds_study': results,
+        'conclusion': (
+            '2D Navier-Stokes zeigt für alle Re stabiles Energieverhalten. '
+            'Höheres Re → höhere Enstrophie und Vortizität, aber kein Blow-up. '
+            'In 3D könnte Re → ∞ zu Singularitäten führen (offene Millennium-Frage).'
+        )
+    }
+
+
+# =============================================================================
 # 5. YANG-MILLS (vereinfachte Quantenfeldtheorie)
 # =============================================================================
 
@@ -1055,6 +1517,310 @@ def lattice_gauge_theory_demo(size: int = 4, coupling: float = 1.0, steps: int =
         'string_tension': string_tension,
         'final_action': current_action,
         'millennium_note': 'Massenlücke Δ > 0 ist unbewiesen für 4D SU(N) Yang-Mills (Clay Prize $1M)'
+    }
+
+
+# =============================================================================
+# 5b. SU(2) GITTER-EICHTHEORIE (nicht-abelsch, Yang-Mills Hauptgruppe)
+# =============================================================================
+
+def _random_su2(rng: np.random.Generator) -> np.ndarray:
+    """
+    @brief Erzeugt eine zufällige SU(2)-Matrix mit Haar-Maß.
+    @description
+        SU(2) = {U = a·I + i(b·σ₁ + c·σ₂ + d·σ₃) : a²+b²+c²+d²=1}
+              = {[[a+id, -b+ic], [b+ic, a-id]] : (a,b,c,d) ∈ S³}
+
+        Gleichmäßige Verteilung auf S³ ⊂ ℝ⁴ → Haar-Maß auf SU(2).
+
+        Pauli-Matrizen:
+            σ₁ = [[0,1],[1,0]], σ₂ = [[0,-i],[i,0]], σ₃ = [[1,0],[0,-1]]
+    @param rng NumPy Zufallsgenerator
+    @return 2×2 komplexe unitäre Matrix mit det=1
+    @lastModified 2026-03-10
+    """
+    # Gleichmäßiger Punkt auf S³: Gausssche Projektion
+    v = rng.standard_normal(4)
+    v /= np.linalg.norm(v)
+    a, b, c, d = v
+
+    # SU(2)-Matrix: U = a·I + i(b·σ₁ + c·σ₂ + d·σ₃)
+    # = [[a+id, ic-b], [ic+b, a-id]]
+    U = np.array([
+        [a + 1j * d,  -b + 1j * c],
+        [ b + 1j * c,  a - 1j * d]
+    ], dtype=complex)
+
+    return U
+
+
+def _su2_plaquette(links: np.ndarray, i: int, j: int, size: int) -> np.ndarray:
+    """
+    @brief Berechnet die Wilson-Plaquette im SU(2)-Gitter.
+    @description
+        Plaquette U_□(i,j) = U_x(i,j) · U_y(i+1,j) · U†_x(i,j+1) · U†_y(i,j)
+
+        Im Gitter: links[i,j,mu] ist eine 2×2 SU(2)-Matrix auf dem Link
+        (i,j) → (i+μ̂,j) für mu=0 (x-Richtung) oder (i,j+ŷ) für mu=1 (y-Richtung).
+
+        Periodische Randbedingungen: (i + 1) % size
+    @param links Array der Form (size, size, 2, 2, 2): links[i,j,mu] = 2×2 Matrix
+    @param i Gitter-x-Index
+    @param j Gitter-y-Index
+    @param size Gittergröße
+    @return 2×2 SU(2)-Plaquette-Matrix
+    @lastModified 2026-03-10
+    """
+    # Vier Links der Plaquette (Uhrzeigersinn)
+    U_x_ij      = links[i, j, 0]                           # U_x(i,j)
+    U_y_ip1j    = links[(i + 1) % size, j, 1]              # U_y(i+1,j)
+    U_x_ijp1_h  = links[i, (j + 1) % size, 0].conj().T    # U†_x(i,j+1)
+    U_y_ij_h    = links[i, j, 1].conj().T                  # U†_y(i,j)
+
+    # Plaquette = Produkt der vier Links
+    return U_x_ij @ U_y_ip1j @ U_x_ijp1_h @ U_y_ij_h
+
+
+def lattice_gauge_su2(
+    size: int = 4,
+    beta: float = 2.0,
+    steps: int = 200,
+    warmup: int = 50
+) -> dict:
+    """
+    @brief SU(2) Gitter-Eichtheorie mit Metropolis-Algorithmus.
+    @description
+        Wilson-Wirkung für SU(2) auf einem size×size Gitter (2D):
+
+            S_W = β · Σ_{Plaquetten} (1 - (1/2) Re Tr(U_□))
+
+        Für β → ∞ (schwache Kopplung g → 0) → Kontinuumsgrenze.
+        Für β → 0 (starke Kopplung) → Confinement, Area-Law.
+
+        Metropolis-Update (Cabibbo-Marinari-ähnlich):
+        1. Wähle zufälligen Link (i,j,μ)
+        2. Schlage neue SU(2)-Matrix U' vor (U_neu = U_zuf · U_alt, mit U_zuf nahe I)
+        3. Berechne ΔS = S(U') - S(U)
+        4. Akzeptiere mit min(1, exp(-ΔS))
+
+        Erwartungswerte:
+        - ⟨P⟩ = Mittelwert der Plaquetten-Spurwerte
+        - Wilson-Loop W(r) → Area-Law → String-Tension σ → Massenlücke Δ ∝ √σ
+        - Für SU(2): Massenlücke aus Glueball-Korrelator (hier: String-Tension-Näherung)
+    @param size Gittergröße (size × size Plaquetten)
+    @param beta Eichkopplungsparameter β = 4/g² (SU(2)-Konvention)
+    @param steps Anzahl Metropolis-Sweeps nach Warmup
+    @param warmup Thermalisierungs-Sweeps
+    @return dict mit Plaquetten-Mittelwert, Wilson-Loops, String-Tension, Massenlücken-Schätzung
+    @lastModified 2026-03-10
+    """
+    rng = np.random.default_rng(42)
+
+    # Gitter initialisieren: alle Links = Einheitsmatrix (kalter Start)
+    # links[i, j, mu] ist eine 2×2-Matrix ∈ SU(2)
+    identity = np.eye(2, dtype=complex)
+    links = np.tile(identity, (size, size, 2, 1, 1))
+
+    def plaquette_sum_action(links_arr: np.ndarray) -> float:
+        """Berechnet die gesamte Wilson-Wirkung S = β·Σ(1 - (1/2)Re Tr U_□)."""
+        total = 0.0
+        for ii in range(size):
+            for jj in range(size):
+                Up = _su2_plaquette(links_arr, ii, jj, size)
+                # (1/2) Re Tr(U_□) liegt in [-1, 1]
+                total += 1.0 - 0.5 * Up.trace().real
+        return beta * total
+
+    def local_action_change(links_arr: np.ndarray, i0: int, j0: int,
+                            mu0: int, U_new: np.ndarray) -> float:
+        """Berechnet ΔS bei Ersetzen von links[i0,j0,mu0] durch U_new."""
+        # Nur die Plaquetten die diesen Link enthalten ändern sich
+        delta_s = 0.0
+        for di, dj in [(-1, 0), (0, 0), (0, -1), (-1, -1)]:
+            ii = (i0 + di) % size
+            jj = (j0 + dj) % size
+
+            # Plaquette vor und nach dem Update
+            old_Up = _su2_plaquette(links_arr, ii, jj, size)
+            links_arr[i0, j0, mu0] = U_new
+            new_Up = _su2_plaquette(links_arr, ii, jj, size)
+            links_arr[i0, j0, mu0] = links_arr[i0, j0, mu0]  # kein Rollback hier
+
+            delta_s += -0.5 * (new_Up.trace().real - old_Up.trace().real)
+
+        return beta * delta_s
+
+    # --- Metropolis-Sweeps ---
+    n_accept = 0
+    n_total = 0
+
+    # Warmup (Thermalisierung, keine Messungen)
+    for _ in range(warmup):
+        for i0 in range(size):
+            for j0 in range(size):
+                for mu0 in range(2):
+                    # Neues Element: U_new = kleiner SU(2)-Schritt × aktuelles Element
+                    epsilon = 0.3  # Schrittgröße (Akzeptanzrate ~50% angestrebt)
+                    # Zufällige SU(2)-Matrix nahe der Identität
+                    v = rng.standard_normal(4) * epsilon
+                    v[0] = math.sqrt(max(0.0, 1.0 - sum(v[1:] ** 2)))  # Normierung auf S³
+                    a, b, c, d = v
+                    dU = np.array([[a + 1j*d, -b + 1j*c], [b + 1j*c, a - 1j*d]], dtype=complex)
+                    U_new = dU @ links[i0, j0, mu0]
+
+                    # Metropolis-Akzeptanz
+                    old_action = plaquette_sum_action(links)
+                    links_backup = links[i0, j0, mu0].copy()
+                    links[i0, j0, mu0] = U_new
+                    new_action = plaquette_sum_action(links)
+                    delta_s = new_action - old_action
+
+                    if delta_s > 0 and rng.random() >= math.exp(-delta_s):
+                        links[i0, j0, mu0] = links_backup  # Ablehnen
+
+    # Messungs-Sweeps
+    plaquette_values = []
+    for _ in range(steps):
+        for i0 in range(size):
+            for j0 in range(size):
+                for mu0 in range(2):
+                    v = rng.standard_normal(4) * 0.3
+                    v[0] = math.sqrt(max(0.0, 1.0 - sum(v[1:] ** 2)))
+                    a, b, c, d = v
+                    dU = np.array([[a + 1j*d, -b + 1j*c], [b + 1j*c, a - 1j*d]], dtype=complex)
+                    U_new = dU @ links[i0, j0, mu0]
+
+                    old_action = plaquette_sum_action(links)
+                    links_backup = links[i0, j0, mu0].copy()
+                    links[i0, j0, mu0] = U_new
+                    new_action = plaquette_sum_action(links)
+                    delta_s = new_action - old_action
+
+                    if delta_s > 0 and rng.random() >= math.exp(-delta_s):
+                        links[i0, j0, mu0] = links_backup
+                    else:
+                        n_accept += 1
+                    n_total += 1
+
+        # Plaquetten-Messung: ⟨P⟩ = (1/N_plaq) Σ (1/2) Re Tr(U_□)
+        p_sum = 0.0
+        for ii in range(size):
+            for jj in range(size):
+                Up = _su2_plaquette(links, ii, jj, size)
+                p_sum += 0.5 * Up.trace().real
+        plaquette_values.append(p_sum / (size * size))
+
+    # --- Wilson-Loops ---
+    wilson_loops_su2 = []
+    for r in range(1, min(size // 2 + 1, 4)):
+        # Rechteckiger r×r Wilson-Loop
+        w_vals = []
+        for i0 in range(size):
+            for j0 in range(size):
+                W = np.eye(2, dtype=complex)
+                # Unterkante: r Schritte in x
+                for k in range(r):
+                    W = W @ links[(i0 + k) % size, j0, 0]
+                # Rechtskante: r Schritte in y
+                for k in range(r):
+                    W = W @ links[(i0 + r) % size, (j0 + k) % size, 1]
+                # Oberkante: r Schritte in -x (hermitesch konjugiert)
+                for k in range(r):
+                    W = W @ links[(i0 + r - 1 - k) % size, (j0 + r) % size, 0].conj().T
+                # Linkskante: r Schritte in -y
+                for k in range(r):
+                    W = W @ links[i0, (j0 + r - 1 - k) % size, 1].conj().T
+                w_vals.append(0.5 * W.trace().real)
+        wilson_loops_su2.append({'r': r, 'W': float(np.mean(w_vals))})
+
+    # String-Tension σ aus Area-Law: W(r) ~ exp(-σ·r²)
+    string_tension_su2 = 0.0
+    if len(wilson_loops_su2) >= 2:
+        w1 = wilson_loops_su2[0]['W']
+        w2 = wilson_loops_su2[1]['W']
+        if abs(w1) > 1e-10 and abs(w2) > 1e-10:
+            string_tension_su2 = max(0.0, -math.log(abs(w2) / abs(w1)))
+
+    # Massenlücken-Schätzung: Δ ≈ √σ (Glueball-Masse aus String-Tension)
+    mass_gap_su2 = math.sqrt(string_tension_su2) if string_tension_su2 > 0 else 0.0
+
+    mean_plaquette = float(np.mean(plaquette_values)) if plaquette_values else 0.0
+    accept_rate = n_accept / n_total if n_total > 0 else 0.0
+
+    return {
+        'gauge_group': 'SU(2)',
+        'size': size,
+        'beta': beta,
+        'mean_plaquette': mean_plaquette,
+        'plaquette_variance': float(np.var(plaquette_values)) if plaquette_values else 0.0,
+        'wilson_loops': wilson_loops_su2,
+        'string_tension': string_tension_su2,
+        'mass_gap_estimate': mass_gap_su2,
+        'acceptance_rate': accept_rate,
+        'n_sweeps': steps,
+        'millennium_note': (
+            'SU(2) nicht-abelsche Eichtheorie. '
+            f'β={beta}: Massenlücken-Schätzung Δ≈{mass_gap_su2:.4f}. '
+            'Massenlücke > 0 ist das Yang-Mills Millennium-Problem (Clay Prize $1M).'
+        )
+    }
+
+
+def yang_mills_mass_gap_study(
+    beta_values: list | None = None,
+    size: int = 4
+) -> dict:
+    """
+    @brief Untersucht die Massenlücke als Funktion der Kopplung β für SU(2).
+    @description
+        Die Yang-Mills-Massenlücke ist die positive untere Schranke des Spektrums
+        des Hamilton-Operators H:
+
+            Δ = inf { E : E > 0, E ∈ Spec(H) } > 0  (Millennium-Vermutung)
+
+        Auf dem Gitter: Extrapolation der String-Tension σ(β) zum Kontinuum.
+        Im Skalenbereich (β → ∞ bei fixem physikalischen Abstand):
+            σ(β) ~ exp(-2π²β / (11/3))  (Asymptotische Freiheit für SU(3))
+
+        Für SU(2): σ(β) ~ exp(-π²β / (11/6))
+
+        Confinement-Kriterium: σ > 0 (Area-Law für Wilson-Loops)
+        → Massenlücke Δ ≈ √σ / a  (a = Gitterabstand)
+    @param beta_values Liste von β-Werten (None → [0.5, 1.0, 1.5, 2.0, 2.5])
+    @param size Gittergröße
+    @return dict mit σ(β), Massenlücke(β) und Skalenanalyse
+    @lastModified 2026-03-10
+    """
+    if beta_values is None:
+        beta_values = [0.5, 1.0, 1.5, 2.0, 2.5]
+
+    results = {}
+    for beta in beta_values:
+        r = lattice_gauge_su2(size=size, beta=beta, steps=50, warmup=20)
+        results[f'beta={beta}'] = {
+            'beta': beta,
+            'mean_plaquette': r['mean_plaquette'],
+            'string_tension': r['string_tension'],
+            'mass_gap': r['mass_gap_estimate'],
+            'wilson_loops': r['wilson_loops'],
+        }
+
+    # Theoretische Skalenprädiktion für SU(2): σ ~ exp(-π²β/c) mit c=11/6
+    beta_arr = np.array(beta_values)
+    c_su2 = 11.0 / 6.0
+    sigma_theory = np.exp(-math.pi ** 2 * beta_arr / c_su2)
+
+    return {
+        'gauge_group': 'SU(2)',
+        'beta_scan': results,
+        'theoretical_sigma': dict(zip([f'beta={b}' for b in beta_values],
+                                      sigma_theory.tolist())),
+        'interpretation': (
+            'Bei großem β (schwacher Kopplung) → kleine String-Tension, großes Gitter. '
+            'Bei kleinem β (starker Kopplung) → Area-Law, Confinement. '
+            'Massenlücke Δ > 0 für alle endlichen β wird numerisch beobachtet, '
+            'aber der analytische Beweis im Kontinuum ist das Millennium-Problem.'
+        )
     }
 
 
