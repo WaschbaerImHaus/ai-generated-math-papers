@@ -181,7 +181,8 @@ def numerical_integral(f: Callable[[float], float], a: float, b: float, n: int =
 
 
 def newton_raphson(f: Callable[[float], float], x0: float, tol: float = NEWTON_TOL,
-                   max_iter: int = MAX_ITERATIONS, h: float = 1e-7) -> float:
+                   max_iter: int = MAX_ITERATIONS, h: float = 1e-7,
+                   verbose: bool = False) -> float:
     """
     @brief Newton-Raphson-Verfahren zur Nullstellensuche.
     @description
@@ -205,16 +206,30 @@ def newton_raphson(f: Callable[[float], float], x0: float, tol: float = NEWTON_T
     @param tol Toleranz (Abbruch wenn |f(x)| < tol) – Standard: NEWTON_TOL aus config.py.
     @param max_iter Maximale Anzahl Iterationen – Standard: MAX_ITERATIONS aus config.py.
     @param h Schrittweite für numerische Ableitung.
+    @param verbose Wenn True, werden alle Iterationsschritte via MathLogger protokolliert.
     @return Näherungswert der Nullstelle.
     @raises RuntimeError Wenn das Verfahren nicht konvergiert.
     @date 2026-03-05
+    @lastModified 2026-03-10
     """
+    # Optionaler Logger: wird nur bei verbose=True initialisiert (lazy import)
+    if verbose:
+        from math_logger import get_logger
+        logger = get_logger()
+        logger.section("Newton-Raphson-Verfahren")
+
     x = x0
     for i in range(max_iter):
         fx = f(x)
 
+        # Optionale Debug-Ausgabe des aktuellen Schritts
+        if verbose:
+            logger.step("Newton-Raphson", iteration=i + 1, x=float(x), fx=float(fx))
+
         # Konvergenzkriterium
         if abs(fx) < tol:
+            if verbose:
+                logger.result("Nullstelle", float(x))
             return x
 
         # Numerische Ableitung

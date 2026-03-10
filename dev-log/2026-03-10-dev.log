@@ -357,3 +357,18 @@
   stft: -> list[list[complex]]
 
 ## Build 15
+
+## 2026-03-10 - Build 14: Logging-System, Schritt-für-Schritt-Modus und Web-Interface
+
+### Neue Dateien
+- src/math_logger.py: MathLogger-Klasse mit step(), result(), convergence_warning(), matrix_step(), timing(), section(); Globale Hilfsfunktionen get_logger(), enable_debug_logging(), disable_logging()
+- src/step_by_step.py: Schritt-für-Schritt-Erklärungen für newton_raphson_steps(), bisection_steps(), gauss_elimination_steps(), euclidean_algorithm_steps(), rsa_steps(), prime_factorization_steps(), lu_decomposition_steps(); format_steps_text(), format_steps_html()
+- src/webapp/templates/steps.html: Interaktive Web-Seite mit fade-in Animation, KaTeX-Formeln, 6 Algorithmus-Panels
+- tests/test_step_by_step.py: 57 Tests für alle step_by_step-Funktionen
+- tests/test_logger.py: 47 Tests für MathLogger und globale Funktionen
+- logs/.gitkeep: Logs-Verzeichnis angelegt
+
+### Änderungen
+- src/webapp/app.py: Import von step_by_step, 6 neue API-Routen (/api/steps/*), GET /steps
+- src/webapp/templates/base.html: Navigationseintrag "Schritt-für-Schritt" (Symbol ∑)
+- src/analysis.py: newton_raphson() um verbose=True Parameter erweitert (optionales Logging)

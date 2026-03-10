@@ -1,0 +1,758 @@
+{% extends "base.html" %}
+<!--
+    @file steps.html
+    @brief Schritt-für-Schritt-Erklärungen mathematischer Algorithmen.
+    @description
+        Interaktive Seite mit animierten Schritt-für-Schritt-Erklärungen für:
+        - Newton-Raphson-Verfahren
+        - Bisektionsverfahren
+        - Gauss-Elimination
+        - Euklidischer Algorithmus (ggT)
+        - RSA-Kryptographie
+        - Primfaktorzerlegung
+
+        Jeder Schritt wird mit fade-in Animation dargestellt.
+        Formeln werden via KaTeX gerendert.
+    @author Kurt Ingwer
+    @date 2026-03-10
+-->
+
+{% block title %}Schritt-für-Schritt — Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">∑ Schritt-für-Schritt-Erklärungen</h1>
+    <p class="page-subtitle">
+        Lerne Algorithmen durch vollständige, animierte Lösungswege —
+        von der Eingabe bis zum Ergebnis.
+    </p>
+</div>
+
+<!-- ========================================================
+     SELEKTOR: Algorithmus wählen
+     ======================================================== -->
+<div class="card algorithm-selector">
+    <h2 class="card-title">Algorithmus wählen</h2>
+    <div class="algo-buttons">
+        <button class="algo-btn active" data-algo="newton" onclick="selectAlgo('newton', this)">
+            <span class="algo-icon">∂</span>
+            <span class="algo-name">Newton-Raphson</span>
+            <span class="algo-desc">Nullstellensuche</span>
+        </button>
+        <button class="algo-btn" data-algo="bisection" onclick="selectAlgo('bisection', this)">
+            <span class="algo-icon">⟨⟩</span>
+            <span class="algo-name">Bisektion</span>
+            <span class="algo-desc">Intervallhalbierung</span>
+        </button>
+        <button class="algo-btn" data-algo="gauss" onclick="selectAlgo('gauss', this)">
+            <span class="algo-icon">▦</span>
+            <span class="algo-name">Gauss-Elimination</span>
+            <span class="algo-desc">Lineares Gleichungssystem</span>
+        </button>
+        <button class="algo-btn" data-algo="gcd" onclick="selectAlgo('gcd', this)">
+            <span class="algo-icon">ℤ</span>
+            <span class="algo-name">Euklidischer Algorithmus</span>
+            <span class="algo-desc">ggT berechnen</span>
+        </button>
+        <button class="algo-btn" data-algo="rsa" onclick="selectAlgo('rsa', this)">
+            <span class="algo-icon">🔑</span>
+            <span class="algo-name">RSA-Kryptographie</span>
+            <span class="algo-desc">Schlüssel & Ver-/Entschlüsselung</span>
+        </button>
+        <button class="algo-btn" data-algo="prime" onclick="selectAlgo('prime', this)">
+            <span class="algo-icon">ℙ</span>
+            <span class="algo-name">Primfaktorzerlegung</span>
+            <span class="algo-desc">Trial Division</span>
+        </button>
+    </div>
+</div>
+
+<!-- ========================================================
+     EINGABE-PANEL (dynamisch je nach Algorithmus)
+     ======================================================== -->
+
+<!-- Newton-Raphson Eingabe -->
+<div class="card input-panel" id="input-newton">
+    <h2 class="card-title">Newton-Raphson-Verfahren</h2>
+    <p class="algo-description">
+        Findet Nullstellen einer Funktion iterativ:<br>
+        $$x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}$$
+        Konvergiert quadratisch nahe der Nullstelle.
+    </p>
+    <div class="input-row">
+        <div class="input-group">
+            <label for="newton-expr">Funktion f(x)</label>
+            <input type="text" id="newton-expr" value="x**2 - 2" placeholder="z.B. x**2 - 2">
+        </div>
+        <div class="input-group">
+            <label for="newton-x0">Startwert x₀</label>
+            <input type="number" id="newton-x0" value="1.5" step="0.1">
+        </div>
+    </div>
+    <button class="btn-compute" onclick="runNewton()">Berechnen &amp; Schritte anzeigen</button>
+</div>
+
+<!-- Bisektions-Eingabe -->
+<div class="card input-panel hidden" id="input-bisection">
+    <h2 class="card-title">Bisektionsverfahren</h2>
+    <p class="algo-description">
+        Halbiert das Suchintervall bei jedem Schritt:<br>
+        $$m = \frac{a + b}{2}$$
+        Garantiert Konvergenz wenn f(a)·f(b) &lt; 0.
+    </p>
+    <div class="input-row">
+        <div class="input-group">
+            <label for="bisect-expr">Funktion f(x)</label>
+            <input type="text" id="bisect-expr" value="x**2 - 2" placeholder="z.B. x**2 - 2">
+        </div>
+        <div class="input-group">
+            <label for="bisect-a">Linke Grenze a</label>
+            <input type="number" id="bisect-a" value="1.0" step="0.1">
+        </div>
+        <div class="input-group">
+            <label for="bisect-b">Rechte Grenze b</label>
+            <input type="number" id="bisect-b" value="2.0" step="0.1">
+        </div>
+    </div>
+    <button class="btn-compute" onclick="runBisection()">Berechnen &amp; Schritte anzeigen</button>
+</div>
+
+<!-- Gauss-Eingabe -->
+<div class="card input-panel hidden" id="input-gauss">
+    <h2 class="card-title">Gauss-Elimination</h2>
+    <p class="algo-description">
+        Löst lineares Gleichungssystem Ax = b:<br>
+        $$A\mathbf{x} = \mathbf{b}$$
+        Mit Teilpivotsuche für numerische Stabilität.
+    </p>
+    <div class="input-row">
+        <div class="input-group" style="flex:2">
+            <label>Koeffizientenmatrix A (Zeilen mit Semikolon trennen)</label>
+            <input type="text" id="gauss-matrix" value="2,1;1,3" placeholder="z.B. 2,1;1,3">
+        </div>
+        <div class="input-group">
+            <label>Rechte Seite b (kommagetrennt)</label>
+            <input type="text" id="gauss-b" value="5,10" placeholder="z.B. 5,10">
+        </div>
+    </div>
+    <button class="btn-compute" onclick="runGauss()">Berechnen &amp; Schritte anzeigen</button>
+</div>
+
+<!-- ggT-Eingabe -->
+<div class="card input-panel hidden" id="input-gcd">
+    <h2 class="card-title">Euklidischer Algorithmus</h2>
+    <p class="algo-description">
+        Berechnet den größten gemeinsamen Teiler:<br>
+        $$\gcd(a, b) = \gcd(b,\; a \bmod b)$$
+        Verwendet: a = b·q + r (Division mit Rest).
+    </p>
+    <div class="input-row">
+        <div class="input-group">
+            <label for="gcd-a">Zahl a</label>
+            <input type="number" id="gcd-a" value="48" step="1" min="1">
+        </div>
+        <div class="input-group">
+            <label for="gcd-b">Zahl b</label>
+            <input type="number" id="gcd-b" value="18" step="1" min="1">
+        </div>
+    </div>
+    <button class="btn-compute" onclick="runGcd()">Berechnen &amp; Schritte anzeigen</button>
+</div>
+
+<!-- RSA-Eingabe -->
+<div class="card input-panel hidden" id="input-rsa">
+    <h2 class="card-title">RSA-Kryptographie</h2>
+    <p class="algo-description">
+        Asymmetrisches Kryptosystem:<br>
+        $$c \equiv m^e \pmod{n}, \quad m \equiv c^d \pmod{n}$$
+        Sicherheit basiert auf Faktorisierungsproblem.
+    </p>
+    <div class="input-row">
+        <div class="input-group">
+            <label for="rsa-p">Primzahl p</label>
+            <input type="number" id="rsa-p" value="5" step="1" min="2">
+        </div>
+        <div class="input-group">
+            <label for="rsa-q">Primzahl q</label>
+            <input type="number" id="rsa-q" value="11" step="1" min="2">
+        </div>
+        <div class="input-group">
+            <label for="rsa-msg">Nachricht m</label>
+            <input type="number" id="rsa-msg" value="7" step="1" min="1">
+        </div>
+    </div>
+    <button class="btn-compute" onclick="runRsa()">Berechnen &amp; Schritte anzeigen</button>
+</div>
+
+<!-- Primfaktor-Eingabe -->
+<div class="card input-panel hidden" id="input-prime">
+    <h2 class="card-title">Primfaktorzerlegung</h2>
+    <p class="algo-description">
+        Zerlegt eine Zahl in ihre Primfaktoren:<br>
+        $$n = \prod_{i} p_i^{e_i}$$
+        Methode: Trial Division (Probedivision).
+    </p>
+    <div class="input-row">
+        <div class="input-group">
+            <label for="prime-n">Zahl n</label>
+            <input type="number" id="prime-n" value="360" step="1" min="2">
+        </div>
+    </div>
+    <button class="btn-compute" onclick="runPrime()">Berechnen &amp; Schritte anzeigen</button>
+</div>
+
+<!-- ========================================================
+     ERGEBNIS-BEREICH (Schritt-für-Schritt Anzeige)
+     ======================================================== -->
+<div class="card" id="result-card" style="display:none;">
+    <div id="result-container"></div>
+</div>
+
+<!-- Lade-Indikator -->
+<div class="loading-spinner hidden" id="spinner">
+    <div class="spinner-circle"></div>
+    <span>Berechne Schritte...</span>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<style>
+    /* =========================================================
+       SCHRITT-FÜR-SCHRITT SEITEN-CSS
+       ========================================================= */
+
+    /* Algorithmus-Auswahl-Buttons */
+    .algo-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .algo-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 1rem 0.75rem;
+        background: var(--surface1);
+        border: 2px solid var(--overlay0);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s, transform 0.1s;
+        text-align: center;
+    }
+
+    .algo-btn:hover {
+        border-color: var(--blue);
+        background: var(--surface2);
+        transform: translateY(-2px);
+    }
+
+    .algo-btn.active {
+        border-color: var(--mauve);
+        background: color-mix(in srgb, var(--mauve) 15%, var(--surface1));
+    }
+
+    .algo-icon {
+        font-size: 1.5rem;
+        display: block;
+    }
+
+    .algo-name {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .algo-desc {
+        font-size: 0.72rem;
+        color: var(--subtext0);
+    }
+
+    /* Eingabe-Panel */
+    .input-panel { margin-top: 1rem; }
+    .input-panel.hidden { display: none; }
+
+    .algo-description {
+        color: var(--subtext1);
+        margin-bottom: 1.25rem;
+        line-height: 1.6;
+    }
+
+    .input-row {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+
+    .input-group {
+        flex: 1;
+        min-width: 140px;
+    }
+
+    .input-group label {
+        display: block;
+        font-size: 0.82rem;
+        color: var(--subtext0);
+        margin-bottom: 0.3rem;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        background: var(--surface0);
+        border: 1px solid var(--overlay0);
+        border-radius: 6px;
+        color: var(--text);
+        font-size: 0.9rem;
+        box-sizing: border-box;
+    }
+
+    .btn-compute {
+        padding: 0.6rem 1.5rem;
+        background: var(--mauve);
+        border: none;
+        border-radius: 6px;
+        color: var(--base);
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-compute:hover { background: var(--lavender); }
+
+    /* Lade-Spinner */
+    .loading-spinner {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        color: var(--subtext1);
+    }
+
+    .loading-spinner.hidden { display: none; }
+
+    .spinner-circle {
+        width: 24px;
+        height: 24px;
+        border: 3px solid var(--overlay0);
+        border-top-color: var(--mauve);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* =========================================================
+       SCHRITT-CONTAINER (generiert von format_steps_html)
+       ========================================================= */
+
+    .steps-container {
+        width: 100%;
+    }
+
+    .steps-header {
+        border-bottom: 2px solid var(--overlay0);
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .steps-title {
+        font-size: 1.3rem;
+        color: var(--mauve);
+        margin: 0 0 0.4rem 0;
+    }
+
+    .steps-formula {
+        color: var(--subtext1);
+        font-size: 0.95rem;
+        overflow-x: auto;
+    }
+
+    .steps-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    /* Einzelner Schritt */
+    .step {
+        background: var(--surface1);
+        border: 1px solid var(--overlay0);
+        border-left: 4px solid var(--blue);
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        /* fade-in Animation */
+        opacity: 0;
+        transform: translateY(8px);
+        animation: step-appear 0.35s ease forwards;
+    }
+
+    /* Jeder Schritt erscheint etwas später als der vorherige */
+    .step:nth-child(1)  { animation-delay: 0.05s; }
+    .step:nth-child(2)  { animation-delay: 0.10s; }
+    .step:nth-child(3)  { animation-delay: 0.15s; }
+    .step:nth-child(4)  { animation-delay: 0.20s; }
+    .step:nth-child(5)  { animation-delay: 0.25s; }
+    .step:nth-child(6)  { animation-delay: 0.30s; }
+    .step:nth-child(7)  { animation-delay: 0.35s; }
+    .step:nth-child(8)  { animation-delay: 0.40s; }
+    .step:nth-child(9)  { animation-delay: 0.45s; }
+    .step:nth-child(10) { animation-delay: 0.50s; }
+    .step:nth-child(n+11) { animation-delay: 0.55s; }
+
+    @keyframes step-appear {
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-error {
+        border-left-color: var(--red);
+    }
+
+    .step-header {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .step-number {
+        background: var(--blue);
+        color: var(--base);
+        font-size: 0.75rem;
+        font-weight: 700;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .step-error .step-number { background: var(--red); }
+
+    .step-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text);
+    }
+
+    .step-operation {
+        margin: 0.3rem 0;
+    }
+
+    .step-operation code {
+        background: var(--surface0);
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.88rem;
+        color: var(--green);
+        display: inline-block;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .step-explanation {
+        font-size: 0.83rem;
+        color: var(--subtext1);
+        line-height: 1.5;
+        margin-top: 0.25rem;
+    }
+
+    .step-matrix {
+        margin-top: 0.5rem;
+    }
+
+    .matrix-label {
+        font-size: 0.8rem;
+        color: var(--subtext0);
+        font-weight: 600;
+    }
+
+    .step-matrix pre {
+        margin: 0.2rem 0 0 0;
+        background: var(--surface0);
+        border-radius: 4px;
+        padding: 0.4rem 0.6rem;
+        overflow-x: auto;
+    }
+
+    .step-matrix pre code {
+        font-size: 0.8rem;
+        color: var(--text);
+    }
+
+    /* Ergebnis-Box */
+    .steps-result {
+        background: color-mix(in srgb, var(--green) 10%, var(--surface1));
+        border: 1px solid var(--green);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .steps-result h4 {
+        margin: 0 0 0.5rem 0;
+        color: var(--green);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .result-value {
+        font-size: 1.1rem;
+        color: var(--text);
+        font-weight: 700;
+    }
+
+    .result-dict {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.2rem 0.75rem;
+        margin: 0;
+    }
+
+    .result-dict dt {
+        color: var(--subtext0);
+        font-size: 0.82rem;
+    }
+
+    .result-dict dd {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .convergence-status {
+        margin-top: 0.5rem;
+        font-size: 0.83rem;
+        font-weight: 600;
+    }
+
+    .converged { color: var(--green); }
+    .not-converged { color: var(--red); }
+</style>
+
+<script>
+    /**
+     * Wählt den aktiven Algorithmus aus und zeigt das entsprechende Eingabe-Panel.
+     * @param {string} algo - Algorithmus-Bezeichner (newton, bisection, gauss, gcd, rsa, prime)
+     * @param {HTMLElement} btn - Geklickter Button
+     */
+    function selectAlgo(algo, btn) {
+        // Alle Eingabe-Panels verstecken
+        document.querySelectorAll('.input-panel').forEach(panel => panel.classList.add('hidden'));
+        // Alle Buttons deaktivieren
+        document.querySelectorAll('.algo-btn').forEach(b => b.classList.remove('active'));
+
+        // Gewähltes Panel anzeigen und Button aktivieren
+        const panel = document.getElementById('input-' + algo);
+        if (panel) panel.classList.remove('hidden');
+        btn.classList.add('active');
+
+        // Ergebnis ausblenden
+        document.getElementById('result-card').style.display = 'none';
+    }
+
+    /**
+     * Zeigt den Lade-Spinner an/aus.
+     * @param {boolean} show - true zum Anzeigen
+     */
+    function setSpinner(show) {
+        const spinner = document.getElementById('spinner');
+        spinner.classList.toggle('hidden', !show);
+    }
+
+    /**
+     * Zeigt das HTML-Ergebnis in der Ergebnis-Karte an.
+     * @param {string} html - HTML-Inhalt des steps-Containers
+     */
+    function showStepsResult(html) {
+        const card = document.getElementById('result-card');
+        const container = document.getElementById('result-container');
+        container.innerHTML = html;
+        card.style.display = 'block';
+
+        // KaTeX-Formeln im neuen Inhalt rendern
+        if (typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(container, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+        }
+
+        // Sanft zur Ergebnis-Karte scrollen
+        setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    }
+
+    /**
+     * Zeigt eine Fehlermeldung in der Ergebnis-Karte.
+     * @param {string} message - Fehlermeldungstext
+     */
+    function showStepsError(message) {
+        const card = document.getElementById('result-card');
+        document.getElementById('result-container').innerHTML =
+            `<div class="result-error">&#9888; ${message}</div>`;
+        card.style.display = 'block';
+    }
+
+    // -----------------------------------------------------------------
+    // API-Aufrufe für jeden Algorithmus
+    // -----------------------------------------------------------------
+
+    /** Startet Newton-Raphson-Berechnung und zeigt Schritte. */
+    async function runNewton() {
+        const expr = document.getElementById('newton-expr').value.trim();
+        const x0 = parseFloat(document.getElementById('newton-x0').value);
+
+        if (!expr) { showStepsError('Bitte Funktion f(x) eingeben.'); return; }
+
+        setSpinner(true);
+        try {
+            const data = await apiPost('/api/steps/newton', { expr, x0 });
+            showStepsResult(data.html);
+        } catch (e) {
+            showStepsError(e.message);
+        } finally {
+            setSpinner(false);
+        }
+    }
+
+    /** Startet Bisektions-Berechnung und zeigt Schritte. */
+    async function runBisection() {
+        const expr = document.getElementById('bisect-expr').value.trim();
+        const a = parseFloat(document.getElementById('bisect-a').value);
+        const b = parseFloat(document.getElementById('bisect-b').value);
+
+        if (!expr) { showStepsError('Bitte Funktion f(x) eingeben.'); return; }
+
+        setSpinner(true);
+        try {
+            const data = await apiPost('/api/steps/bisection', { expr, a, b });
+            showStepsResult(data.html);
+        } catch (e) {
+            showStepsError(e.message);
+        } finally {
+            setSpinner(false);
+        }
+    }
+
+    /** Startet Gauss-Elimination und zeigt Schritte. */
+    async function runGauss() {
+        const matrixStr = document.getElementById('gauss-matrix').value.trim();
+        const bStr = document.getElementById('gauss-b').value.trim();
+
+        if (!matrixStr || !bStr) { showStepsError('Bitte Matrix und Vektor b eingeben.'); return; }
+
+        // Matrix aus "2,1;1,3" → [[2,1],[1,3]] parsen
+        let matrix, bVec;
+        try {
+            matrix = matrixStr.split(';').map(row =>
+                row.split(',').map(v => parseFloat(v.trim()))
+            );
+            bVec = bStr.split(',').map(v => parseFloat(v.trim()));
+        } catch (e) {
+            showStepsError('Ungültiges Format. Beispiel: "2,1;1,3" und "5,10"');
+            return;
+        }
+
+        setSpinner(true);
+        try {
+            const data = await apiPost('/api/steps/gauss', { matrix, b: bVec });
+            showStepsResult(data.html);
+        } catch (e) {
+            showStepsError(e.message);
+        } finally {
+            setSpinner(false);
+        }
+    }
+
+    /** Startet ggT-Berechnung und zeigt Schritte. */
+    async function runGcd() {
+        const a = parseInt(document.getElementById('gcd-a').value);
+        const b = parseInt(document.getElementById('gcd-b').value);
+
+        if (isNaN(a) || isNaN(b) || a <= 0 || b <= 0) {
+            showStepsError('a und b müssen positive ganze Zahlen sein.');
+            return;
+        }
+
+        setSpinner(true);
+        try {
+            const data = await apiPost('/api/steps/gcd', { a, b });
+            showStepsResult(data.html);
+        } catch (e) {
+            showStepsError(e.message);
+        } finally {
+            setSpinner(false);
+        }
+    }
+
+    /** Startet RSA-Berechnung und zeigt Schritte. */
+    async function runRsa() {
+        const p = parseInt(document.getElementById('rsa-p').value);
+        const q = parseInt(document.getElementById('rsa-q').value);
+        const message = parseInt(document.getElementById('rsa-msg').value);
+
+        if (isNaN(p) || isNaN(q) || p < 2 || q < 2) {
+            showStepsError('p und q müssen Primzahlen ≥ 2 sein.');
+            return;
+        }
+
+        setSpinner(true);
+        try {
+            const data = await apiPost('/api/steps/rsa', { p, q, message });
+            showStepsResult(data.html);
+        } catch (e) {
+            showStepsError(e.message);
+        } finally {
+            setSpinner(false);
+        }
+    }
+
+    /** Startet Primfaktorzerlegung und zeigt Schritte. */
+    async function runPrime() {
+        const n = parseInt(document.getElementById('prime-n').value);
+
+        if (isNaN(n) || n < 2) {
+            showStepsError('n muss eine ganze Zahl ≥ 2 sein.');
+            return;
+        }
+
+        setSpinner(true);
+        try {
+            const data = await apiPost('/api/steps/prime_factorization', { n });
+            showStepsResult(data.html);
+        } catch (e) {
+            showStepsError(e.message);
+        } finally {
+            setSpinner(false);
+        }
+    }
+
+    // Enter-Taste in Eingabefeldern auslösen
+    document.addEventListener('DOMContentLoaded', () => {
+        // Alle Eingabe-Panels: Enter-Taste löst Berechnung aus
+        const enterMap = {
+            'newton-expr': runNewton, 'newton-x0': runNewton,
+            'bisect-expr': runBisection, 'bisect-a': runBisection, 'bisect-b': runBisection,
+            'gauss-matrix': runGauss, 'gauss-b': runGauss,
+            'gcd-a': runGcd, 'gcd-b': runGcd,
+            'rsa-p': runRsa, 'rsa-q': runRsa, 'rsa-msg': runRsa,
+            'prime-n': runPrime
+        };
+
+        Object.entries(enterMap).forEach(([id, fn]) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') fn(); });
+        });
+    });
+</script>
+{% endblock %}

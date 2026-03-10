@@ -135,5 +135,22 @@
 - [x] Binomialkoeffizient, Stirling-Zahlen (2. Art), Bell-Zahlen
 - [x] Catalan-Zahlen, Derangements, Ganzzahlpartitionen, Multinomialkoeffizient
 
+### Logging-System (src/math_logger.py) - Build 14
+- [x] MathLogger-Klasse mit konfigurierbaren Leveln (DEBUG/INFO/WARNING/ERROR)
+- [x] Ausgabe auf Konsole und/oder Datei (logs/-Verzeichnis)
+- [x] step(), result(), convergence_warning(), matrix_step(), timing(), section()
+- [x] Globale Hilfsfunktionen: get_logger(), enable_debug_logging(), disable_logging()
+- [x] newton_raphson() in analysis.py um verbose=True erweitert
+
+### Schritt-für-Schritt-Modus (src/step_by_step.py) - Build 14
+- [x] newton_raphson_steps(), bisection_steps(), gauss_elimination_steps()
+- [x] euclidean_algorithm_steps(), rsa_steps(), prime_factorization_steps(), lu_decomposition_steps()
+- [x] format_steps_text() und format_steps_html() mit KaTeX-Formeln
+
+### Web-Interface: Schritt-für-Schritt (Build 14)
+- [x] GET /steps: Neue interaktive Seite mit Fade-in-Animationen
+- [x] POST /api/steps/{newton,bisection,gauss,gcd,rsa,prime_factorization}
+- [x] Navigationseintrag "Schritt-für-Schritt" in Sidebar
+
 ## Offene Aufgaben
 _(keine bekannten offenen Features mehr)_

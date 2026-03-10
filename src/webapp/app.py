@@ -87,6 +87,16 @@ from millennium_problems import (
     riemann_zeros_mpmath, hardy_littlewood_goldbach_density, complexity_comparison
 )
 from proof_theory import goldbach_all_decompositions
+from step_by_step import (
+    newton_raphson_steps,
+    bisection_steps,
+    gauss_elimination_steps,
+    euclidean_algorithm_steps,
+    rsa_steps,
+    prime_factorization_steps,
+    format_steps_text,
+    format_steps_html,
+)
 
 
 # ===========================================================================
@@ -1739,6 +1749,302 @@ def millennium_complexity():
 
 
 # ===========================================================================
+# SCHRITT-FÜR-SCHRITT-SEITE UND API-ENDPUNKTE
+# ===========================================================================
+
+@app.route('/steps')
+def steps_page():
+    """
+    @brief Schritt-für-Schritt-Erklärungen Seite.
+    @description
+        Zeigt eine Übersicht aller verfügbaren interaktiven Schritt-für-Schritt-
+        Erklärungen: Newton-Raphson, Bisektion, Gauss-Elimination, ggT, RSA, Primfaktoren.
+
+    @return Gerendertes HTML-Template
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    return render_template('steps.html')
+
+
+@app.route('/api/steps/newton', methods=['POST'])
+def steps_newton():
+    """
+    @brief API-Endpunkt: Newton-Raphson Schritt-für-Schritt.
+    @description
+        Führt das Newton-Raphson-Verfahren auf einem symbolischen Ausdruck aus
+        und gibt jeden Berechnungsschritt zurück.
+
+        Request-Body (JSON):
+            {"expr": "x**2 - 2", "x0": 1.5}
+
+        Response (JSON):
+            {"steps": [...], "result": float, "html": "...", "text": "..."}
+
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    try:
+        # JSON-Body lesen und validieren
+        data = request.get_json(force=True)
+        if not data:
+            return error_response("Kein JSON-Body erhalten.")
+
+        expr_str = data.get('expr', '')
+        x0 = float(data.get('x0', 1.0))
+
+        if not expr_str:
+            return error_response("Parameter 'expr' fehlt.")
+
+        # Ausdruck sicher parsen und numerische Funktion erzeugen
+        expr, x_sym = safe_parse_expr(expr_str)
+        f_num = sp.lambdify(x_sym, expr, modules=['math'])
+
+        # Schritt-für-Schritt Newton-Raphson ausführen
+        tol = float(data.get('tol', 1e-10))
+        max_iter = int(data.get('max_iter', 50))
+        result_dict = newton_raphson_steps(f_num, x0, tol=tol, max_iter=max_iter)
+
+        return jsonify({
+            'steps': result_dict['steps'],
+            'result': result_dict['result'],
+            'converged': result_dict.get('converged', False),
+            'iterations': result_dict.get('iterations', 0),
+            'method': result_dict.get('method', ''),
+            'html': format_steps_html(result_dict),
+            'text': format_steps_text(result_dict)
+        })
+    except Exception as e:
+        return error_response(f"Newton-Raphson Fehler: {str(e)}")
+
+
+@app.route('/api/steps/bisection', methods=['POST'])
+def steps_bisection():
+    """
+    @brief API-Endpunkt: Bisektionsverfahren Schritt-für-Schritt.
+    @description
+        Führt das Bisektionsverfahren auf einem symbolischen Ausdruck aus.
+
+        Request-Body (JSON):
+            {"expr": "x**2 - 2", "a": 1.0, "b": 2.0}
+
+        Response (JSON):
+            {"steps": [...], "result": float, "html": "..."}
+
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    try:
+        data = request.get_json(force=True)
+        if not data:
+            return error_response("Kein JSON-Body erhalten.")
+
+        expr_str = data.get('expr', '')
+        a = float(data.get('a', 0.0))
+        b = float(data.get('b', 2.0))
+
+        if not expr_str:
+            return error_response("Parameter 'expr' fehlt.")
+
+        # Ausdruck parsen und Funktion erzeugen
+        expr, x_sym = safe_parse_expr(expr_str)
+        f_num = sp.lambdify(x_sym, expr, modules=['math'])
+
+        tol = float(data.get('tol', 1e-10))
+        max_iter = int(data.get('max_iter', 50))
+        result_dict = bisection_steps(f_num, a, b, tol=tol, max_iter=max_iter)
+
+        # Fehlerfall (kein Vorzeichenwechsel)
+        if result_dict.get('result') is None:
+            return error_response(result_dict.get('error', 'Bisektionsfehler'))
+
+        return jsonify({
+            'steps': result_dict['steps'],
+            'result': result_dict['result'],
+            'converged': result_dict.get('converged', False),
+            'iterations': result_dict.get('iterations', 0),
+            'method': result_dict.get('method', ''),
+            'html': format_steps_html(result_dict),
+            'text': format_steps_text(result_dict)
+        })
+    except Exception as e:
+        return error_response(f"Bisektion Fehler: {str(e)}")
+
+
+@app.route('/api/steps/gauss', methods=['POST'])
+def steps_gauss():
+    """
+    @brief API-Endpunkt: Gauss-Elimination Schritt-für-Schritt.
+    @description
+        Löst ein lineares Gleichungssystem Ax = b und zeigt jeden Umformungsschritt.
+
+        Request-Body (JSON):
+            {"matrix": [[2,1],[1,3]], "b": [5, 10]}
+
+        Response (JSON):
+            {"steps": [...], "result": [float], "html": "..."}
+
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    try:
+        data = request.get_json(force=True)
+        if not data:
+            return error_response("Kein JSON-Body erhalten.")
+
+        matrix = data.get('matrix')
+        b = data.get('b')
+
+        if matrix is None or b is None:
+            return error_response("Parameter 'matrix' und 'b' erforderlich.")
+
+        # Dimensionsprüfung
+        n = len(matrix)
+        if len(b) != n:
+            return error_response(f"matrix hat {n} Zeilen, b hat {len(b)} Einträge – müssen gleich sein.")
+
+        result_dict = gauss_elimination_steps(matrix, b)
+
+        # Singuläre Matrix abfangen
+        if result_dict.get('result') is None:
+            return error_response(result_dict.get('error', 'Gauss-Eliminations-Fehler'))
+
+        return jsonify({
+            'steps': result_dict['steps'],
+            'result': result_dict['result'],
+            'method': result_dict.get('method', ''),
+            'html': format_steps_html(result_dict),
+            'text': format_steps_text(result_dict)
+        })
+    except Exception as e:
+        return error_response(f"Gauss-Elimination Fehler: {str(e)}")
+
+
+@app.route('/api/steps/gcd', methods=['POST'])
+def steps_gcd():
+    """
+    @brief API-Endpunkt: Euklidischer Algorithmus (ggT) Schritt-für-Schritt.
+    @description
+        Berechnet den größten gemeinsamen Teiler zweier Zahlen und zeigt jeden Schritt.
+
+        Request-Body (JSON):
+            {"a": 48, "b": 18}
+
+        Response (JSON):
+            {"steps": [...], "result": int, "html": "..."}
+
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    try:
+        data = request.get_json(force=True)
+        if not data:
+            return error_response("Kein JSON-Body erhalten.")
+
+        a = int(data.get('a', 0))
+        b = int(data.get('b', 0))
+
+        if a <= 0 or b <= 0:
+            return error_response("a und b müssen positive ganze Zahlen sein.")
+
+        result_dict = euclidean_algorithm_steps(a, b)
+
+        return jsonify({
+            'steps': result_dict['steps'],
+            'result': result_dict['result'],
+            'method': result_dict.get('method', ''),
+            'html': format_steps_html(result_dict),
+            'text': format_steps_text(result_dict)
+        })
+    except Exception as e:
+        return error_response(f"Euklidischer Algorithmus Fehler: {str(e)}")
+
+
+@app.route('/api/steps/rsa', methods=['POST'])
+def steps_rsa():
+    """
+    @brief API-Endpunkt: RSA-Kryptographie Schritt-für-Schritt.
+    @description
+        Zeigt alle Schritte der RSA-Schlüsselgenerierung und Ver-/Entschlüsselung.
+
+        Request-Body (JSON):
+            {"p": 5, "q": 11, "message": 7}
+
+        Response (JSON):
+            {"steps": [...], "result": {...}, "html": "..."}
+
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    try:
+        data = request.get_json(force=True)
+        if not data:
+            return error_response("Kein JSON-Body erhalten.")
+
+        p = int(data.get('p', 5))
+        q = int(data.get('q', 11))
+        message = int(data.get('message', 7))
+
+        if p < 2 or q < 2:
+            return error_response("p und q müssen Primzahlen ≥ 2 sein.")
+
+        result_dict = rsa_steps(p, q, message)
+
+        return jsonify({
+            'steps': result_dict['steps'],
+            'result': result_dict['result'],
+            'method': result_dict.get('method', ''),
+            'html': format_steps_html(result_dict),
+            'text': format_steps_text(result_dict)
+        })
+    except Exception as e:
+        return error_response(f"RSA Fehler: {str(e)}")
+
+
+@app.route('/api/steps/prime_factorization', methods=['POST'])
+def steps_prime_factorization():
+    """
+    @brief API-Endpunkt: Primfaktorzerlegung Schritt-für-Schritt.
+    @description
+        Zerlegt eine Zahl in Primfaktoren und zeigt jeden Divisionsschritt.
+
+        Request-Body (JSON):
+            {"n": 360}
+
+        Response (JSON):
+            {"steps": [...], "result": [int], "html": "..."}
+
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    try:
+        data = request.get_json(force=True)
+        if not data:
+            return error_response("Kein JSON-Body erhalten.")
+
+        n = int(data.get('n', 0))
+
+        if n < 2:
+            return error_response("n muss eine ganze Zahl ≥ 2 sein.")
+        if n > 10**12:
+            return error_response("n ist zu groß (max. 10^12 für schnelle Berechnung).")
+
+        result_dict = prime_factorization_steps(n)
+
+        return jsonify({
+            'steps': result_dict['steps'],
+            'result': result_dict['result'],
+            'factor_counts': result_dict.get('factor_counts', {}),
+            'product_str': result_dict.get('product_str', ''),
+            'method': result_dict.get('method', ''),
+            'html': format_steps_html(result_dict),
+            'text': format_steps_text(result_dict)
+        })
+    except Exception as e:
+        return error_response(f"Primfaktorzerlegung Fehler: {str(e)}")
+
+
+# ===========================================================================
 # HAUPTPROGRAMM
 # ===========================================================================
 
@@ -1747,7 +2053,7 @@ if __name__ == '__main__':
     # Port 8080, debug=True für Entwicklung (zeigt Fehler im Browser)
     print("=" * 60)
     print("  Mathematik-Spezialist Web-Interface")
-    print("  Build 13 | Port 8080")
+    print("  Build 14 | Port 8080")
     print("  URL: http://localhost:8080")
     print("=" * 60)
     app.run(host='0.0.0.0', port=8080, debug=True)
