@@ -176,9 +176,9 @@ class TestGammaMpmath:
         # Γ(1 + i) ist berechenbar
         ergebnis = gamma_mpmath(complex(1, 1), dps=30)
         assert isinstance(ergebnis, complex)
-        # |Γ(1+i)| ≈ 0.498... (bekannter Wert)
-        assert abs(abs(ergebnis) - 0.498) < 0.01, (
-            f"|Γ(1+i)| ≈ 0.498, erhalten: {abs(ergebnis):.4f}"
+        # |Γ(1+i)| = sqrt(π/sinh(π)) ≈ 0.5216 (mathematisch korrekt)
+        assert abs(abs(ergebnis) - 0.5216) < 0.01, (
+            f"|Γ(1+i)| ≈ 0.5216, erhalten: {abs(ergebnis):.4f}"
         )
 
 

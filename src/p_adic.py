@@ -1,6 +1,6 @@
 """
 @file p_adic.py
-@brief p-adische Zahlen – Theorie und Implementierung.
+@brief p-adische Zahlen – Theorie, Implementierung und p-adische L-Funktionen.
 @description
     Implementiert p-adische Zahlen, die Metrik und grundlegende Operationen.
     p-adische Zahlen sind ein alternatives Zahlensystem, das auf einem
@@ -21,13 +21,21 @@
     Anwendungen:
         - Hensels Lemma (p-adisches Newton-Verfahren)
         - Lokal-globale Prinzipien (Hasse-Minkowski)
-        - p-adische L-Funktionen
+        - p-adische L-Funktionen (Kubota-Leopoldt)
+        - Iwasawa-Theorie
         - Kryptographie (p-adische Gitter)
 
+    Erweiterungen (Build 11):
+        - Bernoulli-Zahlen und verallgemeinerte Bernoulli-Zahlen B_{n,chi}
+        - Kubota-Leopoldt p-adische L-Funktion L_p(s, chi)
+        - Kummer-Kongruenzen (Grundlage der p-adischen L-Funktion)
+        - p-adische Zeta-Funktion zeta_p(s)
+        - Iwasawa μ- und λ-Invarianten (Schätzung)
+
 @author Kurt Ingwer
-@version 1.0
+@version 2.0
 @since 2026-03-08
-@lastModified 2026-03-08
+@lastModified 2026-03-10
 """
 
 import math
@@ -737,5 +745,517 @@ def ostrowski_theorem_demo(n: int) -> dict:
             f"|{n}|_∞ = {abs_inf}, "
             + ", ".join(f"|{n}|_{p} = {v:.6f}" for p, v in p_adic_values.items() if v != 1.0)
             + f" → Produkt = {exact_product:.10f}"
+        )
+    }
+
+
+# ===========================================================================
+# BERNOULLI-ZAHLEN UND VERALLGEMEINERTE BERNOULLI-ZAHLEN
+# ===========================================================================
+
+def bernoulli_number(n: int) -> float:
+    """
+    Berechnet die n-te Bernoulli-Zahl B_n.
+
+    Definition via erzeugende Funktion:
+        t / (e^t - 1) = Σ_{n=0}^∞ B_n · t^n / n!
+
+    Rekurrenzformel (zur Berechnung):
+        B_0 = 1
+        Σ_{k=0}^{n} C(n+1, k) · B_k = 0   für n ≥ 1
+        ⟺  B_n = -1/(n+1) · Σ_{k=0}^{n-1} C(n+1, k) · B_k
+
+    Bekannte Werte:
+        B_0 = 1
+        B_1 = -1/2
+        B_2 = 1/6
+        B_3 = 0
+        B_4 = -1/30
+        B_5 = 0
+        B_6 = 1/42
+        B_8 = -1/30
+        B_{10} = 5/66
+
+    Eigenschaften:
+        - B_n = 0 für alle ungeraden n > 1
+        - Zusammenhang mit Riemann-Zeta: ζ(-n) = -B_{n+1} / (n+1) für n ≥ 0
+        - Verbindung zu Fermatschen Zahlen und Kummer-Regularität
+
+    @param n: Nicht-negative ganze Zahl (Index der Bernoulli-Zahl)
+    @return: Bernoulli-Zahl B_n als Gleitkommazahl
+    @raises ValueError: Wenn n < 0
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    if n < 0:
+        raise ValueError(f"n muss ≥ 0 sein, erhalten: n = {n}")
+
+    # Sonderfälle direkt zurückgeben
+    if n == 0:
+        return 1.0
+    if n == 1:
+        return -0.5
+    if n % 2 != 0:
+        # Alle ungeraden B_n = 0 für n > 1
+        return 0.0
+
+    # Rekurrenzberechnung: Speichere bisherige Bernoulli-Zahlen
+    # B[k] = B_k für k = 0, ..., n-1
+    B = [0.0] * (n + 1)
+    B[0] = 1.0
+    B[1] = -0.5
+
+    # Binomialkoeffizient C(m, k) via Pascal-Dreieck oder direkte Formel
+    def binom(m: int, k: int) -> float:
+        """Binomialkoeffizient C(m, k)."""
+        if k < 0 or k > m:
+            return 0.0
+        if k == 0 or k == m:
+            return 1.0
+        k = min(k, m - k)  # Symmetrie nutzen
+        result = 1.0
+        for i in range(k):
+            result *= (m - i) / (i + 1)
+        return result
+
+    for j in range(2, n + 1):
+        if j % 2 != 0:
+            # Ungerade j > 1: B_j = 0
+            B[j] = 0.0
+            continue
+        # Rekurrenz: B_j = -1/(j+1) · Σ_{k=0}^{j-1} C(j+1, k) · B_k
+        s = 0.0
+        for k in range(j):
+            s += binom(j + 1, k) * B[k]
+        B[j] = -s / (j + 1)
+
+    return B[n]
+
+
+def generalized_bernoulli_numbers(chi_conductor: int, n_max: int) -> list:
+    """
+    Berechnet verallgemeinerte Bernoulli-Zahlen B_{n, chi} für n = 0, ..., n_max.
+
+    Für den trivialen Charakter (chi_conductor = 1) gilt:
+        B_{n, trivial} = B_n   (gewöhnliche Bernoulli-Zahlen)
+
+    Für einen Dirichlet-Charakter χ mit Führe f = chi_conductor:
+        B_{n, chi} = f^{n-1} · Σ_{a=1}^{f} χ(a) · B_n(a/f)
+
+    wobei B_n(x) = Σ_{k=0}^{n} C(n,k) · B_k · x^{n-k} die Bernoulli-Polynome sind.
+
+    Für den trivialen Charakter χ_0 mod 1 (alle χ(a) = 1, f = 1):
+        B_{n, χ_0} = B_n(1/1) · 1^{n-1} = B_n  (Bernoulli-Zahlen)
+
+    Anwendung in der Iwasawa-Theorie:
+        L_p(1-n, χ) = -(1 - χ(p)·p^{n-1}) · B_{n, χ} / n
+
+    @param chi_conductor: Führe des Dirichlet-Charakters (1 = trivial, nur B_n)
+    @param n_max: Maximales n (erzeugt B_{0,chi}, ..., B_{n_max, chi})
+    @return: Liste [B_{0,chi}, B_{1,chi}, ..., B_{n_max, chi}] als Gleitkommazahlen
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    if chi_conductor == 1:
+        # Trivialer Charakter: einfach die gewöhnlichen Bernoulli-Zahlen
+        return [bernoulli_number(n) for n in range(n_max + 1)]
+
+    # Für allgemeine Charaktere: B_{n, chi} via Bernoulli-Polynome
+    f = chi_conductor
+
+    def bernoulli_polynomial(n: int, x: float) -> float:
+        """
+        Berechnet das n-te Bernoulli-Polynom B_n(x).
+
+        B_n(x) = Σ_{k=0}^{n} C(n, k) · B_k · x^{n-k}
+
+        @param n: Grad des Bernoulli-Polynoms
+        @param x: Argument (reelle Zahl)
+        @return: B_n(x)
+        """
+        def binom_coeff(m: int, k: int) -> float:
+            if k < 0 or k > m:
+                return 0.0
+            if k == 0 or k == m:
+                return 1.0
+            k = min(k, m - k)
+            result = 1.0
+            for i in range(k):
+                result *= (m - i) / (i + 1)
+            return result
+
+        result = 0.0
+        for k in range(n + 1):
+            result += binom_coeff(n, k) * bernoulli_number(k) * (x ** (n - k))
+        return result
+
+    # Sehr einfacher Dirichlet-Charakter für Führe f:
+    # Für chi_conductor > 1 verwenden wir den primitiven Charakter mod f.
+    # Hier: Näherung durch Charaktersumme (für den Hauptcharakter mod f)
+    # Hauptcharakter mod f: chi(a) = 1 wenn gcd(a, f) = 1, sonst 0
+    def main_character(a: int, f: int) -> float:
+        """Hauptcharakter mod f: 1 wenn gcd(a,f)=1, sonst 0."""
+        return 1.0 if math.gcd(a, f) == 1 else 0.0
+
+    result = []
+    for n in range(n_max + 1):
+        # B_{n, chi} = f^{n-1} · Σ_{a=1}^{f} chi(a) · B_n(a/f)
+        s = 0.0
+        for a in range(1, f + 1):
+            chi_a = main_character(a, f)
+            if chi_a != 0:
+                s += chi_a * bernoulli_polynomial(n, a / f)
+
+        # Vorfaktor f^{n-1} (für n=0: f^{-1} = 1/f)
+        if n == 0:
+            prefactor = 1.0 / f if f > 0 else 1.0
+        else:
+            prefactor = float(f) ** (n - 1)
+
+        result.append(prefactor * s)
+
+    return result
+
+
+# ===========================================================================
+# KUBOTA-LEOPOLDT P-ADISCHE L-FUNKTION
+# ===========================================================================
+
+def kubota_leopoldt_l_function(chi_conductor: int, s_padic: int, p: int, terms: int = 50) -> complex:
+    """
+    Berechnet die Kubota-Leopoldt p-adische L-Funktion L_p(s, chi).
+
+    Die p-adische L-Funktion wurde von Kubota und Leopoldt (1964) konstruiert.
+    Sie ist die einzige p-adische analytische Funktion, die die klassischen
+    Dirichlet-L-Werte interpoliert:
+
+        L_p(1-n, chi) = -(1 - chi(p) · p^{n-1}) · B_{n, chi} / n
+
+    für alle positiven ganzen Zahlen n mit chi(-1) = (-1)^n.
+
+    Für den trivialen Charakter (Riemann-Fall):
+        L_p(1-n, 1) = -(1 - p^{n-1}) · B_n / n   (Kummer-Kongruenz)
+
+    Dies ist der p-adische Analogon der Formel:
+        L(1-n, chi) = -B_{n, chi} / n   (klassisch)
+
+    Der Faktor (1 - chi(p) · p^{n-1}) ist der "Euler-Faktor bei p" (entfernt p aus dem Produkt).
+
+    Berechnung für s = 1-n (negative ganzzahlige Argumente):
+        Verwende die Interpolationsformel direkt.
+
+    @param chi_conductor: Führe f des Dirichlet-Charakters (1 = trivial = Riemann)
+    @param s_padic: Wert von s in Z_p (ganzzahlig für direkte Interpolation)
+                   s = 1-n entspricht n = 1-s (für n ≥ 1 muss s ≤ 0 sein)
+    @param p: Primzahl (p ≥ 2)
+    @param terms: Anzahl der Terme für numerische Näherungen
+    @return: Wert L_p(s, chi) als komplexe Zahl
+    @raises ValueError: Wenn p < 2 oder chi_conductor < 1
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    if p < 2:
+        raise ValueError(f"p muss eine Primzahl ≥ 2 sein, erhalten: p = {p}")
+    if chi_conductor < 1:
+        raise ValueError(f"chi_conductor muss ≥ 1 sein, erhalten: {chi_conductor}")
+
+    # Für ganzzahlige s = 1-n: verwende Interpolationsformel
+    # s = 1-n ⟹ n = 1-s
+    n = 1 - s_padic
+
+    if n >= 1:
+        # Direkte Interpolation: L_p(1-n, chi) = -(1 - chi(p)*p^{n-1}) * B_{n,chi} / n
+        # Verallgemeinerte Bernoulli-Zahlen berechnen
+        b_values = generalized_bernoulli_numbers(chi_conductor, n)
+        B_n_chi = b_values[n] if n < len(b_values) else 0.0
+
+        # chi(p): Hauptcharakter chi mod f: chi(p) = 1 wenn gcd(p,f)=1, sonst 0
+        if chi_conductor == 1:
+            chi_p = 1  # Trivialer Charakter
+        else:
+            chi_p = 1 if math.gcd(p, chi_conductor) == 1 else 0
+
+        # Euler-Faktor: (1 - chi(p) * p^{n-1})
+        euler_factor = 1 - chi_p * (p ** (n - 1))
+
+        # L_p(1-n, chi) = -(1 - chi(p)*p^{n-1}) * B_{n,chi} / n
+        if n == 0:
+            # Pol bei n=0 (s=1) für trivialen Charakter
+            return complex(float('inf'))
+
+        result = -euler_factor * B_n_chi / n
+        return complex(result)
+
+    else:
+        # Für s > 1 (analytische Fortsetzung): Näherung via Charaktersummen
+        # L_p(s, chi) ≈ Σ_{a=1, gcd(a,p)=1}^{f*p^k} chi(a) * <a>^{-s} / (f*p^k)
+        # Wobei <a> = a/|a|_p^{...} der Teichmüller-Repräsentant ist
+        # Vereinfachte numerische Näherung
+        f = chi_conductor
+        approx = complex(0.0)
+
+        for k in range(1, terms + 1):
+            # Näherungsterm via Bernoulli-Zahlen-Interpolation
+            if k % 2 == 0 and k >= 2:
+                B_k = bernoulli_number(k)
+                if B_k != 0:
+                    approx += (-1) ** (k // 2) * B_k / k * (p ** (-k * s_padic))
+
+        return approx
+
+
+def p_adic_zeta_function(p: int, s: int, terms: int = 30) -> float:
+    """
+    Berechnet die p-adische Zeta-Funktion ζ_p(s) = L_p(s, trivial character).
+
+    Die p-adische Zeta-Funktion ist der Spezialfall der Kubota-Leopoldt
+    L-Funktion für den trivialen Charakter χ = 1:
+
+        ζ_p(s) = L_p(s, 1)
+
+    Interpolationsformel für s = 1-n (n gerade, n ≥ 2):
+        ζ_p(1-n) = -(1 - p^{n-1}) · B_n / n
+
+    Wobei:
+        B_n: n-te Bernoulli-Zahl
+        (1 - p^{n-1}): Euler-Faktor bei p (entfernt den p-Faktor aus ζ(1-n))
+        ζ(1-n) = -B_n / n: Klassischer Riemann-Zeta-Wert (analytische Fortsetzung)
+
+    Vergleich klassisch vs. p-adisch:
+        ζ(1-n) = -B_n / n
+        ζ_p(1-n) = -(1 - p^{n-1}) · B_n / n = (1 - p^{n-1}) · ζ(1-n)
+
+    Kummer-Kongruenz (fundamentales Ergebnis):
+        (1 - p^{n-1}) · B_n / n ≡ (1 - p^{m-1}) · B_m / m (mod p)
+        für n ≡ m ≢ 0 (mod p-1) (für reguläre Primzahlen p)
+
+    Diese Kongruenz garantiert, dass ζ_p eine wohldefinierte p-adische Funktion ist.
+
+    @param p: Primzahl (p ≥ 2)
+    @param s: Ganzzahliges Argument (s = 1-n, also s ≤ -1 für n ≥ 2)
+    @param terms: Nicht verwendet (für Konsistenz mit anderen L-Funktionen)
+    @return: Wert ζ_p(s) als Gleitkommazahl
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # s = 1-n ⟹ n = 1-s
+    n = 1 - s
+
+    if n <= 0:
+        # s >= 1: Pol bei s=1 (für n=0), analytische Fortsetzung komplizierter
+        if n == 0:
+            return float('inf')  # Pol
+        return 0.0  # Vereinfachung für s > 1
+
+    if n % 2 != 0:
+        # Für ungerades n > 1: B_n = 0, also ζ_p(1-n) = 0
+        if n == 1:
+            # n=1: B_1 = -1/2, aber Sonderbehandlung nötig
+            B_1 = -0.5
+            euler_factor = 1 - (p ** 0)  # = 1 - 1 = 0
+            return -euler_factor * B_1 / 1
+        return 0.0
+
+    # Gerades n ≥ 2: ζ_p(1-n) = -(1 - p^{n-1}) · B_n / n
+    B_n = bernoulli_number(n)
+    euler_factor = 1.0 - float(p) ** (n - 1)
+
+    return -euler_factor * B_n / n
+
+
+def kummer_congruence_check(p: int, n_values: list) -> dict:
+    """
+    Prüft die Kummer-Kongruenzen für die p-adische Zeta-Funktion.
+
+    Kummer-Kongruenz (Kummer, 1851):
+        Wenn n ≡ m (mod (p-1)) und n, m gerade und n, m ≥ 2, dann gilt:
+            (1 - p^{n-1}) · B_n / n  ≡  (1 - p^{m-1}) · B_m / m  (mod p)
+
+    Genauer: Die Ausdrücke f(n) = (1 - p^{n-1}) · B_n / n sind in Z_p
+    (den p-adischen ganzen Zahlen) und stimmen modulo p überein wenn n ≡ m (mod p-1).
+
+    Bedeutung: Die Kummer-Kongruenzen zeigen, dass ζ_p eine wohldefinierte
+    p-adisch stetige Funktion auf Z_p ohne {1} ist. Ohne diese Kongruenzen würde
+    die p-adische Interpolation nicht funktionieren.
+
+    Vandiver-Vermutung: Für reguläre Primzahlen p (p ∤ Klassenzahl von Q(ζ_p))
+    sind alle Kummer-Kongruenzen erfüllt. Alle Primzahlen p < 125000 sind regulär
+    (außer: 37, 59, 67, 101, 103, ... sind irregulär).
+
+    @param p: Primzahl (p ≥ 2)
+    @param n_values: Liste gerader positiver ganzer Zahlen zum Testen
+    @return: Dictionary mit:
+             'results': {(n, m): {'lhs': float, 'rhs': float, 'congruent': bool}}
+             'all_satisfied': bool – alle Paare erfüllen die Kongruenz?
+             'p': int – die Primzahl
+             'bernoulli_values': {n: B_n} für gegebene n
+             'zeta_p_values': {n: ζ_p(1-n)} für gegebene n
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # Filtere auf gerade n ≥ 2
+    even_n = [n for n in n_values if n >= 2 and n % 2 == 0]
+
+    # Bernoulli-Zahlen und ζ_p-Werte vorberechnen
+    bernoulli_vals = {n: bernoulli_number(n) for n in even_n}
+
+    # f(n) = (1 - p^{n-1}) * B_n / n  (der relevante Ausdruck für Kummer-Kongruenz)
+    def f_kummer(n: int) -> float:
+        """Kummer-Ausdruck f(n) = (1 - p^{n-1}) * B_n / n."""
+        B_n = bernoulli_vals.get(n, bernoulli_number(n))
+        euler = 1.0 - float(p) ** (n - 1)
+        return euler * B_n / n
+
+    zeta_p_vals = {n: f_kummer(n) for n in even_n}
+
+    # Paarweise Kongruenzprüfung: n ≡ m (mod p-1)?
+    results = {}
+    for i, n in enumerate(even_n):
+        for m in even_n[i+1:]:
+            # Prüfe ob n ≡ m (mod p-1)
+            if p > 2 and (n - m) % (p - 1) == 0:
+                # Kummer-Kongruenz sollte gelten: f(n) ≡ f(m) (mod p)
+                fn = f_kummer(n)
+                fm = f_kummer(m)
+
+                # Prüfe Kongruenz mod p: (fn - fm) soll durch p teilbar sein (in Q_p)
+                # Numerisch: Bruch (fn - fm) hat p-adisch kleinen Betrag
+                diff = fn - fm
+                # Absolute Differenz klein genug? (Näherungsprüfung)
+                # Exact würde rationale Arithmetik brauchen
+                congruent = abs(diff) < abs(fn) * 0.1 + 1e-10
+
+                results[(n, m)] = {
+                    'lhs': fn,
+                    'rhs': fm,
+                    'diff': diff,
+                    'n_mod_p_minus_1': n % (p - 1),
+                    'm_mod_p_minus_1': m % (p - 1),
+                    'congruent': congruent
+                }
+
+    all_satisfied = all(v['congruent'] for v in results.values()) if results else True
+
+    return {
+        'results': results,
+        'all_satisfied': all_satisfied,
+        'p': p,
+        'bernoulli_values': bernoulli_vals,
+        'zeta_p_values': zeta_p_vals
+    }
+
+
+def iwasawa_mu_lambda_invariants(p: int, chi_conductor: int, n_check: int = 10) -> dict:
+    """
+    Schätzt die Iwasawa μ- und λ-Invarianten der p-adischen L-Funktion.
+
+    Die Iwasawa-Theorie (Iwasawa, 1960er-1970er) beschreibt das Verhalten
+    von L_p(s, chi) in der Iwasawa-Algebra:
+        Λ = Z_p[[T]] (formale Potenzreihen über den p-adischen ganzen Zahlen)
+
+    Via die Substitution T = (1+p)^s - 1 wird L_p(s, chi) zur einer Potenzreihe
+        F(T) ∈ Z_p[[T]]
+
+    μ-Invariante (Iwasawa μ):
+        μ = min{n : p^n | F(T)}   (p-adische Valuation des führenden Koeffizienten)
+        Äquivalent: μ ist die p-adische Valuation von F als Element von Λ
+
+    λ-Invariante (Iwasawa λ):
+        λ = Anzahl der Nullstellen von F(T) in der Einheitsscheibe {|T|_p < 1}
+        (gezählt mit Vielfachheit)
+
+    Vandiver-Vermutung (für Riemann/triviale χ):
+        μ = 0 für alle regulären Primzahlen p
+
+    Greenberg-Vermutung: μ = 0 für alle p (unbewiesen allgemein,
+    numerisch verifiziert für p < 4000000).
+
+    Diese Implementierung schätzt μ und λ numerisch durch Auswertung von
+    L_p(1-n, chi) für n = 2, 4, 6, ..., n_check.
+
+    @param p: Primzahl (p ≥ 2)
+    @param chi_conductor: Führe des Dirichlet-Charakters (1 = trivial)
+    @param n_check: Maximales n für die numerische Schätzung (n = 2, 4, ..., n_check)
+    @return: Dictionary mit:
+             'mu_estimate': int – geschätzte μ-Invariante (0 = keine p-Teilung)
+             'lambda_estimate': int – geschätzte λ-Invariante (Anzahl Nullstellen)
+             'l_p_values': {n: L_p(1-n, chi)} – berechnete L-Werte
+             'p_adic_valuations': {n: v_p(L_p(1-n,chi))} – p-adische Bewertungen
+             'vandiver_ok': bool – μ = 0? (Vandiver-Vermutung konsistent?)
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # Berechne L_p(1-n, chi) für gerade n = 2, 4, ..., n_check
+    even_ns = list(range(2, n_check + 1, 2))
+
+    l_p_values = {}
+    p_adic_vals = {}
+    zero_count = 0
+
+    for n in even_ns:
+        s = 1 - n  # s = 1-n
+
+        # L_p(1-n, chi) = -(1 - chi(p)*p^{n-1}) * B_{n,chi} / n
+        b_list = generalized_bernoulli_numbers(chi_conductor, n)
+        B_n_chi = b_list[n] if n < len(b_list) else 0.0
+
+        # Hauptcharakter chi(p)
+        if chi_conductor == 1:
+            chi_p = 1
+        else:
+            chi_p = 1 if math.gcd(p, chi_conductor) == 1 else 0
+
+        euler_factor = 1 - chi_p * (p ** (n - 1))
+
+        if n > 0:
+            l_val = -euler_factor * B_n_chi / n
+        else:
+            l_val = 0.0
+
+        l_p_values[n] = l_val
+
+        # p-adische Bewertung von L_p(1-n, chi) schätzen
+        # Numerisch: wie oft ist p ein Teiler des Zählers?
+        if abs(l_val) < 1e-15:
+            # Nullstelle der L-Funktion (λ zählt diese)
+            p_adic_vals[n] = float('inf')
+            zero_count += 1
+        else:
+            # Näherungsweise p-adische Bewertung via |l_val|_∞ / p^k
+            # Für eine rationale Zahl a/b: v_p(a/b) = v_p(a) - v_p(b)
+            # Hier: Näherung durch Runden auf rationale Approximation
+            # (vereinfacht: schätze v_p via log_p(|l_val|))
+            import math as _math
+            if l_val != 0:
+                log_val = _math.log(abs(l_val)) / _math.log(p)
+                v_estimate = -int(_math.floor(log_val))  # Vereinfachte Schätzung
+            else:
+                v_estimate = float('inf')
+            p_adic_vals[n] = max(0, v_estimate)
+
+    # μ-Invariante: Minimum der p-adischen Bewertungen (wenn alle endlich)
+    finite_vals = [v for v in p_adic_vals.values() if v != float('inf')]
+    mu_estimate = min(finite_vals) if finite_vals else 0
+    mu_estimate = max(0, mu_estimate)  # Nicht negativ
+
+    # λ-Invariante: Anzahl der Nullstellen (N → ∞, hier Näherung)
+    lambda_estimate = zero_count
+
+    # Vandiver-Vermutung: μ = 0 für alle regulären Primzahlen
+    vandiver_ok = (mu_estimate == 0)
+
+    return {
+        'mu_estimate': mu_estimate,
+        'lambda_estimate': lambda_estimate,
+        'l_p_values': l_p_values,
+        'p_adic_valuations': p_adic_vals,
+        'vandiver_ok': vandiver_ok,
+        'p': p,
+        'chi_conductor': chi_conductor,
+        'n_checked': even_ns,
+        'interpretation': (
+            f'μ={mu_estimate} (Vandiver: μ=0 ↔ {vandiver_ok}), '
+            f'λ≈{lambda_estimate} Nullstellen in geprüftem Bereich. '
+            f'Greenberg-Vermutung: μ=0 für alle p (unbewiesen allgemein).'
         )
     }

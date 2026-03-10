@@ -2,11 +2,10 @@
 
 ## Implementierte Features
 
-### Algebra (src/algebra.py) - Build 2
+### Algebra (src/algebra_core.py, algebra_numbertheory.py, algebra_diophantine.py) - Build 2-11
 - [x] Polynomklasse mit Horner-Schema-Auswertung
 - [x] Polynom-Addition, Subtraktion, Multiplikation
 - [x] Polynom-Ableitung (Potenzregel)
-- [x] Polynom String-Darstellung
 - [x] Linearer Gleichungslöser (mit Sonderfällen: keine/unendlich viele Lösungen)
 - [x] Quadratischer Gleichungslöser (inkl. komplexe Wurzeln)
 - [x] Euklidischer Algorithmus (ggT, kgV)
@@ -15,180 +14,88 @@
 - [x] Primzahltest (optimiert: 6k±1-Methode)
 - [x] Primfaktorzerlegung
 - [x] Eulersche Phi-Funktion
+- [x] RSA-Kryptographie (keygen, encrypt, decrypt)
+- [x] Diophantische Gleichungen: linear, Pell, Pythagoreer, Zwei-Quadrate, Markov
+- [x] Quadratische Reste: is_quadratic_residue, quadratic_residues, quadratic_reciprocity
+- [x] Wurzelberechnung mod p: Tonelli-Shanks, Cipolla
 
-### Analysis (src/analysis.py) - Build 2
-- [x] Numerische Ableitung 1. Ordnung (zentraler Differenzenquotient, h≈ε^1/3)
-- [x] Numerische Ableitung 2. Ordnung (mit optimaler Schrittweite h≈ε^1/4)
-- [x] Numerische Integration (Simpson-Regel, O(h⁴) Genauigkeit)
-- [x] Newton-Raphson-Verfahren (Nullstellensuche, quadratische Konvergenz)
-- [x] Bisektionsverfahren (Nullstellensuche, garantierte Konvergenz)
+### Analysis (src/analysis.py) - Build 2-9
+- [x] Numerische Ableitung 1./2. Ordnung (zentraler Differenzenquotient)
+- [x] Numerische Integration (Simpson-Regel, O(h⁴))
+- [x] Newton-Raphson, Bisektionsverfahren
 - [x] Taylor-Reihen-Entwicklung (symbolisch via SymPy)
+- [x] Symbolische Grenzwerte (symbolic_limit, lhopital_applicable, limit_comparison)
+- [x] Partialbruchzerlegung (symbolisch und numerisch)
+- [x] Uneigentliche Integrale (numerisch und symbolisch)
+- [x] Cauchy-Hauptwert
 
-### Lineare Algebra (src/linear_algebra.py) - Build 2
+### Lineare Algebra (src/vectors.py, matrix_ops.py, matrix_decomp.py) - Build 2-8
 - [x] Vektor: Skalarprodukt, Kreuzprodukt, Norm, Normierung
-- [x] Vektor: Addition, Subtraktion, Skalarmultiplikation
-- [x] Matrix: Erstellen, Identity, Zeros
-- [x] Matrix: Multiplikation (matmul)
-- [x] Matrix: Transponierung, Spur
-- [x] Matrix: Determinante (Gauss mit Pivotsuche)
-- [x] Matrix: Inverse (Gauss-Jordan)
-- [x] Matrix: LGS lösen (Gauss mit Rücksubstitution)
-- [x] Matrix: Eigenwerte (analytisch 2×2, QR-Iteration n×n)
-- [x] Gram-Schmidt-Orthogonalisierung (mit ONB-Option)
+- [x] Matrix: Determinante, Inverse, LGS lösen
+- [x] Matrix: Eigenwerte und Eigenvektoren (QR-Iteration + SVD-Kern)
+- [x] Gram-Schmidt-Orthogonalisierung
+- [x] LU-Zerlegung (Doolittle + Teilpivot), QR-Zerlegung (Householder)
+- [x] SVD, Rang, Konditionszahl
+- [x] Givens-Rotation, Givens-QR, Kleinste-Quadrate
 
 ### Statistik & Wahrscheinlichkeit (src/statistics_math.py) - Build 2
-- [x] Deskriptive Statistik: mean, median, mode, variance, std_dev
-- [x] Lage- und Streuungsmaße: quartiles, iqr, skewness, kurtosis
-- [x] Normalverteilung: PDF, CDF, PPF (Quantilfunktion)
-- [x] Binomialverteilung: PMF, CDF
-- [x] Poisson-Verteilung: PMF, CDF
-- [x] Hypothesentests: Ein-/Zwei-Stichproben-t-Test, Chi-Quadrat-Test
-- [x] Bayes-Theorem
-- [x] Monte-Carlo-Simulation (π-Schätzung)
+- [x] Deskriptive Statistik, Verteilungsfunktionen (Normal, Binomial, Poisson)
+- [x] Hypothesentests, Bayes-Theorem, Monte-Carlo-Simulation
 
 ### Differentialgleichungen (src/ode.py) - Build 2
-- [x] Euler-Verfahren (explizit, 1. Ordnung)
-- [x] Runge-Kutta 4. Ordnung (klassisch, O(h⁴))
-- [x] Runge-Kutta-Fehlberg RK45 (adaptiv, Schrittweitensteuerung)
-- [x] Lineare ODE mit konstanten Koeffizienten (Zustandsraum + RK4)
-- [x] Numerische Laplace-Transformation (Simpson-Regel)
-- [x] Numerische inverse Laplace-Transformation (Stehfest-Algorithmus)
+- [x] Euler, Runge-Kutta 4, RK45 (adaptiv), Zustandsraum, Laplace/ILT
 
-## Implementierte Features (Fortsetzung)
-
-### Beweistheorie & Offene Vermutungen (src/proof_theory.py) - Build 4
-- [x] Collatz-Vermutung: Folge, Stoppzeit, Maximalwert, Bereichs-Verifikation
-- [x] Goldbach-Vermutung: Zerlegung, alle Zerlegungen, Bereichs-Verifikation
-- [x] Zwillingsprimzahlen: Suche, Zählung, Hardy-Littlewood-Konstante
-- [x] Riemann-Zeta-Funktion: Partialsumme, Euler-Maclaurin, numerische Nullstellensuche
-- [x] Sieb des Eratosthenes (O(n log log n))
-- [x] Miller-Rabin-Primzahltest (deterministisch bis 3.3×10^24)
-- [x] Legendre-Symbol (quadratische Reste)
-- [x] Jacobi-Symbol (verallgemeinertes Legendre)
-- [x] Chinesischer Restsatz (CRT)
-- [x] ProofByInduction-Klasse (Basisfall, empirische Verifikation)
-- [x] Vermutungsstatus-Report (alle 7 Millennium-Probleme + weitere)
+### Beweistheorie (src/proof_theory.py) - Build 4
+- [x] Collatz, Goldbach, Zwillingsprimzahlen, Riemann-Zeta, Miller-Rabin
+- [x] Legendre/Jacobi-Symbol, CRT, Hardy-Littlewood-Kreismethode
 
 ### Komplexe Analysis (src/complex_analysis.py) - Build 5
-- [x] Gamma-Funktion Γ(z) via Lanczos-Approximation (15 Stellen Genauigkeit)
-- [x] log_gamma(z) via Stirling-Reihe (numerisch stabil für großes |z|)
-- [x] Vollständige Riemann-Zeta ζ(s) über analytische Fortsetzung (3-Bereich-Strategie)
-- [x] ξ-Funktion (symmetrisch: ξ(s)=ξ(1-s) auf ~10^-15 verifiziert)
-- [x] Riemann-Siegel-Z-Funktion (reellwertig auf kritischer Geraden)
-- [x] Nullstellensuche via find_zeta_zeros() mit Bisektionsverfeinerung
-- [x] N(T)-Formel (Riemann-von-Mangoldt: Anzahl Nullstellen bis |Im| ≤ T)
-- [x] Cauchy-Integralsatz (numerische Mittelwerteigenschaft)
-- [x] Residuensatz (numerisch)
-
-### Fourier-Analysis (src/fourier.py) - Build 6
-- [x] DFT/IDFT (diskrete Fourier-Transformation, O(N²))
-- [x] FFT/IFFT (Cooley-Tukey radix-2, O(N log N))
-- [x] fft_padded (Zero-Padding auf nächste Zweierpotenz)
-- [x] Fourier-Reihen: fourier_coefficients, fourier_series_eval
-- [x] Fensterfunktionen: Hanning, Hamming, Blackman, apply_window
-- [x] Leistungsdichtespektrum (PSD), dominant_frequency
-- [x] Kurzzeit-Fourier-Transformation (STFT)
-
-### Numerische Methoden (src/numerical_methods.py) - Build 6
-- [x] Lagrange-Interpolation
-- [x] Newton-Interpolation (dividierte Differenzen, inkrementell)
-- [x] Kubische Splines (natürlich, Tridiagonal-LGS, Thomas-Algorithmus)
-- [x] Gradient Descent (mit numerischem Gradient-Fallback)
-- [x] Goldener-Schnitt-Suche (unimodale Funktionen)
-- [x] Numerischer Gradient (zentrale Differenzen)
-- [x] Simplex-Algorithmus (lineare Programmierung, Minimierungsform)
-
-### Lineare Algebra Erweiterungen (src/linear_algebra.py) - Build 6
-- [x] LU-Zerlegung (Doolittle mit Teilpivotisierung, PA=LU)
-- [x] QR-Zerlegung (Householder-Reflexionen, numerisch stabil)
-- [x] Singulärwertzerlegung SVD (A = U·Σ·Vᵀ)
-- [x] Matrixrang (via SVD, robust gegen Fast-Singularität)
-- [x] Konditionszahl κ = σ_max/σ_min
-
-### Build 8 Erweiterungen (2026-03-08)
-- [x] Eigenvektoren via SVD-Kernel (linear_algebra.py) – 5 Tests
-- [x] BFGS quasi-Newton Optimierer (numerical_methods.py) – 5 Tests
-- [x] RSA-Kryptosystem: keygen/encrypt/decrypt (algebra.py) – 5 Tests
-- [x] Umfassende .md-Dokumentation für alle 10 Module (Build 7)
-- **Gesamttests: 333/333 grün**
-
-### Build 9 Erweiterungen (2026-03-08)
-- [x] Kreismethode (Hardy-Littlewood) für Goldbach (proof_theory.py) – 20 Tests
-- [x] Modulformen Grundlagen → neue modular_forms.py (SL2Z, Eisenstein, Delta, j-Invariante, Hecke, Shimura-Taniyama) – 40 Tests
-- [x] p-adische Zahlen → neue p_adic.py (Bewertung, Norm, PAdicNumber, Hensel, Exp/Log, Ostrowski) – 47 Tests
-- [x] Diophantische Gleichungen (algebra.py): linear, Pell, Pythagoras, Zwei-Quadrate, Markov – 66 Tests
-- [x] Quadratisches Reziprozitätsgesetz vollständig (is_quadratic_residue, Tonelli-Shanks, Cipolla) – Teil der 66 Tests
-- [x] Analysis: Grenzwerte symbolisch, L'Hôpital, Partialbrüche, Uneigentliche Integrale, Cauchy-PV – 40 Tests
-- [x] Givens-Rotationen für QR-Zerlegung (linear_algebra.py) – 27 Tests
-- [x] Vollständiges Visualisierungsmodul → neue visualization.py (2D/3D, Vektorfeld, Phasenraum, Fraktale) – 48 Tests
-- **Gesamttests: 641/641 grün**
+- [x] Gamma (Lanczos), vollständige Riemann-Zeta ζ(s), ξ-Funktion
+- [x] Riemann-Siegel-Z, Nullstellensuche, N(T)-Formel, Cauchy-Integral
+- [x] **NEU Build 11**: Arbitrary Precision via mpmath: riemann_zeta_mpmath, gamma_mpmath
+- [x] **NEU Build 11**: riemann_siegel_z_mpmath, find_zeta_zeros_mpmath, verify_riemann_hypothesis_range_mpmath, li_function_mpmath
 
 ### Analytische Zahlentheorie (src/analytic_number_theory.py) - Build 5
-- [x] Primzahlzählfunktion π(x) (exakt via Sieb)
-- [x] Logarithmisches Integral Li(x) (Gauß/Riemann-Approximation)
-- [x] Vergleich π(x) vs Li(x) vs x/ln(x) (Primzahlsatz mit Fehlerterm)
-- [x] Von-Mangoldt-Funktion Λ(n)
-- [x] Tschebyschow-Funktionen θ(x), ψ(x)
-- [x] Dirichlet-Charaktere und L-Funktionen
-- [x] Primzahlen in arithmetischen Restklassen (Dirichlet-Theorem)
-- [x] Semiprime und Chen-Zerlegung (fast-Primzahlen)
-- [x] Primzahl-Lücken und Cramér-Vermutung
-- [x] Riemanns Explizite Formel π(x) ≈ Li(x) - Σ Li(x^ρ) (Nullstellen-Approximation)
-- [x] Sieb-Methoden: Brun-Sieb, Selberg-Sieb, Chen-Zerlegung
+- [x] π(x), Li(x), von-Mangoldt-Funktion Λ(n), θ(x)/ψ(x)
+- [x] Dirichlet-L-Reihen, Chen-Primzahlsatz, Explizite Formel
 
-## Geplante Features
+### Fourier-Analysis (src/fourier.py) - Build 6
+- [x] DFT, FFT (Cooley-Tukey), IFFT, Fourier-Reihen
+- [x] Fensterfunktionen (Hann, Hamming, Blackman), STFT
 
-### Beweistheorie Erweiterungen (Priorität: HÖCHSTE – Fernziel: Millennium-Beweise)
-- [x] Kreismethode (Hardy-Littlewood) für Goldbach – Build 9
-- [x] Modulformen (Grundlagen) – Build 9
-- [x] p-adische Zahlen – Build 9
+### Numerische Methoden (src/numerical_methods.py) - Build 6
+- [x] Lagrange/Newton/CubicSpline-Interpolation
+- [x] Gradientenverfahren, Goldener Schnitt, Simplex-Verfahren, BFGS
 
-### Zahlentheorie (Priorität: hoch)
-- [x] RSA-Verschlüsselung (keygen, encrypt, decrypt) – Build 8
-- [x] Diophantische Gleichungen (linear, Pell, Pythagoras, Zwei-Quadrate, Markov) – Build 9
-- [x] Quadratisches Reziprozitätsgesetz (vollständig) – Build 9
+### Modulformen (src/modular_forms.py) - Build 9-11
+- [x] ModularGroup SL(2,Z), Eisenstein-Reihen, E4/E6, Delta, j-Invariante
+- [x] Ramanujan-Tau, Hecke-Operatoren, Shimura-Taniyama, Cusp-Formen, Theta-Reihen
+- [x] **NEU Build 11**: Hecke-Algebra Vertiefung: hecke_algebra_structure, hecke_eigenform, petersson_inner_product_estimate
+- [x] **NEU Build 11**: L-Funktionen elliptischer Kurven: l_function_elliptic_curve, trace_of_frobenius, birch_swinnerton_dyer_bsd_estimate
+- [x] **NEU Build 11**: L-Funktion Modulformen: l_function_modular_form, functional_equation_l_function
 
-### Analysis Erweiterungen (Priorität: mittel)
-- [x] Grenzwertberechnung (symbolisch via SymPy) – Build 9
-- [x] Fourier-Reihen und -Transformation (DFT/FFT) – Build 6
-- [x] Partialbruchzerlegung – Build 9
-- [x] Uneigentliche Integrale – Build 9
+### p-adische Zahlen (src/p_adic.py) - Build 9-11
+- [x] p_adic_valuation, p_adic_norm, PAdicNumber, hensel_lift, p_adic_exp/log, ostrowski_theorem_demo
+- [x] **NEU Build 11**: bernoulli_number, generalized_bernoulli_numbers
+- [x] **NEU Build 11**: kubota_leopoldt_l_function, p_adic_zeta_function, kummer_congruence_check, iwasawa_mu_lambda_invariants
 
-### Lineare Algebra Erweiterungen (Priorität: mittel)
-- [x] LU-Zerlegung (Doolittle mit Teilpivotisierung) – Build 6
-- [x] QR-Zerlegung (Householder) – Build 6
-- [x] Singulärwertzerlegung (SVD) – Build 6
-- [x] Eigenvektoren via SVD-Kernel (zu vorhandenen Eigenwerten) – Build 8
-- [x] Givens-Rotationen für QR – Build 9
+### Visualisierung (src/visualization.py) - Build 9-11
+- [x] 2D/3D Plotter, Vektorfeld, Phasenporträt
+- [x] Fraktale: Mandelbrot/Julia/Sierpinski/Newton
+- [x] **NEU Build 11**: animate_ode_trajectory, animate_phase_portrait, animate_wave_equation (GIF-Export)
+- [x] **NEU Build 11**: save_figure_svg, save_figure_pdf, plot_and_export, export_all_formats
+- [x] **NEU Build 11**: mandelbrot_smooth (Smooth Iteration Count, vollständig NumPy-vektorisiert)
 
-### Numerische Methoden (Priorität: mittel)
-- [x] Interpolation (Lagrange, Newton, kubische Splines) – Build 6
-- [x] Optimierung (Gradient Descent, Goldener Schnitt) – Build 6
-- [x] Lineare Programmierung (Simplex-Algorithmus) – Build 6
-- [x] BFGS quasi-Newton Optimierung (mit Armijo-Line-Search) – Build 8
+### REPL-Modus (src/repl.py) - Build 10
+- [x] Interaktive Kommandozeile, LaTeX-Export
 
-### Visualisierung (Priorität: niedrig)
-- [x] Funktionsplotter 2D (matplotlib) – Build 9
-- [x] Funktionsplotter 3D (matplotlib 3D) – Build 9
-- [x] Vektorfelddarstellung – Build 9
-- [x] Phasenraum-Visualisierung (für ODE) – Build 9
-- [x] Fraktal-Generator (Mandelbrot, Julia, Sierpinski, Newton) – Build 9
+## Optimierungen - Build 11
+- [x] config.py: Globale Konstanten (kein Magic Numbers)
+- [x] __init__.py: src/ als Python-Package
+- [x] sympify()-Härtung: Alle unsicheren Aufrufe in analysis.py gesichert
+- [x] Modulaufteilung linear_algebra.py → vectors.py, matrix_ops.py, matrix_decomp.py
+- [x] Modulaufteilung algebra.py → algebra_core.py, algebra_numbertheory.py, algebra_diophantine.py
+- [x] Mandelbrot/Julia: Vollständige NumPy-Vektorisierung + Smooth Coloring
 
-## Build 10 Erweiterungen (2026-03-09)
-- [x] Modulformen Vertiefung: Cusp-Formen (dim S_k, Ramanujan-Tau-Eigenschaften) – 30 Tests
-- [x] Theta-Reihen: Jacobi-θ, Transformation, Summe-der-Quadrate, Dedekind-η, Jacobi-Dreifachprodukt – 34 Tests
-- [x] Farey-Folgen + vollständige Goldbach-Kreismethode (Major/Minor Arcs) – 50 Tests
-- [x] LaTeX-Export → neue latex_export.py (15 Funktionen) – 40 Tests
-- [x] REPL-Modus → neue repl.py (MathREPL, 15 Befehle, Jupyter-Integration) – 30 Tests
-- [x] Property-Based Testing (Hypothesis) → 38 Tests für mathematische Identitäten
-- [x] NumPy-Vektorisierung: statistics_math.py, fourier.py, numerical_methods.py
-- [x] sympify()-Härtung → _safe_parse() mit parse_expr() und Whitelist (SECURITY_FIXED)
-- **Gesamttests: 903/903 grün**
-
-## Offene Features (nach Build 10)
-- [ ] Modulformen: Hecke-Algebra Vertiefung, L-Funktionen elliptischer Kurven
-- [ ] p-adische L-Funktionen (Kubota-Leopoldt)
-- [ ] matplotlib-Animationen für ODE-Trajektorien
-- [ ] SVG/PDF-Export für Vektorgrafiken
-- [ ] Arbitrary Precision via mpmath (>64-Bit für Riemann-Nullstellen)
-- [ ] Paket-Struktur: src/ als Python-Package (__init__.py)
+## Offene Aufgaben
+_(keine bekannten offenen Features mehr)_

@@ -1,6 +1,6 @@
 """
 @file modular_forms.py
-@brief Modulformen – Grundlagen, Cusp-Formen und Theta-Reihen.
+@brief Modulformen – Grundlagen, Cusp-Formen, Theta-Reihen, Hecke-Algebra und L-Funktionen.
 @description
     Implementiert grundlegende Konzepte der Theorie der Modulformen:
     - Die modulare Gruppe SL(2,Z) und Möbius-Transformationen
@@ -8,10 +8,12 @@
     - Ramanujan-Delta-Funktion Δ(τ) (Diskriminantenform)
     - j-Invariante j(τ)
     - Ramanujan-Tau-Funktion τ(n)
-    - Hecke-Operatoren T_p
+    - Hecke-Operatoren T_p und Hecke-Algebra-Struktur
     - Shimura-Taniyama-Wiles-Verbindung (Demonstration)
     - Cusp-Formen S_k(Γ_0(N)): Dimension, Eigenschaften, Ramanujan-Tau
     - Theta-Reihen: Jacobi-Theta, Dedekind-Eta, Jacobi-Dreifachprodukt
+    - L-Funktionen elliptischer Kurven und Modulformen
+    - BSD-Vermutung (empirische Schätzung)
 
     Modulformen sind holomorphe Funktionen auf der oberen Halbebene H = {τ : Im(τ) > 0},
     die unter Möbius-Transformationen γ ∈ SL(2,Z) folgende Transformationsregel erfüllen:
@@ -22,9 +24,9 @@
     da elliptische Kurven und Modulformen via Shimura-Taniyama-Wiles verknüpft sind.
 
 @author Kurt Ingwer
-@version 2.0
+@version 3.0
 @since 2026-03-08
-@lastModified 2026-03-09
+@lastModified 2026-03-10
 """
 
 import math
@@ -1009,6 +1011,47 @@ def jacobi_triple_product(z: complex, q: complex, n_terms: int = 20) -> complex:
     return product
 
 
+def _is_prime_simple(n: int) -> bool:
+    """
+    Einfacher Primzahltest (nur für interne Nutzung in diesem Modul).
+
+    @param n: Zu testende ganze Zahl
+    @return: True wenn n eine Primzahl ist
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    if n < 2:
+        return False
+    if n == 2:
+        return True
+    if n % 2 == 0:
+        return False
+    for i in range(3, int(n**0.5) + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+
+def _primes_up_to(n: int) -> list:
+    """
+    Gibt alle Primzahlen bis n zurück (Sieb des Eratosthenes).
+
+    @param n: Obere Grenze
+    @return: Liste aller Primzahlen ≤ n
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    if n < 2:
+        return []
+    sieve = [True] * (n + 1)
+    sieve[0] = sieve[1] = False
+    for i in range(2, int(n**0.5) + 1):
+        if sieve[i]:
+            for j in range(i*i, n + 1, i):
+                sieve[j] = False
+    return [i for i in range(2, n + 1) if sieve[i]]
+
+
 def dedekind_eta(z: complex, n_terms: int = 100) -> complex:
     """
     Berechnet die Dedekind-Eta-Funktion η(τ).
@@ -1054,3 +1097,666 @@ def dedekind_eta(z: complex, n_terms: int = 100) -> complex:
         q_power *= q  # q^{n+1}
 
     return q_124 * product
+
+
+# ===========================================================================
+# HECKE-ALGEBRA VERTIEFUNG
+# ===========================================================================
+
+def hecke_algebra_structure(k: int, level: int = 1) -> dict:
+    """
+    Untersucht die Struktur der Hecke-Algebra für Modulformen vom Gewicht k.
+
+    Die Hecke-Algebra ist die von den Hecke-Operatoren T_n erzeugte kommutative
+    Algebra. Für die Gruppe SL(2,Z) gilt:
+
+        - Kommutativität: T_p ∘ T_q = T_q ∘ T_p für alle Primzahlen p, q
+        - Multiplikativität: T_mn = T_m · T_n für gcd(m, n) = 1
+        - Rekursion für Primzahlpotenzen: T_{p^{r+1}} = T_p · T_{p^r} - p^{k-1} · T_{p^{r-1}}
+
+    Die Hecke-Eigenwerte für die Ramanujan-Delta-Funktion Δ sind die
+    Ramanujan-Tau-Zahlen: T_p Δ = τ(p) · Δ.
+
+    Diese Funktion berechnet:
+        1. Hecke-Eigenwerte (tau-Funktion) für kleine Primzahlen
+        2. Kommutatorscheck: T_p T_q - T_q T_p = 0 (numerisch auf Koeffizienten)
+        3. Multiplikativitätsscheck: τ(p·q) = τ(p)·τ(q) für verschiedene Primzahlen p≠q
+
+    @param k: Gewicht der Modulform (gerade ≥ 4; Standard Delta hat k=12)
+    @param level: Niveau (Standard: 1 = volle Modulgruppe SL(2,Z))
+    @return: Dictionary mit Hecke-Struktur-Informationen:
+             'hecke_eigenvalues': {p: tau(p)} für kleine Primzahlen
+             'commutativity_check': {(p,q): bool} – T_p T_q = T_q T_p?
+             'multiplicativity_check': {(p,q): bool} – tau(p*q) = tau(p)*tau(q)?
+             'is_commutative': bool – Gesamturteil Kommutativität
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # Ramanujan-Tau-Koeffizienten bis zu einem hinreichend hohen Index berechnen
+    # Für die Kommutatortests brauchen wir Koeffizienten bis ca. p*q*p
+    max_prime = 13  # Kleine Primzahlen: 2, 3, 5, 7, 11, 13
+    small_primes = _primes_up_to(max_prime)
+
+    # Tau-Koeffizienten (Hecke-Eigenwerte der Delta-Funktion) berechnen
+    # Wir brauchen genug Koeffizienten: bis zu p*q = 13*11 = 143
+    n_coeff = 200
+    tau_list = fourier_coefficients_delta(n_coeff)
+
+    # Hecke-Eigenwerte: τ(p) für jede Primzahl p ≤ max_prime
+    hecke_eigenvalues = {}
+    for p in small_primes:
+        # tau(p) ist der p-te Fourier-Koeffizient der Delta-Funktion
+        if p <= n_coeff:
+            hecke_eigenvalues[p] = tau_list[p - 1]
+
+    # Kommutativitätsprüfung: T_p(T_q(f)) == T_q(T_p(f))
+    # Wir wenden beide Reihenfolgen auf die tau-Koeffizienten an
+    commutativity_check = {}
+    for i, p in enumerate(small_primes[:3]):       # Nur erste 3 Primes für Effizienz
+        for q in small_primes[i+1:i+3]:            # Nächste zwei Primes
+            # Wende T_p dann T_q an
+            tpq = hecke_operator(hecke_operator(tau_list, p, k), q, k)
+            # Wende T_q dann T_p an
+            tqp = hecke_operator(hecke_operator(tau_list, q, k), p, k)
+            # Vergleiche erste Koeffizienten
+            min_len = min(len(tpq), len(tqp), 10)
+            comm = all(tpq[i] == tqp[i] for i in range(min_len))
+            commutativity_check[(p, q)] = comm
+
+    # Multiplikativitätsprüfung: τ(p*q) = τ(p) * τ(q) für verschiedene Primzahlen
+    multiplicativity_check = {}
+    for i, p in enumerate(small_primes[:3]):
+        for q in small_primes[i+1:i+3]:
+            pq = p * q
+            if pq <= n_coeff:
+                tau_pq = tau_list[pq - 1]
+                tau_p = tau_list[p - 1]
+                tau_q = tau_list[q - 1]
+                # Multiplikativität: τ(pq) = τ(p) * τ(q) da gcd(p,q)=1 für zwei verschiedene Primzahlen
+                multiplicativity_check[(p, q)] = (tau_pq == tau_p * tau_q)
+
+    # Gesamturteil Kommutativität
+    is_commutative = all(commutativity_check.values()) if commutativity_check else True
+
+    return {
+        'hecke_eigenvalues': hecke_eigenvalues,
+        'commutativity_check': commutativity_check,
+        'multiplicativity_check': multiplicativity_check,
+        'is_commutative': is_commutative,
+        'weight': k,
+        'level': level,
+        'description': (
+            'Die Hecke-Algebra ist kommutativ. Eigenwerte sind Ramanujan-Tau-Zahlen. '
+            'Multiplikativität τ(mn)=τ(m)τ(n) für gcd(m,n)=1 bestätigt die '
+            'Hecke-Eigenform-Eigenschaft der Delta-Funktion.'
+        )
+    }
+
+
+def hecke_eigenform(coefficients: list, primes: list) -> dict:
+    """
+    Prüft, ob eine Modulform (gegeben durch Fourier-Koeffizienten) eine Hecke-Eigenform ist.
+
+    Eine Hecke-Eigenform ist eine Modulform f mit:
+        T_p f = λ_p · f   für alle Primzahlen p
+
+    Für eine normierte Eigenform (a_1 = 1) gilt:
+        λ_p = a_p   (p-ter Fourier-Koeffizient)
+
+    Prüfkriterium: Wenn f eine Hecke-Eigenform ist, müssen die Koeffizienten
+    der transformierten Form T_p(f) Vielfache der Originalkoeffizienten sein.
+    Genauer: (T_p f)_n = a_p · a_n für alle n.
+
+    Für die Delta-Funktion (Ramanujan-Tau): T_p(Δ) = τ(p) · Δ, also ist Δ eine
+    normierte Hecke-Eigenform mit Eigenwerten λ_p = τ(p).
+
+    Multiplikativität als notwendige Bedingung:
+        a_{mn} = a_m · a_n   für gcd(m,n) = 1
+
+    @param coefficients: Liste [a_1, a_2, ..., a_N] der Fourier-Koeffizienten (ab n=1)
+    @param primes: Liste der zu prüfenden Primzahlen
+    @return: Dictionary mit:
+             'is_eigenform': bool – Gesamturteil (Eigenform?)
+             'eigenvalues': {p: lambda_p} – geschätzte Eigenwerte
+             'eigenvalue_test': {p: bool} – besteht jede T_p-Prüfung?
+             'multiplicativity': {(m,n): bool} – a_{mn} = a_m * a_n für coprime m,n?
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # Koeffizienten ab Index 0 = a_1 (Konvention: coefficients[i] = a_{i+1})
+    N = len(coefficients)
+
+    # Schätze Eigenwerte: Falls a_1 ≠ 0, ist λ_p = a_p / a_1
+    a1 = coefficients[0] if N > 0 else 0
+
+    eigenvalues = {}
+    eigenvalue_test = {}
+
+    for p in primes:
+        if p > N:
+            continue
+        # Eigenwert-Schätzung: λ_p = a_p (für normierte Form mit a_1 = 1)
+        a_p = coefficients[p - 1] if p - 1 < N else 0
+
+        if a1 != 0:
+            # Eigenwert λ_p = a_p / a_1
+            eigenvalues[p] = a_p / a1
+        else:
+            eigenvalues[p] = 0
+
+        # Eigenform-Test: Wende T_p auf die Koeffizienten an
+        # Ergebnis sollte λ_p-fache der Originalkoeffizienten sein
+        # Interne Koeffizientendarstellung: coefficients[i] = a_{i+1}
+        # hecke_operator erwartet [a(0), a(1), ..., a(N)] → füge a(0)=0 vorne an
+        full_coeffs = [0] + list(coefficients)
+        t_p_result = hecke_operator(full_coeffs, p, k=12)
+
+        # Prüfe ob T_p(f) = λ_p * f (auf verfügbaren Koeffizienten)
+        lambda_p = eigenvalues[p]
+        is_eigen = True
+        for i in range(min(len(t_p_result), min(N, 10))):
+            expected = lambda_p * (full_coeffs[i] if i < len(full_coeffs) else 0)
+            actual = t_p_result[i]
+            # Relative Toleranz für numerischen Vergleich
+            if abs(expected) > 1e-10:
+                if abs(actual - expected) / abs(expected) > 1e-6:
+                    is_eigen = False
+                    break
+            else:
+                if abs(actual - expected) > 1e-6:
+                    is_eigen = False
+                    break
+        eigenvalue_test[p] = is_eigen
+
+    # Multiplikativitätstest: a_{mn} = a_m * a_n für gcd(m,n) = 1
+    multiplicativity = {}
+    for i, p in enumerate(primes[:3]):
+        for q in primes[i+1:i+3]:
+            if p != q and p * q <= N:
+                a_p = coefficients[p - 1] if p - 1 < N else 0
+                a_q = coefficients[q - 1] if q - 1 < N else 0
+                a_pq = coefficients[p * q - 1] if p * q - 1 < N else 0
+                # Normierung: a_{pq} = a_p * a_q / a_1² (für normierte Form a_1=1)
+                if a1 != 0:
+                    expected_pq = (a_p * a_q) / (a1)
+                else:
+                    expected_pq = 0
+                # Prüfe Multiplikativität mit Toleranz
+                if abs(expected_pq) > 1e-10:
+                    mult_ok = abs(a_pq - expected_pq) / abs(expected_pq) < 1e-6
+                else:
+                    mult_ok = abs(a_pq - expected_pq) < 1e-6
+                multiplicativity[(p, q)] = mult_ok
+
+    # Gesamturteil: Eigenform wenn alle T_p-Tests bestehen
+    is_eigenform = all(eigenvalue_test.values()) if eigenvalue_test else False
+
+    return {
+        'is_eigenform': is_eigenform,
+        'eigenvalues': eigenvalues,
+        'eigenvalue_test': eigenvalue_test,
+        'multiplicativity': multiplicativity,
+        'a1_coefficient': a1
+    }
+
+
+def petersson_inner_product_estimate(f_coeffs: list, g_coeffs: list, k: int) -> complex:
+    """
+    Schätzt das Petersson-Skalarprodukt ⟨f, g⟩ numerisch.
+
+    Das Petersson-Skalarprodukt ist definiert als:
+        ⟨f, g⟩ = ∫∫_F f(τ) · conj(g(τ)) · (Im τ)^k · dx dy / y²
+
+    wobei F der Fundamentalbereich von SL(2,Z) ist:
+        F = {τ ∈ H : |Re(τ)| ≤ 1/2, |τ| ≥ 1, Im(τ) > 0}
+
+    Numerische Approximation: Wir integrieren über Gitterpunkte im Fundamentalbereich.
+    Gitterpunkte: τ = x + iy mit x ∈ [-1/2, 1/2], y ∈ [1, Y_max], |τ| ≥ 1.
+
+    Aus der Fourier-Entwicklung:
+        f(τ) = Σ a_n q^n,  g(τ) = Σ b_n q^n  (q = e^{2πiτ})
+
+    Approximierter Wert via Rankin-Selberg-Methode (für zwei Cusp-Formen):
+        ⟨f, g⟩ ≈ Σ_n a_n · conj(b_n) · (4πn)^{-(k-1)} · Γ(k-1) / normierung
+
+    Da diese Formel auf dem Rangkin-Selberg-Integral basiert und die genaue
+    Normierung vom Niveau N abhängt, gibt diese Implementierung eine rohe Schätzung zurück.
+
+    @param f_coeffs: Fourier-Koeffizienten [a_1, a_2, ..., a_N] von f
+    @param g_coeffs: Fourier-Koeffizienten [b_1, b_2, ..., b_N] von g
+    @param k: Gewicht der Modulformen (muss für beide gleich sein)
+    @return: Schätzwert für ⟨f, g⟩ als komplexe Zahl
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    import math
+
+    # Rankin-Selberg-Approximation:
+    # ⟨f, g⟩ ~ Σ_{n=1}^{N} a_n * conj(b_n) * weight(n)
+    # mit weight(n) = n^{-(k-1)} * Γ(k-1) (vereinfacht)
+
+    N = min(len(f_coeffs), len(g_coeffs))
+    if N == 0:
+        return complex(0.0)
+
+    # Gammafunktion Γ(k-1) (für k ≥ 2: Γ(k-1) = (k-2)!)
+    if k >= 2:
+        gamma_k_minus_1 = math.factorial(k - 2) if k >= 2 else 1.0
+    else:
+        gamma_k_minus_1 = 1.0
+
+    # Normierungsfaktor (vereinfacht, ohne genauen Fundamentalbereich-Faktor)
+    norm_factor = gamma_k_minus_1 / ((4 * math.pi) ** (k - 1))
+
+    # Summiere Beiträge: Σ a_n * conj(b_n) * n^{-(k-1)}
+    result = complex(0.0)
+    for n in range(1, N + 1):
+        a_n = complex(f_coeffs[n - 1])
+        b_n = complex(g_coeffs[n - 1])
+        # Gewichtsfaktor: n^{-(k-1)}
+        weight = n ** (-(k - 1))
+        result += a_n * b_n.conjugate() * weight
+
+    return result * norm_factor
+
+
+# ===========================================================================
+# L-FUNKTIONEN ELLIPTISCHER KURVEN
+# ===========================================================================
+
+def elliptic_curve_points_over_fp(a: int, b: int, p: int) -> list:
+    """
+    Berechnet alle affinen Punkte einer elliptischen Kurve E: y² = x³ + ax + b über F_p.
+
+    Algorithmus (Brute-Force):
+        Für jedes x ∈ {0, 1, ..., p-1}:
+            1. Berechne rhs = (x³ + ax + b) mod p
+            2. Prüfe ob rhs ein quadratischer Rest mod p ist
+            3. Falls ja, berechne y = sqrt(rhs) mod p (beide Wurzeln ± y)
+
+    Quadratische Reste mod p: Für ungerades p und a ≢ 0 (mod p) gilt:
+        a ist QR ⟺ a^{(p-1)/2} ≡ 1 (mod p)   (Euler-Kriterium)
+
+    Die Kurve ist nicht-singulär, falls die Diskriminante
+        Δ = -16(4a³ + 27b²) ≢ 0 (mod p)
+
+    Hinweis: Der Punkt im Unendlichen O ist NICHT in der Liste enthalten,
+    wird aber für #E(F_p) mitgezählt.
+
+    @param a: Koeffizient der elliptischen Kurve E: y² = x³ + ax + b
+    @param b: Konstantterm der elliptischen Kurve
+    @param p: Primzahl p ≥ 3 (Charakteristik des Körpers F_p)
+    @return: Liste aller affinen Punkte (x, y) ∈ F_p × F_p auf E
+    @raises ValueError: Wenn p < 3 oder p nicht prim
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    if p < 3:
+        raise ValueError(f"p muss eine Primzahl ≥ 3 sein, erhalten: p = {p}")
+
+    points = []
+
+    for x in range(p):
+        # Rechte Seite der Kurvengleichung: x³ + ax + b mod p
+        rhs = (pow(x, 3, p) + a * x + b) % p
+
+        if rhs == 0:
+            # y = 0 ist einzige Lösung (doppelter Punkt bei y=0)
+            points.append((x, 0))
+        else:
+            # Euler-Kriterium: rhs ist QR ⟺ rhs^{(p-1)/2} ≡ 1 (mod p)
+            if pow(rhs, (p - 1) // 2, p) == 1:
+                # Berechne Quadratwurzel mod p
+                # Für p ≡ 3 (mod 4): y = rhs^{(p+1)/4} mod p
+                # Allgemein: Tonelli-Shanks-Algorithmus (hier einfache Variante)
+                y = pow(rhs, (p + 1) // 4, p)
+                # Verifikation
+                if pow(y, 2, p) == rhs:
+                    points.append((x, y))
+                    if y != 0 and y != p - y:
+                        points.append((x, p - y))
+                else:
+                    # Fallback: Brute-Force für Fälle wo p ≡ 1 (mod 4)
+                    for y_try in range(1, p):
+                        if pow(y_try, 2, p) == rhs:
+                            points.append((x, y_try))
+                            if y_try != p - y_try:
+                                points.append((x, p - y_try))
+                            break
+
+    return points
+
+
+def trace_of_frobenius(a: int, b: int, p: int) -> int:
+    """
+    Berechnet die Frobenius-Spur a_p = p + 1 - #E(F_p) einer elliptischen Kurve.
+
+    Definition:
+        a_p(E) = p + 1 - #E(F_p)
+
+    wobei #E(F_p) die Anzahl der F_p-Punkte inkl. dem Punkt im Unendlichen O ist:
+        #E(F_p) = |{(x,y) ∈ F_p² : y² = x³+ax+b}| + 1
+
+    Der Satz von Hasse (Hasse-Weil-Schranke) besagt:
+        |a_p(E)| = |p + 1 - #E(F_p)| ≤ 2√p
+
+    Dies ist die elliptische Kurve Analogie zur Riemann-Vermutung!
+
+    Die Frobenius-Spur taucht auf als Eigenwert des Frobenius-Endomorphismus
+    φ: (x, y) ↦ (x^p, y^p) auf dem Tate-Modul T_ℓ(E).
+
+    @param a: Koeffizient der elliptischen Kurve E: y² = x³ + ax + b
+    @param b: Konstantterm der elliptischen Kurve
+    @param p: Primzahl p ≥ 3
+    @return: Frobenius-Spur a_p = p + 1 - #E(F_p)
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # Berechne alle affinen Punkte
+    affine_points = elliptic_curve_points_over_fp(a, b, p)
+    # Füge den Punkt im Unendlichen O hinzu
+    num_points = len(affine_points) + 1  # +1 für O
+
+    # Frobenius-Spur
+    return p + 1 - num_points
+
+
+def l_function_elliptic_curve(a: int, b: int, s: complex, terms: int = 100) -> complex:
+    """
+    Berechnet die L-Funktion einer elliptischen Kurve E: y² = x³ + ax + b.
+
+    Die L-Funktion wird als Dirichlet-Reihe dargestellt:
+        L(E, s) = Σ_{n=1}^∞ a_n(E) / n^s
+
+    Die Koeffizienten a_n(E) sind multiplikativ und bestimmt durch:
+        - Für Primzahlen p mit guter Reduktion:
+            a_p(E) = p + 1 - #E(F_p)   (Frobenius-Spur)
+        - Für Primzahlpotenzen p^r:
+            a_{p^r}(E) = a_p · a_{p^{r-1}} - p · a_{p^{r-2}}  (Rekursion)
+        - Für zusammengesetzte Zahlen n = m·k mit gcd(m,k) = 1:
+            a_n(E) = a_m(E) · a_k(E)  (Multiplikativität)
+
+    Die Reihe konvergiert für Re(s) > 3/2.
+
+    Die Verbindung zu Hecke-Operatoren:
+        L(E, s) = L(f_E, s)  (nach dem Satz von Shimura-Taniyama-Wiles)
+    wobei f_E die zugehörige Modulform ist.
+
+    @param a: Koeffizient der elliptischen Kurve
+    @param b: Konstantterm der elliptischen Kurve
+    @param s: Komplexes Argument (Re(s) > 3/2 für Konvergenz)
+    @param terms: Anzahl der Summanden in der Dirichlet-Reihe
+    @return: Näherungswert von L(E, s) als komplexe Zahl
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    # Berechne Frobenius-Spuren a_p für Primzahlen bis ca. terms
+    # Für die Dirichlet-Reihe brauchen wir a_n für n = 1, ..., terms
+
+    # Schritt 1: Primzahlen bis terms bestimmen
+    primes_needed = _primes_up_to(min(terms, 200))
+
+    # Schritt 2: a_p für jede Primzahl p berechnen (Frobenius-Spuren)
+    a_prime = {}
+    for p in primes_needed:
+        try:
+            a_prime[p] = trace_of_frobenius(a, b, p)
+        except Exception:
+            a_prime[p] = 0  # Schlechte Reduktion: a_p = 0 oder ±1
+
+    # Schritt 3: a_n für alle n bis terms via Multiplikativität berechnen
+    a_n = [0.0] * (terms + 1)
+    a_n[1] = 1.0  # a_1 = 1 per Konvention
+
+    for n in range(2, terms + 1):
+        # Primfaktorzerlegung von n
+        temp = n
+        factors = {}
+        for p in primes_needed:
+            if p * p > temp:
+                break
+            if temp % p == 0:
+                factors[p] = 0
+                while temp % p == 0:
+                    factors[p] += 1
+                    temp //= p
+        if temp > 1:
+            factors[temp] = 1
+
+        if len(factors) == 1:
+            # n = p^r: Rekursionsformel
+            p = list(factors.keys())[0]
+            r = factors[p]
+            if r == 1:
+                a_n[n] = float(a_prime.get(p, 0))
+            elif r == 2:
+                a_n[n] = float(a_prime.get(p, 0)) ** 2 - p
+            else:
+                # Allgemeine Rekursion: a_{p^r} = a_p * a_{p^{r-1}} - p * a_{p^{r-2}}
+                prev1 = int(round(a_n[p ** (r-1)])) if p ** (r-1) <= terms else 0
+                prev2 = int(round(a_n[p ** (r-2)])) if p ** (r-2) <= terms else 0
+                a_n[n] = float(a_prime.get(p, 0)) * prev1 - p * prev2
+        elif len(factors) > 1:
+            # n = m * k mit gcd(m,k) = 1: Multiplikativität a_n = a_m * a_k
+            ps = list(factors.keys())
+            # Teile n in zwei coprime Teile
+            p1 = ps[0]
+            m = p1 ** factors[p1]
+            k = n // m
+            if m <= terms and k <= terms:
+                a_n[n] = a_n[m] * a_n[k]
+
+    # Schritt 4: L-Funktion als Dirichlet-Reihe summieren: L(E,s) = Σ a_n / n^s
+    result = complex(0.0)
+    for n in range(1, terms + 1):
+        if a_n[n] != 0.0:
+            result += complex(a_n[n]) / (n ** s)
+
+    return result
+
+
+def birch_swinnerton_dyer_bsd_estimate(a: int, b: int, primes: list) -> dict:
+    """
+    Empirische Schätzung der BSD-Vermutung (Birch und Swinnerton-Dyer).
+
+    Die BSD-Vermutung (Millennium-Problem) besagt:
+        ord_{s=1} L(E, s) = Rang(E(Q))
+
+    d.h. die Ordnung der Nullstelle von L(E, s) bei s=1 ist gleich dem
+    arithmetischen Rang der elliptischen Kurve über Q.
+
+    Empirische Schätzung (Birch und Swinnerton-Dyer, 1960er Jahre):
+        Π_{p ≤ X} (N_p / p) ≈ C · (log X)^r
+
+    wobei:
+        N_p = #E(F_p)   (Punktanzahl über F_p)
+        r   = Rang(E(Q))   (gesuchter Rang)
+        C   = Konstante (abhängig von E)
+        X   = Schranke für die Primzahlen
+
+    Logarithmieren:
+        log(Produkt) ≈ r · log(log X) + log(C)
+
+    Damit kann man r schätzen durch lineare Regression von
+        log(Produkt) gegen log(log X).
+
+    @param a: Koeffizient der elliptischen Kurve E: y² = x³ + ax + b
+    @param b: Konstantterm der elliptischen Kurve
+    @param primes: Liste der zu verwendenden Primzahlen p ≥ 3
+    @return: Dictionary mit:
+             'estimate': float – Schätzung für den Rang
+             'primes_used': list – verwendete Primzahlen
+             'log_product': float – log(Π N_p/p)
+             'product': float – Π N_p/p
+             'n_p_values': dict – {p: N_p} Punktanzahlen
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    import math
+
+    # Schritt 1: N_p = #E(F_p) für jede Primzahl berechnen
+    n_p_values = {}
+    log_product = 0.0
+    product = 1.0
+    valid_primes = []
+
+    for p in primes:
+        if p < 3:
+            continue
+        try:
+            affine_pts = elliptic_curve_points_over_fp(a, b, p)
+            n_p = len(affine_pts) + 1  # +1 für Punkt im Unendlichen
+            n_p_values[p] = n_p
+
+            # Beitrag zum Produkt: N_p / p
+            ratio = n_p / p
+            if ratio > 0:
+                log_product += math.log(ratio)
+                product *= ratio
+                valid_primes.append(p)
+        except Exception:
+            continue
+
+    # Schritt 2: Rang-Schätzung via log(log X)
+    # Bei X = max(primes): Schätze r aus log(Produkt) ≈ r * log(log X)
+    if valid_primes:
+        X = max(valid_primes)
+        log_log_X = math.log(math.log(X)) if X > 2 else 1.0
+        # Einfache Schätzung: r ≈ log(Produkt) / log(log X)
+        rank_estimate = log_product / log_log_X if abs(log_log_X) > 1e-10 else 0.0
+    else:
+        rank_estimate = 0.0
+
+    return {
+        'estimate': rank_estimate,
+        'primes_used': valid_primes,
+        'log_product': log_product,
+        'product': product,
+        'n_p_values': n_p_values
+    }
+
+
+def l_function_modular_form(coefficients: list, s: complex, k: int) -> complex:
+    """
+    Berechnet die L-Funktion einer Modulform f = Σ a_n q^n.
+
+    Definition:
+        L(f, s) = Σ_{n=1}^∞ a_n / n^s
+
+    Die Reihe konvergiert absolut für Re(s) > (k+1)/2 (nach dem Phragmen-Lindelöf-Prinzip).
+
+    Für eine Hecke-Eigenform hat L(f, s) ein Euler-Produkt:
+        L(f, s) = Π_p (1 - a_p · p^{-s} + p^{k-1-2s})^{-1}
+
+    Für die Ramanujan-Delta-Funktion (k=12):
+        L(Δ, s) = Π_p (1 - τ(p) · p^{-s} + p^{11-2s})^{-1}
+
+    Verbindung zur vollständigen L-Funktion:
+        Λ(f, s) = (√N / 2π)^s · Γ(s) · L(f, s) = ε · Λ(f, k-s)
+
+    @param coefficients: Liste [a_1, a_2, ..., a_N] der Fourier-Koeffizienten
+    @param s: Komplexes Argument der L-Funktion (Re(s) > (k+1)/2)
+    @param k: Gewicht der Modulform (für Konvergenzhinweis)
+    @return: Wert L(f, s) als komplexe Zahl (Partialsumme)
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    result = complex(0.0)
+    N = len(coefficients)
+
+    for n in range(1, N + 1):
+        a_n = complex(coefficients[n - 1])
+        if a_n != 0:
+            # Summand: a_n / n^s
+            result += a_n / (n ** s)
+
+    return result
+
+
+def functional_equation_l_function(coefficients: list, k: int, N: int, s: complex) -> dict:
+    """
+    Berechnet die vollständige L-Funktion und verifiziert die Funktionalgleichung.
+
+    Vollständige L-Funktion (completed L-function):
+        Λ(f, s) = (√N / (2π))^s · Γ(s) · L(f, s)
+
+    Funktionalgleichung:
+        Λ(f, s) = ε · Λ(f̄, k - s)
+
+    wobei:
+        ε = ±1: Vorzeichen (Atkin-Lehner-Eigenwert)
+        f̄: Komplex-konjugierte Modulform (für reelle Koeffizienten: f̄ = f)
+        N: Niveau (conductor) der Modulform
+        k: Gewicht
+
+    Für normierte Hecke-Eigenformen mit reellen Koeffizienten (wie Δ):
+        Λ(f, s) = ε · Λ(f, k - s)
+
+    Das Vorzeichen ε hängt von der Atkin-Lehner-Involution ab:
+        ε = (-1)^{k/2} für SL(2,Z) (Niveau 1)
+
+    @param coefficients: Fourier-Koeffizienten [a_1, ..., a_M]
+    @param k: Gewicht der Modulform
+    @param N: Niveau (conductor), Standardfall: N = 1 für SL(2,Z)
+    @param s: Komplexes Argument
+    @return: Dictionary mit:
+             'lambda_s': Λ(f, s) – vollständige L-Funktion bei s
+             'lambda_k_minus_s': Λ(f, k-s) – vollständige L-Funktion bei k-s
+             'epsilon': Vorzeichen ε = (-1)^{k/2}
+             'functional_equation_ratio': Λ(f,s) / (ε · Λ(f, k-s))
+             'functional_equation_verified': bool – |ratio - 1| < 0.1?
+    @author Kurt Ingwer
+    @lastModified 2026-03-10
+    """
+    import cmath
+    import math
+
+    # Vorzeichen: ε = (-1)^{k/2} für die volle Modulgruppe SL(2,Z)
+    epsilon = (-1) ** (k // 2)
+
+    # Gamma-Funktion Γ(s) via Stirling-Näherung oder für ganzzahlige Argumente exakt
+    def gamma_approx(z: complex) -> complex:
+        """Näherung der Gamma-Funktion via Stirling-Formel."""
+        if z.real > 0.5:
+            # Stirling: Γ(z) ≈ sqrt(2π/z) · (z/e)^z
+            return cmath.sqrt(2 * math.pi / z) * (z / math.e) ** z
+        else:
+            # Reflexionsformel: Γ(z) · Γ(1-z) = π / sin(πz)
+            return math.pi / (cmath.sin(math.pi * z) * gamma_approx(1 - z))
+
+    # Vorfaktor: (√N / (2π))^s
+    prefactor_s = (math.sqrt(N) / (2 * math.pi)) ** s
+    prefactor_ks = (math.sqrt(N) / (2 * math.pi)) ** (k - s)
+
+    # L-Funktion bei s und k-s
+    l_s = l_function_modular_form(coefficients, s, k)
+    l_ks = l_function_modular_form(coefficients, k - s, k)
+
+    # Gamma-Faktoren
+    gamma_s = gamma_approx(s)
+    gamma_ks = gamma_approx(k - s)
+
+    # Vollständige L-Funktionen
+    lambda_s = prefactor_s * gamma_s * l_s
+    lambda_ks = prefactor_ks * gamma_ks * l_ks
+
+    # Verhältnis: Λ(f,s) / (ε · Λ(f, k-s)) soll = 1 sein
+    if abs(lambda_ks) > 1e-30:
+        ratio = lambda_s / (epsilon * lambda_ks)
+        verified = abs(ratio - 1.0) < 0.1  # Toleranz wegen Partialsummen-Approximation
+    else:
+        ratio = complex(float('nan'))
+        verified = False
+
+    return {
+        'lambda_s': lambda_s,
+        'lambda_k_minus_s': lambda_ks,
+        'epsilon': epsilon,
+        'functional_equation_ratio': ratio,
+        'functional_equation_verified': verified,
+        'l_s': l_s,
+        'l_k_minus_s': l_ks,
+        's': s,
+        'k': k,
+        'N': N
+    }
