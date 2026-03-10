@@ -549,3 +549,51 @@ class TestLehmerVermutungBeweis:
             # Giuga-Zahlen sind kein Gegenbeispiel zu Lehmer
             assert (n - 1) % phi != 0, \
                 f"n={n} (Giuga-Zahl) erfüllt fälschlicherweise Lehmer-Bedingung!"
+
+    def test_kein_3prim_gerade_status_bewiesen(self):
+        r = self.lv.satz_kein_3prim_gerade_beweis()
+        assert r['status'] == 'BEWIESEN'
+
+    def test_kein_3prim_gerade_kernargument(self):
+        r = self.lv.satz_kein_3prim_gerade_beweis()
+        alle = ' '.join(r['beweis_kern'])
+        # Muss b-Fallunterscheidung und Widerspruch enthalten
+        assert 'WIDERSPRUCH' in alle
+        assert 'r = 2q' in alle or 'r=2q' in alle or '2q' in alle
+
+    def test_kein_3prim_gerade_algebraisch(self):
+        """Verifikation: (r-1)|(2q-1) ist für q<r (beide prim) unmöglich."""
+        import sympy as sp
+        # Teste alle Primpaare q<r mit q,r ≤ 100
+        verletzungen = []
+        for q in sp.primerange(3, 100):
+            for r in sp.primerange(q + 1, 100):
+                if (2 * q - 1) % (r - 1) == 0:
+                    verletzungen.append((q, r))
+        # Wenn es Verletzungen gäbe, wäre der Beweis falsch
+        # Aber: (r-1)|(2q-1) mit r>q ist möglich! Der Beweis zeigt Unmöglichkeit von r prim.
+        # Also: für alle (q, r) wo (r-1)|(2q-1) MUSS r zusammengesetzt sein
+        for q, r in verletzungen:
+            assert not sp.isprime(r), \
+                f"(q={q}, r={r}): (r-1)|(2q-1) und r prim! Beweis falsch?"
+
+    def test_notwendige_bedingung_2qr_korrekt(self):
+        """Notwendige Bed.: (r-1)|(2qr-1) impliziert (r-1)|(2q-1)."""
+        import sympy as sp
+        for q in sp.primerange(3, 30):
+            for r in sp.primerange(q + 1, 50):
+                n = 2 * q * r
+                # Prüfe: wenn (r-1)|(2qr-1), dann auch (r-1)|(2q-1)
+                if (n - 1) % (r - 1) == 0:
+                    assert (2 * q - 1) % (r - 1) == 0, \
+                        f"Notwendige Bedingung verletzt: q={q}, r={r}"
+
+    def test_3prim_gerade_kein_kandidat(self):
+        """Numerisch: Kein n=2qr (q,r odd prime) erfüllt φ(n)|(n-1) bis q,r≤100."""
+        import sympy as sp
+        for q in sp.primerange(3, 100):
+            for r in sp.primerange(q + 1, 100):
+                n = 2 * q * r
+                phi = (q - 1) * (r - 1)
+                assert (n - 1) % phi != 0, \
+                    f"GEGENBEISPIEL: n=2·{q}·{r}={n}, φ(n)={phi}, n-1={n-1}"
