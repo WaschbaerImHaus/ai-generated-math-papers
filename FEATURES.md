@@ -97,5 +97,43 @@
 - [x] Modulaufteilung algebra.py → algebra_core.py, algebra_numbertheory.py, algebra_diophantine.py
 - [x] Mandelbrot/Julia: Vollständige NumPy-Vektorisierung + Smooth Coloring
 
+### Topologie & Geometrie (src/topology.py) - Build 12
+- [x] Standardmetriken: Euklidisch, Manhattan, Chebyshev, Diskret, Lp
+- [x] MetricSpace-Klasse mit Axiomprüfung (alle 4 Axiome)
+- [x] Offene Kugeln, offene Mengen (diskret)
+- [x] Cauchy-Folgen Erkennung
+- [x] Epsilon-Zusammenhang (Union-Find)
+- [x] Hausdorff-Abstand H(A,B)
+- [x] Durchmesser einer Punktmenge
+- [x] ParametricCurve: Bogenlänge, Krümmung, Umlaufzahl, Abgeschlossenheit
+- [x] Vorgefertigte Kurven: Kreis, Lissajous, Helix
+- [x] Euler-Charakteristik, Geschlecht
+- [x] Betti-Zahlen für Graphen (β₀, β₁)
+- [x] Box-Counting-Dimension
+- [x] Hausdorff-Dimension: Cantor-Menge, Sierpinski-Dreieck
+
+### Graphentheorie & Kombinatorik (src/graph_theory.py) - Build 12
+- [x] Graph-Klasse (gerichtet/ungerichtet, gewichtet, Adjazenzliste)
+- [x] Grundoperationen: add/remove vertex/edge, degree, Adjazenzmatrix
+- [x] Grapheigenschaften: Zusammenhang, Zyklen, Baumtest, Bipartitheit
+- [x] Komplementgraph, induzierter Teilgraph
+- [x] BFS (Breitensuche) mit Abständen und Vorgänger
+- [x] DFS (Tiefensuche) mit Entdeckungs-/Abschlusszeiten
+- [x] Dijkstra-Algorithmus (MinHeap, O((V+E)log V))
+- [x] Bellman-Ford (negative Gewichte, Zykluserkennung)
+- [x] Floyd-Warshall (alle kürzesten Wege, O(V³))
+- [x] Kruskal-MST (Union-Find, O(E log E))
+- [x] Prim-MST (MinHeap, O((V+E) log V))
+- [x] Topologische Sortierung (Kahn-Algorithmus)
+- [x] Greedy-Graphfärbung, chromatische Zahl (Obergrenze)
+- [x] Euler-Kreis und Euler-Pfad Erkennung
+- [x] Hamiltonpfad-Suche (Backtracking)
+- [x] Kliquenzahl ω(G) (Bron-Kerbosch)
+- [x] Unabhängigkeitszahl α(G) = ω(Komplement)
+- [x] Graphdichte
+- [x] Graphkonstruktoren: K_n, C_n, P_n, K_{m,n}, Petersen, Gitter
+- [x] Binomialkoeffizient, Stirling-Zahlen (2. Art), Bell-Zahlen
+- [x] Catalan-Zahlen, Derangements, Ganzzahlpartitionen, Multinomialkoeffizient
+
 ## Offene Aufgaben
 _(keine bekannten offenen Features mehr)_
