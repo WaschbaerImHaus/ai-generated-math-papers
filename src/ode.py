@@ -67,13 +67,13 @@ def euler_method(
     Fehlerordnung: O(h) pro Schritt (global O(h)).
     Einfach, aber ungenau - besser für didaktische Zwecke.
 
-    :param f: Rechte Seite der ODE f(t, y)
-    :param t0: Anfangszeitpunkt
-    :param y0: Anfangswert (Skalar oder Vektor)
-    :param t_end: Endzeitpunkt
-    :param n_steps: Anzahl der Zeitschritte
-    :return: Tupel (Zeitpunkte, Lösungswerte)
-    :last_modified: 2026-03-05
+    @param f Rechte Seite der ODE f(t, y)
+    @param t0 Anfangszeitpunkt
+    @param y0 Anfangswert (Skalar oder Vektor)
+    @param t_end Endzeitpunkt
+    @param n_steps Anzahl der Zeitschritte
+    @return Tupel (Zeitpunkte, Lösungswerte)
+    @lastModified 2026-03-10
     """
     h = (t_end - t0) / n_steps
     t = t0
@@ -120,13 +120,13 @@ def runge_kutta4(
     Fehlerordnung: O(h^4) pro Schritt (global O(h^4)).
     Gutes Gleichgewicht zwischen Aufwand und Genauigkeit.
 
-    :param f: Rechte Seite der ODE f(t, y)
-    :param t0: Anfangszeitpunkt
-    :param y0: Anfangswert (Skalar oder Vektor für Systeme)
-    :param t_end: Endzeitpunkt
-    :param n_steps: Anzahl der Zeitschritte
-    :return: Tupel (Zeitpunkte, Lösungswerte)
-    :last_modified: 2026-03-05
+    @param f Rechte Seite der ODE f(t, y)
+    @param t0 Anfangszeitpunkt
+    @param y0 Anfangswert (Skalar oder Vektor für Systeme)
+    @param t_end Endzeitpunkt
+    @param n_steps Anzahl der Zeitschritte
+    @return Tupel (Zeitpunkte, Lösungswerte)
+    @lastModified 2026-03-10
     """
     h = (t_end - t0) / n_steps
     t = t0
@@ -177,15 +177,15 @@ def runge_kutta45(
     Schrittweitenanpassung:
       h_neu = h * (tol / fehler)^(1/5) * 0.9 (Sicherheitsfaktor 0.9)
 
-    :param f: Rechte Seite der ODE f(t, y)
-    :param t0: Anfangszeitpunkt
-    :param y0: Anfangswert
-    :param t_end: Endzeitpunkt
-    :param tol: Toleranz für den lokalen Fehler
-    :param h_min: Minimale Schrittweite
-    :param h_max: Maximale Schrittweite
-    :return: Tupel (Zeitpunkte, Lösungswerte)
-    :last_modified: 2026-03-05
+    @param f Rechte Seite der ODE f(t, y)
+    @param t0 Anfangszeitpunkt
+    @param y0 Anfangswert
+    @param t_end Endzeitpunkt
+    @param tol Toleranz für den lokalen Fehler
+    @param h_min Minimale Schrittweite
+    @param h_max Maximale Schrittweite
+    @return Tupel (Zeitpunkte, Lösungswerte)
+    @lastModified 2026-03-10
     """
     # Fehlberg-Koeffizienten (Butcher-Tableau für RK45)
     # Knotenkoeffizienten
@@ -203,16 +203,16 @@ def runge_kutta45(
     # RK5-Gewichte (6 Stufen) für Fehlerabschätzung
     e1, e3, e4, e5, e6 = 16/135, 6656/12825, 28561/56430, -9/50, 2/55
 
-    def _scale(c, a):
+    def _scale(c: float, a: StateType) -> StateType:
         return _scale_state(c, a)
 
-    def _add(*args):
+    def _add(*args: StateType) -> StateType:
         result = args[0]
         for a in args[1:]:
             result = _add_states(result, a)
         return result
 
-    def _error_norm(e):
+    def _error_norm(e: StateType) -> float:
         """Berechnet die Fehlernorm (L_inf für Skalare, L2 für Vektoren)."""
         if isinstance(e, list):
             return max(abs(ei) for ei in e)
@@ -285,13 +285,13 @@ def solve_linear_ode(
     Methode: Umformung in ein System 1. Ordnung (Zustandsraum-Darstellung)
     und Lösung via RK4.
 
-    :param coeffs: Koeffizienten [a_0, a_1, ..., a_n] (a_0 != 0)
-    :param initial: Anfangswerte [y(t0), y'(t0), ..., y^(n-1)(t0)]
-    :param t_vals: Zeitpunkte, an denen die Lösung gesucht wird
-    :param forcing: Erzwingungsfunktion g(t), None für homogene ODE
-    :return: Lösungswerte y(t) an den gegebenen Zeitpunkten
-    :raises ValueError: Bei ungültigen Parametern
-    :last_modified: 2026-03-05
+    @param coeffs Koeffizienten [a_0, a_1, ..., a_n] (a_0 != 0)
+    @param initial Anfangswerte [y(t0), y'(t0), ..., y^(n-1)(t0)]
+    @param t_vals Zeitpunkte, an denen die Lösung gesucht wird
+    @param forcing Erzwingungsfunktion g(t), None für homogene ODE
+    @return Lösungswerte y(t) an den gegebenen Zeitpunkten
+    @throws ValueError Bei ungültigen Parametern
+    @lastModified 2026-03-10
     """
     n = len(coeffs) - 1  # Ordnung der ODE
     if len(initial) != n:
@@ -355,13 +355,13 @@ def laplace_transform(
     Die Integration wird bei t_max abgebrochen, wenn e^(-s*t_max) sehr klein ist.
     Verwendet die Simpson-Regel für die numerische Integration.
 
-    :param f: Zeitbereichsfunktion f(t)
-    :param s: Komplexe Frequenz (hier real, s > 0)
-    :param t_max: Obere Integrationsgrenze (approximiert Unendlich)
-    :param n_intervals: Anzahl der Intervalle für die Simpson-Regel
-    :return: Näherungswert von F(s)
-    :raises ValueError: Bei s <= 0
-    :last_modified: 2026-03-05
+    @param f Zeitbereichsfunktion f(t)
+    @param s Komplexe Frequenz (hier real, s > 0)
+    @param t_max Obere Integrationsgrenze (approximiert Unendlich)
+    @param n_intervals Anzahl der Intervalle für die Simpson-Regel
+    @return Näherungswert von F(s)
+    @throws ValueError Bei s <= 0
+    @lastModified 2026-03-10
     """
     if s <= 0:
         raise ValueError("s muss > 0 sein für Konvergenz")
@@ -393,69 +393,6 @@ def inverse_laplace(
     F: Callable[[float], float],
     t: float,
     sigma: float = 1.0,
-    n_terms: int = 1000
-) -> float:
-    """
-    Berechnet die inverse Laplace-Transformation numerisch (Post-Widder).
-
-    Verwendet die Post-Widder-Inversion:
-      f(t) ≈ lim_{n->inf} ((-1)^n / n!) * (n/t)^(n+1) * F^(n)(n/t)
-
-    Praktische Implementierung via Euler-Summe (Abate & Whitt Methode).
-
-    Formel: f(t) ≈ (e^A / (2*t)) * Re[ F(A/(2t)) + sum_{k=1}^{N} C_k * F((A + 2*pi*i*k) / (2t)) ]
-
-    :param F: Laplace-Transformierte F(s) als Funktion
-    :param t: Zeitpunkt (t > 0)
-    :param sigma: Konvergenzparameter (sigma > maximale Singularität)
-    :param n_terms: Anzahl der Terme für die Euler-Summe
-    :return: Näherungswert von f(t)
-    :last_modified: 2026-03-05
-    """
-    if t <= 0:
-        raise ValueError("t muss > 0 sein")
-
-    # Talbot-Methode: einfache aber effektive numerische Inversion
-    # Basierend auf der Bromwich-Kontur mit optimierter Parametrisierung
-    # Referenz: Abate & Valko (2004)
-    M = n_terms
-    # Talbot-Kontourparameter
-    r = 2 * M / (5 * t)
-    theta_vals = [k * math.pi / M for k in range(M + 1)]
-
-    # Erste Term (k=0)
-    s0 = r
-    F0_val = F(s0).real if hasattr(F(s0), 'real') else F(s0)
-    total = 0.5 * F0_val * math.exp(r * t)
-
-    # Summe über Kontourpunkte
-    for k in range(1, M + 1):
-        theta = theta_vals[k]
-        sigma_k = r * theta * (1.0/math.tan(theta) + 1j)  # Talbot-Kontur (komplex)
-
-        # Ableitung der Talbot-Kontur
-        sigma_prime = r * (1j + (theta * math.tan(theta) - 1.0) / (math.tan(theta)**2 + 1e-30))
-        # Da F nur reell definiert: approximiere durch zwei reelle Auswertungen
-        # F(s) für s = Re(sigma_k) ± kleine imaginäre Störung
-        s_re = sigma_k.real
-
-        # Vereinfachte Näherung: nur Realteil der Kontur verwenden
-        try:
-            F_val = F(s_re) if s_re > 0 else 0.0
-        except Exception:
-            F_val = 0.0
-
-        weight = (2.0 / M) * math.exp(s_re * t)
-        total += weight * F_val * math.cos(k * math.pi)
-
-    return total / t
-
-
-# Einfachere Alternative für inverse Laplace (Post-Widder Approximation)
-def inverse_laplace(
-    F: Callable[[float], float],
-    t: float,
-    sigma: float = 1.0,
     n_terms: int = 20
 ) -> float:
     """
@@ -465,12 +402,12 @@ def inverse_laplace(
       f(t) ≈ (1/t) * sum_{k=1}^{N} (-1)^(k+N/2) * C(N, N/2+k) * F(k/t)
       (Stehfest-Algorithmus)
 
-    :param F: Laplace-Transformierte F(s)
-    :param t: Zeitpunkt (t > 0)
-    :param sigma: Ungenutzt (Kompatibilität)
-    :param n_terms: Anzahl der Terme (gerade Zahl empfohlen)
-    :return: Näherungswert von f(t)
-    :last_modified: 2026-03-05
+    @param F Laplace-Transformierte F(s)
+    @param t Zeitpunkt (t > 0)
+    @param sigma Ungenutzt (Kompatibilität)
+    @param n_terms Anzahl der Terme (gerade Zahl empfohlen)
+    @return Näherungswert von f(t)
+    @lastModified 2026-03-10
     """
     # Stehfest-Algorithmus (sehr effizient für monotone Funktionen)
     N = n_terms if n_terms % 2 == 0 else n_terms + 1
@@ -506,9 +443,9 @@ def _factorial(n: int) -> float:
     """
     Berechnet n! (Fakultät).
 
-    :param n: Nicht-negative ganze Zahl
-    :return: n!
-    :last_modified: 2026-03-05
+    @param n Nicht-negative ganze Zahl
+    @return n!
+    @lastModified 2026-03-10
     """
     if n < 0:
         return 0.0

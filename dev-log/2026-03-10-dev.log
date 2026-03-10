@@ -477,3 +477,12 @@
 - test_brent_cubic: kubisches Polynom, 2 Nullstellen
 
 ### Testergebnis: 26/26 ✓ (test_analysis.py)
+
+2026-03-10 $(date +%H:%M) – Build 19: Elliptische Kurven & Tensor-Geometrie im Web-Interface
+  - Neue Seite /elliptic: Kurvenanalyse (Δ, j-Invariante, Singularitätsprüfung),
+    Punktarithmetik (2P, n·P), Hasse-Schranke mod p, Base64-Plot (Dark Theme)
+  - Neue Seite /tensor: Metriktensor g_ij, Ricci-Skalar R, Gaußsche Krümmung K,
+    für Sphäre/Torus/Hyperbolisch/Sattel/Flach; 3D-Plots mit markiertem Punkt
+  - Navigation in base.html um 'Elliptische Kurven' und 'Tensor-Geometrie' erweitert
+  - API-Endpunkte: /api/elliptic/analyze, /api/elliptic/hasse, /api/tensor/curvature
+  - 26 neue Tests → Gesamt 84/84 grün

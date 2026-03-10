@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+<!--
+    @file elliptic.html
+    @brief Elliptische Kurven – Gruppenstruktur, Punktarithmetik und Hasse-Schranke.
+    @description
+        Interaktive Werkzeuge für elliptische Kurven in Weierstrass-Normalform:
+        - Diskriminante Δ = -16(4a³ + 27b²)
+        - Prüfung ob ein Punkt auf der Kurve liegt
+        - Punktverdoppelung 2P (Tangentenmethode)
+        - Skalarmultiplikation n·P (Double-and-Add)
+        - Hasse-Schranke: Anzahl Punkte mod kleiner Primzahlen
+        - Matplotlib-Plot der Kurve (Base64-PNG)
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+{% block title %}Elliptische Kurven – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><span>𝓔</span> Elliptische Kurven</h1>
+    <p class="page-subtitle">
+        Weierstrass-Normalform $y^2 = x^3 + ax + b$ – Gruppenstruktur, Arithmetik und zahlentheoretische Anwendungen.
+    </p>
+</div>
+
+<!-- ===== Formelübersicht ===== -->
+<div class="card">
+    <h2>Grundformeln</h2>
+    <div class="formula-grid">
+        <div class="formula-item">
+            <div class="formula-label">Weierstrass-Form</div>
+            <div class="formula-display" id="formula-weierstrass"></div>
+        </div>
+        <div class="formula-item">
+            <div class="formula-label">Diskriminante</div>
+            <div class="formula-display" id="formula-discriminant"></div>
+        </div>
+        <div class="formula-item">
+            <div class="formula-label">Hasse-Schranke</div>
+            <div class="formula-display" id="formula-hasse"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Kurvenparameter-Eingabe ===== -->
+<div class="card">
+    <h2>Kurvenparameter</h2>
+    <p style="color: var(--subtext0); font-size: 0.85rem; margin-bottom: 1rem;">
+        Definiere die elliptische Kurve $E: y^2 = x^3 + ax + b$ durch die Koeffizienten $a$ und $b$.
+        Δ ≠ 0 ist Voraussetzung für eine nicht-singuläre Kurve.
+    </p>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">Koeffizient a</label>
+            <input class="form-input" id="ec-a" type="number" value="-1" step="0.1">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Koeffizient b</label>
+            <input class="form-input" id="ec-b" type="number" value="0" step="0.1">
+        </div>
+    </div>
+
+    <!-- Beispiel-Kurven -->
+    <div style="margin-bottom: 0.75rem;">
+        <span style="font-size: 0.8rem; color: var(--subtext0);">Bekannte Kurven: </span>
+        <span class="example-btn" onclick="setCurve(-1, 0)">y²=x³−x (j=1728)</span>
+        <span class="example-btn" onclick="setCurve(0, 1)">y²=x³+1</span>
+        <span class="example-btn" onclick="setCurve(-3, 3)">y²=x³−3x+3</span>
+        <span class="example-btn" onclick="setCurve(1, 0)">secp256k1-ähnlich</span>
+        <span class="example-btn" onclick="setCurve(-2, 1)">y²=x³−2x+1</span>
+    </div>
+
+    <!-- Optionaler Punkt P -->
+    <hr style="border-color: var(--surface1); margin: 1rem 0;">
+    <div style="font-size: 0.85rem; color: var(--subtext0); margin-bottom: 0.5rem;">
+        Optionaler Punkt P = (x, y) auf der Kurve (für Punktarithmetik):
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">Punkt P – x-Koordinate</label>
+            <input class="form-input" id="ec-px" type="number" value="0" step="0.001" placeholder="leer = kein Punkt">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Punkt P – y-Koordinate</label>
+            <input class="form-input" id="ec-py" type="number" value="1" step="0.001">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Skalarmultiplikator n (für n·P)</label>
+            <input class="form-input" id="ec-n" type="number" value="3" min="1" max="100">
+        </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="calcElliptic()">▶ Kurve analysieren</button>
+    <div class="result-box" id="ec-result"></div>
+</div>
+
+<!-- ===== Plot-Anzeige ===== -->
+<div class="card" id="ec-plot-card" style="display: none;">
+    <h2>Kurvenplot</h2>
+    <div style="text-align: center;">
+        <img id="ec-plot-img" src="" alt="Elliptische Kurve" style="max-width: 100%; border-radius: 8px;">
+    </div>
+</div>
+
+<!-- ===== Hasse-Schranke ===== -->
+<div class="card">
+    <h2>Hasse-Schranke &amp; Punkte mod p</h2>
+    <p style="color: var(--subtext0); font-size: 0.85rem; margin-bottom: 1rem;">
+        Nach dem Satz von Hasse gilt für die Anzahl der Punkte #E(𝔽_p):
+        $|$#E(𝔽_p) − (p+1)$| \leq 2\sqrt{p}$.<br>
+        Berechne die Gruppenordnung für kleine Primzahlen und prüfe die Schranke.
+    </p>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">Koeffizient a</label>
+            <input class="form-input" id="hasse-a" type="number" value="-1" step="1">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Koeffizient b</label>
+            <input class="form-input" id="hasse-b" type="number" value="0" step="1">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Primzahlen bis (max 50)</label>
+            <input class="form-input" id="hasse-limit" type="number" value="20" min="5" max="50">
+        </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="calcHasse()">▶ Hasse-Schranke berechnen</button>
+    <div class="result-box" id="hasse-result"></div>
+</div>
+
+<script>
+// ============================================================
+// INITIALISIERUNG: Formeln rendern
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+    // Weierstrass-Form: y² = x³ + ax + b
+    renderLatex('y^2 = x^3 + ax + b',
+        document.getElementById('formula-weierstrass'), true);
+
+    // Diskriminante: Δ = -16(4a³ + 27b²)
+    renderLatex('\\Delta = -16(4a^3 + 27b^2)',
+        document.getElementById('formula-discriminant'), true);
+
+    // Hasse-Schranke: |#E(F_p) - (p+1)| ≤ 2√p
+    renderLatex('|\\#E(\\mathbb{F}_p) - (p+1)| \\leq 2\\sqrt{p}',
+        document.getElementById('formula-hasse'), true);
+});
+
+// ============================================================
+// HILFSFUNKTIONEN
+// ============================================================
+
+/** Setzt Beispielkurve in Formularfelder */
+function setCurve(a, b) {
+    document.getElementById('ec-a').value = a;
+    document.getElementById('ec-b').value = b;
+    document.getElementById('hasse-a').value = a;
+    document.getElementById('hasse-b').value = b;
+}
+
+// ============================================================
+// KURVENANALYSE
+// ============================================================
+
+/** Analysiert die elliptische Kurve mit optionalem Punkt P */
+async function calcElliptic() {
+    const a = parseFloat(document.getElementById('ec-a').value);
+    const b = parseFloat(document.getElementById('ec-b').value);
+    const px = document.getElementById('ec-px').value.trim();
+    const py = document.getElementById('ec-py').value.trim();
+    const n = parseInt(document.getElementById('ec-n').value) || 3;
+    const result = document.getElementById('ec-result');
+    const plotCard = document.getElementById('ec-plot-card');
+    const plotImg = document.getElementById('ec-plot-img');
+
+    // Eingabe validieren
+    if (isNaN(a) || isNaN(b)) {
+        showError(result, 'Bitte gültige Zahlen für a und b eingeben.');
+        return;
+    }
+
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne Kurve...</div>';
+
+    // Request-Body aufbauen
+    const body = { a, b, n };
+    // Punkt nur senden wenn ausgefüllt
+    if (px !== '' && py !== '') {
+        body.px = parseFloat(px);
+        body.py = parseFloat(py);
+    }
+
+    try {
+        const data = await apiPost('/api/elliptic/analyze', body);
+
+        // Farbe je nach Diskriminante
+        const deltaColor = data.is_singular
+            ? 'var(--red)'
+            : (data.discriminant > 0 ? 'var(--green)' : 'var(--peach)');
+
+        // Grundeigenschaften der Kurve anzeigen
+        let html = `<table class="result-table">
+            <tr><td>Kurve</td><td style="font-family: monospace;">y² = x³ + ${a}x + ${b}</td></tr>
+            <tr><td>Diskriminante Δ</td>
+                <td style="color: ${deltaColor}; font-weight: 700;">${data.discriminant.toFixed(6)}</td></tr>
+            <tr><td>j-Invariante</td><td>${data.j_invariant !== null ? data.j_invariant.toFixed(4) : '–'}</td></tr>
+            <tr><td>Singulär?</td><td>${data.is_singular
+                ? '<span style="color: var(--red);">⚠ Ja – Knoten oder Spitze (Δ = 0)</span>'
+                : '<span style="color: var(--green);">✓ Nein – reguläre Kurve</span>'}</td></tr>
+        </table>`;
+
+        // Fehlermeldung bei singulärer Kurve
+        if (data.is_singular) {
+            html += `<div class="result-error" style="margin-top: 0.5rem;">
+                ⚠ Singuläre Kurve (Δ = 0): Die Kurve hat einen Knoten oder eine Spitze.
+                Wähle andere Koeffizienten a, b, sodass 4a³ + 27b² ≠ 0.
+            </div>`;
+            showResult(result, html);
+            plotCard.style.display = 'none';
+            return;
+        }
+
+        // Punktarithmetik anzeigen wenn P angegeben
+        if (data.point_results) {
+            const pr = data.point_results;
+            html += `<hr style="border-color: var(--surface1); margin: 0.75rem 0;">
+            <h3 style="color: var(--subtext1); font-size: 0.9rem; margin-bottom: 0.5rem;">Punktarithmetik für P = (${pr.px}, ${pr.py})</h3>
+            <table class="result-table">
+                <tr><td>P liegt auf E?</td><td>${pr.on_curve
+                    ? '<span style="color: var(--green);">✓ Ja</span>'
+                    : '<span style="color: var(--red);">✗ Nein</span>'}</td></tr>`;
+
+            if (pr.on_curve) {
+                html += `<tr><td>2P (Verdoppelung)</td><td style="font-family: monospace;">${pr.double_p}</td></tr>
+                <tr><td>${n}·P (Skalarmultiplikation)</td><td style="font-family: monospace;">${pr.n_times_p}</td></tr>`;
+            }
+            html += `</table>`;
+        }
+
+        showResult(result, html);
+
+        // Plot anzeigen wenn vorhanden
+        if (data.plot) {
+            plotImg.src = 'data:image/png;base64,' + data.plot;
+            plotCard.style.display = 'block';
+        }
+
+        // LaTeX-Formel für Diskriminante rendern
+        setTimeout(() => {
+            const container = result.querySelector('.result-success');
+            if (!container) return;
+            const latexDiv = document.createElement('div');
+            latexDiv.className = 'formula-display';
+            latexDiv.style.marginTop = '0.5rem';
+            container.appendChild(latexDiv);
+            renderLatex(
+                `\\Delta = -16(4 \\cdot ${a}^3 + 27 \\cdot ${b}^2) = ${data.discriminant.toFixed(2)}`,
+                latexDiv, false
+            );
+        }, 50);
+
+    } catch (e) {
+        showError(result, e.message);
+        plotCard.style.display = 'none';
+    }
+}
+
+// ============================================================
+// HASSE-SCHRANKE
+// ============================================================
+
+/** Berechnet Gruppenordnung mod p für mehrere kleine Primzahlen */
+async function calcHasse() {
+    const a = parseInt(document.getElementById('hasse-a').value) || 0;
+    const b = parseInt(document.getElementById('hasse-b').value) || 0;
+    const limit = parseInt(document.getElementById('hasse-limit').value) || 20;
+    const result = document.getElementById('hasse-result');
+
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne Hasse-Schranke...</div>';
+
+    try {
+        const data = await apiPost('/api/elliptic/hasse', { a, b, prime_limit: limit });
+
+        if (data.is_singular) {
+            showError(result, `Singuläre Kurve (Δ = 0): Hasse-Schranke nicht definiert.`);
+            return;
+        }
+
+        // Tabelle mit Ergebnissen pro Primzahl
+        let rows = data.primes.map(entry => {
+            const hasse_ok = Math.abs(entry.order - (entry.p + 1)) <= 2 * Math.sqrt(entry.p);
+            return `<tr>
+                <td>${entry.p}</td>
+                <td>${entry.order}</td>
+                <td>${entry.p + 1}</td>
+                <td>${entry.trace}</td>
+                <td>${(2 * Math.sqrt(entry.p)).toFixed(3)}</td>
+                <td>${hasse_ok
+                    ? '<span style="color: var(--green);">✓</span>'
+                    : '<span style="color: var(--red);">✗</span>'}</td>
+            </tr>`;
+        }).join('');
+
+        const html = `
+        <div style="overflow-x: auto;">
+        <table class="result-table">
+            <thead>
+                <tr style="color: var(--subtext0); font-size: 0.8rem;">
+                    <th>p</th>
+                    <th>#E(𝔽_p)</th>
+                    <th>p+1</th>
+                    <th>Spur a_p</th>
+                    <th>2√p</th>
+                    <th>Hasse ✓</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+        </div>
+        <div class="formula-display" id="hasse-latex" style="margin-top: 0.75rem;"></div>`;
+
+        showResult(result, html);
+
+        setTimeout(() => {
+            const el = document.getElementById('hasse-latex');
+            if (el) renderLatex(
+                `a_p = p + 1 - \\#E(\\mathbb{F}_p), \\quad |a_p| \\leq 2\\sqrt{p}`,
+                el, false
+            );
+        }, 50);
+
+    } catch (e) {
+        showError(result, e.message);
+    }
+}
+</script>
+{% endblock %}

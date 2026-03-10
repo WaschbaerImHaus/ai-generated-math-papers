@@ -642,3 +642,296 @@ class TestErrorHandling:
         # Sollte entweder 400 oder einen Fehler zurückgeben
         data = resp.get_json()
         assert 'error' in data or resp.status_code == 400
+
+
+# ===========================================================================
+# TESTS: ELLIPTISCHE KURVEN
+# ===========================================================================
+
+class TestEllipticCurves:
+    """
+    @brief Tests für die Elliptische-Kurven-API.
+    @description
+        Prüft /api/elliptic/analyze und /api/elliptic/hasse auf
+        korrekte Berechnung von Diskriminante, Gruppenordnung und Hasse-Schranke.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+
+    def test_elliptic_page_loads(self, client):
+        """GET /elliptic muss Status 200 zurückgeben."""
+        resp = client.get('/elliptic')
+        assert resp.status_code == 200
+
+    def test_analyze_regular_curve(self, client):
+        """Reguläre Kurve y²=x³−x: Δ≠0, nicht singuläre Antwort."""
+        resp = post_json(client, '/api/elliptic/analyze', {'a': -1, 'b': 0})
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data['is_singular'] is False
+        # Δ = -16*(4*(-1)³+27*0²) = -16*(-4) = 64
+        assert abs(data['discriminant'] - 64.0) < 1e-6
+        assert 'j_invariant' in data
+
+    def test_analyze_singular_curve(self, client):
+        """Singuläre Kurve y²=x³ (a=0, b=0): Δ=0, is_singular=True."""
+        resp = post_json(client, '/api/elliptic/analyze', {'a': 0, 'b': 0})
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data['is_singular'] is True
+
+    def test_analyze_with_point_on_curve(self, client):
+        """Punkt (0,1) liegt auf y²=x³+1 → on_curve=True."""
+        # y²=0+0+1=1 → y=1 ✓
+        resp = post_json(client, '/api/elliptic/analyze', {
+            'a': 0, 'b': 1,
+            'px': 0.0, 'py': 1.0, 'n': 2
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data['is_singular'] is False
+        assert data['point_results'] is not None
+        assert data['point_results']['on_curve'] is True
+
+    def test_analyze_with_point_not_on_curve(self, client):
+        """Punkt (1,5) liegt nicht auf y²=x³−x → on_curve=False."""
+        resp = post_json(client, '/api/elliptic/analyze', {
+            'a': -1, 'b': 0,
+            'px': 1.0, 'py': 5.0, 'n': 3
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data['point_results']['on_curve'] is False
+
+    def test_analyze_returns_plot(self, client):
+        """Reguläre Kurve muss einen Base64-Plot zurückgeben."""
+        resp = post_json(client, '/api/elliptic/analyze', {'a': -1, 'b': 0})
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data['plot'] is not None
+        assert len(data['plot']) > 100  # Base64-String nicht leer
+
+    def test_analyze_j_invariant_y2_x3_minus_x(self, client):
+        """j-Invariante von y²=x³−x muss 1728 sein (CM durch ℤ[i])."""
+        resp = post_json(client, '/api/elliptic/analyze', {'a': -1, 'b': 0})
+        assert resp.status_code == 200
+        data = resp.get_json()
+        # j = -1728*(4*(-1))^3 / 64 = -1728*(-64)/64 = 1728
+        assert abs(data['j_invariant'] - 1728.0) < 1.0
+
+    def test_hasse_page_values(self, client):
+        """Hasse-Schranke für y²=x³−x: #E(F_p) muss in Hasse-Band liegen."""
+        resp = post_json(client, '/api/elliptic/hasse', {
+            'a': -1, 'b': 0, 'prime_limit': 13
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data['is_singular'] is False
+        assert len(data['primes']) > 0
+        # Hasse-Schranke prüfen: |a_p| ≤ 2√p
+        import math
+        for entry in data['primes']:
+            p = entry['p']
+            trace = abs(entry['trace'])
+            assert trace <= 2 * math.sqrt(p) + 0.001, \
+                f"Hasse-Schranke verletzt für p={p}: |a_p|={trace} > 2√{p}={2*math.sqrt(p):.3f}"
+
+    def test_hasse_singular_returns_flag(self, client):
+        """Singuläre Kurve bei Hasse: is_singular=True, leere Primzahlliste."""
+        resp = post_json(client, '/api/elliptic/hasse', {
+            'a': 0, 'b': 0, 'prime_limit': 10
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data['is_singular'] is True
+
+    def test_hasse_prime_limit_capped(self, client):
+        """prime_limit > 50 wird auf 50 begrenzt."""
+        resp = post_json(client, '/api/elliptic/hasse', {
+            'a': -1, 'b': 0, 'prime_limit': 999
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        # Alle zurückgegebenen Primzahlen dürfen nicht > 50 sein
+        if data['primes']:
+            assert max(e['p'] for e in data['primes']) <= 50
+
+    def test_analyze_no_json_returns_400(self, client):
+        """POST ohne Body muss HTTP 400 zurückgeben."""
+        resp = client.post('/api/elliptic/analyze', content_type='application/json')
+        assert resp.status_code == 400
+
+
+# ===========================================================================
+# TESTS: TENSOR-GEOMETRIE
+# ===========================================================================
+
+class TestTensorGeometry:
+    """
+    @brief Tests für die Tensor-Geometrie-API.
+    @description
+        Prüft /api/tensor/curvature für alle Mannigfaltigkeiten:
+        Sphäre, Torus, Hyperbolisch, Sattel, Flach.
+        Validiert Metriktensor, Ricci-Skalar und Gaußsche Krümmung.
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+
+    def test_tensor_page_loads(self, client):
+        """GET /tensor muss Status 200 zurückgeben."""
+        resp = client.get('/tensor')
+        assert resp.status_code == 200
+
+    def test_sphere_curvature(self, client):
+        """Sphäre r=1: K=1, R=2, g_11=r²=1."""
+        import math
+        resp = post_json(client, '/api/tensor/curvature', {
+            'manifold': 'sphere',
+            'params': {'r': 1.0, 'theta': math.pi / 2, 'phi': 0.0}
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert abs(data['gaussian_curvature'] - 1.0) < 0.05
+        assert abs(data['ricci_scalar'] - 2.0) < 0.1
+        # Metriktensor-Diagonale g_11 = r² = 1
+        assert abs(data['metric'][0][0] - 1.0) < 1e-6
+        # Nicht-Diagonale g_12 = 0
+        assert abs(data['metric'][0][1]) < 1e-6
+
+    def test_sphere_larger_radius(self, client):
+        """Sphäre r=2: K=1/r²=0.25."""
+        import math
+        resp = post_json(client, '/api/tensor/curvature', {
+            'manifold': 'sphere',
+            'params': {'r': 2.0, 'theta': math.pi / 2, 'phi': 0.0}
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert abs(data['gaussian_curvature'] - 0.25) < 0.05
+
+    def test_hyperbolic_curvature(self, client):
+        """Hyperbolische Ebene: K = -1 (konstant)."""
+        resp = post_json(client, '/api/tensor/curvature', {
+            'manifold': 'hyperbolic',
+            'params': {'x': 0.0, 'y': 1.0}
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert abs(data['gaussian_curvature'] - (-1.0)) < 0.1
+
+    def test_flat_curvature(self, client):
+        """Flache Ebene: K=0, R=0."""
+        resp = post_json(client, '/api/tensor/curvature', {
+            'manifold': 'flat',
+            'params': {'x': 0.0, 'y': 0.0}
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert abs(data['gaussian_curvature']) < 1e-4
+        assert abs(data['ricci_scalar']) < 1e-4
+        # Einheitsmetrik: g_ij = δ_ij
+        assert abs(data['metric'][0][0] - 1.0) < 1e-6
+        assert abs(data['metric'][1][1] - 1.0) < 1e-6
+
+    def test_torus_curvature_outside(self, client):
+        """Torus außen (θ=0): K > 0 (positiv)."""
+        resp = post_json(client, '/api/tensor/curvature', {
+            'manifold': 'torus',
+            'params': {'R': 2.0, 'r': 1.0, 'theta': 0.0, 'phi': 0.0}
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        # Außen: K = cos(0) / (r*(R+r*cos(0))) = 1/(1*3) ≈ 0.333
+        assert data['gaussian_curvature'] > 0
+
+    def test_torus_curvature_inside(self, client):
+        """Torus innen (θ=π): K < 0 (negativ)."""
+        import math
+        resp = post_json(client, '/api/tensor/curvature', {
+            'manifold': 'torus',
+            'params': {'R': 2.0, 'r': 1.0, 'theta': math.pi, 'phi': 0.0}
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data['gaussian_curvature'] < 0
+
+    def test_saddle_curvature_origin(self, client):
+        """Sattelfläche im Ursprung: K = -1."""
+        resp = post_json(client, '/api/tensor/curvature', {
+            'manifold': 'saddle',
+            'params': {'x': 0.0, 'y': 0.0}
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        # K(0,0) = -1/(1+0+0)² = -1
+        assert abs(data['gaussian_curvature'] - (-1.0)) < 0.1
+
+    def test_tensor_returns_plot(self, client):
+        """Sphäre muss Base64-Plot zurückgeben."""
+        import math
+        resp = post_json(client, '/api/tensor/curvature', {
+            'manifold': 'sphere',
+            'params': {'r': 1.0, 'theta': math.pi / 2, 'phi': 0.0}
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data['plot'] is not None
+        assert len(data['plot']) > 100
+
+    def test_tensor_returns_physical_description(self, client):
+        """Antwort muss physikalische Beschreibung enthalten."""
+        resp = post_json(client, '/api/tensor/curvature', {
+            'manifold': 'flat',
+            'params': {'x': 0.0, 'y': 0.0}
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert 'physical_description' in data
+        assert len(data['physical_description']) > 10
+
+    def test_tensor_returns_metric_latex(self, client):
+        """Antwort muss metric_latex für KaTeX enthalten."""
+        resp = post_json(client, '/api/tensor/curvature', {
+            'manifold': 'sphere',
+            'params': {'r': 1.0, 'theta': 1.5708, 'phi': 0.0}
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert 'metric_latex' in data
+        assert 'g_{ij}' in data['metric_latex'] or 'g_' in data['metric_latex']
+
+    def test_tensor_unknown_manifold_returns_400(self, client):
+        """Unbekannte Mannigfaltigkeit muss HTTP 400 zurückgeben."""
+        resp = post_json(client, '/api/tensor/curvature', {
+            'manifold': 'unknownxyz',
+            'params': {}
+        })
+        assert resp.status_code == 400
+
+    def test_tensor_no_json_returns_400(self, client):
+        """POST ohne Body muss HTTP 400 zurückgeben."""
+        resp = client.post('/api/tensor/curvature', content_type='application/json')
+        assert resp.status_code == 400
+
+    def test_curvature_type_positive(self, client):
+        """Sphäre: curvature_type muss 'positiv' enthalten."""
+        import math
+        resp = post_json(client, '/api/tensor/curvature', {
+            'manifold': 'sphere',
+            'params': {'r': 1.0, 'theta': math.pi / 2, 'phi': 0.0}
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert 'positiv' in data['curvature_type'].lower() or data['gaussian_curvature'] > 0
+
+    def test_curvature_type_flat(self, client):
+        """Flache Ebene: curvature_type muss 'flach' oder K≈0 zeigen."""
+        resp = post_json(client, '/api/tensor/curvature', {
+            'manifold': 'flat',
+            'params': {'x': 1.0, 'y': 2.0}
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert abs(data['gaussian_curvature']) < 1e-3

@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+<!--
+    @file tensor.html
+    @brief Tensor-Geometrie – Metriktensor, Ricci-Skalar, Gaußsche Krümmung.
+    @description
+        Interaktive Werkzeuge für Riemannsche Geometrie und Tensorrechnung:
+        - Mannigfaltigkeit auswählen (Sphäre, Torus, Hyperbolisch, Sattel, Flach)
+        - Metriktensor g_{ij} am gewählten Punkt
+        - Ricci-Skalar R (Gesamtkrümmung)
+        - Gaußsche Krümmung K
+        - Physikalische Bedeutung (Allgemeine Relativitätstheorie)
+        - Matplotlib-3D-Plot der Mannigfaltigkeit mit markiertem Punkt
+    @author Kurt Ingwer
+    @date 2026-03-10
+    @lastModified 2026-03-10
+-->
+{% block title %}Tensor-Geometrie – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><span>g</span> Tensor-Geometrie</h1>
+    <p class="page-subtitle">
+        Riemannsche Mannigfaltigkeiten, Metriktensoren, Krümmung und Allgemeine Relativitätstheorie.
+    </p>
+</div>
+
+<!-- ===== Formelübersicht ===== -->
+<div class="card">
+    <h2>Grundformeln</h2>
+    <div class="formula-grid">
+        <div class="formula-item">
+            <div class="formula-label">Metriktensor</div>
+            <div class="formula-display" id="formula-metric"></div>
+        </div>
+        <div class="formula-item">
+            <div class="formula-label">Ricci-Skalar</div>
+            <div class="formula-display" id="formula-ricci"></div>
+        </div>
+        <div class="formula-item">
+            <div class="formula-label">Einstein-Gleichung</div>
+            <div class="formula-display" id="formula-einstein"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Mannigfaltigkeits-Rechner ===== -->
+<div class="card">
+    <h2>Mannigfaltigkeit auswählen</h2>
+    <p style="color: var(--subtext0); font-size: 0.85rem; margin-bottom: 1rem;">
+        Wähle eine klassische 2D-Mannigfaltigkeit und einen Koordinatenpunkt.
+        Die Krümmungsgrößen werden am angegebenen Punkt berechnet.
+    </p>
+
+    <div class="form-row">
+        <div class="form-group" style="flex: 2;">
+            <label class="form-label">Mannigfaltigkeit</label>
+            <select class="form-select" id="tensor-manifold" onchange="onManifoldChange()">
+                <option value="sphere">Sphäre S² (Kugeloberfläche)</option>
+                <option value="torus">Torus T² (Donut-Form)</option>
+                <option value="hyperbolic">Hyperbolische Ebene H² (Poincaré-Modell)</option>
+                <option value="saddle">Sattelfläche z = xy</option>
+                <option value="flat">Flache Ebene ℝ² (Euklidisch)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Parameter je nach Mannigfaltigkeit -->
+    <div id="params-sphere">
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Radius r</label>
+                <input class="form-input" id="sphere-r" type="number" value="1.0" min="0.1" step="0.1">
+            </div>
+            <div class="form-group">
+                <label class="form-label">θ (Breitenwinkel, 0 bis π)</label>
+                <input class="form-input" id="sphere-theta" type="number" value="1.5708" step="0.1">
+            </div>
+            <div class="form-group">
+                <label class="form-label">φ (Längenwinkel, 0 bis 2π)</label>
+                <input class="form-input" id="sphere-phi" type="number" value="0.0" step="0.1">
+            </div>
+        </div>
+    </div>
+
+    <div id="params-torus" style="display: none;">
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Großer Radius R</label>
+                <input class="form-input" id="torus-R" type="number" value="2.0" min="0.1" step="0.1">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Kleiner Radius r (r &lt; R)</label>
+                <input class="form-input" id="torus-r" type="number" value="1.0" min="0.1" step="0.1">
+            </div>
+            <div class="form-group">
+                <label class="form-label">θ (innerer Winkel, 0 bis 2π)</label>
+                <input class="form-input" id="torus-theta" type="number" value="0.0" step="0.1">
+            </div>
+            <div class="form-group">
+                <label class="form-label">φ (äußerer Winkel, 0 bis 2π)</label>
+                <input class="form-input" id="torus-phi" type="number" value="0.0" step="0.1">
+            </div>
+        </div>
+    </div>
+
+    <div id="params-hyperbolic" style="display: none;">
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">x-Koordinate</label>
+                <input class="form-input" id="hyp-x" type="number" value="0.0" step="0.1">
+            </div>
+            <div class="form-group">
+                <label class="form-label">y-Koordinate (y > 0)</label>
+                <input class="form-input" id="hyp-y" type="number" value="1.0" min="0.01" step="0.1">
+            </div>
+        </div>
+    </div>
+
+    <div id="params-saddle" style="display: none;">
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">x-Koordinate</label>
+                <input class="form-input" id="saddle-x" type="number" value="0.5" step="0.1">
+            </div>
+            <div class="form-group">
+                <label class="form-label">y-Koordinate</label>
+                <input class="form-input" id="saddle-y" type="number" value="0.5" step="0.1">
+            </div>
+        </div>
+    </div>
+
+    <div id="params-flat" style="display: none;">
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">x-Koordinate</label>
+                <input class="form-input" id="flat-x" type="number" value="0.0" step="0.1">
+            </div>
+            <div class="form-group">
+                <label class="form-label">y-Koordinate</label>
+                <input class="form-input" id="flat-y" type="number" value="0.0" step="0.1">
+            </div>
+        </div>
+    </div>
+
+    <!-- Beispiel-Buttons -->
+    <div style="margin-bottom: 0.75rem;">
+        <span style="font-size: 0.8rem; color: var(--subtext0);">Beispiele: </span>
+        <span class="example-btn" onclick="setExample('sphere', {r: 1, theta: 1.5708, phi: 0})">Sphäre (Äquator)</span>
+        <span class="example-btn" onclick="setExample('sphere', {r: 1, theta: 0.5, phi: 1.0})">Sphäre (Pol-nah)</span>
+        <span class="example-btn" onclick="setExample('torus', {R: 2, r: 1, theta: 0, phi: 0})">Torus (Außen)</span>
+        <span class="example-btn" onclick="setExample('torus', {R: 2, r: 1, theta: 3.14159, phi: 0})">Torus (Innen)</span>
+        <span class="example-btn" onclick="setExample('hyperbolic', {x: 0, y: 1})">H² (y=1)</span>
+        <span class="example-btn" onclick="setExample('saddle', {x: 0, y: 0})">Sattel (Ursprung)</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="calcTensor()">▶ Krümmung berechnen</button>
+    <div class="result-box" id="tensor-result"></div>
+</div>
+
+<!-- ===== Plot-Anzeige ===== -->
+<div class="card" id="tensor-plot-card" style="display: none;">
+    <h2>Mannigfaltigkeits-Visualisierung</h2>
+    <div style="text-align: center;">
+        <img id="tensor-plot-img" src="" alt="Mannigfaltigkeit" style="max-width: 100%; border-radius: 8px;">
+    </div>
+</div>
+
+<!-- ===== Physikalischer Kontext ===== -->
+<div class="card">
+    <h2>Physikalische Bedeutung in der ART</h2>
+    <p style="color: var(--subtext0); font-size: 0.85rem; margin-bottom: 1rem;">
+        In der Allgemeinen Relativitätstheorie beschreibt der Metriktensor $g_{\mu\nu}$
+        die Geometrie der vierdimensionalen Raumzeit. Die Einstein-Gleichungen verknüpfen
+        Krümmung mit der Energiedichte der Materie.
+    </p>
+    <div id="physics-table">
+        <table class="result-table">
+            <tr><td>$g_{\mu\nu}$</td><td>Metriktensor – misst Abstände in der Raumzeit: $ds^2 = g_{\mu\nu}\, dx^\mu dx^\nu$</td></tr>
+            <tr><td>$\Gamma^\lambda_{\mu\nu}$</td><td>Christoffel-Symbole – Verbindung (Levi-Civita), beschreiben Geodätenkrümmung</td></tr>
+            <tr><td>$R_{\mu\nu}$</td><td>Ricci-Tensor – Spur des Riemann-Tensors, taucht in Einstein-Gl. auf</td></tr>
+            <tr><td>$R$</td><td>Ricci-Skalar – gibt Gesamtkrümmung als Zahl; $R=0$ im Vakuum</td></tr>
+            <tr><td>$K$</td><td>Gaußsche Krümmung – für 2D-Flächen: $K>0$ Sphäre, $K=0$ Ebene, $K&lt;0$ Sattel</td></tr>
+            <tr><td>$G_{\mu\nu} = 8\pi G\, T_{\mu\nu}$</td><td>Einstein-Gleichung: Geometrie = Materie/Energie</td></tr>
+        </table>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// INITIALISIERUNG: Formeln rendern
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+    // Metriktensor: ds² = g_ij dx^i dx^j
+    renderLatex('ds^2 = g_{ij}\\, dx^i dx^j',
+        document.getElementById('formula-metric'), true);
+
+    // Ricci-Skalar: R = g^{ij} R_{ij}
+    renderLatex('R = g^{ij} R_{ij}',
+        document.getElementById('formula-ricci'), true);
+
+    // Einstein-Gleichung
+    renderLatex('G_{\\mu\\nu} = R_{\\mu\\nu} - \\tfrac{1}{2}R\\,g_{\\mu\\nu} = 8\\pi G\\,T_{\\mu\\nu}',
+        document.getElementById('formula-einstein'), true);
+});
+
+// ============================================================
+// HILFSFUNKTIONEN
+// ============================================================
+
+/** Blendet Parametergruppen je nach Mannigfaltigkeit ein/aus */
+function onManifoldChange() {
+    const type = document.getElementById('tensor-manifold').value;
+    // Alle Parameter-Divs ausblenden
+    ['sphere','torus','hyperbolic','saddle','flat'].forEach(t => {
+        document.getElementById('params-' + t).style.display = t === type ? 'block' : 'none';
+    });
+}
+
+/** Setzt Beispielwerte in die Eingabefelder */
+function setExample(type, params) {
+    document.getElementById('tensor-manifold').value = type;
+    onManifoldChange();
+    if (type === 'sphere') {
+        if (params.r !== undefined) document.getElementById('sphere-r').value = params.r;
+        if (params.theta !== undefined) document.getElementById('sphere-theta').value = params.theta;
+        if (params.phi !== undefined) document.getElementById('sphere-phi').value = params.phi;
+    } else if (type === 'torus') {
+        if (params.R !== undefined) document.getElementById('torus-R').value = params.R;
+        if (params.r !== undefined) document.getElementById('torus-r').value = params.r;
+        if (params.theta !== undefined) document.getElementById('torus-theta').value = params.theta;
+        if (params.phi !== undefined) document.getElementById('torus-phi').value = params.phi;
+    } else if (type === 'hyperbolic') {
+        if (params.x !== undefined) document.getElementById('hyp-x').value = params.x;
+        if (params.y !== undefined) document.getElementById('hyp-y').value = params.y;
+    } else if (type === 'saddle') {
+        if (params.x !== undefined) document.getElementById('saddle-x').value = params.x;
+        if (params.y !== undefined) document.getElementById('saddle-y').value = params.y;
+    }
+}
+
+// ============================================================
+// TENSOR-BERECHNUNG
+// ============================================================
+
+/** Berechnet Metriktensor, Ricci-Skalar und Gaußsche Krümmung via API */
+async function calcTensor() {
+    const manifold = document.getElementById('tensor-manifold').value;
+    const result = document.getElementById('tensor-result');
+    const plotCard = document.getElementById('tensor-plot-card');
+    const plotImg = document.getElementById('tensor-plot-img');
+
+    // Parameter je nach Mannigfaltigkeit einsammeln
+    let params = {};
+    if (manifold === 'sphere') {
+        params = {
+            r:     parseFloat(document.getElementById('sphere-r').value) || 1.0,
+            theta: parseFloat(document.getElementById('sphere-theta').value) || Math.PI/2,
+            phi:   parseFloat(document.getElementById('sphere-phi').value) || 0.0,
+        };
+    } else if (manifold === 'torus') {
+        params = {
+            R:     parseFloat(document.getElementById('torus-R').value) || 2.0,
+            r:     parseFloat(document.getElementById('torus-r').value) || 1.0,
+            theta: parseFloat(document.getElementById('torus-theta').value) || 0.0,
+            phi:   parseFloat(document.getElementById('torus-phi').value) || 0.0,
+        };
+    } else if (manifold === 'hyperbolic') {
+        params = {
+            x: parseFloat(document.getElementById('hyp-x').value) || 0.0,
+            y: parseFloat(document.getElementById('hyp-y').value) || 1.0,
+        };
+    } else if (manifold === 'saddle') {
+        params = {
+            x: parseFloat(document.getElementById('saddle-x').value) || 0.0,
+            y: parseFloat(document.getElementById('saddle-y').value) || 0.0,
+        };
+    } else if (manifold === 'flat') {
+        params = {
+            x: parseFloat(document.getElementById('flat-x').value) || 0.0,
+            y: parseFloat(document.getElementById('flat-y').value) || 0.0,
+        };
+    }
+
+    result.innerHTML = '<div class="loading"><div class="spinner"></div> Berechne Krümmungstensoren...</div>';
+
+    try {
+        const data = await apiPost('/api/tensor/curvature', { manifold, params });
+
+        // Farbe je nach Krümmungsvorzeichen
+        const kColor = data.gaussian_curvature > 0.001
+            ? 'var(--green)'
+            : (data.gaussian_curvature < -0.001 ? 'var(--red)' : 'var(--yellow)');
+
+        // Metriktensor-Komponenten als Matrix formatieren
+        const g = data.metric;
+        const gFormatted = `[[${g[0][0].toFixed(6)}, ${g[0][1].toFixed(6)}], [${g[1][0].toFixed(6)}, ${g[1][1].toFixed(6)}]]`;
+
+        let html = `<table class="result-table">
+            <tr><td>Mannigfaltigkeit</td><td style="font-weight: 700;">${data.name}</td></tr>
+            <tr><td>Punkt</td><td style="font-family: monospace;">${data.point_str}</td></tr>
+            <tr><td>Metriktensor g_{ij}</td>
+                <td style="font-family: monospace;">
+                    [${g[0][0].toFixed(6)}, ${g[0][1].toFixed(6)}]<br>
+                    [${g[1][0].toFixed(6)}, ${g[1][1].toFixed(6)}]
+                </td></tr>
+            <tr><td>det(g)</td><td>${data.det_g.toFixed(8)}</td></tr>
+            <tr><td>Ricci-Skalar R</td>
+                <td style="font-size: 1.15em; font-weight: 700; color: var(--blue);">
+                    ${data.ricci_scalar.toFixed(8)}</td></tr>
+            <tr><td>Gaußsche Krümmung K</td>
+                <td style="font-size: 1.15em; font-weight: 700; color: ${kColor};">
+                    ${data.gaussian_curvature.toFixed(8)}</td></tr>
+            <tr><td>Krümmungstyp</td>
+                <td style="color: ${kColor};">${data.curvature_type}</td></tr>
+        </table>
+
+        <div style="background: var(--surface1); border-radius: 6px; padding: 0.75rem; margin-top: 0.5rem; font-size: 0.85rem; color: var(--subtext1);">
+            <strong>Physikalische Bedeutung:</strong> ${data.physical_description}
+        </div>
+
+        <div class="formula-display" id="tensor-latex" style="margin-top: 0.75rem;"></div>`;
+
+        showResult(result, html);
+
+        // LaTeX-Darstellung des Metriktensors
+        setTimeout(() => {
+            const el = document.getElementById('tensor-latex');
+            if (el) renderLatex(data.metric_latex, el, false);
+        }, 50);
+
+        // Plot anzeigen wenn vorhanden
+        if (data.plot) {
+            plotImg.src = 'data:image/png;base64,' + data.plot;
+            plotCard.style.display = 'block';
+        }
+
+    } catch (e) {
+        showError(result, e.message);
+        plotCard.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

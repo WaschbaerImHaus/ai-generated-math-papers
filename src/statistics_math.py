@@ -39,9 +39,9 @@ def _erf(x: float) -> float:
 
     Approximation nach Abramowitz & Stegun, Formel 7.1.26.
 
-    :param x: Eingabewert
-    :return: Näherungswert von erf(x), Fehler < 1.5e-7
-    :last_modified: 2026-03-05
+    @param x Eingabewert
+    @return Näherungswert von erf(x), Fehler < 1.5e-7
+    @lastModified 2026-03-10
     """
     # Vorzeichenbehandlung: erf ist ungerade
     sign = 1 if x >= 0 else -1
@@ -61,9 +61,9 @@ def _erfinv(p: float) -> float:
 
     Verwendet eine Rational-Approximation (Peter Acklam's Methode).
 
-    :param p: Eingabewert im Bereich (-1, 1)
-    :return: x mit erf(x) = p
-    :last_modified: 2026-03-05
+    @param p Eingabewert im Bereich (-1, 1)
+    @return x mit erf(x) = p
+    @lastModified 2026-03-10
     """
     # Umwandlung: erfinv(p) = ppf((1+p)/2) / sqrt(2) für Normalverteilung
     # Wir verwenden die Probit-Funktion über rational approximation
@@ -76,9 +76,9 @@ def _probit(p: float) -> float:
 
     Rational-Approximation nach Peter Acklam (max. Fehler: 1.15e-9).
 
-    :param p: Wahrscheinlichkeit im Bereich (0, 1)
-    :return: z-Wert mit CDF(z) = p
-    :last_modified: 2026-03-05
+    @param p Wahrscheinlichkeit im Bereich (0, 1)
+    @return z-Wert mit CDF(z) = p
+    @lastModified 2026-03-10
     """
     if p <= 0 or p >= 1:
         raise ValueError(f"p muss im Bereich (0,1) liegen, nicht {p}")
@@ -123,10 +123,10 @@ def _gamma_inc_reg(a: float, x: float) -> float:
 
     Verwendet Reihenentwicklung für x < a+1, Kettenbruch für x >= a+1.
 
-    :param a: Formparameter (a > 0)
-    :param x: Obere Grenze (x >= 0)
-    :return: P(a,x) = gamma(a,x) / Gamma(a)
-    :last_modified: 2026-03-05
+    @param a Formparameter (a > 0)
+    @param x Obere Grenze (x >= 0)
+    @return P(a,x) = gamma(a,x) / Gamma(a)
+    @lastModified 2026-03-10
     """
     if x < 0:
         raise ValueError("x muss >= 0 sein")
@@ -178,10 +178,10 @@ def _t_cdf(t: float, df: int) -> float:
 
     Verwendet die Beziehung zur regularisierten Betafunktion.
 
-    :param t: t-Statistik
-    :param df: Freiheitsgrade
-    :return: P(T <= t)
-    :last_modified: 2026-03-05
+    @param t t-Statistik
+    @param df Freiheitsgrade
+    @return P(T <= t)
+    @lastModified 2026-03-10
     """
     x = df / (df + t * t)
     # Regularisierte Betafunktion I_x(df/2, 0.5)
@@ -198,11 +198,11 @@ def _beta_inc_reg(a: float, b: float, x: float) -> float:
 
     Verwendet den Algorithmus von Numerical Recipes (Kettenbruch).
 
-    :param a: Erster Formparameter
-    :param b: Zweiter Formparameter
-    :param x: Obere Grenze (0 <= x <= 1)
-    :return: I_x(a,b)
-    :last_modified: 2026-03-05
+    @param a Erster Formparameter
+    @param b Zweiter Formparameter
+    @param x Obere Grenze (0 <= x <= 1)
+    @return I_x(a,b)
+    @lastModified 2026-03-10
     """
     if x < 0 or x > 1:
         raise ValueError(f"x muss in [0,1] liegen, nicht {x}")
@@ -220,7 +220,7 @@ def _beta_inc_reg(a: float, b: float, x: float) -> float:
         return 1.0 - _beta_inc_reg(b, a, 1 - x)
 
     # Lentz-Kettenbruch
-    def cont_frac():
+    def cont_frac() -> float:
         qab = a + b
         qap = a + 1
         qam = a - 1
@@ -266,14 +266,28 @@ def _chi2_cdf(x: float, df: int) -> float:
 
     Verwendet die regularisierte Gammafunktion: CDF = P(df/2, x/2).
 
-    :param x: Eingabewert (x >= 0)
-    :param df: Freiheitsgrade
-    :return: P(X <= x)
-    :last_modified: 2026-03-05
+    @param x Eingabewert (x >= 0)
+    @param df Freiheitsgrade
+    @return P(X <= x)
+    @lastModified 2026-03-10
     """
     if x < 0:
         return 0.0
     return _gamma_inc_reg(df / 2.0, x / 2.0)
+
+
+def _normal_cdf_approx(x: float) -> float:
+    """
+    Berechnet eine schnelle Approximation der Standard-Normalverteilungs-CDF.
+
+    Hilfsfunktion für interne Berechnungen, wo Geschwindigkeit wichtiger
+    als höchste Genauigkeit ist.
+
+    @param x Standardisierter z-Wert
+    @return Näherungswert von P(Z <= x) für Z ~ N(0,1)
+    @lastModified 2026-03-10
+    """
+    return 0.5 * (1.0 + _erf(x / math.sqrt(2.0)))
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -288,10 +302,10 @@ def mean(data: list[float]) -> float:
 
     Implementierung mit np.mean() für optimale Performance bei großen Datensätzen.
 
-    :param data: Liste von Messwerten
-    :return: Arithmetischer Mittelwert
-    :raises ValueError: Bei leerer Liste
-    :last_modified: 2026-03-09
+    @param data Liste von Messwerten
+    @return Arithmetischer Mittelwert
+    @throws ValueError Bei leerer Liste
+    @lastModified 2026-03-10
 
     Beispiele:
     >>> mean([1, 2, 3, 4, 5])
@@ -311,10 +325,10 @@ def median(data: list[float]) -> float:
 
     Bei gerader Anzahl: Mittelwert der beiden mittleren Werte.
 
-    :param data: Liste von Messwerten
-    :return: Median
-    :raises ValueError: Bei leerer Liste
-    :last_modified: 2026-03-05
+    @param data Liste von Messwerten
+    @return Median
+    @throws ValueError Bei leerer Liste
+    @lastModified 2026-03-10
 
     Beispiele:
     >>> median([1, 2, 3])
@@ -339,10 +353,10 @@ def mode(data: list[Any]) -> list[Any]:
 
     Bei mehreren gleich häufigen Werten werden alle zurückgegeben.
 
-    :param data: Liste von Messwerten
-    :return: Liste der häufigsten Werte
-    :raises ValueError: Bei leerer Liste
-    :last_modified: 2026-03-05
+    @param data Liste von Messwerten
+    @return Liste der häufigsten Werte
+    @throws ValueError Bei leerer Liste
+    @lastModified 2026-03-10
     """
     if not data:
         raise ValueError("Datenliste darf nicht leer sein")
@@ -365,11 +379,11 @@ def variance(data: list[float], ddof: int = 1) -> float:
 
     Implementierung mit np.var() für vektorisierte Berechnung (kein Python-Loop).
 
-    :param data: Liste von Messwerten
-    :param ddof: Delta Freiheitsgrade (0=Population, 1=Stichprobe)
-    :return: Varianz
-    :raises ValueError: Bei zu wenigen Datenpunkten
-    :last_modified: 2026-03-09
+    @param data Liste von Messwerten
+    @param ddof Delta Freiheitsgrade (0=Population, 1=Stichprobe)
+    @return Varianz
+    @throws ValueError Bei zu wenigen Datenpunkten
+    @lastModified 2026-03-10
 
     Beispiele:
     >>> round(variance([2, 4, 4, 4, 5, 5, 7, 9]), 4)
@@ -392,10 +406,10 @@ def std_dev(data: list[float], ddof: int = 1) -> float:
 
     Implementierung mit np.std() für vektorisierte Berechnung (kein Python-Loop).
 
-    :param data: Liste von Messwerten
-    :param ddof: Delta Freiheitsgrade (0=Population, 1=Stichprobe)
-    :return: Standardabweichung
-    :last_modified: 2026-03-09
+    @param data Liste von Messwerten
+    @param ddof Delta Freiheitsgrade (0=Population, 1=Stichprobe)
+    @return Standardabweichung
+    @lastModified 2026-03-10
     """
     # Validierung über variance() sicherstellen
     n = len(data)
@@ -411,10 +425,10 @@ def quartiles(data: list[float]) -> tuple[float, float, float]:
 
     Q2 = Median, Q1 = Median der unteren Hälfte, Q3 = Median der oberen Hälfte.
 
-    :param data: Liste von Messwerten
-    :return: Tupel (Q1, Q2, Q3)
-    :raises ValueError: Bei zu wenigen Datenpunkten
-    :last_modified: 2026-03-05
+    @param data Liste von Messwerten
+    @return Tupel (Q1, Q2, Q3)
+    @throws ValueError Bei zu wenigen Datenpunkten
+    @lastModified 2026-03-10
     """
     if len(data) < 4:
         raise ValueError("Mindestens 4 Datenpunkte für Quartile erforderlich")
@@ -440,9 +454,9 @@ def iqr(data: list[float]) -> float:
 
     Der IQR ist ein robustes Streuungsmaß (resistent gegen Ausreißer).
 
-    :param data: Liste von Messwerten
-    :return: Interquartilsabstand
-    :last_modified: 2026-03-05
+    @param data Liste von Messwerten
+    @return Interquartilsabstand
+    @lastModified 2026-03-10
     """
     q1, _, q3 = quartiles(data)
     return q3 - q1
@@ -459,10 +473,10 @@ def skewness(data: list[float]) -> float:
 
     Implementierung mit NumPy-Vektorisierung: keine Python-for-Schleife.
 
-    :param data: Liste von Messwerten
-    :return: Fisher-Schiefe
-    :raises ValueError: Bei weniger als 3 Datenpunkten
-    :last_modified: 2026-03-09
+    @param data Liste von Messwerten
+    @return Fisher-Schiefe
+    @throws ValueError Bei weniger als 3 Datenpunkten
+    @lastModified 2026-03-10
     """
     n = len(data)
     if n < 3:
@@ -490,10 +504,10 @@ def kurtosis(data: list[float]) -> float:
 
     Implementierung mit NumPy-Vektorisierung: keine Python-for-Schleife.
 
-    :param data: Liste von Messwerten
-    :return: Exzess-Kurtosis (Fisher-Definition)
-    :raises ValueError: Bei weniger als 4 Datenpunkten
-    :last_modified: 2026-03-09
+    @param data Liste von Messwerten
+    @return Exzess-Kurtosis (Fisher-Definition)
+    @throws ValueError Bei weniger als 4 Datenpunkten
+    @lastModified 2026-03-10
     """
     n = len(data)
     if n < 4:
@@ -519,12 +533,12 @@ def normal_pdf(x: float, mu: float = 0.0, sigma: float = 1.0) -> float:
 
     Formel: f(x) = (1 / (sigma * sqrt(2*pi))) * exp(-0.5 * ((x-mu)/sigma)^2)
 
-    :param x: Stelle, an der die Dichte berechnet wird
-    :param mu: Erwartungswert (Lageparameter)
-    :param sigma: Standardabweichung (Skalierungsparameter, sigma > 0)
-    :return: Wahrscheinlichkeitsdichte f(x)
-    :raises ValueError: Bei sigma <= 0
-    :last_modified: 2026-03-05
+    @param x Stelle, an der die Dichte berechnet wird
+    @param mu Erwartungswert (Lageparameter)
+    @param sigma Standardabweichung (Skalierungsparameter, sigma > 0)
+    @return Wahrscheinlichkeitsdichte f(x)
+    @throws ValueError Bei sigma <= 0
+    @lastModified 2026-03-10
     """
     if sigma <= 0:
         raise ValueError(f"Standardabweichung sigma muss > 0 sein, nicht {sigma}")
@@ -543,11 +557,11 @@ def normal_cdf(x: float, mu: float = 0.0, sigma: float = 1.0) -> float:
 
     Formel: F(x) = 0.5 * (1 + erf((x - mu) / (sigma * sqrt(2))))
 
-    :param x: Obere Integrationsgrenze
-    :param mu: Erwartungswert
-    :param sigma: Standardabweichung (sigma > 0)
-    :return: Wahrscheinlichkeit P(X <= x)
-    :last_modified: 2026-03-05
+    @param x Obere Integrationsgrenze
+    @param mu Erwartungswert
+    @param sigma Standardabweichung (sigma > 0)
+    @return Wahrscheinlichkeit P(X <= x)
+    @lastModified 2026-03-10
     """
     if sigma <= 0:
         raise ValueError(f"sigma muss > 0 sein, nicht {sigma}")
@@ -564,12 +578,12 @@ def normal_ppf(p: float, mu: float = 0.0, sigma: float = 1.0) -> float:
 
     Formel: x = mu + sigma * sqrt(2) * erfinv(2p - 1)
 
-    :param p: Wahrscheinlichkeit (0 < p < 1)
-    :param mu: Erwartungswert
-    :param sigma: Standardabweichung (sigma > 0)
-    :return: x-Wert mit CDF(x) = p
-    :raises ValueError: Bei p ausserhalb (0,1) oder sigma <= 0
-    :last_modified: 2026-03-05
+    @param p Wahrscheinlichkeit (0 < p < 1)
+    @param mu Erwartungswert
+    @param sigma Standardabweichung (sigma > 0)
+    @return x-Wert mit CDF(x) = p
+    @throws ValueError Bei p ausserhalb (0,1) oder sigma <= 0
+    @lastModified 2026-03-10
     """
     if not 0 < p < 1:
         raise ValueError(f"p muss in (0,1) liegen, nicht {p}")
@@ -587,10 +601,10 @@ def _binom_coeff(n: int, k: int) -> int:
     """
     Berechnet den Binomialkoeffizienten C(n,k) = n! / (k! * (n-k)!).
 
-    :param n: Gesamtanzahl
-    :param k: Auswahlanzahl
-    :return: Binomialkoeffizient
-    :last_modified: 2026-03-05
+    @param n Gesamtanzahl
+    @param k Auswahlanzahl
+    @return Binomialkoeffizient
+    @lastModified 2026-03-10
     """
     if k < 0 or k > n:
         return 0
@@ -610,12 +624,12 @@ def binomial_pmf(k: int, n: int, p: float) -> float:
 
     P(X = k) = C(n,k) * p^k * (1-p)^(n-k)
 
-    :param k: Anzahl Erfolge (0 <= k <= n)
-    :param n: Anzahl Versuche
-    :param p: Erfolgswahrscheinlichkeit (0 <= p <= 1)
-    :return: P(X = k)
-    :raises ValueError: Bei ungültigen Parametern
-    :last_modified: 2026-03-05
+    @param k Anzahl Erfolge (0 <= k <= n)
+    @param n Anzahl Versuche
+    @param p Erfolgswahrscheinlichkeit (0 <= p <= 1)
+    @return P(X = k)
+    @throws ValueError Bei ungültigen Parametern
+    @lastModified 2026-03-10
     """
     if n < 0:
         raise ValueError("n muss >= 0 sein")
@@ -641,11 +655,11 @@ def binomial_cdf(k: int, n: int, p: float) -> float:
 
     P(X <= k) = sum_{i=0}^{k} C(n,i) * p^i * (1-p)^(n-i)
 
-    :param k: Obere Grenze (inklusive)
-    :param n: Anzahl Versuche
-    :param p: Erfolgswahrscheinlichkeit (0 <= p <= 1)
-    :return: P(X <= k)
-    :last_modified: 2026-03-05
+    @param k Obere Grenze (inklusive)
+    @param n Anzahl Versuche
+    @param p Erfolgswahrscheinlichkeit (0 <= p <= 1)
+    @return P(X <= k)
+    @lastModified 2026-03-10
     """
     if k >= n:
         return 1.0
@@ -668,11 +682,11 @@ def poisson_pmf(k: int, lam: float) -> float:
     Die Poisson-Verteilung modelliert die Anzahl seltener Ereignisse
     in einem festen Zeitintervall.
 
-    :param k: Anzahl Ereignisse (k >= 0)
-    :param lam: Erwartungswert lambda (lambda > 0)
-    :return: P(X = k)
-    :raises ValueError: Bei ungültigen Parametern
-    :last_modified: 2026-03-05
+    @param k Anzahl Ereignisse (k >= 0)
+    @param lam Erwartungswert lambda (lambda > 0)
+    @return P(X = k)
+    @throws ValueError Bei ungültigen Parametern
+    @lastModified 2026-03-10
     """
     if k < 0:
         return 0.0
@@ -691,10 +705,10 @@ def poisson_cdf(k: int, lam: float) -> float:
 
     P(X <= k) = sum_{i=0}^{k} (lambda^i * e^(-lambda)) / i!
 
-    :param k: Obere Grenze (inklusive)
-    :param lam: Erwartungswert lambda
-    :return: P(X <= k)
-    :last_modified: 2026-03-05
+    @param k Obere Grenze (inklusive)
+    @param lam Erwartungswert lambda
+    @return P(X <= k)
+    @lastModified 2026-03-10
     """
     if k < 0:
         return 0.0
@@ -714,11 +728,11 @@ def t_test_one_sample(data: list[float], mu: float) -> tuple[float, float]:
 
     Teststatistik: t = (x_bar - mu) / (s / sqrt(n))
 
-    :param data: Stichprobendaten
-    :param mu: Hypothetischer Populationsmittelwert
-    :return: Tupel (t-Statistik, p-Wert)
-    :raises ValueError: Bei zu wenigen Datenpunkten
-    :last_modified: 2026-03-05
+    @param data Stichprobendaten
+    @param mu Hypothetischer Populationsmittelwert
+    @return Tupel (t-Statistik, p-Wert)
+    @throws ValueError Bei zu wenigen Datenpunkten
+    @lastModified 2026-03-10
     """
     n = len(data)
     if n < 2:
@@ -752,12 +766,12 @@ def t_test_two_sample(
     Nullhypothese H0: mu1 = mu2
     Alternativhypothese H1: mu1 != mu2 (zweiseitig)
 
-    :param data1: Erste Stichprobe
-    :param data2: Zweite Stichprobe
-    :param equal_var: True = Student-t-Test (gleiche Varianzen),
-                      False = Welch-t-Test (ungleiche Varianzen)
-    :return: Tupel (t-Statistik, p-Wert)
-    :last_modified: 2026-03-05
+    @param data1 Erste Stichprobe
+    @param data2 Zweite Stichprobe
+    @param equal_var True = Student-t-Test (gleiche Varianzen),
+                     False = Welch-t-Test (ungleiche Varianzen)
+    @return Tupel (t-Statistik, p-Wert)
+    @lastModified 2026-03-10
     """
     n1, n2 = len(data1), len(data2)
     if n1 < 2 or n2 < 2:
@@ -800,11 +814,11 @@ def chi_square_test(
 
     Teststatistik: chi2 = sum((O_i - E_i)^2 / E_i)
 
-    :param observed: Beobachtete Häufigkeiten
-    :param expected: Erwartete Häufigkeiten
-    :return: Tupel (chi2-Statistik, p-Wert)
-    :raises ValueError: Bei ungleicher Länge oder negativen erwarteten Werten
-    :last_modified: 2026-03-05
+    @param observed Beobachtete Häufigkeiten
+    @param expected Erwartete Häufigkeiten
+    @return Tupel (chi2-Statistik, p-Wert)
+    @throws ValueError Bei ungleicher Länge oder negativen erwarteten Werten
+    @lastModified 2026-03-10
     """
     if len(observed) != len(expected):
         raise ValueError("observed und expected müssen gleich lang sein")
@@ -836,12 +850,12 @@ def bayes_theorem(prior: float, likelihood: float, evidence: float) -> float:
     - likelihood = P(B|A)     : Likelihood der Beobachtung gegeben die Hypothese
     - evidence  = P(B)        : Gesamtwahrscheinlichkeit der Beobachtung
 
-    :param prior: A-priori-Wahrscheinlichkeit P(A)
-    :param likelihood: Bedingte Wahrscheinlichkeit P(B|A)
-    :param evidence: Marginale Wahrscheinlichkeit P(B)
-    :return: A-posteriori-Wahrscheinlichkeit P(A|B)
-    :raises ValueError: Bei evidence = 0
-    :last_modified: 2026-03-05
+    @param prior A-priori-Wahrscheinlichkeit P(A)
+    @param likelihood Bedingte Wahrscheinlichkeit P(B|A)
+    @param evidence Marginale Wahrscheinlichkeit P(B)
+    @return A-posteriori-Wahrscheinlichkeit P(A|B)
+    @throws ValueError Bei evidence = 0
+    @lastModified 2026-03-10
     """
     if evidence == 0:
         raise ValueError("Evidence P(B) darf nicht 0 sein")
@@ -864,11 +878,11 @@ def monte_carlo_pi(n_samples: int = 100000, seed: int = None) -> float:
 
     Konvergenzrate: O(1/sqrt(n)) durch das Gesetz der großen Zahlen.
 
-    :param n_samples: Anzahl zufälliger Stichproben
-    :param seed: Zufallsseed für Reproduzierbarkeit (None = zufällig)
-    :return: Näherung von pi
-    :raises ValueError: Bei n_samples <= 0
-    :last_modified: 2026-03-05
+    @param n_samples Anzahl zufälliger Stichproben
+    @param seed Zufallsseed für Reproduzierbarkeit (None = zufällig)
+    @return Näherung von pi
+    @throws ValueError Bei n_samples <= 0
+    @lastModified 2026-03-10
     """
     if n_samples <= 0:
         raise ValueError("n_samples muss > 0 sein")

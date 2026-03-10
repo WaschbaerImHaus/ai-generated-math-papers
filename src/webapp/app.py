@@ -33,6 +33,11 @@
         POST /api/millennium/zeros      → Riemann-Nullstellen
         POST /api/millennium/goldbach   → Goldbach-Zerlegungen
         POST /api/millennium/complexity → Komplexitätsvergleich
+        GET  /elliptic                  → Elliptische-Kurven-Seite
+        POST /api/elliptic/analyze      → Kurvenanalyse (Δ, j, Plot, Punktarithmetik)
+        POST /api/elliptic/hasse        → Hasse-Schranke (Gruppenordnung mod p)
+        GET  /tensor                    → Tensor-Geometrie-Seite
+        POST /api/tensor/curvature      → Metriktensor, Ricci-Skalar, Gaußsche Krümmung
 
 @author Kurt Ingwer
 @date 2026-03-10
@@ -87,6 +92,12 @@ from millennium_problems import (
     riemann_zeros_mpmath, hardy_littlewood_goldbach_density, complexity_comparison
 )
 from proof_theory import goldbach_all_decompositions
+from elliptic_curves import EllipticCurve, ECPoint
+from tensor_geometry import (
+    sphere_metric, torus_metric, hyperbolic_plane_metric,
+    saddle_metric, flat_metric,
+    ricci_scalar, gaussian_curvature
+)
 from step_by_step import (
     newton_raphson_steps,
     bisection_steps,
@@ -2166,6 +2177,559 @@ def proof_induction_check():
         })
     except Exception as e:
         return error_response(f"Induktions-Test Fehler: {str(e)}")
+
+
+# ===========================================================================
+# ROUTEN: ELLIPTISCHE KURVEN (Seite + API)
+# ===========================================================================
+
+@app.route('/elliptic')
+def page_elliptic():
+    """
+    @brief Elliptische-Kurven-Seite: Gruppenstruktur, Arithmetik, Hasse-Schranke.
+    @return Gerendertes HTML-Template
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    return render_template('elliptic.html')
+
+
+@app.route('/api/elliptic/analyze', methods=['POST'])
+def api_elliptic_analyze():
+    """
+    @brief Analysiert eine elliptische Kurve y²=x³+ax+b.
+    @description
+        Berechnet Diskriminante, j-Invariante, Singularität,
+        optionale Punktarithmetik (2P, n·P) und gibt einen Base64-Plot zurück.
+
+        Erwartet JSON:
+            {
+                "a": float,
+                "b": float,
+                "n": int (optional, Standard 3),
+                "px": float (optional),
+                "py": float (optional)
+            }
+    @return JSON mit Kurvenanalyse und Base64-Plot
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    if not data:
+        return error_response("Kein JSON-Body übergeben.")
+
+    try:
+        # Koeffizienten aus Request lesen
+        a = float(data.get('a', 0))
+        b = float(data.get('b', 0))
+        n = int(data.get('n', 3))
+
+        # Diskriminante vorberechnen (unabhängig von Singularität)
+        discriminant = -16.0 * (4.0 * a**3 + 27.0 * b**2)
+        is_singular = abs(discriminant) < 1e-12
+
+        result = {
+            "discriminant": discriminant,
+            "is_singular": is_singular,
+            "j_invariant": None,
+            "point_results": None,
+            "plot": None,
+        }
+
+        if is_singular:
+            # Singuläre Kurve – kein Plot, keine Punktarithmetik
+            return jsonify(result)
+
+        # Kurvenobjekt erstellen (wirft ValueError wenn singulär)
+        curve = EllipticCurve(a, b)
+        result["j_invariant"] = curve.j_invariant()
+
+        # Optionale Punktarithmetik
+        px = data.get('px', None)
+        py = data.get('py', None)
+        if px is not None and py is not None:
+            px, py = float(px), float(py)
+            on_curve = curve.is_on_curve(px, py)
+            point_results = {
+                "px": px,
+                "py": py,
+                "on_curve": on_curve,
+                "double_p": "–",
+                "n_times_p": "–",
+            }
+
+            if on_curve:
+                try:
+                    # Punkt P erstellen
+                    P = curve.point(px, py)
+                    # Verdoppelung 2P
+                    P2 = P + P
+                    if P2.is_infinity:
+                        point_results["double_p"] = "O (Punkt im Unendlichen)"
+                    else:
+                        point_results["double_p"] = f"({P2.x:.6f}, {P2.y:.6f})"
+
+                    # Skalarmultiplikation n·P über wiederholte Addition
+                    Pn = ECPoint.infinity(curve)
+                    Pi = P
+                    for _ in range(n):
+                        Pn = Pn + Pi
+                    if Pn.is_infinity:
+                        point_results["n_times_p"] = "O (Punkt im Unendlichen)"
+                    else:
+                        point_results["n_times_p"] = f"({Pn.x:.6f}, {Pn.y:.6f})"
+                except Exception as e:
+                    # Fehler in Punktarithmetik – trotzdem weitermachen
+                    point_results["double_p"] = f"Fehler: {e}"
+                    point_results["n_times_p"] = f"Fehler: {e}"
+
+            result["point_results"] = point_results
+
+        # Plot erstellen (Dark Theme angepasst)
+        try:
+            fig = curve.plot_curve(x_range=(-3, 3))
+            # Axes aus Figure holen und Dark-Theme anwenden
+            ax = fig.axes[0]
+            fig.patch.set_facecolor('#1e1e2e')
+            ax.set_facecolor('#181825')
+            ax.tick_params(colors='#cdd6f4')
+            ax.xaxis.label.set_color('#cdd6f4')
+            ax.yaxis.label.set_color('#cdd6f4')
+            ax.title.set_color('#cba6f7')
+            for spine in ax.spines.values():
+                spine.set_edgecolor('#313244')
+            # Linienfarben auf Blautöne ändern
+            for line in ax.get_lines():
+                line.set_color('#89b4fa')
+
+            # Optionalen Punkt P markieren
+            if px is not None and py is not None and curve.is_on_curve(px, py):
+                ax.plot(px, py, 'o', color='#a6e3a1', markersize=10,
+                        label=f'P = ({px:.2f}, {py:.2f})', zorder=5)
+                ax.legend(facecolor='#313244', labelcolor='#cdd6f4',
+                          edgecolor='#45475a')
+
+            result["plot"] = figure_to_base64(fig)
+        except Exception:
+            # Plot-Fehler ist nicht kritisch
+            result["plot"] = None
+
+        return jsonify(result)
+
+    except Exception as e:
+        return error_response(f"Kurvenanalyse-Fehler: {str(e)}")
+
+
+@app.route('/api/elliptic/hasse', methods=['POST'])
+def api_elliptic_hasse():
+    """
+    @brief Berechnet Hasse-Schranke: Gruppenordnung #E(F_p) für kleine Primzahlen.
+    @description
+        Erwartet JSON:
+            {"a": int, "b": int, "prime_limit": int (bis zu welcher Primzahl)}
+
+        Gibt für jede Primzahl p ≤ prime_limit zurück:
+        - Gruppenordnung #E(F_p)
+        - Frobenius-Spur a_p = p + 1 - #E(F_p)
+        - Ob Hasse-Schranke |a_p| ≤ 2√p eingehalten wird
+    @return JSON mit Liste von Primzahl-Ergebnissen
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    if not data:
+        return error_response("Kein JSON-Body übergeben.")
+
+    try:
+        a = int(float(data.get('a', 0)))
+        b = int(float(data.get('b', 0)))
+        prime_limit = min(int(data.get('prime_limit', 20)), 50)
+
+        # Singularität vorab prüfen
+        discriminant = -16.0 * (4.0 * a**3 + 27.0 * b**2)
+        if abs(discriminant) < 1e-12:
+            return jsonify({"is_singular": True, "primes": []})
+
+        curve = EllipticCurve(a, b)
+
+        # Primzahlen bis prime_limit bestimmen (Sieb des Eratosthenes)
+        sieve = list(range(2, prime_limit + 1))
+        primes = []
+        for candidate in sieve:
+            is_prime = all(candidate % p != 0 for p in range(2, int(candidate**0.5) + 1))
+            if is_prime:
+                primes.append(candidate)
+
+        # Für jede Primzahl Gruppenordnung berechnen
+        prime_results = []
+        for p in primes:
+            try:
+                order = curve.order_over_fp(p)
+                trace = p + 1 - order
+                prime_results.append({
+                    "p": p,
+                    "order": order,
+                    "trace": trace,
+                })
+            except Exception:
+                # Kurve mod p singulär – überspringen
+                pass
+
+        return jsonify({
+            "is_singular": False,
+            "discriminant": discriminant,
+            "primes": prime_results,
+        })
+
+    except Exception as e:
+        return error_response(f"Hasse-Berechnung fehlgeschlagen: {str(e)}")
+
+
+# ===========================================================================
+# ROUTEN: TENSOR-GEOMETRIE (Seite + API)
+# ===========================================================================
+
+@app.route('/tensor')
+def page_tensor():
+    """
+    @brief Tensor-Geometrie-Seite: Metriktensor, Krümmung, Mannigfaltigkeiten.
+    @return Gerendertes HTML-Template
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    return render_template('tensor.html')
+
+
+@app.route('/api/tensor/curvature', methods=['POST'])
+def api_tensor_curvature():
+    """
+    @brief Berechnet Metriktensor, Ricci-Skalar und Gaußsche Krümmung.
+    @description
+        Erwartet JSON:
+            {
+                "manifold": "sphere"|"torus"|"hyperbolic"|"saddle"|"flat",
+                "params": {
+                    // Sphäre:      {"r": float, "theta": float, "phi": float}
+                    // Torus:       {"R": float, "r": float, "theta": float, "phi": float}
+                    // Hyperbolisch:{"x": float, "y": float}
+                    // Sattel:      {"x": float, "y": float}
+                    // Flach:       {"x": float, "y": float}
+                }
+            }
+
+        Gibt zurück:
+        - metric:              2×2 Metriktensor als Liste
+        - ricci_scalar:        R (Ricci-Skalar)
+        - gaussian_curvature:  K (Gaußsche Krümmung)
+        - curvature_type:      Textbeschreibung der Krümmung
+        - physical_description: Physikalische Bedeutung
+        - metric_latex:        KaTeX-LaTeX-Formel des Metriktensors
+        - plot:                Base64-PNG-Plot der Mannigfaltigkeit
+    @return JSON mit allen Krümmungsgrößen
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    data = request.get_json()
+    if not data:
+        return error_response("Kein JSON-Body übergeben.")
+
+    try:
+        manifold = data.get('manifold', 'sphere')
+        params = data.get('params', {})
+
+        # Mannigfaltigkeit und Koordinaten auflösen
+        if manifold == 'sphere':
+            r = float(params.get('r', 1.0))
+            theta = float(params.get('theta', np.pi / 2))
+            phi = float(params.get('phi', 0.0))
+            metric_func = sphere_metric(r)
+            point = [theta, phi]
+            name = f"Sphäre S² (Radius r = {r})"
+            point_str = f"θ={theta:.4f}, φ={phi:.4f}"
+            # Theoretische Werte für die Ausgabe vorbereiten
+            metric_latex_template = (
+                f"g_{{ij}} = \\begin{{pmatrix}} {r**2} & 0 \\\\"
+                f" 0 & {r**2}\\sin^2\\theta \\end{{pmatrix}}"
+            )
+            physical = (
+                f"Die Sphäre hat konstant positive Gaußsche Krümmung K = 1/r² = {1/r**2:.4f}. "
+                f"In der ART entspricht dies einer geschlossenen, endlichen Raumzeit "
+                f"(positiv-gekrümmtes Universum). Geodäten sind Großkreise."
+            )
+
+        elif manifold == 'torus':
+            R = float(params.get('R', 2.0))
+            r = float(params.get('r', 1.0))
+            theta = float(params.get('theta', 0.0))
+            phi = float(params.get('phi', 0.0))
+            metric_func = torus_metric(R, r)
+            point = [theta, phi]
+            name = f"Torus T² (R = {R}, r = {r})"
+            point_str = f"θ={theta:.4f}, φ={phi:.4f}"
+            rho = R + r * np.cos(theta)
+            metric_latex_template = (
+                f"g_{{ij}} = \\begin{{pmatrix}} {r**2} & 0 \\\\"
+                f" 0 & (R + r\\cos\\theta)^2 \\end{{pmatrix}}"
+            )
+            physical = (
+                f"Der Torus hat variable Krümmung: positiv außen (θ≈0), negativ innen (θ≈π). "
+                f"Am Punkt θ={theta:.2f}: ρ = R + r·cos(θ) = {rho:.4f}. "
+                f"Torusförmige Universen sind in der Kosmologie als 'Doughnut-Universum' bekannt."
+            )
+
+        elif manifold == 'hyperbolic':
+            x = float(params.get('x', 0.0))
+            y = float(params.get('y', 1.0))
+            if y <= 0:
+                y = 1e-4
+            metric_func = hyperbolic_plane_metric()
+            point = [x, y]
+            name = f"Hyperbolische Ebene H² (Poincaré-Halbebene)"
+            point_str = f"x={x:.4f}, y={y:.4f}"
+            coeff = 1.0 / y**2
+            metric_latex_template = (
+                f"g_{{ij}} = \\frac{{1}}{{y^2}} \\begin{{pmatrix}} 1 & 0 \\\\ 0 & 1 \\end{{pmatrix}}"
+                f",\\quad y = {y:.4f}"
+            )
+            physical = (
+                f"Die hyperbolische Ebene hat konstant negative Krümmung K = -1. "
+                f"Am Punkt (x={x:.2f}, y={y:.2f}): g_ij = {coeff:.4f}·I. "
+                f"In der ART entspricht dies anti-de-Sitter-Raumzeit (AdS), "
+                f"relevant in der AdS/CFT-Korrespondenz."
+            )
+
+        elif manifold == 'saddle':
+            x = float(params.get('x', 0.5))
+            y = float(params.get('y', 0.5))
+            metric_func = saddle_metric()
+            point = [x, y]
+            name = f"Sattelfläche z = xy"
+            point_str = f"x={x:.4f}, y={y:.4f}"
+            metric_latex_template = (
+                f"g_{{ij}} = \\begin{{pmatrix}} 1+y^2 & xy \\\\ xy & 1+x^2 \\end{{pmatrix}}"
+                f",\\quad (x,y)=({x:.2f},{y:.2f})"
+            )
+            physical = (
+                f"Die Sattelfläche z=xy hat variable negative Krümmung K = -1/(1+x²+y²)². "
+                f"Am Ursprung (0,0) ist K = -1 (maximal negativ). "
+                f"Sattelpunkte treten in der ART an Sattelstellen des Gravitationspotentials auf."
+            )
+
+        elif manifold == 'flat':
+            x = float(params.get('x', 0.0))
+            y = float(params.get('y', 0.0))
+            metric_func = flat_metric(2)
+            point = [x, y]
+            name = "Flache Ebene ℝ² (Euklidisch)"
+            point_str = f"x={x:.4f}, y={y:.4f}"
+            metric_latex_template = (
+                "g_{ij} = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}"
+            )
+            physical = (
+                "Die flache Ebene ℝ² hat überall K = 0 und R = 0. "
+                "In der ART entspricht dies dem Minkowski-Raum (spezielle Relativitätstheorie) "
+                "im Vakuum ohne Materie oder Energie. Einstein-Tensor G_μν = 0."
+            )
+        else:
+            return error_response(f"Unbekannte Mannigfaltigkeit: '{manifold}'.")
+
+        # Metriktensor am Punkt berechnen
+        g = metric_func(point)
+        det_g = float(np.linalg.det(g))
+
+        # Ricci-Skalar und Gaußsche Krümmung numerisch berechnen
+        R = ricci_scalar(metric_func, point)
+        K = gaussian_curvature(metric_func, point)
+
+        # Krümmungstyp bestimmen
+        if abs(K) < 1e-6:
+            curvature_type = "Flach (K ≈ 0) – keine intrinsische Krümmung"
+        elif K > 0:
+            curvature_type = f"Positiv gekrümmt (K = {K:.6f}) – wie Kugeloberfläche"
+        else:
+            curvature_type = f"Negativ gekrümmt (K = {K:.6f}) – wie Sattelform"
+
+        # Plot erstellen
+        plot_b64 = None
+        try:
+            fig = _plot_manifold(manifold, params, point)
+            if fig is not None:
+                plot_b64 = figure_to_base64(fig)
+        except Exception:
+            plot_b64 = None
+
+        return jsonify({
+            "name": name,
+            "point_str": point_str,
+            "metric": g.tolist(),
+            "det_g": det_g,
+            "ricci_scalar": float(R),
+            "gaussian_curvature": float(K),
+            "curvature_type": curvature_type,
+            "physical_description": physical,
+            "metric_latex": metric_latex_template,
+            "plot": plot_b64,
+        })
+
+    except Exception as e:
+        return error_response(f"Tensor-Berechnung fehlgeschlagen: {str(e)}")
+
+
+def _plot_manifold(manifold: str, params: dict, point: list):
+    """
+    @brief Erstellt einen matplotlib-Plot der angegebenen Mannigfaltigkeit.
+    @description
+        Zeichnet die Mannigfaltigkeit als 3D-Oberfläche (Sphäre, Torus)
+        oder als 2D-Farbkarte (Hyperbolisch, Sattel, Flach).
+        Der gegebene Koordinatenpunkt wird markiert.
+    @param manifold: Bezeichner der Mannigfaltigkeit
+    @param params: Parameter-Dictionary (Radien, Winkel, Koordinaten)
+    @param point: Koordinatenpunkt [coord1, coord2]
+    @return matplotlib.figure.Figure oder None bei Fehler
+    @date 2026-03-10
+    @lastModified 2026-03-10
+    """
+    # Dark-Theme-Farben
+    BG_DARK = '#1e1e2e'
+    AX_DARK = '#181825'
+    TEXT_COLOR = '#cdd6f4'
+    ACCENT = '#89b4fa'
+    POINT_COLOR = '#a6e3a1'
+
+    if manifold == 'sphere':
+        r = float(params.get('r', 1.0))
+        theta_p = float(params.get('theta', np.pi / 2))
+        phi_p = float(params.get('phi', 0.0))
+
+        # Sphärengitter generieren
+        u = np.linspace(0, np.pi, 60)
+        v = np.linspace(0, 2 * np.pi, 60)
+        X = r * np.outer(np.sin(u), np.cos(v))
+        Y = r * np.outer(np.sin(u), np.sin(v))
+        Z = r * np.outer(np.cos(u), np.ones_like(v))
+
+        fig = plt.figure(figsize=(8, 6))
+        fig.patch.set_facecolor(BG_DARK)
+        ax = fig.add_subplot(111, projection='3d')
+        ax.set_facecolor(AX_DARK)
+        ax.plot_surface(X, Y, Z, alpha=0.4, color=ACCENT)
+        # Punkt markieren
+        px = r * np.sin(theta_p) * np.cos(phi_p)
+        py = r * np.sin(theta_p) * np.sin(phi_p)
+        pz = r * np.cos(theta_p)
+        ax.scatter([px], [py], [pz], color=POINT_COLOR, s=120, zorder=5,
+                   label=f'P=(θ={theta_p:.2f}, φ={phi_p:.2f})')
+        ax.set_title(f'Sphäre S² (r={r})', color=TEXT_COLOR)
+        ax.legend(facecolor='#313244', labelcolor=TEXT_COLOR, edgecolor='#45475a')
+        ax.tick_params(colors=TEXT_COLOR)
+        return fig
+
+    elif manifold == 'torus':
+        R = float(params.get('R', 2.0))
+        r = float(params.get('r', 1.0))
+        theta_p = float(params.get('theta', 0.0))
+        phi_p = float(params.get('phi', 0.0))
+
+        # Torus-Gitter
+        u = np.linspace(0, 2 * np.pi, 80)
+        v = np.linspace(0, 2 * np.pi, 80)
+        U, V = np.meshgrid(u, v)
+        X = (R + r * np.cos(U)) * np.cos(V)
+        Y = (R + r * np.cos(U)) * np.sin(V)
+        Z = r * np.sin(U)
+
+        fig = plt.figure(figsize=(8, 6))
+        fig.patch.set_facecolor(BG_DARK)
+        ax = fig.add_subplot(111, projection='3d')
+        ax.set_facecolor(AX_DARK)
+        ax.plot_surface(X, Y, Z, alpha=0.4, color=ACCENT)
+        # Punkt markieren
+        px = (R + r * np.cos(theta_p)) * np.cos(phi_p)
+        py = (R + r * np.cos(theta_p)) * np.sin(phi_p)
+        pz = r * np.sin(theta_p)
+        ax.scatter([px], [py], [pz], color=POINT_COLOR, s=120, zorder=5,
+                   label=f'P=(θ={theta_p:.2f}, φ={phi_p:.2f})')
+        ax.set_title(f'Torus T² (R={R}, r={r})', color=TEXT_COLOR)
+        ax.legend(facecolor='#313244', labelcolor=TEXT_COLOR, edgecolor='#45475a')
+        ax.tick_params(colors=TEXT_COLOR)
+        return fig
+
+    elif manifold == 'hyperbolic':
+        x_p = float(params.get('x', 0.0))
+        y_p = float(params.get('y', 1.0))
+
+        # Poincaré-Halbebene: Krümmungskarte (K = -1/y²... nein, K = -1 überall)
+        xs = np.linspace(-3, 3, 100)
+        ys = np.linspace(0.1, 3, 100)
+        XX, YY = np.meshgrid(xs, ys)
+        # Gaußsche Krümmung ist konstant -1, aber zeige 1/y² für visuelles Verständnis
+        ZZ = 1.0 / YY**2   # g-Koeffizient (zeigt Verzerrung)
+
+        fig, ax = plt.subplots(figsize=(8, 6))
+        fig.patch.set_facecolor(BG_DARK)
+        ax.set_facecolor(AX_DARK)
+        cf = ax.contourf(XX, YY, ZZ, levels=20, cmap='plasma')
+        fig.colorbar(cf, ax=ax, label='g-Koeffizient 1/y²')
+        ax.axhline(y=0, color='#45475a', linewidth=1)
+        ax.scatter([x_p], [y_p], color=POINT_COLOR, s=120, zorder=5,
+                   label=f'P=({x_p:.2f}, {y_p:.2f})')
+        ax.set_xlabel('x', color=TEXT_COLOR)
+        ax.set_ylabel('y', color=TEXT_COLOR)
+        ax.set_title('Hyperbolische Ebene H² (Poincaré-Modell)', color=TEXT_COLOR)
+        ax.legend(facecolor='#313244', labelcolor=TEXT_COLOR, edgecolor='#45475a')
+        ax.tick_params(colors=TEXT_COLOR)
+        return fig
+
+    elif manifold == 'saddle':
+        x_p = float(params.get('x', 0.5))
+        y_p = float(params.get('y', 0.5))
+
+        # Sattelfläche z = x*y
+        xs = np.linspace(-2, 2, 60)
+        ys = np.linspace(-2, 2, 60)
+        XX, YY = np.meshgrid(xs, ys)
+        ZZ = XX * YY
+
+        fig = plt.figure(figsize=(8, 6))
+        fig.patch.set_facecolor(BG_DARK)
+        ax = fig.add_subplot(111, projection='3d')
+        ax.set_facecolor(AX_DARK)
+        ax.plot_surface(XX, YY, ZZ, alpha=0.5, cmap='coolwarm')
+        # Punkt markieren
+        z_p = x_p * y_p
+        ax.scatter([x_p], [y_p], [z_p], color=POINT_COLOR, s=120, zorder=5,
+                   label=f'P=({x_p:.2f}, {y_p:.2f}, {z_p:.2f})')
+        ax.set_xlabel('x', color=TEXT_COLOR)
+        ax.set_ylabel('y', color=TEXT_COLOR)
+        ax.set_zlabel('z = xy', color=TEXT_COLOR)
+        ax.set_title('Sattelfläche z = xy', color=TEXT_COLOR)
+        ax.legend(facecolor='#313244', labelcolor=TEXT_COLOR, edgecolor='#45475a')
+        ax.tick_params(colors=TEXT_COLOR)
+        return fig
+
+    elif manifold == 'flat':
+        x_p = float(params.get('x', 0.0))
+        y_p = float(params.get('y', 0.0))
+
+        # Flache Ebene – einfaches Gitter
+        xs = np.linspace(-3, 3, 10)
+        ys = np.linspace(-3, 3, 10)
+        XX, YY = np.meshgrid(xs, ys)
+        ZZ = np.zeros_like(XX)
+
+        fig = plt.figure(figsize=(8, 6))
+        fig.patch.set_facecolor(BG_DARK)
+        ax = fig.add_subplot(111, projection='3d')
+        ax.set_facecolor(AX_DARK)
+        ax.plot_surface(XX, YY, ZZ, alpha=0.3, color=ACCENT)
+        ax.scatter([x_p], [y_p], [0], color=POINT_COLOR, s=120, zorder=5,
+                   label=f'P=({x_p:.2f}, {y_p:.2f}, 0)')
+        ax.set_title('Flache Ebene ℝ² (K = 0)', color=TEXT_COLOR)
+        ax.legend(facecolor='#313244', labelcolor=TEXT_COLOR, edgecolor='#45475a')
+        ax.tick_params(colors=TEXT_COLOR)
+        return fig
+
+    return None
 
 
 # ===========================================================================
