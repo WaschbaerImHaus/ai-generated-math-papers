@@ -59,3 +59,8 @@
 - tensor_geometry.py: clear_christoffel_cache() und get_christoffel_cache_size() hinzugefügt
 - Cache-Kommentare erweitert (Cache-Key-Schema, Größenlimit dokumentiert)
 - tests/test_tensor_geometry.py: 7 neue Caching-Tests (TestChristoffelCaching)
+
+2026-03-11 Build 52: pytest-xdist + Makefile aktualisiert
+- Makefile: test/test-fast/test-coverage an Aufgabenvorgaben angepasst (absoluter Pfad, -n auto, --timeout=60)
+- pytest.ini: -n auto bereits konfiguriert, bestätigt
+- pytest-xdist 3.8.0 bereits installiert

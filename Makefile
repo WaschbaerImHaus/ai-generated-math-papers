@@ -1,35 +1,24 @@
 # Makefile — specialist-maths
-# Zentrale Testkonfiguration: pytest + Hypothesis + Doctests in einem Lauf
+# Zentrale Testkonfiguration: pytest + xdist (parallel) + Coverage
 # Autor: Kurt Ingwer
-# Zuletzt geändert: 2026-03-10
+# Zuletzt geändert: 2026-03-11
 
 .PHONY: test test-fast test-doctests test-property test-coverage clean lint
 
-# --- Vollständiger Testlauf (Standard) ---
-# Führt alle Tests aus: Unit, Hypothesis-Property-Tests, Doctests
+# --- Vollständiger Testlauf mit paralleler Ausführung (Standard) ---
+# -n auto: Alle verfügbaren CPU-Kerne nutzen (pytest-xdist)
+# --timeout=60: Einzelner Test darf maximal 60 Sekunden dauern
 test:
-	@echo "=== Vollständiger Testlauf ==="
-	cd $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) && \
-	python3 -m pytest tests/ \
-	    --doctest-modules \
-	    --ignore=src/webapp \
-	    --ignore=src/__init__.py \
-	    -p hypothesis \
-	    --hypothesis-seed=0 \
-	    -v \
-	    --tb=short \
-	    -q \
-	    2>&1
+	cd /home/claude-code/project/specialist-maths && python3 -m pytest tests/ -n auto --timeout=60
 
-# --- Schneller Testlauf (kein Doctest, kein Hypothesis) ---
+# --- Schneller Testlauf: erster Fehler stoppt (-x), minimale Ausgabe (-q) ---
 test-fast:
-	@echo "=== Schneller Testlauf (ohne Doctests & Property-Tests) ==="
-	cd $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) && \
-	python3 -m pytest tests/ \
-	    -p no:hypothesis \
-	    --tb=short \
-	    -q \
-	    2>&1
+	cd /home/claude-code/project/specialist-maths && python3 -m pytest tests/ -n auto --timeout=60 -x -q
+
+# --- Testabdeckung (Coverage) ---
+# Erstellt HTML-Bericht unter build/coverage/index.html
+test-coverage:
+	cd /home/claude-code/project/specialist-maths && python3 -m pytest tests/ --cov=src --cov-report=html
 
 # --- Nur Doctests ---
 test-doctests:
@@ -50,23 +39,10 @@ test-property:
 	python3 -m pytest tests/ \
 	    -k "property or hypothesis or fuzz" \
 	    --hypothesis-seed=0 \
+	    -n auto \
 	    -v \
 	    --tb=short \
 	    2>&1
-
-# --- Testabdeckung (Coverage) ---
-test-coverage:
-	@echo "=== Test-Coverage ==="
-	cd $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) && \
-	python3 -m pytest tests/ \
-	    --cov=src \
-	    --cov-report=term-missing \
-	    --cov-report=html:build/coverage \
-	    --ignore=src/webapp \
-	    --tb=short \
-	    -q \
-	    2>&1
-	@echo "Coverage-Bericht: build/coverage/index.html"
 
 # --- Lint (SyntaxWarnings prüfen) ---
 lint:
