@@ -274,3 +274,20 @@ _(keine bekannten offenen Features mehr)_
 #### Neue Papers – Satz von Wilson (Build 62)
 - [x] papers/batch2/paper8_wilson_theorem.tex (EN): 5 Sätze (Wilson, Fakultätsrest, Primzahlpotenzen, Quotient, allgemein)
 - [x] papers/batch2/paper8_wilson_satz_de.tex (DE): Vollständige deutsche Übersetzung
+
+#### Neue Papers – Wilson für Primzahlpotenzen (Build 63)
+- [x] papers/batch2/paper9_wilson_prime_powers.tex (EN): Vollst. Beweis via Paarung + Struktur
+- [x] papers/batch2/paper9_wilson_primzahlpotenzen_de.tex (DE): Deutsche Version
+
+#### Neue Papers – Wilson-Quotient und Wilson-Primzahlen (Build 64)
+- [x] papers/batch2/paper10_wilson_quotient.tex (EN): W_p, Wilson-Primzahlen, Bernoulli, Heuristik
+- [x] papers/batch2/paper10_wilson_quotient_de.tex (DE): Deutsche Version
+
+#### Neue Papers – Allgemeiner Wilson für abelsche Gruppen (Build 65)
+- [x] papers/batch2/paper11_wilson_abelian.tex (EN): Gruppentheoretische Verallgemeinerung
+- [x] papers/batch2/paper11_wilson_abelsch_de.tex (DE): Deutsche Version
+
+#### Neue Papers – Anwendungen des Wilson-Satzes (Build 66)
+- [x] papers/batch2/paper12_wilson_applications.tex (EN): 4 Anwendungen inkl. QR, Fermat, Wolstenholme
+- [x] papers/batch2/paper12_wilson_anwendungen_de.tex (DE): Deutsche Version
+- [x] tests/test_wilson_theorems.py: 78 Tests, alle grün (Wilson-Themen)

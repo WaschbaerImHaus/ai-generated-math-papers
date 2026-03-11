@@ -196,3 +196,48 @@
   - papers/batch2/paper8_wilson_satz_de.tex (DE): Vollständige deutsche Übersetzung
   - tests/test_config.py: Korrektur: AUTHOR-Test auf 'Michael Fuhrmann' (nicht 'Kurt Ingwer')
   - Alle 7111 Tests grün
+
+2026-03-11 09:44 Build 63: Paper 9 – Wilson für Primzahlpotenzen (EN + DE)
+- paper9_wilson_prime_powers.tex: Vollständiger Beweis via Paarungsmethode
+  * Lemma: Einzige Quadratwurzeln der 1 modulo p^k (ungerades p) sind ±1
+  * Satz: Produkt aller Einheiten mod p^k ≡ -1 für ungerades p
+  * Satz: p=2 Sonderfall: k=1→1, k=2→-1, k≥3→+1
+  * Satz: Struktursatz (Z/p^kZ)* ≅ Z_{p^{k-1}(p-1)} (zyklisch, ungerades p)
+  * Beweise: Hensel-Lifting für Primitivwurzel-Lift, direkte Gruppenrechnung
+- paper9_wilson_primzahlpotenzen_de.tex: Vollständige deutsche Version
+
+2026-03-11 09:44 Build 64: Paper 10 – Wilson-Quotient und Wilson-Primzahlen (EN + DE)
+- paper10_wilson_quotient.tex: Vollständige Behandlung des Wilson-Quotienten
+  * Definition W_p = ((p-1)!+1)/p, Wilson-Primzahl-Kriterium
+  * Harmonische Darstellung: W_p ≡ -Σ 1/j (mod p)
+  * Bernoulli-Zahlen-Zusammenhang: W_p ≡ -B_{p-1} (mod p)
+  * Bekannte Wilson-Primzahlen: 5, 13, 563
+  * Heuristik: ~ln ln x Wilson-Primzahlen bis x (Mertens-Satz)
+- paper10_wilson_quotient_de.tex: Vollständige deutsche Version
+
+2026-03-11 09:44 Build 65: Paper 11 – Allgemeiner Wilson für abelsche Gruppen (EN + DE)
+- paper11_wilson_abelian.tex: Gruppentheoretische Verallgemeinerung
+  * Paarungs-Lemma: Produkt = Produkt der selbst-inversen Elemente
+  * Untergruppe S = {g: g²=e} ≅ (Z/2Z)^k (elementar-abelsch)
+  * Allgemeiner Wilson: Produkt = τ wenn |{Ordnung-2-Elemente}|=1, sonst e
+  * Klassischer Wilson als Korollar
+  * Gaußsche Verallgemeinerung: n=1,2,4,p^k,2p^k → Produkt=-1, sonst 1
+- paper11_wilson_abelsch_de.tex: Vollständige deutsche Version
+
+2026-03-11 09:44 Build 66: Paper 12 – Anwendungen des Wilson-Satzes (EN + DE)
+- paper12_wilson_applications.tex: Vier Anwendungen
+  * Primzahlcharakterisierung via Wilson (mit Aufwandsanalyse)
+  * -1 als Quadratrest: Leg(-1|p) = (-1)^{(p-1)/2} via Doppelzählung von (p-1)!
+  * Harmonisches Lemma von Wolstenholme: Σ 1/j ≡ 0 (mod p) für p≥3
+  * Fermats kleiner Satz via Wilson (Permutationsargument)
+  * Skizze: Eulerscher Satz via Struktursatz + Wilson
+- paper12_wilson_anwendungen_de.tex: Vollständige deutsche Version
+- tests/test_wilson_theorems.py: 78 Tests, alle grün
+  * Klassischer Wilson: Primzahlen bis 50
+  * Primzahlpotenzen: p=2,3,5,7 mit k=1,2,3,4
+  * Wilson-Quotient: W_2, W_3, W_5, W_7, W_11
+  * Wilson-Primzahlen: 5, 13 verifiziert; 3, 7, 11, 17 ausgeschlossen
+  * Allgemeiner Wilson / Gaußsche Verallgemeinerung: n=2..20
+  * Harmonische Summe: Primzahlen 3..50
+  * Quadratreste: -1 als QR, Doppelzählungsformel
+  * Fermat via Wilson: Permutations- und Kürzungsargument
