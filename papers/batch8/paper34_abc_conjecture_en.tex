@@ -98,10 +98,14 @@ larger than $1$.
 Equivalently, only finitely many triples have quality $q(a,b,c) > 1+\varepsilon$.
 
 \begin{remark}
-  The $\varepsilon$ is necessary: the triple $a=1$, $b=2^n-1$, $c=2^n$ can produce
-  quality approaching $1$ from below (if $2^n-1$ is prime), showing the bound $c\leq
-  K\cdot\operatorname{rad}(abc)$ without $\varepsilon$ fails.  The largest known quality
-  exceeding $1$ is the triple $(2, 3^{10}\cdot109, 23^5)$ with $q\approx1.6299$.
+  The $\varepsilon$ is necessary: the record triple $a=1$, $b=3^{10}\cdot109$,
+  $c=23^5$ has quality $q \approx 1.6299 > 1$, so $c = \operatorname{rad}(abc)^{1.6299}
+  \gg \operatorname{rad}(abc)$, showing the bound $c \leq K \cdot \operatorname{rad}(abc)$
+  (exponent $1$ without $\varepsilon$) cannot hold universally.  Triples with quality
+  $q \to 1$ from below exist in abundance (e.g.\ $a=1$, $b=2^n-1$, $c=2^n$ when
+  $2^n-1$ is a Mersenne prime) but do \emph{not} violate the $\varepsilon=0$ bound;
+  it is the record triples with $q > 1$ that force $\varepsilon > 0$.  The largest
+  known quality exceeding $1$ is $q \approx 1.6299$.
 \end{remark}
 
 \subsection{Equivalent Formulations}

@@ -101,11 +101,14 @@ größer als $1$ sein kann.
 Äquivalent dazu gilt: Nur endlich viele Tripel haben die Qualität $q(a,b,c) > 1+\varepsilon$.
 
 \begin{remark}
-  Der Term $\varepsilon$ ist notwendig: Das Tripel $a=1$, $b=2^n-1$, $c=2^n$ kann eine
-  Qualität erzeugen, die sich von unten an $1$ annähert (wenn $2^n-1$ prim ist), was zeigt,
-  dass die Schranke $c \leq K\cdot\operatorname{rad}(abc)$ ohne $\varepsilon$ scheitert.
-  Die größte bekannte Qualität oberhalb von $1$ ist das Tripel $(2, 3^{10}\cdot109, 23^5)$
-  mit $q\approx1{,}6299$.
+  Der Term $\varepsilon$ ist notwendig: Das Rekordtripel $a=1$, $b=3^{10}\cdot109$,
+  $c=23^5$ hat Qualität $q \approx 1{,}6299 > 1$, also $c = \operatorname{rad}(abc)^{1{,}6299}
+  \gg \operatorname{rad}(abc)$, was zeigt, dass die Schranke $c \leq K \cdot \operatorname{rad}(abc)$
+  (Exponent $1$ ohne $\varepsilon$) nicht universell gelten kann.  Tripel mit Qualität
+  $q \to 1$ von unten existieren in großer Zahl (z.\,B.\ $a=1$, $b=2^n-1$, $c=2^n$,
+  wenn $2^n-1$ eine Mersenne-Primzahl ist), verletzen die $\varepsilon=0$-Schranke
+  jedoch \emph{nicht} — es sind die Rekordtripel mit $q > 1$, die $\varepsilon > 0$
+  erzwingen.  Die größte bekannte Qualität oberhalb von $1$ beträgt $q \approx 1{,}6299$.
 \end{remark}
 
 \subsection{Äquivalente Formulierungen}
