@@ -13,7 +13,7 @@
 
     Mathematische Grundlagen werden in jedem Docblock erklärt.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-05
 @lastModified 2026-03-10
 """
@@ -67,7 +67,7 @@ def _safe_parse(expr_str: str, local_vars: dict | None = None) -> sp.Expr:
     @param expr_str: Mathematischer Ausdruck als String
     @param local_vars: Optionale lokale Variablen-Zuordnung
     @return: SymPy-Ausdruck
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified: 2026-03-09
     """
     # Whitelist der erlaubten Funktionen und Symbole
@@ -369,7 +369,7 @@ def brent_method(f: Callable[[float], float], a: float, b: float,
     @return Näherungswert der Nullstelle.
     @raises ValueError Wenn f(a) und f(b) dasselbe Vorzeichen haben.
     @raises ConvergenceError Wenn keine Konvergenz innerhalb max_iter erreicht wird.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     fa = f(a)
@@ -598,7 +598,7 @@ def symbolic_limit(expr_str: str, var: str, point: float | str, direction: str =
     @param point Grenzpunkt (Zahl, 'oo', '-oo').
     @param direction Richtung: '+' (rechts), '-' (links), '+-' (beidseitig).
     @return SymPy-Ergebnis des Grenzwerts.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-08
     """
     # SymPy-Variable erstellen
@@ -643,7 +643,7 @@ def lhopital_applicable(numerator_str: str, denominator_str: str, var: str, poin
     @param var Variablenname.
     @param point Grenzpunkt.
     @return Dict mit 'applicable' (bool), 'form' (str), 'limit' (SymPy-Ergebnis).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-08
     """
     sym_var = sp.Symbol(var)
@@ -717,7 +717,7 @@ def limit_comparison(f_str: str, g_str: str, var: str, point: float | str) -> di
     @param var Variablenname.
     @param point Grenzpunkt.
     @return Dict mit 'limit_ratio' (lim f/g) und 'same_behavior' (bool).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-08
     """
     sym_var = sp.Symbol(var)
@@ -782,7 +782,7 @@ def partial_fraction_decomposition(numerator_coeffs: list[float], denominator_co
     @param numerator_coeffs Koeffizienten des Zählers (höchster Grad zuerst).
     @param denominator_coeffs Koeffizienten des Nenners (höchster Grad zuerst).
     @return String-Darstellung der Partialbruchzerlegung.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-08
     """
     x = sp.Symbol('x')
@@ -824,7 +824,7 @@ def partial_fraction_symbolic(expr_str: str, var: str = 'x') -> dict[str, str | 
     @param expr_str SymPy-Ausdruck als String.
     @param var Variablenname (Standard: 'x').
     @return Dict mit 'original', 'decomposed', 'terms'.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-08
     """
     sym_var = sp.Symbol(var)
@@ -873,7 +873,7 @@ def improper_integral_numerical(f: Callable[[float], float], a: float, b: float,
     @param singularities Liste von Singularitätspunkten im Inneren von (a,b).
     @param eps Epsilon-Umgebung um Singularitäten und für Grenzen.
     @return Näherungswert des uneigentlichen Integrals.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-08
     """
     from scipy import integrate as sci_integrate
@@ -952,7 +952,7 @@ def improper_integral_symbolic(expr_str: str, var: str, a: float | str, b: float
     @param a Untere Grenze (Zahl, 'oo', '-oo', oder sympy-Ausdruck).
     @param b Obere Grenze (Zahl, 'oo', '-oo', oder sympy-Ausdruck).
     @return Dict mit 'integral' (SymPy), 'converges' (bool), 'value' (float oder None).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-08
     """
     sym_var = sp.Symbol(var)
@@ -1031,7 +1031,7 @@ def cauchy_principal_value(f: Callable[[float], float], a: float, b: float,
     @param singularity Innere Singularitätsstelle c ∈ (a, b).
     @param eps Epsilon-Parameter für die Näherung des Grenzwerts.
     @return Cauchyscher Hauptwert des Integrals.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-08
     """
     from scipy import integrate as sci_integrate

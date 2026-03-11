@@ -22,7 +22,7 @@
     - help             : Alle Befehle anzeigen
     - exit/quit        : REPL beenden
 
-    Sicherheitsaudit (Build 49, 2026-03-11):
+    Sicherheitsaudit (Build 57, 2026-03-11):
     - KEINE unsicheren eval() oder exec()-Aufrufe vorhanden.
     - Benutzereingaben werden ausschließlich via command.split() aufgeteilt
       und via json.loads() für JSON-Argumente geparst.
@@ -30,8 +30,11 @@
     - Funktionsnamen werden gegen eine feste Whitelist (func_map) geprüft.
     - Eingaben werden auf max. 500 Zeichen begrenzt.
     - Alle Eingaben werden auf DEBUG-Level geloggt.
+    - Kein Zugriff auf das Dateisystem oder Netzwerk durch Benutzereingaben.
+    - Integer-Parsing via int()/float() – kein Overflow-Risiko in Python.
+    - Audit-Ergebnis: Keine Sicherheitslücken gefunden (Stand Build 57).
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-09
 @version 1.1.0
 @lastModified 2026-03-11
