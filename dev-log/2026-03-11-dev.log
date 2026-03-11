@@ -11,3 +11,8 @@
 - matrix_ops.py: solve() nutzt jetzt numpy.linalg.cond() explizit mit Warn-Text "Konditionszahl {kond:.2e} überschreitet 1e10 – numerische Instabilität möglich"
 - matrix_ops.py: condition_number_check(matrix) neu hinzugefügt – gibt True/False zurück
 - tests/test_stability_analysis.py: 5 neue Tests (test_stabile_matrix_keine_warnung, test_instabile_matrix_warnung_geloggt, test_condition_number_check_rueckgabe, test_condition_number_check_numpy_array, test_condition_number_check_matrix_objekt)
+
+2026-03-11 Build 47: Plugin-System implementiert
+- src/plugin_registry.py: PluginRegistry-Klasse mit register/load/list_plugins/is_loaded/unregister/reload
+- DEFAULT_REGISTRY mit 15 vorregistrierten Standardmodulen
+- tests/test_plugin_registry.py: 25 Tests in 5 Klassen
