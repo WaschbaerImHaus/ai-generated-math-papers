@@ -503,3 +503,11 @@ Technische Details:
   (n=4: 2C_2, n=6: 4C_2, n=8: 2C_2, n=10: 8C_2/3, n=12: 4C_2, n=30: 16C_2/3)
 - Bestätigt: BUG-010 (paper2 DE) bereits behoben — "Alternativer Beweis:" vorhanden
 - Bestätigt: BUG-011 (paper7 DE) bereits behoben — "p-1 \ge 2 > 0" vorhanden
+
+2026-03-11 Build 95: Review-Bugs aus neuen Reviews behoben
+  - Paper 25 DE: Fehlendes Beispiel singuläre Kurve y²=x³-x² in Torsionsbeispiele eingefügt
+  - Paper 28 DE: "nein --" Fragment + falsche Parametrisierungsformel (x_0=((a+b)/2)²) entfernt
+  - Paper 28 DE: "ächtes Pythagoräisches Tripel" durch klare Formulierung (a≠b, nicht gleichschenklig) ersetzt
+  - Paper 28 DE: Tunnell C(n) 8x²+2y²+16z²→4x²+y²+8z², D(n) 8x²+2y²+64z²→4x²+y²+32z² (kritischer Fehler behoben)
+  - Paper 28 EN: Nagell-Lutz y₀²|-4n⁶ → y₀²|4n⁶ (Betrag genommen, Division durch Negatives vermieden)
+  - Alle anderen gemeldeten Bugs (Paper 18 EN/DE Vorzeichen, Paper 18 DE Fallunterscheidung, Paper 20 Tabelle, Paper 19 Querverweise, Paper 27 DE Verifikationsaussage) waren bereits behoben

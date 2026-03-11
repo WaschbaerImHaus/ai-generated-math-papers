@@ -121,15 +121,8 @@ $\mathrm{rang}(E_n(\Q)) \ge 1$.
 \begin{proof}
 \textbf{(Kongruent $\Rightarrow$ Punkt unendlicher Ordnung.)}
 Seien $a^2 + b^2 = c^2$ und $ab/2 = n$ mit $a,b,c \in \Q_{>0}$.
-Wir definieren
-\[
-  x_0 = \Bigl(\frac{a+b}{2}\Bigr)^2, \quad
-  y_0 = \frac{(a+b)^2 \cdot c}{8} \cdot \text{(geeignetes Vorzeichen)}.
-\]
-Die korrekte Standardparametrisierung (vgl.\ \cite{Koblitz1984}, Kapitel~1) ergibt:
-Aus $(a,b,c)$ mit $a^2+b^2=c^2$ und $ab=2n$ setzt man
-$x_0 = ((a^2+b^2)/2)$ nein -- die eleganteste Version ist:
-Der Punkt
+Die Standardparametrisierung (vgl.\ \cite{Koblitz1984}, Kapitel~1) liefert
+aus $(a,b,c)$ mit $a^2+b^2=c^2$ und $ab=2n$ den Punkt
 \[
   P = \Bigl(\bigl(\tfrac{c}{2}\bigr)^2,\; \tfrac{c(a^2-b^2)}{8}\Bigr)
 \]
@@ -148,8 +141,8 @@ Mit $c^4 - 16n^2 = (a^2+b^2)^2 - (ab)^2 = (a^2-b^2)^2$ folgt
 $P \in E_n(\Q)$.
 
 Dieser Punkt liegt nicht in der Torsionsuntergruppe $\{O, (0,0), (\pm n, 0)\}$
-(da $y_0 = c(a^2-b^2)/8 \ne 0$ f\"ur ein \"achtes Pythagor\"aisches
-Tripel mit $a \ne b$), also hat er unendliche Ordnung.
+(da $y_0 = c(a^2-b^2)/8 \ne 0$ genau dann, wenn $a \ne b$,
+d.\,h.\ das rechtwinklige Dreieck nicht gleichschenklig ist), also hat er unendliche Ordnung.
 
 \textbf{(Punkt unendlicher Ordnung $\Rightarrow$ kongruent.)}
 Sei $(x_0,y_0) \in E_n(\Q)$ mit $y_0 \ne 0$. Die Zahlen
@@ -202,9 +195,9 @@ F\"ur eine quadratfreie positive ganze Zahl $n$ definiere:
 \begin{align*}
   A(n) &= \#\{(x,y,z) \in \Z^3 : 2x^2 + y^2 + 8z^2 = n\}, \\
   B(n) &= \#\{(x,y,z) \in \Z^3 : 2x^2 + y^2 + 32z^2 = n\}, \\
-  C(n) &= \#\{(x,y,z) \in \Z^3 : 8x^2 + 2y^2 + 16z^2 = n/2\}
+  C(n) &= \#\{(x,y,z) \in \Z^3 : 4x^2 + y^2 + 8z^2 = n/2\}
   \quad (n \text{ gerade}), \\
-  D(n) &= \#\{(x,y,z) \in \Z^3 : 8x^2 + 2y^2 + 64z^2 = n/2\}
+  D(n) &= \#\{(x,y,z) \in \Z^3 : 4x^2 + y^2 + 32z^2 = n/2\}
   \quad (n \text{ gerade}).
 \end{align*}
 \begin{enumerate}
