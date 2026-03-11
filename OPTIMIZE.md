@@ -1,7 +1,7 @@
 # OPTIMIZE.md - specialist-maths
 
 Optimierungsvorschläge und -status für alle Bereiche des Projekts.
-Letzte Aktualisierung: 2026-03-11 (Build 68)
+Letzte Aktualisierung: 2026-03-11 (Build 102)
 
 ---
 
@@ -97,11 +97,32 @@ Letzte Aktualisierung: 2026-03-11 (Build 68)
 
 ---
 
+## Refactoring-Plan (Build 102)
+
+### Erledigt (Build 102)
+- [x] **`math_helpers.py`**: Zentrale Hilfsfunktionen (is_prime, gcd, euler_phi etc.) erstellt.
+  Neue Module sollen von hier importieren. Migration bestehender Module schrittweise.
+- [x] **`langlands_program.py`**: Bereits math_helpers importiert (Vorbildcharakter).
+- [x] **Visualisierung-Bug**: `create_interactive_plot()` gibt jetzt `return fig` zurück (Build 102).
+
+### Offen (geplant)
+- [ ] **Migration bestehender Module**: algebraic_number_theory.py, galois_representations.py, l_functions.py,
+  elliptic_curves.py auf math_helpers umstellen (je ~20 Zeilen Duplikat einsparen).
+- [ ] **galois_theory.py aufteilen** (3005 Zeilen → 4 Module):
+  - `galois_theory_fields.py` — FiniteField, FieldExtension, GaloisGroup
+  - `galois_theory_polynomials.py` — discriminant, galois_group_polynomial, cyclotomic
+  - `galois_theory_constructibility.py` — is_constructible, construct_regular_polygon
+  - `galois_theory.py` → Re-export-Wrapper (rückwärtskompatibel)
+- [ ] **modular_forms.py aufteilen** (1848 Zeilen → Hecke + L-Funktionen + Theta):
+  - `modular_forms_hecke.py` — Hecke-Algebra, Eigenformen
+  - `modular_forms_l.py` — L-Funktionen, Funktionalgleichung
+  - `modular_forms.py` → Re-export-Wrapper
+
 ## Prioritäten (Stand 2026-03-11)
 
 1. `_safe_parse()` Logging-Fallback (Sicherheit/Debuggbarkeit)
 2. `repl.py` Eingabe-Validierung (Sicherheit)
-3. `euler_phi()` → `prime_factorization()` intern (Performance)
+3. Migration math_helpers (Performance + Wartbarkeit)
 4. Christoffel-Symbole Memoization (Performance)
 5. SVG/PDF-Export (Visualisierung)
 6. Numba JIT (Performance, Numba-Installation nötig)

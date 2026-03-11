@@ -4066,6 +4066,9 @@ def create_interactive_plot(
         except Exception:
             pass  # Headless-Modus: Keine Anzeige möglich
 
+    # Figure zurückgeben (damit Tests darauf zugreifen können)
+    return fig
+
 
 # ===========================================================================
 # EXPORT: Figure in mehrere Formate speichern (PNG, SVG, PDF)
