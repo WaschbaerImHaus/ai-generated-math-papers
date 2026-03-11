@@ -622,3 +622,13 @@ Bereits behoben (kein Handlungsbedarf):
 ## Testergebnis
 - 49 neue Tests (test_math_helpers.py): alle grün
 - 0 fehlgeschlagene Tests (Visualisierung-Bug behoben)
+
+2026-03-11 Review Build 103: Review-Bugs Papers 25–28 behoben
+- BUG-B6-P25-DE-001: paper25 DE — Grammatikfehler "das Invariante" → "die Invariante" behoben
+- BUG-B6-P26-EN-001: paper26 EN — Falsches Euler-Produkt L(E,s)=∏L_p^{-1} → ∏L_p korrigiert
+- BUG-B6-P26-DE-001: paper26 DE — Gleicher Euler-Produkt-Fehler behoben
+- BUG-B6-P27-DE-001: paper27 DE — Genitivfehler "Kolyvagings" → "Kolyvagins" behoben
+- BUG-B6-P27-DE-002: paper27 DE — Grammatikfehler "eine endliche Vektorraum" → "ein endlicher Vektorraum"
+- BUG-B6-P28-EN-003: paper28 EN — Abstract: falsche Substitutionsvariable x=(b/2)² → x=(c/2)²
+- BUG-B6-P28-EN-004: paper28 EN — bibitem-Schlüssel Koblitz1993 → Koblitz1994 (2. Aufl. 1994)
+- BUG-B6-P28-DE-001: paper28 DE — Gleicher bibitem-Schlüssel-Fehler behoben

@@ -5,6 +5,46 @@ _(keine bekannten Bugs)_
 
 ## Behobene Bugs
 
+### BUG-B6-P28-EN-004 (Build 102): paper28 EN — Falscher bibitem-Schlüssel Koblitz
+- **Datei**: papers/batch6/paper28_congruent_numbers_bsd_en.tex
+- **Problem**: bibitem-Schlüssel `Koblitz1993` widersprach dem Erscheinungsjahr der 2. Auflage (1994)
+- **Behoben**: Schlüssel auf `Koblitz1994` korrigiert
+
+### BUG-B6-P28-DE-001 (Build 102): paper28 DE — Gleicher falscher bibitem-Schlüssel
+- **Datei**: papers/batch6/paper28_congruent_numbers_bsd_de.tex
+- **Problem**: Analog zu BUG-B6-P28-EN-004
+- **Behoben**: Schlüssel auf `Koblitz1994` korrigiert
+
+### BUG-B6-P28-EN-003 (Build 102): paper28 EN — Falsche Substitutionsvariable im Abstract
+- **Datei**: papers/batch6/paper28_congruent_numbers_bsd_en.tex, Zeile 48
+- **Problem**: Abstract nannte `x = (b/2)^2` als Substitution, wobei `b` eine Kathete ist. Korrekt ist die Standardparametrisierung `x = (c/2)^2` (Hypotenuse `c`), wie im Beweis von Theorem 2.1 explizit ausgeführt (`x_0 = c^2/4`)
+- **Behoben**: `(b/2)^2` → `(c/2)^2`
+
+### BUG-B6-P27-DE-002 (Build 102): paper27 DE — Grammatikfehler "eine endliche Vektorraum"
+- **Datei**: papers/batch6/paper27_bsd_conjecture_de.tex, Zeile 263
+- **Problem**: "Der Selmer-Raum ist eine endliche $\mathbb{F}_2$-Vektorraum" — maskulines Nomen mit falschem Artikel und Adjektivendung
+- **Behoben**: "eine endliche" → "ein endlicher"
+
+### BUG-B6-P27-DE-001 (Build 102): paper27 DE — Falsche Genitivform "Kolyvagings"
+- **Datei**: papers/batch6/paper27_bsd_conjecture_de.tex, Zeile 238
+- **Problem**: "Kolyvagings Beweis" ist eine falsche Genitivbildung des Eigennamens
+- **Behoben**: "Kolyvagings" → "Kolyvagins"
+
+### BUG-B6-P26-DE-001 (Build 102): paper26 DE — Falsches Euler-Produkt
+- **Datei**: papers/batch6/paper26_l_function_elliptic_de.tex, Definition 3.2
+- **Problem**: `L(E,s) = ∏_p L_p(E,s)^{-1}` ist mathematisch falsch. Da `L_p(E,s)^{-1}` als Polynom `1 - a_p p^{-s} + p^{1-2s}` definiert ist, bedeutet `L_p(E,s) = 1/(1-...)` (der konvergente Faktor). Das Produkt `∏_p L_p(E,s)^{-1} = ∏_p Polynom` ergibt kein konvergentes L-Funktion-Produkt. Korrekt ist `L(E,s) = ∏_p L_p(E,s)`.
+- **Behoben**: `\prod_p L_p(E,s)^{-1}` → `\prod_p L_p(E,s)`
+
+### BUG-B6-P26-EN-001 (Build 102): paper26 EN — Falsches Euler-Produkt
+- **Datei**: papers/batch6/paper26_l_function_elliptic_en.tex, Definition 3.2
+- **Problem**: Analog zu BUG-B6-P26-DE-001: `L(E,s) = ∏_p L_p(E,s)^{-1}` falsch
+- **Behoben**: `\prod_p L_p(E,s)^{-1}` → `\prod_p L_p(E,s)`
+
+### BUG-B6-P25-DE-001 (Build 102): paper25 DE — Grammatikfehler Genus "das Invariante"
+- **Datei**: papers/batch6/paper25_elliptic_curves_Q_de.tex, Zeile 287
+- **Problem**: "ist das geheimnisvollste Invariante" — "Invariante" ist feminin, erfordert Artikel "die"
+- **Behoben**: "das geheimnisvollste" → "die geheimnisvollste"
+
 ### BUG-B4-P18-EN-001 (Build 92): paper18 EN — Vereinfachung Remark 4.3
 - **Datei**: papers/batch4/paper18_vinogradov_three_primes.tex
 - **Problem**: In Remark 4.3 stand `$1 + \mu(2)^3 c_2(n)/\phi(2)^3 = 1 - c_2(n)$`
