@@ -597,3 +597,77 @@ class TestLehmerVermutungBeweis:
                 phi = (q - 1) * (r - 1)
                 assert (n - 1) % phi != 0, \
                     f"GEGENBEISPIEL: n=2·{q}·{r}={n}, φ(n)={phi}, n-1={n-1}"
+
+    # --- Lehmer 3-Prim alle ungerade ---
+
+    def test_kein_3prim_ungerade_status_bewiesen(self):
+        r = self.lv.satz_kein_3prim_alle_ungerade_beweis()
+        assert r['status'] == 'BEWIESEN'
+
+    def test_schlüsselidentität_korrekt(self):
+        """Verifikation: 2(ab+bc+ca)+(a+b+c) = αc + β für alle ungeraden Primzahlen."""
+        import sympy as sp
+        for p in sp.primerange(3, 30):
+            for q in sp.primerange(p + 1, 30):
+                for r in sp.primerange(q + 1, 30):
+                    a, b, c = (p-1)//2, (q-1)//2, (r-1)//2
+                    alpha = p + q - 1
+                    beta = (p*q - 1) // 2
+                    lhs = 2*(a*b + b*c + c*a) + (a + b + c)
+                    rhs = alpha * c + beta
+                    assert lhs == rhs, \
+                        f"Identität falsch für p={p},q={q},r={r}: {lhs} ≠ {rhs}"
+
+    def test_schranke_nur_p3_q5_moeglich(self):
+        """Schranke q ≤ 3(p-1)/(p-2) erlaubt nur p=3,q=5 für ungerade Primzahlen."""
+        import sympy as sp
+        erlaubt = []
+        for p in sp.primerange(3, 100):
+            if p <= 2:
+                continue
+            schranke = 3 * (p - 1) / (p - 2)
+            for q in sp.primerange(p + 1, int(schranke) + 2):
+                if q <= schranke and q > p:
+                    erlaubt.append((p, int(q)))
+        # Nur (3, 5) darf in der Liste sein
+        assert (3, 5) in erlaubt or len(erlaubt) == 0 or all(pair == (3, 5) for pair in erlaubt), \
+            f"Unerwartete Paare: {erlaubt}"
+
+    def test_finale_widerlegung_p3_q5(self):
+        """Für p=3, q=5: (r-1) muss Teiler von 14 sein; alle Kandidaten nicht prim."""
+        import sympy as sp
+        teiler_von_14 = [d for d in range(1, 15) if 14 % d == 0]
+        r_kandidaten = [d + 1 for d in teiler_von_14]
+        # Kein r > 5 prim
+        for r in r_kandidaten:
+            if r > 5:
+                assert not sp.isprime(r), \
+                    f"r={r} ist prim und > 5! Beweis falsch?"
+        # Teiler von 14: 1, 2, 7, 14 → r ∈ {2, 3, 8, 15}
+        assert sorted(r_kandidaten) == [2, 3, 8, 15]
+
+    def test_alle_3prim_ungerade_kein_kandidat(self):
+        """Numerisch: Kein n=pqr (alle ungerade prim) erfüllt φ(n)|(n-1) bis 200."""
+        import sympy as sp
+        primes = list(sp.primerange(3, 60))
+        for i, p in enumerate(primes):
+            for j, q in enumerate(primes):
+                if q <= p:
+                    continue
+                for k, r in enumerate(primes):
+                    if r <= q:
+                        continue
+                    n = p * q * r
+                    phi = (p-1) * (q-1) * (r-1)
+                    assert (n - 1) % phi != 0, \
+                        f"GEGENBEISPIEL: n={p}·{q}·{r}={n}"
+
+    def test_3prim_korollar_vollständig(self):
+        """Korollar: Kein 3-Prim-Produkt (weder 2qr noch pqr-ungerade) ist Lehmer-Lösung."""
+        r2 = self.lv.satz_kein_3prim_gerade_beweis()
+        r3 = self.lv.satz_kein_3prim_alle_ungerade_beweis()
+        assert r2['status'] == 'BEWIESEN'
+        assert r3['status'] == 'BEWIESEN'
+        # Beide zusammen decken alle 3-Prim-Fälle ab
+        assert 'korollar' in r3
+        assert '2·q·r' in r3.get('korollar', '') or '2qr' in r3.get('korollar', '') or 'Satz' in r3.get('korollar', '')

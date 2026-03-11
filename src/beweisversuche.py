@@ -1378,6 +1378,108 @@ class LehmerVermutungBeweis:
             ),
         }
 
+    def satz_kein_3prim_alle_ungerade_beweis(self) -> Dict:
+        """
+        @brief SATZ (BEWIESEN): Kein n=p·q·r (alle ungerade Primzahlen) ist Lehmer-Lösung.
+        @description
+            **Behauptung**: Für keine drei ungeraden Primzahlen p < q < r gilt φ(pqr) | (pqr-1).
+
+            **Beweis** (in 3 Stufen):
+
+            **Stufe 0 – Schlüsselidentität**:
+            Sei a=(p-1)/2, b=(q-1)/2, c=(r-1)/2. Dann:
+            $$pqr - 1 = 8abc + 4(ab+bc+ca) + 2(a+b+c)$$
+            Also: φ(pqr) = 8abc | (pqr-1) ⟺ **4abc | 2(ab+bc+ca) + (a+b+c)  (HC)**.
+
+            Elegante Umformung: α := p+q-1, β := (pq-1)/2. Dann gilt:
+            $$2(ab+bc+ca) + (a+b+c) = \\alpha c + \\beta$$
+
+            (Beweis: α·c = (2a+2b+1)c = 2bc+2ca+c; +β = +a+b+2ab. Summe = 2(ab+bc+ca)+(a+b+c). ✓)
+
+            **Stufe 1 – Erste Einschränkung** (mod c):
+            (HC) erfordert 4abc | αc + β. Betrachtung mod c:
+            4abc ≡ 0 (mod c), also c | β = (pq-1)/2, d.h. **(r-1) | (pq-1)**.
+
+            Sei k := (pq-1)/(r-1). Da r > q und beide ungerade: r ≥ q+2, r-1 ≥ q+1.
+            Damit: k = (pq-1)/(r-1) < pq/q = p. Also **k ≤ p-1**.
+
+            (HC) reduziert sich jetzt zu: **(p-1)(q-1) | (p+q-1) + k  (II)**.
+
+            **Stufe 2 – Hauptschranke**:
+            Da (p-1)(q-1) | (p+q-1)+k und (p+q-1)+k ≤ (p+q-1)+(p-1) = 2p+q-2:
+            $$(p-1)(q-1) \\leq 2p+q-2$$
+            $$pq-p-q+1 \\leq 2p+q-2$$
+            $$q(p-2) \\leq 3(p-1)$$
+            $$q \\leq \\frac{3(p-1)}{p-2}$$
+
+            Auswertung für ungerade Primzahlen p:
+            - p=3: q ≤ 6 → nur q=5 möglich (einzige Primzahl in (3,6]).
+            - p=5: q ≤ 4 → unmöglich (q > p=5, also q ≥ 7). ✗
+            - p≥7: q ≤ 3(p-1)/(p-2) ≤ 3·6/5 = 3.6 → unmöglich. ✗
+
+            **Einziger Fall: p=3, q=5.**
+
+            **Stufe 3 – Finale Widerlegung für p=3, q=5**:
+            Aus Stufe 1: (r-1) | (pq-1) = 14. Teiler von 14: {1, 2, 7, 14}.
+            Entsprechende r-Werte: r ∈ {2, 3, 8, 15}.
+            - r=2: nicht > q=5. ✗
+            - r=3: nicht > q=5. ✗
+            - r=8: nicht prim. ✗
+            - r=15 = 3·5: nicht prim. ✗
+
+            Kein gültiges r existiert. **WIDERSPRUCH IN ALLEN FÄLLEN!** □
+
+            **Korollar**: Zusammen mit Satz (Kein 2·q·r) gilt:
+            Kein 3-Primfaktor-Produkt n=p₁p₂p₃ ist eine Lehmer-Lösung.
+            (Fälle: p₁=2 → Satz 2·qr; p₁≥3 → Satz p·q·r ungerade.)
+
+        @return Beweisobjekt mit vollständigem Beweis.
+        @lastModified 2026-03-11
+        """
+        # Algebraische Verifikation der Schlüsselidentität
+        def verify_identity(p: int, q: int, r: int) -> bool:
+            """Prüft: 2(ab+bc+ca)+(a+b+c) = α·c + β"""
+            a, b, c = (p-1)//2, (q-1)//2, (r-1)//2
+            alpha = p + q - 1
+            beta = (p*q - 1) // 2 if (p*q - 1) % 2 == 0 else None
+            if beta is None:
+                return False  # Nur für ungerade p,q
+            lhs = 2*(a*b + b*c + c*a) + (a + b + c)
+            rhs = alpha * c + beta
+            return lhs == rhs
+
+        # Verifikation für einige Werte
+        stichproben = []
+        for p in [3, 5, 7, 11]:
+            for q in [5, 7, 11, 13, 17]:
+                for r in [7, 11, 13, 17, 19]:
+                    if p < q < r:
+                        stichproben.append({
+                            'triple': (p, q, r),
+                            'identität_korrekt': verify_identity(p, q, r)
+                        })
+
+        return {
+            'satz': 'Kein n=p·q·r (alle ungerade Primzahlen) erfüllt φ(n)|(n-1).',
+            'status': 'BEWIESEN',
+            'beweis_kern': [
+                'Stufe 0: Identität pqr-1 = 8abc+4(ab+bc+ca)+2(a+b+c), a=(p-1)/2 etc.',
+                'HC-Bedingung: 4abc | αc+β mit α=p+q-1, β=(pq-1)/2.',
+                'Stufe 1: mod c → (r-1)|(pq-1); k=(pq-1)/(r-1) ≤ p-1.',
+                'HC vereinfacht zu: (p-1)(q-1) | (p+q-1)+k ≤ 2p+q-2.',
+                'Stufe 2: q(p-2) ≤ 3(p-1). Für p=5: q≤4. Für p≥7: q≤3.6. Unmöglich.',
+                'Einziger Fall: p=3, q=5. Dann (r-1)|(14). r∈{2,3,8,15}. Kein r prim>5.',
+                'WIDERSPRUCH IN ALLEN FÄLLEN. □',
+            ],
+            'schlüsselidentität_stichproben': [s for s in stichproben[:6] if s['identität_korrekt']],
+            'alle_identitäten_korrekt': all(s['identität_korrekt'] for s in stichproben),
+            'korollar': (
+                'Kombiniert mit Satz (2qr-Fall): '
+                'Kein 3-Primfaktor-Produkt ist eine Lehmer-Lösung. '
+                '(Analog zu Giuga-Korollar für 3 Faktoren!)'
+            ),
+        }
+
     def satz_kein_3prim_alle_ungerade_analyse(self) -> Dict:
         """
         @brief Analysiert den all-ungeraden 3-Prim-Fall für die Lehmer-Vermutung.
@@ -1508,6 +1610,20 @@ def schwierigkeitsranking() -> Dict:
                 'methode': '(r-1)|(2q-1); b=1 → r=2q (nicht prim); b≥2 → q≥r. Widerspruch.',
                 'neuheit': 'Vollständiger Beweis für geraden 3-Prim-Fall!'
             },
+            'Lehmer_Kein_pqr_ungerade': {
+                'aussage': 'Kein n=p·q·r (alle ungerade Primzahlen) erfüllt φ(n)|(n-1)',
+                'methode': (
+                    'Schlüsselidentität 4abc|αc+β; k=(pq-1)/(r-1)≤p-1; '
+                    'Schranke q≤3(p-1)/(p-2) → nur p=3,q=5 möglich; '
+                    '14=(pq-1) hat keine Primzahl-Teiler r>5. Widerspruch.'
+                ),
+                'neuheit': 'NEUER vollständiger Beweis für alle-ungeraden 3-Prim-Lehmer-Fall!'
+            },
+            'Lehmer_Korollar_3Prim': {
+                'aussage': 'KEIN 3-Primfaktor-Produkt ist eine Lehmer-Lösung (vollständig!)',
+                'methode': 'Kombination: 2qr-Fall (Satz) + pqr-ungerade-Fall (Satz)',
+                'neuheit': 'Vollständiger Beweis für den 3-Prim-Lehmer-Fall! (analog zu Giuga)'
+            },
         },
         'PARTIELL_bewiesen': {
             'Erdős-Straus_mod4': {
@@ -1537,7 +1653,9 @@ def schwierigkeitsranking() -> Dict:
             {'rang': 8,  'vermutung': 'Giuga Korollar: kein 3-Prim',    'status': '✓ VOLLSTÄNDIG BEWIESEN (NEU!)', 'schwierigkeit': 'Mittel'},
             {'rang': 9,  'vermutung': 'Brocard-Ramanujan modulare Analyse', 'status': '~ Teilresultat', 'schwierigkeit': 'Mittel'},
             {'rang': 10, 'vermutung': 'Kurepa Strukturanalyse',          'status': '~ Numerisch', 'schwierigkeit': 'Mittel'},
-            {'rang': 9,  'vermutung': 'Lehmer (2qr-Fall)',                'status': '✓ BEWIESEN (NEU!)', 'schwierigkeit': 'Mittel'},
+            {'rang': 9,  'vermutung': 'Lehmer (2qr-Fall)',                'status': '✓ BEWIESEN', 'schwierigkeit': 'Mittel'},
+            {'rang': 10, 'vermutung': 'Lehmer (pqr alle ungerade)',       'status': '✓ BEWIESEN (NEU!)', 'schwierigkeit': 'Mittel-Schwer'},
+            {'rang': 10, 'vermutung': 'Lehmer Korollar: kein 3-Prim',    'status': '✓ VOLLSTÄNDIG BEWIESEN (NEU!)', 'schwierigkeit': 'Mittel-Schwer'},
             {'rang': 11, 'vermutung': 'Giuga allgemein',                 'status': '? Offen', 'schwierigkeit': 'Sehr schwer'},
             {'rang': 12, 'vermutung': 'Lehmer allgemein',                'status': '? Offen', 'schwierigkeit': 'Sehr schwer'},
             {'rang': 13, 'vermutung': 'Zwillingsprimzahlen',             'status': '? Offen', 'schwierigkeit': 'Extrem schwer'},
