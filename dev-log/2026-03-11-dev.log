@@ -295,3 +295,9 @@
 - Korrektur Test: sp.diff mit n=2 als kwarg gibt cos(x) → positionales Argument nötig
 
 ### Testergebnis: 26/26 neue Tests grün
+2026-03-11 10:50:43 Build 73: Batch 3 – Vier LaTeX-Papers zu Siebmethoden erstellt
+2026-03-11 10:50:43   - paper15_large_sieve.tex: Große-Sieb-Ungleichung (Montgomery–Vaughan 1973), EN
+2026-03-11 10:50:43   - paper15_grosses_sieb_de.tex: Vollständige deutsche Übersetzung
+2026-03-11 10:50:43   - paper16_chen_theorem.tex: Chens Satz (1+2), Buchstab-Identität, Paritätsproblem, EN
+2026-03-11 10:50:43   - paper16_chen_satz_de.tex: Vollständige deutsche Übersetzung
+2026-03-11 10:50:43   - Verzeichnis papers/batch3/ angelegt
