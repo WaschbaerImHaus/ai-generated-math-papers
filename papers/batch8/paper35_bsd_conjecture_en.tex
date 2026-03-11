@@ -1,0 +1,562 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsmath,amssymb,amsthm,hyperref,geometry}
+\usepackage{enumitem,booktabs,array}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{definition}[theorem]{Definition}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+% -------------------------------------------------------
+% Metadata
+% -------------------------------------------------------
+\title{\textbf{The Birch and Swinnerton-Dyer Conjecture}\\[0.5em]
+\large Rank, L-Functions, and the Arithmetic of Elliptic Curves}
+\author{Michael Fuhrmann}
+\date{March 2026}
+
+\hypersetup{
+  pdftitle={The Birch and Swinnerton-Dyer Conjecture},
+  pdfauthor={Michael Fuhrmann},
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue
+}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+The Birch and Swinnerton-Dyer (BSD) conjecture, formulated in the early 1960s based on
+extensive numerical experimentation, predicts a deep connection between the algebraic rank
+of an elliptic curve over $\mathbb{Q}$ and the order of vanishing of its associated
+$L$-function at $s=1$.  It is one of the seven Millennium Prize Problems.
+
+This paper presents the Mordell--Weil theorem, which establishes the group structure
+$E(\mathbb{Q}) \cong \mathbb{Z}^r \oplus T$, the precise BSD conjecture in both weak and
+strong forms, the known partial results (rank 0 via Coates--Wiles 1977, rank 1 via
+Gross--Zagier 1986 and Kolyvagin 1989), numerical verifications from the Cremona database
+and LMFDB, the connection to Iwasawa theory, and the current state of the problem in 2026.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ================================================================
+\section{Elliptic Curves and the Mordell--Weil Group}
+% ================================================================
+
+\subsection{Basic Definitions}
+
+\begin{definition}[Elliptic Curve]
+  An \emph{elliptic curve} over $\mathbb{Q}$ is a smooth projective curve of genus $1$
+  with a specified rational point $O$ (the identity).  It can be written in
+  \emph{Weierstrass form}
+  \begin{equation}\label{eq:weierstrass}
+    E\colon y^2 + a_1 xy + a_3 y = x^3 + a_2 x^2 + a_4 x + a_6,
+    \quad a_i \in \mathbb{Z},
+  \end{equation}
+  or in \emph{short Weierstrass form} (after completing the square and cube)
+  \[
+    y^2 = x^3 + Ax + B, \quad A,B\in\mathbb{Q},\; \Delta := -16(4A^3 + 27B^2) \neq 0.
+  \]
+\end{definition}
+
+\begin{definition}[Group Law]
+  The rational points $E(\mathbb{Q})$ form an abelian group under the chord-and-tangent
+  law: given two points $P, Q$ on $E$, the line through them meets $E$ in a third point
+  $R$; the sum is $P + Q := -R$ (reflection in the $x$-axis).  The identity is the point
+  at infinity $O$.
+\end{definition}
+
+\subsection{The Mordell--Weil Theorem}
+
+\begin{theorem}[Mordell--Weil~\cite{Mordell1922,Weil1928}]
+  Let $E$ be an elliptic curve over $\mathbb{Q}$.  Then the group of rational points
+  $E(\mathbb{Q})$ is a finitely generated abelian group:
+  \begin{equation}\label{eq:mordellweil}
+    E(\mathbb{Q}) \;\cong\; \mathbb{Z}^r \;\oplus\; T,
+  \end{equation}
+  where $r \geq 0$ is the \emph{rank} of $E$ and $T$ is a finite group called the
+  \emph{torsion subgroup}.
+\end{theorem}
+
+\begin{theorem}[Mazur's Torsion Theorem~\cite{Mazur1977}]
+  The torsion subgroup $T = E(\mathbb{Q})_{\mathrm{tors}}$ is isomorphic to one of the
+  following fifteen groups:
+  \[
+    \mathbb{Z}/n\mathbb{Z} \text{ for } n \in \{1,2,3,\ldots,10,12\},
+    \quad\text{or}\quad
+    \mathbb{Z}/2\mathbb{Z} \times \mathbb{Z}/2n\mathbb{Z} \text{ for } n \in \{1,2,3,4\}.
+  \]
+\end{theorem}
+
+The rank $r$ measures the ``size'' of $E(\mathbb{Q})$: if $r = 0$, there are finitely
+many rational points; if $r \geq 1$, there are infinitely many.
+
+\subsection{Computing the Rank: Descent}
+
+The standard algorithmic approach to the rank uses the \emph{$2$-descent}:
+\begin{enumerate}[nosep]
+  \item Compute the $2$-Selmer group $\mathrm{Sel}^{(2)}(E/\mathbb{Q})$.
+  \item The Selmer rank gives an upper bound: $r \leq \dim_{\mathbb{F}_2}\mathrm{Sel}^{(2)} - \dim_{\mathbb{F}_2} E(\mathbb{Q})[2]$.
+  \item The Shafarevich--Tate group $\Sha(E/\mathbb{Q})$ measures the obstruction:
+  \[
+    0 \to E(\mathbb{Q})/2E(\mathbb{Q}) \to \mathrm{Sel}^{(2)}(E) \to \Sha(E)[2] \to 0.
+  \]
+\end{enumerate}
+
+The BSD conjecture predicts $\Sha(E/\mathbb{Q})$ is finite; this is known only in special
+cases.
+
+% ================================================================
+\section{The $L$-Function of an Elliptic Curve}
+% ================================================================
+
+\subsection{Local Factors}
+
+For each prime $p$, define the local factor:
+\[
+  L_p(E, s) \;=\;
+  \begin{cases}
+    (1 - a_p p^{-s} + p^{1-2s})^{-1} & \text{if } E \text{ has good reduction at } p, \\
+    (1 - p^{-s})^{-1}                 & \text{if } E \text{ has split multiplicative reduction,} \\
+    (1 + p^{-s})^{-1}                 & \text{if } E \text{ has non-split multiplicative reduction,} \\
+    1                                  & \text{if } E \text{ has additive reduction,}
+  \end{cases}
+\]
+where the \emph{Frobenius trace} $a_p = p + 1 - \#E(\mathbb{F}_p)$ satisfies
+$|a_p| \leq 2\sqrt{p}$ by the Hasse bound.
+
+\subsection{The Global $L$-Function}
+
+\begin{definition}[$L$-function of $E$]
+  The \emph{$L$-function} of $E/\mathbb{Q}$ is the Euler product
+  \begin{equation}\label{eq:lfunction}
+    L(E,s) \;=\; \prod_p L_p(E,s)^{-1},
+  \end{equation}
+  convergent for $\operatorname{Re}(s) > 3/2$.
+\end{definition}
+
+By the modularity theorem (Wiles 1995, Breuil--Conrad--Diamond--Taylor 2001), every
+elliptic curve over $\mathbb{Q}$ is modular: $L(E,s)$ equals the $L$-function of a
+weight-$2$ cuspidal newform $f_E$ of level $N$ (the conductor of $E$):
+\[
+  L(E,s) \;=\; L(f_E,s) \;=\; \sum_{n=1}^\infty \frac{a_n}{n^s}.
+\]
+This allows analytic continuation to all $s \in \mathbb{C}$ and establishes the
+functional equation:
+\begin{equation}\label{eq:functional}
+  \Lambda(E,s) \;:=\; \left(\frac{\sqrt{N}}{2\pi}\right)^s \Gamma(s) L(E,s)
+  \;=\; \varepsilon(E) \cdot \Lambda(E, 2-s),
+\end{equation}
+where $\varepsilon(E) \in \{+1,-1\}$ is the \emph{root number} of $E$.
+
+\begin{remark}[Parity Conjecture]
+  The parity conjecture predicts $(-1)^r = \varepsilon(E)$.  This is known to hold under
+  BSD and is proved unconditionally in many cases.
+\end{remark}
+
+% ================================================================
+\section{The Birch and Swinnerton-Dyer Conjecture}
+% ================================================================
+
+\subsection{Historical Origin}
+
+In the early 1960s, Birch and Swinnerton-Dyer~\cite{BSD1965} computed $\prod_{p \leq X} \#E(\mathbb{F}_p)/p$
+for many curves and observed empirically that this product grows like $(\log X)^r$ as
+$X \to \infty$.  Writing $L(E,1) = \prod_p (1 - a_p/p + \ldots)^{-1}$, this heuristic
+translates to:
+
+\subsection{Weak BSD Conjecture}
+
+\begin{conjecture}[Weak BSD~\cite{BSD1965,BSD1963}]
+  Let $E/\mathbb{Q}$ be an elliptic curve of rank $r$.  Then
+  \begin{equation}\label{eq:weakbsd}
+    \operatorname{ord}_{s=1} L(E,s) \;=\; r \;=\; \operatorname{rank}(E(\mathbb{Q})).
+  \end{equation}
+  In other words, the analytic rank equals the algebraic rank.
+\end{conjecture}
+
+\subsection{Strong BSD Conjecture}
+
+The strong (or full) BSD conjecture additionally specifies the leading coefficient of the
+Taylor expansion $L(E,s) = c_r (s-1)^r + c_{r+1}(s-1)^{r+1} + \ldots$ at $s=1$:
+
+\begin{conjecture}[Strong BSD~\cite{BSD1965,Tate1966}]
+  \begin{equation}\label{eq:strongbsd}
+    \lim_{s\to 1} \frac{L(E,s)}{(s-1)^r}
+    \;=\;
+    \frac{|\Sha(E)| \cdot \Omega_E \cdot R_E \cdot \prod_p c_p}
+         {|E(\mathbb{Q})_{\mathrm{tors}}|^2},
+  \end{equation}
+  where:
+  \begin{itemize}[nosep]
+    \item $|\Sha(E)|$ is the order of the Shafarevich--Tate group (predicted finite),
+    \item $\Omega_E = \int_{E(\mathbb{R})} |\omega|$ is the real period (integral of the
+          Néron differential),
+    \item $R_E = \det\bigl(\langle P_i, P_j \rangle\bigr)_{1\leq i,j\leq r}$ is the
+          regulator (determinant of the height pairing matrix on free generators),
+    \item $c_p = [E(\mathbb{Q}_p) : E_0(\mathbb{Q}_p)]$ are the Tamagawa numbers
+          (finite, equal to $1$ for $p \nmid N$),
+    \item $|E(\mathbb{Q})_{\mathrm{tors}}|$ is the order of the torsion subgroup.
+  \end{itemize}
+\end{conjecture}
+
+The formula \eqref{eq:strongbsd} simultaneously predicts:
+\begin{itemize}[nosep]
+  \item the vanishing order of $L(E,s)$ at $s=1$,
+  \item the finiteness of $\Sha(E)$,
+  \item the exact leading coefficient in terms of arithmetic invariants.
+\end{itemize}
+
+% ================================================================
+\section{Known Results}
+% ================================================================
+
+\subsection{Rank 0: Coates--Wiles (1977)}
+
+\begin{theorem}[Coates--Wiles~\cite{CoatesWiles1977}]
+  Let $E/\mathbb{Q}$ be an elliptic curve with complex multiplication (CM) by the ring
+  of integers of an imaginary quadratic field $K$.  If $L(E,1) \neq 0$, then
+  $E(\mathbb{Q})$ is finite (i.e., $r = 0$).
+\end{theorem}
+
+This was the first unconditional result towards BSD and uses the theory of elliptic
+units and Iwasawa theory for CM fields.
+
+\subsection{Rank 0: Kolyvagin's Euler Systems (1989)}
+
+\begin{theorem}[Kolyvagin~\cite{Kolyvagin1989}]
+  Let $E/\mathbb{Q}$ be a modular elliptic curve (now known for all $E/\mathbb{Q}$).
+  If $L(E,1) \neq 0$, then:
+  \begin{enumerate}[nosep]
+    \item $r = 0$ (finite Mordell--Weil group), and
+    \item $\Sha(E/\mathbb{Q})$ is finite.
+  \end{enumerate}
+\end{theorem}
+
+Kolyvagin's method introduces \emph{Euler systems of Heegner points}, bounding the
+Selmer group by explicit cohomological constructions.
+
+\subsection{Rank 1: Gross--Zagier and Kolyvagin (1986--1989)}
+
+\begin{theorem}[Gross--Zagier~\cite{GrossZagier1986}]
+  If $L(E,1) = 0$ but $L'(E,1) \neq 0$ (analytic rank $1$), then the Heegner point
+  $y_K \in E(K)$ (for an auxiliary imaginary quadratic field $K$) has infinite order.
+\end{theorem}
+
+\begin{corollary}[Gross--Zagier + Kolyvagin~\cite{Kolyvagin1989}]
+  Under the same hypothesis ($\operatorname{ord}_{s=1} L(E,s) = 1$):
+  \begin{enumerate}[nosep]
+    \item $r = 1$,
+    \item $\Sha(E/\mathbb{Q})$ is finite.
+  \end{enumerate}
+\end{corollary}
+
+Together, these results prove: \emph{analytic rank $\leq 1$ $\Rightarrow$ algebraic rank $=$ analytic rank}.
+
+\subsection{Partial Towards Higher Rank}
+
+For analytic rank $\geq 2$, the situation is more difficult.  Zhang~\cite{Zhang2001}
+and others have generalised the Gross--Zagier formula to Shimura curves, providing
+partial results.  Skinner--Urban~\cite{SkinnerUrban2014} proved one divisibility of the
+BSD formula using Iwasawa theory for the $p$-adic $L$-function in many cases.
+
+% ================================================================
+\section{Numerical Evidence}
+% ================================================================
+
+\subsection{Cremona Database and LMFDB}
+
+The \emph{Cremona database}~\cite{Cremona2023} lists elliptic curves over $\mathbb{Q}$
+in order of conductor and provides:
+\begin{itemize}[nosep]
+  \item algebraic rank (computed via $2$- and $4$-descent),
+  \item $L(E,1)$ to high precision (via Buhler--Gross numerical methods),
+  \item Tamagawa numbers, periods, and regulator.
+\end{itemize}
+
+The \emph{LMFDB} (L-Functions and Modular Forms Database,~\cite{LMFDB}) contains
+data for over $3.5$ million elliptic curves as of 2026.
+
+\subsection{Examples of Numerical Verification}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lllll}
+\toprule
+Curve (label) & $N$ & $r$ & $L^{(r)}(E,1)/r!$ & $|\Sha|$ (predicted) \\
+\midrule
+\texttt{37a1} & 37  & 1 & $0.3059997...$ & 1 \\
+\texttt{389a1} & 389 & 2 & $0.1598058...$ & 1 \\
+\texttt{5077a1} & 5077 & 3 & $1.7327...$ & 1 \\
+\texttt{234446a1} & 234446 & 4 & computed & 1 (predicted) \\
+\bottomrule
+\end{tabular}
+\caption{Elliptic curves with verified BSD data (Cremona/LMFDB)}
+\end{table}
+
+For curve \texttt{37a1} ($y^2 + y = x^3 - x$), $L(E,1)=0$, $L'(E,1) \approx 0.306$,
+the Heegner point method explicitly constructs a rational point of infinite order, confirming
+$r=1$ and the strong BSD formula.
+
+% ================================================================
+\section{Iwasawa Theory and $p$-adic $L$-Functions}
+% ================================================================
+
+\subsection{Overview of Iwasawa Theory}
+
+Iwasawa theory studies the variation of arithmetic objects in $\mathbb{Z}_p$-extensions.
+For an elliptic curve $E/\mathbb{Q}$ and prime $p$, consider the cyclotomic
+$\mathbb{Z}_p$-extension $\mathbb{Q}_\infty = \bigcup_n \mathbb{Q}(\zeta_{p^n})$.
+
+\begin{definition}[$p$-adic $L$-function]
+  The $p$-adic $L$-function $L_p(E, s)$ (Mazur--Swinnerton-Dyer,~\cite{MazurSD1974}) is a
+  $p$-adic analytic function interpolating special values $L(E, \chi, 1)$ for Dirichlet
+  characters $\chi$ of $p$-power conductor.
+\end{definition}
+
+\subsection{The Iwasawa Main Conjecture for Elliptic Curves}
+
+\begin{conjecture}[Iwasawa Main Conjecture for $E$]
+  Let $X_\infty$ be the Pontrjagin dual of the $p^\infty$-Selmer group of $E$ over
+  $\mathbb{Q}_\infty$.  Then as modules over the Iwasawa algebra $\Lambda = \mathbb{Z}_p[[T]]$:
+  \[
+    \mathrm{char}_\Lambda(X_\infty) \;=\; (L_p(E, s))
+    \quad \text{in } \Lambda \otimes \mathbb{Q}_p.
+  \]
+\end{conjecture}
+
+\begin{theorem}[Skinner--Urban~\cite{SkinnerUrban2014}]
+  For $p \geq 5$, $E$ without CM, $p \nmid N \cdot |E(\mathbb{Q})_{\mathrm{tors}}|^2 \cdot \prod_\ell c_\ell$,
+  and assuming the $p$-adic $L$-function is not identically zero, one divisibility of the
+  Iwasawa main conjecture holds:
+  \[
+    (L_p(E, s)) \;\mid\; \mathrm{char}_\Lambda(X_\infty).
+  \]
+\end{theorem}
+
+This gives the most powerful unconditional results towards BSD for rank 0 curves.
+
+\subsection{Connection to BSD}
+
+The Iwasawa main conjecture implies BSD in the rank 0 case (when $L(E,1) \neq 0$) for
+good ordinary primes $p$, as the $p$-adic $L$-function then does not vanish at $s=1$.
+For rank $\geq 1$ curves, $L_p(E,s)$ vanishes at $s=1$, and the connection to BSD
+requires the theory of $p$-adic heights and the $p$-adic regulator.
+
+% ================================================================
+\section{Weak vs. Strong BSD}
+% ================================================================
+
+\subsection{What Weak BSD States}
+
+Weak BSD (equation \eqref{eq:weakbsd}) is purely a statement about the analytic rank:
+$L(E,s)$ vanishes to order exactly $r$ at $s=1$.  This is still open for any $r \geq 2$.
+
+\subsection{What Strong BSD Adds}
+
+Strong BSD (equation \eqref{eq:strongbsd}) additionally predicts the \emph{exact value}
+of the leading coefficient, which encodes:
+\begin{itemize}[nosep]
+  \item the finiteness and exact order of $\Sha(E/\mathbb{Q})$,
+  \item the canonical height pairing regulator,
+  \item all Tamagawa numbers and periods.
+\end{itemize}
+
+Verifying the strong BSD formula numerically requires:
+\begin{enumerate}[nosep]
+  \item Compute $L^{(r)}(E,1)/r!$ to sufficient precision (via modular symbols).
+  \item Compute $\Omega_E$, $R_E$, $\prod c_p$, $|E(\mathbb{Q})_{\mathrm{tors}}|$.
+  \item Deduce $|\Sha(E)|$ and verify it is a perfect square (as predicted by the
+        Cassels--Tate pairing).
+\end{enumerate}
+
+\subsection{The Shafarevich--Tate Group}
+
+$\Sha(E/\mathbb{Q})$ classifies \emph{principal homogeneous spaces} (torsors) of $E$
+that are locally trivial (have points over $\mathbb{Q}_v$ for all places $v$) but have
+no rational point:
+\[
+  \Sha(E/\mathbb{Q}) \;:=\; \ker\!\left(H^1(\mathbb{Q}, E) \to \prod_v H^1(\mathbb{Q}_v, E)\right).
+\]
+The Cassels--Tate pairing makes $\Sha$ into an alternating, non-degenerate group, forcing
+$|\Sha|$ to be a perfect square (if finite).
+
+% ================================================================
+\section{Current State (2026)}
+% ================================================================
+
+\subsection{What is Known}
+
+\begin{itemize}[nosep]
+  \item \textbf{Analytic rank $0$ $\Rightarrow$ algebraic rank $0$:} Proved for all
+    modular curves (= all $E/\mathbb{Q}$) by Kolyvagin (1989).
+  \item \textbf{Analytic rank $1$ $\Rightarrow$ algebraic rank $1$:} Proved by
+    Gross--Zagier + Kolyvagin (1986--1989).
+  \item \textbf{Finiteness of $\Sha$:} Known in ranks $0$ and $1$ (Kolyvagin).
+  \item \textbf{One divisibility (Iwasawa):} Skinner--Urban (2014) for many primes $p$.
+  \item \textbf{$p$-converse theorems:} Wei Zhang (2014)~\cite{WeiZhang2014} proved the
+    $p$-converse: algebraic rank $0$ $\Rightarrow$ $L(E,1) \neq 0$ under mild hypotheses.
+\end{itemize}
+
+\subsection{What Remains Open}
+
+\begin{itemize}[nosep]
+  \item \textbf{Analytic rank $\geq 2$:} No unconditional result connecting analytic and
+    algebraic rank for $r \geq 2$.
+  \item \textbf{Strong BSD in rank $\geq 2$:} The exact formula for the leading coefficient
+    is unproved.
+  \item \textbf{Finiteness of $\Sha$ in general:} Open for $r \geq 2$.
+  \item \textbf{Unbounded rank:} Whether $r$ can be arbitrarily large is open
+    (Elkies has curves of rank $\geq 28$).
+  \item \textbf{Effective height bounds:} No effective algorithm to find all rational
+    points on a curve of rank $\geq 2$ is known.
+\end{itemize}
+
+\subsection{Computational Verifications (2026)}
+
+As of 2026, BSD has been numerically verified to high precision for all elliptic curves
+in the Cremona database ($N \leq 500000$) and for the millions of curves in the LMFDB.
+In all cases:
+\begin{itemize}[nosep]
+  \item The analytic rank equals the rank computed by descent.
+  \item The strong BSD formula holds to the precision computed.
+  \item $|\Sha|$ is a perfect square in all cases where it can be computed.
+\end{itemize}
+
+No counterexample to BSD has ever been found.
+
+% ================================================================
+\section{Connections to Other Millennium Problems}
+% ================================================================
+
+\begin{itemize}[nosep]
+  \item \textbf{Riemann Hypothesis:} The Hasse bound $|a_p| \leq 2\sqrt{p}$ is a
+    consequence of the Riemann hypothesis for $L$-functions of curves over finite fields
+    (Weil 1948), a proved analogue of RH.
+  \item \textbf{Langlands programme:} BSD fits into the general Langlands philosophy that
+    $L$-functions attached to motives encode arithmetic.  The modularity theorem connecting
+    $L(E,s)$ to modular forms is a landmark in the Langlands programme.
+  \item \textbf{Hodge Conjecture:} BSD for abelian varieties over number fields is
+    connected to the Hodge conjecture for abelian varieties (via the Tate conjecture).
+\end{itemize}
+
+% ================================================================
+\section{Conclusion}
+% ================================================================
+
+The BSD conjecture encapsulates one of the deepest mysteries of arithmetic: why should
+an analytic invariant (the order of vanishing of $L(E,s)$) equal a purely algebraic
+quantity (the rank of the Mordell--Weil group)?  The partial results of Coates--Wiles,
+Gross--Zagier, and Kolyvagin have opened the door, but the full conjecture — especially
+for rank $\geq 2$ — remains unproved.
+
+The precise formula in strong BSD ties together periods, heights, Tamagawa numbers, and
+the mysterious Shafarevich--Tate group into a single identity, suggesting profound
+connections between analysis, geometry, and algebra that are only beginning to be
+understood.
+
+\begin{thebibliography}{99}
+
+\bibitem{BSD1963}
+B.~J.~Birch and H.~P.~F.~Swinnerton-Dyer,
+\textit{Notes on elliptic curves I},
+J.\ reine angew.\ Math.\ \textbf{212} (1963), 7--25.
+
+\bibitem{BSD1965}
+B.~J.~Birch and H.~P.~F.~Swinnerton-Dyer,
+\textit{Notes on elliptic curves II},
+J.\ reine angew.\ Math.\ \textbf{218} (1965), 79--108.
+
+\bibitem{Tate1966}
+J.~Tate,
+\textit{On the conjecture of Birch and Swinnerton-Dyer and a geometric analog},
+Séminaire Bourbaki, Exposé \textbf{306} (1966), 415--440.
+
+\bibitem{Mordell1922}
+L.~J.~Mordell,
+\textit{On the rational solutions of the indeterminate equations of the third and fourth degrees},
+Proc.\ Cambridge Philos.\ Soc.\ \textbf{21} (1922), 179--192.
+
+\bibitem{Weil1928}
+A.~Weil,
+\textit{L'arithmétique sur les courbes algébriques},
+Acta Math.\ \textbf{52} (1928), 281--315.
+
+\bibitem{Mazur1977}
+B.~Mazur,
+\textit{Modular curves and the Eisenstein ideal},
+Publ.\ Math.\ IHES \textbf{47} (1977), 33--186.
+
+\bibitem{CoatesWiles1977}
+J.~Coates and A.~Wiles,
+\textit{On the conjecture of Birch and Swinnerton-Dyer},
+Invent.\ Math.\ \textbf{39} (1977), 223--251.
+
+\bibitem{GrossZagier1986}
+B.~H.~Gross and D.~B.~Zagier,
+\textit{Heegner points and derivatives of $L$-series},
+Invent.\ Math.\ \textbf{84} (1986), 225--320.
+
+\bibitem{Kolyvagin1989}
+V.~A.~Kolyvagin,
+\textit{Euler systems},
+in \textit{The Grothendieck Festschrift}, vol.~II, Birkhäuser, 1989, pp.~435--483.
+
+\bibitem{MazurSD1974}
+B.~Mazur and P.~Swinnerton-Dyer,
+\textit{Arithmetic of Weil curves},
+Invent.\ Math.\ \textbf{25} (1974), 1--61.
+
+\bibitem{SkinnerUrban2014}
+C.~Skinner and E.~Urban,
+\textit{The Iwasawa main conjecture for $\mathrm{GL}_2$},
+Invent.\ Math.\ \textbf{195} (2014), 1--277.
+
+\bibitem{WeiZhang2014}
+W.~Zhang,
+\textit{Selmer groups and the indivisibility of Heegner points},
+Camb.\ J.\ Math.\ \textbf{2} (2014), 191--253.
+
+\bibitem{Zhang2001}
+S.~Zhang,
+\textit{Gross--Zagier formula for $\mathrm{GL}(2)$},
+Asian J.\ Math.\ \textbf{5} (2001), 183--290.
+
+\bibitem{Cremona2023}
+J.~Cremona,
+\textit{Algorithms for Modular Elliptic Curves},
+Cambridge University Press, 2nd ed., 1997; database continuously updated,
+\url{https://johncremona.github.io/ecdata/}.
+
+\bibitem{LMFDB}
+The LMFDB Collaboration,
+\textit{The $L$-Functions and Modular Forms Database},
+\url{https://www.lmfdb.org}, accessed 2026.
+
+\bibitem{Silverman2009}
+J.~H.~Silverman,
+\textit{The Arithmetic of Elliptic Curves},
+2nd ed., Springer GTM \textbf{106}, 2009.
+
+\bibitem{Wiles1995}
+A.~Wiles,
+\textit{Modular elliptic curves and Fermat's Last Theorem},
+Ann.\ of Math.\ \textbf{141} (1995), 443--551.
+
+\end{thebibliography}
+
+\end{document}

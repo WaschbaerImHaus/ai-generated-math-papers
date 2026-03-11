@@ -1,0 +1,488 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsmath,amssymb,amsthm,hyperref,geometry}
+\usepackage{enumitem,booktabs,array}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\newtheorem{definition}[theorem]{Definition}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{example}[theorem]{Beispiel}
+
+% -------------------------------------------------------
+% Metadaten
+% -------------------------------------------------------
+\title{\textbf{Navier--Stokes-Gleichungen: Existenz und Regularität}\\[0.5em]
+\large Schwache Lösungen, Regularität, Turbulenz und das Millennium-Problem}
+\author{Michael Fuhrmann}
+\date{März 2026}
+
+\hypersetup{
+  pdftitle={Navier-Stokes-Existenz und Regularität},
+  pdfauthor={Michael Fuhrmann},
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue
+}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Die Navier--Stokes-Gleichungen beschreiben die Bewegung zäher inkompressibler Flüssigkeiten
+und bilden die Grundlage nahezu aller Modellierungen in der Strömungslehre, von der
+Aeronautik bis zur Wettervorhersage. Das Millennium-Preisproblem fragt, ob für beliebige
+glatte, schnell abfallende Anfangsdaten $u_0 \in C^\infty(\mathbb{R}^3)$ immer glatte
+(unendlich oft differenzierbare) globale Lösungen existieren, oder ob Singularitäten
+(„Blow-up") in endlicher Zeit entstehen können.
+
+Dieses Paper stellt die Gleichungen, die benötigten Funktionenräume (Sobolev, Leray) für
+schwache Lösungen, Lerays fundamentale Ergebnisse von 1934, Ladyzhenskayas vollständige
+2D-Theorie, den Partialregularitätssatz von Caffarelli--Kohn--Nirenberg, Kolmogorovs
+Turbulenztheorie von 1941 sowie Taos gemittelte Navier--Stokes-Blow-up-Konstruktion von
+2016 vor. Der aktuelle Stand im Jahr 2026 wird zusammengefasst.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ================================================================
+\section{Die Navier--Stokes-Gleichungen}
+% ================================================================
+
+\subsection{Herleitung und physikalische Bedeutung}
+
+Die \emph{Navier--Stokes-Gleichungen} für eine inkompressible zähe Newtonsche Flüssigkeit
+mit Geschwindigkeitsfeld $u\colon \mathbb{R}^3 \times [0,\infty) \to \mathbb{R}^3$ und
+Druck $p\colon \mathbb{R}^3 \times [0,\infty) \to \mathbb{R}$ lauten:
+\begin{align}
+  \partial_t u + (u \cdot \nabla)u &= -\nabla p + \nu \Delta u + f, \label{eq:ns_impuls}\\
+  \nabla \cdot u &= 0, \label{eq:ns_inkompressibel}
+\end{align}
+mit Anfangsbedingung $u(x, 0) = u_0(x)$.
+
+Dabei bedeuten:
+\begin{itemize}[nosep]
+  \item $(u \cdot \nabla)u$: der \emph{Advektionsterm} (nichtlinear),
+  \item $-\nabla p$: der \emph{Druckgradient},
+  \item $\nu > 0$: die \emph{kinematische Viskosität},
+  \item $\nu \Delta u$: der \emph{Diffusionsterm} (Viskositätsspannung),
+  \item $f$: eine äußere Volumenkraft (z.\,B.\ Schwerkraft).
+\end{itemize}
+
+Gleichung \eqref{eq:ns_inkompressibel} drückt die Inkompressibilitätsbedingung
+$\operatorname{div}\, u = 0$ aus, die besagt, dass die Flüssigkeit volumenerhaltend ist.
+
+\subsection{Die Millennium-Problemstellung}
+
+Das Clay Mathematics Institute~\cite{Clay2000} verlangt einen der folgenden Beweise:
+\begin{enumerate}[nosep]
+  \item Einen Beweis, dass für beliebige glatte, schnell abfallende Anfangsdaten
+    $u_0 \in C^\infty(\mathbb{R}^3)$ mit $\nabla \cdot u_0 = 0$ immer eine glatte globale
+    Lösung $(u, p)$ mit $u \in C^\infty(\mathbb{R}^3 \times [0,\infty))$ existiert.
+  \item Einen Beweis eines \emph{Blow-ups}: Anfangsdaten, für die keine glatte globale
+    Lösung existiert.
+\end{enumerate}
+
+Das Problem ist in $\mathbb{R}^3$ (und auf dem Torus $\mathbb{T}^3$) offen.
+
+% ================================================================
+\section{Funktionenräume und schwache Formulierung}
+% ================================================================
+
+\subsection{Sobolev-Räume}
+
+\begin{definition}[Sobolev-Raum $H^k$]
+  Für $k \geq 0$ besteht der Sobolev-Raum $H^k(\mathbb{R}^n) = W^{k,2}(\mathbb{R}^n)$
+  aus Funktionen $f \in L^2(\mathbb{R}^n)$ mit schwachen Ableitungen bis zur Ordnung $k$
+  in $L^2$:
+  \[
+    H^k(\mathbb{R}^n) \;=\; \bigl\{ f \in L^2(\mathbb{R}^n) :
+    \|\hat{f}\|_{H^k}^2 := \int_{\mathbb{R}^n} (1+|\xi|^2)^k |\hat{f}(\xi)|^2\,d\xi < \infty \bigr\}.
+  \]
+\end{definition}
+
+Die Energie der Navier--Stokes-Lösung wird durch die $L^2$-Norm von $u$ gemessen:
+\[
+  E(t) \;=\; \frac{1}{2}\int_{\mathbb{R}^3} |u(x,t)|^2\,dx.
+\]
+Formal ergibt Multiplikation von \eqref{eq:ns_impuls} mit $u$ und Integration die
+\emph{Energieungleichung}:
+\begin{equation}\label{eq:energie}
+  E(t) + \nu \int_0^t \int_{\mathbb{R}^3} |\nabla u|^2\,dx\,ds \;\leq\; E(0),
+\end{equation}
+für $f \equiv 0$. Dies zeigt, dass Energie nicht zunimmt (Viskosität dissipiert Energie).
+
+\subsection{Lerays schwache Formulierung (1934)}
+
+\begin{definition}[Schwache (Leray-) Lösung~\cite{Leray1934}]
+  Eine \emph{schwache Lösung} auf $[0,T]$ ist ein divergenzfreies Vektorfeld
+  $u \in L^\infty(0,T; L^2) \cap L^2(0,T; H^1)$, das folgende Bedingungen erfüllt:
+  \begin{enumerate}[nosep]
+    \item Für alle divergenzfreien Testfunktionen $\phi \in C_c^\infty(\mathbb{R}^3 \times (0,T))$:
+    \[
+      \int_0^T\!\int_{\mathbb{R}^3} \!\bigl(-u \cdot \partial_t \phi
+      - (u\otimes u):\nabla\phi + \nu \nabla u : \nabla\phi\bigr)\,dx\,dt = 0.
+    \]
+    \item Die Energieungleichung \eqref{eq:energie} gilt.
+    \item $u(t) \to u_0$ in $L^2$ für $t \to 0^+$.
+  \end{enumerate}
+\end{definition}
+
+\begin{theorem}[Leray 1934~\cite{Leray1934}]
+  Für jedes $u_0 \in L^2(\mathbb{R}^3)$ mit $\nabla \cdot u_0 = 0$ und $f \in L^2$
+  existiert mindestens eine globale schwache (Leray-) Lösung.
+\end{theorem}
+
+Lerays Beweis verwendet eine \emph{Regularisierung} (Glättung der Nichtlinearität durch
+einen Parameter $\varepsilon$) und anschließend den Grenzübergang $\varepsilon \to 0$
+unter Verwendung von Kompaktheit (Aubin--Lions-Lemma). Die entstehende Lösung wird
+\emph{Leray--Hopf-schwache Lösung} nach Leray~\cite{Leray1934} und Hopf~\cite{Hopf1951}
+genannt.
+
+% ================================================================
+\section{Der 2D-Fall: Vollständige Theorie}
+% ================================================================
+
+\begin{theorem}[Ladyzhenskaya 1969~\cite{Lady1969}]
+  In zwei Raumdimensionen ($u\colon \mathbb{R}^2 \times [0,\infty) \to \mathbb{R}^2$)
+  gilt für jedes $u_0 \in H^1(\mathbb{R}^2)$ mit $\nabla \cdot u_0 = 0$:
+  \begin{enumerate}[nosep]
+    \item Es existiert eine eindeutige globale glatte Lösung.
+    \item Die Lösung hängt stetig von den Anfangsdaten ab.
+    \item Die Strömung ist global wohlgestellt in $H^k$ für alle $k \geq 1$.
+  \end{enumerate}
+\end{theorem}
+
+Das zentrale Hilfsmittel in 2D ist die \emph{Ladyzhenskaya-Ungleichung}:
+\[
+  \|u\|_{L^4}^2 \;\leq\; C\|u\|_{L^2}\|\nabla u\|_{L^2},
+\]
+die zusammen mit der 2D-Wirbelgleichung $\partial_t \omega + (u\cdot\nabla)\omega = \nu\Delta\omega$
+(wobei der Wirbelstreck-Term $\omega\cdot\nabla u$ in 2D verschwindet) eine $L^\infty$-Schranke
+für die Wirbelstärke liefert und einen Blow-up verhindert.
+
+In 3D lautet die entsprechende Wirbelgleichung:
+$\partial_t \omega + (u\cdot\nabla)\omega = (\omega\cdot\nabla)u + \nu\Delta\omega$,
+wobei der \emph{Wirbelstreck-Term} $(\omega\cdot\nabla)u$ die Wirbelstärke verstärken und
+potenziell zu einem Blow-up führen kann.
+
+% ================================================================
+\section{Das 3D-Regularitätsproblem}
+% ================================================================
+
+\subsection{Lokale Existenz glatter Lösungen}
+
+\begin{theorem}[Kato--Fujita 1962~\cite{KatoFujita1962}]
+  Für $u_0 \in H^s(\mathbb{R}^3)$ mit $s \geq 1/2$ und $\nabla\cdot u_0=0$ existieren
+  $T^* > 0$ und eine eindeutige glatte Lösung $u \in C([0,T^*); H^s)$.
+\end{theorem}
+
+Die Frage ist, ob die maximale Existenzzeit $T^*$ immer $+\infty$ ist (globale Existenz)
+oder endlich sein kann (Blow-up).
+
+\subsection{Blow-up-Kriterien}
+
+\begin{theorem}[Beale--Kato--Majda 1984~\cite{BKM1984}]
+  Falls $T^* < \infty$ (Blow-up in endlicher Zeit), muss notwendigerweise
+  \[
+    \int_0^{T^*} \|\omega(\cdot,t)\|_{L^\infty}\,dt = +\infty
+  \]
+  gelten, wobei $\omega = \nabla \times u$ die Wirbelstärke ist. Äquivalent: Die
+  Wirbelstärke muss für einen Blow-up unbeschränkt werden.
+\end{theorem}
+
+Dieses Kriterium lokalisiert das Regularitätsproblem auf das Verhalten der Wirbelstärke.
+
+\subsection{Serrins Regularitätskriterium}
+
+\begin{theorem}[Serrin 1962~\cite{Serrin1962}; Prodi 1959]
+  Sei $u$ eine Leray--Hopf-schwache Lösung auf $(0,T)$. Falls zusätzlich
+  $u \in L^q(0,T; L^r(\mathbb{R}^3))$ für ein Paar $(q,r)$ mit
+  \[
+    \frac{2}{q} + \frac{3}{r} = 1, \quad r > 3,
+  \]
+  gilt, so ist $u$ die eindeutige glatte Lösung auf $(0,T)$.
+\end{theorem}
+
+Die Serrin-Klassen-Schranken sind skaleninvariant (die Navier--Stokes-Gleichungen sind
+invariant unter $(u,p,x,t) \mapsto (\lambda u, \lambda^2 p, \lambda^{-1}x, \lambda^{-2}t)$),
+und der kritische Fall $r=3$, $q=\infty$ wurde durch Escauriaza--Seregin--Šverák
+(2003)~\cite{ESS2003} bewiesen.
+
+% ================================================================
+\section{Caffarelli--Kohn--Nirenberg-Partialregularität}
+% ================================================================
+
+\begin{theorem}[Caffarelli--Kohn--Nirenberg 1982~\cite{CKN1982}]
+  Sei $(u, p)$ eine \emph{geeignete schwache Lösung} auf $\mathbb{R}^3 \times (0,T)$
+  (eine Leray--Hopf-Lösung, die eine lokale Energieungleichung erfüllt). Dann genügt die
+  singuläre Menge $\mathcal{S} = \{(x,t) : u \text{ ist lokal unbeschränkt bei } (x,t)\}$
+  der Abschätzung:
+  \[
+    \mathcal{H}^1(\mathcal{S}) = 0,
+  \]
+  wobei $\mathcal{H}^1$ das eindimensionale parabolische Hausdorff-Maß ist.
+  Insbesondere hat die singuläre Menge \emph{parabolische Hausdorff-Dimension} $\leq 1$.
+\end{theorem}
+
+Dies ist das stärkste unbedingte Regularitätsergebnis in 3D. Insbesondere:
+\begin{itemize}[nosep]
+  \item Die singuläre Menge kann keine Kurve, Fläche oder offene Menge enthalten.
+  \item Zu jedem festen Zeitpunkt $t$ kann es höchstens endlich viele singuläre Punkte geben.
+  \item Raumzeit-Singularitäten (falls vorhanden) sind sehr dünn gesät.
+\end{itemize}
+
+\begin{remark}
+  Der CKN-Satz schließt nicht aus, dass $\mathcal{S}$ nicht-leer ist; er schränkt lediglich
+  ihre Größe ein. Die Konstruktion einer geeigneten schwachen Lösung mit nicht-leerer
+  singulärer Menge, oder der Beweis $\mathcal{S} = \emptyset$ für alle glatten Daten,
+  bleibt offen.
+\end{remark}
+
+% ================================================================
+\section{Turbulenz: Kolmogorovs Theorie von 1941}
+% ================================================================
+
+\subsection{Die Energiekaskade}
+
+Kolmogorov~\cite{Kolmogorov1941} (1941) schlug eine statistische Theorie voll entwickelter
+Turbulenz auf der Grundlage zweier Hypothesen vor:
+\begin{enumerate}[nosep]
+  \item \textbf{Lokale Isotropie:} Bei hohen Reynolds-Zahlen sind kleinskalige turbulente
+    Bewegungen statistisch isotrop (unabhängig von der Großskalen-Geometrie).
+  \item \textbf{Universelles Gleichgewicht:} Im \emph{Inertialbereich} (Skalen zwischen
+    der Integralskala $L$ und der viskosen Dissipationsskala $\eta$) hängt die Statistik
+    nur von der mittleren Energiedissipationsrate $\varepsilon$ und der Viskosität $\nu$ ab.
+\end{enumerate}
+
+\subsection{Das Kolmogorov-$-5/3$-Spektrum}
+
+Aus dimensionsanalytischen Gründen allein (mit $[\varepsilon] = \text{m}^2\text{s}^{-3}$
+und $[k] = \text{m}^{-1}$) muss das Energiespektrum $E(k)$ (Energie pro Wellenzahleinheit)
+der Beziehung genügen:
+\begin{equation}\label{eq:k41}
+  E(k) \;=\; C_K \varepsilon^{2/3} k^{-5/3}, \quad \eta^{-1} \ll k \ll L^{-1},
+\end{equation}
+wobei $C_K \approx 1{,}5$ die \emph{Kolmogorov-Konstante} ist.
+
+Die Kolmogorov-Dissipationsskala ist $\eta = (\nu^3/\varepsilon)^{1/4}$ und die Reynolds-Zahl
+$\mathrm{Re} = L^{4/3}\varepsilon^{1/3}/\nu$. Das $k^{-5/3}$-Gesetz \eqref{eq:k41}
+ist experimentell über viele Größenordnungen bestätigt.
+
+\subsection{K41 und Navier--Stokes}
+
+Eine rigorose Herleitung von K41 aus den Navier--Stokes-Gleichungen ist bislang nicht
+gelungen. Constantin und Doering~\cite{ConstantinDoering1994} haben obere Schranken für
+die Energiedissipation bewiesen, die mit K41 verträglich sind. Die Verbindung zwischen der
+K41-Phänomenologie und dem mathematischen Regularitätsproblem (Blow-up) ist ein aktives
+Forschungsgebiet.
+
+% ================================================================
+\section{Taos gemittelte Navier--Stokes-Blow-up-Konstruktion (2016)}
+% ================================================================
+
+\subsection{Die gemittelten Gleichungen}
+
+Im Jahr 2016 konstruierte Terence Tao~\cite{Tao2016} einen Blow-up für ein modifiziertes
+System, die sogenannten \emph{gemittelten Navier--Stokes-Gleichungen}:
+\[
+  \partial_t u = \nu\Delta u - B(u,u), \quad \nabla\cdot u = 0,
+\]
+wobei $B(u,v) = \frac{1}{2}[\nabla\times(u\times v) + P\nabla(u\cdot v)]$ eine
+symmetrisierte Bilinearform ist, die mit der Navier--Stokes-Nichtlinearität verwandt und
+über SO(3)-Rotationen gemittelt wurde:
+\[
+  B_{\mathrm{avg}}(u,v) \;=\; \mathbb{E}_{R \in SO(3)}\bigl[R^{-1}B(Ru, Rv)\bigr].
+\]
+
+\subsection{Taos Satz}
+
+\begin{theorem}[Tao 2016~\cite{Tao2016}]
+  Es gibt ein gemitteltes Navier--Stokes-System mit einer glatten, divergenzfreien
+  Anfangsbedingung $u_0 \in C^\infty(\mathbb{R}^3)$, sodass die eindeutige glatte Lösung
+  $u(t)$ zu einem endlichen Zeitpunkt $T^* < \infty$ aufbläst:
+  \[
+    \limsup_{t \to T^*} \|u(t)\|_{H^1(\mathbb{R}^3)} = +\infty.
+  \]
+\end{theorem}
+
+\begin{remark}
+  Das gemittelte System erfüllt die \emph{Energiegleichung} (nicht nur die Ungleichung),
+  ist divergenzfrei und hat dieselbe Skaleninvarianz wie Navier--Stokes. Es unterscheidet
+  sich von den wahren Navier--Stokes-Gleichungen darin, dass die Nichtlinearität gemittelt
+  ist.
+\end{remark}
+
+\subsection{Implikationen von Taos Ergebnis}
+
+Taos Paper~\cite{Tao2016} erfüllt mehrere Zwecke:
+\begin{enumerate}[nosep]
+  \item Es zeigt, dass ein Blow-up durch die Struktur der Gleichungen allein
+    (Energieungleichung, Divergenzfreiheit, Skalierung) \emph{nicht ausgeschlossen} wird.
+  \item Der Blow-up-Mechanismus (eine „Energie-Kaskaden-Maschine") liefert ein
+    konzeptionelles Modell dafür, wie Singularitäten im wahren Navier--Stokes-System
+    entstehen könnten.
+  \item Er identifiziert Hindernisse: Jeder Beweis globaler Regularität muss eine
+    Eigenschaft von Navier--Stokes nutzen, die das gemittelte System nicht besitzt.
+\end{enumerate}
+
+% ================================================================
+\section{Neuere Entwicklungen (2020--2026)}
+% ================================================================
+
+\begin{itemize}[nosep]
+  \item \textbf{Nicht-Eindeutigkeit schwacher Lösungen (2019--2022):} Buckmaster und
+    Vicol~\cite{BuckmasterVicol2019} bewiesen mittels konvexer Integration, dass
+    nicht-eindeutige schwache Lösungen mit $H^{1/3-\varepsilon}$-Regularität existieren.
+    Dies legt nahe, dass Leray-Lösungen unterhalb einer kritischen Regularitätsschwelle
+    nicht eindeutig sind.
+  \item \textbf{Onsager-Vermutung (bewiesen):} De Lellis und Székelyhidi (2019)~\cite{DeLellis2019}
+    bewiesen die Onsager-Vermutung: Es existieren Lösungen der \emph{Euler-Gleichungen}
+    ($\nu=0$) mit $C^{1/3-\varepsilon}$-Regularität, die Energie dissipieren, während alle
+    Lösungen mit $C^{1/3+\varepsilon}$-Regularität Energie erhalten.
+  \item \textbf{Stochastische Navier--Stokes:} Das Hinzufügen von Rauschen kann
+    Eindeutigkeit wiederherstellen (Da Prato et al.); Eindeutigkeit für stochastische
+    Navier--Stokes in 3D in bestimmten Klassen wurde von Hofmanova et al.\ (2022)
+    nachgewiesen.
+  \item \textbf{Maschinelles Lernen und Turbulenz (2023--2026):} Neuronale Operatoren
+    (Fourier-Neural-Operators von Li et al.) haben bemerkenswerte Genauigkeit bei
+    Turbulenzsimulationen erzielt, sind aber numerisch-statistische Ansätze ohne Bezug
+    zum mathematischen Existenzproblem.
+  \item \textbf{Millennium-Problem (2026):} Kein Beweis globaler Regularität oder eines
+    Blow-ups für die wahren 3D-Navier--Stokes-Gleichungen wurde gefunden. Das Problem
+    bleibt vollständig offen.
+\end{itemize}
+
+% ================================================================
+\section{Zusammenfassung der Ergebnisse}
+% ================================================================
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+Dimension & Existenz & Eindeutigkeit/Regularität \\
+\midrule
+2D & Global, glatt (Leray 1934) & Eindeutig, glatt (Ladyzhenskaya 1969) \\
+3D & Global schwach (Leray 1934) & Offen \\
+3D (kurze Zeit) & Lokal glatt (Kato--Fujita 1962) & Eindeutig (kurze Zeit) \\
+3D (sing.\ Menge) & Hausdorff-Dim.\ $\leq 1$ (CKN 1982) & --- \\
+Gemittelt 3D & Blow-up (Tao 2016) & --- \\
+\bottomrule
+\end{tabular}
+\caption{Überblick über die Navier--Stokes-Ergebnisse}
+\end{table}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Das Navier--Stokes-Problem ist ein Paradebeispiel für die tiefe Kluft zwischen
+physikalischer Intuition und mathematischer Strenge. Flüssigkeiten verhalten sich in jedem
+physikalischen Experiment und jeder numerischen Simulation glatt, doch dieses Verhalten
+aus den Gleichungen heraus zu beweisen, hat sich fast ein Jahrhundert lang allen
+Bemühungen widersetzt.
+
+Die Teilergebnisse — Lerays schwache Lösungen, Ladyzhenskayas vollständige 2D-Theorie,
+Caffarelli--Kohn--Nirenbergs Singularitätsmengen-Schranke und Taos gemittelter Blow-up —
+umreißen zusammen die Grenzen des aktuellen Wissens. Die Lösung des Millennium-Problems
+wird wahrscheinlich echte neue Mathematik erfordern: neue Funktionenräume, neue
+Regularitätskriterien oder eine unerwartete Blow-up-Konstruktion.
+
+\begin{thebibliography}{99}
+
+\bibitem{Clay2000}
+C.~L.~Fefferman,
+\textit{Existence and Smoothness of the Navier--Stokes Equation},
+Beschreibung des Clay Mathematics Institute Millennium-Problems, 2000,
+\url{https://www.claymath.org/millennium-problems/navier-stokes-equation}.
+
+\bibitem{Leray1934}
+J.~Leray,
+\textit{Sur le mouvement d'un liquide visqueux emplissant l'espace},
+Acta Math.\ \textbf{63} (1934), 193--248.
+
+\bibitem{Hopf1951}
+E.~Hopf,
+\textit{Über die Anfangswertaufgabe für die hydrodynamischen Grundgleichungen},
+Math.\ Nachr.\ \textbf{4} (1951), 213--231.
+
+\bibitem{Lady1969}
+O.~A.~Ladyzhenskaya,
+\textit{The Mathematical Theory of Viscous Incompressible Flow},
+Gordon and Breach, New York, 1969.
+
+\bibitem{KatoFujita1962}
+T.~Kato und H.~Fujita,
+\textit{On the non-stationary Navier--Stokes system},
+Rend.\ Sem.\ Mat.\ Univ.\ Padova \textbf{32} (1962), 243--260.
+
+\bibitem{BKM1984}
+J.~T.~Beale, T.~Kato und A.~Majda,
+\textit{Remarks on the breakdown of smooth solutions for the 3-D Euler equations},
+Comm.\ Math.\ Phys.\ \textbf{94} (1984), 61--66.
+
+\bibitem{Serrin1962}
+J.~Serrin,
+\textit{On the interior regularity of weak solutions of the Navier--Stokes equations},
+Arch.\ Rational Mech.\ Anal.\ \textbf{9} (1962), 187--195.
+
+\bibitem{ESS2003}
+L.~Escauriaza, G.~Seregin und V.~Šverák,
+\textit{$L_{3,\infty}$-solutions of the Navier--Stokes equations and backward uniqueness},
+Russian Math.\ Surveys \textbf{58} (2003), 211--250.
+
+\bibitem{CKN1982}
+L.~Caffarelli, R.~Kohn und L.~Nirenberg,
+\textit{Partial regularity of suitable weak solutions of the Navier--Stokes equations},
+Comm.\ Pure Appl.\ Math.\ \textbf{35} (1982), 771--831.
+
+\bibitem{Kolmogorov1941}
+A.~N.~Kolmogorov,
+\textit{The local structure of turbulence in incompressible viscous fluid for very large Reynolds numbers},
+Dokl.\ Akad.\ Nauk SSSR \textbf{30} (1941), 301--305.
+
+\bibitem{ConstantinDoering1994}
+P.~Constantin und C.~R.~Doering,
+\textit{Variational bounds on energy dissipation in incompressible flows: II. Channel flow},
+Phys.\ Rev.\ E \textbf{51} (1995), 3192--3198.
+
+\bibitem{Tao2016}
+T.~Tao,
+\textit{Finite time blowup for an averaged three-dimensional Navier--Stokes equation},
+J.\ Amer.\ Math.\ Soc.\ \textbf{29} (2016), 601--674.
+
+\bibitem{BuckmasterVicol2019}
+T.~Buckmaster und V.~Vicol,
+\textit{Nonuniqueness of weak solutions to the Navier--Stokes equation},
+Ann.\ of Math.\ \textbf{189} (2019), 101--144.
+
+\bibitem{DeLellis2019}
+C.~De Lellis und L.~Székelyhidi,
+\textit{On turbulence and geometry: from Nash to Onsager},
+Notices Amer.\ Math.\ Soc.\ \textbf{66} (2019), 677--685.
+
+\bibitem{ConstantinFoias1988}
+P.~Constantin und C.~Foias,
+\textit{Navier--Stokes Equations},
+University of Chicago Press, 1988.
+
+\bibitem{Temam1984}
+R.~Temam,
+\textit{Navier--Stokes Equations: Theory and Numerical Analysis},
+AMS Chelsea Publishing, 1984.
+
+\end{thebibliography}
+
+\end{document}
