@@ -719,3 +719,16 @@ Fakten-Richtigkeit und EN/DE-Konsistenz.
 - Alle Sections mit Inhalt gefüllt, keine TODO-Marken
 - EN/DE Konsistenz: gleiche mathematische Tiefe, gleiche Sections/Theoreme
 
+
+2026-03-11 Review Batch 6 — Papers 25–28 vollständiges Review
+- Alle 8 Dateien geprüft: paper25 (EN/DE), paper26 (EN/DE), paper27 (EN/DE), paper28 (EN/DE)
+- BUG-B6-P26-EN-NEW-001: Abstract paper26 EN: \prod_p L_p^{-1} → \prod_p L_p (Euler-Produkt-Notation)
+- BUG-B6-P26-EN-NEW-002: Fehlende \newtheorem{example} in paper26 EN Präambel ergänzt
+- BUG-B6-P26-DE-NEW-001: Sektionsreihenfolge paper26 DE korrigiert (L@s=1 vor Numerik)
+- BUG-B6-P26-DE-NEW-002: Kolyvagin-Jahr 1989 → 1990 in paper26 DE
+- Bestätigt korrekt: paper25 EN/DE, paper27 EN/DE (Kolyvagin-Schreibweise OK), paper28 EN/DE (c/2, Koblitz1994 OK)
+- begin/end-Balance: alle 8 Dateien OK
+- cite/bibitem-Konsistenz: alle 8 Dateien OK (keine fehlenden bibitems)
+- Mathematische Inhalte: Mordell-Weil korrekt, BSD korrekt, Kolyvagin Rang-0/1 korrekt, Tunnell-Kriterium korrekt
+- BUGS.md aktualisiert
+- Git commit + push auf Bitbucket master erfolgreich

@@ -57,6 +57,26 @@ _(keine bekannten Bugs)_
 
 
 
+### BUG-B6-P26-EN-NEW-001 (Review Batch6 2026-03-11): paper26 EN — Abstract Euler-Produkt falsch
+- **Datei**: papers/batch6/paper26_l_function_elliptic_en.tex, Abstract Zeile 51
+- **Problem**: `$L(E,s) = \prod_p L_p(E,s)^{-1}$` im Abstract war inkonsistent mit Definition 3.1, wo `L_p(E,s)^{-1}` als das Polynom `1 - a_p p^{-s} + p^{1-2s}` definiert ist. Mit dieser Notation ist `L_p(E,s) = 1/(1-...)` der konvergente Faktor, also ist `\prod_p L_p(E,s)` (ohne `^{-1}`) das korrekte Euler-Produkt.
+- **Behoben**: `\prod_p L_p(E,s)^{-1}` → `\prod_p L_p(E,s)` im Abstract
+
+### BUG-B6-P26-EN-NEW-002 (Review Batch6 2026-03-11): paper26 EN — Fehlende example-Umgebungsdefinition
+- **Datei**: papers/batch6/paper26_l_function_elliptic_en.tex, Präambel
+- **Problem**: `\begin{example}` wurde 3-mal verwendet (Zeilen 114, 295, 304), aber `\newtheorem{example}[theorem]{Example}` fehlte in der Präambel. DE-Version hatte es korrekt definiert.
+- **Behoben**: `\newtheorem{example}[theorem]{Example}` nach `\newtheorem{remark}` eingefügt
+
+### BUG-B6-P26-DE-NEW-001 (Review Batch6 2026-03-11): paper26 DE — Sektionsreihenfolge inkonsistent mit EN
+- **Datei**: papers/batch6/paper26_l_function_elliptic_de.tex
+- **Problem**: Sektion 6 "Numerische Beispiele" stand VOR Sektion 7 "Die L-Funktion bei s=1". In EN ist die Reihenfolge umgekehrt (erst Definition der Verschwindungsordnung, dann Beispiele), was didaktisch und strukturell korrekt ist.
+- **Behoben**: Sektionen getauscht — "Die L-Funktion bei s=1" ist nun Sektion 6, "Numerische Beispiele" Sektion 7
+
+### BUG-B6-P26-DE-NEW-002 (Review Batch6 2026-03-11): paper26 DE — Kolyvagin-Jahr 1989 statt 1990
+- **Datei**: papers/batch6/paper26_l_function_elliptic_de.tex, Numerische Beispiele (Rang-0)
+- **Problem**: "von Kolyvagin (1989) bedingungslos bewiesen" — bibitem heißt `Kolyvagin1990`, alle anderen Stellen im Paper sagen "1990". Die korrekte Veröffentlichung ist 1990.
+- **Behoben**: `(1989)` → `(1990)`
+
 ### BUG-B6-P28-EN-004 (Build 102): paper28 EN — Falscher bibitem-Schlüssel Koblitz
 - **Datei**: papers/batch6/paper28_congruent_numbers_bsd_en.tex
 - **Problem**: bibitem-Schlüssel `Koblitz1993` widersprach dem Erscheinungsjahr der 2. Auflage (1994)
