@@ -318,3 +318,7 @@
   - paper20_goldbach_singular_series.tex (EN): Goldbach singuläre Reihe, Hypothesis H, Paritätsproblem
   - paper20_goldbach_singulaere_reihe_de.tex (DE): Deutsche Version
   Gesamt: 8 LaTeX-Dateien, Batch 4 komplett
+2026-03-11 12:27 Build 81: BUG-010 + BUG-011 behoben
+  - paper2_lehmer_drei_primfaktoren_de.tex: \textit{Alternativer Beweis:}-Label vor zweitem Beweis eingefügt (Zeilen 144–155)
+  - paper7_lehmer_kein_semiprim_de.tex: Ungleichungskette Zeile 98 verschärft:
+    1*(p-1)-1=p-2 >= 1  →  1*p-1=p-1 >= 2 (nutzt q-2 >= p statt q-2 >= p-1)
