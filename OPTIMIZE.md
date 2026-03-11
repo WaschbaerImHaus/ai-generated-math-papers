@@ -53,7 +53,7 @@ Letzte Aktualisierung: 2026-03-11 (Build 68)
 
 ### Geschwindigkeit (konkrete Hot-Spots)
 - [x] **Fourier FFT-Polynommultiplikation**: `polynomial_multiply_fft()` in `fourier.py` O(n log n) (Build 58)
-- [ ] **Cython/Numba JIT**: Performance-kritische Schleifen in `proof_theory.py` (Sieb), `complex_analysis.py` (ζ-Iteration) → Numba-JIT für 10–50x Speedup; Numba derzeit nicht installiert
+- [x] **Numba JIT**: `numba_jit.py` mit `sieve_numpy()` + `eta_euler_accelerated_jit()` — **13.9× Sieb-Speedup, 34.2× η(s)-Speedup** (Build 71)
 - [ ] **Symbolische vs. Numerische Wahl**: Automatische Entscheidung je nach Problem-Typ (kleine Polynome → SymPy symbolisch; große Matrizen → NumPy numerisch) — `computation_strategy.py` vorhanden, noch nicht überall integriert
 - [ ] **`prime_factorization()` + `euler_phi()`**: Zwei separate Primfaktor-Traversierungen; `euler_phi` könnte `prime_factorization()` direkt wiederverwenden
 - [x] **`bisection()` + `newton_raphson()` Hybridmethode**: `brent_method()` implementiert (Build 19)
