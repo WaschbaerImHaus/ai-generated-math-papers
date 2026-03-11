@@ -1,0 +1,386 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage[ngerman]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+% -------------------------------------------------------
+% Eigene Makros
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\ggT}{ggT}
+\newcommand{\leg}[2]{\left(\frac{#1}{#2}\right)}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Anwendungen des Satzes von Wilson}
+
+\author{Michael Fuhrmann}
+\address{Specialist-Mathematics-Projekt, Build 66}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Wir stellen vier wesentliche Anwendungen des Satzes von Wilson vor:
+(i) Eine vollständige Primzahlcharakterisierung via $(n-1)! \equiv -1 \pmod{n}$
+mit einer Analyse ihrer rechnerischen Unpraktikabilität;
+(ii) einen Beweis, dass $-1$ genau dann ein quadratischer Rest modulo einer
+ungeraden Primzahl $p$ ist, wenn $p \equiv 1 \pmod{4}$ gilt, direkt aus Wilson
+via der Faktorisierung von $(p-1)!$ hergeleitet;
+(iii) einen elementaren Beweis des harmonischen Lemmas von Wolstenholme:
+$1 + 1/2 + \cdots + 1/(p-1) \equiv 0 \pmod{p}$ für alle Primzahlen $p \geq 3$;
+und (iv) einen alternativen Beweis des kleinen Satzes von Fermat mit Hilfe
+des Satzes von Wilson, mit einer Skizze, wie dieser Ansatz auf den Satz von
+Euler erweitert werden kann.
+Alle Beweise sind elementar und in sich abgeschlossen.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung}
+% ================================================================
+
+Der Satz von Wilson — $(p-1)! \equiv -1 \pmod{p}$ genau dann, wenn $p$
+eine Primzahl ist — ist mehr als eine isolierte Kuriosität. Er ist ein
+Werkzeug zur Herleitung tieferer Erkenntnisse über Primzahlen, quadratische
+Reste und multiplikative Arithmetik.
+
+In diesem Paper sammeln wir vier Anwendungen. Die erste ist der Satz selbst,
+verwendet als Primalitätstest, mit einer ehrlichen Einschätzung seiner
+Grenzen. Die zweite leitet ein vollständiges Kriterium dafür ab, dass $-1$
+ein quadratischer Rest modulo $p$ ist — ein Ergebnis, das normalerweise via
+Charaktertheorie oder Gauß-Summen bewiesen wird — hier mit nichts mehr als
+Schulalgebra erhalten. Die dritte beweist eine harmonische Kongruenz von
+Wolstenholme. Die vierte gibt einen alternativen Beweis des kleinen Satzes
+von Fermat via Wilson und zeigt die Verflechtung dieser klassischen Ergebnisse.
+
+% ================================================================
+\section{Wilson als Primalitätstest}
+% ================================================================
+
+\begin{theorem}[Primzahlcharakterisierung]\label{satz:primalitaet}
+  Eine ganze Zahl $n \geq 2$ ist genau dann eine Primzahl, wenn
+  \[
+    (n-1)! \;\equiv\; -1 \pmod{n}.
+  \]
+\end{theorem}
+
+\begin{proof}
+  \textbf{($\Rightarrow$)} Sei $n = p$ eine Primzahl. Die multiplikative
+  Gruppe $(\Z/p\Z)^*$ hat Ordnung $p-1$ und ihre Elemente sind $1, 2, \ldots, p-1$.
+  Jedes Element $a$ hat ein eindeutiges Inverses $a^{-1}$ in $\{1, \ldots, p-1\}$.
+  Die einzigen Elemente, die gleich ihrem eigenen Inversen sind, erfüllen
+  $a^2 \equiv 1 \pmod{p}$, d.\,h.\ $p \mid (a-1)(a+1)$; da $p$ prim ist,
+  gilt $a \equiv \pm 1 \pmod{p}$, also $a \in \{1, p-1\}$.
+
+  Alle anderen Elemente $2, \ldots, p-2$ bilden Paare $a \leftrightarrow a^{-1}$
+  mit $a \cdot a^{-1} \equiv 1 \pmod{p}$. Daher:
+  \[
+    (p-1)! = 1 \cdot (p-1) \cdot \prod_{\substack{a=2\\a \neq a^{-1}}}^{p-2} a
+    \equiv 1 \cdot (p-1) \cdot 1 \equiv p-1 \equiv -1 \pmod{p}.
+  \]
+
+  \textbf{($\Leftarrow$)} Sei $n$ zusammengesetzt, $n = ab$ mit $1 < a \leq b < n$.
+
+  \emph{Fall 1: $a < b$.} Dann sind $a$ und $b$ verschiedene ganze Zahlen in
+  $\{1, \ldots, n-1\}$, also gilt $ab = n \mid (n-1)!$ und
+  $(n-1)! \equiv 0 \not\equiv -1$.
+
+  \emph{Fall 2: $a = b$, also $n = a^2$.}
+  Falls $a \geq 3$: Sowohl $a$ als auch $2a$ liegen in $\{1, \ldots, n-1\}$
+  (da $2a < a^2$ für $a \geq 3$), also gilt $2a^2 = 2n \mid (n-1)!$ und
+  $(n-1)! \equiv 0$.
+  Falls $a = 2$: $n = 4$ und $(4-1)! = 6 \equiv 2 \pmod{4} \neq -1$.
+\end{proof}
+
+\begin{bemerkung}[Rechnerische Unpraktikabilität]
+  Obwohl Satz~\ref{satz:primalitaet} theoretisch einen perfekten Primalitätstest
+  liefert, ist er für große $n$ rechnerisch nutzlos. Die naïve Berechnung von
+  $(n-1)! \bmod n$ erfordert $n-2$ Multiplikationen modulo $n$.
+  Für $n \approx 2^{1000}$ (eine 300-stellige Primzahl) sind das $\sim 2^{1000}$
+  Schritte — weit jenseits jeder praktikablen Berechnung.
+
+  Im Gegensatz dazu arbeitet der Miller--Rabin-probabilistische Primalitätstest
+  in $O(k \log^2 n)$ Zeit mit $k$ Runden, und der AKS-Algorithmus
+  \cite{Agrawal2004} entscheidet die Primalität deterministisch in
+  Polynomialzeit $O(\log^{6} n)$. Wilsons Test hat theoretische Bedeutung,
+  aber keine praktische Anwendung für Primalitätstests.
+\end{bemerkung}
+
+% ================================================================
+\section{Quadratische Reste: Wann ist $-1$ ein Quadrat modulo $p$?}
+% ================================================================
+
+\begin{definition}[Quadratischer Rest]\label{def:quadratischer_rest}
+  Sei $p$ eine ungerade Primzahl. Eine ganze Zahl $a$ mit $\ggT(a,p) = 1$
+  ist ein \emph{quadratischer Rest} modulo $p$, wenn $a \equiv x^2 \pmod{p}$
+  für eine ganze Zahl $x$ gilt. Das Legendre-Symbol ist definiert durch
+  \[
+    \leg{a}{p} =
+    \begin{cases}
+      1  & \text{falls } a \text{ ein quadratischer Rest mod } p \text{ ist}, \\
+      -1 & \text{falls } a \text{ ein Nicht-Rest mod } p \text{ ist.}
+    \end{cases}
+  \]
+\end{definition}
+
+\begin{theorem}[Erste Ergänzung zum quadratischen Reziprozitätsgesetz]%
+  \label{satz:minus1_qr}
+  Sei $p$ eine ungerade Primzahl. Dann ist $-1$ genau dann ein quadratischer
+  Rest modulo $p$, wenn $p \equiv 1 \pmod{4}$ gilt. Äquivalent:
+  \[
+    \leg{-1}{p} \;=\; (-1)^{(p-1)/2}.
+  \]
+\end{theorem}
+
+\begin{proof}
+  Wir berechnen $(p-1)!$ auf zwei verschiedene Weisen.
+
+  \textbf{Weise 1 (Wilson):}
+  Nach dem Satz von Wilson gilt $(p-1)! \equiv -1 \pmod{p}$.
+
+  \textbf{Weise 2 (Umgruppierung):}
+  Schreibe das Produkt $(p-1)! = 1 \cdot 2 \cdots \frac{p-1}{2} \cdot
+  \frac{p+1}{2} \cdots (p-1)$. In der zweiten Hälfte ersetze $j$ durch
+  $p - j$ für $j \in \{(p+1)/2, \ldots, p-1\}$, was bijektiv auf
+  $\{1, \ldots, (p-1)/2\}$ abbildet:
+  Für $k = 1, 2, \ldots, (p-1)/2$ gilt $p - k \equiv -k \pmod{p}$.
+  Also:
+  \[
+    (p-1)! = \prod_{k=1}^{(p-1)/2} k \cdot \prod_{k=1}^{(p-1)/2}(p-k)
+    \equiv \prod_{k=1}^{(p-1)/2} k \cdot \prod_{k=1}^{(p-1)/2}(-k)
+    = \Bigl(\prod_{k=1}^{(p-1)/2} k\Bigr)^2 \cdot (-1)^{(p-1)/2} \pmod{p}.
+  \]
+  Sei $M = \bigl(\tfrac{p-1}{2}\bigr)!$. Dann gilt:
+  \[
+    (p-1)! \equiv M^2 \cdot (-1)^{(p-1)/2} \pmod{p}.
+  \]
+
+  \textbf{Kombination:}
+  Aus Weise 1 und Weise 2 folgt:
+  \[
+    -1 \equiv M^2 \cdot (-1)^{(p-1)/2} \pmod{p}.
+  \]
+  Daraus ergibt sich:
+  \begin{itemize}
+    \item Falls $(p-1)/2$ gerade ist (d.\,h.\ $p \equiv 1 \pmod{4}$):
+      $(-1)^{(p-1)/2} = 1$, also $-1 \equiv M^2 \pmod{p}$.
+      Damit ist $-1$ ein quadratischer Rest modulo $p$. \checkmark
+    \item Falls $(p-1)/2$ ungerade ist (d.\,h.\ $p \equiv 3 \pmod{4}$):
+      $(-1)^{(p-1)/2} = -1$, also $-1 \equiv -M^2 \pmod{p}$,
+      d.\,h.\ $M^2 \equiv 1 \pmod{p}$.
+      Wäre $-1$ ein quadratischer Rest, so gäbe es $x$ mit $-1 \equiv x^2 \pmod{p}$.
+      Multiplikation liefert: $(-1)^{(p-1)/2} \equiv x^{p-1} \equiv 1 \pmod{p}$
+      nach dem kleinen Satz von Fermat. Aber $(-1)^{(p-1)/2} = -1 \neq 1$.
+      Widerspruch. Also ist $-1$ kein Rest. \checkmark
+  \end{itemize}
+  In beiden Fällen gilt $\leg{-1}{p} = (-1)^{(p-1)/2}$. \qedhere
+\end{proof}
+
+\begin{korollar}[Voraussetzung für Fermats Zwei-Quadrate-Satz]%
+  \label{kor:zwei_quadrate}
+  Eine Primzahl $p$ lässt sich als $p = x^2 + y^2$ mit ganzen Zahlen $x, y$
+  schreiben, nur wenn $p = 2$ oder $p \equiv 1 \pmod{4}$.
+\end{korollar}
+
+\begin{proof}
+  Falls $p = x^2 + y^2$, gilt $x^2 \equiv -y^2 \pmod{p}$. Falls $p \nmid y$,
+  dann ist $(xy^{-1})^2 \equiv -1 \pmod{p}$, also ist $-1$ ein quadratischer
+  Rest mod $p$, was $p \equiv 1 \pmod{4}$ nach Satz~\ref{satz:minus1_qr}
+  erfordert. Der Fall $p = 2 = 1^2 + 1^2$ ist direkt. \qedhere
+\end{proof}
+
+% ================================================================
+\section{Das harmonische Lemma von Wolstenholme}
+% ================================================================
+
+\begin{theorem}[Harmonische Kongruenz von Wolstenholme]\label{satz:harmonisch}
+  Für jede Primzahl $p \geq 3$ gilt:
+  \[
+    1 + \frac{1}{2} + \frac{1}{3} + \cdots + \frac{1}{p-1}
+    \;\equiv\; 0 \pmod{p},
+  \]
+  wobei jeder Bruch $1/j$ das multiplikative Inverse von $j$ modulo $p$ bezeichnet.
+\end{theorem}
+
+\begin{proof}
+  Bezeichne die harmonische Summe mit $H = \sum_{j=1}^{p-1} j^{-1} \pmod{p}$.
+
+  \textbf{Schritt 1 (Symmetrie).}
+  Für jedes $j \in \{1, \ldots, p-1\}$ liegt das Inverse $j^{-1}$ ebenfalls
+  in $\{1, \ldots, p-1\}$ (da $(\Z/p\Z)^*$ eine Gruppe ist), und die Abbildung
+  $j \mapsto j^{-1}$ ist eine Bijektion auf $\{1, \ldots, p-1\}$.
+  Daher ist die Summe über alle $j$ gleich der Summe über alle $j^{-1}$:
+  \[
+    H = \sum_{j=1}^{p-1} j^{-1} = \sum_{j=1}^{p-1} j \pmod{p}.
+  \]
+
+  \textbf{Schritt 2 (Auswertung von $\sum_{j=1}^{p-1} j$).}
+  \[
+    \sum_{j=1}^{p-1} j = \frac{(p-1)p}{2}.
+  \]
+  Modulo $p$: Da $p \equiv 0 \pmod{p}$, gilt $(p-1)p/2 \equiv 0 \pmod{p}$.
+
+  \textbf{Schlussfolgerung.}
+  Daher gilt $H \equiv \sum_{j=1}^{p-1} j \equiv 0 \pmod{p}$. \qedhere
+\end{proof}
+
+\begin{bemerkung}
+  Wolstenholmes stärkerer Satz (1862) besagt, dass für $p \geq 5$ gilt:
+  \[
+    1 + \frac{1}{2} + \cdots + \frac{1}{p-1} \equiv 0 \pmod{p^2}.
+  \]
+  Dies ist ein tieferes Ergebnis und erfordert eine Analyse modulo $p^2$,
+  die es mit dem Wilson-Quotienten verbindet (vgl.\ Paper~10 dieser Serie).
+  Eine Primzahl $p$ ist genau dann eine Wilson-Primzahl, wenn die noch
+  stärkere Kongruenz des Wilson-Quotienten modulo $p$ gilt.
+\end{bemerkung}
+
+% ================================================================
+\section{Der kleine Satz von Fermat via Wilson}
+% ================================================================
+
+\begin{theorem}[Kleiner Satz von Fermat]\label{satz:fermat}
+  Sei $p$ eine Primzahl und $a$ eine ganze Zahl mit $\ggT(a,p) = 1$.
+  Dann gilt:
+  \[
+    a^{p-1} \;\equiv\; 1 \pmod{p}.
+  \]
+\end{theorem}
+
+\begin{proof}[Beweis via Wilson]
+  Betrachte die $p-1$ Vielfachen $a, 2a, 3a, \ldots, (p-1)a$.
+  Wir behaupten, dass diese alle verschieden modulo $p$ sind und eine
+  Permutation von $\{1, 2, \ldots, p-1\}$ bilden.
+
+  \textbf{Schritt 1 (Verschiedenheit).}
+  Falls $ja \equiv ka \pmod{p}$ mit $1 \leq j, k \leq p-1$, dann gilt
+  $p \mid (j-k)a$. Da $\ggT(a,p)=1$, folgt $p \mid j-k$.
+  Aber $|j-k| < p$, also $j = k$.
+
+  \textbf{Schritt 2 (Sie liegen in $\{1,\ldots,p-1\}$).}
+  Jedes $ja$ erfüllt $\ggT(ja, p) = \ggT(j,p)\ggT(a,p) = 1$
+  (da $1 \leq j \leq p-1$ und $\ggT(a,p) = 1$), also gilt $ja \not\equiv 0 \pmod{p}$.
+
+  \textbf{Schritt 3 (Produktvergleich).}
+  Wir multiplizieren alle $p-1$ Kongruenzen:
+  \[
+    a \cdot 2a \cdot 3a \cdots (p-1)a \;\equiv\; 1 \cdot 2 \cdot 3 \cdots (p-1) \pmod{p}.
+  \]
+  Die linke Seite ist $a^{p-1} \cdot (p-1)!$ und die rechte Seite ist $(p-1)!$.
+  Daher gilt:
+  \[
+    a^{p-1} \cdot (p-1)! \equiv (p-1)! \pmod{p}.
+  \]
+
+  \textbf{Schritt 4 (Kürzung via Wilson).}
+  Nach dem Satz von Wilson gilt $(p-1)! \equiv -1 \pmod{p}$, also ist
+  $\ggT((p-1)!, p) = 1$ (da $p \nmid (p-1)!$ klar ist, weil $p$ prim und
+  keines der Elemente $1, \ldots, p-1$ durch $p$ teilbar ist).
+  Daher ist $(p-1)!$ invertierbar modulo $p$, und wir können kürzen:
+  \[
+    a^{p-1} \equiv 1 \pmod{p}. \qedhere
+  \]
+\end{proof}
+
+\begin{bemerkung}
+  Der Standardbeweis des kleinen Satzes von Fermat (der das Permutationsargument
+  aus Schritten 1--3 verwendet) benötigt Wilson eigentlich nicht — das Kürzen
+  in Schritt 4 erfordert nur $(p-1)! \not\equiv 0 \pmod{p}$, was offensichtlich
+  ist, da $p$ prim und keines der Elemente $1, \ldots, p-1$ durch $p$ teilbar ist.
+  Der Satz von Wilson wird hier verwendet, um den \emph{Wert} von $(p-1)!$ zu
+  liefern und den Kürzungsschritt expliziter darzustellen.
+  Der obige Beweis zeigt, wie Wilson und Fermat Facetten derselben
+  gruppentheoretischen Tatsache sind: $(\Z/p\Z)^*$ ist eine Gruppe der Ordnung $p-1$.
+\end{bemerkung}
+
+\begin{korollar}[Skizze: Eulerscher Satz via Wilson + Struktur]\label{kor:euler}
+  Für $\ggT(a, n) = 1$ gilt: $a^{\varphi(n)} \equiv 1 \pmod{n}$.
+\end{korollar}
+
+\begin{proof}[Beweissskizze]
+  Nach dem Chinesischen Restsatz gilt $(\Z/n\Z)^* \cong \prod_i (\Z/p_i^{k_i}\Z)^*$
+  für die Primfaktorzerlegung $n = \prod p_i^{k_i}$.
+  Jeder Faktor $(\Z/p_i^{k_i}\Z)^*$ hat Ordnung $\varphi(p_i^{k_i})$, also gilt
+  $a^{\varphi(p_i^{k_i})} \equiv 1 \pmod{p_i^{k_i}}$.
+  Da $\varphi(n) = \prod \varphi(p_i^{k_i})$ und $\varphi(p_i^{k_i}) \mid \varphi(n)$,
+  erhalten wir $a^{\varphi(n)} \equiv 1$ modulo jedem $p_i^{k_i}$, also
+  $a^{\varphi(n)} \equiv 1 \pmod{n}$ nach CRT.
+  Die Rolle Wilson-artiger Sätze ist die Sicherstellung, dass die Einheitengruppen
+  $(\Z/p^k\Z)^*$ die Ordnung genau $\varphi(p^k) = p^{k-1}(p-1)$ haben, was die
+  Zyklizität dieser Gruppen erfordert (bewiesen mit der Existenz von Primitivwurzeln,
+  die wiederum Wilson für $p$ verwendet).
+\end{proof}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Der Satz von Wilson ist zwar als Primalitätstest rechnerisch unpraktisch,
+beleuchtet aber tiefe strukturelle Eigenschaften der ganzen Zahlen modulo $p$.
+
+Die Herleitung der ersten Ergänzung zum quadratischen Reziprozitätsgesetz
+($\leg{-1}{p} = (-1)^{(p-1)/2}$) aus Wilson durch eine doppelte Zählung
+von $(p-1)!$ ist eines der elegantesten Argumente in der elementaren
+Zahlentheorie. Das harmonische Lemma von Wolstenholme folgt aus einem einfachen
+Symmetrieargument über die Gruppe $(\Z/p\Z)^*$. Und der Beweis des kleinen
+Satzes von Fermat via Wilson zeigt die gruppentheoretische Einheit beider
+Ergebnisse.
+
+Diese vier Anwendungen zeigen, dass der Satz von Wilson keine isolierte
+Kuriosität ist, sondern ein grundlegendes Werkzeug, das Primalität,
+quadratische Reziprozität, harmonische Summen und die multiplikative Struktur
+von $\Z/p\Z$ verbindet.
+
+\begin{thebibliography}{9}
+
+\bibitem{Hardy1979}
+G.~H.~Hardy und E.~M.~Wright.
+\newblock \emph{Einführung in die Zahlentheorie} (An Introduction to the Theory of Numbers), 5.~Aufl.
+\newblock Oxford University Press, 1979.
+
+\bibitem{Ireland1990}
+K.~Ireland und M.~Rosen.
+\newblock \emph{A Classical Introduction to Modern Number Theory}, 2.~Aufl.
+\newblock Springer, New York, 1990.
+
+\bibitem{Agrawal2004}
+M.~Agrawal, N.~Kayal und N.~Saxena.
+\newblock PRIMES is in P.
+\newblock \emph{Ann.\ of Math.}, 160(2):781--793, 2004.
+
+\bibitem{Niven1991}
+I.~Niven, H.~S.~Zuckerman und H.~L.~Montgomery.
+\newblock \emph{An Introduction to the Theory of Numbers}, 5.~Aufl.
+\newblock Wiley, New York, 1991.
+
+\bibitem{Crandall1997}
+R.~Crandall, K.~Dilcher und C.~Pomerance.
+\newblock A search for Wieferich and Wilson primes.
+\newblock \emph{Math.\ Comp.}, 66(217):433--449, 1997.
+
+\end{thebibliography}
+
+\end{document}

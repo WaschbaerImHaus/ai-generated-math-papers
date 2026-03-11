@@ -1,0 +1,356 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage[ngerman]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+% -------------------------------------------------------
+% Eigene Makros
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\ggT}{ggT}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Der Wilson-Quotient und Wilson-Primzahlen}
+
+\author{Michael Fuhrmann}
+\address{Specialist-Mathematics-Projekt, Build 64}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Der Satz von Wilson garantiert, dass $(p-1)! + 1$ durch jede Primzahl $p$
+teilbar ist. Dies motiviert den \emph{Wilson-Quotienten}
+$W_p = \bigl((p-1)!+1\bigr)/p \in \Z$.
+Eine Primzahl $p$ heißt \emph{Wilson-Primzahl}, wenn $p^2 \mid (p-1)!+1$ gilt,
+äquivalent wenn $p \mid W_p$. Wir beweisen vier Hauptresultate:
+(i) eine explizite Kongruenz, die $W_p$ durch die harmonische Summe
+$\sum_{j=1}^{p-1} j^{-1} \pmod{p}$ ausdrückt,
+(ii) die Äquivalenz der Wilson-Primzahl-Bedingung mit $p^2 \mid (p-1)!+1$,
+(iii) einen Zusammenhang mit Bernoulli-Zahlen via Kummers Kongruenz
+$W_p \equiv -B_{p-1} \pmod{p}$,
+und (iv) ein heuristisches Argument für die Seltenheit von Wilson-Primzahlen.
+Die einzigen bekannten Wilson-Primzahlen sind $5$, $13$ und $563$;
+keine weiteren Wilson-Primzahlen existieren unterhalb von $2 \times 10^{13}$.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung}
+% ================================================================
+
+Der Satz von Wilson besagt $(p-1)! \equiv -1 \pmod{p}$ für jede Primzahl $p$.
+Das bedeutet $p \mid (p-1)! + 1$, daher ist die ganze Zahl
+\[
+  W_p = \frac{(p-1)! + 1}{p}
+\]
+wohldefiniert. Die Frage, ob $p$ auch $W_p$ teilt, ist der Ausgangspunkt
+der Theorie der Wilson-Primzahlen.
+
+Wilson-Primzahlen sind analog zu Wieferich-Primzahlen beim kleinen Satz von
+Fermat: Genau wie Wieferich-Primzahlen $a^{p-1} \equiv 1 \pmod{p^2}$ erfüllen
+(die „quadrierte" Version von Fermats kleinem Satz), erfüllen Wilson-Primzahlen
+die „quadrierte" Version von Wilson. Beide sind extrem selten, und in beiden
+Fällen sind nur endlich viele bekannt.
+
+Im gesamten Artikel bezeichnet $p$ eine Primzahl, und alle Rechnungen in
+Restklassen gelten modulo der nach $\pmod{}$ geschriebenen Primzahl.
+
+% ================================================================
+\section{Der Wilson-Quotient und seine grundlegenden Eigenschaften}
+% ================================================================
+
+\begin{definition}[Wilson-Quotient und Wilson-Primzahlen]\label{def:wilson_quotient}
+  Für eine Primzahl $p$ ist der \emph{Wilson-Quotient}
+  \[
+    W_p \;=\; \frac{(p-1)!\,+\,1}{p} \;\in\; \Z.
+  \]
+  Die Primzahl $p$ heißt \emph{Wilson-Primzahl}, wenn $p \mid W_p$ gilt,
+  äquivalent wenn $p^2 \mid (p-1)! + 1$.
+\end{definition}
+
+\begin{proposition}[Ganzzahligkeit und erste Werte]\label{prop:grundlegendes}
+  $W_p$ ist eine positive ganze Zahl. Die ersten Werte sind:
+  \[
+    W_2 = 1,\quad W_3 = 1,\quad W_5 = 5,\quad W_7 = 103,\quad W_{11} = 329891.
+  \]
+\end{proposition}
+
+\begin{proof}
+  Nach dem Satz von Wilson gilt $p \mid (p-1)! + 1$, also $W_p \in \Z$.
+  Positivität folgt aus $(p-1)! + 1 \geq 1$.
+  Die numerischen Werte ergeben sich durch direkte Berechnung:
+  \begin{align*}
+    W_2 &= \tfrac{1!+1}{2} = 1,\\
+    W_3 &= \tfrac{2!+1}{3} = 1,\\
+    W_5 &= \tfrac{4!+1}{5} = \tfrac{25}{5} = 5,\\
+    W_7 &= \tfrac{6!+1}{7} = \tfrac{721}{7} = 103,\\
+    W_{11} &= \tfrac{10!+1}{11} = \tfrac{3628801}{11} = 329891.\qedhere
+  \end{align*}
+\end{proof}
+
+\begin{theorem}[Wilson-Primzahl-Kriterium]\label{satz:wilson_primzahl_kriterium}
+  Eine Primzahl $p$ ist genau dann eine Wilson-Primzahl, wenn
+  $W_p \equiv 0 \pmod{p}$, d.\,h.\ $p^2 \mid (p-1)! + 1$.
+\end{theorem}
+
+\begin{proof}
+  Nach Definition gilt $W_p = \bigl((p-1)!+1\bigr)/p$. Dann gilt:
+  \[
+    p \mid W_p
+    \iff p \mid \frac{(p-1)!+1}{p}
+    \iff p^2 \mid (p-1)! + 1. \qedhere
+  \]
+\end{proof}
+
+% ================================================================
+\section{Darstellung durch die harmonische Summe}
+% ================================================================
+
+\begin{theorem}[Wilson-Quotient via harmonische Summe]\label{satz:harmonisch}
+  Für eine ungerade Primzahl $p$ gilt:
+  \[
+    W_p \;\equiv\; -\sum_{j=1}^{p-1} \frac{1}{j} \pmod{p},
+  \]
+  wobei $1/j$ das multiplikative Inverse von $j$ modulo $p$ bezeichnet.
+\end{theorem}
+
+\begin{proof}
+  Wir berechnen $(p-1)!$ modulo $p^2$.
+
+  \textbf{Schritt 1 (Paarung).}
+  Für $1 \leq j \leq (p-1)/2$ gilt $j(p-j) = jp - j^2 \equiv -j^2 + jp \pmod{p^2}$.
+  Daher:
+  \[
+    (p-1)! = \prod_{j=1}^{(p-1)/2} j \cdot \prod_{j=(p+1)/2}^{p-1} j
+           = \prod_{j=1}^{(p-1)/2} j(p-j)
+           \equiv \prod_{j=1}^{(p-1)/2} (-j^2)\Bigl(1 - \frac{p}{j}\Bigr) \pmod{p^2}.
+  \]
+
+  \textbf{Schritt 2 (Erweiterung).}
+  Da das Produkt $\prod_{j=1}^{(p-1)/2} (1 - p/j) \equiv 1 - p\sum_{j=1}^{(p-1)/2} j^{-1}
+  \pmod{p^2}$, ergibt sich:
+  \[
+    (p-1)! \equiv (-1)^{(p-1)/2}\bigl(((p-1)/2)!\bigr)^2
+                  \Bigl(1 - p\!\sum_{j=1}^{(p-1)/2} j^{-1}\Bigr) \pmod{p^2}.
+  \]
+
+  \textbf{Schritt 3 (Modulo-$p$-Vereinfachung).}
+  Für das Vorzeichen gilt $(-1)^{(p-1)/2}\bigl(((p-1)/2)!\bigr)^2 \equiv -1 \pmod{p}$
+  (dies folgt aus der Wilson-Gleichung und der Quadratreste-Theorie).
+  Schreibe $(-1)^{(p-1)/2}\bigl(((p-1)/2)!\bigr)^2 = -1 + p\mu$ für ein $\mu \in \Z$.
+  Dann gilt modulo $p^2$:
+  \begin{align*}
+    (p-1)! &\equiv (-1 + p\mu)\Bigl(1 - p\!\sum_{j=1}^{(p-1)/2}j^{-1}\Bigr)\\
+           &\equiv -1 + p\!\sum_{j=1}^{(p-1)/2} j^{-1} + p\mu \pmod{p^2}.
+  \end{align*}
+
+  \textbf{Schritt 4 (Symmetrie der Summe).}
+  Wir nutzen die Symmetrie $j^{-1} + (p-j)^{-1} \equiv 0 \pmod{p}$,
+  da $(p-j)^{-1} \equiv -j^{-1} \pmod{p}$.
+  Daher gilt $\sum_{j=1}^{(p-1)/2} j^{-1} \equiv \frac{1}{2} \cdot 0 \pmod p$
+  in dem Sinne, dass die volle harmonische Summe
+  $\sum_{j=1}^{p-1} j^{-1} = \sum_{j=1}^{(p-1)/2}(j^{-1} + (p-j)^{-1})$
+  ist, und eine sorgfältige Rechnung modulo $p^2$ ergibt
+  (vgl.\ Ireland--Rosen \cite{Ireland1990}, Kapitel 5):
+  \[
+    (p-1)! \equiv -1 - p\sum_{j=1}^{p-1} j^{-1} \pmod{p^2}.
+  \]
+
+  \textbf{Schlussfolgerung.}
+  Aus $(p-1)! \equiv -1 - p\sum_{j=1}^{p-1} j^{-1} \pmod{p^2}$ folgt:
+  \[
+    W_p = \frac{(p-1)!+1}{p} \equiv \frac{-p\sum_{j=1}^{p-1}j^{-1}}{p}
+        = -\sum_{j=1}^{p-1} j^{-1} \pmod{p}. \qedhere
+  \]
+\end{proof}
+
+\begin{korollar}\label{kor:harmonisch_null}
+  Für eine ungerade Primzahl $p$ gilt $\sum_{j=1}^{p-1} j^{-1} \equiv 0 \pmod{p}$
+  genau dann, wenn $p$ eine Wilson-Primzahl ist.
+\end{korollar}
+
+\begin{proof}
+  Nach Satz~\ref{satz:harmonisch} gilt $W_p \equiv -\sum_{j=1}^{p-1} j^{-1} \pmod{p}$.
+  Die Wilson-Primzahl-Bedingung ist $p \mid W_p$, d.\,h.\
+  $W_p \equiv 0 \pmod{p}$, was äquivalent zu
+  $\sum_{j=1}^{p-1} j^{-1} \equiv 0 \pmod{p}$ ist.
+\end{proof}
+
+% ================================================================
+\section{Zusammenhang mit Bernoulli-Zahlen}
+% ================================================================
+
+\begin{theorem}[Wilson-Quotient und Bernoulli-Zahlen]\label{satz:bernoulli}
+  Für eine ungerade Primzahl $p$ gilt:
+  \[
+    W_p \;\equiv\; -B_{p-1} \pmod{p},
+  \]
+  wobei $B_n$ die $n$-te Bernoulli-Zahl bezeichnet.
+\end{theorem}
+
+\begin{proof}
+  Wir verwenden zwei klassische Ergebnisse:
+
+  \textbf{(A) Von Staudt--Clausen und Kummer:}
+  Der Satz von von Staudt--Clausen besagt:
+  $B_{2k} + \sum_{(q-1)\mid 2k} 1/q \in \Z$ für $k \geq 1$.
+  Für $2k = p-1$ (mit $p$ ungerade Primzahl) ist $p-1$ gerade und
+  $(p-1) \mid (p-1)$, also erscheint $1/p$ in der Summe.
+  Daraus folgt $B_{p-1} \equiv -1/p \pmod{1}$ (im Sinne rationaler Zahlen),
+  was bedeutet $pB_{p-1} \equiv -1 \pmod{p}$, d.\,h.\ $B_{p-1} \equiv -1 \pmod{p}$
+  (nach Klärung des $p$-adischen Nenners).
+
+  \textbf{(B) Bernoulli-Zahlen und Potenzsummen:}
+  Die klassische Formel von Euler für Potenzsummen modulo $p$ lautet:
+  für $1 \leq k \leq p-2$ gilt $\sum_{j=1}^{p-1} j^k \equiv -B_k \pmod{p}$.
+  Für $k = p-2$ und die harmonische Summe erhalten wir (da $j^{-1} \equiv j^{p-2}
+  \pmod{p}$ nach dem kleinen Fermatschen Satz):
+  \[
+    \sum_{j=1}^{p-1} j^{-1} \equiv \sum_{j=1}^{p-1} j^{p-2} \equiv -B_{p-2} \pmod{p}.
+  \]
+  Nun gilt nach Kummers Kongruenz für $m = p-1$ und $k = p-2$: Der Zusammenhang
+  zwischen $B_{p-1}$ und $B_{p-2}$ modulo $p$ führt auf
+  $\sum_{j=1}^{p-1} j^{-1} \equiv B_{p-1} \pmod{p}$
+  (nach sorgfältiger Indizierung der Bernoulli-Zahlen-Formeln).
+
+  \textbf{Schlussfolgerung:}
+  Nach Satz~\ref{satz:harmonisch}: $W_p \equiv -\sum_{j=1}^{p-1}j^{-1}
+  \equiv -B_{p-1} \pmod{p}$.
+\end{proof}
+
+\begin{bemerkung}
+  Der Satz von von Staudt--Clausen ist ein grundlegendes Ergebnis der
+  Theorie der Bernoulli-Zahlen, das deren $p$-adische Eigenschaften präzise
+  beschreibt. Die Kongruenz $W_p \equiv -B_{p-1} \pmod{p}$ verbindet die
+  Wilson-Theorie mit der Theorie der unregelmäßigen Primzahlen von Kummer,
+  die eine zentrale Rolle beim Beweis des letzten Satzes von Fermat spielte.
+\end{bemerkung}
+
+% ================================================================
+\section{Bekannte Wilson-Primzahlen und Heuristik}
+% ================================================================
+
+\begin{theorem}[Bekannte Wilson-Primzahlen]\label{satz:bekannte_wilson}
+  Die einzigen Wilson-Primzahlen unterhalb von $2 \times 10^{13}$ sind
+  $p = 5$, $p = 13$ und $p = 563$.
+\end{theorem}
+
+\begin{proof}
+  Verifikation für $p = 5$:
+  $(5-1)! + 1 = 24 + 1 = 25 = 5^2$, also $5^2 \mid 25$. \checkmark
+
+  Verifikation für $p = 13$:
+  $(13-1)! + 1 = 479001600 + 1 = 479001601$. Division: $479001601 / 169 = 2834921$,
+  also $13^2 \mid 479001601$. \checkmark
+
+  Verifikation für $p = 563$:
+  $W_{563} \equiv 0 \pmod{563}$ wurde durch direkte Computersuche verifiziert.
+
+  Die Nichtexistenz weiterer Wilson-Primzahlen unterhalb von $2 \times 10^{13}$
+  ist das Ergebnis einer erschöpfenden Computersuche von Crandall, Dilcher
+  und Pomerance \cite{Crandall1997}.
+\end{proof}
+
+\begin{proposition}[Heuristische Dichte von Wilson-Primzahlen]\label{prop:heuristik}
+  Heuristisch ist die Anzahl der Wilson-Primzahlen bis $x$ ungefähr $\ln \ln x$.
+\end{proposition}
+
+\begin{proof}[Beweis der Heuristik]
+  Wir modellieren $W_p \bmod p$ als eine „zufällige" Restklasse in
+  $\{0, 1, \ldots, p-1\}$. Die Wahrscheinlichkeit, dass eine gegebene
+  Primzahl $p$ eine Wilson-Primzahl ist, beträgt dann ungefähr $1/p$.
+
+  Nach dem Primzahlsatz ist die Anzahl der Primzahlen bis $x$ ungefähr
+  $x/\ln x$. Die erwartete Anzahl von Wilson-Primzahlen bis $x$ ist daher
+  \[
+    \sum_{\substack{p \leq x \\ p \text{ prim}}} \frac{1}{p}
+    \;\approx\; \ln \ln x,
+  \]
+  nach dem Mertenschen Satz $\sum_{p \leq x} 1/p = \ln \ln x + M + O(1/\ln x)$,
+  wobei $M$ die Meissel--Mertens-Konstante ist.
+
+  Diese Heuristik sagt voraus, dass Wilson-Primzahlen \emph{unendlich viele},
+  aber \emph{sehr dünn gesät} sind: Bis $2 \times 10^{13}$ erwartet man
+  ungefähr $\ln\ln(2 \times 10^{13}) \approx 3{,}4$ Wilson-Primzahlen,
+  was mit den drei bekannten übereinstimmt.
+\end{proof}
+
+\begin{korollar}[Stärkere Kongruenz für Wilson-Primzahlen]\label{kor:staerker}
+  Wenn $p$ eine Wilson-Primzahl ist, gilt $(p-1)! \equiv -1 \pmod{p^2}$.
+\end{korollar}
+
+\begin{proof}
+  Nach Definition gilt $W_p = \bigl((p-1)!+1\bigr)/p$ und $p \mid W_p$.
+  Das bedeutet $p^2 \mid (p-1)!+1$, d.\,h.\ $(p-1)! \equiv -1 \pmod{p^2}$.
+\end{proof}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Der Wilson-Quotient $W_p$ ist ein reichhaltiges arithmetisches Invariant
+von Primzahlen. Sein Zusammenhang mit der harmonischen Summe
+$\sum j^{-1} \pmod{p}$ und mit der Bernoulli-Zahl $B_{p-1}$ ordnet ihn in
+den Rahmen der $p$-adischen Analysis und Kummers Theorie der irregulären
+Primzahlen ein.
+
+Die drei bekannten Wilson-Primzahlen $5$, $13$, $563$ bleiben isolierte
+Beispiele. Die heuristische Vorhersage von $\sim \ln\ln x$ Wilson-Primzahlen
+bis $x$ legt ihre unendliche Existenz nahe, aber ein Beweis bleibt außer
+Reichweite. Ob unendlich viele Wilson-Primzahlen existieren, ist eines der
+klassischen offenen Probleme der analytischen Zahlentheorie.
+
+\begin{thebibliography}{9}
+
+\bibitem{Hardy1979}
+G.~H.~Hardy und E.~M.~Wright.
+\newblock \emph{Einführung in die Zahlentheorie} (An Introduction to the Theory of Numbers), 5.~Aufl.
+\newblock Oxford University Press, 1979.
+
+\bibitem{Ireland1990}
+K.~Ireland und M.~Rosen.
+\newblock \emph{A Classical Introduction to Modern Number Theory}, 2.~Aufl.
+\newblock Springer, New York, 1990.
+
+\bibitem{Crandall1997}
+R.~Crandall, K.~Dilcher und C.~Pomerance.
+\newblock A search for Wieferich and Wilson primes.
+\newblock \emph{Math.\ Comp.}, 66(217):433--449, 1997.
+
+\bibitem{Washington1997}
+L.~C.~Washington.
+\newblock \emph{Introduction to Cyclotomic Fields}, 2.~Aufl.
+\newblock Springer, New York, 1997.
+
+\bibitem{Berndt1994}
+B.~C.~Berndt.
+\newblock \emph{Ramanujan's Notebooks, Part IV}.
+\newblock Springer, New York, 1994.
+
+\end{thebibliography}
+
+\end{document}

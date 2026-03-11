@@ -1,0 +1,357 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\DeclareMathOperator{\ord}{ord}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{The General Wilson Theorem for Finite Abelian Groups}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 65}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+We prove a general version of Wilson's theorem valid for every finite abelian
+group $G$: the product of all elements of $G$ equals the identity $e$ unless
+$G$ has \emph{exactly one} element of order $2$, in which case the product
+equals that element.  The proof uses only the pairing method and elementary
+group theory.  As a corollary we derive the classical Wilson theorem
+(for $G = (\Z/p\Z)^*$), the Wilson theorem for prime powers, and the
+Gauss generalisation: for $n \geq 3$,
+\[
+  \prod_{\substack{a=1\\\gcd(a,n)=1}}^{n} a
+  \;\equiv\;
+  \begin{cases}
+    -1 \pmod n & \text{if } n = 1, 2, 4, p^k, \text{ or } 2p^k\,(p \text{ odd prime}),\\
+    \phantom{-}1 \pmod n & \text{otherwise.}
+  \end{cases}
+\]
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Introduction}
+% ================================================================
+
+Wilson's classical theorem says that the product of all non-zero elements of
+$\Z/p\Z$ equals $-1$.  This product is nothing other than the product of all
+elements of the multiplicative group $G = (\Z/p\Z)^*$.
+The natural framework for such product computations is the theory of finite
+abelian groups, and the general result is known as the \emph{general Wilson
+theorem}.
+
+The key observation is simple: in any group, if we multiply all elements together,
+then non-self-inverse elements cancel in pairs.  Only the self-inverse elements
+(those satisfying $g^2 = e$) contribute to the final product.  Whether this
+contribution is $e$ or something non-trivial depends on the number of
+self-inverse elements.
+
+The Gauss generalisation of Wilson's theorem to composite moduli is then
+an immediate corollary once we know the structure of $(\Z/n\Z)^*$ via the
+Chinese Remainder Theorem.
+
+% ================================================================
+\section{Self-Inverse Elements and the Product Lemma}
+% ================================================================
+
+\begin{lemma}[Pairing lemma]\label{lem:pairing}
+  Let $(G, \cdot)$ be a finite abelian group with identity $e$.  Then
+  \[
+    \prod_{g \in G} g \;=\; \prod_{\substack{g \in G \\ g = g^{-1}}} g.
+  \]
+  In other words, the product of all elements of $G$ equals the product of
+  all self-inverse elements.
+\end{lemma}
+
+\begin{proof}
+  Since $G$ is abelian, we may rearrange factors freely.
+  Pair each element $g \in G$ with its inverse $g^{-1}$.  If $g \neq g^{-1}$,
+  then $\{g, g^{-1}\}$ is a two-element subset of $G$, and the pair contributes
+  $g \cdot g^{-1} = e$ to the product.  Since $e$ does not change the product,
+  only the elements with $g = g^{-1}$ (i.e.\ $g^2 = e$) contribute non-trivially.
+  Hence the full product $\prod_{g \in G} g$ equals $\prod_{g^2=e} g$.
+\end{proof}
+
+\begin{lemma}[Subgroup of involutions]\label{lem:subgroup}
+  Let $(G, \cdot)$ be a finite abelian group.  The set
+  $S = \{g \in G : g^2 = e\}$ is a subgroup of $G$.  Moreover, $S$ is an
+  elementary abelian $2$-group: either $S = \{e\}$ or
+  $S \cong (\Z/2\Z)^k$ for some $k \geq 1$.  In particular, $|S| = 2^k$
+  for some $k \geq 0$.
+\end{lemma}
+
+\begin{proof}
+  \textbf{$S$ is a subgroup:} $e^2 = e$, so $e \in S$.  If $g, h \in S$,
+  then $(gh)^2 = g^2 h^2 = e \cdot e = e$ (using commutativity), so $gh \in S$.
+  If $g \in S$, then $g^{-1} = g$ (since $g^2 = e$ implies $g = g^{-1}$), so
+  $g^{-1} \in S$.  Hence $S \leq G$.
+
+  \textbf{$S$ is elementary abelian:}  Every non-identity element of $S$ has
+  order exactly $2$.  Therefore $S$ is an abelian group in which every element
+  has order $1$ or $2$.  By the classification of finite abelian groups
+  (every element has square equal to the identity), $S$ is a direct product
+  of copies of $\Z/2\Z$:  $S \cong (\Z/2\Z)^k$.  In particular $|S| = 2^k$.
+\end{proof}
+
+% ================================================================
+\section{The General Wilson Theorem}
+% ================================================================
+
+\begin{theorem}[General Wilson Theorem]\label{thm:general_wilson}
+  Let $(G, \cdot)$ be a finite abelian group.  Then
+  \[
+    \prod_{g \in G} g
+    \;=\;
+    \begin{cases}
+      e   & \text{if the number of elements of order } 2 \text{ in } G
+             \text{ is not equal to } 1, \\
+      \tau & \text{if } G \text{ has exactly one element } \tau \text{ of order } 2.
+    \end{cases}
+  \]
+\end{theorem}
+
+\begin{proof}
+  By Lemma~\ref{lem:pairing}, $\prod_{g \in G} g = \prod_{g \in S} g$
+  where $S = \{g \in G : g^2 = e\}$.
+
+  By Lemma~\ref{lem:subgroup}, $S \cong (\Z/2\Z)^k$ for some $k \geq 0$.
+
+  \textbf{Case $k = 0$:} $S = \{e\}$, so $\prod_{g \in S} g = e$.
+
+  \textbf{Case $k = 1$:} $S = \{e, \tau\}$ where $\tau$ has order $2$.
+  Then $\prod_{g \in S} g = e \cdot \tau = \tau$.
+
+  \textbf{Case $k \geq 2$:}  $S \cong (\Z/2\Z)^k$ with $k \geq 2$.
+  We claim $\prod_{g \in S} g = e$.
+  In $(\Z/2\Z)^k$ (written additively), the sum of all elements equals:
+  \[
+    \sum_{v \in (\Z/2\Z)^k} v = \sum_{i=1}^k e_i \cdot 2^{k-1},
+  \]
+  where $e_i$ are the standard basis vectors.  Since each coordinate sum
+  $\sum_{v \in (\Z/2\Z)^k} v_i = 2^{k-1} \cdot 1 = 0$ in $\Z/2\Z$ (as $k \geq 2$
+  means $2^{k-1}$ is even), the total sum is $0$.  In multiplicative notation
+  this is $e$.
+
+  Alternatively: for $k \geq 2$, pair each $s \in S \setminus \{e\}$ with any
+  fixed $\tau \in S \setminus \{e\}$ via the map $s \mapsto \tau s$.
+  This is a bijection $S \to S$ (since $\tau \in S$ and $S$ is closed under
+  multiplication).  Except for $s = \tau$ (which maps to $e$) and $s = e$ (which
+  maps to $\tau$), elements pair as $\{s, \tau s\}$ with product $s \cdot \tau s
+  = \tau s^2 = \tau e = \tau$.  So the product of each such pair is $\tau$.
+  For $k \geq 2$, there are $(|S| - 2)/2 = (2^k - 2)/2 = 2^{k-1} - 1$ such pairs.
+  Together with the fixed points $e$ and $\tau$:
+  \[
+    \prod_{g \in S} g = e \cdot \tau \cdot \tau^{2^{k-1}-1} = \tau^{2^{k-1}}.
+  \]
+  Since $\tau^2 = e$, the exponent $2^{k-1}$ is even for $k \geq 2$, so
+  $\tau^{2^{k-1}} = (\tau^2)^{2^{k-2}} = e^{2^{k-2}} = e$.
+
+  In all cases the formula is established. \qedhere
+\end{proof}
+
+\begin{remark}
+  The number of elements of order $2$ in a finite abelian group is always
+  of the form $2^k - 1$ for some $k \geq 0$ (counting only elements of
+  order exactly $2$, not $1$): for $k=0$ there are $0$ such elements, for
+  $k=1$ there is $1$, for $k=2$ there are $3$, etc.  In particular, the
+  count is \emph{never} $2$, so the only case in which the product is non-trivial
+  is when there is exactly one element of order $2$.
+\end{remark}
+
+% ================================================================
+\section{Classical Wilson as a Special Case}
+% ================================================================
+
+\begin{corollary}[Classical Wilson]\label{cor:classical_wilson}
+  For an odd prime $p$: $(p-1)! \equiv -1 \pmod p$.
+\end{corollary}
+
+\begin{proof}
+  Take $G = (\Z/p\Z)^*$.  This group is cyclic of even order $p-1$.
+  A cyclic group of even order has exactly one element of order $2$.
+  For $G = (\Z/p\Z)^*$, this element is $p-1 \equiv -1 \pmod p$.
+  By Theorem~\ref{thm:general_wilson} (case $k=1$), the product of all
+  elements equals $-1 \equiv -1 \pmod p$, which is $(p-1)!$.
+\end{proof}
+
+% ================================================================
+\section{The Gauss Generalisation}
+% ================================================================
+
+We now characterise all $n$ for which the product of units modulo $n$ is $-1$.
+
+\begin{theorem}[Gauss generalisation of Wilson]\label{thm:gauss}
+  For $n \geq 1$:
+  \[
+    \prod_{\substack{a=1\\\gcd(a,n)=1}}^{n} a
+    \;\equiv\;
+    \begin{cases}
+      -1 \pmod n & \text{if } n \in \{1, 2, 4\}
+                   \text{ or } n = p^k \text{ or } n = 2p^k
+                   \text{ (with } p \text{ odd prime, } k \geq 1),\\
+      \phantom{-}1 \pmod n & \text{otherwise.}
+    \end{cases}
+  \]
+\end{theorem}
+
+\begin{proof}
+  The product $\prod_{\gcd(a,n)=1} a$ is the product of all elements of
+  $G_n = (\Z/n\Z)^*$.  By Theorem~\ref{thm:general_wilson}, this product
+  equals $-1$ if and only if $G_n$ has exactly one element of order $2$.
+
+  We determine when $G_n$ has exactly one element of order $2$ using the
+  structure theorem for $(\Z/n\Z)^*$.
+
+  \textbf{Step 1: Structure of $(\Z/n\Z)^*$.}
+  By the Chinese Remainder Theorem, if $n = \prod_{i} p_i^{k_i}$ is the
+  prime factorisation, then
+  \[
+    (\Z/n\Z)^* \;\cong\; \prod_i (\Z/p_i^{k_i}\Z)^*.
+  \]
+  The structure of each factor is:
+  \begin{itemize}
+    \item $(\Z/2\Z)^* = \{1\}$ (trivial),
+    \item $(\Z/4\Z)^* \cong \Z_2$,
+    \item $(\Z/2^k\Z)^* \cong \Z_2 \times \Z_{2^{k-2}}$ for $k \geq 3$,
+    \item $(\Z/p^k\Z)^* \cong \Z_{p^{k-1}(p-1)}$ for odd $p$ (cyclic).
+  \end{itemize}
+
+  \textbf{Step 2: Elements of order 2.}
+  The number of elements of order dividing $2$ in a product group
+  $H_1 \times \cdots \times H_r$ is $\prod_i |\{h \in H_i : h^2 = e\}|$.
+
+  For each factor:
+  \begin{itemize}
+    \item $(\Z/2\Z)^*$: $1$ element of order $\leq 2$ (namely $e$).
+    \item $(\Z/4\Z)^* \cong \Z_2$: $2$ elements of order $\leq 2$ ($e$ and $\tau$).
+    \item $(\Z/2^k\Z)^* \cong \Z_2 \times \Z_{2^{k-2}}$ for $k \geq 3$:
+      $4$ elements of order $\leq 2$.
+    \item $(\Z/p^k\Z)^*$ for odd $p$: cyclic of even order $p^{k-1}(p-1)$,
+      so $2$ elements of order $\leq 2$ (namely $e$ and $-1$).
+  \end{itemize}
+
+  The total number of elements of order $\leq 2$ in $G_n$ is the product
+  of these counts over all prime power factors.  The number of elements of
+  order \emph{exactly} $2$ is this product minus $1$ (subtracting $e$).
+
+  \textbf{Step 3: When is the count exactly 1?}
+  We need the total number of elements of order $\leq 2$ to be exactly $2$
+  (one for $e$, one for $\tau$).  This product must equal $2$.
+  Hence exactly one factor contributes $2$ and all others contribute $1$.
+
+  A factor contributes $1$ if and only if the corresponding group factor is trivial
+  (no element of order $2$ other than $e$), which happens for $(\Z/2\Z)^*$.
+  A factor contributes $2$ when it is a cyclic group of even order, which occurs
+  for $(\Z/4\Z)^*$ or $(\Z/p^k\Z)^*$ with $p$ odd.
+  A factor contributes $4$ for $(\Z/2^k\Z)^*$ with $k \geq 3$.
+
+  For the product to be $2$:
+  \begin{itemize}
+    \item There is no factor with contribution $\geq 4$: no $2^k$-component
+      with $k \geq 3$.
+    \item Exactly one factor with contribution $2$: either exactly one odd prime
+      power factor (and no $4$-factor), or exactly one $4$-factor (and no odd
+      prime power factors).
+  \end{itemize}
+
+  The $n$-values satisfying this are:
+  \begin{itemize}
+    \item $n = 1$: trivially $G_1 = \{1\}$, product is $1 \equiv -1 \pmod 1$.
+    \item $n = 2$: $G_2 = \{1\}$, product $1 \equiv -1 \pmod 2$.
+    \item $n = 4$: $G_4 \cong \Z_2$, unique element of order $2$ is $3 \equiv -1 \pmod 4$. \checkmark
+    \item $n = p^k$ ($p$ odd prime, $k \geq 1$): $G_{p^k}$ is cyclic of even order, unique element of order $2$ is $-1$. \checkmark
+    \item $n = 2p^k$ ($p$ odd prime, $k \geq 1$): $G_{2p^k} \cong \{1\} \times G_{p^k}$
+      since $(\Z/2\Z)^*$ is trivial.  So $G_{2p^k} \cong G_{p^k}$, which is cyclic
+      with unique element of order $2$, namely $-1$. \checkmark
+  \end{itemize}
+
+  All other $n$ have either $0$ or $\geq 3$ elements of order $2$ in $G_n$,
+  giving product $e = 1 \pmod n$.  \qedhere
+\end{proof}
+
+\begin{corollary}[Product $\equiv 1$ for most $n$]\label{cor:product_one}
+  For $n \geq 3$ with $n \neq 4$, $n \neq p^k$, $n \neq 2p^k$:
+  \[
+    \prod_{\substack{a=1\\\gcd(a,n)=1}}^{n} a \;\equiv\; 1 \pmod n.
+  \]
+  In particular, for $n = 8$ the product of all odd residues modulo $8$
+  is $1 \cdot 3 \cdot 5 \cdot 7 = 105 \equiv 1 \pmod 8$.
+\end{corollary}
+
+\begin{proof}
+  This is the complement of Theorem~\ref{thm:gauss}.  For $n = 8$:
+  $G_8 = (\Z/8\Z)^*$ has four elements of order $\leq 2$ (namely $1,3,5,7$),
+  more than one of order $2$, so the product is $1$.
+  Direct check: $1 \cdot 3 \cdot 5 \cdot 7 = 105 = 13 \cdot 8 + 1 \equiv 1 \pmod 8$. \checkmark
+\end{proof}
+
+% ================================================================
+\section{Conclusion}
+% ================================================================
+
+The general Wilson theorem unifies all the specific cases into a single
+group-theoretic statement: the product of all elements of a finite abelian
+group $G$ is non-trivial (equals $\tau$) precisely when $G$ has exactly one
+involution $\tau$ (element of order $2$).  This occurs if and only if $G$ is
+cyclic of even order, which by the structure theorem for $(\Z/n\Z)^*$ happens
+for $n = 4, p^k, 2p^k$.
+
+The proof technique — pairing elements with their inverses — is elementary
+but powerful, and applies to any group (not just abelian ones).
+However, the final identification of the unpaired elements requires commutativity
+to ensure $|S|$ is always a power of $2$.
+
+\begin{thebibliography}{9}
+
+\bibitem{Hardy1979}
+G.~H.~Hardy and E.~M.~Wright.
+\newblock \emph{An Introduction to the Theory of Numbers}, 5th~ed.
+\newblock Oxford University Press, 1979.
+
+\bibitem{Ireland1990}
+K.~Ireland and M.~Rosen.
+\newblock \emph{A Classical Introduction to Modern Number Theory}, 2nd~ed.
+\newblock Springer, New York, 1990.
+
+\bibitem{Lang2002}
+S.~Lang.
+\newblock \emph{Algebra}, revised 3rd~ed.
+\newblock Springer, New York, 2002.
+
+\bibitem{Dummit2003}
+D.~S.~Dummit and R.~M.~Foote.
+\newblock \emph{Abstract Algebra}, 3rd~ed.
+\newblock Wiley, Hoboken, 2003.
+
+\end{thebibliography}
+
+\end{document}

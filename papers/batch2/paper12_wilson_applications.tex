@@ -1,0 +1,391 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\DeclareMathOperator{\ord}{ord}
+\newcommand{\leg}[2]{\left(\frac{#1}{#2}\right)}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Applications of Wilson's Theorem}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 66}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+We demonstrate four major applications of Wilson's theorem:
+(i) a complete primality characterisation via $(n-1)! \equiv -1 \pmod n$,
+with an analysis of its computational impracticality;
+(ii) a proof that $-1$ is a quadratic residue modulo an odd prime $p$
+if and only if $p \equiv 1 \pmod 4$, derived directly from Wilson via
+the factorisation of $(p-1)!$;
+(iii) an elementary proof of Wolstenholme's harmonic lemma:
+$1 + 1/2 + \cdots + 1/(p-1) \equiv 0 \pmod p$ for all primes $p \geq 3$;
+and (iv) an alternative proof of Fermat's little theorem using Wilson's theorem,
+with a sketch of how this approach extends to Euler's theorem.
+All proofs are elementary and self-contained.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Introduction}
+% ================================================================
+
+Wilson's theorem — $(p-1)! \equiv -1 \pmod p$ if and only if $p$ is prime —
+is more than an isolated curiosity.  It is a tool for deriving deeper facts
+about primes, quadratic residues, and multiplicative arithmetic.
+
+In this paper we collect four applications.  The first is the theorem itself
+used as a primality test, with an honest assessment of its limitations.
+The second derives a complete criterion for $-1$ to be a quadratic residue
+modulo $p$ — a result usually proved via character theory or Gauss sums — here
+obtained with nothing more than high school algebra.  The third proves a
+harmonic congruence due to Wolstenholme.  The fourth gives an alternative
+proof of Fermat's little theorem via Wilson, demonstrating the interconnection
+of these classical results.
+
+% ================================================================
+\section{Wilson's Theorem as a Primality Test}
+% ================================================================
+
+\begin{theorem}[Primality characterisation]\label{thm:primality}
+  An integer $n \geq 2$ is prime if and only if
+  \[
+    (n-1)! \;\equiv\; -1 \pmod n.
+  \]
+\end{theorem}
+
+\begin{proof}
+  \textbf{($\Rightarrow$)} Suppose $n = p$ is prime.  The multiplicative group
+  $(\Z/p\Z)^*$ has order $p-1$, and its elements are $1, 2, \ldots, p-1$.
+  Every element $a$ has a unique inverse $a^{-1}$ in $\{1, \ldots, p-1\}$.
+  The only elements equal to their own inverse satisfy $a^2 \equiv 1 \pmod p$,
+  i.e.\ $p \mid (a-1)(a+1)$; since $p$ is prime, $a \equiv \pm 1 \pmod p$,
+  giving $a \in \{1, p-1\}$.
+
+  All other elements $2, \ldots, p-2$ pair up: $a \leftrightarrow a^{-1}$
+  with $a \cdot a^{-1} \equiv 1 \pmod p$.  Hence
+  \[
+    (p-1)! = 1 \cdot (p-1) \cdot \prod_{\substack{a=2\\a \neq a^{-1}}}^{p-2} a
+    \equiv 1 \cdot (p-1) \cdot 1 \equiv p-1 \equiv -1 \pmod p.
+  \]
+
+  \textbf{($\Leftarrow$)} Suppose $n$ is composite, $n = ab$ with $1 < a \leq b < n$.
+
+  \emph{Case 1: $a < b$.}  Then $a$ and $b$ are distinct integers in
+  $\{1, \ldots, n-1\}$, so $ab = n \mid (n-1)!$ and $(n-1)! \equiv 0 \not\equiv -1$.
+
+  \emph{Case 2: $a = b$, so $n = a^2$.}
+  If $a \geq 3$: both $a$ and $2a$ lie in $\{1, \ldots, n-1\}$ (since
+  $2a < a^2$ for $a \geq 3$), so $2a^2 = 2n \mid (n-1)!$ and $(n-1)! \equiv 0$.
+  If $a = 2$: $n = 4$ and $(4-1)! = 6 \equiv 2 \pmod 4 \neq -1$.
+\end{proof}
+
+\begin{remark}[Computational impracticality]
+  Although Theorem~\ref{thm:primality} provides a perfect primality test in
+  principle, it is computationally useless for large $n$.  Computing $(n-1)!
+  \bmod n$ naively requires $n-2$ multiplications, each modulo $n$.
+  With $n \approx 2^{1000}$ (a $300$-digit prime), this needs $\sim 2^{1000}$
+  steps — far beyond any feasible computation.
+
+  By contrast, Miller--Rabin probabilistic primality testing runs in
+  $O(k \log^2 n)$ time with $k$ rounds, and the AKS algorithm \cite{Agrawal2004}
+  deterministically decides primality in polynomial time $O(\log^{6} n)$.
+  Wilson's test has theoretical importance but no practical application to
+  primality testing.
+\end{remark}
+
+% ================================================================
+\section{Quadratic Residues: When Is $-1$ a Square Modulo $p$?}
+% ================================================================
+
+\begin{definition}[Quadratic residue]\label{def:quadratic_residue}
+  Let $p$ be an odd prime.  An integer $a$ with $\gcd(a,p) = 1$ is a
+  \emph{quadratic residue} modulo $p$ if $a \equiv x^2 \pmod p$ for some
+  integer $x$.  The Legendre symbol is defined by
+  \[
+    \leg{a}{p} =
+    \begin{cases}
+      1  & \text{if } a \text{ is a quadratic residue mod } p, \\
+      -1 & \text{if } a \text{ is a non-residue mod } p.
+    \end{cases}
+  \]
+\end{definition}
+
+\begin{theorem}[First supplement to quadratic reciprocity]\label{thm:minus1_qr}
+  Let $p$ be an odd prime.  Then $-1$ is a quadratic residue modulo $p$
+  if and only if $p \equiv 1 \pmod 4$.  Equivalently:
+  \[
+    \leg{-1}{p} \;=\; (-1)^{(p-1)/2}.
+  \]
+\end{theorem}
+
+\begin{proof}
+  We compute $(p-1)!$ in two different ways.
+
+  \textbf{Way 1 (Wilson):}
+  By Wilson's theorem, $(p-1)! \equiv -1 \pmod p$.
+
+  \textbf{Way 2 (regrouping):}
+  Write the product $(p-1)! = 1 \cdot 2 \cdots \frac{p-1}{2} \cdot \frac{p+1}{2}
+  \cdots (p-1)$.  In the second half, replace $j$ by $p - j$ for
+  $j \in \{(p+1)/2, \ldots, p-1\}$, which maps bijectively to
+  $\{1, \ldots, (p-1)/2\}$ via $j \mapsto p-j$:
+  \[
+    \frac{p+1}{2} \cdot \frac{p+3}{2} \cdots (p-1)
+    = (p - \tfrac{p-1}{2})(p - \tfrac{p-3}{2}) \cdots (p-1).
+  \]
+  More cleanly: for $k = 1, 2, \ldots, (p-1)/2$ we have
+  $p - k \equiv -k \pmod p$.  So
+  \[
+    (p-1)! = \prod_{k=1}^{(p-1)/2} k \cdot \prod_{k=1}^{(p-1)/2}(p-k)
+    \equiv \prod_{k=1}^{(p-1)/2} k \cdot \prod_{k=1}^{(p-1)/2}(-k)
+    = \Bigl(\prod_{k=1}^{(p-1)/2} k\Bigr)^2 \cdot (-1)^{(p-1)/2} \pmod p.
+  \]
+  Let $M = \bigl(\tfrac{p-1}{2}\bigr)!$.  Then
+  \[
+    (p-1)! \equiv M^2 \cdot (-1)^{(p-1)/2} \pmod p.
+  \]
+
+  \textbf{Combining:}
+  From Ways 1 and 2:
+  \[
+    -1 \equiv M^2 \cdot (-1)^{(p-1)/2} \pmod p.
+  \]
+  Therefore
+  \[
+    (-1)^{(p-1)/2} \equiv -1 \cdot M^{-2} \pmod p
+    \quad\Longleftrightarrow\quad
+    (-1)^{(p-1)/2+1} \equiv M^{-2} \pmod p.
+  \]
+  Rearranging:
+  \[
+    (-1)^{(p-1)/2} \equiv \frac{-1}{M^2} \pmod p.
+  \]
+  But we want to determine whether $-1$ is a QR.  From the equation
+  $-1 \equiv M^2 (-1)^{(p-1)/2}$:
+  \begin{itemize}
+    \item If $(p-1)/2$ is even (i.e.\ $p \equiv 1 \pmod 4$):
+      $(-1)^{(p-1)/2} = 1$, so $-1 \equiv M^2 \pmod p$.
+      Thus $-1$ is a quadratic residue modulo $p$. \checkmark
+    \item If $(p-1)/2$ is odd (i.e.\ $p \equiv 3 \pmod 4$):
+      $(-1)^{(p-1)/2} = -1$, so $-1 \equiv -M^2 \pmod p$,
+      i.e.\ $M^2 \equiv 1 \pmod p$, meaning $M \equiv \pm 1 \pmod p$.
+      If $-1$ were a QR, then $-1 \equiv x^2 \pmod p$ for some $x$.
+      Multiplying: $(-1)^{(p-1)/2} \equiv x^{p-1} \equiv 1 \pmod p$ by
+      Fermat's little theorem.  But $(-1)^{(p-1)/2} = -1 \neq 1$. Contradiction.
+      Hence $-1$ is a non-residue. \checkmark
+  \end{itemize}
+  In both cases the formula $\leg{-1}{p} = (-1)^{(p-1)/2}$ holds.
+\end{proof}
+
+\begin{corollary}[Fermat's two-square theorem — prerequisite]\label{cor:twosquares}
+  A prime $p$ can be written as $p = x^2 + y^2$ with integers $x, y$ only
+  if $p = 2$ or $p \equiv 1 \pmod 4$.
+\end{corollary}
+
+\begin{proof}
+  If $p = x^2 + y^2$, then $x^2 \equiv -y^2 \pmod p$.  If $p \nmid y$, then
+  $(xy^{-1})^2 \equiv -1 \pmod p$, so $-1$ is a QR mod $p$, requiring
+  $p \equiv 1 \pmod 4$ by Theorem~\ref{thm:minus1_qr}.
+  The case $p = 2 = 1^2 + 1^2$ is direct.
+\end{proof}
+
+% ================================================================
+\section{Wolstenholme's Harmonic Lemma}
+% ================================================================
+
+\begin{theorem}[Wolstenholme's harmonic congruence]\label{thm:harmonic}
+  For every prime $p \geq 3$:
+  \[
+    1 + \frac{1}{2} + \frac{1}{3} + \cdots + \frac{1}{p-1}
+    \;\equiv\; 0 \pmod p,
+  \]
+  where each fraction $1/j$ denotes the multiplicative inverse of $j$ modulo $p$.
+\end{theorem}
+
+\begin{proof}
+  Denote the harmonic sum $H = \sum_{j=1}^{p-1} j^{-1} \pmod p$.
+
+  \textbf{Step 1 (Symmetry).}
+  For each $j \in \{1, \ldots, p-1\}$, its inverse $j^{-1}$ also lies in
+  $\{1, \ldots, p-1\}$ (since $(\Z/p\Z)^*$ is a group), and the map
+  $j \mapsto j^{-1}$ is a bijection on $\{1, \ldots, p-1\}$.
+  Therefore summing over all $j$ and summing over all $j^{-1}$ gives the same
+  sum:
+  \[
+    H = \sum_{j=1}^{p-1} j^{-1} = \sum_{j=1}^{p-1} j \pmod p.
+  \]
+
+  \textbf{Step 2 (Evaluating $\sum_{j=1}^{p-1} j$).}
+  \[
+    \sum_{j=1}^{p-1} j = \frac{(p-1)p}{2}.
+  \]
+  Modulo $p$: $p \equiv 0 \pmod p$, so $(p-1)p/2 \equiv 0 \pmod p$.
+
+  \textbf{Conclusion.}
+  Therefore $H \equiv \sum_{j=1}^{p-1} j \equiv 0 \pmod p$. \qedhere
+\end{proof}
+
+\begin{remark}
+  Wolstenholme's stronger theorem (1862) states that for $p \geq 5$:
+  \[
+    1 + \frac{1}{2} + \cdots + \frac{1}{p-1} \equiv 0 \pmod{p^2}.
+  \]
+  This is a deeper result and requires analysis modulo $p^2$, connecting it
+  to the Wilson quotient (see Paper~10 in this series).  A prime $p$ is a
+  Wilson prime if and only if the even stronger congruence modulo $p$ on the
+  Wilson quotient holds.
+\end{remark}
+
+% ================================================================
+\section{Fermat's Little Theorem via Wilson}
+% ================================================================
+
+\begin{theorem}[Fermat's little theorem]\label{thm:fermat}
+  Let $p$ be a prime and $a$ an integer with $\gcd(a,p) = 1$.  Then
+  \[
+    a^{p-1} \;\equiv\; 1 \pmod p.
+  \]
+\end{theorem}
+
+\begin{proof}[Proof via Wilson]
+  Consider the $p-1$ multiples $a, 2a, 3a, \ldots, (p-1)a$.
+  We claim these are all distinct modulo $p$ and form a permutation of
+  $\{1, 2, \ldots, p-1\}$.
+
+  \textbf{Step 1 (Distinctness).}
+  If $ja \equiv ka \pmod p$ with $1 \leq j, k \leq p-1$, then
+  $p \mid (j-k)a$.  Since $\gcd(a,p)=1$, we get $p \mid j-k$.
+  But $|j-k| < p$, so $j = k$.
+
+  \textbf{Step 2 (They lie in $\{1,\ldots,p-1\}$).}
+  Each $ja$ satisfies $\gcd(ja, p) = \gcd(j,p)\gcd(a,p) = 1$
+  (since $1 \leq j \leq p-1$ and $\gcd(a,p) = 1$), so $ja \not\equiv 0 \pmod p$.
+
+  \textbf{Step 3 (Product comparison).}
+  Multiplying all the $p-1$ congruences together:
+  \[
+    a \cdot 2a \cdot 3a \cdots (p-1)a \;\equiv\; 1 \cdot 2 \cdot 3 \cdots (p-1) \pmod p.
+  \]
+  The left side is $a^{p-1} \cdot (p-1)!$ and the right side is $(p-1)!$.
+  Therefore
+  \[
+    a^{p-1} \cdot (p-1)! \equiv (p-1)! \pmod p.
+  \]
+
+  \textbf{Step 4 (Cancellation using Wilson).}
+  By Wilson's theorem, $(p-1)! \equiv -1 \pmod p$, so $\gcd((p-1)!, p) = 1$
+  (since $p \nmid (p-1)!+1$ would contradict Wilson; rather Wilson says
+  $p \mid (p-1)!+1$, i.e.\ $(p-1)! \equiv -1 \not\equiv 0$).
+  Hence $(p-1)!$ is invertible modulo $p$, and we may cancel it:
+  \[
+    a^{p-1} \equiv 1 \pmod p. \qedhere
+  \]
+\end{proof}
+
+\begin{remark}
+  The standard proof of Fermat's little theorem (using the permutation
+  argument in Step 1--3) does not actually require Wilson — the cancellation
+  in Step 4 only needs $(p-1)! \not\equiv 0 \pmod p$, which is clear since
+  $p$ is prime and none of $1, \ldots, p-1$ is divisible by $p$.
+  Wilson's theorem is invoked here to provide the \emph{value} of $(p-1)!$
+  and thereby demonstrate the cancellation step more explicitly.
+  The proof above shows how Wilson and Fermat are facets of the same
+  group-theoretic fact: $(\Z/p\Z)^*$ is a group of order $p-1$.
+\end{remark}
+
+\begin{corollary}[Sketch: Euler's theorem via Wilson + structure]\label{cor:euler}
+  For $\gcd(a, n) = 1$: $a^{\phi(n)} \equiv 1 \pmod n$.
+\end{corollary}
+
+\begin{proof}[Proof sketch]
+  By the Chinese Remainder Theorem, $(\Z/n\Z)^* \cong \prod_i (\Z/p_i^{k_i}\Z)^*$
+  for the prime factorisation $n = \prod p_i^{k_i}$.
+  Each factor $(\Z/p_i^{k_i}\Z)^*$ has order $\phi(p_i^{k_i})$, so
+  $a^{\phi(p_i^{k_i})} \equiv 1 \pmod{p_i^{k_i}}$.
+  Since $\phi(n) = \prod \phi(p_i^{k_i})$ and $\phi(p_i^{k_i}) \mid \phi(n)$,
+  we get $a^{\phi(n)} \equiv 1$ modulo each $p_i^{k_i}$, hence
+  $a^{\phi(n)} \equiv 1 \pmod n$ by CRT.
+  The role of Wilson-type theorems is to ensure that the unit groups
+  $(\Z/p^k\Z)^*$ have order exactly $\phi(p^k) = p^{k-1}(p-1)$, which
+  requires the fact that these groups are cyclic (proved using the existence
+  of primitive roots, which in turn uses Wilson for $p$).
+\end{proof}
+
+% ================================================================
+\section{Conclusion}
+% ================================================================
+
+Wilson's theorem, while computationally impractical as a primality test,
+illuminates deep structural properties of the integers modulo $p$.
+
+The derivation of the first supplement to quadratic reciprocity
+($\leg{-1}{p} = (-1)^{(p-1)/2}$) from Wilson via a double counting of $(p-1)!$
+is one of the most elegant arguments in elementary number theory.
+Wolstenholme's harmonic lemma follows from a simple symmetry argument about
+the group $(\Z/p\Z)^*$.  And the proof of Fermat's little theorem via Wilson
+exhibits the group-theoretic unity underlying both results.
+
+These four applications demonstrate that Wilson's theorem is not an isolated
+curiosity but a foundational tool, connecting primality, quadratic reciprocity,
+harmonic sums, and the multiplicative structure of $\Z/p\Z$.
+
+\begin{thebibliography}{9}
+
+\bibitem{Hardy1979}
+G.~H.~Hardy and E.~M.~Wright.
+\newblock \emph{An Introduction to the Theory of Numbers}, 5th~ed.
+\newblock Oxford University Press, 1979.
+
+\bibitem{Ireland1990}
+K.~Ireland and M.~Rosen.
+\newblock \emph{A Classical Introduction to Modern Number Theory}, 2nd~ed.
+\newblock Springer, New York, 1990.
+
+\bibitem{Agrawal2004}
+M.~Agrawal, N.~Kayal, and N.~Saxena.
+\newblock PRIMES is in P.
+\newblock \emph{Ann.\ of Math.}, 160(2):781--793, 2004.
+
+\bibitem{Niven1991}
+I.~Niven, H.~S.~Zuckerman, and H.~L.~Montgomery.
+\newblock \emph{An Introduction to the Theory of Numbers}, 5th~ed.
+\newblock Wiley, New York, 1991.
+
+\bibitem{Crandall1997}
+R.~Crandall, K.~Dilcher, and C.~Pomerance.
+\newblock A search for Wieferich and Wilson primes.
+\newblock \emph{Math.\ Comp.}, 66(217):433--449, 1997.
+
+\end{thebibliography}
+
+\end{document}
