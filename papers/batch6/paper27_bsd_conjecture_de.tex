@@ -2,6 +2,7 @@
 
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{mathtools}
+\usepackage[utf8]{inputenc}
 \usepackage[ngerman]{babel}
 \usepackage{hyperref}
 \usepackage{geometry}
@@ -260,8 +261,17 @@ lokal beschreibt.  Der Selmer-Raum ist eine endliche $\mathbb{F}_2$-Vektorraum,
 der lokal-global-l\"osbare Homomorphismen erfasst; seine Dimension gibt eine
 obere Schranke f\"ur $r + \dim_{\mathbb{F}_2} \Sha(E/\Q)[2]$.
 
-Unter der Annahme $\Sha(E/\Q) = 0$ ergibt sich der Rang $r$ direkt als
-$r = \dim_{\mathbb{F}_2} \mathrm{Sel}_2(E/\Q)$.
+Die exakte algebraische Beziehung (ohne Sha$=0$-Annahme) lautet:
+\[
+  r + \dim_{\mathbb{F}_2} \Sha(E/\Q)[2]
+  \;=\; \dim_{\mathbb{F}_2} \mathrm{Sel}_2(E/\Q)
+        - \dim_{\mathbb{F}_2} E(\Q)_{\mathrm{tors}}[2].
+\]
+Dies folgt aus der exakten Folge $0 \to E(\Q)/2E(\Q) \to \mathrm{Sel}_2(E/\Q) \to \Sha(E/\Q)[2] \to 0$
+und dem Struktursatz $E(\Q)/2E(\Q) \cong (\mathbb{Z}/2\mathbb{Z})^r \times E(\Q)_{\mathrm{tors}}[2]$
+(da $E(\Q) \cong \mathbb{Z}^r \times E(\Q)_{\mathrm{tors}}$).
+Unter der Annahme $\Sha(E/\Q) = 0$ vereinfacht sich dies zu
+$r = \dim_{\mathbb{F}_2} \mathrm{Sel}_2(E/\Q) - \dim_{\mathbb{F}_2} E(\Q)_{\mathrm{tors}}[2]$.
 Kolyvagin \cite{Kolyvagin1990} zeigte: wenn $L(E,1) \ne 0$ oder $L'(E,1) \ne 0$,
 dann ist $\Sha(E/\Q)$ endlich und $r \le 1$.
 \end{remark}
