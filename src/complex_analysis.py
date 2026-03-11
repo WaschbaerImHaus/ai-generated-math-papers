@@ -11,7 +11,7 @@ Mathematischer Hintergrund:
     Die Funktionalgleichung (Riemann 1859) verbindet ζ(s) mit ζ(1-s):
         ξ(s) = ξ(1-s)  mit  ξ(s) = ½s(s-1)π^(-s/2)Γ(s/2)ζ(s)
 
-@author: Kurt Ingwer
+@author: Michael Fuhrmann
 @version: 1.0
 @since: 2026-03-08
 @lastModified: 2026-03-10
@@ -639,7 +639,7 @@ def riemann_zeta_mpmath(s: complex, dps: int = 50) -> complex:
              interne Berechnung in dps Dezimalstellen)
     @raises ImportError: Wenn mpmath nicht installiert ist
     @raises ValueError: Wenn s = 1 (Pol)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     _check_mpmath()
@@ -687,7 +687,7 @@ def find_zeta_zeros_mpmath(
              {'t': float, 'zero': complex, 'verified': bool}
              wobei 'verified' bedeutet: |ζ(1/2 + it)| < 1e-8
     @raises ImportError: Wenn mpmath nicht installiert ist
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     _check_mpmath()
@@ -765,7 +765,7 @@ def riemann_siegel_z_mpmath(t: float, dps: int = 50) -> float:
     @param dps: Dezimalstellen Genauigkeit (Standard: 50)
     @return: Z(t) als Python float
     @raises ImportError: Wenn mpmath nicht installiert ist
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     _check_mpmath()
@@ -797,7 +797,7 @@ def gamma_mpmath(z: complex, dps: int = 50) -> complex:
     @param dps: Dezimalstellen Genauigkeit (Standard: 50)
     @return: Γ(z) als komplexe Python-Zahl
     @raises ImportError: Wenn mpmath nicht installiert ist
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     _check_mpmath()
@@ -841,7 +841,7 @@ def verify_riemann_hypothesis_range_mpmath(
              - all_on_critical_line: True wenn alle Re(ρ_n) = 1/2 ± 1e-8
              - max_deviation: Maximale Abweichung |Re(ρ_n) - 1/2|
     @raises ImportError: Wenn mpmath nicht installiert ist
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     _check_mpmath()
@@ -908,7 +908,7 @@ def li_function_mpmath(x: float, dps: int = 50) -> float:
     @param dps: Dezimalstellen Genauigkeit (Standard: 50)
     @return: li(x) als Python float
     @raises ImportError: Wenn mpmath nicht installiert ist
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     _check_mpmath()
@@ -933,7 +933,7 @@ def _get_riemann_zeros(n_zeros: int) -> list[float]:
 
     @param n_zeros: Anzahl der gewünschten Nullstellen
     @return: Sortierte Liste der Imaginärteile γ_n > 0
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
     # Vorberechnete bekannte erste Nullstellen (hohe Genauigkeit)
@@ -1023,7 +1023,7 @@ def zeta_zero_spacing_statistics(n_zeros: int = 100) -> dict:
              - 'ks_poisson_statistic', 'ks_poisson_p_value': KS-Test gegen Poisson
              - 'gue_mean_theoretical': theoretischer GUE-Mittelwert ≈ 1
              - 'n_spacings': Anzahl der verwendeten Abstände
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
     from scipy import stats as scipy_stats
@@ -1180,7 +1180,7 @@ def pair_correlation_function(n_zeros: int = 200, r: float = 1.0) -> dict:
              - 'r_grid': Liste von r-Werten für Kurvenplot
              - 'gue_curve': R_2^{GUE} für jeden r-Wert
              - 'empirical_curve': empirische R_2 für jeden r-Wert
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
     import numpy as np
@@ -1325,7 +1325,7 @@ def random_matrix_gue_sample(n: int = 100, size: int = 50) -> dict:
              - 'sample_matrix_shape': (size, size)
              - 'n_matrices': Anzahl der erzeugten Matrizen
              - 'eigenvalues_real': True (hermitesche Matrix → reelle Eigenwerte)
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
     import numpy as np

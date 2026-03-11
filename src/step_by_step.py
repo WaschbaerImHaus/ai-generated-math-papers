@@ -17,7 +17,7 @@
         result = newton_raphson_steps(lambda x: x**2 - 2, 1.5)
         print(format_steps_text(result))
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-10
 @lastModified 2026-03-10
 """
@@ -46,7 +46,7 @@ def _numerical_derivative(f, x: float, h: float = 1e-7) -> float:
     @param x: Stelle, an der abgeleitet wird
     @param h: Schrittweite (Standard: 1e-7 für guten Kompromiss Rundung/Trunkierung)
     @return Numerische Ableitung f'(x)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     return (f(x + h) - f(x - h)) / (2 * h)
@@ -60,7 +60,7 @@ def _matrix_to_str(matrix: list) -> str:
 
     @param matrix: 2D-Liste
     @return Mehrzeiliger String der Matrix
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     rows = []
@@ -84,7 +84,7 @@ def _augmented_to_str(matrix: list, b: list) -> str:
     @param matrix: Koeffizientenmatrix A
     @param b: Rechte-Seite-Vektor b
     @return Formatierten String von [A|b]
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     rows = []
@@ -123,7 +123,7 @@ def newton_raphson_steps(
     @param tol: Konvergenztoleranz – Abbruch wenn |f(x)| < tol
     @param max_iter: Maximale Anzahl Iterationen
     @return Dict mit 'steps', 'result', 'converged', 'iterations', 'method'
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     steps = []
@@ -215,7 +215,7 @@ def bisection_steps(
     @param tol: Toleranz – Abbruch wenn |b-a| < tol
     @param max_iter: Maximale Anzahl Iterationen
     @return Dict mit 'steps', 'result', 'converged', 'iterations', 'method'
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     steps = []
@@ -310,7 +310,7 @@ def gauss_elimination_steps(matrix: list[list[float]], b: list[float]) -> dict:
     @param matrix: Koeffizientenmatrix A als 2D-Liste (n×n)
     @param b: Rechte-Seite-Vektor als Liste (Länge n)
     @return Dict mit 'steps', 'result', 'method'
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     steps = []
@@ -460,7 +460,7 @@ def euclidean_algorithm_steps(a: int, b: int) -> dict:
     @param a: Erste ganze Zahl (positiv)
     @param b: Zweite ganze Zahl (positiv)
     @return Dict mit 'steps', 'result' (ggT), 'method'
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     steps = []
@@ -543,7 +543,7 @@ def rsa_steps(p: int, q: int, message: int) -> dict:
     @param q: Zweite Primzahl
     @param message: Zu verschlüsselnde Nachricht (ganzzahlig, < n)
     @return Dict mit allen RSA-Schritten und 'result'
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     steps = []
@@ -721,7 +721,7 @@ def prime_factorization_steps(n: int) -> dict:
 
     @param n: Positive ganze Zahl, die zerlegt werden soll
     @return Dict mit 'steps', 'result' (Liste der Primfaktoren), 'method'
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     steps = []
@@ -846,7 +846,7 @@ def lu_decomposition_steps(matrix: list[list[float]]) -> dict:
 
     @param matrix: Quadratische Matrix als 2D-Liste
     @return Dict mit 'steps', 'result' (L, U, P), 'method'
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     steps = []
@@ -971,7 +971,7 @@ def format_steps_text(steps_dict: dict) -> str:
 
     @param steps_dict: Ausgabe-Dict einer step-Funktion
     @return Formatierter String für Konsole
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     lines = []
@@ -1055,7 +1055,7 @@ def format_steps_html(steps_dict: dict) -> str:
 
     @param steps_dict: Ausgabe-Dict einer step-Funktion
     @return HTML-String mit vollständigem Schritt-Container
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     method = steps_dict.get('method', 'Algorithmus')

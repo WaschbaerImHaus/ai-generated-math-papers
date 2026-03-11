@@ -2,7 +2,7 @@
 @file algebraic_topology.py
 @brief Algebraische Topologie – simpliziale und singuläre Homologie, Kohomologie,
        Homotopiegruppen, Faserbündel, Spektralsequenzen, K-Theorie und CW-Komplexe.
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 @version 1.0
 
@@ -38,7 +38,7 @@ def compute_smith_normal_form(
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     @brief Berechnet die Smith-Normalform einer ganzzahligen Matrix.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die Smith-Normalform einer ganzzahligen Matrix A ist eine Diagonalmatrix D,
@@ -149,7 +149,7 @@ def homology_from_boundary_matrices(
 ) -> Dict[int, Dict]:
     """
     @brief Berechnet Homologiegruppen aus gegebenen Randoperatormatrizen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Aus den Randoperatoren ∂_k werden die Homologiegruppen
@@ -231,7 +231,7 @@ def homology_from_boundary_matrices(
 def classify_surface(genus: int, orientable: bool) -> Dict:
     """
     @brief Klassifiziert kompakte Flächen nach Geschlecht und Orientierbarkeit.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Klassifikationssatz kompakter Flächen:
@@ -318,7 +318,7 @@ def classify_surface(genus: int, orientable: bool) -> Dict:
 def van_kampen_free_product(g1: str, g2: str) -> str:
     """
     @brief Berechnet das freie Produkt zweier Gruppen (Seifert-van-Kampen).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Der Seifert-van-Kampen-Satz besagt: Wenn X = A ∪ B mit A ∩ B wegzusammenhängend,
@@ -343,7 +343,7 @@ def van_kampen_free_product(g1: str, g2: str) -> str:
 def lyndon_hochschild_serre_demo() -> str:
     """
     @brief Demonstriert die Lyndon-Hochschild-Serre-Spektralsequenz.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Für eine Gruppenextension 1 → N → G → Q → 1 gibt es eine Spektralsequenz
@@ -367,7 +367,7 @@ def lyndon_hochschild_serre_demo() -> str:
 def classifying_space_demo(group: str) -> str:
     """
     @brief Beschreibt den klassifizierenden Raum BG einer Gruppe G.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Der klassifizierende Raum BG ist ein topologischer Raum mit
@@ -403,7 +403,7 @@ def classifying_space_demo(group: str) -> str:
 class SimplicialComplex:
     """
     @brief Repräsentiert einen Simplizialkomplex.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Ein Simplizialkomplex K ist eine Menge von Simplizes (Ecken, Kanten,
@@ -417,7 +417,7 @@ class SimplicialComplex:
     def __init__(self, simplices: List[tuple]) -> None:
         """
         @brief Initialisiert den Simplizialkomplex mit einer Liste von Simplizes.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param simplices Liste von Tupeln, z.B. [(0,), (1,), (0,1), (0,1,2)].
@@ -431,7 +431,7 @@ class SimplicialComplex:
     def _add_with_faces(self, simplex: tuple) -> None:
         """
         @brief Fügt einen Simplex und alle seine Seiten hinzu (Abschlusseigenschaft).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param simplex Tupel der Ecken des Simplex.
@@ -445,7 +445,7 @@ class SimplicialComplex:
     def faces(self) -> List[tuple]:
         """
         @brief Gibt alle Simplizes (Seiten) des Komplexes zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @return Sortierte Liste aller Simplizes.
@@ -455,7 +455,7 @@ class SimplicialComplex:
     def _simplices_of_dim(self, k: int) -> List[tuple]:
         """
         @brief Gibt alle k-Simplizes zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param k Dimension (0=Punkte, 1=Kanten, 2=Dreiecke, ...).
@@ -469,7 +469,7 @@ class SimplicialComplex:
     def euler_characteristic(self) -> int:
         """
         @brief Berechnet die Euler-Charakteristik χ = V - E + F - ...
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Formel (KaTeX):
@@ -492,7 +492,7 @@ class SimplicialComplex:
     def boundary_matrix(self, p: int) -> np.ndarray:
         """
         @brief Berechnet den Randoperator ∂_p als Matrix.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Der Randoperator ∂_p: C_p → C_{p-1} ist definiert durch:
@@ -534,7 +534,7 @@ class SimplicialComplex:
     def betti_numbers(self) -> Dict[int, int]:
         """
         @brief Berechnet die Betti-Zahlen β_k = dim H_k.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Betti-Zahlen messen die Anzahl der k-dimensionalen "Löcher":
@@ -594,7 +594,7 @@ class SimplicialComplex:
 class SimplicialHomology:
     """
     @brief Berechnet die simpliziale Homologie eines Simplizialkomplexes.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die simpliziale Homologie nutzt die Kettengruppen C_k und Randoperatoren
@@ -604,7 +604,7 @@ class SimplicialHomology:
     def __init__(self, complex: SimplicialComplex) -> None:
         """
         @brief Initialisiert SimplicialHomology mit einem Simplizialkomplex.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param complex Ein SimplicialComplex-Objekt.
@@ -614,7 +614,7 @@ class SimplicialHomology:
     def chain_groups(self) -> Dict[int, int]:
         """
         @brief Gibt die Dimensionen der Kettengruppen C_k zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         C_k ist der freie abelsche Gruppe, erzeugt von den k-Simplizes.
@@ -635,7 +635,7 @@ class SimplicialHomology:
     def boundary_operators(self) -> Dict[int, np.ndarray]:
         """
         @brief Gibt alle Randoperatoren als Matrizen zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @return Dict: k → ∂_k (Matrix).
@@ -649,7 +649,7 @@ class SimplicialHomology:
     def homology_groups(self) -> Dict[int, Dict]:
         """
         @brief Berechnet alle Homologiegruppen H_k mit Rang und Torsion.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Verwendet Smith-Normalform für die vollständige Strukturbestimmung
@@ -710,7 +710,7 @@ class SimplicialHomology:
     def betti_numbers(self) -> Dict[int, int]:
         """
         @brief Gibt die Betti-Zahlen als Dict zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @return Dict: k → β_k.
@@ -725,7 +725,7 @@ class SimplicialHomology:
 class SingularHomology:
     """
     @brief Abstrakte Darstellung der singulären Homologie bekannter Räume.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die singuläre Homologie ist der natürliche Begriff der Homologie für
@@ -736,7 +736,7 @@ class SingularHomology:
     def __init__(self, space_name: str = "") -> None:
         """
         @brief Initialisiert SingularHomology.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param space_name Name des topologischen Raums (optional).
@@ -746,7 +746,7 @@ class SingularHomology:
     def homology_of_sphere(self, n: int) -> Dict[int, str]:
         """
         @brief Gibt die singulären Homologiegruppen der n-Sphäre S^n zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Formel (KaTeX):
@@ -779,7 +779,7 @@ class SingularHomology:
     def homology_of_torus(self) -> Dict[int, str]:
         """
         @brief Gibt die singulären Homologiegruppen des 2-Torus T² zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Formel (KaTeX):
@@ -800,7 +800,7 @@ class SingularHomology:
     def homology_of_rp(self, n: int) -> Dict[int, str]:
         """
         @brief Gibt die singulären Homologiegruppen des reell-projektiven Raums RP^n zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Formel (KaTeX):
@@ -834,7 +834,7 @@ class SingularHomology:
     def homology_of_cp(self, n: int) -> Dict[int, str]:
         """
         @brief Gibt die singulären Homologiegruppen des komplex-projektiven Raums CP^n zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Formel (KaTeX):
@@ -860,7 +860,7 @@ class SingularHomology:
     def mayer_vietoris_demo(self) -> str:
         """
         @brief Demonstriert die Mayer-Vietoris-Sequenz am Beispiel S^2 = D² ∪ D².
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Die Mayer-Vietoris-Sequenz ist eine lange exakte Sequenz:
@@ -888,7 +888,7 @@ class SingularHomology:
 class CohomologyRing:
     """
     @brief Beschreibt den Kohomologiering eines topologischen Raums.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Der Kohomologiering H*(X; ℤ) trägt eine Ring-Struktur durch das Cup-Produkt:
@@ -898,7 +898,7 @@ class CohomologyRing:
     def __init__(self, space_name: str = "") -> None:
         """
         @brief Initialisiert CohomologyRing.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param space_name Name des Raums.
@@ -908,7 +908,7 @@ class CohomologyRing:
     def cohomology_of_sphere(self, n: int) -> Dict[int, str]:
         """
         @brief Gibt die Kohomologiegruppen der n-Sphäre zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Formel (KaTeX):
@@ -934,7 +934,7 @@ class CohomologyRing:
     def cohomology_of_torus(self) -> Dict[int, str]:
         """
         @brief Gibt die Kohomologiegruppen des 2-Torus T² zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Formel (KaTeX):
@@ -955,7 +955,7 @@ class CohomologyRing:
     def cup_product_demo(self, space: str) -> str:
         """
         @brief Demonstriert das Cup-Produkt für einen gegebenen Raum.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Das Cup-Produkt macht H*(X) zu einem graduierten Ring.
@@ -993,7 +993,7 @@ class CohomologyRing:
     def poincare_duality_demo(self, space: str, dim: int) -> str:
         """
         @brief Demonstriert die Poincaré-Dualität für eine orientierbare Mannigfaltigkeit.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Poincaré-Dualität: Für eine kompakte, orientierbare n-Mannigfaltigkeit M:
@@ -1021,7 +1021,7 @@ class CohomologyRing:
 class HomotopyGroups:
     """
     @brief Beschreibt Homotopiegruppen bekannter topologischer Räume.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die Homotopiegruppen π_k(X) klassifizieren k-dimensionale Schleifen:
@@ -1044,7 +1044,7 @@ class HomotopyGroups:
     def __init__(self) -> None:
         """
         @brief Initialisiert HomotopyGroups.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         pass
@@ -1052,7 +1052,7 @@ class HomotopyGroups:
     def fundamental_group(self, space: str) -> str:
         """
         @brief Gibt die Fundamentalgruppe π_1 eines bekannten Raums zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Bekannte Fundamentalgruppen:
@@ -1091,7 +1091,7 @@ class HomotopyGroups:
     def higher_homotopy_sphere(self, n: int, k: int) -> str:
         """
         @brief Gibt bekannte höhere Homotopiegruppen π_k(S^n) zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Allgemeine Regeln:
@@ -1144,7 +1144,7 @@ class HomotopyGroups:
     def seifert_van_kampen_demo(self) -> str:
         """
         @brief Demonstriert den Seifert-van-Kampen-Satz.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Seifert-van-Kampen: Wenn X = A ∪ B und A, B, A∩B wegzusammenhängend:
@@ -1169,7 +1169,7 @@ class HomotopyGroups:
     def covering_space_demo(self) -> str:
         """
         @brief Demonstriert die Überlagerungsraumtheorie.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Überlagerungsräume: p: X̃ → X mit p_*π_1(X̃) ⊂ π_1(X).
@@ -1191,7 +1191,7 @@ class HomotopyGroups:
     def long_exact_sequence_demo(self) -> str:
         """
         @brief Demonstriert die lange exakte Homotopiesequenz eines Faserraums.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Für ein Faserbündel F → E → B gilt die lange exakte Sequenz:
@@ -1220,7 +1220,7 @@ class HomotopyGroups:
 class FiberBundle:
     """
     @brief Beschreibt Faserbündel und ihre topologischen Invarianten.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Ein Faserbündel F → E → B besteht aus:
@@ -1233,7 +1233,7 @@ class FiberBundle:
     def __init__(self, base: str, fiber: str, total: str) -> None:
         """
         @brief Initialisiert FiberBundle.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param base Name des Basisraums (z.B. "S^2").
@@ -1247,7 +1247,7 @@ class FiberBundle:
     def hopf_fibration_demo(self) -> Dict:
         """
         @brief Demonstriert die Hopf-Faserung S¹ → S³ → S².
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Die Hopf-Faserung ist das historisch erste nicht-triviale Faserbündel:
@@ -1279,7 +1279,7 @@ class FiberBundle:
     def vector_bundle_demo(self) -> str:
         """
         @brief Demonstriert Vektorbündel und ihre Eigenschaften.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @return Beschreibungsstring.
@@ -1298,7 +1298,7 @@ class FiberBundle:
     def characteristic_classes_demo(self) -> str:
         """
         @brief Demonstriert charakteristische Klassen von Vektorbündeln.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Charakteristische Klassen sind kohomologische Invarianten von Bündeln:
@@ -1323,7 +1323,7 @@ class FiberBundle:
     def euler_class_demo(self) -> str:
         """
         @brief Demonstriert die Euler-Klasse.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Die Euler-Klasse e(E) ∈ H^r(B; ℤ) eines orientierten Bündels vom Rang r:
@@ -1351,7 +1351,7 @@ class FiberBundle:
 class SpectralSequence:
     """
     @brief Beschreibt Spektralsequenzen in der algebraischen Topologie.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Spektralsequenzen sind algebraische Werkzeuge zur Berechnung von
@@ -1361,7 +1361,7 @@ class SpectralSequence:
     def __init__(self, name: str) -> None:
         """
         @brief Initialisiert SpectralSequence.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param name Name der Spektralsequenz (z.B. "Serre", "Leray").
@@ -1371,7 +1371,7 @@ class SpectralSequence:
     def serre_spectral_sequence_demo(self) -> str:
         """
         @brief Demonstriert die Serre-Spektralsequenz.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Für ein Faserbündel F → E → B mit π_1(B)-Wirkung auf H_*(F):
@@ -1396,7 +1396,7 @@ class SpectralSequence:
     def leray_hirsch_theorem_demo(self) -> str:
         """
         @brief Demonstriert den Leray-Hirsch-Satz.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Leray-Hirsch: Wenn H*(F; ℝ) von globalen Klassen erzeugt wird,
@@ -1417,7 +1417,7 @@ class SpectralSequence:
     def e2_page_description(self) -> str:
         """
         @brief Beschreibt die E₂-Seite der aktuellen Spektralsequenz.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @return Beschreibungsstring der E₂-Seite.
@@ -1439,7 +1439,7 @@ class SpectralSequence:
 class KTheory:
     """
     @brief Beschreibt K-Theorie und Bott-Periodizität.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die K-Theorie K(X) klassifiziert Vektorbündel über X:
@@ -1450,7 +1450,7 @@ class KTheory:
     def __init__(self) -> None:
         """
         @brief Initialisiert KTheory.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         pass
@@ -1458,7 +1458,7 @@ class KTheory:
     def k_group_of_sphere(self, n: int) -> Dict:
         """
         @brief Gibt die reduzierte K-Theorie-Gruppen K̃(S^n) zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Bott-Periodizität für K-Theorie:
@@ -1495,7 +1495,7 @@ class KTheory:
     def bott_periodicity_demo(self) -> str:
         """
         @brief Demonstriert die Bott-Periodizität.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Bott-Periodizität (komplexe K-Theorie):
@@ -1526,7 +1526,7 @@ class KTheory:
     def chern_character_demo(self) -> str:
         """
         @brief Demonstriert den Chern-Charakter ch: K(X) → H*(X; ℚ).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Der Chern-Charakter verbindet K-Theorie mit rationaler Kohomologie:
@@ -1551,7 +1551,7 @@ class KTheory:
     def atiyah_singer_index_theorem_demo(self) -> str:
         """
         @brief Demonstriert den Atiyah-Singer-Indexsatz.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Atiyah-Singer: Für einen elliptischen Differentialoperator D auf M:
@@ -1582,7 +1582,7 @@ class KTheory:
 class CWComplex:
     """
     @brief Beschreibt CW-Komplexe und ihre zelluläre Homologie.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Ein CW-Komplex ist ein topologischer Raum, aufgebaut durch sukzessives
@@ -1595,7 +1595,7 @@ class CWComplex:
     def __init__(self, cells: Dict[int, int]) -> None:
         """
         @brief Initialisiert CWComplex mit Zellenanzahlen pro Dimension.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param cells Dict: k → Anzahl der k-Zellen (z.B. {0: 1, 2: 1} für S²).
@@ -1605,7 +1605,7 @@ class CWComplex:
     def euler_characteristic(self) -> int:
         """
         @brief Berechnet die Euler-Charakteristik χ = Σ (-1)^k · #k-Zellen.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @return Euler-Charakteristik.
@@ -1615,7 +1615,7 @@ class CWComplex:
     def attaching_map_example(self) -> str:
         """
         @brief Gibt ein Beispiel einer Anheftungsabbildung zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @return Beschreibungsstring.
@@ -1648,7 +1648,7 @@ class CWComplex:
     def cellular_homology_demo(self) -> Dict[int, int]:
         """
         @brief Berechnet die zelluläre Homologie (vereinfacht: Betti-Zahlen).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Die zelluläre Homologie nutzt Anheftungsgrade, um Randoperatoren

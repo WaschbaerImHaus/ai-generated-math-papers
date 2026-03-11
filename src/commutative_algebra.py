@@ -17,7 +17,7 @@
     und der algebraischen Zahlentheorie. Zentrale Objekte sind kommutative
     Ringe mit Eins und ihre Ideale.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 

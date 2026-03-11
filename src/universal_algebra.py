@@ -28,7 +28,7 @@
     - Birkhoff: K ist Varietät ⟺ K = HSP(K)
     - Freie Algebra: universelle Eigenschaft gegenüber allen Algebren der Varietät
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 

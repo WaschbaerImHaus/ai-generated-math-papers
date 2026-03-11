@@ -38,7 +38,7 @@
     sind bereits in information_theory.py (Klasse ErrorCorrection) implementiert.
     Dieses Modul ergänzt mit algebraischer Kodierungstheorie und formalen Sprachen.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @version 1.0
 @date 2026-03-10
 @lastModified 2026-03-10
@@ -79,7 +79,7 @@ class GaloisField:
     @param p  Primzahl (Charakteristik des Körpers)
     @param n  Erweiterungsgrad (n=1 → Primkörper GF(p))
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -398,7 +398,7 @@ class LinearCode:
 
     @param generator_matrix  Generatormatrix G als 2D-Liste oder numpy-Array (k×n über GF(2))
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -656,7 +656,7 @@ class HammingCode:
 
     @param r  Ordnung des Hamming-Codes (r ≥ 2)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -852,7 +852,7 @@ class CyclicCode:
     @param generator_poly Generatorpolynom als Koeffizientenliste [a0, a1, ..., ak]
                           (a0 = Konstantterm, ak = Leitterm)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -1039,7 +1039,7 @@ class BCHCode:
           gegebene Sequenz erzeugt
         - Grundlage der BCH/RS-Dekodierung
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -1258,7 +1258,7 @@ class DFA:
     @param start       Startzustand
     @param accepting   Menge akzeptierender Zustände
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -1402,7 +1402,7 @@ class NFA:
     @param start       Startzustand q₀
     @param accepting   Akzeptierende Zustände F
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -1485,7 +1485,7 @@ class RegularExpression:
 
     @param pattern  Regulärer Ausdruck als String
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -1537,7 +1537,7 @@ class ContextFreeGrammar:
     @param rules          Produktionsregeln {A: [['B', 'C'], ['a'], ...]}
     @param start          Startsymbol
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -1685,7 +1685,7 @@ class PushdownAutomaton:
     @param start         Startzustand q₀
     @param accepting     Akzeptierende Zustände F
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -1796,7 +1796,7 @@ class FormalLanguages:
     @description
         Bequeme Re-Exporte von DFA, NFA, RegularExpression,
         ContextFreeGrammar und PushdownAutomaton.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -1823,7 +1823,7 @@ class ComputabilityTheory:
         - Church-Turing-These und Äquivalenz verschiedener Berechnungsmodelle
         - Unentscheidbare Probleme (Halteproblem, Post, Rice, ...)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """

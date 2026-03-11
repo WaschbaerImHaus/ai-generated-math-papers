@@ -39,7 +39,7 @@
         GET  /tensor                    → Tensor-Geometrie-Seite
         POST /api/tensor/curvature      → Metriktensor, Ricci-Skalar, Gaußsche Krümmung
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-10
 @lastModified 2026-03-10
 """
@@ -1456,7 +1456,7 @@ def parse_edge_list(edge_string: str, weighted: bool = False) -> list:
     @param weighted True wenn Gewichte erwartet werden (Format 'u-v:w').
     @return Liste von (u, v) oder (u, v, weight) Tupeln.
     @raises ValueError bei ungültigem Format.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     """
     edges = []
@@ -1530,7 +1530,7 @@ def topology_metric():
         - chebyshev:  d = max|xᵢ-yᵢ|
         - p_norm:     d = (Σ|xᵢ-yᵢ|^p)^(1/p)
     @return JSON mit Distanz, Dimension und LaTeX-Formel
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     """
     data = request.get_json()
@@ -1597,7 +1597,7 @@ def topology_curve():
         Lissajous: params = {"a": int, "b": int, "delta": float}
         Helix:     params = {"radius": float, "pitch": float}
     @return JSON mit arc_length, is_closed, dimension, ambient_dim
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     """
     data = request.get_json()
@@ -1669,7 +1669,7 @@ def topology_euler():
             Würfel:    V=8, E=12, F=6  → χ=2, g=0
             Torus:     V=1, E=1,  F=1  → χ=0 (ohne Rand), g=1
     @return JSON mit chi, genus, vertices, edges, faces
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     """
     data = request.get_json()
@@ -1710,7 +1710,7 @@ def topology_fractal():
         Die Box-Counting-Dimension ist ein Maß für die fraktale Komplexität
         einer Punktmenge: d = log(N(ε)) / log(1/ε).
     @return JSON mit dimension, interpretation, epsilon_values
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     """
     data = request.get_json()
@@ -1782,7 +1782,7 @@ def graph_analyze():
         - Bipartitheit
         - Euler-Kreis-Status (alle Knoten gerader Grad)
     @return JSON mit Grapheigenschaften
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     """
     data = request.get_json()
@@ -1885,7 +1885,7 @@ def graph_dijkstra():
         Format der Kantenliste: 'u-v:gewicht'
         Gibt Distanzen und Pfade von Startknoten zu allen anderen Knoten zurück.
     @return JSON mit distances (dict) und paths (dict)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     """
     data = request.get_json()
@@ -1968,7 +1968,7 @@ def graph_combinatorics():
         - derangements: D_n = n! * Σ(-1)^k / k!
         - partition:    p(n) = Anzahl additive Zerlegungen von n
     @return JSON mit result, function_name, latex
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     """
     data = request.get_json()
@@ -2054,7 +2054,7 @@ def millennium_zeros():
         Nutzt mpmath.zetazero() für hochgenaue Berechnung.
         Alle bekannten Nullstellen liegen auf Re(s) = 1/2 (krit. Gerade).
     @return JSON mit Liste von Nullstellen {real, imag}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     """
     data = request.get_json()
@@ -2109,7 +2109,7 @@ def millennium_goldbach():
         Gibt alle Zerlegungen n = p + q (p,q prim) zurück,
         sowie die Hardy-Littlewood-Schätzung der Anzahl.
     @return JSON mit decompositions, hl_estimate, hl_accuracy
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     """
     data = request.get_json()
@@ -2161,7 +2161,7 @@ def millennium_complexity():
         O(1), O(log n), O(sqrt n), O(n), O(n log n), O(n²), O(n³), O(2^n), O(n!)
         Für n > 30 werden O(2^n) und O(n!) als Infinity zurückgegeben.
     @return JSON mit Operationszahlen pro Komplexitätsklasse
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     """
     data = request.get_json()
@@ -2225,7 +2225,7 @@ def steps_page():
         Erklärungen: Newton-Raphson, Bisektion, Gauss-Elimination, ggT, RSA, Primfaktoren.
 
     @return Gerendertes HTML-Template
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     return render_template('steps.html')
@@ -2245,7 +2245,7 @@ def steps_newton():
         Response (JSON):
             {"steps": [...], "result": float, "html": "...", "text": "..."}
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     try:
@@ -2295,7 +2295,7 @@ def steps_bisection():
         Response (JSON):
             {"steps": [...], "result": float, "html": "..."}
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     try:
@@ -2348,7 +2348,7 @@ def steps_gauss():
         Response (JSON):
             {"steps": [...], "result": [float], "html": "..."}
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     try:
@@ -2397,7 +2397,7 @@ def steps_gcd():
         Response (JSON):
             {"steps": [...], "result": int, "html": "..."}
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     try:
@@ -2437,7 +2437,7 @@ def steps_rsa():
         Response (JSON):
             {"steps": [...], "result": {...}, "html": "..."}
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     try:
@@ -2478,7 +2478,7 @@ def steps_prime_factorization():
         Response (JSON):
             {"steps": [...], "result": [int], "html": "..."}
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     try:
@@ -3196,7 +3196,7 @@ def api_group_cyclic():
     @description
         Erwartet JSON: {"n": 6}
         Gibt Ordnung, Elemente, Generatoren, is_abelian zurück.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3226,7 +3226,7 @@ def api_group_sylow():
     @description
         Erwartet JSON: {"n": 12, "p": 2}
         Gibt Sylow-Untergruppen-Ordnung und Anzahl zurück.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3257,7 +3257,7 @@ def api_group_dihedral():
     @description
         Erwartet JSON: {"n": 4}
         Gibt Ordnung, is_abelian, Rotationen/Spiegelungen zurück.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3294,7 +3294,7 @@ def api_ring_properties():
     @description
         Erwartet JSON: {"n": 12}
         Gibt Einheiten, Nullteiler, is_field, is_integral_domain zurück.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3322,7 +3322,7 @@ def api_ring_factorize():
     @description
         Erwartet JSON: {"coefficients": [1, 0, 1], "p": 2}
         Koeffizienten: höchster Grad zuerst.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3349,7 +3349,7 @@ def api_ring_irreducible():
     @brief Prüft ob ein Polynom irreduzibel mod p ist.
     @description
         Erwartet JSON: {"coefficients": [1, 1, 1], "p": 2}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3380,7 +3380,7 @@ def api_galois_group():
     @description
         Erwartet JSON: {"coefficients": [1, 0, -2]}
         Koeffizienten höchster Grad zuerst.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3407,7 +3407,7 @@ def api_galois_solvable():
     @brief Prüft ob ein Polynom durch Radikale lösbar ist.
     @description
         Erwartet JSON: {"coefficients": [1, 0, -2]}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3433,7 +3433,7 @@ def api_galois_finite_field():
     @brief Analysiert den endlichen Körper GF(p^n).
     @description
         Erwartet JSON: {"p": 2, "n": 3}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3464,7 +3464,7 @@ def api_modules_smith():
     @brief Berechnet die Smith-Normalform einer ganzzahligen Matrix.
     @description
         Erwartet JSON: {"matrix": [[2,4,4],[-6,6,12],[10,-4,-16]]}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3491,7 +3491,7 @@ def api_modules_classify():
     @description
         Erwartet JSON: {"invariants": [2, 6, 12]}
         Invariantenfaktoren als Liste (Smith-Diagonale).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3522,7 +3522,7 @@ def api_modules_spectrum():
     @brief Berechnet das Primspektrum von Z/nZ.
     @description
         Erwartet JSON: {"n": 12}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3552,7 +3552,7 @@ def api_fourier_dft():
     @brief Berechnet die diskrete Fourier-Transformation (FFT).
     @description
         Erwartet JSON: {"values": [1, 0, -1, 0]}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3589,7 +3589,7 @@ def api_fourier_series():
     @brief Berechnet Fourier-Reihen-Koeffizienten einer Funktion.
     @description
         Erwartet JSON: {"func": "sin(x)", "period": 6.283, "n_terms": 5}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3620,7 +3620,7 @@ def api_fourier_dominant():
     @brief Bestimmt die dominante Frequenz in einem Signal.
     @description
         Erwartet JSON: {"values": [...], "sample_rate": 16.0}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3657,7 +3657,7 @@ def api_analytic_pi():
     @brief Berechnet die Primzählfunktion pi(x) und Vergleichsapproximationen.
     @description
         Erwartet JSON: {"x": 100}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3692,7 +3692,7 @@ def api_analytic_li():
     @brief Berechnet das Logarithmische Integral Li(x).
     @description
         Erwartet JSON: {"x": 1000}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3719,7 +3719,7 @@ def api_analytic_von_mangoldt():
     @brief Berechnet die Von-Mangoldt-Funktion Lambda(n) bis zur Grenze n.
     @description
         Erwartet JSON: {"n": 30}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3758,7 +3758,7 @@ def api_modular_eisenstein():
     @brief Berechnet den Wert der Eisenstein-Reihe E_k(z).
     @description
         Erwartet JSON: {"k": 4, "z_re": 0.0, "z_im": 1.0}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3788,7 +3788,7 @@ def api_modular_j():
     @brief Berechnet die j-Invariante.
     @description
         Erwartet JSON: {"z_re": 0.0, "z_im": 1.0}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3821,7 +3821,7 @@ def api_modular_delta():
     @brief Berechnet die ersten n Ramanujan tau-Koeffizienten.
     @description
         Erwartet JSON: {"n_terms": 10}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3850,7 +3850,7 @@ def api_lfunc_dirichlet():
     @brief Berechnet eine Dirichlet-L-Funktion L(s, chi).
     @description
         Erwartet JSON: {"s_re": 2.0, "s_im": 0.0, "q": 4, "chi_index": 0}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3880,7 +3880,7 @@ def api_lfunc_characters():
     @brief Listet alle Dirichlet-Charaktere mod q auf.
     @description
         Erwartet JSON: {"q": 5}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3917,7 +3917,7 @@ def api_lfunc_special_values():
     @brief Berechnet Spezialwerte von L-Funktionen mod q.
     @description
         Erwartet JSON: {"q": 4}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3961,7 +3961,7 @@ def api_padic_valuation():
     @brief Berechnet p-adische Bewertung und Norm einer Zahl n.
     @description
         Erwartet JSON: {"n": 360, "p": 2}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -3990,7 +3990,7 @@ def api_padic_expansion():
     @brief Berechnet die p-adische Entwicklung einer Zahl n.
     @description
         Erwartet JSON: {"n": 42, "p": 5}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -4032,7 +4032,7 @@ def api_padic_hensel():
     @description
         Erwartet JSON: {"a": 3, "p": 7, "k": 3}
         Hebt f(x) = x^2 - 2 (Beispiel) von mod p auf mod p^k.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -4071,7 +4071,7 @@ def api_iwasawa_kummer():
     @brief Prüft Kummer-Kongruenzen für eine Primzahl p.
     @description
         Erwartet JSON: {"p": 5}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -4104,7 +4104,7 @@ def api_iwasawa_polynomial():
     @description
         Erwartet JSON: {"coefficients": [3, 1, 0, 1], "p": 3}
         Koeffizienten: niedrigstes Grad zuerst.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -4132,7 +4132,7 @@ def api_iwasawa_kubota():
     @brief Berechnet die Kubota-Leopoldt p-adische Zeta-Funktion.
     @description
         Erwartet JSON: {"p": 5, "s": -1}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -4175,7 +4175,7 @@ def api_spinors_gamma():
     @brief Gibt Gamma-Matrizen für eine gegebene Dimension zurück.
     @description
         Erwartet JSON: {"dim": 4}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -4208,7 +4208,7 @@ def api_spinors_clifford():
     @brief Prüft Clifford-Algebra-Relationen der Gamma-Matrizen.
     @description
         Erwartet JSON: {"dim": 4}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -4237,7 +4237,7 @@ def api_spinors_dirac():
     @brief Berechnet Dirac-Spinor für freies Teilchen.
     @description
         Erwartet JSON: {"m": 1.0, "pz": 0.5}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -4275,7 +4275,7 @@ def api_numerical_interpolate():
     @brief Lagrange-Interpolation an einem Punkt.
     @description
         Erwartet JSON: {"x_vals": [...], "y_vals": [...], "x_eval": 1.5}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -4303,7 +4303,7 @@ def api_numerical_optimize():
     @brief Gradientenabstieg für f(x,y) = x^2 + y^2.
     @description
         Erwartet JSON: {"x0": 3.0, "y0": 4.0, "learning_rate": 0.1}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -4336,7 +4336,7 @@ def api_numerical_golden():
     @brief Golden-Section-Suche für eine Funktion auf [a, b].
     @description
         Erwartet JSON: {"func": "(x-2)**2+1", "a": 0, "b": 4}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5160,7 +5160,7 @@ def api_repr_character_table():
     @description
         Gibt die Charaktertafel für S3 oder Z2 zurück.
         POST-Body: {"group_name": "S3" | "Z2"}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5205,7 +5205,7 @@ def api_repr_schur_orthogonality():
     @description
         Prüft ⟨χᵢ, χⱼ⟩ = δᵢⱼ für die irreduziblen Charaktere einer Gruppe.
         POST-Body: {"group_name": "S3" | "Z2"}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5260,7 +5260,7 @@ def api_repr_burnside():
     @description
         POST-Body: {"n_colorings": int, "n_rotations": int}
         Beispiel: Perlen-Halskette mit n Farben und Rotationssymmetrie.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5300,7 +5300,7 @@ def api_lattice_create():
     @brief Teilerverband oder Potenzmengeverband erstellen.
     @description
         POST-Body: {"type": "divisibility" | "power_set", "n": int}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5341,7 +5341,7 @@ def api_lattice_is_distributive():
     @description
         POST-Body: {"type": "divisibility" | "power_set", "n": int}
         Gibt is_distributive, is_modular und Gegenbeispiel zurück (falls vorhanden).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5380,7 +5380,7 @@ def api_lattice_birkhoff():
     @brief Birkhoff-Darstellungssatz für endliche distributive Verbände.
     @description
         POST-Body: {"n": int} – Teilerverband von n analysieren.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5421,7 +5421,7 @@ def api_multilinear_tensor_product():
     @brief Tensorprodukt zweier Matrizen (Kronecker-Produkt) berechnen.
     @description
         POST-Body: {"A": [[...], ...], "B": [[...], ...]}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5455,7 +5455,7 @@ def api_multilinear_exterior_product():
     @description
         POST-Body: {"u": [float, ...], "v": [float, ...]}
         Berechnet u ∧ v als antisymmetrischen Tensor.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5491,7 +5491,7 @@ def api_multilinear_signature():
     @description
         POST-Body: {"M": [[...], ...]} – symmetrische Matrix der Bilinearform.
         Gibt (p, q, r) zurück: p positive, q negative, r Null-Eigenwerte.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5526,7 +5526,7 @@ def api_homological_chain_complex():
     @description
         POST-Body: {"simplex_type": "triangle" | "tetrahedron" | "circle"}
         Erstellt einen simplizialen Kettenkomplex.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5582,7 +5582,7 @@ def api_homological_homology():
     @brief Homologiegruppen eines simplizialen Komplexes berechnen.
     @description
         POST-Body: {"simplex_type": "triangle" | "tetrahedron" | "circle" | "torus"}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5630,7 +5630,7 @@ def api_homological_ext_tor():
     @brief Ext- und Tor-Gruppen berechnen (abgeleitete Funktoren).
     @description
         POST-Body: {"n": int, "m": int, "degree": int}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5666,7 +5666,7 @@ def api_algstruct_magma():
     @brief Magma-Struktur aus Verknüpfungstafel erstellen und analysieren.
     @description
         POST-Body: {"table": [[int, ...], ...], "elements": [str, ...]}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5706,7 +5706,7 @@ def api_algstruct_check_group():
     @brief Prüft ob eine Verknüpfungstafel eine Gruppe definiert.
     @description
         POST-Body: {"table": [[int, ...], ...], "elements": [str, ...]}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5771,7 +5771,7 @@ def api_invariant_reynolds():
     @description
         POST-Body: {"poly": "x**2 + y**2", "n": int}
         Mittelt das Polynom über die symmetrische Gruppe S_n.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5837,7 +5837,7 @@ def api_invariant_molien():
     @brief Molien-Reihe: Erzeugende Funktion der Invariantendimensionen.
     @description
         POST-Body: {"group_type": "Z2" | "S2" | "cyclic", "max_degree": int}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5876,7 +5876,7 @@ def api_invariant_symmetric():
     @brief Elementarsymmetrische Polynome für S_n berechnen.
     @description
         POST-Body: {"n": int}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5909,7 +5909,7 @@ def api_universal_algebra_check():
     @brief Prüft ob eine Struktur eine Varietät erfüllt.
     @description
         POST-Body: {"variety": "groups" | "rings" | "lattices"}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5963,7 +5963,7 @@ def api_universal_free_monoid():
     @brief Freies Monoid über einem Alphabet generieren.
     @description
         POST-Body: {"alphabet": ["a", "b", ...]}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -5994,7 +5994,7 @@ def api_model_satisfies():
     @description
         POST-Body: {"theory": "group" | "field" | "order"}
         Gibt Axiome und Erfüllbarkeit zurück.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6024,7 +6024,7 @@ def api_model_elementary_equivalence():
     @brief Elementare Äquivalenz zweier Strukturen prüfen.
     @description
         POST-Body: {"theory1": str, "theory2": str}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6052,7 +6052,7 @@ def api_model_quantifier_elimination():
     @brief Quantorenelimination für Theorien demonstrieren.
     @description
         POST-Body: {"theory": "DLO" | "RCF" | "ACF"}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6078,7 +6078,7 @@ def api_proof_formal_sequent():
     @brief Sequenzenkalkül LK – einfache Beweise.
     @description
         POST-Body: {"formula": str} – logische Formel zu beweisen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6106,7 +6106,7 @@ def api_proof_formal_nd():
     @brief Natürliches Schließen – einfache Formeln beweisen.
     @description
         POST-Body: {"formula": str} – Aussagenlogische Formel.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6171,7 +6171,7 @@ def api_recursion_turing_machine():
     @description
         POST-Body: {"machine": "palindrome" | "binary_increment" | "unary_addition",
                     "input": [str, ...]}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6232,7 +6232,7 @@ def api_recursion_ackermann():
     @brief Ackermann-Funktion berechnen (schnell wachsend).
     @description
         POST-Body: {"m": int (0-3), "n": int (0-10)}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6270,7 +6270,7 @@ def api_measure_lebesgue_integral():
     @description
         POST-Body: {"function_type": "polynomial" | "step" | "continuous",
                     "a": float, "b": float}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6317,7 +6317,7 @@ def api_measure_sigma_algebra():
     @brief σ-Algebra erzeugt von Generatoren berechnen.
     @description
         POST-Body: {"base_set": [elements], "generators": [[subset1], [subset2], ...]}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6389,7 +6389,7 @@ def api_special_bessel():
     @brief Bessel-Funktionen J_n(x) und Y_n(x) berechnen.
     @description
         POST-Body: {"n": int, "x": float}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6432,7 +6432,7 @@ def api_special_legendre():
     @brief Legendre-Polynome P_n(x) berechnen.
     @description
         POST-Body: {"n": int, "x": float}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6510,7 +6510,7 @@ def api_functional_banach():
     @brief Banach-Raum: Norm und Vollständigkeit prüfen.
     @description
         POST-Body: {"vectors": [[float, ...], ...], "norm_type": "1" | "2" | "inf"}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6559,7 +6559,7 @@ def api_functional_hilbert():
     @brief Hilbert-Raum: Skalarprodukt, Orthogonalität, Parseval.
     @description
         POST-Body: {"vectors": [[float, ...], ...]}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6601,7 +6601,7 @@ def api_functional_fixed_point():
     @brief Banachscher Fixpunktsatz: Kontraktionsabbildung.
     @description
         POST-Body: {"contraction_factor": float (0<c<1), "x0": float}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6643,7 +6643,7 @@ def api_pde_classify():
     @description
         POST-Body: {"A": float, "B": float, "C": float}
         PDE: A·u_xx + B·u_xy + C·u_yy + ... = 0
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6683,7 +6683,7 @@ def api_pde_heat():
     @description
         POST-Body: {"u0": [float, ...], "L": float, "T": float, "alpha": float}
         u_t = α · u_xx auf [0, L] × [0, T]
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -6733,7 +6733,7 @@ def api_pde_wave():
     @description
         POST-Body: {"u0": [float, ...], "v0": [float, ...], "L": float, "T": float, "c": float}
         u_tt = c² · u_xx auf [0, L] × [0, T]
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -7689,6 +7689,282 @@ def api_diff_top_sphere():
                         'hairy_ball': hairy_ball_theorem_demo()})
     except Exception as e:
         return error_response(str(e))
+
+
+# ===========================================================================
+# SEITE: Interaktive Funktionalanalysis
+# ===========================================================================
+
+@app.route('/functional_analysis_interactive')
+def functional_analysis_interactive():
+    """
+    @brief Interaktive Seite zur Spektralberechnung und C*-Visualisierung.
+    @description
+        Rendert das Template für die interaktive Funktionalanalysis-Seite.
+        Nutzer können Matrizen eingeben und deren Spektrum (Eigenwerte)
+        in der komplexen Ebene visualisieren lassen.
+    @return Gerendertes HTML-Template
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    @lastModified 2026-03-11
+    """
+    return render_template('functional_analysis_interactive.html')
+
+
+# ===========================================================================
+# API: Funktionalanalysis – Spektrum einer Matrix
+# ===========================================================================
+
+@app.route('/api/functional_analysis/spectrum', methods=['POST'])
+def api_functional_analysis_spectrum():
+    """
+    @brief Berechnet das Spektrum (Eigenwerte) einer quadratischen Matrix.
+    @description
+        Nimmt eine Matrix als JSON-Array entgegen, berechnet ihre Eigenwerte
+        via NumPy und gibt Real- und Imaginärteil zurück.
+        Optional: Plot der Eigenwerte in der komplexen Ebene als Base64-PNG.
+
+        Eingabe-JSON:
+            matrix (list[list[float]]): Quadratische Matrix (2×2 bis 6×6)
+            plot   (bool, optional):    Ob ein Plot erstellt werden soll (Standard: false)
+
+        Ausgabe-JSON:
+            eigenvalues (list[dict]):   Eigenwerte mit "real" und "imag"
+            spectral_radius (float):    Spektralradius = max(|λ|)
+            plot_b64 (str, optional):   Base64-PNG des Spektrum-Plots
+
+    @return Flask JSON-Response
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    @lastModified 2026-03-11
+    """
+    try:
+        # Eingabe-Daten lesen
+        data = request.get_json(force=True)
+        matrix_data = data.get('matrix')
+        do_plot = bool(data.get('plot', False))
+
+        if matrix_data is None:
+            return error_response('Feld "matrix" fehlt in der Anfrage')
+
+        # Matrix als NumPy-Array laden
+        mat = np.array(matrix_data, dtype=complex)
+
+        # Dimensionsprüfung: nur quadratische Matrizen erlaubt
+        if mat.ndim != 2 or mat.shape[0] != mat.shape[1]:
+            return error_response('Matrix muss quadratisch sein (n×n)')
+        if mat.shape[0] < 2 or mat.shape[0] > 6:
+            return error_response('Matrix-Größe muss zwischen 2×2 und 6×6 liegen')
+
+        # Eigenwerte mit NumPy berechnen
+        eigenvalues_raw = np.linalg.eigvals(mat)
+
+        # Eigenwerte als Liste von Dicts (Real- und Imaginärteil)
+        eigenvalues = [
+            {'real': float(ev.real), 'imag': float(ev.imag)}
+            for ev in eigenvalues_raw
+        ]
+
+        # Spektralradius: Maximum der Beträge aller Eigenwerte
+        spectral_radius = float(np.max(np.abs(eigenvalues_raw)))
+
+        # Ergebnis-Dict aufbauen
+        result = {
+            'eigenvalues': eigenvalues,
+            'spectral_radius': spectral_radius,
+            'matrix_size': mat.shape[0],
+        }
+
+        # Plot der Eigenwerte in der komplexen Ebene erzeugen
+        if do_plot:
+            fig, ax = plt.subplots(figsize=(6, 6))
+            fig.patch.set_facecolor('#1e1e2e')  # Catppuccin-Mocha Hintergrund
+            ax.set_facecolor('#181825')
+
+            # Einheitskreis zeichnen (wichtige Referenz in Spektraltheorie)
+            theta = np.linspace(0, 2 * np.pi, 300)
+            ax.plot(np.cos(theta), np.sin(theta),
+                    color='#6c7086', linewidth=1.0, linestyle='--',
+                    label='Einheitskreis $|z|=1$', zorder=1)
+
+            # Koordinatenachsen
+            ax.axhline(0, color='#6c7086', linewidth=0.7, zorder=1)
+            ax.axvline(0, color='#6c7086', linewidth=0.7, zorder=1)
+
+            # Eigenwerte als farbige Punkte einzeichnen
+            palette = ['#89b4fa', '#a6e3a1', '#f38ba8', '#fab387',
+                       '#cba6f7', '#94e2d5']
+            for idx, ev in enumerate(eigenvalues_raw):
+                farbe = palette[idx % len(palette)]
+                ax.scatter(ev.real, ev.imag, color=farbe, s=120, zorder=3,
+                           label=f'$\\lambda_{{{idx+1}}}$ = {ev.real:.3f}{"+" if ev.imag >= 0 else ""}{ev.imag:.3f}i')
+
+            # Achsenbeschriftungen und Titel
+            ax.set_xlabel('Re(λ)', color='#cdd6f4')
+            ax.set_ylabel('Im(λ)', color='#cdd6f4')
+            ax.set_title(f'Spektrum der Matrix – Spektralradius ρ = {spectral_radius:.4f}',
+                         color='#cdd6f4', pad=12)
+            ax.tick_params(colors='#a6adc8')
+            for spine in ax.spines.values():
+                spine.set_edgecolor('#45475a')
+
+            # Achsen gleich skalieren damit Kreise rund bleiben
+            ax.set_aspect('equal', adjustable='datalim')
+            ax.legend(loc='upper right', fontsize=8,
+                      facecolor='#313244', labelcolor='#cdd6f4',
+                      edgecolor='#45475a')
+
+            # Figure als Base64-String kodieren und in das Ergebnis einfügen
+            result['plot_b64'] = figure_to_base64(fig)
+
+        return jsonify(result)
+
+    except np.linalg.LinAlgError as e:
+        return error_response(f'Numerischer Fehler bei Eigenwertberechnung: {e}')
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# API: Operatoralgebren – Gelfand-Spektrum
+# ===========================================================================
+
+@app.route('/api/operator_algebras/gelfand_spectrum', methods=['POST'])
+def api_operator_algebras_gelfand_spectrum():
+    """
+    @brief Berechnet das Gelfand-Spektrum eines Operators und visualisiert es.
+    @description
+        Erstellt für verschiedene Operator-Typen die Matrixdarstellung,
+        berechnet das Spektrum und gibt einen Plot als Base64-PNG zurück.
+
+        Operator-Typen:
+            "shift":          Vorwärts-Shift-Operator (unilateral)
+            "multiplication": Multiplikationsoperator mit [1, 2, ..., n]
+            "custom":         Benutzerdefinierte Matrix (Fallback: Shift)
+
+        Eingabe-JSON:
+            operator_type (str):  "shift" | "multiplication" | "custom"
+            size          (int):  Matrixgröße n (2 bis 8, Standard: 5)
+
+        Ausgabe-JSON:
+            operator_type (str):           Gewählter Typ
+            matrix_repr  (list[list]):     Matrixdarstellung (Real-Anteile)
+            eigenvalues  (list[dict]):     Eigenwerte mit "real" und "imag"
+            spectral_radius (float):       Spektralradius
+            plot_b64     (str):            Base64-PNG des Spektrum-Plots
+
+    @return Flask JSON-Response
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    @lastModified 2026-03-11
+    """
+    try:
+        # Eingabe-Daten lesen
+        data = request.get_json(force=True)
+        operator_type = data.get('operator_type', 'shift')
+        size = int(data.get('size', 5))
+
+        # Größenbeschränkung
+        if size < 2 or size > 8:
+            return error_response('Größe muss zwischen 2 und 8 liegen')
+
+        # Matrixdarstellung je nach Operator-Typ erstellen
+        if operator_type == 'shift':
+            # Vorwärts-Shift: S·e_k = e_{k+1}, S·e_n = 0
+            # Supradiagonale Einsen, Rest Null
+            mat = np.zeros((size, size), dtype=complex)
+            for k in range(size - 1):
+                mat[k, k + 1] = 1.0
+            titel = f'Vorwärts-Shift S (n={size})'
+            beschreibung = 'Nilpotenter Operator – Spektrum = {0}'
+
+        elif operator_type == 'multiplication':
+            # Multiplikationsoperator M_f mit f(k) = k auf {1,...,n}
+            # Diagonalmatrix mit Einträgen 1, 2, ..., n
+            mat = np.diag(np.arange(1, size + 1, dtype=complex))
+            titel = f'Multiplikationsoperator M_f, f(k)=k (n={size})'
+            beschreibung = 'Normaler Operator – Spektrum = {1, 2, ..., n}'
+
+        else:
+            # Fallback / "custom": Tridiagonale Matrix (typisches Beispiel)
+            mat = np.zeros((size, size), dtype=complex)
+            for k in range(size):
+                mat[k, k] = 2.0  # Hauptdiagonale
+            for k in range(size - 1):
+                mat[k, k + 1] = -1.0  # Supradiagonale
+                mat[k + 1, k] = -1.0  # Subdiagonale
+            titel = f'Tridiagonale Testmatrix (n={size})'
+            beschreibung = 'Symmetrischer Operator – Spektrum reell'
+            operator_type = 'custom'
+
+        # Eigenwerte berechnen
+        eigenvalues_raw = np.linalg.eigvals(mat)
+
+        # Spektralradius
+        spectral_radius = float(np.max(np.abs(eigenvalues_raw)))
+
+        # Eigenwerte als serialisierbare Liste aufbereiten
+        eigenvalues = [
+            {'real': float(ev.real), 'imag': float(ev.imag)}
+            for ev in eigenvalues_raw
+        ]
+
+        # Matrixdarstellung für Ausgabe (nur Real-Anteile als verschachtelte Liste)
+        matrix_repr = [[float(mat[r, c].real) for c in range(size)] for r in range(size)]
+
+        # Plot erstellen
+        fig, ax = plt.subplots(figsize=(6, 6))
+        fig.patch.set_facecolor('#1e1e2e')
+        ax.set_facecolor('#181825')
+
+        # Einheitskreis als Referenz
+        theta = np.linspace(0, 2 * np.pi, 300)
+        ax.plot(np.cos(theta), np.sin(theta),
+                color='#6c7086', linewidth=1.0, linestyle='--',
+                label='Einheitskreis', zorder=1)
+
+        # Koordinatenachsen
+        ax.axhline(0, color='#6c7086', linewidth=0.7, zorder=1)
+        ax.axvline(0, color='#6c7086', linewidth=0.7, zorder=1)
+
+        # Eigenwerte einzeichnen
+        palette = ['#89b4fa', '#a6e3a1', '#f38ba8', '#fab387',
+                   '#cba6f7', '#94e2d5', '#eba0ac', '#f9e2af']
+        for idx, ev in enumerate(eigenvalues_raw):
+            farbe = palette[idx % len(palette)]
+            label_str = f'$\\lambda_{{{idx+1}}}={ev.real:.3f}{"+" if ev.imag >= 0 else ""}{ev.imag:.3f}i$'
+            ax.scatter(ev.real, ev.imag, color=farbe, s=130, zorder=3, label=label_str)
+
+        # Titel und Achsenbeschriftung
+        ax.set_xlabel('Re(λ)', color='#cdd6f4')
+        ax.set_ylabel('Im(λ)', color='#cdd6f4')
+        ax.set_title(f'Gelfand-Spektrum: {titel}\nρ(A) = {spectral_radius:.4f}',
+                     color='#cdd6f4', pad=12)
+        ax.tick_params(colors='#a6adc8')
+        for spine in ax.spines.values():
+            spine.set_edgecolor('#45475a')
+
+        ax.set_aspect('equal', adjustable='datalim')
+        ax.legend(loc='upper right', fontsize=7,
+                  facecolor='#313244', labelcolor='#cdd6f4',
+                  edgecolor='#45475a')
+
+        # Base64-Plot kodieren
+        plot_b64 = figure_to_base64(fig)
+
+        return jsonify({
+            'operator_type': operator_type,
+            'title': titel,
+            'description': beschreibung,
+            'matrix_repr': matrix_repr,
+            'eigenvalues': eigenvalues,
+            'spectral_radius': spectral_radius,
+            'plot_b64': plot_b64,
+        })
+
+    except Exception as e:
+        return error_response(str(e))
+
 
 # ===========================================================================
 # HAUPTPROGRAMM

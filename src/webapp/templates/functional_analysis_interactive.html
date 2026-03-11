@@ -1,0 +1,611 @@
+{% extends "base.html" %}
+<!--
+    @file functional_analysis_interactive.html
+    @brief Interaktive Seite zur Spektralvisualisierung und C*-Operator-Analyse.
+    @description
+        Ermöglicht die Eingabe beliebiger quadratischer Matrizen (2×2 bis 6×6)
+        und visualisiert deren Spektrum (Eigenwerte) in der komplexen Ebene.
+        Außerdem können vordefinierte Operator-Typen (Shift, Multiplikation,
+        Tridiagonal) analysiert werden – als Einstieg in die Gelfand-Theorie
+        der C*-Algebren.
+
+        Verwendete API-Endpunkte:
+            POST /api/functional_analysis/spectrum       — Spektrum einer Matrix
+            POST /api/operator_algebras/gelfand_spectrum — Vordefinierte Operatoren
+
+        Technologie: Bootstrap-freies Dark-Theme (Catppuccin Mocha),
+        KaTeX für Formeln, Fetch-API für asynchrone Serveranfragen.
+
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    @lastModified 2026-03-11
+-->
+
+{% block title %}Spektrum-Visualisierung – Funktionalanalysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>&#955; Interaktive Funktionalanalysis</h1>
+    <p class="page-desc">
+        Berechne das <strong>Spektrum</strong> $\sigma(A) = \{\lambda \in \mathbb{C} : A - \lambda I \text{ nicht invertierbar}\}$
+        einer Matrix und visualisiere die Eigenwerte in der komplexen Ebene.
+        Erkunde vordefinierte Operator-Typen aus der <strong>C*-Algebren-Theorie</strong>.
+    </p>
+</div>
+
+<!-- Theoretischer Hintergrund -->
+<section class="math-section">
+    <h2>&#120016; Theoretischer Hintergrund</h2>
+    <p>
+        Der <strong>Spektralsatz</strong> ist eines der zentralen Ergebnisse der Funktionalanalysis:
+        Für einen normalen Operator $T$ auf einem Hilbert-Raum $H$ gibt es ein Spektralmaß $E$, sodass
+        $$T = \int_{\sigma(T)} \lambda \, dE(\lambda).$$
+        Das <strong>Spektrum</strong> $\sigma(T)$ enthält alle $\lambda$, für die $T - \lambda I$ nicht bijektiv ist.
+        Der <strong>Spektralradius</strong> ist $\rho(A) = \max\{|\lambda| : \lambda \in \sigma(A)\} = \lim_{n\to\infty} \|A^n\|^{1/n}$.
+    </p>
+    <p>
+        Im Kontext der <strong>C*-Algebren</strong> (Gelfand-Theorie):
+        Für eine kommutative C*-Algebra $\mathcal{A}$ ist der
+        <strong>Gelfand-Isomorphismus</strong> $\hat{\cdot}: \mathcal{A} \to C(\hat{\mathcal{A}})$
+        ein isometrischer *-Algebren-Isomorphismus, wobei $\hat{\mathcal{A}}$ der
+        maximale Idealraum (Gelfand-Spektrum) ist.
+    </p>
+</section>
+
+<!-- ===== SECTION 1: MATRIX-SPEKTRUM INTERAKTIV ===== -->
+<section class="math-section">
+    <h2>&#9632; Spektrum einer benutzerdefinierten Matrix</h2>
+
+    <div class="card-grid">
+
+        <!-- Matrizen-Eingabe -->
+        <div class="card" style="grid-column: span 2;">
+            <h3>Matrix-Eingabe und Spektralberechnung</h3>
+            <p>
+                Gib eine quadratische Matrix $A \in \mathbb{C}^{n \times n}$ ($2 \leq n \leq 6$) ein.
+                Die Eigenwerte $\lambda_i$ mit $Av_i = \lambda_i v_i$ werden in der
+                komplexen Ebene visualisiert. Reelle, symmetrische Matrizen haben stets
+                reelles Spektrum (alle Punkte auf der reellen Achse).
+            </p>
+
+            <!-- Größen-Auswahl -->
+            <div class="input-row">
+                <label>Matrixgröße $n$:</label>
+                <select id="matrix-size" onchange="updateMatrixGrid()">
+                    <option value="2">2×2</option>
+                    <option value="3" selected>3×3</option>
+                    <option value="4">4×4</option>
+                    <option value="5">5×5</option>
+                    <option value="6">6×6</option>
+                </select>
+                <!-- Vorgaben-Buttons für schnelle Beispiele -->
+                <button onclick="loadPreset('identity')" class="btn-secondary" style="margin-left:12px;">Einheitsmatrix</button>
+                <button onclick="loadPreset('rotation')" class="btn-secondary">Rotation</button>
+                <button onclick="loadPreset('jordan')" class="btn-secondary">Jordan-Block</button>
+                <button onclick="loadPreset('symmetric')" class="btn-secondary">Symmetrisch</button>
+                <button onclick="loadPreset('random')" class="btn-secondary">Zufällig</button>
+            </div>
+
+            <!-- Dynamisches Matrixgitter -->
+            <div id="matrix-grid-container" style="margin: 16px 0; overflow-x: auto;">
+                <!-- Wird per JavaScript befüllt -->
+            </div>
+
+            <!-- Berechnen-Button -->
+            <button onclick="calcSpectrum()" class="btn-calc">
+                Spektrum berechnen &amp; visualisieren
+            </button>
+
+            <!-- Ergebnis: Plot + Tabelle nebeneinander -->
+            <div id="spectrum-result-container" style="display:none; margin-top: 20px;">
+                <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start;">
+
+                    <!-- Plot der Eigenwerte -->
+                    <div>
+                        <h4 style="color: #cba6f7; margin-bottom: 8px;">
+                            Komplexe Ebene – Eigenwert-Verteilung
+                        </h4>
+                        <img id="spectrum-plot" src="" alt="Eigenwert-Plot"
+                             style="border: 1px solid #45475a; border-radius: 8px;
+                                    max-width: 420px; width: 100%;">
+                    </div>
+
+                    <!-- Eigenwert-Tabelle -->
+                    <div style="flex: 1; min-width: 220px;">
+                        <h4 style="color: #cba6f7; margin-bottom: 8px;">
+                            Eigenwerte $\sigma(A)$
+                        </h4>
+                        <table id="eigenvalue-table"
+                               style="width:100%; border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:left; padding: 6px 10px;
+                                               border-bottom: 1px solid #45475a; color: #a6adc8;">
+                                        Eigenwert $\lambda_k$
+                                    </th>
+                                    <th style="text-align:right; padding: 6px 10px;
+                                               border-bottom: 1px solid #45475a; color: #a6adc8;">
+                                        $|\lambda_k|$
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="eigenvalue-table-body">
+                                <!-- Per JavaScript befüllt -->
+                            </tbody>
+                        </table>
+                        <div id="spectral-radius-display"
+                             style="margin-top: 14px; padding: 10px; background: #313244;
+                                    border-radius: 6px; border-left: 3px solid #cba6f7;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fehler-Anzeige -->
+            <div id="spectrum-error" class="result-box" style="display:none;"></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 2: GELFAND-SPEKTRUM VORDEFINIERTER OPERATOREN ===== -->
+<section class="math-section">
+    <h2>&#120024; Gelfand-Spektrum – Operator-Typen</h2>
+    <p>
+        Untersuche das Spektrum kanonischer Operatoren aus der Operatortheorie.
+        Der <strong>Shift-Operator</strong> ist nilpotent: $\sigma(S) = \{0\}$.
+        Der <strong>Multiplikationsoperator</strong> ist normal: sein Spektrum
+        besteht aus den Multiplikationswerten $\{f(1), \ldots, f(n)\}$.
+        Für selbstadjungierte Operatoren gilt $\sigma(T) \subset \mathbb{R}$.
+    </p>
+
+    <div class="card-grid">
+
+        <!-- Shift-Operator -->
+        <div class="card">
+            <h3>Vorwärts-Shift $S$</h3>
+            <p>
+                $S e_k = e_{k+1}$, $S e_n = 0$. Darstellung: Supradiagonale Einsen.
+                <strong>Nilpotent</strong>: $S^n = 0 \Rightarrow \sigma(S) = \{0\}$.
+                Spektralradius $\rho(S) = 0$.
+            </p>
+            <div class="input-row">
+                <label>Größe $n$:</label>
+                <input type="number" id="shift-size" value="5" min="2" max="8" style="width:70px;">
+            </div>
+            <button onclick="calcGelfand('shift')" class="btn-calc">Shift-Spektrum berechnen</button>
+            <div id="gelfand-shift-result" class="result-box" style="margin-top:12px;"></div>
+            <div id="gelfand-shift-plot-container" style="margin-top:12px; display:none;">
+                <img id="gelfand-shift-plot" src="" alt="Shift-Spektrum"
+                     style="border: 1px solid #45475a; border-radius: 6px; max-width: 100%;">
+            </div>
+        </div>
+
+        <!-- Multiplikationsoperator -->
+        <div class="card">
+            <h3>Multiplikationsoperator $M_f$</h3>
+            <p>
+                $(M_f g)(k) = f(k) \cdot g(k)$ mit $f(k) = k$.
+                Diagonalmatrix mit Einträgen $1, 2, \ldots, n$.
+                <strong>Normal und selbstadjungiert</strong>: $\sigma(M_f) = \{1,\ldots,n\} \subset \mathbb{R}$.
+            </p>
+            <div class="input-row">
+                <label>Größe $n$:</label>
+                <input type="number" id="mult-size" value="5" min="2" max="8" style="width:70px;">
+            </div>
+            <button onclick="calcGelfand('multiplication')" class="btn-calc">Multiplikations-Spektrum</button>
+            <div id="gelfand-mult-result" class="result-box" style="margin-top:12px;"></div>
+            <div id="gelfand-mult-plot-container" style="margin-top:12px; display:none;">
+                <img id="gelfand-mult-plot" src="" alt="Multiplikations-Spektrum"
+                     style="border: 1px solid #45475a; border-radius: 6px; max-width: 100%;">
+            </div>
+        </div>
+
+        <!-- Tridiagonale Matrix -->
+        <div class="card">
+            <h3>Tridiagonale Matrix (diskr. Laplace)</h3>
+            <p>
+                Matrixdarstellung des <strong>diskreten Laplace-Operators</strong>:
+                Hauptdiagonale 2, Neben-Diagonalen −1. Selbstadjungiert, positiv definit.
+                Eigenwerte: $\lambda_k = 2 - 2\cos\!\left(\frac{k\pi}{n+1}\right) \in (0,4)$.
+            </p>
+            <div class="input-row">
+                <label>Größe $n$:</label>
+                <input type="number" id="custom-size" value="5" min="2" max="8" style="width:70px;">
+            </div>
+            <button onclick="calcGelfand('custom')" class="btn-calc">Laplace-Spektrum</button>
+            <div id="gelfand-custom-result" class="result-box" style="margin-top:12px;"></div>
+            <div id="gelfand-custom-plot-container" style="margin-top:12px; display:none;">
+                <img id="gelfand-custom-plot" src="" alt="Laplace-Spektrum"
+                     style="border: 1px solid #45475a; border-radius: 6px; max-width: 100%;">
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== SECTION 3: MATHEMATISCHER LEITFADEN ===== -->
+<section class="math-section">
+    <h2>&#128218; Mathematische Hintergründe</h2>
+
+    <div class="card-grid">
+
+        <div class="card">
+            <h3>Spektralklassifikation</h3>
+            <p>
+                Das Spektrum eines Operators $T: H \to H$ zerfällt in drei Teile:
+            </p>
+            <ul style="color: #cdd6f4; line-height: 1.8;">
+                <li><strong style="color: #89b4fa;">Punktspektrum</strong> $\sigma_p(T)$:
+                    $T - \lambda I$ hat nicht-triviales Kern (Eigenwerte).</li>
+                <li><strong style="color: #a6e3a1;">Kontinuierliches Spektrum</strong> $\sigma_c(T)$:
+                    $T - \lambda I$ injektiv, dicht im Bild, aber nicht surjektiv.</li>
+                <li><strong style="color: #f38ba8;">Residualspektrum</strong> $\sigma_r(T)$:
+                    $T - \lambda I$ injektiv, Bild nicht dicht.</li>
+            </ul>
+            <p>Für normale Operatoren gilt $\sigma_r(T) = \emptyset$ und $\sigma(T) = \overline{\sigma_p(T)}$.</p>
+        </div>
+
+        <div class="card">
+            <h3>C*-Algebra und Gelfand-Transform</h3>
+            <p>
+                Eine <strong>C*-Algebra</strong> $\mathcal{A}$ ist eine Banach-Algebra mit Involution $*$,
+                die die C*-Bedingung $\|a^* a\| = \|a\|^2$ erfüllt.
+            </p>
+            <p>
+                <strong>Gelfand-Naimark-Satz</strong>: Jede abstrakte C*-Algebra ist
+                isometrisch *-isomorph zu einer Operator-C*-Algebra $B(H)$ für
+                einen geeigneten Hilbert-Raum $H$.
+            </p>
+            <p>
+                Der <strong>Gelfand-Transform</strong> $\hat{a}: \hat{\mathcal{A}} \to \mathbb{C}$,
+                $\hat{a}(\varphi) = \varphi(a)$, ist für kommutative C*-Algebren
+                ein isometrischer Isomorphismus: $\mathcal{A} \cong C(\hat{\mathcal{A}})$.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>Spektralradius-Formel</h3>
+            <p>
+                Für eine Matrix $A \in \mathbb{C}^{n \times n}$ gilt:
+                $$\rho(A) = \lim_{k \to \infty} \|A^k\|^{1/k} = \max_{\lambda \in \sigma(A)} |\lambda|$$
+            </p>
+            <p>
+                Für das <strong>Konvergenzverhalten</strong> von Potenzen gilt:
+                $\|A^k\| \to 0$ genau dann wenn $\rho(A) &lt; 1$ (Neumann-Reihe).
+            </p>
+            <p>
+                Das <strong>charakteristische Polynom</strong>:
+                $p_A(\lambda) = \det(A - \lambda I) = (-1)^n (\lambda - \lambda_1) \cdots (\lambda - \lambda_n)$.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+/**
+ * @file functional_analysis_interactive.html – JavaScript-Teil
+ * @brief Interaktionslogik für Spektralberechnung und Visualisierung.
+ * @author Michael Fuhrmann
+ * @date 2026-03-11
+ * @lastModified 2026-03-11
+ */
+
+// -----------------------------------------------------------------------
+// Hilfs-Funktion: Zahl formatieren (Real + Imag)
+// -----------------------------------------------------------------------
+
+/**
+ * Formatiert einen Eigenwert (real + imag) als lesbaren String.
+ * @param {number} real  - Realteil
+ * @param {number} imag  - Imaginärteil
+ * @returns {string}     - Formatierter String, z.B. "2.000 + 1.500i"
+ */
+function formatEigenvalue(real, imag) {
+    const r = real.toFixed(4);
+    const i = Math.abs(imag).toFixed(4);
+    if (Math.abs(imag) < 1e-10) {
+        // Nur Realteil anzeigen wenn Imaginärteil vernachlässigbar
+        return `${r}`;
+    }
+    const sign = imag >= 0 ? '+' : '−';
+    return `${r} ${sign} ${i}i`;
+}
+
+// -----------------------------------------------------------------------
+// Matrixgitter dynamisch aufbauen
+// -----------------------------------------------------------------------
+
+/**
+ * Erstellt das Eingabegitter für die Matrix entsprechend der gewählten Größe.
+ * Wird aufgerufen wenn der Nutzer die Größen-Dropdown ändert.
+ */
+function updateMatrixGrid() {
+    const n = parseInt(document.getElementById('matrix-size').value);
+    const container = document.getElementById('matrix-grid-container');
+
+    // Tabelle als Eingabe-Gitter erstellen
+    let html = '<table style="border-collapse: separate; border-spacing: 6px;">';
+    for (let r = 0; r < n; r++) {
+        html += '<tr>';
+        for (let c = 0; c < n; c++) {
+            // Standardwerte: Einheitsmatrix-Diagonale
+            const defaultVal = (r === c) ? '1' : '0';
+            html += `
+                <td>
+                    <input type="number" id="m_${r}_${c}"
+                           value="${defaultVal}" step="0.1"
+                           style="width: 64px; text-align: center;
+                                  background: #1e1e2e; color: #cdd6f4;
+                                  border: 1px solid #45475a; border-radius: 4px;
+                                  padding: 4px 6px; font-size: 0.9rem;">
+                </td>`;
+        }
+        html += '</tr>';
+    }
+    html += '</table>';
+    container.innerHTML = html;
+
+    // Bereits angezeigte Ergebnisse ausblenden bei Größenänderung
+    document.getElementById('spectrum-result-container').style.display = 'none';
+    document.getElementById('spectrum-error').style.display = 'none';
+}
+
+// -----------------------------------------------------------------------
+// Vorgaben (Presets) laden
+// -----------------------------------------------------------------------
+
+/**
+ * Lädt bekannte Beispiel-Matrizen in das Eingabegitter.
+ * @param {string} preset - Name des Presets ('identity','rotation','jordan','symmetric','random')
+ */
+function loadPreset(preset) {
+    const sizeSelect = document.getElementById('matrix-size');
+    let n = parseInt(sizeSelect.value);
+
+    // Preset-Matrizen definieren
+    let matrix;
+    if (preset === 'identity') {
+        // Einheitsmatrix: alle Eigenwerte = 1
+        matrix = Array.from({length: n}, (_, r) =>
+            Array.from({length: n}, (_, c) => (r === c ? 1 : 0)));
+
+    } else if (preset === 'rotation') {
+        // Rotationsmatrix 2×2: Eigenwerte e^{±iθ}
+        sizeSelect.value = '2';
+        n = 2;
+        updateMatrixGrid();
+        const theta = Math.PI / 4;  // 45°-Rotation
+        matrix = [
+            [Math.cos(theta), -Math.sin(theta)],
+            [Math.sin(theta),  Math.cos(theta)]
+        ];
+
+    } else if (preset === 'jordan') {
+        // Jordan-Block 3×3 mit Eigenwert 2: nur ein Eigenwert (algebraisch vielfach)
+        sizeSelect.value = '3';
+        n = 3;
+        updateMatrixGrid();
+        matrix = [[2, 1, 0], [0, 2, 1], [0, 0, 2]];
+
+    } else if (preset === 'symmetric') {
+        // Reell-symmetrische 3×3-Matrix: Eigenwerte stets reell
+        sizeSelect.value = '3';
+        n = 3;
+        updateMatrixGrid();
+        matrix = [[4, 2, 1], [2, 3, 0], [1, 0, 2]];
+
+    } else if (preset === 'random') {
+        // Zufällige Matrix mit ganzzahligen Einträgen in [−3, 3]
+        matrix = Array.from({length: n}, () =>
+            Array.from({length: n}, () => Math.floor(Math.random() * 7) - 3));
+    }
+
+    // Werte in die Input-Felder schreiben
+    const currentN = parseInt(sizeSelect.value);
+    for (let r = 0; r < currentN; r++) {
+        for (let c = 0; c < currentN; c++) {
+            const field = document.getElementById(`m_${r}_${c}`);
+            if (field && matrix && matrix[r] && matrix[r][c] !== undefined) {
+                field.value = parseFloat(matrix[r][c].toFixed(4));
+            }
+        }
+    }
+}
+
+// -----------------------------------------------------------------------
+// Spektrum berechnen (eigene Matrix)
+// -----------------------------------------------------------------------
+
+/**
+ * Liest die Matrix aus dem Eingabegitter, sendet sie an die API
+ * und zeigt Plot + Tabelle der Eigenwerte an.
+ */
+async function calcSpectrum() {
+    const n = parseInt(document.getElementById('matrix-size').value);
+
+    // Matrix-Daten aus den Input-Feldern lesen
+    const matrix = [];
+    for (let r = 0; r < n; r++) {
+        const row = [];
+        for (let c = 0; c < n; c++) {
+            const val = parseFloat(document.getElementById(`m_${r}_${c}`).value);
+            if (isNaN(val)) {
+                showSpectrumError('Alle Matrix-Einträge müssen gültige Zahlen sein.');
+                return;
+            }
+            row.push(val);
+        }
+        matrix.push(row);
+    }
+
+    // Ergebnis-Bereich verstecken während Berechnung läuft
+    document.getElementById('spectrum-result-container').style.display = 'none';
+    document.getElementById('spectrum-error').style.display = 'none';
+
+    try {
+        // API-Anfrage senden
+        const response = await fetch('/api/functional_analysis/spectrum', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({matrix: matrix, plot: true})
+        });
+        const data = await response.json();
+
+        if (data.error) {
+            showSpectrumError(data.error);
+            return;
+        }
+
+        // Plot anzeigen
+        if (data.plot_b64) {
+            document.getElementById('spectrum-plot').src =
+                'data:image/png;base64,' + data.plot_b64;
+        }
+
+        // Eigenwert-Tabelle befüllen
+        const tbody = document.getElementById('eigenvalue-table-body');
+        tbody.innerHTML = '';
+        data.eigenvalues.forEach((ev, idx) => {
+            const absVal = Math.sqrt(ev.real * ev.real + ev.imag * ev.imag);
+            const row = document.createElement('tr');
+            row.style.borderBottom = '1px solid #313244';
+            row.innerHTML = `
+                <td style="padding: 6px 10px; color: #cdd6f4; font-family: monospace;">
+                    $\\lambda_{${idx + 1}}$ = ${formatEigenvalue(ev.real, ev.imag)}
+                </td>
+                <td style="padding: 6px 10px; text-align: right; color: #89b4fa; font-family: monospace;">
+                    ${absVal.toFixed(4)}
+                </td>`;
+            tbody.appendChild(row);
+        });
+
+        // Spektralradius anzeigen
+        const radDisplay = document.getElementById('spectral-radius-display');
+        radDisplay.innerHTML = `
+            <strong style="color: #cba6f7;">Spektralradius:</strong>
+            <span style="color: #f9e2af; font-family: monospace; font-size: 1.05em;">
+                ρ(A) = ${data.spectral_radius.toFixed(6)}
+            </span>
+            <br>
+            <small style="color: #6c7086; margin-top: 4px; display: block;">
+                Stabilitätskriterium: ${data.spectral_radius < 1
+                    ? '✓ ρ &lt; 1 → konvergente Potenzen'
+                    : data.spectral_radius > 1
+                        ? '✗ ρ &gt; 1 → divergente Potenzen'
+                        : '⚠ ρ = 1 → Grenzfall'}
+            </small>`;
+
+        // Ergebnis-Bereich einblenden
+        document.getElementById('spectrum-result-container').style.display = 'block';
+
+        // KaTeX neu rendern damit Formeln in der Tabelle dargestellt werden
+        if (typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(document.getElementById('spectrum-result-container'), {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+        }
+
+    } catch (err) {
+        showSpectrumError('Netzwerkfehler: ' + err.message);
+    }
+}
+
+/**
+ * Zeigt eine Fehlermeldung im Spektrum-Bereich an.
+ * @param {string} msg - Fehlermeldung
+ */
+function showSpectrumError(msg) {
+    const errDiv = document.getElementById('spectrum-error');
+    errDiv.textContent = '⚠ Fehler: ' + msg;
+    errDiv.style.display = 'block';
+    errDiv.style.color = '#f38ba8';
+}
+
+// -----------------------------------------------------------------------
+// Gelfand-Spektrum für vordefinierte Operator-Typen
+// -----------------------------------------------------------------------
+
+/**
+ * Berechnet das Gelfand-Spektrum eines vordefinierten Operators.
+ * @param {string} operatorType - 'shift' | 'multiplication' | 'custom'
+ */
+async function calcGelfand(operatorType) {
+    // Größe aus dem passenden Input-Feld lesen
+    const sizeFieldId = {
+        'shift':          'shift-size',
+        'multiplication': 'mult-size',
+        'custom':         'custom-size'
+    }[operatorType];
+
+    const size = parseInt(document.getElementById(sizeFieldId).value);
+
+    // Ergebnis-Elemente für diesen Typ
+    const resultDivId = `gelfand-${operatorType === 'multiplication' ? 'mult' : operatorType}-result`;
+    const plotContId  = `gelfand-${operatorType === 'multiplication' ? 'mult' : operatorType}-plot-container`;
+    const plotImgId   = `gelfand-${operatorType === 'multiplication' ? 'mult' : operatorType}-plot`;
+
+    const resultDiv   = document.getElementById(resultDivId);
+    const plotCont    = document.getElementById(plotContId);
+    const plotImg     = document.getElementById(plotImgId);
+
+    // Ladezustand anzeigen
+    resultDiv.textContent = 'Berechne …';
+    resultDiv.style.color = '#a6adc8';
+    plotCont.style.display = 'none';
+
+    try {
+        const response = await fetch('/api/operator_algebras/gelfand_spectrum', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({operator_type: operatorType, size: size})
+        });
+        const data = await response.json();
+
+        if (data.error) {
+            resultDiv.textContent = '⚠ Fehler: ' + data.error;
+            resultDiv.style.color = '#f38ba8';
+            return;
+        }
+
+        // Ergebnis-Text aufbauen
+        const evStrings = data.eigenvalues
+            .map((ev, i) => `λ${i+1} = ${formatEigenvalue(ev.real, ev.imag)}`)
+            .join('  |  ');
+
+        resultDiv.innerHTML = `
+            <strong style="color: #cba6f7;">${data.title}</strong><br>
+            <small style="color: #6c7086;">${data.description}</small><br>
+            <span style="font-family: monospace; font-size: 0.85rem; color: #cdd6f4;">
+                ${evStrings}
+            </span><br>
+            <span style="color: #f9e2af;">Spektralradius: ρ = ${data.spectral_radius.toFixed(6)}</span>`;
+        resultDiv.style.color = '#cdd6f4';
+
+        // Plot anzeigen
+        if (data.plot_b64) {
+            plotImg.src = 'data:image/png;base64,' + data.plot_b64;
+            plotCont.style.display = 'block';
+        }
+
+    } catch (err) {
+        resultDiv.textContent = 'Netzwerkfehler: ' + err.message;
+        resultDiv.style.color = '#f38ba8';
+    }
+}
+
+// -----------------------------------------------------------------------
+// Initialisierung beim Seitenaufruf
+// -----------------------------------------------------------------------
+
+// Matrixgitter initial aufbauen (3×3 Einheitsmatrix)
+document.addEventListener('DOMContentLoaded', function () {
+    updateMatrixGrid();
+});
+</script>
+{% endblock %}

@@ -22,7 +22,7 @@
     - help             : Alle Befehle anzeigen
     - exit/quit        : REPL beenden
 
-    Sicherheitsaudit (Build 57, 2026-03-11):
+    Sicherheitsaudit (Build 68, 2026-03-11):
     - KEINE unsicheren eval() oder exec()-Aufrufe vorhanden.
     - Benutzereingaben werden ausschließlich via command.split() aufgeteilt
       und via json.loads() für JSON-Argumente geparst.
@@ -32,7 +32,7 @@
     - Alle Eingaben werden auf DEBUG-Level geloggt.
     - Kein Zugriff auf das Dateisystem oder Netzwerk durch Benutzereingaben.
     - Integer-Parsing via int()/float() – kein Overflow-Risiko in Python.
-    - Audit-Ergebnis: Keine Sicherheitslücken gefunden (Stand Build 57).
+    - Audit-Ergebnis: Keine Sicherheitslücken gefunden (Stand Build 68).
 
 @author Michael Fuhrmann
 @date 2026-03-09

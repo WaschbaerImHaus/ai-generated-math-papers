@@ -12,7 +12,7 @@
 
     Ausgelagert aus linear_algebra.py für bessere Modularität.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -29,7 +29,7 @@ class Vector:
     @description
         Unterstützt: Skalarprodukt, Kreuzprodukt (3D), Norm,
         Normierung, Addition, Skalarmultiplikation.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -212,7 +212,7 @@ def gram_schmidt(vectors: list['Vector'], normalize: bool = False) -> list['Vect
     @param vectors Liste der zu orthogonalisierenden Vektoren.
     @param normalize True für ONB (Orthonormalbasis), False für OB.
     @return Liste orthogonaler (oder orthonormaler) Vektoren.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     orthogonal = []

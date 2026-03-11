@@ -27,7 +27,7 @@
     result = plugin.my_function(42)
     ```
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 @version 1.0.0
 """
@@ -52,7 +52,7 @@ def register_plugin(name: str, module: Any) -> None:
 
     @param name   Bezeichner, unter dem das Plugin registriert wird.
     @param module Das geladene Python-Modul-Objekt.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Plugin in der globalen Registry unter dem Namen speichern
@@ -71,7 +71,7 @@ def load_plugin(path: str) -> Any:
     @return      Das geladene Modul-Objekt.
     @raises FileNotFoundError  Wenn die Datei nicht existiert.
     @raises ImportError        Wenn das Modul nicht geladen werden kann.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Sicherstellen, dass die Datei existiert
@@ -106,7 +106,7 @@ def discover_plugins(plugin_dir: str = "plugins/") -> List[str]:
 
     @param plugin_dir  Pfad zum Plugin-Verzeichnis (Standard: "plugins/").
     @return            Liste der Namen der geladenen Plugins.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     loaded: List[str] = []
@@ -151,7 +151,7 @@ def get_plugin(name: str) -> Any:
     @param name  Name des registrierten Plugins.
     @return      Das Modul-Objekt des Plugins.
     @raises KeyError  Wenn kein Plugin mit diesem Namen registriert ist.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     if name not in PLUGIN_REGISTRY:
@@ -164,7 +164,7 @@ def list_plugins() -> List[str]:
     """
     @brief Gibt eine Liste der Namen aller registrierten Plugins zurück.
     @return  Sortierte Liste der Plugin-Namen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     return sorted(PLUGIN_REGISTRY.keys())
@@ -180,7 +180,7 @@ def unload_plugin(name: str) -> None:
 
     @param name  Name des zu entfernenden Plugins.
     @raises KeyError  Wenn kein Plugin mit diesem Namen registriert ist.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     if name not in PLUGIN_REGISTRY:
@@ -201,7 +201,7 @@ def create_plugin_template(name: str, output_dir: str = "plugins/") -> str:
     @param name        Name des neuen Plugins (wird als Dateiname verwendet).
     @param output_dir  Zielverzeichnis für die Template-Datei.
     @return            Absoluter Pfad zur erstellten Datei.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Verzeichnis erstellen, falls es noch nicht existiert
@@ -218,7 +218,7 @@ def create_plugin_template(name: str, output_dir: str = "plugins/") -> str:
 @description
     Beschreibung des Plugins hier einfügen.
     Dieses Plugin wurde automatisch mit create_plugin_template() erstellt.
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 @version 1.0.0
 """
@@ -229,7 +229,7 @@ PLUGIN_NAME = "{safe_name}"
 # Plugin-Metadaten
 PLUGIN_VERSION = "1.0.0"
 PLUGIN_DESCRIPTION = "Beschreibung des Plugins"
-PLUGIN_AUTHOR = "Kurt Ingwer"
+PLUGIN_AUTHOR = "Michael Fuhrmann"
 
 
 def setup() -> None:
@@ -238,7 +238,7 @@ def setup() -> None:
     @description
         Wird beim Laden des Plugins aufgerufen. Hier können Ressourcen
         vorbereitet, Konfigurationen geladen oder Abhängigkeiten geprüft werden.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Initialisierungslogik hier einfügen
@@ -254,7 +254,7 @@ def example_function(x: float) -> float:
 
     @param x  Eingabewert.
     @return   Berechnetes Ergebnis.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Beispiel: Identitätsfunktion – durch echte Logik ersetzen

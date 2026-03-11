@@ -29,7 +29,7 @@
         - Kodierungstheorie (zyklische Codes = Ideale in ℤ_p[x]/(x^n-1))
         - Algebraische Zahlentheorie (Klassenzahl, Einheitengruppe)
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @version 1.0
 @since 2026-03-10
 @lastModified 2026-03-10
@@ -213,7 +213,7 @@ class Ring:
         ℤ/6ℤ = {0,1,2,3,4,5}   – nicht Integritätsbereich (2·3 = 0)
         ℤ/7ℤ = {0,1,...,6}      – Körper (7 Primzahl)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -414,7 +414,7 @@ class Ideal:
         - Maximales Ideal M: R/M ist Körper
         - Hauptideal:     wird von einem Element erzeugt
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -556,7 +556,7 @@ class QuotientRing(Ring):
         - R/P ist Integritätsbereich  ⟺  P ist Primideal
         - R/M ist Körper              ⟺  M ist maximales Ideal
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -648,7 +648,7 @@ class PolynomialRingModP:
         - Addition: komponentenweise mod p
         - Multiplikation: Polynomprodukt, dann mod f(x) und mod p
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """

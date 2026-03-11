@@ -25,7 +25,7 @@
     - SDE: dX = μ(X)dt + σ(X)dW (Itô-Konvention)
     - Geometrische BM: S(t) = S₀ exp((μ - σ²/2)t + σW(t))
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-10
 @lastModified 2026-03-10
 """

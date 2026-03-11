@@ -36,7 +36,7 @@
     - Birch-Swinnerton-Dyer: ord_{s=1} L(E,s) = Rang(E(\\mathbb{Q}))
     - Riemann-Hypothese: alle nicht-trivialen Nullstellen auf Re(s) = 1/2
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @version 1.0
 @since 2026-03-10
 @lastModified 2026-03-10

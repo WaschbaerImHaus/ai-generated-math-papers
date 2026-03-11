@@ -41,7 +41,7 @@
     Sard (generische Transversalität), Morse (Topologie aus kritischen Punkten) und
     de Rham (Kohomologie via Differentialformen).
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @version 1.0
 @since 2026-03-10
 @lastModified 2026-03-10
@@ -70,7 +70,7 @@ class SmoothManifold:
 
     Tangentialraum T_pM und Kotangentialraum T*_pM haben beide Dimension n.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -145,7 +145,7 @@ class DifferentialForm:
     Die coefficients werden als Dict { (i₁,…,iₖ) : f_expr } übergeben,
     wobei die Indizes als aufsteigendes Tupel ganzer Zahlen (0-basiert) dienen.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -393,7 +393,7 @@ class DeRhamCohomology:
     de Rham's Theorem besagt, dass H^k_dR(M) ≅ H^k_sing(M; ℝ) (singuläre Kohomologie).
     Die Dimensionen b_k = dim(H^k_dR(M)) heißen Betti-Zahlen.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -534,7 +534,7 @@ class MorseTheory:
         c_k ≥ b_k    (schwach)
         Σ_k (-1)^k c_k = χ(M)   (Euler-Charakteristik)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -780,7 +780,7 @@ class TransversalityTheory:
     Sard's Theorem: Die Menge der kritischen Werte einer glatten Abbildung
     f : M → N hat Maß 0 in N.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -910,7 +910,7 @@ class VectorBundle:
     - Triviales Bündel: E = B × ℝ^r (globales Produkt)
     - Möbiusband: nicht-triviales ℝ¹-Bündel über S¹
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -1011,7 +1011,7 @@ class CharacteristicClasses:
     - Euler-Klasse e(E) ∈ H^n(M; ℤ) für orientierte Bündel vom Rang n
     - Stiefel-Whitney-Klassen w_k(E) ∈ H^k(M; ℤ/2ℤ) für reelle Bündel
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -1179,7 +1179,7 @@ class SphereTopology:
 
     Sie ist eine kompakte, verbundene, orientierbare n-dimensionale Mannigfaltigkeit.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """

@@ -11,7 +11,7 @@ Mathematischer Hintergrund:
     Optimierung findet Extremwerte von Funktionen.
     Lineare Programmierung maximiert/minimiert lineare Zielfunktionen unter Nebenbedingungen.
 
-@author: Kurt Ingwer
+@author: Michael Fuhrmann
 @version: 1.0
 @since: 2026-03-08
 @lastModified: 2026-03-09
@@ -92,7 +92,7 @@ class NewtonInterpolation:
         f[xᵢ] = yᵢ
         f[xᵢ,...,xₖ] = (f[xᵢ₊₁,...,xₖ] - f[xᵢ,...,xₖ₋₁]) / (xₖ - xᵢ)
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @since: 2026-03-08
     @lastModified: 2026-03-08
     """
@@ -200,7 +200,7 @@ class CubicSpline:
 
     Mathematisch: S(x) = aᵢ + bᵢ(x-xᵢ) + cᵢ(x-xᵢ)² + dᵢ(x-xᵢ)³ auf [xᵢ, xᵢ₊₁]
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @since: 2026-03-08
     @lastModified: 2026-03-08
     """

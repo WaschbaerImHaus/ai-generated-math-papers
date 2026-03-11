@@ -20,7 +20,7 @@
     - BSD-Vermutung: Rang von E(Q) = ord_{s=1} L(E,s)
     - Wiles' Beweis des Grossen Fermatschen Satzes (Shimura-Taniyama-Wiles)
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -164,7 +164,7 @@ class ECPoint:
     - Zwei verschiedene Punkte: Schneide die Sekante mit der Kurve
     - Gleicher Punkt: Verwende die Tangente an diesem Punkt
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -440,7 +440,7 @@ class EllipticCurve:
     Die Diskriminante bestimmt ob die Kurve nicht-singulaer ist.
     Delta != 0 garantiert genau eine Tangente in jedem Kurvenpunkt.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -712,7 +712,7 @@ class EllipticCurveModP(EllipticCurve):
     Gruppenstruktur: E(F_p) ist eine endliche abelsche Gruppe.
     Nach Cauchy/Lagrange: Ordnung n teilt p-1 (nicht direkt, sondern via Hasse).
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -956,7 +956,7 @@ class ECCKeyExchange:
     Sicherheit beruht auf der Schwierigkeit des Diskreten Logarithmus in E(F_p).
     Selbst wenn Angreifer A und B kennen, kann er k nicht rekonstruieren.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 

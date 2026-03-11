@@ -14,7 +14,7 @@
     Importiert extended_gcd und mod_inverse aus algebra_core.
     Ausgelagert aus algebra.py für bessere Modularität.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -46,7 +46,7 @@ def is_prime(n: int) -> bool:
 
     @param n Die zu prüfende natürliche Zahl.
     @return True wenn n eine Primzahl ist, sonst False.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Beispiele:
@@ -97,7 +97,7 @@ def prime_factorization(n: int) -> dict[int, int]:
 
     @param n Die zu zerlegende natürliche Zahl (n >= 2).
     @return Dictionary {primzahl: exponent}.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Beispiele:
@@ -154,7 +154,7 @@ def euler_phi(n: int) -> int:
 
     @param n Positive ganze Zahl.
     @return phi(n) - Anzahl der teilerfremden Zahlen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Beispiele:
@@ -205,7 +205,7 @@ def rsa_keygen(p: int, q: int) -> tuple[tuple[int, int], tuple[int, int]]:
     @param p Erste Primzahl.
     @param q Zweite Primzahl (p ≠ q).
     @return ((e, n), (d, n)) – (public_key, private_key).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     n = p * q
@@ -235,7 +235,7 @@ def rsa_encrypt(message: int, public_key: tuple[int, int]) -> int:
     @param message Klartextnachricht als ganze Zahl (0 ≤ m < n).
     @param public_key (e, n) – öffentlicher Schlüssel.
     @return Chiffretext c.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     e, n = public_key
@@ -252,7 +252,7 @@ def rsa_decrypt(ciphertext: int, private_key: tuple[int, int]) -> int:
     @param ciphertext Chiffretext c.
     @param private_key (d, n) – privater Schlüssel.
     @return Klartextnachricht m.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     d, n = private_key

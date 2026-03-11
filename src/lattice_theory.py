@@ -24,7 +24,7 @@
     - Distributivität: a∧(b∨c) = (a∧b)∨(a∧c)
     - Boolesche Algebra: distributiver, komplementierter beschränkter Verband
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 

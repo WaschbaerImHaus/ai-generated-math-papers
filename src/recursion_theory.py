@@ -25,7 +25,7 @@
     Formeln im KaTeX-Format sind in der Dokumentationsdatei recursion_theory.md
     zu finden.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -76,7 +76,7 @@ class TuringMachine:
     Das Band wird intern als Dictionary {position: symbol} repräsentiert,
     sodass es in beide Richtungen unbegrenzt ist.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 

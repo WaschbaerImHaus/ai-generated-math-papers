@@ -35,7 +35,7 @@
         Quellencodierungssatz (Shannon):
             H(X) ≤ L̄ < H(X) + 1   (L̄ = mittlere Codelänge in Bit)
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @version 1.0
 @since 2026-03-10
 @lastModified 2026-03-10
@@ -66,7 +66,7 @@ class ShannonEntropy:
         b = e   → Einheit: Nat
         b = 10  → Einheit: Hartley (Digit)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -272,7 +272,7 @@ class KLDivergence:
         - D_KL(P||Q) = 0 ⟺ P = Q
         - Nicht symmetrisch: D_KL(P||Q) ≠ D_KL(Q||P)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -491,7 +491,7 @@ class ChannelCapacity:
         existiert ein Codierungsschema, das beliebig zuverlässige
         Übertragung ermöglicht. Für R > C ist das nicht möglich.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -692,7 +692,7 @@ class SourceCoding:
         Codelänge L̄ eines eindeutig dekodierbaren Präfixcodes:
             H(X) ≤ L̄ < H(X) + 1
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -984,7 +984,7 @@ class ErrorCorrection:
     Übertragungsfehlern. Ein linearer (n,k)-Code überträgt k Informationsbits
     in n Bits (n > k), die d = n-k Redundanzbits enthalten.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -1223,7 +1223,7 @@ class DifferentialEntropy:
 
     Im Gegensatz zur diskreten Entropie kann h(X) negativ sein.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 

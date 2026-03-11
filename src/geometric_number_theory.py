@@ -16,7 +16,7 @@
     - det(Λ) = |det(B)| ist das Volumen des Fundamentalbereichs
     - Minkowski: Vol(K) > 2ⁿ·det(Λ) → K enthält einen von 0 verschiedenen Gitterpunkt
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -40,7 +40,7 @@ class Lattice:
             Λ = { Σᵢ aᵢ bᵢ | aᵢ ∈ ℤ }
         Die Basismatrix B hat die Basisvektoren als Zeilen.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -237,7 +237,7 @@ class LLLReduction:
 
         Anwendungen: Kryptanalyse, Faktorisierung, diophantische Approximation.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -498,7 +498,7 @@ class QuadraticForm:
         - Äquivalenz: f ~ g falls f durch GL₂(ℤ)-Transformation in g überführbar
         - Reduzierte Form: |b| ≤ a ≤ c (Gauss'sche Normalform)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -715,7 +715,7 @@ class GaussComposition:
         Die Klassenzahl h(D) = |Cl(D)| misst die "Komplexität" des Zahlkörpers.
         h(D) = 1 ⟺ ℤ[√D] ist faktoriell (eindeutige Primfaktorzerlegung).
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -907,7 +907,7 @@ class SpherePackingTheory:
         - dim=8: E₈-Gitter (optimale Packung, Viazovska 2016)
         - dim=24: Leech-Gitter (optimale Packung, Viazovska et al. 2016)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 

@@ -14,7 +14,7 @@
     - Alle Konvertierungen geben SymPy-Ausdrücke zurück
     - export_to_sage_format() erstellt SageMath-kompatible Python-Skripte
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-11
 @lastModified 2026-03-11
 """
@@ -34,7 +34,7 @@ def is_sage_available() -> bool:
         Bibliotheken (SymPy, NumPy, FLINT, etc.) integriert.
 
     @return: True wenn SageMath verfügbar, sonst False.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     try:
@@ -60,7 +60,7 @@ def to_sage(sympy_expr: Any) -> Any:
 
     @param sympy_expr: SymPy-Ausdruck oder konvertierbarer Wert.
     @return: SageMath-Ausdruck oder SymPy-Fallback.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     # Eingabe zu SymPy konvertieren falls nötig
@@ -93,7 +93,7 @@ def from_sage(sage_expr: Any) -> sp.Expr:
 
     @param sage_expr: SageMath-Ausdruck.
     @return: SymPy-Ausdruck.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     if is_sage_available():
@@ -130,7 +130,7 @@ def export_to_sage_format(data_dict: dict, filename: Optional[str] = None) -> st
     @param data_dict: Dictionary mit Ergebnis-Namen und SymPy-Ausdrücken.
     @param filename: Optionaler Dateipfad zum Speichern (None = kein Speichern).
     @return: Python-Skript als String.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     # Skript-Kopf: SageMath-Kompatibilitäts-Prüfung
@@ -231,7 +231,7 @@ def export_to_sage_string(sympy_expr: Any) -> str:
 
     @param sympy_expr: SymPy-Ausdruck (sp.Basic) oder konvertierbarer Wert.
     @return: SageMath-kompatibler String.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     # Eingabe zu SymPy konvertieren falls nötig
@@ -278,7 +278,7 @@ def import_from_sage_string(sage_str: str) -> sp.Expr:
 
     @param sage_str: SageMath-String (z.B. "x^2 + sin(x)").
     @return: SymPy-Ausdruck.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     import warnings
@@ -355,7 +355,7 @@ def _make_safe_varname(name: str) -> str:
 
     @param name: Zu konvertierender Name.
     @return: Sicherer Python-Variablenname.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     import re

@@ -14,7 +14,7 @@
 
     Ausgelagert aus algebra.py für bessere Modularität.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -44,7 +44,7 @@ class Polynomial:
     @example
         p = Polynomial([1, -3, 2])  # x^2 - 3x + 2
         p.evaluate(1)  # ergibt 0 (Nullstelle)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -250,7 +250,7 @@ def solve_linear(a: float, b: float) -> float | str:
     @param b Konstanter Term.
     @return Lösung x.
     @raises ValueError Wenn keine oder unendlich viele Lösungen existieren.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Beispiele:
@@ -296,7 +296,7 @@ def solve_quadratic(a: float, b: float, c: float) -> list[complex]:
     @param c Konstanter Term.
     @return Liste mit zwei Wurzeln (reell oder komplex).
     @raises ValueError Wenn a = 0.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Beispiele:
@@ -350,7 +350,7 @@ def gcd(a: int, b: int) -> int:
     @param a Erste ganze Zahl.
     @param b Zweite ganze Zahl.
     @return ggT(a, b), immer >= 0.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Beispiele:
@@ -382,7 +382,7 @@ def lcm(a: int, b: int) -> int:
     @param a Erste ganze Zahl.
     @param b Zweite ganze Zahl.
     @return kgV(a, b).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Beispiele:
@@ -415,7 +415,7 @@ def extended_gcd(a: int, b: int) -> tuple[int, int, int]:
     @param a Erste ganze Zahl.
     @param b Zweite ganze Zahl.
     @return Tupel (g, x, y) mit g=ggT(a,b) und a*x + b*y = g.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     if b == 0:
@@ -444,7 +444,7 @@ def mod_inverse(a: int, m: int) -> int:
     @param m Der Modul.
     @return x mit (a * x) % m == 1.
     @raises ValueError Wenn ggT(a, m) != 1 (kein Inverses existiert).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Beispiele:

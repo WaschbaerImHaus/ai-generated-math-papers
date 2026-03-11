@@ -9,7 +9,7 @@
     Alle erzeugten LaTeX-Strings sind direkt in .tex-Dateien verwendbar und
     mit gängigen LaTeX-Compilern (pdflatex, lualatex, xelatex) kompilierbar.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-09
 @version 1.0.0
 """
@@ -558,7 +558,7 @@ def theorem_to_latex(name: str, statement: str, proof: str = '') -> str:
 
 def full_document(content: str,
                   title: str = 'Mathematische Ergebnisse',
-                  author: str = 'Kurt Ingwer',
+                  author: str = 'Michael Fuhrmann',
                   packages: list = None) -> str:
     """
     @brief Erstellt ein vollständiges LaTeX-Dokument.

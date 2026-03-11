@@ -5,7 +5,7 @@ Dieses Modul implementiert Werkzeuge zur algorithmischen Untersuchung
 offener mathematischer Vermutungen. Es dient als Grundlage für das
 Fernziel, bedeutende mathematische Vermutungen zu beweisen oder zu widerlegen.
 
-@author: Kurt Ingwer
+@author: Michael Fuhrmann
 @version: 1.0
 @since: 2026-03-08
 @lastModified: 2026-03-08
@@ -445,7 +445,7 @@ class ProofByInduction:
         2. Induktionsschritt: Zeige P(n) → P(n+1)
         3. Schluss: P(n) gilt für alle n ≥ n₀
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @since: 2026-03-08
     @lastModified: 2026-03-08
     """

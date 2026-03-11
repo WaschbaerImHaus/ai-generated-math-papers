@@ -8,7 +8,7 @@ Dieses Modul implementiert Algorithmen und Demonstrationen zur Transzendenztheor
 - Gelfond-Schneider, Baker-Theorem (Demo)
 - Algebraische Zahlen als Klasse
 
-@author    Kurt Ingwer
+@author    Michael Fuhrmann
 @version   1.0.0
 @timestamp 2026-03-10
 """
@@ -644,7 +644,7 @@ class AlgebraicNumber:
     Klasse zur Darstellung einer algebraischen Zahl α, definiert durch ihr
     Minimalpolynom p(t) = aₙtⁿ + … + a₁t + a₀ mit aᵢ ∈ ℤ, aₙ ≠ 0.
 
-    @author    Kurt Ingwer
+    @author    Michael Fuhrmann
     @version   1.0.0
     @timestamp 2026-03-10
     """

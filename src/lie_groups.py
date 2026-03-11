@@ -34,7 +34,7 @@
     - Cartan-Klassifikation: A_n = su(n+1), B_n = so(2n+1),
                               C_n = sp(2n),   D_n = so(2n)
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -62,7 +62,7 @@ class LieGroup(ABC):
     differenzierbare Mannigfaltigkeit ist, so dass die Gruppenoperationen
     (Multiplikation und Inversenbildung) glatte Abbildungen sind.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -122,7 +122,7 @@ class MatrixLieGroup(LieGroup):
     @param n      Größe der n×n-Matrizen
     @param field  Körper: 'real' (ℝ) oder 'complex' (ℂ)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -246,7 +246,7 @@ class SO(MatrixLieGroup):
 
     @param n  Dimension des Raums
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -418,7 +418,7 @@ class SU(MatrixLieGroup):
 
     @param n  Dimension der unitären Gruppe
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -542,7 +542,7 @@ class GL(MatrixLieGroup):
     @param n      Matrixgröße
     @param field  'real' oder 'complex'
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -589,7 +589,7 @@ class LieAlgebra:
 
     @param basis_matrices  Liste von n×n-Matrizen, die eine Basis der Lie-Algebra bilden
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -727,7 +727,7 @@ class ExponentialMap:
 
     Für Matrixgruppen wird scipy.linalg.expm/logm verwendet (Padé-Approximation).
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 

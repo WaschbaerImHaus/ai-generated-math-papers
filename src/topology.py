@@ -2,7 +2,7 @@
 @file topology.py
 @brief Topologie und Geometrie – metrische Räume, Stetigkeit, Mannigfaltigkeiten,
        parametrische Kurven, simpliziale Homologie und fraktale Dimensionen.
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -17,7 +17,7 @@ from typing import Callable
 def euclidean_metric(x: list[float], y: list[float]) -> float:
     """
     @brief Euklidische Metrik: d(x,y) = sqrt(Σ(x_i - y_i)²).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die gewöhnliche "Luftlinie"-Distanz im ℝⁿ.
@@ -42,7 +42,7 @@ def euclidean_metric(x: list[float], y: list[float]) -> float:
 def manhattan_metric(x: list[float], y: list[float]) -> float:
     """
     @brief Manhattan-Metrik (Taxicab): d(x,y) = Σ|x_i - y_i|.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Benannt nach dem Straßennetz Manhattans – man kann nur
@@ -68,7 +68,7 @@ def manhattan_metric(x: list[float], y: list[float]) -> float:
 def chebyshev_metric(x: list[float], y: list[float]) -> float:
     """
     @brief Chebyshev-Metrik: d(x,y) = max|x_i - y_i|.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Auch "Schachbrett-Metrik" genannt: Ein König auf dem Schachbrett
@@ -88,7 +88,7 @@ def chebyshev_metric(x: list[float], y: list[float]) -> float:
 def discrete_metric(x: object, y: object) -> float:
     """
     @brief Diskrete Metrik: d(x,y) = 0 wenn x=y, sonst 1.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die einfachste Metrik überhaupt. Jedes Paar ungleicher Elemente
@@ -107,7 +107,7 @@ def discrete_metric(x: object, y: object) -> float:
 def p_norm_metric(x: list[float], y: list[float], p: float) -> float:
     """
     @brief Lp-Metrik: d(x,y) = (Σ|x_i - y_i|^p)^{1/p}.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Verallgemeinert Euklidisch (p=2), Manhattan (p=1) und
@@ -135,7 +135,7 @@ def p_norm_metric(x: list[float], y: list[float], p: float) -> float:
 class MetricSpace:
     """
     @brief Metrischer Raum (X, d) mit Metrikfunktion d: X×X → ℝ≥0.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Ein metrischer Raum ist eine Menge X zusammen mit einer Abstandsfunktion d,
@@ -160,7 +160,7 @@ class MetricSpace:
     def verify_metric_axioms(self, points: list[list[float]]) -> dict[str, bool]:
         """
         @brief Prüft alle 4 Metrik-Axiome für eine Liste von Punkten.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Überprüft numerisch, ob die gespeicherte Abstandsfunktion
@@ -213,7 +213,7 @@ class MetricSpace:
     def open_ball(self, center: list[float], radius: float, points: list[list[float]]) -> list[list[float]]:
         """
         @brief Offene Kugel B(center, r) = {x ∈ points : d(center, x) < r}.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Eine offene Kugel enthält alle Punkte, die echt weniger als r
@@ -230,7 +230,7 @@ class MetricSpace:
     def is_open_set(self, subset: list[list[float]], all_points: list[list[float]], tol: float = 1e-9) -> bool:
         """
         @brief Prüft ob eine Teilmenge (in diskreten Punkten) offen ist.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Eine Menge U ist offen, wenn jeder Punkt in U eine offene Kugel
@@ -270,7 +270,7 @@ class MetricSpace:
     def is_cauchy_sequence(self, sequence: list[list[float]], tol: float = 1e-10) -> bool:
         """
         @brief Prüft ob eine Folge Cauchy ist.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Eine Folge (x_n) heißt Cauchy-Folge, wenn für jedes ε > 0
@@ -309,7 +309,7 @@ class MetricSpace:
 def is_connected(points: list[list[float]], metric_func: Callable[[list, list], float], radius: float) -> bool:
     """
     @brief Prüft ob ein diskreter Punktraum epsilon-zusammenhängend ist.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Zwei Punkte sind epsilon-verbunden wenn d(x,y) < radius.
@@ -356,7 +356,7 @@ def is_connected(points: list[list[float]], metric_func: Callable[[list, list], 
 def hausdorff_distance(set_a: list[list[float]], set_b: list[list[float]], metric_func: Callable[[list, list], float]) -> float:
     """
     @brief Hausdorff-Abstand zwischen zwei Mengen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Der Hausdorff-Abstand misst, wie weit zwei Mengen voneinander entfernt sind.
@@ -387,7 +387,7 @@ def hausdorff_distance(set_a: list[list[float]], set_b: list[list[float]], metri
 def compute_diameter(points: list[list[float]], metric_func: Callable[[list, list], float]) -> float:
     """
     @brief Durchmesser einer Menge: diam(A) = sup_{x,y∈A} d(x,y).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Der Durchmesser ist der größtmögliche Abstand zwischen zwei Punkten
@@ -413,7 +413,7 @@ def compute_diameter(points: list[list[float]], metric_func: Callable[[list, lis
 def is_compact_discrete(points: list[list[float]], metric_func: Callable[[list, list], float], epsilon: float) -> bool:
     """
     @brief Prüft (epsilon-)Kompaktheit einer diskreten Punktmenge.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     In der Topologie ist Kompaktheit äquivalent zu: Jede offene Überdeckung
@@ -459,7 +459,7 @@ def is_compact_discrete(points: list[list[float]], metric_func: Callable[[list, 
 class ParametricCurve:
     """
     @brief Parametrische Kurve γ: [a,b] → ℝⁿ.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Eine parametrische Kurve beschreibt eine kontinuierliche Abbildung
@@ -487,7 +487,7 @@ class ParametricCurve:
     def evaluate(self, t: float) -> list[float]:
         """
         @brief Wertet die Kurve bei Parameterwert t aus.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param t Parameterwert im Bereich [t_start, t_end].
@@ -499,7 +499,7 @@ class ParametricCurve:
     def arc_length(self, n: int = 1000) -> float:
         """
         @brief Bogenlänge numerisch berechnen.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Die Bogenlänge ist das Integral der Kurvengeschwindigkeit:
@@ -532,7 +532,7 @@ class ParametricCurve:
     def curvature(self, t: float) -> float:
         """
         @brief Krümmung κ(t) der Kurve an der Stelle t.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Für 2D-Kurven:
@@ -591,7 +591,7 @@ class ParametricCurve:
     def is_closed(self, tol: float = 1e-10) -> bool:
         """
         @brief Prüft ob die Kurve geschlossen ist: γ(a) = γ(b).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Eine geschlossene Kurve verbindet Anfangs- und Endpunkt.
@@ -611,7 +611,7 @@ class ParametricCurve:
     def winding_number(self, point: list[float]) -> int:
         """
         @brief Umlaufzahl einer geschlossenen Kurve um einen Punkt.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Die Umlaufzahl zählt, wie oft die Kurve den Punkt umkreist:
@@ -654,7 +654,7 @@ class ParametricCurve:
 def circle_curve(radius: float = 1.0, center: list[float] | None = None) -> ParametricCurve:
     """
     @brief Erzeugt einen Kreis als ParametricCurve.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Parametrisierung: γ(t) = (cx + r·cos(t), cy + r·sin(t)), t ∈ [0, 2π]
@@ -678,7 +678,7 @@ def circle_curve(radius: float = 1.0, center: list[float] | None = None) -> Para
 def lissajous_curve(a: int, b: int, delta: float = 0.0) -> ParametricCurve:
     """
     @brief Erzeugt eine Lissajous-Figur als ParametricCurve.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Parametrisierung: x(t) = sin(at+δ), y(t) = sin(bt), t ∈ [0, 2π]
@@ -700,7 +700,7 @@ def lissajous_curve(a: int, b: int, delta: float = 0.0) -> ParametricCurve:
 def helix_curve(radius: float = 1.0, pitch: float = 1.0) -> ParametricCurve:
     """
     @brief Erzeugt eine Helix (Schraubenlinie) als ParametricCurve.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Parametrisierung: x(t)=r·cos(t), y(t)=r·sin(t), z(t)=pitch·t/(2π), t ∈ [0, 2π]
@@ -725,7 +725,7 @@ def helix_curve(radius: float = 1.0, pitch: float = 1.0) -> ParametricCurve:
 def euler_characteristic_polygon(n_vertices: int, n_edges: int, n_faces: int) -> int:
     """
     @brief Euler-Charakteristik χ = V - E + F.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die Euler-Charakteristik ist eine topologische Invariante.
@@ -756,7 +756,7 @@ def euler_characteristic_polygon(n_vertices: int, n_edges: int, n_faces: int) ->
 def genus_from_euler(euler_char: int, orientable: bool = True) -> int:
     """
     @brief Geschlecht g einer Fläche aus der Euler-Charakteristik.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Das Geschlecht beschreibt die Anzahl der "Henkel" einer Fläche:
@@ -784,7 +784,7 @@ def genus_from_euler(euler_char: int, orientable: bool = True) -> int:
 def betti_numbers_graph(adjacency_matrix: list[list[int | float]]) -> dict[str, int | list]:
     """
     @brief Betti-Zahlen eines Graphen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Betti-Zahlen sind topologische Invarianten:
@@ -847,7 +847,7 @@ def betti_numbers_graph(adjacency_matrix: list[list[int | float]]) -> dict[str, 
 def box_counting_dimension(points: list[list[float]], epsilon_values: list[float]) -> float:
     """
     @brief Box-Counting-Dimension (Minkowski-Bouligand-Dimension).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die Box-Counting-Dimension ist eine numerische Methode zur Bestimmung
@@ -908,7 +908,7 @@ def box_counting_dimension(points: list[list[float]], epsilon_values: list[float
 def hausdorff_dimension_cantor() -> float:
     """
     @brief Hausdorff-Dimension der Cantor-Menge.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die Cantor-Menge entsteht durch iteratives Entfernen des mittleren
@@ -930,7 +930,7 @@ def hausdorff_dimension_cantor() -> float:
 def sierpinski_dimension() -> float:
     """
     @brief Hausdorff-Dimension des Sierpinski-Dreiecks.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Das Sierpinski-Dreieck entsteht durch iteratives Entfernen des mittleren
@@ -955,7 +955,7 @@ def sierpinski_dimension() -> float:
 def simplicial_homology(simplices: dict[int, list[tuple]]) -> dict:
     """
     @brief Berechnet die simplizialen Homologiegruppen H_k(X, ℤ₂).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Simpliziale Homologie ist ein fundamentales Werkzeug der algebraischen Topologie.
@@ -1084,7 +1084,7 @@ def simplicial_homology(simplices: dict[int, list[tuple]]) -> dict:
 def betti_numbers_from_adjacency(adj_matrix: list[list[int]]) -> dict:
     """
     @brief Berechnet β₀ und β₁ aus der Adjazenzmatrix eines Graphen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Ein Graph ist ein 1-dimensionaler Simplizialkomplex:
@@ -1151,7 +1151,7 @@ def betti_numbers_from_adjacency(adj_matrix: list[list[int]]) -> dict:
 def fundamental_group_free_generators(simplices: dict) -> dict:
     """
     @brief Schätzt die freien Generatoren der Fundamentalgruppe π₁(X).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die Fundamentalgruppe π₁(X, x₀) beschreibt Schleifen in X (modulo Homotopie).
@@ -1209,7 +1209,7 @@ def fundamental_group_free_generators(simplices: dict) -> dict:
 def de_rham_cohomology_circle() -> dict:
     """
     @brief Berechnet H^k_dR(S¹) – de Rham-Kohomologie des Kreises.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die de Rham-Kohomologie klassifiziert Differentialformen auf
@@ -1268,7 +1268,7 @@ def de_rham_cohomology_circle() -> dict:
 def de_rham_cohomology_sphere(n: int = 2) -> dict:
     """
     @brief Berechnet H^k_dR(Sⁿ) – de Rham-Kohomologie der n-Sphäre.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die n-Sphäre Sⁿ = {x ∈ ℝⁿ⁺¹ : |x| = 1} ist eine kompakte,
@@ -1324,7 +1324,7 @@ def de_rham_cohomology_sphere(n: int = 2) -> dict:
 def stokes_theorem_verify(f_expr: str = 'P=y,Q=x', region: str = 'disk') -> dict:
     """
     @brief Numerische Verifikation des Stokes-Satzes (Grünscher Satz in 2D).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Der Stokes-Satz ist eines der fundamentalsten Resultate der Differentialgeometrie:
@@ -1408,7 +1408,7 @@ def stokes_theorem_verify(f_expr: str = 'P=y,Q=x', region: str = 'disk') -> dict
 def brouwer_fixed_point_evidence(n_trials: int = 1000) -> dict:
     """
     @brief Numerische Evidenz für den Brouwerschen Fixpunktsatz.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Der Brouwersche Fixpunktsatz (1910) besagt:
@@ -1495,7 +1495,7 @@ def brouwer_fixed_point_evidence(n_trials: int = 1000) -> dict:
 def separation_axioms_demo() -> dict:
     """
     @brief Demonstration der topologischen Trennungseigenschaften T0 bis T4.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Trennungsaxiome beschreiben, wie gut eine Topologie Punkte
@@ -1607,7 +1607,7 @@ def separation_axioms_demo() -> dict:
 class CompactSpace:
     """
     @brief Klasse zur Modellierung und Überprüfung von Kompaktheit in topologischen Räumen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Ein topologischer Raum heißt **kompakt**, wenn jede offene Überdeckung
@@ -1636,7 +1636,7 @@ class CompactSpace:
     def is_compact_heine_borel(self, a: float, b: float) -> bool:
         """
         @brief Prüft Kompaktheit eines Intervalls [a, b] ⊂ ℝ via Heine-Borel.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Nach dem Satz von Heine-Borel gilt:
@@ -1656,7 +1656,7 @@ class CompactSpace:
     def finite_subcover_demo(self, cover: list[tuple[float, float]], a: float, b: float) -> list[tuple[float, float]]:
         """
         @brief Findet eine endliche Teilüberdeckung des Intervalls [a, b].
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Greedy-Algorithmus: Wählt iterativ das offene Intervall (l, r),
@@ -1695,7 +1695,7 @@ class CompactSpace:
     def sequential_compactness_demo(self, sequence: list[float], a: float, b: float) -> dict:
         """
         @brief Demonstriert sequentielle Kompaktheit: Jede Folge in [a,b] hat eine konvergente Teilfolge.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Satz von Bolzano-Weierstraß: Jede beschränkte Folge in ℝⁿ hat
@@ -1742,7 +1742,7 @@ class CompactSpace:
 def heine_borel_theorem() -> dict:
     """
     @brief Beschreibung und Demo des Satzes von Heine-Borel.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Satz von Heine-Borel (ℝⁿ):
@@ -1808,7 +1808,7 @@ def heine_borel_theorem() -> dict:
 def tychonoff_theorem_demo() -> dict:
     """
     @brief Demo des Satzes von Tychonoff: Produkt kompakter Räume ist kompakt.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Satz von Tychonoff (1930):
@@ -1883,7 +1883,7 @@ def tychonoff_theorem_demo() -> dict:
 class UniformSpace:
     """
     @brief Klasse zur Modellierung uniformer Räume via Entourages.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Ein **uniformer Raum** (X, 𝒰) besteht aus einer Menge X und einem Filter 𝒰
@@ -1918,7 +1918,7 @@ class UniformSpace:
     def entourage(self, epsilon: float) -> list[tuple]:
         """
         @brief Berechnet die Epsilon-Entourage U_ε = {(x,y) | d(x,y) < ε}.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param epsilon Radius der Entourage (positiv).
@@ -1935,7 +1935,7 @@ class UniformSpace:
     def contains_diagonal(self, entourage_set: list[tuple]) -> bool:
         """
         @brief Prüft ob eine Entourage die Diagonale Δ = {(x,x)} enthält.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param entourage_set Liste von Paaren (x, y).
@@ -1949,7 +1949,7 @@ class UniformSpace:
     def is_symmetric(self, entourage_set: list[tuple]) -> bool:
         """
         @brief Prüft Symmetrie der Entourage: (x,y) ∈ U ⟹ (y,x) ∈ U.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param entourage_set Liste von Paaren.
@@ -1962,7 +1962,7 @@ class UniformSpace:
     def uniform_continuity_check(self, f, target_metric, epsilon: float) -> dict:
         """
         @brief Prüft gleichmäßige Stetigkeit einer Funktion f: X → Y.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         f ist gleichmäßig stetig, wenn:
@@ -2018,7 +2018,7 @@ class UniformSpace:
 def cauchy_filter_demo() -> dict:
     """
     @brief Demo einer Cauchy-Folge in ℚ die nicht in ℚ konvergiert (√2-Approximation).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die Folge a_{n+1} = (a_n + 2/a_n) / 2 (Heron-Verfahren) ist eine Cauchy-Folge
@@ -2079,7 +2079,7 @@ def cauchy_filter_demo() -> dict:
 def completion_of_rationals() -> dict:
     """
     @brief Vervollständigung ℚ → ℝ via Cauchy-Folgen und p-adische Alternative.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die Vervollständigung eines metrischen Raums (X, d) ist der kleinste
@@ -2166,7 +2166,7 @@ def completion_of_rationals() -> dict:
 class TopologicalGroup:
     """
     @brief Klasse zur Modellierung topologischer Gruppen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Eine **topologische Gruppe** (G, ·, τ) ist eine Gruppe (G, ·) mit einer
@@ -2221,7 +2221,7 @@ class TopologicalGroup:
     def check_continuity_demo(self, points: list[float], mult_fn, inv_fn) -> dict:
         """
         @brief Prüft numerisch, ob Multiplikation und Inversion stetig wirken.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Stetigkeit: Für ε > 0 gibt es δ > 0 sodass nahe Punkte nahe abgebildet werden.
@@ -2273,7 +2273,7 @@ class TopologicalGroup:
 def topological_group_examples() -> list[dict]:
     """
     @brief Gibt eine Liste von Beispielen topologischer Gruppen zurück.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     @return Liste von dicts mit name, operation, topology, compact, connected, abelian.
@@ -2357,7 +2357,7 @@ def topological_group_examples() -> list[dict]:
 class TopologicalVectorSpace:
     """
     @brief Klasse zur Modellierung topologischer Vektorräume.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Ein **topologischer Vektorraum** (TVR) ist ein Vektorraum V über ℝ (oder ℂ)
@@ -2414,7 +2414,7 @@ class TopologicalVectorSpace:
     def check_convex_neighborhood(self, neighborhood: list[list[float]]) -> bool:
         """
         @brief Prüft ob eine Menge von Punkten (Umgebung der 0) konvex ist.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Eine Menge C ist konvex, wenn für alle x, y ∈ C und t ∈ [0,1]:
@@ -2463,7 +2463,7 @@ class TopologicalVectorSpace:
 def locally_convex_demo() -> dict:
     """
     @brief Demo lokalkonvexer topologischer Vektorräume.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Ein TVR heißt **lokalkonvex**, wenn die Null eine Umgebungsbasis
@@ -2574,7 +2574,7 @@ def locally_convex_demo() -> dict:
 def schwartz_space_intro() -> dict:
     """
     @brief Einführung in den Schwartz-Raum S(ℝⁿ) — schnell fallende glatte Funktionen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Der Schwartz-Raum S(ℝⁿ) ist der Fréchet-Raum aller C^∞-Funktionen,

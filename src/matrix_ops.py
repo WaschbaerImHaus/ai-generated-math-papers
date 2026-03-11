@@ -12,7 +12,7 @@
     Importiert Vector aus vectors.py.
     Ausgelagert aus linear_algebra.py für bessere Modularität.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -49,7 +49,7 @@ class Matrix:
         Intern gespeichert als Liste von Zeilen (List[List[float]]).
         Bietet: Multiplikation, Transponierung, Determinante, Inverse,
                 Gauss-Elimination, LGS-Lösung, Eigenwerte.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -82,7 +82,7 @@ class Matrix:
 
         @param operation: Name der aufrufenden Operation (für Log-Ausgabe).
         @return Konditionszahl (float).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # Nur für quadratische Matrizen sinnvoll
@@ -320,7 +320,7 @@ class Matrix:
         @param b Rechte Seite (Vektor).
         @return Lösungsvektor x.
         @raises ValueError Wenn System keine eindeutige Lösung hat.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         if self.rows != self.cols:
@@ -453,7 +453,7 @@ class Matrix:
         @return Liste von Tupeln (eigenwert, eigenvektor_als_Vector)
                 Eigenvektoren sind normiert (||v|| = 1).
         @raises ValueError Wenn Matrix nicht quadratisch.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-08
         """
         if self.rows != self.cols:
@@ -511,7 +511,7 @@ def analyze_stability(A) -> dict:
 
     @param A: Matrix als Matrix-Objekt, Liste oder numpy-Array.
     @return: Dictionary mit condition_number, is_well_conditioned, rank, determinant.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     # Eingabe zu numpy-Array konvertieren
@@ -573,7 +573,7 @@ def condition_number_check(matrix) -> bool:
 
     @param matrix: Matrix als Matrix-Objekt, Liste oder numpy-Array.
     @return: True wenn gut konditioniert (κ ≤ 1e10), sonst False.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     # Eingabe zu numpy-Array konvertieren

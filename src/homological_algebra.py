@@ -16,7 +16,7 @@
     Das fundamentale Axiom: ∂∘∂ = 0
     (Das Bild von ∂_{n+1} liegt stets im Kern von ∂_n)
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 

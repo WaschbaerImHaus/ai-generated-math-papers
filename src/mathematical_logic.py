@@ -4,7 +4,7 @@ Mathematische Logik / Formale Logik
 Implementiert Aussagenlogik, Prädikatenlogik, Resolution, SAT-Solving,
 Modallogik und Gödels Unvollständigkeitssätze.
 
-Autor: Kurt Ingwer
+Autor: Michael Fuhrmann
 Letzte Änderung: 2026-03-10
 """
 

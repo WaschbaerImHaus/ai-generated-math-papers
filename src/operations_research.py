@@ -19,7 +19,7 @@ Mathematischer Hintergrund:
     Operations Research kombiniert mathematische Modellierung, Statistik und
     algorithmische Methoden, um Entscheidungsprozesse zu optimieren.
 
-@author: Kurt Ingwer
+@author: Michael Fuhrmann
 @version: 1.0
 @since: 2026-03-10
 @lastModified: 2026-03-10
@@ -50,7 +50,7 @@ class LinearProgramming:
 
     Verwendet scipy.optimize.linprog als numerisches Backend.
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
 
@@ -428,7 +428,7 @@ class IntegerProgramming:
     Methoden für kombinatorische Optimierungsprobleme:
     Branch-and-Bound, Gomory-Schnittebenen, Rucksackproblem, TSP-Heuristiken.
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
 
@@ -809,7 +809,7 @@ class QueueingTheory:
         μ = Bedienrate (Bedienungen pro Zeiteinheit pro Server)
         ρ = λ/(s·μ) = Auslastungsgrad
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
 
@@ -1119,7 +1119,7 @@ class MarkovDecisionProcess:
     Bellman-Gleichung für optimale Wertfunktion V*:
         V*(s) = max_a [ R(s,a) + γ · Σ_{s'} P(s'|s,a) · V*(s') ]
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
 
@@ -1353,7 +1353,7 @@ class NetworkFlows:
     Graphrepräsentation:
         Dict {u: {v: Kapazität/Gewicht}} für gerichtete Graphen.
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
 
@@ -1773,7 +1773,7 @@ class GameTheory:
     - Dominante Strategien
     - Pareto-Optimalität
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
 
@@ -2071,7 +2071,7 @@ class StochasticOptimization:
     - Zeitungshändlerproblem (Newsvendor)
     - Stochastische Programmierung (Demo)
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
 

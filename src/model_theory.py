@@ -25,7 +25,7 @@
       Existenzquantor:   "EXISTS(x,phi)"
       Allquantor:        "FORALL(x,phi)"
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -51,7 +51,7 @@ class Signature:
     Beispiel Gruppentheorie: F={'*': 2, 'inv': 1}, R={}, C={'e': 0}
     Beispiel Ordnungstheorie: F={}, R={'<': 2, '≤': 2}, C={}
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -117,7 +117,7 @@ class Structure:
       M ⊨ ∃x φ[s]        ⟺  ∃a∈A: M⊨φ[s(x↦a)]
       M ⊨ ∀x φ[s]        ⟺  ∀a∈A: M⊨φ[s(x↦a)]
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -410,7 +410,7 @@ class ElementaryEmbedding:
 
     Insbesondere ist jede elementare Einbettung ein injektiver Homomorphismus.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -545,7 +545,7 @@ def elementary_equivalence(M: Structure, N: Structure, sentences: list[str]) -> 
     @param sentences Liste von L-Sätzen (ohne freie Variablen)
     @return          True gdw. M und N alle gegebenen Sätze gleich beurteilen
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     for sentence in sentences:
@@ -570,7 +570,7 @@ def is_definable(structure: Structure, subset: list, formula_template: str) -> b
     @param formula_template Formel φ mit genau einer freien Variable 'x'
     @return                True gdw. X = {a ∈ A | M ⊨ φ[x↦a]}
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     subset_set = set(subset)
@@ -605,7 +605,7 @@ def compactness_theorem_demo() -> dict:
 
     @return Dict mit Erläuterung und Beispielmodellen
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Axiome der Nicht-Standard-Arithmetik: c > n für n = 0,1,...,N-1
@@ -680,7 +680,7 @@ def nonstandard_arithmetic_demo() -> dict:
 
     @return Dict mit Erläuterung und Struktur des Nicht-Standard-Modells
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Simuliertes Nicht-Standard-Modell: {0,1,2,3,ω*}
@@ -768,7 +768,7 @@ def lowenheim_skolem_downward(theory_axioms: list[str], model_size: int) -> dict
     @param model_size    Gewünschte Modellgröße (für endliche Demo)
     @return              Dict mit Erläuterung und Modell
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Demo: DLO (Dense Linear Order without Endpoints) über ℚ∩[0,1]
@@ -854,7 +854,7 @@ def lowenheim_skolem_upward(theory_axioms: list[str], base_model_size: int) -> d
     @param base_model_size  Größe des Ausgangsmodells (als Untergrenze)
     @return                 Dict mit Erläuterung
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Demonstration: ℕ als abzählbares Modell, Konstruktion größerer Modelle
@@ -908,7 +908,7 @@ def skolem_paradox_explanation() -> dict:
 
     @return Dict mit Erläuterung des Paradoxons und seiner Auflösung
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     return {
@@ -956,7 +956,7 @@ class Type:
     In einer Struktur M wird ein Typ p(x) durch ein Tupel a̅ ∈ A^n realisiert,
     wenn M ⊨ φ[a̅] für alle φ ∈ p.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -1036,7 +1036,7 @@ def type_space(theory: list[str], variables: list[str]) -> dict:
     @param variables Liste der freien Variablen x₁,…,xₙ
     @return          Dict mit Beschreibung des Typraums
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     n = len(variables)
@@ -1078,7 +1078,7 @@ def omitting_types_theorem_demo() -> dict:
 
     @return Dict mit Erläuterung
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Beispiel: Theorie der dichten linearen Ordnung (DLO)
@@ -1166,7 +1166,7 @@ def theory_is_categorical(theory_name: str, cardinality: str) -> dict:
     @param cardinality  Kardinalität als String (z.B. 'aleph_0', 'aleph_1', 'uncountable')
     @return             Dict mit Kategorik-Information
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Bekannte Kategorik-Tabelle
@@ -1254,7 +1254,7 @@ def vaught_test(theory_name: str) -> dict:
     @param theory_name Name der Theorie
     @return            Dict mit Vollständigkeitsinformation
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Bekannte Vollständigkeits-Information
@@ -1332,7 +1332,7 @@ def morley_theorem_demo() -> dict:
 
     @return Dict mit Erläuterung des Morley-Satzes
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     return {
@@ -1399,7 +1399,7 @@ def quantifier_elimination_demo(theory: str) -> dict:
     @param theory  Theoriename ('DLO', 'ACF', 'RCF', 'Presburger')
     @return        Dict mit QE-Information und Beispielen
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     qe_theories: dict[str, dict] = {
@@ -1524,7 +1524,7 @@ def _split_args(s: str) -> list[str]:
     @param s  Argumentstring
     @return   Liste der einzelnen Argumente (getrimmt)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     args: list[str] = []

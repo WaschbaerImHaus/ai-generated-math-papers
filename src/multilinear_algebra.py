@@ -11,7 +11,7 @@
     - Symmetrische Algebra S(V): Polarisierung, Dimension
     - Multilineare Formen: Symmetrietests, Rang, Sylvester-Signatur
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 

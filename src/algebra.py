@@ -16,7 +16,7 @@
                                 markov_numbers, is_quadratic_residue, quadratic_residues,
                                 quadratic_reciprocity, tonelli_shanks, cipolla_algorithm
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 

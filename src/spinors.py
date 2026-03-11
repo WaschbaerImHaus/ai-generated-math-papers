@@ -27,7 +27,7 @@
 
     mit der Dispersionsrelation E² = |p|² + m² (on-shell-Bedingung).
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 @version 1.0.0
 """
@@ -53,7 +53,7 @@ def _pauli_matrices() -> list[np.ndarray]:
 
     @return list[np.ndarray] Liste mit drei 2×2-Pauli-Matrizen (komplex).
     @lastModified 2026-03-10
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     """
     # σ_1: Spin-x-Komponente
     sigma1 = np.array([[0, 1], [1, 0]], dtype=complex)
@@ -92,7 +92,7 @@ def gamma_matrices(dim: int = 4) -> list[np.ndarray]:
     @return list[np.ndarray] Liste mit 'dim' Gamma-Matrizen.
     @raises ValueError Wenn dim weder 2 noch 4 ist.
     @lastModified 2026-03-10
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     """
     if dim == 2:
         # 2D-Darstellung: Pauli-basierte 2×2-Gamma-Matrizen
@@ -158,7 +158,7 @@ def clifford_algebra_check(
             - 'is_clifford_algebra' (bool): True wenn max_error < 1e-10.
             - 'anticommutators' (dict): {(μ,ν): Frobenius-Fehler}.
     @lastModified 2026-03-10
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     """
     n = len(gammas)
     dim_matrix = gammas[0].shape[0]
@@ -217,7 +217,7 @@ def gamma5(dim: int = 4) -> np.ndarray:
     @return np.ndarray Die 4×4-Matrix γ^5 (komplex).
     @raises ValueError Wenn dim ≠ 4.
     @lastModified 2026-03-10
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     """
     if dim != 4:
         raise ValueError("gamma5 ist nur für dim=4 definiert.")
@@ -260,7 +260,7 @@ def dirac_spinor(
     @return np.ndarray 4-komponentiger Dirac-Spinor u(p,s) (komplex).
     @raises ValueError Wenn spin nicht 0 oder 1 ist.
     @lastModified 2026-03-10
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     """
     if spin not in (0, 1):
         raise ValueError("spin muss 0 (up) oder 1 (down) sein.")
@@ -323,7 +323,7 @@ def dirac_equation_check(
             - 'satisfies_dirac' (bool): True wenn residual < 1e-10.
             - 'energy' (float): Relativistische Energie E = √(m²+|p|²).
     @lastModified 2026-03-10
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     """
     momentum = np.asarray(momentum, dtype=complex)
     px, py, pz = float(np.real(momentum[0])), float(np.real(momentum[1])), float(np.real(momentum[2]))
@@ -376,7 +376,7 @@ def spin_group_element(theta: float, axis: np.ndarray) -> np.ndarray:
     @param axis np.ndarray Rotationsachse [n_x, n_y, n_z] (wird normiert).
     @return np.ndarray 2×2-unitäre Matrix U ∈ SU(2) (komplex).
     @lastModified 2026-03-10
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     """
     axis = np.asarray(axis, dtype=float)
 
@@ -428,7 +428,7 @@ def weyl_spinors(psi: np.ndarray) -> dict:
             - 'is_purely_left' (bool): True wenn ||ψ_R|| < 1e-10.
             - 'is_purely_right' (bool): True wenn ||ψ_L|| < 1e-10.
     @lastModified 2026-03-10
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     """
     psi = np.asarray(psi, dtype=complex)
 
@@ -480,7 +480,7 @@ def majorana_condition_check(psi: np.ndarray) -> dict:
             - 'residual' (float): ||ψ - ψ^c||₂.
             - 'is_majorana' (bool): True wenn residual < 1e-10.
     @lastModified 2026-03-10
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     """
     psi = np.asarray(psi, dtype=complex)
 
@@ -543,7 +543,7 @@ def dirac_hamiltonian_1d(
     @return np.ndarray (2·n_sites × 2·n_sites)-Hermitescher Hamiltonian (komplex).
                        Faktor 2 wegen 2-komponentiger Weyl-Spinoren im 1D-System.
     @lastModified 2026-03-10
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     """
     # Wir verwenden 2×2-Gamma-Matrizen für das 1D-System (Weyl-Spinoren)
     gammas_2d = gamma_matrices(2)
@@ -612,7 +612,7 @@ def dirac_spectrum_1d(
             - 'is_gapped' (bool): True wenn mass_gap > 1e-10.
             - 'n_zero_modes' (int): Anzahl der Null-Moden (|λ| < 1e-8).
     @lastModified 2026-03-10
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     """
     # Baue den Hamiltonian
     H = dirac_hamiltonian_1d(n_sites=n_sites, mass=mass)

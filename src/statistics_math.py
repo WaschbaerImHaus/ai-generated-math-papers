@@ -15,7 +15,7 @@
     - Bayes-Theorem
     - Monte-Carlo-Simulation: Pi-Schätzung
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-05
 @lastModified 2026-03-10
 """

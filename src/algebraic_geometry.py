@@ -38,7 +38,7 @@
     - Nullstellensatz: Verknüpft Ideale mit geometrischen Nullstellenmengen.
     - Gröbner-Basen: Algorithmisches Werkzeug zur Ideal-Arithmetik.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @version 1.0
 @since 2026-03-10
 @lastModified 2026-03-10
@@ -112,7 +112,7 @@ class AffineVariety:
 
         Das erzeugte Ideal ist I = ⟨f₁,...,fₘ⟩ ⊂ k[x₁,...,xₙ].
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -340,7 +340,7 @@ class ProjectiveVariety:
         wohlbefiniert auf Äquivalenzklassen ist: Fᵢ(λp) = λ^d Fᵢ(p) ≠ 0
         falls Fᵢ(p) ≠ 0.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -452,7 +452,7 @@ class HilbertBasisTheorem:
         Gröbner-Basen werden bezüglich einer Monomordnung berechnet
         (hier: lexikographische Ordnung 'lex').
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -547,7 +547,7 @@ class NullstellensatzDemo:
 
         Das Radikal √I = { f ∈ k[x] : ∃m≥1: f^m ∈ I }.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -676,7 +676,7 @@ class EllipticCurveGeometry:
         j-Invariante: j(E) = -1728 · (4a)³ / Δ = 1728 · 4a³·(-16) / (Δ)
         Klassifiziert elliptische Kurven bis auf Isomorphie.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -792,7 +792,7 @@ class IntersectionTheory:
         Lokale Schnittmultiplizität: Misst, wie oft sich zwei Kurven
         in einem bestimmten Punkt berühren.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -903,7 +903,7 @@ class MorphismOfVarieties:
         Dominanz: φ ist dominant, wenn der Pullback φ* injektiv ist,
         äquivalent: φ(V) ist dicht in W (Zariski-Topologie).
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 

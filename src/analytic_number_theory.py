@@ -13,7 +13,7 @@ Mathematisches Fernziel:
     Goldbach-Vermutung: Jede gerade Zahl > 2 = p + q (p, q prim)
     Chen-Theorem (1966): Jede gerade Zahl = p + m, m = Produkt ≤ 2 Primzahlen
 
-@author: Kurt Ingwer
+@author: Michael Fuhrmann
 @version: 1.0
 @since: 2026-03-08
 @lastModified: 2026-03-08
@@ -719,7 +719,7 @@ def selberg_class_check(
     @param degree: Grad d der L-Funktion (ζ hat Grad 1, Modulformen Grad 2)
     @param conductor: Führer N > 0 (Skalar für Funktionalgleichung)
     @return: Dict mit Axiom-Prüfergebnissen und Statistiken
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
     n = len(coefficients)
@@ -822,7 +822,7 @@ def _small_primes_up_to(n: int) -> list[int]:
 
     @param n: Obere Schranke
     @return: Liste der Primzahlen ≤ n
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
     if n < 2:
@@ -870,7 +870,7 @@ def selberg_orthogonality(
              - 'same_function_detected': heuristische Gleichheitserkennung
              - 'primes_used': Anzahl der verwendeten Primzahlen
              - 'orthogonality_measure': Betrag der normierten Summe (nahe 0 → orthogonal)
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
     primes = _small_primes_up_to(prime_bound)
@@ -961,7 +961,7 @@ def selberg_zeta_motivation(x: float) -> dict:
              - 'total_zero_correction': Summe der Nullstellenbeiträge (unter RH)
              - 'rh_error_bound': Fehlerschranke unter RH: √x · ln(x) / π
     @raises ValueError: Wenn x ≤ 2
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @lastModified: 2026-03-10
     """
     if x <= 2:

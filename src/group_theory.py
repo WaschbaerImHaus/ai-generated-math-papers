@@ -33,7 +33,7 @@
     - Sylow: Für p^k | |G| existieren Sylow-p-Untergruppen der Ordnung p^k
     - Burnside: |X/G| = (1/|G|) · Σ_{g∈G} |Fix(g)|
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -100,7 +100,7 @@ class Group:
         3. Neutrales Element: ∃ e ∈ G: e·a = a·e = a
         4. Inverses Element:  ∀ a ∈ G: ∃ a⁻¹ ∈ G: a·a⁻¹ = a⁻¹·a = e
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -483,7 +483,7 @@ class Subgroup(Group):
         Kriterium (Untergruppen-Test):
         H ≤ G ⟺ H ≠ ∅ und ∀ a,b ∈ H: a·b⁻¹ ∈ H
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -536,7 +536,7 @@ class GroupHomomorphism:
         - kern(φ) = {g ∈ G | φ(g) = e_H} ist Normalteiler in G
         - bild(φ) = {φ(g) | g ∈ G} ist Untergruppe von H
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -665,7 +665,7 @@ class QuotientGroup(Group):
         Nach dem Homomorphiesatz gilt:
         G/ker(φ) ≅ im(φ) für jeden Homomorphismus φ: G → H
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -733,7 +733,7 @@ class PermutationGroup(Group):
         - Vorzeichen sgn(σ) = (-1)^(Anzahl gerader Zykel)
         - Gerade Permutationen bilden A_n ≤ S_n
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 

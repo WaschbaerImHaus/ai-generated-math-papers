@@ -1,7 +1,7 @@
 # OPTIMIZE.md - specialist-maths
 
 Optimierungsvorschläge und -status für alle Bereiche des Projekts.
-Letzte Aktualisierung: 2026-03-10 (Build 15)
+Letzte Aktualisierung: 2026-03-11 (Build 68)
 
 ---
 
@@ -47,61 +47,61 @@ Letzte Aktualisierung: 2026-03-10 (Build 15)
 - [x] **Docblock-Stil vereinheitlichen**: Alles auf Doxygen `@param/@return` (Build 20)
 - [x] **Zentrales Test-Discovery-Skript**: `Makefile` mit `make test/test-fast/test-coverage/lint` (Build 20)
 
-### Sicherheit
+### Sicherheit (hohe Priorität)
 - [ ] **`analysis.py` `_safe_parse()` Fallback**: Stiller Fallback auf `sp.sympify()` bei Parse-Fehler sollte geloggt werden (schwer debuggbar ohne Log-Ausgabe)
 - [ ] **`repl.py` Eingabe-Validierung**: Prüfen ob unsichere Eval-Aufrufe vorhanden sind; ggf. Sandboxing ergänzen
 
 ### Geschwindigkeit (konkrete Hot-Spots)
-- [ ] **Fourier-Koeffizienten delta-Funktion**: Polynommultiplikation O(n²) pro Term → FFT-basierte Faltung O(n log n) via `numpy.fft.fft`
+- [x] **Fourier FFT-Polynommultiplikation**: `polynomial_multiply_fft()` in `fourier.py` O(n log n) (Build 58)
 - [ ] **Cython/Numba JIT**: Performance-kritische Schleifen in `proof_theory.py` (Sieb), `complex_analysis.py` (ζ-Iteration) → Numba-JIT für 10–50x Speedup; Numba derzeit nicht installiert
-- [ ] **Symbolische vs. Numerische Wahl**: Automatische Entscheidung je nach Problem-Typ (kleine Polynome → SymPy symbolisch; große Matrizen → NumPy numerisch)
+- [ ] **Symbolische vs. Numerische Wahl**: Automatische Entscheidung je nach Problem-Typ (kleine Polynome → SymPy symbolisch; große Matrizen → NumPy numerisch) — `computation_strategy.py` vorhanden, noch nicht überall integriert
 - [ ] **`prime_factorization()` + `euler_phi()`**: Zwei separate Primfaktor-Traversierungen; `euler_phi` könnte `prime_factorization()` direkt wiederverwenden
 - [x] **`bisection()` + `newton_raphson()` Hybridmethode**: `brent_method()` implementiert (Build 19)
 - [ ] **Christoffel-Symbole cachen**: `christoffel_symbols()` wird in `riemann_tensor()` mehrfach an benachbarten Punkten aufgerufen – Memoization könnte Rechenzeit halbieren
+- [x] **Test-Parallelisierung**: pytest-xdist installiert, `pytest.ini` mit `-n auto` (Build 53)
 
 ### Architektur
-- [ ] **Plugin-System**: Neue mathematische Gebiete als Python-Packages einbinden ohne Core zu ändern (z.B. via `importlib` + Konfigurations-Registry)
+- [x] **Plugin-System**: `plugin_registry.py` mit DEFAULT_REGISTRY (15 Module) implementiert (Build 53)
 - [x] **Differentialformen-Modul vertiefen**: de Rham-Kohomologie + Stokes-Satz in `topology.py` (Build 25)
-- [ ] **Kategorientheorie-Modul**: Objekte, Morphismen, Funktoren, natürliche Transformationen – Verbindung zu abstrakter Algebra
+- [x] **Kategorientheorie-Modul**: `category_theory.py` — Category, Functor, NaturalTransformation, Adjunction (Build 59)
+- [x] **Paralleles symbolisches Rechnen**: `parallel_symbolic_compute()` in `analysis.py` via `ThreadPoolExecutor` (Build 69)
 
 ### Visualisierung
-- [ ] **Interactive Mode**: `matplotlib`-Widgets statt statischer Bilder (`ipywidgets` für Jupyter, `matplotlib.widgets` für CLI)
-- [ ] **Animation**: `matplotlib.animation` für ODE-Trajektorien und iterative Algorithmen (Newton-Konvergenz, Geodäten auf Sphäre)
-- [ ] **Export-Formate**: SVG/PDF-Export neben PNG für Vektorgrafiken (LaTeX-ready)
-- [ ] **Adaptives Gitter**: Feineres Gitter in interessanten Regionen (Nullstellen, Singularitäten)
-- [ ] **3D-Visualisierung Krümmung**: Gaußsche Krümmung als Farbkodierung auf Mannigfaltigkeiten (Sphäre, Torus, Sattelfläche) in `visualization.py` ergänzen
+- [x] **Interactive Mode**: `create_interactive_plot()` + `plot_adaptive_grid()` in `visualization.py` (Build 60)
+- [x] **Animation**: `animate_heat_equation()` + `animate_wave_equation_pde()` in `visualization.py` (Build 53)
+- [x] **Export-Formate**: `export_figure()` in `visualization.py` — PNG/SVG/PDF-Export (Build 69)
+- [x] **Adaptives Gitter**: `plot_adaptive_grid()` in `visualization.py` (Build 60)
+- [x] **3D-Visualisierung Krümmung**: `plot_gaussian_curvature_3d()` in `visualization.py` (Build 53)
+- [x] **Geodäten-Visualisierung**: `plot_geodesic_on_sphere()` + `plot_geodesic_on_torus()` in `visualization.py` (Build 53)
+- [x] **Spezielle Funktionen Galerie**: `plot_special_functions_gallery()` in `visualization.py` (Build 53)
+- [x] **Maßtheorie-Visualisierung**: `plot_cantor_set()` in `visualization.py` (Build 69)
 
 ### Mathematische Vertiefung
-- [ ] **Arbitrary Precision mit mpmath**: `mpmath` für Rechnungen mit >64-Bit-Genauigkeit (wichtig für Riemann-Nullstellen-Verifikation mit >100 Stellen)
-- [ ] **Notebook-Integration**: Jupyter-kompatible Ausgaben (HTML-Darstellung für Matrizen, Polynome, LaTeX-Rendering in Notebooks)
-- [ ] **Symplektische Geometrie**: Hamilton-Mechanik, symplektische Mannigfaltigkeiten, Poisson-Klammern (Erweiterung von `tensor_geometry.py`)
-- [ ] **Faserräume und Verbindungen**: Prinzipal-Faserbündel, Gauge-Theorie (Yang-Mills) – Bezug zu Standardmodell der Teilchenphysik
-- [ ] **Spinor-Rechnung**: Clifford-Algebren, Dirac-Gleichung – Erweiterung von `tensor_geometry.py` Richtung Quantenfeldtheorie
-- [ ] **Algebraische Topologie**: Homologiegruppen, Betti-Zahlen, Euler-Charakteristik (Ergänzung zu `topology.py`)
+- [x] **Arbitrary Precision mit mpmath**: `arbitrary_precision.py` — zeta_zeros_mpmath, verify_riemann_hypothesis_mpmath, pi_mpmath (Build 61)
+- [x] **Notebook-Integration**: `notebook_utils.py` — display_matrix_html, display_polynomial_latex (Build 61)
+- [x] **Symplektische Geometrie**: `symplectic_geometry.py` — SymplecticForm, HamiltonianSystem, SymplecticManifold (Build 53)
+- [x] **Faserräume und Verbindungen**: `fiber_bundles.py` — Prinzipal-Faserbündel, Gauge-Theorie (Build 46–51)
+- [x] **Spinor-Rechnung**: `spinor_calculus.py` + `spinors.py` — Clifford-Algebren, Dirac-Gleichung (Build 46–51)
+- [x] **Algebraische Topologie**: `algebraic_topology.py` — Homologiegruppen, Betti-Zahlen (Build 37)
 
-### Neue Ideen (entdeckt 2026-03-10)
-- [ ] **Paralleles symbolisches Rechnen**: SymPy-Berechnungen (Grenzwerte, Integrale) parallelisieren via `concurrent.futures.ProcessPoolExecutor`
-- [ ] **Benchmark-Regressions-Tests**: Automatischer Vergleich von Laufzeiten zwischen Builds; Alarm bei >10% Verlangsamung
-- [ ] **Interoperabilität SageMath**: Export/Import-Schnittstelle zu SageMath für Berechnungen die SymPy nicht beherrscht
-- [ ] **Automatische Formel-Vereinfachung**: Ergebnisse standardmäßig durch `sp.simplify()` + `sp.nsimplify()` vereinfachen und schönste Darstellung wählen
-- [ ] **Geodäten-Visualisierung**: Aus `tensor_geometry.geodesic_equation()` direkt 3D-Plots auf Sphäre/Torus erzeugen via `visualization.py`
-- [ ] **Numerische Stabilitäts-Analyse**: Konditionszahlen aller Matrixoperationen automatisch protokollieren; Warnung bei Kondition > 1e10
+### Neue Ideen (erledigt)
+- [x] **Benchmark-Regressions-Tests**: `tests/test_benchmark_regression.py` (Build 53)
+- [x] **Interoperabilität SageMath**: `sagemath_bridge.py` (Build 53)
+- [x] **Automatische Formel-Vereinfachung**: `formula_simplifier.py` (Build 63)
+- [x] **Numerische Stabilitäts-Analyse**: `matrix_ops.condition_number_check()` + Warnung bei κ>1e10 (Build 53)
+- [x] **PDE-Visualisierung**: `animate_heat_equation()` + `animate_wave_equation_pde()` (Build 53)
+
+### Webapp
+- [x] **Funktionalanalysis-Interaktiv**: `/functional_analysis_interactive` — Eigenwerte in komplexer Ebene, Spektralradius (Build 70)
+- [x] **Operator-Algebren C*-Visualisierung**: `/api/operator_algebras/gelfand_spectrum` — Shift, Multiplikation, Laplace (Build 70)
 
 ---
 
-## Prioritäten (empfohlene Reihenfolge)
+## Prioritäten (Stand 2026-03-11)
 
-1. Type Hints in den verbleibenden Modulen ergänzen (einfach, hoher Nutzen für IDE-Support)
-2. Docblock-Stil vereinheitlichen (Wartbarkeit)
-3. Zentrales Test-Discovery-Skript (Entwicklungskomfort)
-4. Geodäten-Visualisierung (zeigt tensor_geometry.py in Aktion)
-5. Bisection/Newton Hybridmethode (numerische Verbesserung)
-6. mpmath Arbitrary Precision (für Millennium-Problem-Recherche wichtig)
-
-### Neue Ideen (Build 34, 2026-03-10)
-- [ ] **PDE-Visualisierung**: Wärme-/Wellengleichung als Animation (matplotlib.animation) direkt in Webapp
-- [ ] **Funktionalanalysis-Interaktiv**: Spektrum einer Matrix in Webapp interaktiv zeigen (Eigenwerte als Punkte in komplexer Ebene)
-- [ ] **Operator-Algebren C*-Visualisierung**: Gelfand-Spektrum als Kreis in der Webapp darstellen
-- [ ] **Test-Parallelisierung**: pytest-xdist für parallele Test-Ausführung (bei 4371 Tests 4x schneller möglich)
-- [ ] **Maßtheorie-Visualisierung**: Cantor-Mengen-Konstruktion als interaktives SVG (Stufen 0-8)
-- [ ] **Spezielle Funktionen Galerie**: Alle Bessel-Funktionen J_0..J_5 und Legendre P_0..P_5 als Plots in einer Galerie-Seite
+1. `_safe_parse()` Logging-Fallback (Sicherheit/Debuggbarkeit)
+2. `repl.py` Eingabe-Validierung (Sicherheit)
+3. `euler_phi()` → `prime_factorization()` intern (Performance)
+4. Christoffel-Symbole Memoization (Performance)
+5. SVG/PDF-Export (Visualisierung)
+6. Numba JIT (Performance, Numba-Installation nötig)

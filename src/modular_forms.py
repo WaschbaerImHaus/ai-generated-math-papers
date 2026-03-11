@@ -23,7 +23,7 @@
     Diese Theorie ist zentral für den Beweis des Großen Fermatschen Satzes (Wiles 1995),
     da elliptische Kurven und Modulformen via Shimura-Taniyama-Wiles verknüpft sind.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @version 3.0
 @since 2026-03-08
 @lastModified 2026-03-10
@@ -58,7 +58,7 @@ class ModularGroup:
         T = [[1,1],[0,1]]  – τ ↦ τ+1 (Translation)
         S und T erzeugen SL(2,Z).
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-08
     @lastModified 2026-03-10
     """
@@ -252,7 +252,7 @@ def eisenstein_series_fast(k: int, z: complex, n_terms: int = 50) -> complex:
     @param z Punkt τ in der oberen Halbebene (Im(z) > 0).
     @param n_terms Halbbreite des Gitters (-n_terms ≤ m,n ≤ n_terms).
     @return Wert G_k(τ) als komplexe Zahl.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # τ muss in der oberen Halbebene liegen: Im(τ) > 0
@@ -1103,7 +1103,7 @@ def _is_prime_simple(n: int) -> bool:
 
     @param n: Zu testende ganze Zahl
     @return: True wenn n eine Primzahl ist
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     if n < 2:
@@ -1124,7 +1124,7 @@ def _primes_up_to(n: int) -> list[int]:
 
     @param n: Obere Grenze
     @return: Liste aller Primzahlen ≤ n
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     if n < 2:
@@ -1215,7 +1215,7 @@ def hecke_algebra_structure(k: int, level: int = 1) -> dict[str, object]:
              'commutativity_check': {(p,q): bool} – T_p T_q = T_q T_p?
              'multiplicativity_check': {(p,q): bool} – tau(p*q) = tau(p)*tau(q)?
              'is_commutative': bool – Gesamturteil Kommutativität
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Ramanujan-Tau-Koeffizienten bis zu einem hinreichend hohen Index berechnen
@@ -1306,7 +1306,7 @@ def hecke_eigenform(coefficients: list[float], primes: list[int]) -> dict[str, o
              'eigenvalues': {p: lambda_p} – geschätzte Eigenwerte
              'eigenvalue_test': {p: bool} – besteht jede T_p-Prüfung?
              'multiplicativity': {(m,n): bool} – a_{mn} = a_m * a_n für coprime m,n?
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Koeffizienten ab Index 0 = a_1 (Konvention: coefficients[i] = a_{i+1})
@@ -1412,7 +1412,7 @@ def petersson_inner_product_estimate(f_coeffs: list[float], g_coeffs: list[float
     @param g_coeffs: Fourier-Koeffizienten [b_1, b_2, ..., b_N] von g
     @param k: Gewicht der Modulformen (muss für beide gleich sein)
     @return: Schätzwert für ⟨f, g⟩ als komplexe Zahl
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     import math
@@ -1474,7 +1474,7 @@ def elliptic_curve_points_over_fp(a: int, b: int, p: int) -> list[tuple[int, int
     @param p: Primzahl p ≥ 3 (Charakteristik des Körpers F_p)
     @return: Liste aller affinen Punkte (x, y) ∈ F_p × F_p auf E
     @raises ValueError: Wenn p < 3 oder p nicht prim
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     if p < 3:
@@ -1535,7 +1535,7 @@ def trace_of_frobenius(a: int, b: int, p: int) -> int:
     @param b: Konstantterm der elliptischen Kurve
     @param p: Primzahl p ≥ 3
     @return: Frobenius-Spur a_p = p + 1 - #E(F_p)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Berechne alle affinen Punkte
@@ -1573,7 +1573,7 @@ def l_function_elliptic_curve(a: int, b: int, s: complex, terms: int = 100) -> c
     @param s: Komplexes Argument (Re(s) > 3/2 für Konvergenz)
     @param terms: Anzahl der Summanden in der Dirichlet-Reihe
     @return: Näherungswert von L(E, s) als komplexe Zahl
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Berechne Frobenius-Spuren a_p für Primzahlen bis ca. terms
@@ -1675,7 +1675,7 @@ def birch_swinnerton_dyer_bsd_estimate(a: int, b: int, primes: list[int]) -> dic
              'log_product': float – log(Π N_p/p)
              'product': float – Π N_p/p
              'n_p_values': dict – {p: N_p} Punktanzahlen
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     import math
@@ -1744,7 +1744,7 @@ def l_function_modular_form(coefficients: list[float], s: complex, k: int) -> co
     @param s: Komplexes Argument der L-Funktion (Re(s) > (k+1)/2)
     @param k: Gewicht der Modulform (für Konvergenzhinweis)
     @return: Wert L(f, s) als komplexe Zahl (Partialsumme)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     result = complex(0.0)
@@ -1791,7 +1791,7 @@ def functional_equation_l_function(coefficients: list[float], k: int, N: int, s:
              'epsilon': Vorzeichen ε = (-1)^{k/2}
              'functional_equation_ratio': Λ(f,s) / (ε · Λ(f, k-s))
              'functional_equation_verified': bool – |ratio - 1| < 0.1?
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     import cmath

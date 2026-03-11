@@ -18,7 +18,7 @@
         ├── NotImplementedMathError – Math. Fall noch nicht implementiert
         └── NumericalInstabilityError – Numerische Instabilität (NaN, Inf)
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -35,7 +35,7 @@ class MathematicalError(ValueError):
             except MathematicalError as e:
                 print(f"Mathematischer Fehler: {e}")
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     pass
@@ -52,7 +52,7 @@ class ConvergenceError(MathematicalError):
         raise ConvergenceError("Newton-Raphson", 1000, last_value=3.14)
         # Ergibt: "Newton-Raphson konvergiert nicht nach 1000 Iterationen, letzter Wert: 3.14"
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -90,7 +90,7 @@ class SingularMatrixError(MathematicalError):
         raise SingularMatrixError("LU-Zerlegung")
         # Ergibt: "Singuläre Matrix: LU-Zerlegung nicht möglich"
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -112,7 +112,7 @@ class DivisionByZeroError(MathematicalError):
         dass sie explizit mathematische Kontexte anzeigt (z.B. Modulo-Rechnung,
         Nenner in rationalen Ausdrücken).
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     pass
@@ -131,7 +131,7 @@ class DomainError(MathematicalError):
         raise DomainError("log", -1, domain="(0, ∞)")
         # Ergibt: "log: Wert -1 liegt außerhalb des Definitionsbereichs (0, ∞)"
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -165,7 +165,7 @@ class PrecisionError(MathematicalError):
         raise PrecisionError(required=1e-12, achieved=1e-6)
         # Ergibt: "Genauigkeit: erforderlich 1.00e-12, erreicht 1.00e-06"
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -195,7 +195,7 @@ class InvalidInputError(MathematicalError):
         - Leere Listen wo Elemente erwartet werden
         - Typfehler in mathematischen Funktionen
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     pass
@@ -212,7 +212,7 @@ class PrimeRequiredError(MathematicalError):
         raise PrimeRequiredError(n=4, param="p")
         # Ergibt: "Parameter p=4 muss eine Primzahl sein"
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -236,7 +236,7 @@ class NotImplementedMathError(MathematicalError):
         mathematische Randfälle (z.B. bestimmte Sonderfälle einer Funktion,
         die theoretisch lösbar aber noch nicht implementiert sind).
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     pass
@@ -254,7 +254,7 @@ class NumericalInstabilityError(MathematicalError):
         - Auslöschung bei fast-gleichen Zahlen
         - Schlecht konditionierte Matrizen oder Funktionen
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     pass

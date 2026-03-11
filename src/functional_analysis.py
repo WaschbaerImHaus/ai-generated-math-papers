@@ -20,7 +20,7 @@
     - Quantenmechanik (Hilbert-Raum-Formalismus)
     - Numerische Analysis und Approximationstheorie
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -47,7 +47,7 @@ class NormedSpace:
 
         Jeder normierte Raum ist automatisch ein metrischer Raum mit d(u,v) = ‖u-v‖.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -56,7 +56,7 @@ class NormedSpace:
         @brief Initialisiert den normierten Raum.
         @param vectors  Liste von Vektoren (jeweils als list[float])
         @param norm_func Callable, das einen Vektor auf seinen Normwert (float) abbildet
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # Vektoren als numpy-Arrays speichern für einfache Berechnung
@@ -73,7 +73,7 @@ class NormedSpace:
 
         @param v Vektor (list oder np.ndarray)
         @return Normwert als float
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         return float(self._norm_func(np.array(v, dtype=float)))
@@ -88,7 +88,7 @@ class NormedSpace:
         @param u Erster Vektor
         @param v Zweiter Vektor
         @return Abstand als float
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         u_arr = np.array(u, dtype=float)
@@ -106,7 +106,7 @@ class NormedSpace:
             - Homogenität ‖αv‖ = |α|·‖v‖
 
         @return True wenn alle Axiome für die gespeicherten Vektoren gelten
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         tol = 1e-10  # numerische Toleranz
@@ -139,7 +139,7 @@ class NormedSpace:
 
         @param n_points Anzahl der Punkte auf dem Rand
         @return Liste von Punkten [x, y] mit ‖[x,y]‖ = 1
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         result = []
@@ -170,7 +170,7 @@ class BanachSpace(NormedSpace):
         - Lᵖ[a,b] = {f : ∫|f|ᵖ < ∞} mit ‖·‖_p
         - C[a,b] mit Supremumsnorm ‖·‖_∞
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -187,7 +187,7 @@ class BanachSpace(NormedSpace):
         @param sequence Liste von Vektoren (als list oder np.ndarray)
         @param tol      Toleranzgrenze für "hinreichend klein"
         @return True wenn die Folge eine Cauchy-Folge ist
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         n = len(sequence)
@@ -215,7 +215,7 @@ class BanachSpace(NormedSpace):
             endlich-dimensionalen Räume separabel sind.
 
         @return True (alle hier verwendeten Räume sind endlich-dimensional und damit separabel)
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # Endlich-dimensionale Räume sind immer separabel
@@ -237,7 +237,7 @@ class BanachSpace(NormedSpace):
         @param v Vektor als Liste von Zahlen
         @param p Norm-Parameter (1 ≤ p ≤ ∞, float('inf') für ∞-Norm)
         @return ℓᵖ-Normwert als float
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         v_arr = np.array(v, dtype=float)
@@ -273,7 +273,7 @@ class HilbertSpace(BanachSpace):
         - ℓ² = {(xₙ) : Σ|xₙ|² < ∞} mit ⟨x,y⟩ = Σxₙyₙ
         - L²[a,b] mit ⟨f,g⟩ = ∫ₐᵇ f(x)g(x)dx
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -282,7 +282,7 @@ class HilbertSpace(BanachSpace):
         @brief Initialisiert den Hilbert-Raum mit gegebenem Skalarprodukt.
         @param vectors       Liste von Vektoren
         @param inner_product Callable ⟨u,v⟩: (array, array) → float
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # Skalarprodukt speichern
@@ -305,7 +305,7 @@ class HilbertSpace(BanachSpace):
         @param u Erster Vektor
         @param v Zweiter Vektor
         @return Skalarprodukt ⟨u,v⟩ als float
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         return float(self._inner_product(np.array(u, dtype=float),
@@ -324,7 +324,7 @@ class HilbertSpace(BanachSpace):
         @param u Erster Vektor
         @param v Zweiter Vektor
         @return True wenn ⟨u,v⟩ ≈ 0
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         return abs(self.inner_product(u, v)) < 1e-10
@@ -343,7 +343,7 @@ class HilbertSpace(BanachSpace):
 
         @param basis Liste von linear unabhängigen Vektoren
         @return Liste orthonormaler Vektoren (np.ndarray)
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         orthonormal = []
@@ -376,7 +376,7 @@ class HilbertSpace(BanachSpace):
         @param v    Zu projizierender Vektor
         @param onto Liste von Basisvektoren des Unterraums (nicht notwendig ONB)
         @return Projektionsvektor als list
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         v_arr = np.array(v, dtype=float)
@@ -403,7 +403,7 @@ class HilbertSpace(BanachSpace):
         @param u Erster Vektor
         @param v Zweiter Vektor
         @return True wenn ‖u+v‖² = ‖u‖² + ‖v‖² (d.h. u ⊥ v)
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         u_arr = np.array(u, dtype=float)
@@ -427,7 +427,7 @@ class HilbertSpace(BanachSpace):
         @param functional Lineares Funktional f: H → ℝ
         @param basis      Basis des Raums (wird orthonormalisiert)
         @return Riesz-Repräsentant y als list
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # Gram-Schmidt: ONB erzeugen
@@ -461,7 +461,7 @@ class HilbertSpace(BanachSpace):
         @param v   Vektor
         @param onb Orthonormalbasis (Liste von Vektoren)
         @return True wenn ‖v‖² ≈ Σ|⟨v,eᵢ⟩|²
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         v_arr = np.array(v, dtype=float)
@@ -488,7 +488,7 @@ class HilbertSpace(BanachSpace):
         @param v               Vektor
         @param orthonormal_set Orthonormale Menge (Liste von Vektoren)
         @return True wenn Bessel-Ungleichung erfüllt ist
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         v_arr = np.array(v, dtype=float)
@@ -523,7 +523,7 @@ class LinearOperator:
         - Projektionen: T² = T
         - Kompakte Operatoren: Einheitskugel → präkompakte Menge
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -534,7 +534,7 @@ class LinearOperator:
         @param matrix      Darstellungsmatrix des Operators (np.ndarray)
         @param domain_norm Norm auf dem Definitionsbereich ('l1','l2','linf')
         @param range_norm  Norm auf dem Wertebereich ('l1','l2','linf')
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         self.matrix = np.array(matrix, dtype=float)
@@ -547,7 +547,7 @@ class LinearOperator:
         @param v         Vektor als np.ndarray
         @param norm_type Normtyp: 'l1', 'l2', 'linf'
         @return Normwert als float
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         if norm_type == 'l1':
@@ -563,7 +563,7 @@ class LinearOperator:
         @brief Wendet den Operator T auf einen Vektor an: y = T·v.
         @param v Eingangsvektor (list oder np.ndarray)
         @return Ausgabevektor T·v als list
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         v_arr = np.array(v, dtype=float)
@@ -581,7 +581,7 @@ class LinearOperator:
 
         @param test_vectors Liste von Testvektoren
         @return True wenn ‖Tv‖/‖v‖ für alle Testvektoren endlich ist
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         for v in test_vectors:
@@ -609,7 +609,7 @@ class LinearOperator:
             Die Operatornorm ist fundamental für die Stabilitätsanalyse.
 
         @return Operatornorm als float
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         if self.domain_norm == 'l2' and self.range_norm == 'l2':
@@ -640,7 +640,7 @@ class LinearOperator:
             Der Rang des Operators bestimmt die Kompaktheit: endlicher Rang → kompakt.
 
         @return True (alle endlich-dim. Operatoren sind kompakt)
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # Endlich-dimensionale Operatoren sind immer kompakt
@@ -659,7 +659,7 @@ class LinearOperator:
             auf unendlich-dimensionale Hilbert-Räume.
 
         @return Adjungierter Operator T* als LinearOperator
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # T* = Tᵀ (für reelle Matrizen)
@@ -679,7 +679,7 @@ class LinearOperator:
             - Spektralsatz: vollständige Orthonormalbasis aus Eigenvektoren
 
         @return True wenn ‖T - T*‖ < Toleranz
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         return np.allclose(self.matrix, self.matrix.T, atol=1e-10)
@@ -697,7 +697,7 @@ class LinearOperator:
             Beispiele: Rotationen, Spiegelungen, Fourier-Transformation.
 
         @return True wenn T*T ≈ I
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         n = self.matrix.shape[0]
@@ -718,7 +718,7 @@ class LinearOperator:
             Operator hat eine vollständige ONB aus Eigenvektoren.
 
         @return True wenn ‖T*T - TT*‖ < Toleranz
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         TT_star = self.matrix @ self.matrix.T
@@ -736,7 +736,7 @@ class LinearOperator:
             Beispiel: Projektion auf einen Unterraum U.
 
         @return True wenn ‖T² - T‖ < Toleranz
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         T_sq = self.matrix @ self.matrix
@@ -754,7 +754,7 @@ class LinearOperator:
             Berechnung via SVD: Vektoren zu Singulärwerten ≈ 0 spannen den Kern auf.
 
         @return Liste von Basisvektoren des Kerns (als list)
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # SVD-basierte Kernberechnung
@@ -780,7 +780,7 @@ class LinearOperator:
             Berechnung via SVD: Spalten von U zu Singulärwerten > Toleranz.
 
         @return Liste von Basisvektoren des Bildraums (als list)
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # SVD-basierte Bildraum-Berechnung
@@ -808,7 +808,7 @@ class CompactOperator(LinearOperator):
         - Eigenwerte: abzählbar viele, mit Null als einzigem Häufungspunkt
         - Hilbert-Schmidt-Klasse: K mit Σᵢⱼ|kᵢⱼ|² < ∞
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -823,7 +823,7 @@ class CompactOperator(LinearOperator):
             {eₙ} eine zugehörige ONB aus Eigenvektoren sind.
 
         @return dict mit 'eigenvalues', 'eigenvectors', 'decomposition_valid'
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # Symmetrisieren für selbstadjungierten Fall
@@ -863,7 +863,7 @@ def spectrum(operator: LinearOperator) -> dict:
 
     @param operator LinearOperator
     @return dict mit 'point_spectrum', 'eigenvalues', 'spectral_radius'
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     A = operator.matrix
@@ -894,7 +894,7 @@ def spectral_radius(operator: LinearOperator) -> float:
 
     @param operator LinearOperator
     @return Spektralradius als float
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     eigenvalues = np.linalg.eigvals(operator.matrix)
@@ -918,7 +918,7 @@ def spectral_theorem_demo(self_adjoint_matrix: np.ndarray) -> dict:
 
     @param self_adjoint_matrix Symmetrische Matrix (np.ndarray)
     @return dict mit Eigenwerten, ONB, Rekonstruktionsfehler
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     A = np.array(self_adjoint_matrix, dtype=float)
@@ -960,7 +960,7 @@ def fredholm_alternative(A: np.ndarray, b: np.ndarray) -> dict:
     @param A Matrix (np.ndarray, m×n)
     @param b Rechte Seite (np.ndarray, m)
     @return dict mit Lösbarkeit, Kern, Index
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     A = np.array(A, dtype=float)
@@ -1015,7 +1015,7 @@ class ContinuousFunctions:
         - C[a,b] liegt dicht in L²[a,b]
         - Stone-Weierstraß: Polynome liegen dicht in C[a,b]
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -1024,7 +1024,7 @@ class ContinuousFunctions:
         @brief Initialisiert den Raum C[a,b].
         @param a Linke Intervallgrenze
         @param b Rechte Intervallgrenze
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         self.a = a
@@ -1042,7 +1042,7 @@ class ContinuousFunctions:
 
         @param f_values Funktionswerte f(xᵢ) an diskreten Punkten
         @return Supremumsnorm als float
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         return float(np.max(np.abs(f_values)))
@@ -1059,7 +1059,7 @@ class ContinuousFunctions:
             Dies folgt aus dem Lusin'schen Satz und der Regularität.
 
         @return True (C[a,b] liegt stets dicht in L²[a,b])
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # Theoretische Aussage: C[a,b] ist dicht in L²[a,b] bzgl. ‖·‖₂
@@ -1078,7 +1078,7 @@ class ContinuousFunctions:
             B_n f(x) = Σₖ₌₀ⁿ f(k/n) · C(n,k) · xᵏ · (1-x)^{n-k}
 
         @return dict mit Demonstrationsdaten (Polynom-Approximation von sin)
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # Bernstein-Approximation von f(x) = sin(2πx) auf [0,1]
@@ -1122,7 +1122,7 @@ class SobolevSpace:
         Sobolev-Einbettungssatz (Sobolev 1938):
         W^{k,p}(Ω) ↪ C^m(Ω) wenn k - n/p > m  (n = Dimension von Ω)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -1132,7 +1132,7 @@ class SobolevSpace:
         @param k      Differenzierbarkeitsordnung (k ≥ 0)
         @param p      Integrierbarkeitsexponent (1 ≤ p ≤ ∞)
         @param domain Intervall (a, b) als Tupel
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         self.k = k
@@ -1152,7 +1152,7 @@ class SobolevSpace:
         @param x_values Stützstellen xᵢ
         @param k        Maximale Ableitungsordnung
         @return Sobolev-Norm als float
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         f = np.array(f_values, dtype=float)
@@ -1188,7 +1188,7 @@ class SobolevSpace:
             Für H^1(Ω) = W^{1,2}(Ω): Einbettung in L^{2*} mit 2* = 2n/(n-2).
 
         @return dict mit Einbettungsbedingungen und Räumen
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # n=1 (eindimensionales Intervall)
@@ -1219,7 +1219,7 @@ class L2Space:
         L²[a,b] ist ein separabler Hilbert-Raum.
         Orthonormalbasis (Fourier): {1/√(b-a), √(2/(b-a))·cos(nπx/(b-a)), ...}
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -1228,7 +1228,7 @@ class L2Space:
         @brief Initialisiert L²[a,b].
         @param a Linke Intervallgrenze
         @param b Rechte Intervallgrenze
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         self.a = a
@@ -1245,7 +1245,7 @@ class L2Space:
         @param g Funktionswerte g(xᵢ)
         @param x Stützstellen xᵢ
         @return L²-Skalarprodukt als float
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         f_arr = np.array(f, dtype=float)
@@ -1261,7 +1261,7 @@ class L2Space:
         @param f Funktionswerte f(xᵢ)
         @param x Stützstellen xᵢ
         @return L²-Norm als float
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         return math.sqrt(max(0.0, self.inner_product(f, f, x)))
@@ -1281,7 +1281,7 @@ class L2Space:
         @param a       Linkes Intervallende
         @param b       Rechtes Intervallende
         @return Liste von ONB-Elementen als Callables
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         L = b - a
@@ -1311,7 +1311,7 @@ class L2Space:
         @param x      Stützstellen xᵢ
         @param degree Polynomgrad
         @return Werte des Projektionspolynoms an den Stützstellen
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         f_arr = np.array(f, dtype=float)
@@ -1360,7 +1360,7 @@ def hahn_banach_theorem_demo() -> dict:
         - Schwache Topologie wohldefiniert
 
     @return dict mit Demonstration und Schlussfolgerungen
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Demonstration: Funktional auf Unterraum fortsetzen
@@ -1402,7 +1402,7 @@ def open_mapping_theorem_demo() -> dict:
         beschränkt (d.h. T ist ein topologischer Isomorphismus).
 
     @return dict mit Theoremdaten und Beispiel
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Beispiel: T: ℝ² → ℝ², T(x,y) = (2x+y, x+y) (invertierbar)
@@ -1441,7 +1441,7 @@ def closed_graph_theorem_demo() -> dict:
         prüfen (oft einfacher), um Beschränktheit zu folgern.
 
     @return dict mit Theoremdaten und Beispiel
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Beispiel: T: ℝ² → ℝ², Differentiationsoperator (als Matrix)
@@ -1483,7 +1483,7 @@ def uniform_boundedness_principle_demo() -> dict:
         → Vollständigkeit (Banach-Raum) ist entscheidend.
 
     @return dict mit Demonstration
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Familie von Operatoren Tₙ: ℝ² → ℝ², Tₙ = (1/n)·A mit A fest
@@ -1524,7 +1524,7 @@ def weak_convergence_demo() -> dict:
         Also: schwach konvergent ≠ stark konvergent!
 
     @return dict mit Gegenbeispiel und Auswertung
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Einheitsvektoren eₙ in ℝ¹⁰ (Ausschnitt von ℓ²)
@@ -1564,7 +1564,7 @@ def riesz_representation_theorem() -> dict:
         - Zu jedem f ∈ H* existiert eindeutiges y ∈ H mit f(·) = ⟨·, y⟩
 
     @return dict mit Demonstration
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Beispiel: H = ℝ³, Funktional f(x) = 2x₁ + 3x₂ - x₃
@@ -1617,7 +1617,7 @@ def compact_operator_theory() -> dict:
            aus (verallgemeinerten) Eigenvektoren.
 
     @return dict mit Demonstrationsdaten
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Beispiel: kompakter Operator als Hilbert-Schmidt-Operator
@@ -1675,7 +1675,7 @@ def banach_fixed_point(f: Callable, x0: float, tol: float = 1e-10,
     @param tol      Konvergenztoleranz
     @param max_iter Maximale Iterationsanzahl
     @return dict mit Fixpunkt, Konvergenzhistorie, Kontraktionskonstante
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     history = [x0]
@@ -1728,7 +1728,7 @@ def schauder_fixed_point_demo() -> dict:
         Fixpunkte: x = 0 und x = 1.
 
     @return dict mit Demonstration und Fixpunktnachweis
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Demonstration: T(x) = x² auf K = [0, 1]

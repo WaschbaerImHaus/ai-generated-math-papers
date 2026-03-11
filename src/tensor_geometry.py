@@ -18,7 +18,7 @@
     - Einstein-Gleichungen: G_{μν} = 8πG T_{μν}
     - Geodätengleichung: d²x^μ/dτ² + Γ^μ_{αβ} dx^α/dτ dx^β/dτ = 0
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -50,7 +50,7 @@ def clear_christoffel_cache() -> int:
         - Tests die Isolation zwischen Testfällen brauchen
 
     @return: Anzahl der gelöschten Cache-Einträge.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     # Anzahl der Einträge vor dem Löschen merken
@@ -70,7 +70,7 @@ def get_christoffel_cache_size() -> int:
         Nützlich für Tests und Performance-Analyse.
 
     @return: Anzahl der gecachten Einträge.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     return len(_christoffel_cache)
@@ -1515,7 +1515,7 @@ def symplectic_form(n: int) -> np.ndarray:
 
     @param n: Hälfte der Dimension (Freiheitsgrade); resultiert in 2n×2n-Matrix.
     @return: (2n × 2n)-Matrix J der Standard-symplektischen Form.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Identitätsmatrix der Größe n×n
@@ -1552,7 +1552,7 @@ def is_symplectic_matrix(M: np.ndarray) -> bool:
 
     @param M: Quadratische Matrix (Dimension muss gerade sein).
     @return: True, falls M^T J M = J (bis auf numerische Toleranz 1e-8).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     rows, cols = M.shape
@@ -1601,7 +1601,7 @@ def poisson_bracket(
     @param dq: Gitterabstand in q-Richtung.
     @param dp: Gitterabstand in p-Richtung.
     @return: 2D-Array {f,g}[i,j] über dem (q,p)-Gitter.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Partielle Ableitungen mittels np.gradient (zentrale Differenzen innen,
@@ -1649,7 +1649,7 @@ def hamiltonian_flow(
     @param t_span: Gesamte Simulationszeit.
     @param dt: Zeitschrittgröße (kleiner = genauer, aber langsamer).
     @return: Dictionary mit Arrays 'q', 'p', 't', 'H' (Energie entlang Trajektorie).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Schrittweite für numerische Ableitung von H
@@ -1736,7 +1736,7 @@ def liouville_theorem_check(
     @param initial_conditions: Liste von (q₀, p₀)-Tupeln (Ensemble).
     @param t: Entwicklungszeit.
     @return: Dictionary mit 'volume_initial', 'volume_final', 'ratio'.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Ensemble vorwärtsentwickeln
@@ -1811,7 +1811,7 @@ def action_angle_variables(
     @param E: Energie (Wert der Erhaltungsgröße).
     @param q_range: Suchbereich für die q-Koordinate als (q_min, q_max).
     @return: Dictionary mit 'J' (Wirkung), 'omega' (Frequenz), 'q_vals', 'p_vals'.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     q_min, q_max = q_range
@@ -1917,7 +1917,7 @@ def cotangent_bundle_metric(base_metric: np.ndarray) -> dict:
     @param base_metric: n×n Riemannsche Basismetrik g_{ij} auf M.
     @return: Dictionary mit 'symplectic_form' (2n×2n), 'is_exact' (bool),
              'liouville_form' (1D-Array der Länge 2n).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     n = base_metric.shape[0]   # Dimension der Basis-Mannigfaltigkeit
@@ -1962,7 +1962,7 @@ def darboux_theorem_check(omega: np.ndarray, point: np.ndarray) -> dict:
     @param point: Referenzpunkt auf der Mannigfaltigkeit (für zukünftige Erweiterungen).
     @return: Dictionary mit 'is_non_degenerate', 'is_closed', 'is_antisymmetric',
              'darboux_applicable', 'det_omega'.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     rows, cols = omega.shape

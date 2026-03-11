@@ -37,7 +37,7 @@
     mit der Yang-Mills-Wirkung:
         S_YM = -½ ∫ Tr(F_μν F^μν) d⁴x
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 @version 1.0.0
 """
@@ -66,7 +66,7 @@ class FiberBundle:
             - dim(F) = fiber_dim
             - G = structure_group (als String: 'SO2', 'U1', 'SU2', 'GL2', usw.)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -76,7 +76,7 @@ class FiberBundle:
         @param base_dim        Dimension des Basisraums B.
         @param fiber_dim       Dimension der typischen Faser F.
         @param structure_group Name der Strukturgruppe (z.B. 'SO2', 'U1', 'SU2').
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # Dimensionen und Strukturgruppe speichern
@@ -105,7 +105,7 @@ class FiberBundle:
 
         @param point  Punkt im Gesamtraum E als Array der Länge total_dim.
         @return       Tupel (basis_coords, fiber_coords).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         point = np.asarray(point, dtype=float)
@@ -138,7 +138,7 @@ class FiberBundle:
         @param chart1  Index der ersten Karte (0-basiert).
         @param chart2  Index der zweiten Karte (0-basiert).
         @return        Übergangselement der Strukturgruppe als Matrix.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         point = np.asarray(point, dtype=float)
@@ -187,7 +187,7 @@ class Connection:
         Für eine abelsche Gruppe G (z.B. U(1)) vereinfacht sich dies zu:
             Ω = dω  (die Lie-Klammer [ω,ω] verschwindet)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -195,7 +195,7 @@ class Connection:
         """
         @brief Konstruktor: Konnexion auf dem gegebenen Faserbündel.
         @param bundle  Das Faserbündel, auf dem die Konnexion lebt.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         self.bundle = bundle
@@ -218,7 +218,7 @@ class Connection:
         @param point   Punkt im Basisraum B.
         @param vector  Tangentialvektor X ∈ T_b B.
         @return        Lie-Algebra-Wert ω(X) ∈ g (als 1D-Array).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         point = np.asarray(point, dtype=float)
@@ -254,7 +254,7 @@ class Connection:
 
         @param point  Punkt im Basisraum B.
         @return       Skew-symmetrische Matrix Ω_{μν} ∈ ℝ^{n×n}.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         point = np.asarray(point, dtype=float)
@@ -314,7 +314,7 @@ class Connection:
         @param initial_vector  Startvektor V(0) in der Faser über γ(0).
         @param n_steps         Anzahl der Integrationsschritte.
         @return                Transportierter Vektor V(1) über γ(1).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         dt = 1.0 / n_steps
@@ -368,7 +368,7 @@ class Connection:
         @param loop        Geschlossene Kurve γ: [0,1] → B mit γ(0) = γ(1).
         @param base_point  Basispunkt b = γ(0) = γ(1).
         @return            Holonomieelement als Vektor (transportierter Einheitsvektor).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # Einheitsvektor im Faseranteil als Startvektor
@@ -404,7 +404,7 @@ class YangMillsField:
         - 'U1': U(1)-Gitter-Eichfeld (Quanten-Elektrodynamik, QED)
         - 'SU2': SU(2)-Gitter-Eichfeld (vereinfachtes Modell für QCD)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -413,7 +413,7 @@ class YangMillsField:
         @brief Konstruktor für das Yang-Mills-Gitterfeld.
         @param gauge_group  Eichgruppe: 'U1' oder 'SU2'.
         @param grid_size    Gittergröße in jeder Raumzeit-Dimension.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         self.gauge_group = gauge_group
@@ -449,7 +449,7 @@ class YangMillsField:
         @param site  Gitterstelle (x0, x1, x2, x3) (jede Komponente mod grid_size).
         @param mu    Richtungsindex μ ∈ {0, 1, 2, 3}.
         @return      Link-Variable als komplexe Zahl.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # Periodische Randbedingungen
@@ -463,7 +463,7 @@ class YangMillsField:
         @param site  Ausgangsstelle.
         @param mu    Richtungsindex.
         @return      Nachbarstelle (mit periodischen Randbedingungen).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         s = list(site)
@@ -488,7 +488,7 @@ class YangMillsField:
         @param nu    Zweiter Raumzeitindex ν ∈ {0,1,2,3}.
         @param site  Gitterstelle (x0, x1, x2, x3).
         @return      Feldstärke F_{μν}(x) als komplexe Zahl.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         if mu == nu:
@@ -521,7 +521,7 @@ class YangMillsField:
             Hier verwenden wir β = 1 (kopplung = 1).
 
         @return  Yang-Mills-Gitterwirkung als nicht-negative reelle Zahl.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         beta = 1.0  # Kopplungskonstante
@@ -562,7 +562,7 @@ class YangMillsField:
 
         @param tolerance  Toleranz für den numerischen Vergleich.
         @return           True wenn die Bianchi-Identität erfüllt ist.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # Teste an einigen Gitterstellen
@@ -602,7 +602,7 @@ def mobius_bundle() -> FiberBundle:
         Approximation: base_dim=1 (S¹), fiber_dim=1 (ℝ), G=Z2.
 
     @return  FiberBundle-Objekt für das Möbius-Bündel.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     bundle = FiberBundle(base_dim=1, fiber_dim=1, structure_group='Z2')
@@ -629,7 +629,7 @@ def hopf_fibration() -> FiberBundle:
         - Erste Chern-Klasse: c₁ = 1 (nicht-triviales Bündel)
 
     @return  FiberBundle-Objekt für die Hopf-Faserung.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     bundle = FiberBundle(base_dim=2, fiber_dim=1, structure_group='U1')
@@ -655,7 +655,7 @@ def tangent_bundle(manifold_dim: int) -> FiberBundle:
 
     @param manifold_dim  Dimension n der Mannigfaltigkeit M.
     @return              FiberBundle-Objekt für TM.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     bundle = FiberBundle(
@@ -684,7 +684,7 @@ def chern_class_first(bundle: FiberBundle) -> int:
 
     @param bundle  Das Faserbündel (sollte U(1)-Strukturgruppe haben).
     @return        Erste Chern-Zahl c₁ als ganze Zahl.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Falls explizit gesetzt (z.B. für Hopf-Faserung)

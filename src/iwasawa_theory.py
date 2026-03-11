@@ -23,7 +23,7 @@ r"""
     $$\Lambda = \mathbb{Z}_p[[T]] \cong \mathbb{Z}_p[[\text{Gal}(\mathbb{Q}_\infty/\mathbb{Q})]]$$
     $$L_p(1-n, \chi) = -\frac{1}{n} \sum_{\substack{a=1 \\ p \nmid a}}^{p^k} \chi\omega^{-n}(a) \cdot B_n\!\left(\frac{a}{p^k}\right)$$
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @version 1.0
 @since 2026-03-10
 @lastModified 2026-03-10

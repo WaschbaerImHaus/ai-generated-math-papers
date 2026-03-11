@@ -5,6 +5,6 @@
   "von_mangoldt_loop_500": 0.0001860859920270741,
   "numpy_fft_4096": 0.00014148399350233376,
   "auto_compute_symbolic_deg5": 0.0008373990131076425,
-  "auto_compute_numeric_deg15": 0.0030352509929798543,
+  "auto_compute_numeric_deg15": 0.0029940120002720505,
   "parallel_integrate_3": 0.01626524201128632
 }

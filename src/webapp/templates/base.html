@@ -178,7 +178,7 @@
         <!-- === Gruppe: Analysis & Differentialgleichungen === -->
         <div class="nav-group">
             <input type="checkbox" id="nav-analysis"
-                {% if request.path in ['/analysis', '/ode', '/complex', '/fourier', '/analysis_advanced'] %}checked{% endif %}>
+                {% if request.path in ['/analysis', '/ode', '/complex', '/fourier', '/analysis_advanced', '/functional_analysis_interactive'] %}checked{% endif %}>
             <label class="nav-group-label" for="nav-analysis">Analysis &amp; Differentialgl.</label>
             <div class="nav-group-content">
                 <ul class="nav-list">
@@ -196,6 +196,9 @@
                     </a></li>
                     <li><a href="/analysis_advanced" class="nav-link {% if request.path == '/analysis_advanced' %}active{% endif %}">
                         &#8706; Erweiterte Analysis
+                    </a></li>
+                    <li><a href="/functional_analysis_interactive" class="nav-link {% if request.path == '/functional_analysis_interactive' %}active{% endif %}">
+                        &#955; Spektrum-Visualisierung
                     </a></li>
                 </ul>
             </div>

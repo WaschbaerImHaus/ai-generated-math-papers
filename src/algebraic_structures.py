@@ -27,7 +27,7 @@
     - Monoid: Halbgruppe + ∃e: e∗a = a∗e = a
     - Gruppe: Monoid + ∀a ∃a⁻¹: a∗a⁻¹ = e
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 

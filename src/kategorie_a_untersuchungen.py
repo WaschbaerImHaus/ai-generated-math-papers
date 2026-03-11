@@ -20,7 +20,7 @@
     9. Langlands-Programm (partiell)
     10. Gyárfás- und Seymour-Vermutungen (Graphentheorie)
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-10
 @lastModified 2026-03-10
 """

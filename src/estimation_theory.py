@@ -16,7 +16,7 @@
     - CRB: Var(T̂) ≥ 1/(n · I(θ))
     - Fisher-Info: I(θ) = E[-(∂²/∂θ²) log f(X; θ)]
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-10
 @lastModified 2026-03-10
 """
@@ -41,7 +41,7 @@ class MaximumLikelihoodEstimator:
 
         θ̂_MLE = argmax_{θ} L(θ | x₁, ..., xₙ) = argmax_{θ} Σ log f(xᵢ; θ)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -216,7 +216,7 @@ class MethodOfMoments:
     den empirischen Stichprobenmomenten m'_k = (1/n) Σ xᵢ^k gleichgesetzt
     und das entstehende Gleichungssystem nach den Parametern aufgelöst.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -367,7 +367,7 @@ class SufficiencyTheory:
     Fisher-Neyman-Faktorisierungssatz:
         T ist suffizient für θ ⟺ f(x; θ) = g(T(x), θ) · h(x)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -547,7 +547,7 @@ class CramerRaoBound:
     wobei I(θ) die Fisher-Information einer einzelnen Beobachtung ist.
     Schätzer, die die Schranke erreichen, heißen effizient.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -705,7 +705,7 @@ class ConfidenceIntervals:
     Ein Konfidenzintervall [L, U] zum Niveau 1-α erfüllt:
         P_θ(L ≤ θ ≤ U) ≥ 1 - α  für alle θ
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -913,7 +913,7 @@ class HypothesisTesting:
     - Macht (Power): 1-β = P(H₀ ablehnen | H₁ wahr)
     - UMP: Gleichmäßig mächtigster Test (uniformly most powerful)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -1180,7 +1180,7 @@ class DecisionTheory:
     - Minimax: min_δ max_θ R(θ, δ)
     - Zulässigkeit: δ ist zulässig wenn kein δ' existiert mit R(θ, δ') ≤ R(θ, δ)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 

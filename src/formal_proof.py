@@ -16,7 +16,7 @@
     - Symbolische Verifikation via SymPy = stärker, aber begrenzt
     - Strukturierte Beweise = nachvollziehbar und lehrreich
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -37,7 +37,7 @@ class ProofStatus(Enum):
         Zeigt an, wie stark ein Schritt oder ein ganzer Beweis verifiziert wurde.
         Symbolische Verifikation ist stärker als numerische (die nur endlich viele
         Fälle prüft). ASSUMED gilt für Axiome und Voraussetzungen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     UNVERIFIED = "unverified"       # Noch nicht geprüft
@@ -65,7 +65,7 @@ class ProofStep:
 
         Die Verifikation kann symbolisch (via SymPy simplify) oder numerisch
         (Prüfung endlich vieler Testwerte) erfolgen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -174,7 +174,7 @@ class ProofChain:
             proof.assume("n ∈ ℕ", "Voraussetzung")
             proof.step("Für n=1: Σk = 1 = 1·2/2", "Basisfall")
             proof.conclude("Σk = n(n+1)/2 für alle n ∈ ℕ", "Induktionsprinzip")
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -468,7 +468,7 @@ class InductionProof(ProofChain):
 
         Unterstützt sowohl empirische (numerische) als auch symbolische
         Verifikation des Induktionsschritts via SymPy.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -645,7 +645,7 @@ class ContradictionProof(ProofChain):
         Klassische Beispiele:
         - √2 ist irrational
         - Unendlich viele Primzahlen (Euklid)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -744,7 +744,7 @@ class TheoremRegistry:
         Zentrale Registrierung aller ProofChain-Objekte unter einem Namen.
         Enthält klassische Sätze aus der Mathematikgeschichte.
         Die _registry ist ein Klassen-Attribut (geteilt zwischen allen Instanzen).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 

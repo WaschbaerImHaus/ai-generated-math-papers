@@ -22,7 +22,7 @@
         - SymPy-Ausdrücke müssen als Strings oder Symbole übergeben werden
         - Overhead durch Prozess-Start: lohnt sich erst ab ~0.1s pro Aufgabe
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @version 1.0
 @since 2026-03-10
 @lastModified 2026-03-10
@@ -119,7 +119,7 @@ def parallel_symbolic(
     @param args_list: Liste von Argument-Tupeln (eines pro Aufruf)
     @param max_workers: Maximale Anzahl paralleler Prozesse (Standard: 4)
     @return: Dictionary {args_tuple: Ergebnis} für alle Eingaben
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     results: dict[tuple, Any] = {}
@@ -163,7 +163,7 @@ def parallel_integrate(
     @param x: Name der Integrationsvariable (Standard: 'x')
     @param max_workers: Maximale Anzahl paralleler Prozesse
     @return: Dictionary {ausdruck_str: integral_str}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Argument-Tupel für _integrate_single vorbereiten
@@ -206,7 +206,7 @@ def parallel_limit(
     @param direction: Richtung '+' (von rechts), '-' (von links), '+-' (beidseitig)
     @param max_workers: Maximale Anzahl paralleler Prozesse
     @return: Dictionary {ausdruck_str: grenzwert_str}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Argument-Tupel für _limit_single vorbereiten
@@ -245,7 +245,7 @@ def parallel_derivative(
     @param order: Ableitungsordnung (1 = erste Ableitung, 2 = zweite, etc.)
     @param max_workers: Maximale Anzahl paralleler Prozesse
     @return: Dictionary {ausdruck_str: ableitung_str}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Argument-Tupel für _derivative_single vorbereiten

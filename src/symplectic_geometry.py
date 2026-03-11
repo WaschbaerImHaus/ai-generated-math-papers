@@ -30,7 +30,7 @@
     - Leibniz-Regel: {fg,h} = f{g,h} + g{f,h}
     - Jacobi-Identität: {f,{g,h}} + {g,{h,f}} + {h,{f,g}} = 0
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-11
 @version 1.0.0
 """
@@ -71,7 +71,7 @@ class SymplecticForm:
         @param dim: Halbe Dimension n, sodass der Phasenraum ℝ²ⁿ ist.
                     Die Matrix hat Größe (2n × 2n).
         @param omega_matrix: Optionale antisymmetrische (2n × 2n)-Matrix.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # n = halbe Dimension
@@ -102,7 +102,7 @@ class SymplecticForm:
         @param v: Zweiter Vektor der Länge 2n.
         @return: Reeller Wert ω(u, v).
         @raises ValueError: Falls Vektorlängen falsch.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         u = np.asarray(u, dtype=float)
@@ -124,7 +124,7 @@ class SymplecticForm:
             Für die Standardform ist det(J) = 1 (für alle n).
 
         @return: True, wenn die Form nicht-entartet ist.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         det = np.linalg.det(self.omega)
@@ -138,7 +138,7 @@ class SymplecticForm:
             dω = 0 automatisch. Hier: Immer True für Standard-Symplektikform.
 
         @return: True (Standardform ist immer geschlossen).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Für konstante Koeffizientenmatrizen gilt dω = 0 automatisch
@@ -148,7 +148,7 @@ class SymplecticForm:
         """
         @brief Prüft die Antisymmetrie: Jᵀ = -J.
         @return: True, wenn die Matrix antisymmetrisch ist.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         return np.allclose(self.omega, -self.omega.T, atol=1e-12)
@@ -158,7 +158,7 @@ class SymplecticForm:
         """
         @brief Gibt die Symplektikmatrix J zurück.
         @return: numpy-Array der Form (2n × 2n).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         return self.omega.copy()
@@ -190,7 +190,7 @@ class HamiltonianSystem:
         @brief Initialisiert ein Hamilton-System.
         @param hamiltonian_func: H(q, p) → float. q, p sind numpy-Arrays der Länge n.
         @param dim: Freiheitsgrade n (Phasenraum hat Dimension 2n).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Hamiltonfunktion H(q, p) → float
@@ -217,7 +217,7 @@ class HamiltonianSystem:
         @param p: Impulsvektor der Länge n (oder Skalar für n=1).
         @param h: Schrittweite für numerischen Gradienten.
         @return: Tupel (dq/dt, dp/dt) als numpy-Arrays.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Skalare zu Arrays konvertieren
@@ -266,7 +266,7 @@ class HamiltonianSystem:
         @param t_span: (t_start, t_end) Zeitintervall.
         @param num_points: Anzahl Ausgabepunkte.
         @return: (t, q_traj, p_traj) – Zeit-Array und Trajektorien.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         from scipy.integrate import solve_ivp
@@ -322,7 +322,7 @@ class HamiltonianSystem:
         @param p: Impulsvektor.
         @param h: Schrittweite für numerischen Gradienten.
         @return: Wert der Poisson-Klammer {f,g}(q,p).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         q = np.atleast_1d(np.array(q, dtype=float))
@@ -379,7 +379,7 @@ class SymplecticManifold:
         @brief Initialisiert eine symplektische Mannigfaltigkeit.
         @param dim: Halbe Dimension n (Mannigfaltigkeit hat Dimension 2n).
         @param local_form_matrix: Optionale lokale Symplektikmatrix.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         self.n = dim
@@ -397,7 +397,7 @@ class SymplecticManifold:
             Diese Funktion gibt die Standardform zurück (als lokale Koordinaten).
 
         @return: Dict mit 'q_coords', 'p_coords', 'standard_form'.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         return {
@@ -415,7 +415,7 @@ class SymplecticManifold:
             Symplektisch ⟺ ω ist nicht-entartet und geschlossen.
 
         @return: True, wenn beide Bedingungen erfüllt sind.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         return (self.symplectic_form.is_non_degenerate()
@@ -430,7 +430,7 @@ class SymplecticManifold:
             Normierungsfaktor: 1/n!
 
         @return: Proportionalitätskonstante der Volumenform.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         import math
@@ -472,7 +472,7 @@ def harmonic_oscillator_hamiltonian(
     @param p: Impuls (Skalar oder Array).
     @param omega: Kreisfrequenz (Standard: 1.0).
     @return: Wert der Hamiltonfunktion.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     q = np.asarray(q, dtype=float)
@@ -503,7 +503,7 @@ def kepler_hamiltonian(
     @param G: Gravitationskonstante (Standard: 1.0).
     @return: Wert der Hamiltonfunktion (float).
     @raises ValueError: Falls q der Nullvektor ist (Singularität).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     q = np.asarray(q, dtype=float)
@@ -548,7 +548,7 @@ def double_pendulum_hamiltonian(
     @param l2: Länge des zweiten Stabs.
     @param g: Erdbeschleunigung.
     @return: Hamiltonwert (Gesamtenergie).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     theta1, theta2 = float(q[0]), float(q[1])

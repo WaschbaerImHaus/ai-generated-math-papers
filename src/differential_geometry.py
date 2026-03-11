@@ -21,7 +21,7 @@
     (tensorielle Version), einstein_tensor und geodesic_equation sind bereits in
     tensor_geometry.py definiert und werden dort importiert.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 

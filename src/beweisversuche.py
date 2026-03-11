@@ -30,7 +30,7 @@
     - Modulare Arithmetik und Chinesischer Restsatz (CRT)
     - Numerische Verifikation bis zu großen Grenzen
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-10
 @lastModified 2026-03-10
 """

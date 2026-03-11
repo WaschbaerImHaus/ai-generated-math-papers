@@ -32,7 +32,7 @@
         - p-adische Zeta-Funktion zeta_p(s)
         - Iwasawa μ- und λ-Invarianten (Schätzung)
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @version 2.0
 @since 2026-03-08
 @lastModified 2026-03-10
@@ -175,7 +175,7 @@ class PAdicNumber:
         In 2-adischer Darstellung: ...1111111 (unendlich viele Einsen)
         Als endliche Approximation: [1,1,1,...,1] (mod 2^precision)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-08
     @lastModified 2026-03-08
     """
@@ -797,7 +797,7 @@ def bernoulli_number(n: int) -> float:
     @param n: Nicht-negative ganze Zahl (Index der Bernoulli-Zahl)
     @return: Bernoulli-Zahl B_n als Gleitkommazahl
     @raises ValueError: Wenn n < 0
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     if n < 0:
@@ -866,7 +866,7 @@ def generalized_bernoulli_numbers(chi_conductor: int, n_max: int) -> list:
     @param chi_conductor: Führe des Dirichlet-Charakters (1 = trivial, nur B_n)
     @param n_max: Maximales n (erzeugt B_{0,chi}, ..., B_{n_max, chi})
     @return: Liste [B_{0,chi}, B_{1,chi}, ..., B_{n_max, chi}] als Gleitkommazahlen
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     if chi_conductor == 1:
@@ -964,7 +964,7 @@ def kubota_leopoldt_l_function(chi_conductor: int, s_padic: int, p: int, terms: 
     @param terms: Anzahl der Terme für numerische Näherungen
     @return: Wert L_p(s, chi) als komplexe Zahl
     @raises ValueError: Wenn p < 2 oder chi_conductor < 1
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     if p < 2:
@@ -1048,7 +1048,7 @@ def p_adic_zeta_function(p: int, s: int, terms: int = 30) -> float:
     @param s: Ganzzahliges Argument (s = 1-n, also s ≤ -1 für n ≥ 2)
     @param terms: Nicht verwendet (für Konsistenz mit anderen L-Funktionen)
     @return: Wert ζ_p(s) als Gleitkommazahl
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # s = 1-n ⟹ n = 1-s
@@ -1103,7 +1103,7 @@ def kummer_congruence_check(p: int, n_values: list) -> dict:
              'p': int – die Primzahl
              'bernoulli_values': {n: B_n} für gegebene n
              'zeta_p_values': {n: ζ_p(1-n)} für gegebene n
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Filtere auf gerade n ≥ 2
@@ -1195,7 +1195,7 @@ def iwasawa_mu_lambda_invariants(p: int, chi_conductor: int, n_check: int = 10) 
              'l_p_values': {n: L_p(1-n, chi)} – berechnete L-Werte
              'p_adic_valuations': {n: v_p(L_p(1-n,chi))} – p-adische Bewertungen
              'vandiver_ok': bool – μ = 0? (Vandiver-Vermutung konsistent?)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Berechne L_p(1-n, chi) für gerade n = 2, 4, ..., n_check

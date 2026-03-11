@@ -10,7 +10,7 @@ Wichtig: miller_rabin_primality_test, sieve_of_eratosthenes, legendre_symbol und
 jacobi_symbol stammen aus proof_theory.py und werden dort importiert, um Duplikate
 zu vermeiden.
 
-@author: Kurt Ingwer
+@author: Michael Fuhrmann
 @version: 1.0
 @since: 2026-03-10
 @lastModified: 2026-03-10
@@ -93,7 +93,7 @@ class PrimeSieve:
     Enthält das klassische Eratosthenes-Sieb, das moderne Atkin-Sieb,
     sowie Funktionen zur Analyse von Primzahllücken und Zwillingsprimzahlen.
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @since: 2026-03-10
     @lastModified: 2026-03-10
     """
@@ -242,7 +242,7 @@ class PrimalityTests:
     """
     Sammlung von Primzahltests: deterministisch und probabilistisch.
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @since: 2026-03-10
     @lastModified: 2026-03-10
     """
@@ -498,7 +498,7 @@ class IntegerFactorization:
     Von einfacher Probedivision bis zu modernen Algorithmen wie
     Pollard's ρ-Algorithmus und Fermat-Faktorisierung.
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @since: 2026-03-10
     @lastModified: 2026-03-10
     """
@@ -768,7 +768,7 @@ class DiscreteLogarithm:
     (Diffie-Hellman, ElGamal, DSA). Die Schwierigkeit seiner Berechnung ist
     ein offenes Problem der Komplexitätstheorie.
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @since: 2026-03-10
     @lastModified: 2026-03-10
     """
@@ -1013,7 +1013,7 @@ class ContinuedFractionFactoring:
     Kettenbrüche sind eine wichtige Verbindung zwischen Analysis und Zahlentheorie.
     Die Kettenbruchentwicklung von √n liefert die beste rationale Approximation.
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @since: 2026-03-10
     @lastModified: 2026-03-10
     """
@@ -1256,7 +1256,7 @@ class CryptographicAlgorithms:
     HINWEIS: Diese Implementierung dient ausschließlich Lernzwecken.
     Für produktive Kryptographie sind etablierte Bibliotheken zu verwenden.
 
-    @author: Kurt Ingwer
+    @author: Michael Fuhrmann
     @since: 2026-03-10
     @lastModified: 2026-03-10
     """

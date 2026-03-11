@@ -17,7 +17,7 @@
         WARNING → Konvergenz-Warnungen, ungewöhnliche Zustände
         ERROR   → Fehler, die die Berechnung abbrechen
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-10
 @lastModified 2026-03-10
 """
@@ -47,7 +47,7 @@ class MathLogger:
 
         Ausgabe: Konsole und/oder Datei unter logs/
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -76,7 +76,7 @@ class MathLogger:
         @param level: Log-Level als String: "DEBUG"|"INFO"|"WARNING"|"ERROR"
         @param log_to_file: Wenn True, werden Logs auch in Datei geschrieben
         @param log_dir: Verzeichnis für Log-Dateien (Standard: projekt/logs/)
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         self.name = name
@@ -118,7 +118,7 @@ class MathLogger:
             Zeitstempel hilft beim Nachvollziehen der Ausführungsreihenfolge.
 
         @return logging.Formatter-Instanz
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         return logging.Formatter(
@@ -135,7 +135,7 @@ class MathLogger:
 
         @param log_dir: Überschreibt den Standardpfad (oder None für Standard)
         @return Path-Objekt des Log-Verzeichnisses
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         if log_dir:
@@ -158,7 +158,7 @@ class MathLogger:
 
         @param kwargs: Dictionary mit Schrittwerten
         @return Formatierter String "key1=val1, key2=val2, ..."
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         parts = []
@@ -181,7 +181,7 @@ class MathLogger:
 
         @param matrix: 2D-Liste mit Matrixwerten
         @return Formatierter String
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         if not matrix:
@@ -213,7 +213,7 @@ class MathLogger:
 
         @param algorithm: Name des Algorithmus (z.B. "Newton-Raphson")
         @param kwargs: Schrittparameter (z.B. iteration=1, x=2.5, fx=0.25)
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         params_str = self._format_kwargs(kwargs)
@@ -229,7 +229,7 @@ class MathLogger:
         @param description: Bezeichnung des Ergebnisses (z.B. "Nullstelle")
         @param value: Ergebniswert (beliebiger Typ)
         @param unit: Optionale Einheit (z.B. "rad", "m/s")
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         # Einheit mit Leerzeichen voranstellen falls angegeben
@@ -253,7 +253,7 @@ class MathLogger:
         @param algorithm: Name des iterativen Verfahrens
         @param iteration: Aktuelle Iterationsnummer
         @param residual: Aktuelles Residuum (|f(x)| oder Fehler)
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         self._logger.warning(
@@ -278,7 +278,7 @@ class MathLogger:
         @param matrix_before: Matrix vor der Operation (2D-Liste)
         @param matrix_after: Matrix nach der Operation (2D-Liste)
         @param description: Optionale Erklärung der Operation
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         desc_str = f" ({description})" if description else ""
@@ -300,7 +300,7 @@ class MathLogger:
 
         @param func_name: Name der gemessenen Funktion
         @param elapsed: Verstrichene Zeit in Sekunden
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         self._logger.info(f"Timing: {func_name} dauerte {elapsed:.4f}s")
@@ -313,13 +313,31 @@ class MathLogger:
             Format: [INFO ] ===== TITEL =====
 
         @param title: Abschnittsbezeichnung
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         separator = "=" * 50
         self._logger.info(f"{separator}")
         self._logger.info(f"  {title.upper()}")
         self._logger.info(f"{separator}")
+
+    def warning(self, message: str) -> None:
+        """
+        @brief Gibt eine allgemeine Warnung auf WARNING-Level aus.
+        @description
+            Öffentliche Schnittstelle für Warnmeldungen, die nicht in die
+            spezialisierten Warners (convergence_warning, condition_number_warning)
+            passen. Wird z.B. von _safe_parse() verwendet, wenn parse_expr()
+            scheitert und auf sp.sympify() zurückgegriffen werden muss.
+
+            Format: [WARNING] <message>
+
+        @param message: Warntext als beliebiger String.
+        @author Michael Fuhrmann
+        @lastModified 2026-03-11
+        """
+        # Interne Python-logging-Instanz direkt nutzen
+        self._logger.warning(message)
 
     def set_level(self, level: str) -> None:
         """
@@ -329,7 +347,7 @@ class MathLogger:
             ohne den Logger neu zu erstellen.
 
         @param level: Neuer Level als String: "DEBUG"|"INFO"|"WARNING"|"ERROR"
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         new_level = self._LEVEL_MAP.get(level.upper(), logging.INFO)
@@ -338,6 +356,98 @@ class MathLogger:
         for handler in self._logger.handlers:
             handler.setLevel(new_level)
 
+    def condition_number_warning(
+        self,
+        matrix_name: str,
+        cond: float,
+        threshold: float = 1e10
+    ) -> None:
+        """
+        @brief Warnung bei schlecht konditionierter Matrix.
+        @description
+            Gibt eine WARNING-Meldung aus, wenn die Konditionszahl κ(A) den
+            Schwellenwert überschreitet. Eine hohe Konditionszahl bedeutet,
+            dass kleine Fehler in den Eingabedaten zu großen Fehlern im
+            Ergebnis führen können.
+
+            Konditionszahl κ(A) = ||A|| · ||A⁻¹|| = σ_max / σ_min
+
+            Faustregel: Wenn κ ≈ 10^k, verliert man k Dezimalstellen Genauigkeit.
+            Bei double precision (16 Dezimalstellen) und κ = 10^10 bleiben nur
+            noch ~6 gültige Dezimalstellen übrig.
+
+        @param matrix_name: Name/Bezeichnung der Matrix für den Log.
+        @param cond: Berechnete Konditionszahl.
+        @param threshold: Schwellenwert (Standard: 1e10).
+        @author Michael Fuhrmann
+        @lastModified 2026-03-11
+        """
+        # Nur warnen wenn Konditionszahl den Schwellenwert überschreitet
+        if cond > threshold:
+            self._logger.warning(
+                f"Schlecht konditionierte Matrix '{matrix_name}': "
+                f"κ(A) = {cond:.3e} > {threshold:.1e}. "
+                f"Numerische Ergebnisse können ungenau sein."
+            )
+
+    def stability_report(self, operations: list) -> str:
+        """
+        @brief Gibt eine Zusammenfassung aller Konditionszahlen aus.
+        @description
+            Analysiert eine Liste von Operationen mit zugehörigen Konditionszahlen
+            und gibt einen formatierten Bericht aus.
+
+            Format jedes Eintrags: {"name": str, "cond": float, "operation": str}
+
+        @param operations: Liste von Dicts mit Konditionszahlen-Einträgen.
+        @return: Formatierter Bericht als String.
+        @author Michael Fuhrmann
+        @lastModified 2026-03-11
+        """
+        # Bericht-Zeilen aufbauen
+        lines = ["=== Stabilitätsbericht ==="]
+
+        # Alle Operationen nach Konditionszahl aufsteigend sortieren
+        sorted_ops = sorted(
+            [op for op in operations if isinstance(op, dict) and 'cond' in op],
+            key=lambda op: op.get('cond', 0)
+        )
+
+        if not sorted_ops:
+            lines.append("Keine Konditionszahlen verfügbar.")
+            report = "\n".join(lines)
+            self._logger.info(report)
+            return report
+
+        # Jede Operation auflisten
+        for op in sorted_ops:
+            name = op.get('name', 'Unbekannt')
+            cond = op.get('cond', float('nan'))
+            operation = op.get('operation', '')
+
+            # Bewertung nach Konditionszahl
+            if cond < 1e3:
+                status = "gut konditioniert"
+            elif cond < 1e8:
+                status = "mäßig konditioniert"
+            elif cond < 1e12:
+                status = "schlecht konditioniert"
+            else:
+                status = "KRITISCH (fast singulär)"
+
+            entry = f"  {name} [{operation}]: κ = {cond:.2e} → {status}"
+            lines.append(entry)
+
+            # Auch im Logger ausgeben
+            if cond > 1e10:
+                self._logger.warning(entry.strip())
+            else:
+                self._logger.info(entry.strip())
+
+        lines.append("=========================")
+        report = "\n".join(lines)
+        return report
+
     def disable(self) -> None:
         """
         @brief Deaktiviert den Logger komplett (kein Output mehr).
@@ -345,7 +455,7 @@ class MathLogger:
             Setzt den Level auf CRITICAL+1, sodass keine Meldung mehr ausgegeben wird.
             Nützlich für Produktionsbetrieb oder Performance-Messungen.
 
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         """
         self._logger.setLevel(logging.CRITICAL + 1)
@@ -368,7 +478,7 @@ def get_logger(name: str = None) -> MathLogger:
 
     @param name: Optionaler Name für einen eigenen Logger
     @return MathLogger-Instanz
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     global _default_logger
@@ -385,7 +495,7 @@ def enable_debug_logging() -> None:
         Schaltet alle Berechnungsschritte auf Konsole ein.
         Nützlich für die Entwicklung und Fehlersuche.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     global _default_logger
@@ -398,7 +508,7 @@ def disable_logging() -> None:
     @description
         Unterdrückt alle Ausgaben für Performance-Messungen oder saubere Ausgabe.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     global _default_logger

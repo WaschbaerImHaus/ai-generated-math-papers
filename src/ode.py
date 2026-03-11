@@ -13,7 +13,7 @@
     - Laplace-Transformation (numerisch, Simpson-Regel)
     - Inverse Laplace-Transformation (Stehfest-Algorithmus)
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-05
 @lastModified 2026-03-10
 """

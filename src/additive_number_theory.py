@@ -17,7 +17,7 @@
     Alle Algorithmen sind ausführlich kommentiert und dienen gleichzeitig als
     Lernmaterial für additive Kombinatorik und analytische Zahlentheorie.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @version 1.0
 @since 2026-03-10
 @lastModified 2026-03-10
@@ -110,7 +110,7 @@ class PartitionFunction:
     Erzeugende Funktion (Euler):
         Σ p(n) x^n = ∏_{k≥1} 1/(1-x^k)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -377,7 +377,7 @@ class HardyRamanujanCircleMethod:
     wobei F(x) = ∏ 1/(1-x^k) die erzeugende Funktion ist.
     Der Integrationsweg wird in Farey-Bögen aufgeteilt.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -556,7 +556,7 @@ class WaringProblem:
         g(k) = min. Anzahl k-ter Potenzen, die jede natürliche Zahl darstellen
         G(k) = min. Anzahl k-ter Potenzen für alle hinreichend großen n
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -804,7 +804,7 @@ class GoldbachAnalysis:
     Chen-Theorem (1966):
         Jede hinreichend große gerade Zahl = p + m, wobei m ≤ 2 Primfaktoren hat.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -988,7 +988,7 @@ class ArithmeticProgressions:
     - Van-der-Waerden (1927): Für jede Färbung {1,...,N} mit r Farben
       gibt es eine einfarbige AP der Länge k (wenn N ≥ W(k;r)).
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """
@@ -1217,7 +1217,7 @@ class SumSetTheory:
     - Plünnecke-Ruzsa: |kA| / |A| ≤ (|A+B|/|A|)^k
     - Freiman's Theorem: Kleine Verdoppelungskonstante → A liegt in einem GAP
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @since 2026-03-10
     @lastModified 2026-03-10
     """

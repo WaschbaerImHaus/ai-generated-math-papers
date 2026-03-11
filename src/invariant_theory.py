@@ -23,7 +23,7 @@
     - Molien: M(t) = (1/|G|) Σ_{g∈G} 1/det(I - t·g), Koeff. von tᵏ = dim(Inv_k)
     - Hilbert-Basissatz: Jeder Invariantenring k[x₁,...,xₙ]^G ist endlich erzeugt
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 

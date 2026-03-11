@@ -39,7 +39,7 @@
 
     Formeln können im KaTeX-Format angegeben werden (siehe .md-Datei).
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -78,7 +78,7 @@ class EuclideanGeometry:
     - Winkel: cos θ = (u·v)/(|u||v|)
     - Winkelsumme im Dreieck: α+β+γ = π
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -316,7 +316,7 @@ class ProjectiveGeometry:
 
     Dualität: Geraden und Punkte sind dual (Gerade = [a:b:c] mit ax+by+cw=0).
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -576,7 +576,7 @@ class HyperbolicGeometry:
     - Fläche = π − (α+β+γ) (Gauß-Bonnet für hyperbolische Dreiecke)
     - Unendlich viele Parallelen durch einen Punkt außerhalb einer Geraden
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -854,7 +854,7 @@ class EllipticGeometry:
 
     Anwendungen: Kugelgeometrie, Geodäsie, Navigationssysteme (WGS-84).
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -1017,7 +1017,7 @@ class AffinGeometry:
 
     Affine Abbildung: $f(\\mathbf{x}) = A\\mathbf{x} + \\mathbf{b}$
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -1221,7 +1221,7 @@ class SyntheticGeometry:
     - Gruppe IV: Parallelenaxiom (1 Axiom)
     - Gruppe V: Stetigkeitsaxiome (2 Axiome, Archimedes + Vollständigkeit)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 

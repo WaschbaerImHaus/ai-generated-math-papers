@@ -16,7 +16,7 @@
     Importiert Matrix aus matrix_ops.py und Vector aus vectors.py.
     Ausgelagert aus linear_algebra.py für bessere Modularität.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -57,7 +57,7 @@ def lu_decomposition(matrix: 'Matrix') -> tuple['Matrix', 'Matrix', 'Matrix', in
     @param matrix: Quadratische Matrix A (n×n)
     @return: (L, U, P, n_swaps) – untere/obere Dreiecksmatrix, Permutation, Anzahl Tausche
     @raises ValueError: Wenn Matrix nicht quadratisch oder singulär
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     n = matrix.rows
@@ -146,7 +146,7 @@ def qr_decomposition(matrix: 'Matrix') -> tuple['Matrix', 'Matrix']:
     @param matrix: Matrix A (m×n, m ≥ n)
     @return: (Q, R) – orthogonale Matrix und obere Dreiecksmatrix
     @raises ValueError: Wenn m < n (zu wenig Zeilen)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     m = matrix.rows
@@ -219,7 +219,7 @@ def svd(matrix: 'Matrix') -> tuple['Matrix', list[float], 'Matrix']:
 
     @param matrix: Beliebige Matrix A (m×n)
     @return: (U, sigma, Vt) – linke Vektoren, Singulärwerte, rechte Vektoren transponiert
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Numpy-Array aus Matrix-Daten
@@ -247,7 +247,7 @@ def matrix_rank(matrix: 'Matrix', tol: float = 1e-10) -> int:
     @param matrix: Eingangsmatrix A
     @param tol: Toleranz für "Null" (Standard: 1e-10)
     @return: Rang der Matrix
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     _, sigma, _ = svd(matrix)
@@ -268,7 +268,7 @@ def condition_number(matrix: 'Matrix') -> float:
     @param matrix: Quadratische Matrix
     @return: Konditionszahl κ ≥ 1
     @raises ValueError: Wenn Matrix singulär (σ_min = 0)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     _, sigma, _ = svd(matrix)
@@ -308,7 +308,7 @@ def givens_rotation_matrix(n: int, i: int, j: int, theta: float) -> 'Matrix':
     @param theta: Rotationswinkel in Radiant
     @return: n×n Givens-Rotationsmatrix als Matrix-Objekt
     @raises ValueError: Wenn i, j ungültig oder i == j
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     if i < 0 or j < 0 or i >= n or j >= n:
@@ -360,7 +360,7 @@ def givens_qr_decomposition(A: 'Matrix') -> tuple['Matrix', 'Matrix']:
     @param A: Matrix (m×n, m ≥ n)
     @return: Tupel (Q, R) als Matrix-Objekte
     @raises ValueError: Wenn m < n
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     m = A.rows
@@ -438,7 +438,7 @@ def givens_solve_least_squares(A: 'Matrix', b: list[float]) -> list[float]:
     @param b: Rechte Seite als Liste der Länge m
     @return: Lösungsvektor x als Liste der Länge n
     @raises ValueError: Wenn Dimensionen nicht passen oder System singulär
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     m = A.rows

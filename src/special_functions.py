@@ -4,7 +4,7 @@ Spezielle Funktionen der mathematischen Physik und Analysis.
 Bessel-Funktionen, Legendre-Polynome, hypergeometrische Funktionen,
 Airy-Funktionen, orthogonale Polynome und klassische Sonderfälle.
 
-Autor: Kurt Ingwer
+Autor: Michael Fuhrmann
 Letzte Änderung: 2026-03-10
 """
 

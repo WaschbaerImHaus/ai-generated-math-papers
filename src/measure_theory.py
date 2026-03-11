@@ -1,7 +1,7 @@
 """
 Maßtheorie: σ-Algebren, Maße, Lebesgue-Integral, Produktmaße, L^p-Räume.
 
-Autor: Kurt Ingwer
+Autor: Michael Fuhrmann
 Letzte Änderung: 2026-03-10
 
 Dieses Modul implementiert die fundamentalen Konzepte der Maßtheorie,

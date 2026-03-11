@@ -26,7 +26,7 @@
     - Burnside: |X/G| = (1/|G|) · Σ_{g∈G} |Fix(g)|
     - Maschke: Jede Darst. über ℂ ist vollständig reduzibel
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 

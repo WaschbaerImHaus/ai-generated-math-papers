@@ -7,7 +7,7 @@ Dieses Modul implementiert kombinatorische Spieltheorie und zahlentheoretische S
 - Magische Quadrate und lateinische Quadrate
 - Perfekte, befreundete und figurate Zahlen
 
-@author    Kurt Ingwer
+@author    Michael Fuhrmann
 @version   1.0.0
 @timestamp 2026-03-10
 """
@@ -28,7 +28,7 @@ class NimGame:
     Nim: Zwei Spieler wechseln sich ab, aus einem oder mehreren Haufen Steine
     zu nehmen. Wer den letzten Stein nimmt, gewinnt (Normalspiel-Konvention).
 
-    @author    Kurt Ingwer
+    @author    Michael Fuhrmann
     @version   1.0.0
     @timestamp 2026-03-10
     """
@@ -146,7 +146,7 @@ class SpragueGrundyTheory:
     Jedes endliche, deterministische Zwei-Spieler-Spiel ohne Zufallskomponente
     (normal convention) ist äquivalent zu einem Nim-Haufen der Größe G(Stellung).
 
-    @author    Kurt Ingwer
+    @author    Michael Fuhrmann
     @version   1.0.0
     @timestamp 2026-03-10
     """

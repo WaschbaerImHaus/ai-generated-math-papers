@@ -2,7 +2,7 @@
 @file combinatorics.py
 @brief Kombinatorik und Diskrete Mathematik – Permutationsgruppen, abzählende Kombinatorik,
        erzeugende Funktionen, Ramsey-Theorie, Graphen-Kombinatorik, Kombinatorik auf Wörtern.
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 
 Mathematische Grundlagen:
@@ -28,7 +28,7 @@ from typing import Any
 def _lcm(a: int, b: int) -> int:
     """
     @brief Kleinstes gemeinsames Vielfaches von a und b.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     @param a Erste ganze Zahl.
     @param b Zweite ganze Zahl.
@@ -47,7 +47,7 @@ def _lcm(a: int, b: int) -> int:
 class PermutationGroup:
     """
     @brief Symmetrische Gruppe S_n – alle Permutationen von {1, ..., n}.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Eine Permutation wird als Liste dargestellt: perm[i] = Bild von i (0-indiziert).
@@ -60,7 +60,7 @@ class PermutationGroup:
     def __init__(self, n: int):
         """
         @brief Initialisiert die symmetrische Gruppe S_n.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
         @param n Grad der symmetrischen Gruppe (Anzahl der Elemente).
         """
@@ -73,7 +73,7 @@ class PermutationGroup:
     def all_permutations(n: int) -> list[list[int]]:
         """
         @brief Erzeugt alle Permutationen von {0, ..., n-1}.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Mathematisch: Auflistung aller Elemente der symmetrischen Gruppe S_n.
@@ -89,7 +89,7 @@ class PermutationGroup:
     def permutation_sign(perm: list[int]) -> int:
         """
         @brief Berechnet das Vorzeichen (Signum) einer Permutation.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Das Vorzeichen ist +1 (gerade) oder -1 (ungerade), je nach Anzahl der
@@ -120,7 +120,7 @@ class PermutationGroup:
     def cycle_decomposition(perm: list[int]) -> list[list[int]]:
         """
         @brief Zerlegt eine Permutation in disjunkte Zyklen.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Jede Permutation lässt sich eindeutig als Produkt disjunkter Zyklen
@@ -155,7 +155,7 @@ class PermutationGroup:
     def order_of_permutation(perm: list[int]) -> int:
         """
         @brief Berechnet die Ordnung einer Permutation.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Die Ordnung von σ ∈ S_n ist die kleinste positive Zahl k mit σ^k = id.
@@ -183,7 +183,7 @@ class PermutationGroup:
     def compose_permutations(p1: list[int], p2: list[int]) -> list[int]:
         """
         @brief Berechnet die Komposition p1 ∘ p2 (erst p2, dann p1).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         (p1 ∘ p2)(i) = p1(p2(i))
@@ -203,7 +203,7 @@ class PermutationGroup:
     def inverse_permutation(p: list[int]) -> list[int]:
         """
         @brief Berechnet die inverse Permutation p^{-1}.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         p^{-1} ist definiert durch p(p^{-1}(i)) = i für alle i.
@@ -225,7 +225,7 @@ class PermutationGroup:
     def is_even(perm: list[int]) -> bool:
         """
         @brief Prüft, ob eine Permutation gerade ist (zur alternierenden Gruppe A_n gehört).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         A_n = {σ ∈ S_n | sign(σ) = +1} ist Untergruppe vom Index 2 in S_n.
@@ -240,7 +240,7 @@ class PermutationGroup:
     def fixed_points(perm: list[int]) -> list[int]:
         """
         @brief Gibt alle Fixpunkte der Permutation zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Ein Fixpunkt i erfüllt perm[i] = i (wird nicht bewegt).
@@ -261,7 +261,7 @@ class EnumerativeCombinatorics:
     """
     @brief Abzählende Kombinatorik – Multinomialkoeffizienten, Stirling-Zahlen,
            Euler-Zahlen, Partitionszahlen und weitere kombinatorische Kennzahlen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Stirling 1. Art: s(n,k) = s(n-1,k-1) - (n-1)·s(n-1,k), s(0,0)=1
@@ -273,7 +273,7 @@ class EnumerativeCombinatorics:
     def multinomial(n: int, ks: list[int]) -> int:
         """
         @brief Berechnet den Multinomialkoeffizienten n!/(k1! · k2! · ... · km!).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Gibt die Anzahl Möglichkeiten an, n Objekte in Gruppen der Größen k1,...,km aufzuteilen.
@@ -298,7 +298,7 @@ class EnumerativeCombinatorics:
     def stirling_first(n: int, k: int) -> int:
         """
         @brief Berechnet die vorzeichenbehaftete Stirling-Zahl 1. Art s(n,k).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         s(n,k) = Anzahl der Permutationen in S_n mit genau k Zyklen (vorzeichenbehaftet).
@@ -328,7 +328,7 @@ class EnumerativeCombinatorics:
     def stirling_second(n: int, k: int) -> int:
         """
         @brief Berechnet die Stirling-Zahl 2. Art S(n,k).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         S(n,k) = Anzahl der Partitionen einer n-elementigen Menge in k nicht-leere Teilmengen.
@@ -360,7 +360,7 @@ class EnumerativeCombinatorics:
         """
         @brief Berechnet die Euler-Zahlen A(n,k) – Anzahl der Permutationen von {1,...,n}
                mit genau k Anstiegen (Aufsteige: σ(i) < σ(i+1)).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Rekurrenz: A(n,k) = (k+1)·A(n-1,k) + (n-k)·A(n-1,k-1)
@@ -386,7 +386,7 @@ class EnumerativeCombinatorics:
     def partition_number(n: int) -> int:
         """
         @brief Berechnet die Partitionszahl p(n) – Anzahl der Partitionen von n.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         p(n) = Anzahl der Möglichkeiten, n als geordnete Summe positiver ganzer Zahlen
@@ -438,7 +438,7 @@ class EnumerativeCombinatorics:
     def motzkin_number(n: int) -> int:
         """
         @brief Berechnet die n-te Motzkin-Zahl M_n.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         M_n = Anzahl der Pfade von (0,0) nach (n,0) mit Schritten (+1,+1), (+1,0), (+1,-1),
@@ -472,7 +472,7 @@ class EnumerativeCombinatorics:
     def narayana_number(n: int, k: int) -> int:
         """
         @brief Berechnet die Narayana-Zahl N(n,k).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         N(n,k) = (1/n) · C(n,k) · C(n,k-1)
@@ -498,7 +498,7 @@ class EnumerativeCombinatorics:
     def ballot_problem(p: int, q: int) -> float:
         """
         @brief Berechnet die Wahrscheinlichkeit im Wahlproblem (Bertrand'sches Wahlproblem).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Kandidat A erhält p Stimmen, Kandidat B erhält q Stimmen (p > q).
@@ -521,7 +521,7 @@ class EnumerativeCombinatorics:
     def inclusion_exclusion(sets: list[set]) -> int:
         """
         @brief Berechnet |A_1 ∪ A_2 ∪ ... ∪ A_m| via Inklusion-Exklusion-Prinzip.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         |⋃ A_i| = Σ|A_i| - Σ|A_i ∩ A_j| + Σ|A_i ∩ A_j ∩ A_k| - ...
@@ -559,7 +559,7 @@ class GeneratingFunctions:
     """
     @brief Erzeugende Funktionen – gewöhnliche und exponentielle erzeugende Funktionen,
            Potenzreihenmultiplikation und Rekurrenzrelationen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Eine erzeugende Funktion ist eine formale Potenzreihe, deren Koeffizienten
@@ -573,7 +573,7 @@ class GeneratingFunctions:
     def ordinary_gf(sequence: list[float], n_terms: int) -> list[float]:
         """
         @brief Gibt die ersten n_terms Koeffizienten der gewöhnlichen erzeugenden Funktion.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         OGF(sequence) = a_0 + a_1·x + a_2·x² + ...
@@ -594,7 +594,7 @@ class GeneratingFunctions:
     def exponential_gf(sequence: list[float], n_terms: int) -> list[float]:
         """
         @brief Gibt die ersten n_terms Koeffizienten der exponentiellen erzeugenden Funktion.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         EGF: F(x) = Σ a_n/n! · x^n
@@ -618,7 +618,7 @@ class GeneratingFunctions:
     def fibonacci_gf() -> str:
         """
         @brief Gibt die geschlossene Form der erzeugenden Funktion der Fibonacci-Zahlen.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         OGF der Fibonacci-Zahlen: F(x) = x / (1 - x - x²)
@@ -634,7 +634,7 @@ class GeneratingFunctions:
     def catalan_gf() -> str:
         """
         @brief Gibt die geschlossene Form der erzeugenden Funktion der Catalan-Zahlen.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         OGF der Catalan-Zahlen: C(x) = (1 - √(1 - 4x)) / (2x)
@@ -651,7 +651,7 @@ class GeneratingFunctions:
     def power_series_multiply(f: list[float], g: list[float], n_terms: int) -> list[float]:
         """
         @brief Multipliziert zwei Potenzreihen (Cauchy-Faltung) und gibt n_terms Koeffizienten.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         (f · g)[n] = Σ_{k=0}^{n} f[k] · g[n-k]  (Cauchy-Faltung / Diskretes Konvolutionsprodukt)
@@ -676,7 +676,7 @@ class GeneratingFunctions:
     def gf_from_recurrence(a0: float, a1: float, recurrence_fn, n_terms: int) -> list[float]:
         """
         @brief Berechnet eine Folge aus einer Rekurrenzrelation.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Startet mit a0, a1 und wendet die Rekurrenzfunktion an, um die Folge zu erzeugen.
@@ -709,7 +709,7 @@ class GeneratingFunctions:
 class RamseyTheory:
     """
     @brief Ramsey-Theorie – Ramsey-Zahlen, Van-der-Waerden-Zahlen, Schubfachprinzip.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Ramsey-Satz: Für alle s,t ∈ ℕ existiert eine kleinste Zahl R(s,t), sodass
@@ -735,7 +735,7 @@ class RamseyTheory:
     def ramsey_number_R(cls, s: int, t: int) -> int | None:
         """
         @brief Gibt die Ramsey-Zahl R(s,t) zurück, falls bekannt.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         R(s,t) ist die kleinste Zahl n, sodass jede 2-Färbung der Kanten von K_n
@@ -763,7 +763,7 @@ class RamseyTheory:
     def ramsey_graph_coloring(n: int, k: int) -> dict[tuple[int, int], int]:
         """
         @brief Erzeugt eine zufällige k-Färbung der Kanten des vollständigen Graphen K_n.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Jede Kante {u,v} des K_n erhält eine Farbe aus {0, 1, ..., k-1}.
@@ -789,7 +789,7 @@ class RamseyTheory:
     def van_der_waerden_numbers() -> dict[tuple[int, int], int]:
         """
         @brief Gibt bekannte Van-der-Waerden-Zahlen W(k; r) zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         W(k; r) = kleinste n, sodass jede r-Färbung von {1,...,n}
@@ -817,7 +817,7 @@ class RamseyTheory:
     def hales_jewett_theorem_demo(n: int, k: int) -> dict:
         """
         @brief Demonstriert das Hales-Jewett-Theorem für n-in-a-row auf k×k×...×k Hyperwürfel.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Hales-Jewett-Theorem (1963): Für beliebige k und t existiert d = HJ(k,t) so,
@@ -847,7 +847,7 @@ class RamseyTheory:
     def pigeonhole_principle(n_pigeons: int, n_holes: int) -> dict:
         """
         @brief Schubfachprinzip: Wenn n_pigeons Tauben in n_holes Schubfächer verteilt werden.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Schubfachprinzip: Wenn n > k·m, dann muss mindestens ein Schubfach mehr als m Objekte enthalten.
@@ -886,7 +886,7 @@ class GraphCombinatorics:
     """
     @brief Graphen-Kombinatorik – chromatische Polynome, Matchings, Spannbäume,
            Euler- und Hamilton-Kreise.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Adjazenzmatrix-Darstellung: adj[i][j] = 1 wenn Kante {i,j} vorhanden, sonst 0.
@@ -897,7 +897,7 @@ class GraphCombinatorics:
     def chromatic_polynomial(adj_matrix: list[list[int]]) -> list[int]:
         """
         @brief Berechnet das chromatische Polynom P(G, k) via Deletion-Contraction.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         P(G, k) = Anzahl der k-Färbungen von G (ordnungsgemäße Knotenfärbungen).
@@ -988,7 +988,7 @@ class GraphCombinatorics:
     def tutte_polynomial_demo(adj_matrix: list[list[int]]) -> dict:
         """
         @brief Demo des Tutte-Polynoms T(G; x, y) für einfache Graphen.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Das Tutte-Polynom ist eine 2-variable Verallgemeinerung des chromatischen Polynoms.
@@ -1019,7 +1019,7 @@ class GraphCombinatorics:
     def matching_number(adj_matrix: list[list[int]]) -> int:
         """
         @brief Berechnet die Matchingzahl ν(G) – Größe des maximalen Matchings.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Ein Matching M ⊆ E ist eine Menge knotendisjunkter Kanten.
@@ -1062,7 +1062,7 @@ class GraphCombinatorics:
     def perfect_matching_count(adj_matrix: list[list[int]]) -> int:
         """
         @brief Berechnet die Anzahl perfekter Matchings via Hafnian (allgemeine Graphen).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Ein perfektes Matching M umfasst alle n Knoten (n muss gerade sein) als
@@ -1113,7 +1113,7 @@ class GraphCombinatorics:
     def spanning_tree_count(adj_matrix: list[list[int]]) -> int:
         """
         @brief Berechnet die Anzahl der Spannbäume via Kirchhoff-Matrix-Satz.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Kirchhoff-Matrix-Satz (Matrix-Baum-Satz):
@@ -1182,7 +1182,7 @@ class GraphCombinatorics:
     def eulerian_circuit_exists(adj_matrix: list[list[int]]) -> bool:
         """
         @brief Prüft, ob der Graph einen Euler-Kreis besitzt.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Euler-Kreis-Satz (Euler 1736): Ein zusammenhängender Graph hat genau dann
@@ -1230,7 +1230,7 @@ class GraphCombinatorics:
     def hamiltonian_path_check(adj_matrix: list[list[int]]) -> bool:
         """
         @brief Prüft via Backtracking, ob der Graph einen Hamiltonpfad enthält.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Ein Hamiltonpfad besucht jeden Knoten genau einmal.
@@ -1280,7 +1280,7 @@ class GraphCombinatorics:
 class CombinatoricsOnWords:
     """
     @brief Kombinatorik auf Wörtern – Lyndon-Wörter, Halsketten, LCS, Edit-Distanz, De-Bruijn.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Ein Wort w über Alphabet Σ ist ein Element Σ*.
@@ -1293,7 +1293,7 @@ class CombinatoricsOnWords:
     def lyndon_word_check(word: str) -> bool:
         """
         @brief Prüft, ob ein Wort ein Lyndon-Wort ist.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Ein Lyndon-Wort ist ein nicht-leeres Wort w, das:
@@ -1323,7 +1323,7 @@ class CombinatoricsOnWords:
     def necklaces(n: int, k: int) -> int:
         """
         @brief Berechnet die Anzahl der Halsketten mit n Perlen aus k Farben (Burnside-Lemma).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Eine Halskette ist eine Äquivalenzklasse von Wörtern der Länge n unter Rotation.
@@ -1349,7 +1349,7 @@ class CombinatoricsOnWords:
     def primitive_word(word: str) -> bool:
         """
         @brief Prüft, ob ein Wort primitiv ist (keine echte Periode).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Ein Wort w ist primitiv, wenn kein echtes Teilwort u ≠ w und k ≥ 2 existiert
@@ -1380,7 +1380,7 @@ class CombinatoricsOnWords:
     def longest_common_subsequence(s1: str, s2: str) -> int:
         """
         @brief Berechnet die Länge der längsten gemeinsamen Teilfolge (LCS).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         LCS(s1, s2) = längste Folge, die in s1 und s2 als Teilfolge (nicht zwingend zusammenhängend)
@@ -1416,7 +1416,7 @@ class CombinatoricsOnWords:
     def edit_distance(s1: str, s2: str) -> int:
         """
         @brief Berechnet die Levenshtein-Distanz (Edit-Distanz) zwischen zwei Strings.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Die Edit-Distanz ist die minimale Anzahl von Einfügungen, Löschungen und
@@ -1471,7 +1471,7 @@ class CombinatoricsOnWords:
     def de_bruijn_sequence(n: int, k: int) -> str:
         """
         @brief Generiert eine De-Bruijn-Folge B(k, n) – enthält jedes k-mere der Länge n genau einmal.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Eine De-Bruijn-Folge der Ordnung n über einem k-elementigen Alphabet ist eine
@@ -1519,7 +1519,7 @@ class CombinatoricsOnWords:
 def fibonacci(n: int) -> int:
     """
     @brief Berechnet die n-te Fibonacci-Zahl via Matrix-Exponentiation in O(log n).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Fibonacci-Folge: F_0=0, F_1=1, F_n=F_{n-1}+F_{n-2}.
@@ -1574,7 +1574,7 @@ def fibonacci(n: int) -> int:
 def lucas_numbers(n: int) -> list[int]:
     """
     @brief Berechnet die ersten n Lucas-Zahlen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Lucas-Folge: L_0=2, L_1=1, L_n=L_{n-1}+L_{n-2}.
@@ -1600,7 +1600,7 @@ def lucas_numbers(n: int) -> list[int]:
 def tribonacci(n: int) -> list[int]:
     """
     @brief Berechnet die ersten n Tribonacci-Zahlen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Tribonacci-Folge: T_0=0, T_1=0, T_2=1, T_n=T_{n-1}+T_{n-2}+T_{n-3}.
@@ -1630,7 +1630,7 @@ def tribonacci(n: int) -> list[int]:
 def sylvester_sequence(n: int) -> list[int]:
     """
     @brief Berechnet die ersten n Glieder der Sylvester-Folge.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Sylvester-Folge: a_0=2, a_n=a_{n-1}·(a_{n-1}-1)+1 = a_0·a_1·...·a_{n-1}+1.
@@ -1660,7 +1660,7 @@ def sylvester_sequence(n: int) -> list[int]:
 def happy_numbers(n: int) -> list[int]:
     """
     @brief Findet alle Glückszahlen bis n.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Eine positive ganze Zahl ist glücklich (happy), wenn die iterierte Anwendung
@@ -1688,7 +1688,7 @@ def happy_numbers(n: int) -> list[int]:
 def collatz_tree(n_max: int) -> dict[int, list[int]]:
     """
     @brief Erstellt den Collatz-Baum als Dictionary für alle Startpunkte bis n_max.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Der Collatz-Baum zeigt, welche Zahlen direkt zu einem Knoten führen

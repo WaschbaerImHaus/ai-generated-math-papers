@@ -16,7 +16,7 @@
     - Mathematische Konstanten (Goldener Schnitt)
     - Metadaten (Autor, Version)
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-10
 @lastModified 2026-03-10
 """
@@ -154,7 +154,7 @@ INV_GOLDEN_RATIO: float = 2.0 / (1.0 + math.sqrt(5.0))  # ≈ 0.6180339887498949
 # ===========================================================================
 
 # Autor aller Quelldateien im Projekt
-AUTHOR: str = "Kurt Ingwer"
+AUTHOR: str = "Michael Fuhrmann"
 
 # Aktuelle Versionsnummer des Projekts (entspricht Build-Nummer)
 VERSION: str = "11.0"
@@ -184,7 +184,7 @@ def smart_simplify(expr) -> "sp.Expr":
 
     @param expr: SymPy-Ausdruck oder konvertierbarer Wert.
     @return: Vereinfachter SymPy-Ausdruck (oder unveränderter Eingabe bei Fehler).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Beispiele:
@@ -249,7 +249,7 @@ def auto_compute(expr, x_val: float) -> Union[float, complex]:
     @param expr: SymPy-Ausdruck oder Callable (f(x_val))
     @param x_val: Auswertungspunkt (reelle Zahl)
     @return: Numerischer Wert als float oder complex
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     import numpy as np

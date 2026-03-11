@@ -13,7 +13,7 @@
 
     Dieses Modul stellt numerische Werkzeuge bereit, um diese Probleme zu
     untersuchen, zu verstehen und empirisch zu testen.
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -255,7 +255,7 @@ def _sieve_of_eratosthenes(n: int) -> list:
 
     @param n Obergrenze (inklusive).
     @return Sortierte Liste aller Primzahlen ≤ n.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     if n < 2:
@@ -281,7 +281,7 @@ def _check_goldbach_worker(args: tuple) -> tuple | None:
         vom pickle-Modul serialisiert werden können (multiprocessing-Einschränkung).
     @param args Tupel (n, primes, prime_set)
     @return (n, p, q) bei Erfolg, None wenn keine Zerlegung gefunden.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     n, primes, prime_set = args
@@ -311,7 +311,7 @@ def goldbach_verification_range(n_max: int = 10000) -> dict:
 
     @param n_max Obergrenze (alle geraden n von 4 bis n_max werden geprüft).
     @return Dict mit 'verified_up_to', 'all_verified', 'failed', 'min_decompositions', 'workers_used'.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     import multiprocessing as mp

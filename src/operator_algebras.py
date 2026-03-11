@@ -17,7 +17,7 @@
     Matrizen (numpy arrays) repräsentiert. Dies ermöglicht
     numerische Verifikation der algebraischen Eigenschaften.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-10
 @lastModified 2026-03-10
 """
@@ -42,7 +42,7 @@ class CStarAlgebra:
         Das kanonische Beispiel ist die Algebra der n×n-Matrizen M_n(ℂ)
         mit konjugierter Transposition als Involution und Operatornorm.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -187,7 +187,7 @@ class VonNeumannAlgebra(CStarAlgebra):
         In endlichen Dimensionen: M = Matrizenalgebra, die unter
         Adjunktion und schwachem Abschluss (= normaler Abschluss) abgeschlossen ist.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """
@@ -357,7 +357,7 @@ class Projection(CStarAlgebra):
 
         Partiell-isometrische Operatoren: V mit V*V = P (Projektion).
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @date 2026-03-10
     @lastModified 2026-03-10
     """

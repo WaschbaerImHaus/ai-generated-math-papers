@@ -23,7 +23,7 @@
     Importiert gcd, extended_gcd, mod_inverse, is_prime aus den Kernmodulen.
     Ausgelagert aus algebra.py für bessere Modularität.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -62,7 +62,7 @@ def solve_linear_diophantine(a: int, b: int, c: int) -> tuple[int, int, int] | N
     @param c Rechte Seite.
     @return Tupel (x0, y0, gcd_ab) wobei (x0 + b/g*t, y0 - a/g*t) alle Lösungen sind,
             oder None wenn keine Lösung existiert.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Erweiterter Euklidischer Algorithmus liefert g, x', y' mit a*x' + b*y' = g
@@ -103,7 +103,7 @@ def solve_quadratic_diophantine_pell(D: int, n_solutions: int = 5) -> list[tuple
     @param n_solutions Anzahl der zu berechnenden Lösungen.
     @return Liste von (x, y) Tupeln, erste Lösungen der Pell-Gleichung.
     @raises ValueError Wenn D ein perfektes Quadrat ist.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # D darf kein perfektes Quadrat sein
@@ -176,7 +176,7 @@ def solve_pythagorean_triples(n: int) -> list[tuple[int, int, int]]:
 
     @param n Obere Schranke für die Hypotenuse c.
     @return Sortierte Liste von (a, b, c) Tupeln mit a < b < c.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Beispiele:
@@ -242,7 +242,7 @@ def solve_diophantine_two_squares(n: int) -> list[tuple[int, int]]:
 
     @param n Die zu zerlegende natürliche Zahl.
     @return Liste von (a, b) Tupeln mit a ≤ b und a² + b² = n, leer wenn nicht möglich.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     representations = []
@@ -284,7 +284,7 @@ def markov_numbers(n_terms: int = 20) -> list[int]:
 
     @param n_terms Anzahl der zu berechnenden Markov-Zahlen.
     @return Sortierte Liste der ersten n_terms Markov-Zahlen.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # BFS-Ansatz: Alle Tripel per Breitensuche erzeugen
@@ -343,7 +343,7 @@ def is_quadratic_residue(a: int, p: int) -> bool:
     @param a Die zu prüfende Zahl.
     @param p Ungerade Primzahl.
     @return True wenn a ein quadratischer Rest mod p ist.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Beispiele:
@@ -376,7 +376,7 @@ def quadratic_residues(p: int) -> list[int]:
 
     @param p Ungerade Primzahl.
     @return Sortierte Liste der quadratischen Reste mod p.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     residues = set()
@@ -406,7 +406,7 @@ def quadratic_reciprocity(p: int, q: int) -> dict[str, int | bool]:
     @param p Ungerade Primzahl.
     @param q Ungerade Primzahl (p ≠ q).
     @return Dict mit Legendre-Symbolen, Produkt, erwartetem Vorzeichen und Verifikation.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     def legendre_symbol(a: int, prime: int) -> int:
@@ -459,7 +459,7 @@ def tonelli_shanks(n: int, p: int) -> int | None:
     @param n Zahl deren Quadratwurzel gesucht wird.
     @param p Ungerade Primzahl.
     @return x mit x² ≡ n (mod p), oder None wenn n kein QR mod p ist.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     n = n % p
@@ -536,7 +536,7 @@ def cipolla_algorithm(n: int, p: int) -> int | None:
     @param n Zahl deren Quadratwurzel gesucht wird.
     @param p Ungerade Primzahl.
     @return x mit x² ≡ n (mod p), oder None wenn n kein QR mod p ist.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     n = n % p

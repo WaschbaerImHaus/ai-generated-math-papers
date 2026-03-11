@@ -13,7 +13,7 @@
                          condition_number, givens_rotation_matrix,
                          givens_qr_decomposition, givens_solve_least_squares
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 

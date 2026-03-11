@@ -15,7 +15,7 @@
 
     Verfügbare Module können mit list_modules() abgerufen werden.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-10
 @lastModified 2026-03-10
 """
@@ -172,5 +172,5 @@ def loaded_modules() -> list[str]:
 # Versionsinformation
 # ---------------------------------------------------------------------------
 __version__: str = "13.0"
-__author__: str = "Kurt Ingwer"
+__author__: str = "Michael Fuhrmann"
 __all__: list[str] = list(_MODULE_MAP.keys()) + ['list_modules', 'loaded_modules']

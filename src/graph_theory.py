@@ -2,7 +2,7 @@
 @file graph_theory.py
 @brief Graphentheorie – Graphen, Traversierungsalgorithmen, Spanning Trees,
        Graphenanalyse und kombinatorische Formeln.
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -18,7 +18,7 @@ from typing import Any
 class Graph:
     """
     @brief Ungerichteter oder gerichteter Graph G = (V, E).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Interne Darstellung: Adjazenzliste (dict: vertex → set of neighbors).
@@ -42,7 +42,7 @@ class Graph:
     def add_vertex(self, v: int | str) -> None:
         """
         @brief Fügt einen Knoten zum Graphen hinzu.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param v Knoten (beliebiger hashbarer Typ: int, str, tuple, ...).
@@ -54,7 +54,7 @@ class Graph:
     def add_edge(self, u: int | str, v: int | str, weight: float = 1.0) -> None:
         """
         @brief Fügt eine Kante (u,v) mit optionalem Gewicht hinzu.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Bei ungerichteten Graphen wird auch (v,u) hinzugefügt.
@@ -80,7 +80,7 @@ class Graph:
     def remove_vertex(self, v: int | str) -> None:
         """
         @brief Entfernt einen Knoten und alle angrenzenden Kanten.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         @param v Zu entfernender Knoten.
@@ -100,7 +100,7 @@ class Graph:
     def remove_edge(self, u: int | str, v: int | str) -> None:
         """
         @brief Entfernt die Kante (u,v).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Bei ungerichteten Graphen wird auch (v,u) entfernt.
@@ -127,7 +127,7 @@ class Graph:
     def edges(self) -> list[tuple]:
         """
         @brief Gibt alle Kanten als Liste von Tupeln zurück.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Bei ungerichteten Graphen wird jede Kante nur einmal zurückgegeben.
@@ -163,7 +163,7 @@ class Graph:
     def degree(self, v: int | str) -> int:
         """
         @brief Grad (Anzahl der Kanten) eines Knotens.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Bei gerichteten Graphen: Ausgangsgrad (out-degree).
@@ -178,7 +178,7 @@ class Graph:
     def degree_sequence(self) -> list[int]:
         """
         @brief Sortierte Liste aller Knotengrade (absteigend).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Die Gradfolge ist eine topologische Invariante des Graphen.
@@ -191,7 +191,7 @@ class Graph:
     def adjacency_matrix(self) -> list[list[float]]:
         """
         @brief Adjazenzmatrix als 2D-Liste.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         A[i][j] = Gewicht der Kante (v_i, v_j), oder 0 wenn keine Kante.
@@ -222,7 +222,7 @@ class Graph:
     def is_connected(self) -> bool:
         """
         @brief Prüft ob der Graph zusammenhängend ist.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Verwendet BFS von einem Startknoten. Ein Graph ist zusammenhängend,
@@ -261,7 +261,7 @@ class Graph:
     def connected_components(self) -> list[set]:
         """
         @brief Findet alle Zusammenhangskomponenten.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Verwendet wiederholte BFS für unbesuchte Knoten.
@@ -283,7 +283,7 @@ class Graph:
     def has_cycle(self) -> bool:
         """
         @brief Prüft ob der Graph einen Zyklus enthält.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         DFS-basierte Zykluserkennung:
@@ -326,7 +326,7 @@ class Graph:
     def is_tree(self) -> bool:
         """
         @brief Prüft ob der Graph ein Baum ist.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Ein Baum ist ein zusammenhängender, azyklischer Graph.
@@ -339,7 +339,7 @@ class Graph:
     def is_bipartite(self) -> bool:
         """
         @brief Prüft ob der Graph bipartit ist.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Ein Graph ist bipartit, wenn seine Knoten in zwei disjunkte Mengen A, B
@@ -375,7 +375,7 @@ class Graph:
     def complement(self) -> 'Graph':
         """
         @brief Erzeugt den Komplementgraphen.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Im Komplementgraphen G̅ sind genau diejenigen Paare verbunden,
@@ -407,7 +407,7 @@ class Graph:
     def subgraph(self, vertices: list[int | str]) -> 'Graph':
         """
         @brief Erzeugt den durch vertices induzierten Teilgraphen.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-10
 
         Der induzierte Teilgraph enthält alle Kanten aus G,
@@ -441,7 +441,7 @@ class Graph:
 def bfs(graph: Graph, start: int | str) -> dict[str, dict]:
     """
     @brief Breitensuche (Breadth-First Search).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     BFS erkundet alle Knoten schichtweise nach ihrer Entfernung vom Startknoten.
@@ -487,7 +487,7 @@ def bfs(graph: Graph, start: int | str) -> dict[str, dict]:
 def dfs(graph: Graph, start: int | str) -> dict[str, dict]:
     """
     @brief Tiefensuche (Depth-First Search).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     DFS erkundet Pfade so tief wie möglich, bevor es zurückspringt.
@@ -533,7 +533,7 @@ def dfs(graph: Graph, start: int | str) -> dict[str, dict]:
 def dijkstra(graph: Graph, start: int | str) -> dict[str, dict]:
     """
     @brief Dijkstra-Algorithmus für kürzeste Wege (nicht-negative Gewichte).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Findet die kürzesten Wege von einem Startknoten zu allen anderen Knoten.
@@ -592,7 +592,7 @@ def dijkstra(graph: Graph, start: int | str) -> dict[str, dict]:
 def bellman_ford(graph: Graph, start: int | str) -> dict[str, dict | bool]:
     """
     @brief Bellman-Ford-Algorithmus für kürzeste Wege.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Funktioniert auch mit negativen Kantengewichten und erkennt
@@ -643,7 +643,7 @@ def bellman_ford(graph: Graph, start: int | str) -> dict[str, dict | bool]:
 def floyd_warshall(graph: Graph) -> list[list[float]]:
     """
     @brief Floyd-Warshall-Algorithmus: Alle kürzesten Wege.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Berechnet die kürzesten Wege zwischen ALLEN Knotenpaaren.
@@ -693,7 +693,7 @@ def floyd_warshall(graph: Graph) -> list[list[float]]:
 def kruskal_mst(graph: Graph) -> Graph:
     """
     @brief Kruskal-Algorithmus: Minimaler Spannbaum.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Wählt iterativ die günstigste Kante, die keinen Zyklus erzeugt.
@@ -754,7 +754,7 @@ def kruskal_mst(graph: Graph) -> Graph:
 def prim_mst(graph: Graph, start: int | str | None = None) -> Graph:
     """
     @brief Prim-Algorithmus: Minimaler Spannbaum.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Startet von einem Knoten und wächst den MST durch sukzessives Hinzufügen
@@ -809,7 +809,7 @@ def prim_mst(graph: Graph, start: int | str | None = None) -> Graph:
 def topological_sort(graph: Graph) -> list[int | str]:
     """
     @brief Topologische Sortierung für gerichtete azyklische Graphen (DAGs).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Kahn-Algorithmus: Iterative Entfernung von Knoten mit Eingangsgrad 0.
@@ -861,7 +861,7 @@ def topological_sort(graph: Graph) -> list[int | str]:
 def chromatic_number_greedy(graph: Graph) -> int:
     """
     @brief Greedy-Algorithmus zur Bestimmung der chromatischen Zahl χ(G).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die chromatische Zahl χ(G) ist die minimale Anzahl Farben,
@@ -883,7 +883,7 @@ def chromatic_number_greedy(graph: Graph) -> int:
 def graph_coloring_greedy(graph: Graph) -> dict[int | str, int]:
     """
     @brief Greedy-Graph-Färbung.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Weist jedem Knoten die kleinste verfügbare Farbe zu,
@@ -915,7 +915,7 @@ def graph_coloring_greedy(graph: Graph) -> dict[int | str, int]:
 def is_eulerian(graph: Graph) -> dict[str, bool | list]:
     """
     @brief Prüft ob der Graph einen Euler-Kreis oder Euler-Pfad besitzt.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Euler-Kreis: Jede Kante genau einmal, Anfangs = Endknoten.
@@ -948,7 +948,7 @@ def is_eulerian(graph: Graph) -> dict[str, bool | list]:
 def is_hamiltonian_path(graph: Graph) -> dict[str, bool | list]:
     """
     @brief Sucht einen Hamiltonpfad (besucht alle Knoten genau einmal).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Das Hamiltonpfad-Problem ist NP-vollständig.
@@ -997,7 +997,7 @@ def is_hamiltonian_path(graph: Graph) -> dict[str, bool | list]:
 def clique_number(graph: Graph) -> int:
     """
     @brief Kliquenzahl ω(G): Größte vollständige Teilmenge.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Eine Clique ist eine vollständige Teilmenge (alle Paare verbunden).
@@ -1045,7 +1045,7 @@ def clique_number(graph: Graph) -> int:
 def independence_number(graph: Graph) -> int:
     """
     @brief Unabhängigkeitszahl α(G) = ω(Komplement(G)).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Eine unabhängige Menge enthält keine zwei benachbarten Knoten.
@@ -1064,7 +1064,7 @@ def independence_number(graph: Graph) -> int:
 def graph_density(graph: Graph) -> float:
     """
     @brief Dichte des Graphen: d = |E| / (|V|·(|V|-1)/2).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die Graphendichte gibt an, wie "vollständig" ein Graph ist.
@@ -1095,7 +1095,7 @@ def graph_density(graph: Graph) -> float:
 def complete_graph(n: int) -> Graph:
     """
     @brief K_n: Vollständiger Graph mit n Knoten.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     In K_n ist jeder Knoten mit jedem anderen verbunden.
@@ -1121,7 +1121,7 @@ def complete_graph(n: int) -> Graph:
 def cycle_graph(n: int) -> Graph:
     """
     @brief C_n: Kreisgraph mit n Knoten.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die n Knoten liegen auf einem Kreis: 0-1-2-...(n-1)-0.
@@ -1145,7 +1145,7 @@ def cycle_graph(n: int) -> Graph:
 def path_graph(n: int) -> Graph:
     """
     @brief P_n: Pfadgraph mit n Knoten.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die n Knoten liegen auf einem Pfad: 0-1-2-...(n-1).
@@ -1169,7 +1169,7 @@ def path_graph(n: int) -> Graph:
 def bipartite_complete_graph(m: int, n: int) -> Graph:
     """
     @brief K_{m,n}: Vollständiger bipartiter Graph.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Knoten: Gruppe A = {a0, ..., a(m-1)}, Gruppe B = {b0, ..., b(n-1)}.
@@ -1201,7 +1201,7 @@ def bipartite_complete_graph(m: int, n: int) -> Graph:
 def petersen_graph() -> Graph:
     """
     @brief Der Petersen-Graph.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Der Petersen-Graph ist ein klassisches Gegenbeispiel in der Graphentheorie.
@@ -1236,7 +1236,7 @@ def petersen_graph() -> Graph:
 def grid_graph(m: int, n: int) -> Graph:
     """
     @brief m×n Gittergraph.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Knoten: (i, j) mit 0 ≤ i < m und 0 ≤ j < n.
@@ -1273,7 +1273,7 @@ def grid_graph(m: int, n: int) -> Graph:
 def binomial_coefficient(n: int, k: int) -> int:
     """
     @brief Binomialkoeffizient C(n,k) = n! / (k! * (n-k)!).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Berechnet via dynamischer Programmierung (Pascalsches Dreieck)
@@ -1317,7 +1317,7 @@ def binomial_coefficient(n: int, k: int) -> int:
 def stirling_numbers_second_kind(n: int, k: int) -> int:
     """
     @brief Stirling-Zahlen zweiter Art S(n,k).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     S(n,k) ist die Anzahl der Möglichkeiten, eine n-elementige Menge
@@ -1354,7 +1354,7 @@ def stirling_numbers_second_kind(n: int, k: int) -> int:
 def bell_numbers(n: int) -> list[int]:
     """
     @brief Bell-Zahlen B_0, B_1, ..., B_n.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     B_n ist die Anzahl der Partitionen einer n-elementigen Menge.
@@ -1391,7 +1391,7 @@ def bell_numbers(n: int) -> list[int]:
 def catalan_number(n: int) -> int:
     """
     @brief Catalan-Zahl C_n = C(2n,n) / (n+1).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Die Catalan-Zahlen zählen viele kombinatorische Strukturen:
@@ -1424,7 +1424,7 @@ def catalan_number(n: int) -> int:
 def derangements(n: int) -> int:
     """
     @brief Anzahl der Permutationen ohne Fixpunkt (Subfakultät !n).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Eine Derangement ist eine Permutation σ mit σ(i) ≠ i für alle i.
@@ -1460,7 +1460,7 @@ def derangements(n: int) -> int:
 def partition_count(n: int) -> int:
     """
     @brief Anzahl der Ganzzahlpartitionen p(n).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     p(n) ist die Anzahl der Möglichkeiten, n als Summe positiver
@@ -1494,7 +1494,7 @@ def partition_count(n: int) -> int:
 def multinomial_coefficient(n: int, groups: list[int]) -> int:
     """
     @brief Multinomialkoeffizient n! / (k1! * k2! * ... * km!).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
 
     Verallgemeinert den Binomialkoeffizienten auf mehrere Gruppen.

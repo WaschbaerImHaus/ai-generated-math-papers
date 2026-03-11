@@ -33,7 +33,7 @@
 
     Minkowski-Metrik: g = diag(+1,-1,-1,-1)
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-11
 @version 1.0.0
 """
@@ -86,7 +86,7 @@ class PauliMatrices:
         @param i: Index 1, 2 oder 3.
         @return: 2×2 numpy-Array (komplex).
         @raises ValueError: Falls i ∉ {1, 2, 3}.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         if i not in (1, 2, 3):
@@ -108,7 +108,7 @@ class PauliMatrices:
         @param i: Erster Index (1, 2 oder 3).
         @param j: Zweiter Index (1, 2 oder 3).
         @return: 2×2 Kommutator-Matrix.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         sigma_i = PauliMatrices.sigma(i)
@@ -129,7 +129,7 @@ class PauliMatrices:
         @param i: Erster Index (1, 2 oder 3).
         @param j: Zweiter Index (1, 2 oder 3).
         @return: 2×2 Antikommutator-Matrix.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         sigma_i = PauliMatrices.sigma(i)
@@ -154,7 +154,7 @@ class PauliMatrices:
         @param axis: Rotationsachse n̂ (wird normiert).
         @param angle: Rotationswinkel θ in Bogenmaß.
         @return: 2×2 unitäre Matrix (SU(2)-Element).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         axis = np.asarray(axis, dtype=float)
@@ -207,7 +207,7 @@ class CliffordAlgebra:
         @brief Initialisiert die Clifford-Algebra Cl(p, q).
         @param p: Anzahl positiver Generatoren (eᵢ² = +1 für i ≤ p).
         @param q: Anzahl negativer Generatoren (eᵢ² = -1 für i > p).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         self.p = p  # positive Generatoren
@@ -238,7 +238,7 @@ class CliffordAlgebra:
             - Tensorprodukte für höhere Dimensionen
 
         @return: Liste von Gamma-Matrizen [γ₁, ..., γₙ].
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Pauli-Matrizen als Bausteine
@@ -312,7 +312,7 @@ class CliffordAlgebra:
         @param n: Gesamtanzahl Generatoren.
         @param p: Anzahl positiver Generatoren.
         @return: Liste von Gamma-Matrizen.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Matrixgröße: 2^⌈n/2⌉
@@ -356,7 +356,7 @@ class CliffordAlgebra:
                 γᵢγⱼ + γⱼγᵢ = 2η_{ij}·I
 
         @return: Liste von numpy-Arrays (Gamma-Matrizen).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         return [g.copy() for g in self._gamma_matrices]
@@ -371,7 +371,7 @@ class CliffordAlgebra:
         @param a: Erste Matrix (Clifford-Element in Matrixdarstellung).
         @param b: Zweite Matrix (Clifford-Element in Matrixdarstellung).
         @return: Produkt-Matrix a·b.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         return a @ b
@@ -389,7 +389,7 @@ class CliffordAlgebra:
 
         @param a: Matrix-Darstellung eines Clifford-Elements.
         @return: Matrix der Hauptinvolution.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Vereinfachte Implementierung: Konjugation mit erstem Gamma
@@ -417,7 +417,7 @@ class CliffordAlgebra:
 
         @param a: Matrix-Darstellung eines Clifford-Elements.
         @return: Matrix der Reversion.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Für hermitesche Gamma-Matrizen: Reversion ~ hermitesche Konjugation
@@ -427,7 +427,7 @@ class CliffordAlgebra:
         """
         @brief Prüft die Clifford-Algebra-Relationen {γᵢ, γⱼ} = 2ηᵢⱼ·I.
         @return: True, wenn alle Relationen erfüllt sind.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         gammas = self._gamma_matrices
@@ -478,7 +478,7 @@ class Spinor:
         @brief Initialisiert einen Spinor.
         @param components: Komplexe Komponenten des Spinors (ℂⁿ-Vektor).
         @param clifford_alg: Zugehörige Clifford-Algebra (Standard: Cl(1,3) für Dirac).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         self.components = np.asarray(components, dtype=complex)
@@ -492,7 +492,7 @@ class Spinor:
         """
         @brief Berechnet die Norm des Spinors: ||ψ|| = √(ψ†ψ).
         @return: Nicht-negative reelle Zahl.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # ψ†ψ = Σᵢ |ψᵢ|²
@@ -511,7 +511,7 @@ class Spinor:
             - ψ̄σ^{μν}ψ: Antisymmetrischer Tensor
 
         @return: Zeilenvektor ψ̄ = ψ†·γ⁰ als numpy-Array.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         gammas = self.clifford_alg.generators()
@@ -539,7 +539,7 @@ class Spinor:
 
         @param S: 4×4 (oder n×n) Matrix der Spinordarstellung.
         @return: Transformierter Spinor S·ψ.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         S = np.asarray(S, dtype=complex)
@@ -580,7 +580,7 @@ class DiracEquation:
         @brief Initialisiert die Dirac-Gleichung.
         @param mass: Ruhemasse des Teilchens (in natürlichen Einheiten: ℏ=c=1).
         @param dim: Spinor-Dimension (Standard: 4 für Dirac-Spinor in 4D).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         self.mass = float(mass)
@@ -603,7 +603,7 @@ class DiracEquation:
             mit Minkowski-Metrik g^{μν} = diag(+1,-1,-1,-1).
 
         @return: Liste [γ⁰, γ¹, γ², γ³].
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         I2 = np.eye(2, dtype=complex)
@@ -626,7 +626,7 @@ class DiracEquation:
         """
         @brief Gibt die vier Gamma-Matrizen γ⁰, γ¹, γ², γ³ zurück.
         @return: Liste [γ⁰, γ¹, γ², γ³] als numpy-Arrays.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         return [g.copy() for g in self._gammas]
@@ -642,7 +642,7 @@ class DiracEquation:
 
         @param momentum: Impulsvektor (3D).
         @return: Positive Energie E (float).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         p = np.asarray(momentum, dtype=float)
@@ -667,7 +667,7 @@ class DiracEquation:
         @param momentum: 3-Impuls (p₁, p₂, p₃).
         @param spin: 'up' oder 'down' für Spin-Eigenrichtung.
         @return: 4-komponentiger Dirac-Spinor u(p).
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         p = np.asarray(momentum, dtype=float)
@@ -712,7 +712,7 @@ class DiracEquation:
             mit Minkowski-Metrik g = diag(+1,-1,-1,-1).
 
         @return: True, wenn alle Clifford-Relationen erfüllt sind.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Minkowski-Metrik (Signatur +,-,-,-)

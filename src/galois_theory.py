@@ -28,7 +28,7 @@
     - Kreisteilungspolynome via Möbius-Formel
     - Minimalpolynome via SymPy-Annullierungsalgorithmus
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @version 1.0
 @since 2026-03-10
 @lastModified 2026-03-10
@@ -269,7 +269,7 @@ class FiniteField:
     @example
         GF(2^4) hat 16 Elemente, primitive Elemente erzeugen GF(16)^×.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -439,7 +439,7 @@ class FieldExtension:
         FieldExtension([−2, 0, 1]) → ℚ(√2), Grad 2
         FieldExtension([−2, 0, 0, 1]) → ℚ(∛2), Grad 3
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -645,7 +645,7 @@ class GaloisGroup:
         - Grad 4: S_4, A_4, D_4, ℤ/4ℤ, ℤ/2ℤ×ℤ/2ℤ
         - Grad 5+: Oft S_n oder A_n (nicht auflösbar für n ≥ 5)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 

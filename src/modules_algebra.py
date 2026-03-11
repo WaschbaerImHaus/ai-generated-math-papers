@@ -18,7 +18,7 @@
     Wichtigster Fall: M = ℤ^n / Im(A) für eine ganzzahlige Matrix A.
     Klassifikation durch Smith-Normalform: d_1 | d_2 | ... | d_r.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -778,7 +778,7 @@ class Module:
         R × M → M, die die Distributivgesetze erfüllt.
         Über ℤ sind Moduln dasselbe wie abelsche Gruppen.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 

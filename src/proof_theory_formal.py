@@ -10,7 +10,7 @@ Dieses Modul implementiert Kernkonzepte der formalen Beweistheorie nach Gentzen 
 - Ordinale Analyse (ε₀, Gentzen)
 - Reverse Mathematics (Big Five)
 
-@author: Kurt Ingwer
+@author: Michael Fuhrmann
 @version: 1.0
 @since: 2026-03-10
 @lastModified: 2026-03-10

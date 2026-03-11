@@ -16,7 +16,7 @@
     7. SetFamily        – Familie von Mengen, σ-Algebren
     8. Filter           – Mengentheoretischer Filter / Ultrafilter
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -41,7 +41,7 @@ class MathSet:
         B = MathSet([2, 3, 4])
         print(A | B)   # {1, 2, 3, 4}
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -252,7 +252,7 @@ class Relation:
         R = Relation({(1,1), (2,2), (3,3)}, A, A)
         print(R.is_reflexive())   # True
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -489,7 +489,7 @@ class MathFunction:
         f = MathFunction({1: 2, 2: 4, 3: 6}, A, B)
         print(f.is_bijective())  # True
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -933,7 +933,7 @@ class Ordinal:
     Darstellung:
         Ordinal(0), Ordinal(1), …, Ordinal('omega'), Ordinal('omega+1'), …
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -1476,7 +1476,7 @@ class SetFamily:
 
     Unterstützt: Vereinigung, Schnitt, Partition-Prüfung, σ-Algebra-Prüfung.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
@@ -1648,7 +1648,7 @@ class Filter:
     2. A∈F, A⊆B ⊆ U ⟹ B∈F  (Aufwärtsabgeschlossenheit)
     3. A,B∈F ⟹ A∩B∈F  (Schnitt-Abgeschlossenheit)
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
 
