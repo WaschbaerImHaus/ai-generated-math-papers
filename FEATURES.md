@@ -239,3 +239,38 @@ _(keine bekannten offenen Features mehr)_
 - [x] Funktionalanalysis (src/functional_analysis.py): Banach/Hilbert-Räume, lineare Operatoren, Spektraltheorie, Fixpunktsätze
 - [x] Partielle DGL (src/pde.py): Wärmegleichung, Wellengleichung, Laplace/Poisson, Schrödinger, FEM, Charakteristiken
 - [x] Operatoralgebren (src/operator_algebras.py): C*-Algebren, Von-Neumann-Algebren, Gelfand-Darstellung, K-Theorie
+
+### Builds 57-62 (2026-03-11)
+
+#### Sicherheit (Build 57)
+- [x] repl.py: Sicherheitsaudit-Kommentar erweitert (vollständige Dokumentation der Sicherheitseigenschaften)
+- [x] analysis.py: _safe_parse() loggt WARNING bei Fallback auf sympify() (verifiziert)
+
+#### Performance (Build 58)
+- [x] fourier.py: polynomial_multiply_fft() – FFT-basierte Polynommultiplikation O(n log n) via numpy.fft
+- [x] fourier.py: polynomial_multiply_naive() – O(n²) Referenzimplementierung für Vergleiche
+- [x] algebra_numbertheory.py: euler_phi() nutzt prime_factorization() mit @lru_cache (verifiziert)
+- [x] tensor_geometry.py: Christoffel-Symbol-Cache bereits implementiert (verifiziert)
+
+#### Architektur (Build 59)
+- [x] category_theory.py: Adjunction-Klasse (F ⊣ G, unit, counit, Dreieck-Identitäten)
+- [x] category_theory.py: DiscreteCategory-Klasse (nur Identitätsmorphismen)
+- [x] category_theory.py: FinSetCategory-Klasse (endliche Mengen, enumerate_functions)
+- [x] category_theory.py: discrete_category() Fabrikfunktion
+- [x] category_theory.py: yoneda_lemma_demo() Demonstration
+- [x] plugin_registry.py: DEFAULT_REGISTRY mit 25 weiteren Modulen erweitert
+
+#### Visualisierung (Build 60)
+- [x] visualization.py: plot_adaptive_grid() – Adaptiver Gitterplot via Bisektions-Strategie
+- [x] visualization.py: create_interactive_plot() – Interaktiver Plot mit matplotlib.widgets.Slider
+
+#### Mathematik (Build 61)
+- [x] arbitrary_precision.py: zeta_zeros_mpmath(n, prec) – Erste n Riemann-Nullstellen
+- [x] arbitrary_precision.py: verify_riemann_hypothesis_mpmath(N, prec) – Numerische RH-Verifikation
+- [x] arbitrary_precision.py: pi_mpmath(prec) – π auf prec Stellen
+- [x] notebook_utils.py: display_matrix_html(M) – IPython-kompatible Matrixanzeige
+- [x] notebook_utils.py: display_polynomial_latex(coeffs) – IPython-kompatible Polynomdarstellung
+
+#### Neue Papers – Satz von Wilson (Build 62)
+- [x] papers/batch2/paper8_wilson_theorem.tex (EN): 5 Sätze (Wilson, Fakultätsrest, Primzahlpotenzen, Quotient, allgemein)
+- [x] papers/batch2/paper8_wilson_satz_de.tex (DE): Vollständige deutsche Übersetzung

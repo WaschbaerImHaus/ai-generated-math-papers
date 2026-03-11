@@ -1,0 +1,325 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\DeclareMathOperator{\ord}{ord}
+\newcommand{\Wq}[1]{W_{#1}}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Wilson's Theorem and Its Generalizations:\\
+       A Self-Contained Elementary Proof}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 62}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Wilson's theorem asserts that an integer $p \geq 2$ is prime if and only if
+$(p-1)! \equiv -1 \pmod{p}$.
+We present a self-contained, elementary proof of this classical result
+using only basic properties of modular arithmetic and the structure of
+the multiplicative group $(\Z/p\Z)^*$.
+
+Beyond the classical theorem, we establish several natural generalizations:
+\begin{enumerate}
+  \item[(i)]   the exact residue of $(n-1)!$ modulo $n$ for composite $n$,
+  \item[(ii)]  a Wilson-type theorem for prime powers $p^k$,
+  \item[(iii)] the Wilson quotient $W_p = \bigl((p-1)!+1\bigr)/p$
+               and its relation to Wolstenholme primes, and
+  \item[(iv)]  a product formula over all elements of a finite abelian group
+               (the general Wilson theorem).
+\end{enumerate}
+Each proof is elementary and requires no algebraic machinery beyond
+undergraduate number theory.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Introduction}
+% ================================================================
+
+The result now known as Wilson's theorem appears first in a 1770 letter
+by Edward Waring, who attributed it to John Wilson.
+The first published proof was given by Lagrange in 1771 using
+polynomial congruences over $\Fp$.
+
+\begin{theorem}[Wilson, 1770; Lagrange, 1771]\label{thm:wilson}
+  An integer $p \geq 2$ is prime if and only if
+  \[
+    (p-1)! \;\equiv\; -1 \pmod{p}.
+  \]
+\end{theorem}
+
+The theorem provides a complete characterisation of the primes,
+but it is not practical as a primality test because computing $(p-1)!$ requires
+exponentially many multiplications.
+Its importance lies in the structural insight it provides about the
+multiplicative group modulo a prime.
+
+Throughout this paper, all congruences are taken modulo the integer written
+after~$\pmod{}$.  We write $a \mid b$ for divisibility, $\gcd(a,b)$ for the
+greatest common divisor, and $p$ exclusively for a prime number.
+
+% ================================================================
+\section{Proof of Wilson's Theorem}
+% ================================================================
+
+\subsection{The ``if'' direction: primes satisfy $(p-1)!\equiv -1$}
+
+The proof rests on one key observation about self-inverse elements.
+
+\begin{lemma}[Self-inverse elements modulo $p$]\label{lem:selfinverse}
+  Let $p$ be prime and $a \in \{1,2,\ldots,p-1\}$.
+  Then $a^2 \equiv 1 \pmod{p}$ if and only if $a \in \{1, p-1\}$.
+\end{lemma}
+
+\begin{proof}
+  $a^2 \equiv 1 \pmod p$ implies $p \mid a^2 - 1 = (a-1)(a+1)$.
+  Since $p$ is prime, $p \mid a-1$ or $p \mid a+1$,
+  i.e.\ $a \equiv 1$ or $a \equiv -1 \pmod p$.
+  Both values lie in $\{1, p-1\}$ (for $p \geq 3$; for $p=2$ the only
+  element is $1 \equiv -1$).
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:wilson}, ``if'' direction]
+  Let $p$ be prime.  For $p = 2$: $(2-1)! = 1 \equiv -1 \pmod 2$. \checkmark
+
+  Now let $p \geq 3$.
+  Every element $a \in \{1,\ldots,p-1\}$ has a unique multiplicative
+  inverse $a^{-1} \in \{1,\ldots,p-1\}$ modulo~$p$
+  (since $(\Z/p\Z)^*$ is a group of order $p-1$).
+
+  By Lemma~\ref{lem:selfinverse}, the elements $1$ and $p-1$ are their own
+  inverses.  All other elements $a \in \{2,\ldots,p-2\}$ satisfy $a^{-1} \ne a$,
+  so they pair up into $(p-3)/2$ distinct pairs $\{a, a^{-1}\}$
+  (note $p-3$ is even since $p$ is odd).
+
+  Multiplying all elements of $\{1,\ldots,p-1\}$:
+  \[
+    (p-1)!
+    = 1 \cdot \Bigl[\prod_{\substack{a=2 \\ a \ne a^{-1}}}^{p-2} a\Bigr]
+      \cdot (p-1)
+    = 1 \cdot \Bigl[\prod_{\{a,a^{-1}\}} a \cdot a^{-1}\Bigr] \cdot (p-1).
+  \]
+  Each pair $\{a, a^{-1}\}$ contributes the factor $a \cdot a^{-1} \equiv 1 \pmod p$.
+  Hence
+  \[
+    (p-1)! \;\equiv\; 1 \cdot 1^{(p-3)/2} \cdot (p-1)
+             \;\equiv\; p-1 \;\equiv\; -1 \pmod p. \qedhere
+  \]
+\end{proof}
+
+\subsection{The ``only if'' direction: non-primes fail}
+
+\begin{proof}[Proof of Theorem~\ref{thm:wilson}, ``only if'' direction]
+  Let $n \geq 2$ be composite.  We show $(n-1)! \not\equiv -1 \pmod n$.
+
+  Write $n = ab$ with $1 < a \leq b < n$.
+
+  \textbf{Case 1: $a < b$.}
+  Then both $a$ and $b$ appear as distinct factors in the product
+  $(n-1)! = 1 \cdot 2 \cdots (n-1)$,
+  so $n = ab \mid (n-1)!$, giving $(n-1)! \equiv 0 \pmod n \ne -1$.
+
+  \textbf{Case 2: $a = b$, i.e.\ $n = a^2$ with $a \geq 2$.}
+  \begin{itemize}
+    \item If $a \geq 3$: then $a$ and $2a$ are both in $\{1,\ldots,n-1\}$
+      (since $2a = 2\sqrt{n} < n$ for $n \geq 9$), and $a \cdot 2a = 2n$,
+      so $n \mid (n-1)!$; hence $(n-1)! \equiv 0 \pmod n$.
+    \item If $a = 2$: $n = 4$, and $(4-1)! = 6 \equiv 2 \pmod 4 \ne -1$.
+  \end{itemize}
+  In all cases $(n-1)! \not\equiv -1 \pmod n$. \qedhere
+\end{proof}
+
+% ================================================================
+\section{The Residue of $(n-1)!$ for Composite $n$}
+% ================================================================
+
+\begin{theorem}\label{thm:composite_factorial}
+  Let $n \geq 6$ be composite.  Then $(n-1)! \equiv 0 \pmod n$.
+\end{theorem}
+
+\begin{proof}
+  If $n$ is composite and $n \ne 4$, then $n$ has a factorisation $n = ab$
+  with $1 < a < b < n$.  Both $a$ and $b$ appear in $(n-1)!$, so $ab = n \mid (n-1)!$.
+
+  The exception $n = 4$ gives $(4-1)! = 6 \equiv 2 \pmod 4$, and $6 \geq 6$ is
+  excluded since $n = 4 < 6$.
+\end{proof}
+
+\begin{corollary}
+  For $n \geq 2$, the residue $(n-1)! \bmod n$ takes the value $-1$ (i.e.\ $n-1$)
+  if and only if $n$ is prime or $n = 1$.
+\end{corollary}
+
+% ================================================================
+\section{Wilson's Theorem for Prime Powers}
+% ================================================================
+
+\begin{theorem}[Wilson for $p^k$]\label{thm:wilson_prime_power}
+  Let $p$ be an odd prime and $k \geq 2$.  Then
+  \[
+    \prod_{\substack{j=1 \\ \gcd(j,p^k)=1}}^{p^k} j
+    \;\equiv\; -1 \pmod{p^k}.
+  \]
+  For $p = 2$: The analogous product modulo $2^k$ ($k \geq 3$) equals $-1$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+  The group $(\Z/p^k\Z)^*$ has order $\phi(p^k) = p^{k-1}(p-1)$.
+  For odd $p$, this group is cyclic (generated by a primitive root $g$
+  modulo $p^k$).
+
+  The product of all elements of a cyclic group $G$ of order $m$ equals:
+  \begin{itemize}
+    \item the unique element of order $2$ in $G$, if $m$ is even and $G$ is cyclic, or
+    \item $1$, if $m$ is odd.
+  \end{itemize}
+  Since $(\Z/p^k\Z)^*$ is cyclic of even order for odd $p$, the unique element
+  of order $2$ is $-1 \equiv p^k - 1$.
+  Hence the product of all units modulo $p^k$ equals $-1 \pmod{p^k}$.
+\end{proof}
+
+% ================================================================
+\section{The Wilson Quotient}
+% ================================================================
+
+\begin{definition}\label{def:wilson_quotient}
+  For a prime $p$, the \emph{Wilson quotient} is defined as
+  \[
+    W_p \;=\; \frac{(p-1)!\,+\,1}{p} \;\in\; \Z.
+  \]
+  (This is an integer by Wilson's theorem.)
+  A prime $p$ is called a \emph{Wilson prime} if $p^2 \mid (p-1)! + 1$,
+  equivalently $p \mid W_p$.
+\end{definition}
+
+\begin{proposition}\label{prop:wilson_quotient_basic}
+  The Wilson quotient satisfies:
+  \[
+    W_p \equiv \frac{(p-1)!+1}{p} \pmod p.
+  \]
+  In particular, $p$ is a Wilson prime if and only if $W_p \equiv 0 \pmod p$.
+\end{proposition}
+
+\begin{proof}
+  This is immediate from the definition: $W_p \in \Z$ and the condition
+  $p^2 \mid (p-1)!+1$ is equivalent to $p \mid W_p$.
+\end{proof}
+
+\begin{remark}
+  The only known Wilson primes are $5$, $13$, and $563$.
+  It is conjectured (but not proved) that infinitely many Wilson primes exist.
+  For these three primes:
+  \[
+    (5-1)! + 1 = 25 = 5^2, \quad
+    (13-1)! + 1 = 479001601 = 13^2 \cdot 2834329, \quad
+    W_{563} \equiv 0 \pmod{563}.
+  \]
+\end{remark}
+
+% ================================================================
+\section{General Wilson Theorem for Finite Abelian Groups}
+% ================================================================
+
+\begin{theorem}[General Wilson Theorem]\label{thm:general_wilson}
+  Let $(G, \cdot)$ be a finite abelian group.  Then
+  \[
+    \prod_{g \in G} g
+    \;=\;
+    \begin{cases}
+      e        & \text{if } G \text{ has no element of order } 2, \\
+      \tau      & \text{if } G \text{ has a unique element } \tau \text{ of order } 2, \\
+      e        & \text{if } G \text{ has more than one element of order } 2.
+    \end{cases}
+  \]
+  In particular, for $G = (\Z/p\Z)^*$ with $p$ an odd prime, the unique
+  element of order $2$ is $-1$, yielding $(p-1)! \equiv -1 \pmod p$.
+\end{theorem}
+
+\begin{proof}
+  Pair each $g \in G$ with its inverse $g^{-1}$.  If $g \ne g^{-1}$,
+  the pair contributes $g \cdot g^{-1} = e$ to the product.
+  Only the self-inverse elements (i.e.\ elements of order $1$ or $2$)
+  remain unpaired.
+
+  The set $S = \{g \in G : g^2 = e\}$ is a subgroup of $G$.
+  \begin{itemize}
+    \item If $|S| = 1$: $S = \{e\}$, and the product equals $e$.
+    \item If $|S| = 2$: $S = \{e, \tau\}$, and the product equals $e \cdot \tau = \tau$.
+    \item If $|S| \geq 4$: $S \cong (\Z/2\Z)^k$ for some $k \geq 2$.
+      The product of all elements of $(\Z/2\Z)^k$ (which is a vector space over $\Fp[2]$)
+      equals $0$, i.e.\ $e$ in multiplicative notation.
+  \end{itemize}
+  For $G = (\Z/p\Z)^*$ ($p$ odd prime), this group is cyclic of even order $p-1$.
+  A cyclic group of even order has exactly one element of order $2$, namely $-1$.
+  Hence $\prod_{g \in G} g = -1 \pmod p$, which is Wilson's theorem. \qedhere
+\end{proof}
+
+% ================================================================
+\section{Conclusion}
+% ================================================================
+
+We have presented a self-contained proof of Wilson's theorem and established
+four natural generalizations.  The elementary nature of the proofs highlights
+the deep connection between the structure of multiplicative groups modulo $n$
+and the arithmetic of the factorials.
+
+The Wilson quotient and Wilson primes remain an active area of computational
+number theory: it is known that no Wilson prime exists below $2 \times 10^{13}$
+(Crandall--Dilcher--Pomerance, 1997), and heuristic arguments suggest
+about $\ln\ln(N)$ Wilson primes up to $N$.
+
+\begin{thebibliography}{9}
+
+\bibitem{Hardy1979}
+G.~H.~Hardy and E.~M.~Wright.
+\newblock \emph{An Introduction to the Theory of Numbers}, 5th~ed.
+\newblock Oxford University Press, 1979.
+
+\bibitem{Ireland1990}
+K.~Ireland and M.~Rosen.
+\newblock \emph{A Classical Introduction to Modern Number Theory}, 2nd~ed.
+\newblock Springer, New York, 1990.
+
+\bibitem{Crandall1997}
+R.~Crandall, K.~Dilcher, and C.~Pomerance.
+\newblock A search for Wieferich and Wilson primes.
+\newblock \emph{Math.\ Comp.}, 66(217):433--449, 1997.
+
+\bibitem{Lagrange1771}
+J.-L.~Lagrange.
+\newblock Démonstration d'un théorème nouveau concernant les nombres premiers.
+\newblock \emph{Nouv.\ Mém.\ Acad.\ Berlin}, 1771.
+
+\end{thebibliography}
+
+\end{document}

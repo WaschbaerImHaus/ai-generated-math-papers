@@ -132,3 +132,67 @@
     BUG-006: Bednarek-Autorenzuschreibung
     BUG-008: Saubere Fallunterscheidung ohne "Hmm"-Kommentar
     BUG-009: \euler → \varphi, redundanter Term entfernt
+
+2026-03-11 08:49 - Build 57: Sicherheits-Audit repl.py
+  - repl.py: Sicherheitsaudit erweitert (Build 57)
+    * Kein Zugriff auf Dateisystem/Netzwerk durch Benutzereingaben
+    * Integer-Parsing ohne Overflow-Risiko
+    * Audit-Ergebnis: Keine Sicherheitslücken (Stand Build 57)
+  - analysis.py: _safe_parse() loggt Fallback auf sp.sympify() bei WARNING-Level (bereits in Build 49 implementiert, verifiziert)
+  - Alle 7061 Tests grün
+
+2026-03-11 08:49 - Build 58: Performance-Optimierungen
+  - fourier.py: polynomial_multiply_fft() – FFT-basierte Polynommultiplikation O(n log n)
+    * numpy.fft.fft + zero-padding auf Zweierpotenz
+    * polynomial_multiply_naive() als O(n²) Referenzimplementierung
+  - algebra_numbertheory.py: euler_phi() nutzt prime_factorization() mit @lru_cache (verifiziert)
+  - tensor_geometry.py: christoffel_symbols() Manueller Cache bereits vorhanden (verifiziert)
+  - 7 neue Tests in test_fourier.py (TestPolynomialMultiplyFFT)
+  - Alle 7068 Tests grün
+
+2026-03-11 08:49 - Build 59: Architektur-Erweiterungen
+  - category_theory.py: Neue Klassen und Funktionen:
+    * Adjunction: Adjunktion F ⊣ G mit unit/counit und Dreieck-Identitäten
+    * DiscreteCategory: Nur Identitätsmorphismen, lehnt andere ab
+    * FinSetCategory: Kategorie endlicher Mengen mit enumerate_functions()
+    * discrete_category(): Fabrik-Funktion für diskrete Kategorien
+    * yoneda_lemma_demo(): Demonstration des Yoneda-Lemmas
+  - plugin_registry.py: DEFAULT_REGISTRY erweitert mit 25 neuen Modulen
+    (category_theory, algebraic_structures, galois_theory, etc.)
+  - 19 neue Tests in test_category_theory.py
+  - Alle 7090 Tests grün
+
+2026-03-11 08:49 - Build 60: Visualisierung
+  - visualization.py: 2 neue Plot-Funktionen:
+    * plot_adaptive_grid(): Adaptiver Gitterplot mit Bisektions-Strategie
+      - Verfeinert nahe Nullstellen (Vorzeichenwechsel), Singularitäten, Extrema
+      - Stack-basierter Algorithmus (keine Rekursion)
+    * create_interactive_plot(): Interaktiver Plot mit matplotlib.widgets.Slider
+      - f(x, param) mit einstellbarem Parameter-Slider
+      - Headless-kompatibel (Agg-Backend)
+  - 5 neue Tests in test_visualization.py
+  - Alle 7095 Tests grün
+
+2026-03-11 08:49 - Build 61: Mathematik-Erweiterungen
+  - arbitrary_precision.py: 3 neue Funktionen:
+    * zeta_zeros_mpmath(n, prec): Erste n Riemann-Nullstellen via mpmath.zetazero()
+    * verify_riemann_hypothesis_mpmath(N, prec): Prüft Re(s)=1/2 für erste N Nullstellen
+    * pi_mpmath(prec): π auf prec Stellen (Chudnovsky-Algorithmus intern)
+  - notebook_utils.py: 2 neue Funktionen:
+    * display_matrix_html(M): IPython.display + HTML-Tabelle für Matrizen
+    * display_polynomial_latex(coeffs, variable): IPython.display.Math für Polynome
+  - 16 neue Tests (8 in test_arbitrary_precision.py, 8 in test_notebook_utils.py)
+  - Alle 7111 Tests grün
+
+2026-03-11 08:49 - Build 62: Neues Beweisthema – Satz von Wilson
+  - Thema gewählt: Satz von Wilson und Verallgemeinerungen
+    (Schöne elementare Beweise, zahlentheoretisch interessant, nicht trivial)
+  - papers/batch2/paper8_wilson_theorem.tex (EN): 5 Sätze:
+    1. Wilson's Theorem (vollständiger Beweis mit Lemma über selbst-inverse Elemente)
+    2. Rest von (n-1)! für zusammengesetzte n ≥ 6 ist 0
+    3. Wilson-Satz für Primzahlpotenzen p^k
+    4. Wilson-Quotient W_p und Wilson-Primzahlen
+    5. Allgemeiner Wilson-Satz für endliche abelsche Gruppen
+  - papers/batch2/paper8_wilson_satz_de.tex (DE): Vollständige deutsche Übersetzung
+  - tests/test_config.py: Korrektur: AUTHOR-Test auf 'Michael Fuhrmann' (nicht 'Kurt Ingwer')
+  - Alle 7111 Tests grün

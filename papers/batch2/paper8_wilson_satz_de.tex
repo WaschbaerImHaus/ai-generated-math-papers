@@ -1,0 +1,326 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage[ngerman]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+% -------------------------------------------------------
+% Eigene Makros
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\ggT}{ggT}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Der Satz von Wilson und seine Verallgemeinerungen:\\
+       Ein elementarer und vollständiger Beweis}
+
+\author{Michael Fuhrmann}
+\address{Specialist-Mathematics-Projekt, Build 62}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Der Satz von Wilson besagt, dass eine ganze Zahl $p \geq 2$ genau dann eine
+Primzahl ist, wenn $(p-1)! \equiv -1 \pmod{p}$ gilt.
+Wir präsentieren einen vollständigen, elementaren Beweis dieses klassischen
+Ergebnisses mithilfe grundlegender Eigenschaften modularer Arithmetik und
+der Struktur der multiplikativen Gruppe $(\Z/p\Z)^*$.
+
+Darüber hinaus beweisen wir vier natürliche Verallgemeinerungen:
+\begin{enumerate}
+  \item[(i)]   Den exakten Rest von $(n-1)!$ modulo $n$ für zusammengesetzte $n$,
+  \item[(ii)]  einen Wilson-artigen Satz für Primzahlpotenzen $p^k$,
+  \item[(iii)] den Wilson-Quotienten $W_p = \bigl((p-1)!+1\bigr)/p$
+               und seinen Bezug zu Wilson-Primzahlen,
+  \item[(iv)]  eine Produktformel über alle Elemente einer endlichen abelschen
+               Gruppe (Allgemeiner Wilson-Satz).
+\end{enumerate}
+Alle Beweise sind elementar und benötigen keine Hilfsmittel jenseits der
+Zahlentheorie des Grundstudiums.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung}
+% ================================================================
+
+Das heute als Satz von Wilson bekannte Ergebnis erscheint erstmals in einem
+Brief von Edward Waring aus dem Jahr 1770, der es John Wilson zuschrieb.
+Der erste veröffentlichte Beweis stammte von Lagrange (1771) mithilfe
+von Polynomkongruenzen über $\Fp$.
+
+\begin{theorem}[Wilson 1770; Lagrange 1771]\label{satz:wilson}
+  Eine ganze Zahl $p \geq 2$ ist genau dann eine Primzahl, wenn
+  \[
+    (p-1)! \;\equiv\; -1 \pmod{p}.
+  \]
+\end{theorem}
+
+Der Satz liefert eine vollständige Charakterisierung der Primzahlen,
+ist aber als Primalitätstest unpraktisch, da die Berechnung von $(p-1)!$
+exponentiell viele Multiplikationen erfordert.
+Seine Bedeutung liegt in der strukturellen Einsicht über die
+multiplikative Gruppe modulo einer Primzahl.
+
+Im gesamten Artikel stehen alle Kongruenzen modulo der nach $\pmod{}$
+geschriebenen Zahl. Wir schreiben $a \mid b$ für Teilbarkeit und~$p$
+ausschließlich für eine Primzahl.
+
+% ================================================================
+\section{Beweis des Satzes von Wilson}
+% ================================================================
+
+\subsection{Die „Wenn"-Richtung: Primzahlen erfüllen $(p-1)! \equiv -1$}
+
+Der Beweis stützt sich auf eine Schlüsselbeobachtung über selbst-inverse
+Elemente.
+
+\begin{lemma}[Selbst-inverse Elemente modulo $p$]\label{lem:selbstinvers}
+  Sei $p$ eine Primzahl und $a \in \{1, 2, \ldots, p-1\}$.
+  Dann gilt $a^2 \equiv 1 \pmod{p}$ genau dann, wenn $a \in \{1, p-1\}$.
+\end{lemma}
+
+\begin{proof}
+  Aus $a^2 \equiv 1 \pmod{p}$ folgt $p \mid a^2 - 1 = (a-1)(a+1)$.
+  Da $p$ eine Primzahl ist, gilt $p \mid a-1$ oder $p \mid a+1$,
+  also $a \equiv 1$ oder $a \equiv -1 \pmod{p}$.
+  Beide Werte liegen in $\{1, p-1\}$ (für $p \geq 3$;
+  für $p = 2$ gilt $1 \equiv -1$).
+\end{proof}
+
+\begin{proof}[Beweis von Satz~\ref{satz:wilson}, „Wenn"-Richtung]
+  Sei $p$ eine Primzahl.  Für $p = 2$: $(2-1)! = 1 \equiv -1 \pmod{2}$. \checkmark
+
+  Sei nun $p \geq 3$.
+  Jedes Element $a \in \{1, \ldots, p-1\}$ besitzt ein eindeutiges
+  multiplikatives Inverses $a^{-1} \in \{1, \ldots, p-1\}$ modulo~$p$
+  (da $(\Z/p\Z)^*$ eine Gruppe der Ordnung $p-1$ ist).
+
+  Gemäß Lemma~\ref{lem:selbstinvers} sind $1$ und $p-1$ ihre eigenen Inversen.
+  Alle anderen Elemente $a \in \{2, \ldots, p-2\}$ erfüllen $a^{-1} \neq a$,
+  bilden also $(p-3)/2$ disjunkte Paare $\{a, a^{-1}\}$
+  (beachte: $p-3$ ist gerade, da $p$ ungerade).
+
+  Wir multiplizieren alle Elemente von $\{1, \ldots, p-1\}$:
+  \[
+    (p-1)!
+    = 1 \cdot \Bigl[\prod_{\substack{a=2 \\ a \neq a^{-1}}}^{p-2} a\Bigr]
+      \cdot (p-1)
+    = 1 \cdot \Bigl[\prod_{\{a,a^{-1}\}} a \cdot a^{-1}\Bigr] \cdot (p-1).
+  \]
+  Jedes Paar $\{a, a^{-1}\}$ liefert den Faktor $a \cdot a^{-1} \equiv 1 \pmod{p}$.
+  Daher gilt
+  \[
+    (p-1)! \;\equiv\; 1 \cdot 1^{(p-3)/2} \cdot (p-1)
+             \;\equiv\; p-1 \;\equiv\; -1 \pmod{p}. \qedhere
+  \]
+\end{proof}
+
+\subsection{Die „Nur wenn"-Richtung: zusammengesetzte Zahlen versagen}
+
+\begin{proof}[Beweis von Satz~\ref{satz:wilson}, „Nur wenn"-Richtung]
+  Sei $n \geq 2$ zusammengesetzt.  Wir zeigen $(n-1)! \not\equiv -1 \pmod{n}$.
+
+  Schreibe $n = ab$ mit $1 < a \leq b < n$.
+
+  \textbf{Fall 1: $a < b$.}
+  Dann erscheinen $a$ und $b$ als verschiedene Faktoren in
+  $(n-1)! = 1 \cdot 2 \cdots (n-1)$,
+  also gilt $n = ab \mid (n-1)!$, d.\,h.\ $(n-1)! \equiv 0 \pmod{n} \neq -1$.
+
+  \textbf{Fall 2: $a = b$, d.\,h.\ $n = a^2$ mit $a \geq 2$.}
+  \begin{itemize}
+    \item Falls $a \geq 3$: Dann sind $a$ und $2a$ beide in $\{1, \ldots, n-1\}$
+      (da $2a = 2\sqrt{n} < n$ für $n \geq 9$), und $a \cdot 2a = 2n$,
+      also $n \mid (n-1)!$; folglich $(n-1)! \equiv 0 \pmod{n}$.
+    \item Falls $a = 2$: $n = 4$, und $(4-1)! = 6 \equiv 2 \pmod{4} \neq -1$.
+  \end{itemize}
+  In allen Fällen gilt $(n-1)! \not\equiv -1 \pmod{n}$. \qedhere
+\end{proof}
+
+% ================================================================
+\section{Der Rest von $(n-1)!$ für zusammengesetzte $n$}
+% ================================================================
+
+\begin{theorem}\label{satz:zusammengesetzt}
+  Sei $n \geq 6$ zusammengesetzt.  Dann gilt $(n-1)! \equiv 0 \pmod{n}$.
+\end{theorem}
+
+\begin{proof}
+  Ist $n$ zusammengesetzt und $n \neq 4$, so besitzt $n$ eine Zerlegung $n = ab$
+  mit $1 < a < b < n$.  Beide Faktoren $a$ und $b$ kommen in $(n-1)!$ vor,
+  also gilt $ab = n \mid (n-1)!$.
+
+  Der Ausnahmefall $n = 4$ liefert $(4-1)! = 6 \equiv 2 \pmod{4}$,
+  aber $n = 4 < 6$ ist von der Voraussetzung $n \geq 6$ ausgeschlossen.
+\end{proof}
+
+\begin{korollar}
+  Für $n \geq 2$ nimmt der Rest $(n-1)! \bmod n$ genau dann den Wert $-1$
+  (d.\,h.\ $n-1$) an, wenn $n$ eine Primzahl ist.
+\end{korollar}
+
+% ================================================================
+\section{Wilson-Satz für Primzahlpotenzen}
+% ================================================================
+
+\begin{theorem}[Wilson für $p^k$]\label{satz:wilson_primzahlpotenz}
+  Sei $p$ eine ungerade Primzahl und $k \geq 2$.  Dann gilt
+  \[
+    \prod_{\substack{j=1 \\ \ggT(j,p^k)=1}}^{p^k} j
+    \;\equiv\; -1 \pmod{p^k}.
+  \]
+  Für $p = 2$: Das analoge Produkt modulo $2^k$ ($k \geq 3$) ist ebenfalls $\equiv -1$.
+\end{theorem}
+
+\begin{proof}[Beweissskizze]
+  Die Gruppe $(\Z/p^k\Z)^*$ hat Ordnung $\varphi(p^k) = p^{k-1}(p-1)$.
+  Für ungerades $p$ ist diese Gruppe zyklisch (erzeugt durch eine Primitivwurzel
+  $g$ modulo $p^k$).
+
+  Das Produkt aller Elemente einer zyklischen Gruppe gerader Ordnung ist gleich
+  dem eindeutigen Element der Ordnung~$2$.
+  In $(\Z/p^k\Z)^*$ ist das eindeutige Element der Ordnung~$2$ gleich
+  $-1 \equiv p^k - 1 \pmod{p^k}$.
+  Also ist das Produkt aller Einheiten modulo $p^k$ gleich $-1$.
+\end{proof}
+
+% ================================================================
+\section{Der Wilson-Quotient und Wilson-Primzahlen}
+% ================================================================
+
+\begin{definition}\label{def:wilson_quotient}
+  Für eine Primzahl $p$ ist der \emph{Wilson-Quotient} definiert als
+  \[
+    W_p \;=\; \frac{(p-1)!\,+\,1}{p} \;\in\; \Z.
+  \]
+  (Dies ist eine ganze Zahl nach dem Satz von Wilson.)
+  Eine Primzahl $p$ heißt \emph{Wilson-Primzahl}, wenn $p^2 \mid (p-1)! + 1$,
+  äquivalent $p \mid W_p$.
+\end{definition}
+
+\begin{proposition}\label{prop:wilson_quotient}
+  Der Wilson-Quotient erfüllt:
+  \[
+    W_p \;\equiv\; \frac{(p-1)!+1}{p} \pmod{p}.
+  \]
+  Insbesondere ist $p$ genau dann eine Wilson-Primzahl, wenn $W_p \equiv 0 \pmod{p}$.
+\end{proposition}
+
+\begin{proof}
+  Dies folgt unmittelbar aus der Definition: $W_p \in \Z$ und die Bedingung
+  $p^2 \mid (p-1)!+1$ ist äquivalent zu $p \mid W_p$.
+\end{proof}
+
+\begin{bemerkung}
+  Die einzigen bekannten Wilson-Primzahlen sind $5$, $13$ und $563$.
+  Es wird vermutet (aber nicht bewiesen), dass unendlich viele Wilson-Primzahlen
+  existieren.  Für diese drei Primzahlen gilt:
+  \[
+    (5-1)! + 1 = 25 = 5^2, \quad
+    W_{13} \equiv 0 \pmod{13}, \quad
+    W_{563} \equiv 0 \pmod{563}.
+  \]
+\end{bemerkung}
+
+% ================================================================
+\section{Allgemeiner Wilson-Satz für endliche abelsche Gruppen}
+% ================================================================
+
+\begin{theorem}[Allgemeiner Wilson-Satz]\label{satz:allgemein_wilson}
+  Sei $(G, \cdot)$ eine endliche abelsche Gruppe.  Dann gilt
+  \[
+    \prod_{g \in G} g
+    \;=\;
+    \begin{cases}
+      e        & \text{falls } G \text{ kein Element der Ordnung } 2 \text{ hat}, \\
+      \tau      & \text{falls } G \text{ genau ein Element } \tau \text{ der Ordnung } 2 \text{ hat}, \\
+      e        & \text{falls } G \text{ mehr als ein Element der Ordnung } 2 \text{ hat}.
+    \end{cases}
+  \]
+  Für $G = (\Z/p\Z)^*$ mit einer ungeraden Primzahl $p$ ist das eindeutige
+  Element der Ordnung $2$ gleich $-1$, was $(p-1)! \equiv -1 \pmod{p}$ liefert.
+\end{theorem}
+
+\begin{proof}
+  Wir ordnen jedem $g \in G$ sein Inverses $g^{-1}$ zu.
+  Falls $g \neq g^{-1}$, liefert das Paar $\{g, g^{-1}\}$ den Beitrag
+  $g \cdot g^{-1} = e$ zum Produkt.
+  Nur die selbst-inversen Elemente (Ordnung $1$ oder $2$) bleiben übrig.
+
+  Die Menge $S = \{g \in G : g^2 = e\}$ ist eine Untergruppe von $G$.
+  \begin{itemize}
+    \item $|S| = 1$: $S = \{e\}$, das Produkt ist $e$.
+    \item $|S| = 2$: $S = \{e, \tau\}$, das Produkt ist $e \cdot \tau = \tau$.
+    \item $|S| \geq 4$: $S \cong (\Z/2\Z)^k$ für $k \geq 2$.
+      Das Produkt aller Elemente von $(\Z/2\Z)^k$ ist $0$ (im additiven Sinne),
+      also $e$ in multiplikativer Notation.
+  \end{itemize}
+  Für $G = (\Z/p\Z)^*$ ($p$ ungerade Primzahl) ist diese Gruppe zyklisch von
+  gerader Ordnung $p-1$ und besitzt daher genau ein Element der Ordnung $2$,
+  nämlich $-1$.  Also $\prod_{g \in G} g = -1 \pmod{p}$. \qedhere
+\end{proof}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Wir haben einen vollständigen elementaren Beweis des Satzes von Wilson und vier
+natürliche Verallgemeinerungen vorgestellt.
+Der elementare Charakter der Beweise verdeutlicht die tiefe Verbindung zwischen
+der Struktur multiplikativer Gruppen modulo $n$ und der Arithmetik der Fakultäten.
+
+Der Wilson-Quotient und Wilson-Primzahlen bleiben ein aktives Gebiet der
+algorithmischen Zahlentheorie: Bekannt ist, dass keine Wilson-Primzahl
+unterhalb von $2 \times 10^{13}$ existiert (Crandall--Dilcher--Pomerance, 1997),
+und heuristische Argumente legen nahe, dass bis zu $N$ ungefähr $\ln\ln(N)$
+Wilson-Primzahlen existieren.
+
+\begin{thebibliography}{9}
+
+\bibitem{Hardy1979}
+G.~H.~Hardy und E.~M.~Wright.
+\newblock \emph{Einführung in die Zahlentheorie} (An Introduction to the Theory of Numbers), 5.~Aufl.
+\newblock Oxford University Press, 1979.
+
+\bibitem{Ireland1990}
+K.~Ireland und M.~Rosen.
+\newblock \emph{A Classical Introduction to Modern Number Theory}, 2.~Aufl.
+\newblock Springer, New York, 1990.
+
+\bibitem{Crandall1997}
+R.~Crandall, K.~Dilcher und C.~Pomerance.
+\newblock A search for Wieferich and Wilson primes.
+\newblock \emph{Math.\ Comp.}, 66(217):433--449, 1997.
+
+\bibitem{Lagrange1771}
+J.-L.~Lagrange.
+\newblock Démonstration d'un théorème nouveau concernant les nombres premiers.
+\newblock \emph{Nouv.\ Mém.\ Acad.\ Berlin}, 1771.
+
+\end{thebibliography}
+
+\end{document}

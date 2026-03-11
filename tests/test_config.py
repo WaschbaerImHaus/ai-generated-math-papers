@@ -448,9 +448,9 @@ class TestMetadata:
         assert isinstance(config.AUTHOR, str)
 
     def test_author_value(self):
-        """AUTHOR muss 'Kurt Ingwer' sein."""
-        assert config.AUTHOR == "Kurt Ingwer", \
-            f"AUTHOR='{config.AUTHOR}' ist nicht 'Kurt Ingwer'"
+        """AUTHOR muss 'Michael Fuhrmann' sein."""
+        assert config.AUTHOR == "Michael Fuhrmann", \
+            f"AUTHOR='{config.AUTHOR}' ist nicht 'Michael Fuhrmann'"
 
     def test_version_exists(self):
         """VERSION muss vorhanden sein."""
