@@ -5,6 +5,7 @@
 \usepackage{hyperref}
 \usepackage{geometry}
 \geometry{margin=2.5cm}
+\usepackage[OT2,T1]{fontenc}
 
 % -------------------------------------------------------
 % Theorem environments
@@ -28,7 +29,9 @@
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\Fp}{\mathbb{F}_p}
 \DeclareMathOperator{\ord}{ord}
-\DeclareMathOperator{\Sha}{\Sha}
+% Tate-Shafarevich-Gruppe: kyrillisches Sha (Ш) als Mathsymbol
+\DeclareSymbolFont{cyrletters}{OT2}{wncyr}{m}{n}
+\DeclareMathSymbol{\Sha}{\mathop}{cyrletters}{"58}
 
 % -------------------------------------------------------
 \begin{document}
