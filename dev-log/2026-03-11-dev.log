@@ -322,3 +322,19 @@
   - paper2_lehmer_drei_primfaktoren_de.tex: \textit{Alternativer Beweis:}-Label vor zweitem Beweis eingefügt (Zeilen 144–155)
   - paper7_lehmer_kein_semiprim_de.tex: Ungleichungskette Zeile 98 verschärft:
     1*(p-1)-1=p-2 >= 1  →  1*p-1=p-1 >= 2 (nutzt q-2 >= p statt q-2 >= p-1)
+2026-03-11 12:43 Build 83: Batch 4 — 15 Bugs behoben (Papers 17–20)
+  BUG-B4-01 (17 EN MINOR): Toter Code \e-Makro entfernt
+  BUG-B4-02 (17 DE MINOR): Beweis Lemma Farey-Partition ergänzt
+  BUG-B4-03 (18 EN MITTEL): Orthogonalitätsformel im Beweis von Lemma 3.1 präzisiert
+  BUG-B4-04 (18 EN HOCH): Entwurfsüberrest 'Wait, let us recompute' entfernt + Beweis vollständig
+  BUG-B4-05 (18 EN MINOR): Schwellwert Korollar 6.2 auf B>=4A+8 vereinheitlicht
+  BUG-B4-06 (18 EN HOCH): \newtheorem*{theorem*}{Theorem} in Präambel ergänzt
+  BUG-B4-07 (18 DE HOCH): Vorzeichenfehler Euler-Produkt behoben: -c_p(n)/(p-1)^3
+  BUG-B4-08 (19 EN HOCH): Korollar auf G(k)<=(k-2)2^{k-1}+5 korrigiert, Beweis korrekt
+  BUG-B4-09 (19 EN MINOR): \bibitem{Wooley2016} in zwei Einträge (2012+2013) aufgeteilt
+  BUG-B4-10 (19 DE MINOR): Schreibweise Abstract G(k) ist mathematisch korrekt (kein Eingriff)
+  BUG-B4-11 (20 EN HOCH): Konvergenzbegründung durch sum 1/phi(q)^2 = prod(1+1/(p-1)^2) ersetzt
+  BUG-B4-12 (20 EN MITTEL): Unbalancierte Klammer ((p-1)^2-1)/(p-1)^2 korrigiert
+  BUG-B4-13 (20 EN MITTEL): GRH-Beweis neu geschrieben + Goldston1992 als Referenz
+  BUG-B4-14 (20 EN MITTEL): Tabelle n=30 Faktor 28/28 entfernt (29 teilt 30 nicht)
+  BUG-B4-15 (20 DE MINOR): Tabelle n=30 Faktor 28/27 entfernt

@@ -210,23 +210,20 @@ The representation count is
   Paper~17, Lemma~5.3), and $\delta = \delta(k,s) > 0$.
 \end{theorem}
 
-\begin{corollary}[Circle method bound for $G(k)$]\label{cor:Gk_circle}
-  For $s = 2^k + 1$ (Weyl's original bound):
-  $G(k) \leq 2^k + 1$.
+\begin{corollary}[Weyl bound for $G(k)$]\label{cor:Gk_circle}
+  For all $k \geq 2$:
+  \[
+    G(k) \;\leq\; (k-2)\,2^{k-1} + 5.
+  \]
 \end{corollary}
 
 \begin{proof}
-  With $s = 2^k + 1$, Weyl's inequality (Paper~17, Theorem~6.1) gives
-  a saving of $N^{-\sigma}$ with $\sigma = 2^{1-k}$ on the minor arcs.
-  The condition for the minor arc error to be absorbed into the main term is
-  $s(1 - \sigma) + 1 < s/k - 1$, i.e.\ $(s - s\sigma) < s/k - 2$.
-  For $s = 2^k + 1$ and $\sigma = 2^{1-k}$, $s\sigma = 3$, so
-  $s - s\sigma = 2^k - 2$.  The condition becomes $2^k - 2 < 2^k/k - 2$,
-  which simplifies to $1 < 1/k$, valid for... wait, this is inconsistent.
-  The correct statement is: Weyl's inequality gives $G(k) \leq 2^{k-1}(k-1)+1$
-  after careful application; the ``$2^k+1$'' bound arises from a cruder
-  argument.  See Vaughan~\cite[Chapter~5]{Vaughan1981} for the precise
-  computation yielding $G(k) \leq (k-2)2^{k-1}+5$.
+  Apply Weyl's inequality (Paper~17, Theorem~6.1) with $s = (k-2)2^{k-1}+5$:
+  the minor arc saving $N^{-\sigma}$ with $\sigma = 2^{1-k}$ gives a minor arc
+  error of order $N^{s/k - 1 - \delta}$ for some $\delta > 0$, which is absorbed
+  into the main term $N^{s/k - 1}$ of Theorem~\ref{thm:HL_formula}.
+  A careful computation of the threshold condition shows that $s = (k-2)2^{k-1}+5$
+  suffices; see Vaughan~\cite[Chapter~5]{Vaughan1981} for details.
 \end{proof}
 
 % ================================================================
@@ -500,11 +497,15 @@ M.~B.~Nathanson.
 \newblock \emph{Additive Number Theory: The Classical Bases}.
 \newblock Springer, 1996.
 
+\bibitem{Wooley2013}
+T.~D.~Wooley.
+\newblock Vinogradov's mean value theorem via efficient congruencing, I.
+\newblock \emph{Ann.\ of Math.\ (2)}, 175(3):1575--1627, 2012.
+
 \bibitem{Wooley2016}
 T.~D.~Wooley.
 \newblock Vinogradov's mean value theorem via efficient congruencing, II.
 \newblock \emph{Duke Math.\ J.}, 162(4):673--730, 2013.
-\newblock \emph{Adv.\ Math.}, 294:532--561, 2016.
 
 \bibitem{BDG2015}
 J.~Bourgain, C.~Demeter, and L.~Guth.

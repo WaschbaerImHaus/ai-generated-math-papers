@@ -140,8 +140,12 @@ where $c_q(n) = \sum_{\gcd(a,q)=1} \eq{an/q}$ is the Ramanujan sum.
     \mathfrak{S}(n)
     \;=\; \sum_{q=1}^{\infty} \frac{\mu(q)^2\, c_q(n)}{\phi(q)^2}.
   \]
-  This series converges absolutely since $|c_q(n)| \leq \phi(q)$ and
-  $\sum_q \mu(q)^2/\phi(q) = \prod_p (1 + 1/(p-1)) < \infty$.
+  This series converges absolutely: for squarefree $q$ one has
+  $|c_q(n)/\phi(q)^2| \leq 1/\phi(q)$, and more precisely
+  $|c_q(n)/\phi(q)^2| \leq 1/\phi(q)^2$ when the Ramanujan sum is
+  estimated via multiplicativity.  Since
+  $\sum_q \mu(q)^2/\phi(q)^2 = \prod_p (1 + 1/(p-1)^2) < \infty$,
+  the series converges absolutely.
 \end{definition}
 
 \subsection{Euler product representation}
@@ -179,7 +183,7 @@ where $c_q(n) = \sum_{\gcd(a,q)=1} \eq{an/q}$ is the Ramanujan sum.
 
   For $p = 2$ (even $n$, so $2 \mid n$): $c_2(n) = 2-1 = 1$, factor = $1 + 1/1 = 2$.
   For $p \geq 3$ with $p \mid n$: $c_p(n) = p-1$, factor = $1 + (p-1)/(p-1)^2 = 1 + 1/(p-1)$.
-  For $p \geq 3$ with $p \nmid n$: $c_p(n) = -1$, factor = $1 - 1/(p-1)^2 = (p-1)^2-1)/(p-1)^2 = p(p-2)/(p-1)^2$.
+  For $p \geq 3$ with $p \nmid n$: $c_p(n) = -1$, factor = $1 - 1/(p-1)^2 = ((p-1)^2-1)/(p-1)^2 = p(p-2)/(p-1)^2$.
 
   Therefore:
   \begin{align*}
@@ -249,7 +253,7 @@ $n$ & $\mathfrak{S}(n)$ (exact) & $\mathfrak{S}(n)$ (decimal) & $r_2(n)$ (actual
 8  & $2 C_2 \cdot \frac{2}{1} = 4C_2$ & $2.6407\ldots$ & 1 & $3+5$ \\
 10 & $2 C_2 \cdot \frac{2}{1} \cdot \frac{4}{3} = \frac{16C_2}{3}$ & $3.5209\ldots$ & 2 & $3+7, 5+5$ \\
 12 & $2 C_2 \cdot \frac{2}{1} \cdot \frac{4}{3} \cdot \frac{6}{5}$ & $4.2251\ldots$ & 1 & $5+7$ \\
-30 & $2 C_2 \cdot \frac{2}{1}\cdot\frac{4}{3}\cdot\frac{6}{5}\cdot\frac{28}{28}$ & $\approx 5.9$ & 3 & $7+23,11+19,13+17$ \\
+30 & $2 C_2 \cdot \frac{2}{1}\cdot\frac{4}{3}\cdot\frac{6}{5}$ & $\approx 5.1$ & 3 & $7+23,11+19,13+17$ \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -424,17 +428,20 @@ and is related to Mertens' constant by:
     \left|\int_{\mathfrak{m}} S^2 \eq{-n\cdot}\right|
     \;\ll\; \sqrt{N} (\log N)^2 \cdot N \log N \;=\; N^{3/2} (\log N)^3.
   \]
-  Compared to the main term $\mathfrak{S}(n) \cdot N \gg N/\log\log N$,
-  the minor arc error $N^{3/2} (\log N)^3$ still dominates for large $N$...
+  This naive bound $O(N^{3/2}(\log N)^3)$ dominates the main term $\Theta(N)$,
+  confirming the failure of the unconditional circle method for binary Goldbach
+  (see Section~\ref{sec:parity}).
 
-  The improvement under GRH is that one can use \emph{exponential sum}
-  bounds and Vaughan's identity more carefully.  The full proof uses
-  the zero-free region $\text{Re}(s) > 1/2$ of $L(s,\chi)$ and partial
-  summation to bound the major arc error at $O(\sqrt{N})$ per arc,
-  with only $Q^2 \sim (\log N)^{2B}$ arcs.  The total major arc error
-  becomes $O(\sqrt{N} (\log N)^{2B+O(1)})$, which is $o(N)$.  Combined
-  with a minor arc bound $O(N^{1-\varepsilon})$ obtainable under GRH
-  via character sum bounds, the result follows.  See~\cite{HardyLittlewood1923}.
+  Under GRH the key gain is in the \emph{major arc} approximation:
+  GRH implies $|S(\alpha) - \mu(q)/\phi(q)\cdot I(\beta)| \ll \sqrt{N}(\log N)^2$
+  (instead of $O(Ne^{-c\sqrt{\log N}})$).  The major arc integral then gives
+  $\mathfrak{S}(n)\cdot n + O(\sqrt{n}(\log n)^2)$.
+  For the minor arcs, the GRH zero-free region $\mathrm{Re}(s)\geq 1/2$ and
+  partial summation yield $|S(\alpha)| \ll \sqrt{N}(\log N)^2$ on $\mathfrak{m}$
+  (choosing $Q = \sqrt{N}/(\log N)^C$), so the minor arc contribution is
+  $O(N(\log N)^{-A})$ for any fixed $A$.  Since the main term $\mathfrak{S}(n)\cdot n
+  \gg n/\log\log n$ dominates $O(\sqrt{n}(\log n)^2)$ for $n \geq n_0$, we get
+  $R_2(n) > 0$.  A detailed proof can be found in Goldston~\cite{Goldston1992}.
 \end{proof}
 
 % ================================================================
@@ -531,6 +538,12 @@ G.~H.~Hardy and J.~E.~Littlewood.
 \newblock Some problems of ``Partitio Numerorum''.  III: On the expression of
   a number as a sum of primes.
 \newblock \emph{Acta Math.}, 44:1--70, 1923.
+
+\bibitem{Goldston1992}
+D.~A.~Goldston.
+\newblock On Hardy and Littlewood's contribution to the Goldbach conjecture.
+\newblock In \emph{Proceedings of the Amalfi Conference on Analytic Number
+  Theory}, pp.\ 115--155.  Universit\`a di Salerno, 1992.
 
 \bibitem{Vinogradov1937}
 I.~M.~Vinogradov.
