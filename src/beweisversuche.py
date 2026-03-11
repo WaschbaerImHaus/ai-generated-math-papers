@@ -1555,6 +1555,277 @@ class LehmerVermutungBeweis:
 
 
 # ===========================================================
+# TEIL 6: GIUGA-CARMICHAEL-ANALYSE
+# ===========================================================
+
+class GiugaCarmichaelAnalyse:
+    """
+    @brief Analyse der Vereinbarkeit von Giuga-Pseudoprimes und Carmichael-Zahlen.
+    @description
+        **Offene Frage**: Kann eine Zahl gleichzeitig ein Giuga-Pseudoprime
+        UND eine Carmichael-Zahl sein?
+
+        **Giuga-Pseudoprime** (stark): n zusammengesetzt, quadratfrei,
+        für alle Primteiler p|n: p|(n/p-1) UND (p-1)|(n/p-1).
+
+        **Carmichael-Zahl** (Korselt-Kriterium): n zusammengesetzt, quadratfrei,
+        für alle Primteiler p|n: (p-1)|(n-1).
+
+        **Schlüsselobservation** (aus BEIDEN Bedingungen):
+        Giuga-schwach: n ≡ p (mod p²) für alle p|n.
+        Carmichael:    n ≡ 1 (mod p-1) für alle p|n.
+        Combined:      n ≡ p (mod p²(p-1)) für alle p|n. [da gcd(p², p-1) = 1]
+
+        **CRT-Unverträglichkeit** für n mit Primfaktoren {3, 5, 7}:
+        - n ≡ 3 (mod 18)  und  n ≡ 5 (mod 100)  →  n ≡ 705 (mod 900)
+        - n ≡ 7 (mod 294): gcd(900, 294) = 6, und (7-705) mod 6 = 4 ≠ 0
+        → System unlösbar! □
+
+    @lastModified 2026-03-11
+    """
+
+    def satz_carmichael_ungerade(self) -> Dict:
+        """
+        @brief SATZ (BEWIESEN): Alle Carmichael-Zahlen sind ungerade.
+        @description
+            **Beweis**:
+            Sei n eine gerade Carmichael-Zahl. Nach Korselt ist n quadratfrei.
+            Da n gerade und quadratfrei: 2|n, aber 4∤n, d.h. n = 2·m mit m ungerade.
+
+            Für a = n-1 (ungerade): gcd(n-1, n) = gcd(n-1, n) = 1.
+            Carmichael: (n-1)^{n-1} ≡ 1 (mod n).
+            Aber n-1 ist ungerade, und n ≡ 0 (mod 2), also n-1 ≡ 1 (mod 2).
+
+            Einfacher: a = -1, gcd(-1, n) = 1. Carmichael: (-1)^{n-1} ≡ 1 (mod n).
+            Da n gerade: n-1 ungerade, also (-1)^{n-1} = -1.
+            Also: -1 ≡ 1 (mod n), d.h. n | 2. Da n > 2: Widerspruch! □
+
+        @return Beweisobjekt.
+        @lastModified 2026-03-11
+        """
+        return {
+            'satz': 'Alle Carmichael-Zahlen sind ungerade.',
+            'status': 'BEWIESEN',
+            'beweis_kern': [
+                'Sei n gerade Carmichael-Zahl.',
+                'Carmichael: a^{n-1} ≡ 1 (mod n) für gcd(a,n)=1.',
+                'Setze a = -1: gcd(-1, n) = 1. ✓',
+                'Da n gerade: n-1 ungerade → (-1)^{n-1} = -1.',
+                'Also: -1 ≡ 1 (mod n) → n | 2. Aber n zusammengesetzt > 2. WIDERSPRUCH. □',
+            ],
+            'konsequenz': 'Jede Giuga-Carmichael-Zahl muss ungerade sein → alle Primfaktoren ungerade ≥ 3.',
+        }
+
+    def satz_notwendige_kongruenz(self) -> Dict:
+        """
+        @brief SATZ (BEWIESEN): Für Giuga-Carmichael-Zahlen gilt n ≡ p (mod p²(p-1)).
+        @description
+            **Beweis**:
+            Sei n ein Giuga-Pseudoprime (schwach): p | (n/p - 1) für alle p|n.
+            D.h.: n/p ≡ 1 (mod p), also n ≡ p (mod p²).
+
+            Sei n auch Carmichael: (p-1) | (n-1) für alle p|n.
+            D.h.: n ≡ 1 (mod p-1).
+
+            Da p ≡ 1 (mod p-1) [denn p = (p-1)+1]:
+            Beide Bedingungen zusammen: n ≡ p (mod p²) UND n ≡ p (mod p-1).
+            Da gcd(p², p-1) = 1 (Euler/Fermat: p ist prim):
+            $$n \\equiv p \\pmod{p^2(p-1)}$$
+
+        @return Beweisobjekt.
+        @lastModified 2026-03-11
+        """
+        return {
+            'satz': 'Für jede Giuga-Carmichael-Zahl n gilt: n ≡ p (mod p²(p-1)) für alle p|n.',
+            'status': 'BEWIESEN',
+            'beweis_kern': [
+                'Giuga-schwach: n/p ≡ 1 (mod p) → n ≡ p (mod p²).',
+                'Carmichael: n ≡ 1 (mod p-1). Da p ≡ 1 (mod p-1): n ≡ p (mod p-1). ✓',
+                'gcd(p², p-1) = 1 [p prim, aufeinanderfolgende Faktoren koprim].',
+                'CRT: n ≡ p (mod p²) UND n ≡ p (mod p-1) → n ≡ p (mod p²(p-1)). □',
+            ],
+            'kongruenzen': {
+                'p=3': 'n ≡ 3 (mod 18)',
+                'p=5': 'n ≡ 5 (mod 100)',
+                'p=7': 'n ≡ 7 (mod 294)',
+                'p=11': 'n ≡ 11 (mod 1210)',
+                'p=13': 'n ≡ 13 (mod 2028)',
+            },
+        }
+
+    def satz_crt_widerspruch_357(self) -> Dict:
+        """
+        @brief SATZ (BEWIESEN): Kein n mit Primfaktoren {3,5,7,...} ist Giuga-Carmichael.
+        @description
+            **Beweis** via Chinesischem Restsatz (CRT):
+
+            Jede Giuga-Carmichael-Zahl mit Faktoren 3, 5, 7 muss erfüllen:
+            - n ≡ 3 (mod 18)    [aus p=3]
+            - n ≡ 5 (mod 100)   [aus p=5]
+            - n ≡ 7 (mod 294)   [aus p=7]
+
+            **Schritt 1**: Aus n ≡ 3 (mod 18) und n ≡ 5 (mod 100):
+            n = 18k+3, 18k ≡ 2 (mod 100), 9k ≡ 1 (mod 50).
+            9^{-1} mod 50 = 39 (da 9·39 = 351 = 7·50+1 ≡ 1).
+            k ≡ 39 (mod 50), also **n ≡ 705 (mod 900)**.
+
+            **Schritt 2**: n ≡ 705 (mod 900) und n ≡ 7 (mod 294):
+            900m + 705 ≡ 7 (mod 294).
+            900 ≡ 18 (mod 294) [900 = 3·294+18].
+            18m ≡ 7-705 = -698 ≡ -698+3·294 = 184 (mod 294).
+            gcd(18, 294) = 6. Aber 184 mod 6 = 4 ≠ 0.
+
+            Das CRT-System hat **keine Lösung**! **WIDERSPRUCH!** □
+
+        @return Beweisobjekt mit vollständiger CRT-Analyse.
+        @lastModified 2026-03-11
+        """
+        import math
+        # Verifikation der CRT-Berechnung
+        m1, r1 = 18, 3    # n ≡ 3 (mod 18)
+        m2, r2 = 100, 5   # n ≡ 5 (mod 100)
+        m3, r3 = 294, 7   # n ≡ 7 (mod 294)
+
+        # Schritt 1: Kombiniere (m1, r1) und (m2, r2)
+        m12 = m1 * m2 // math.gcd(m1, m2)  # lcm(18, 100) = 900
+        # Suche n ≡ r1 (mod m1) und n ≡ r2 (mod m2)
+        crt12_loesung = None
+        for n_test in range(0, m12):
+            if n_test % m1 == r1 and n_test % m2 == r2:
+                crt12_loesung = n_test
+                break
+
+        # Schritt 2: Prüfe Kompatibilität mit (m3, r3)
+        g = math.gcd(m12, m3)
+        kompatibel = ((r3 - crt12_loesung) % g == 0) if crt12_loesung is not None else False
+
+        return {
+            'satz': 'Kein n mit Primfaktoren 3, 5, 7 kann Giuga-Carmichael sein.',
+            'status': 'BEWIESEN',
+            'beweis_kern': [
+                'Notwendige Kongruenzen: n≡3(mod 18), n≡5(mod 100), n≡7(mod 294).',
+                'CRT(18,3; 100,5): n ≡ 705 (mod 900). [lcm=900, Lösung n=705]',
+                'CRT(900,705; 294,7): gcd(900,294)=6. (7-705) mod 6 = 184 mod 6 = 4 ≠ 0.',
+                'CRT-System unlösbar! WIDERSPRUCH. □',
+            ],
+            'verifikation': {
+                'lcm_18_100': m12,
+                'n_mod_900': crt12_loesung,
+                'gcd_900_294': g,
+                'rest_mod_6': (r3 - crt12_loesung) % g if crt12_loesung is not None else None,
+                'system_lösbar': kompatibel,
+            },
+            'schluss': 'Das System n≡3(18), n≡5(100), n≡7(294) hat keine ganzzahlige Lösung.',
+        }
+
+    def analyse_prime_kongruenz_unverträglichkeit(self) -> Dict:
+        """
+        @brief Prüft CRT-Kompatibilität für verschiedene Primzahl-Mengenkombinationen.
+        @description
+            Für n Giuga-Carmichael: n ≡ p (mod p²(p-1)) für alle p|n.
+            Prüfe für Primzahl-Mengen {p₁, ..., pₖ} ob das CRT-System lösbar ist.
+
+        @return Kompatibilitätsanalyse.
+        @lastModified 2026-03-11
+        """
+        import math
+
+        def crt_system_lösbar(prime_list: List[int]) -> Tuple[bool, Optional[Dict]]:
+            """Prüft ob das System n ≡ p (mod p²(p-1)) für alle p in prime_list lösbar ist."""
+            moduli = [p * p * (p - 1) for p in prime_list]
+            residues = list(prime_list)
+
+            # Iterativ CRT anwenden
+            m_aktuell = moduli[0]
+            r_aktuell = residues[0]
+
+            for i in range(1, len(moduli)):
+                m_i = moduli[i]
+                r_i = residues[i]
+                g = math.gcd(m_aktuell, m_i)
+                if (r_i - r_aktuell) % g != 0:
+                    return False, {
+                        'schritt': i,
+                        'konflikt_bei': (prime_list[i], m_i),
+                        'gcd': g,
+                        'rest': (r_i - r_aktuell) % g
+                    }
+                # Neue Lösung berechnen
+                m_neu = m_aktuell * m_i // g
+                # Kombiniere r_aktuell (mod m_aktuell) mit r_i (mod m_i)
+                for n_test in range(r_aktuell, m_neu, m_aktuell):
+                    if n_test % m_i == r_i:
+                        r_aktuell = n_test
+                        break
+                m_aktuell = m_neu
+
+            return True, {'loesung_mod': m_aktuell, 'loesung': r_aktuell}
+
+        # Teste verschiedene Primzahl-Mengen
+        primmengen = [
+            [3, 5, 7],
+            [3, 5, 11],
+            [3, 5, 13],
+            [3, 7, 11],
+            [5, 7, 11],
+            [3, 5, 7, 11],
+        ]
+
+        ergebnisse = {}
+        for menge in primmengen:
+            name = '·'.join(map(str, menge))
+            lösbar, detail = crt_system_lösbar(menge)
+            ergebnisse[name] = {
+                'lösbar': lösbar,
+                'detail': detail,
+                'primes': menge,
+            }
+
+        unlösbare = [k for k, v in ergebnisse.items() if not v['lösbar']]
+        return {
+            'ergebnisse': ergebnisse,
+            'unlösbare_mengen': unlösbare,
+            'schluss': f'{len(unlösbare)}/{len(primmengen)} Primzahl-Mengen geben CRT-Widerspruch.',
+        }
+
+    def numerische_verifikation(self, grenze: int = 100000) -> Dict:
+        """
+        @brief Numerisch: Keine Giuga-Carmichael-Zahl bis grenze.
+        @param grenze Obere Schranke.
+        @return Verifikationsergebnis.
+        @lastModified 2026-03-11
+        """
+        kandidaten = []
+        for n in range(6, grenze + 1):
+            fd = sympy.factorint(n)
+            # Muss quadratfrei sein
+            if not all(e == 1 for e in fd.values()):
+                continue
+            # Muss zusammengesetzt sein
+            if sympy.isprime(n):
+                continue
+            primes = list(fd.keys())
+            # Giuga schwach: p | (n/p - 1)
+            giuga_schwach = all((n // p - 1) % p == 0 for p in primes)
+            if not giuga_schwach:
+                continue
+            # Giuga stark: (p-1) | (n/p - 1)
+            giuga_stark = all((n // p - 1) % (p - 1) == 0 for p in primes)
+            if not giuga_stark:
+                continue
+            # Carmichael Korselt: (p-1) | (n-1)
+            carmichael = all((n - 1) % (p - 1) == 0 for p in primes)
+            if carmichael:
+                kandidaten.append(n)
+
+        return {
+            'grenze': grenze,
+            'giuga_carmichael_kandidaten': kandidaten,
+            'verifiziert': len(kandidaten) == 0,
+        }
+
+
+# ===========================================================
 # Gesamtauswertung und Schwierigkeitsranking
 # ===========================================================
 
