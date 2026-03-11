@@ -98,7 +98,7 @@ $k$ & $g(k)$ & $G(k)$ & $G(k)$ exact? & Source \\
 \midrule
 2 & 4 & 4 & Yes & Lagrange 1770 \\
 3 & 9 & $\leq 7$ & No & $G(3) \geq 4$ is known \\
-4 & 19 & 16 & Yes & Balasubramanian, Dress, Deshouillers 1986 \\
+4 & 19 & 16 & Yes & Balasubramanian, Deshouillers, Dress 1986 \\
 5 & 37 & $\leq 17$ & No & \\
 6 & 73 & $\leq 24$ & No & \\
 $k$ & see text & $\leq k(\log k+4.2)$ & No & Wooley 2016 \\
@@ -194,7 +194,8 @@ We follow the notation of Paper~17.  Let $M = \lfloor N^{1/k} \rfloor$ and
 \]
 The representation count is
 \[
-  r_{k,s}(n) \;=\; \#\{(x_1,\ldots,x_s) : x_i^k = n\}
+  r_{k,s}(n) \;=\; \#\bigl\{(x_1,\ldots,x_s) \in \N_0^s :
+                       x_1^k + \cdots + x_s^k = n\bigr\}
   \;=\; \int_0^1 f(\alpha)^s\, \eq{-n\alpha}\, d\alpha.
 \]
 

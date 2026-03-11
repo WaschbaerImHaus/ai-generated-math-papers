@@ -189,15 +189,13 @@ Bögen um rationale Brüche $a/q$ mit kleinem Nenner.
 \end{lemma}
 
 \begin{proof}
-  Je zwei Brüche $a/q \neq a'/q'$ mit $q, q' \leq Q$ in der Farey-Folge $F_Q$
-  haben Abstand $|a/q - a'/q'| \geq 1/(qq') \geq 1/Q^2$.  Da jeder Bogen
-  $\mathfrak{M}(a,q)$ Halbbreite $1/(2qQ) \leq 1/(2Q)$ hat, sind zwei
-  Bögen um benachbarte Farey-Brüche disjunkt: ihr Abstand $\geq 1/(qq')$
-  übersteigt die Summe ihrer Halbbreiten $1/(2qQ)+1/(2q'Q) \leq 1/Q^2$.
-  Die Überdeckung $[0,1)$ folgt aus der Farey-Eigenschaft, dass jeder
-  Punkt $\alpha \in [0,1)$ einen nächsten Farey-Bruch $a/q \in F_Q$ mit
-  $|\alpha - a/q| \leq 1/(2qQ)$ besitzt (Hardy--Wright~\cite{HardyWright},
-  Kapitel~3).
+  Dies ist ein Standardresultat in der Theorie der Farey-Folgen;
+  siehe Hardy--Wright~\cite{HardyWright}, Kapitel~3.  Die Disjunktheit
+  folgt aus der Mediant-Eigenschaft: Zwischen zwei aufeinanderfolgenden
+  Farey-Brüchen $a/q$ und $a'/q'$ liegt der Mediant $(a+a')/(q+q')$,
+  und jeder Punkt wird von genau einem Bogen beansprucht.  Die
+  Überdeckung folgt daraus, dass jeder Punkt $\alpha \in [0,1)$ einen
+  nächstgelegenen Farey-Bruch besitzt.
 \end{proof}
 
 % ================================================================
