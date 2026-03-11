@@ -338,3 +338,31 @@
   BUG-B4-13 (20 EN MITTEL): GRH-Beweis neu geschrieben + Goldston1992 als Referenz
   BUG-B4-14 (20 EN MITTEL): Tabelle n=30 Faktor 28/28 entfernt (29 teilt 30 nicht)
   BUG-B4-15 (20 DE MINOR): Tabelle n=30 Faktor 28/27 entfernt
+
+2026-03-11 Build 84: Algebraische Zahlentheorie — neues Modul
+  - src/algebraic_number_theory.py: Vollständiges Modul erstellt
+    * NumberField(poly_coeffs): Q(α) mit degree(), signature(), ring_of_integers(), discriminant()
+    * DedekindIdeal: norm(), is_prime_ideal(), is_principal()
+    * ideal_factorization(p, poly): Zerlegung (p)=p1^e1·p2^e2·... (Kummer-Dedekind)
+    * ramification_index(), inertia_degree(), efg_equation_check() — Fundamentalsatz
+    * class_number(d): h(Q(√d)) inkl. vollständiger Tabelle bis d=-163
+    * minkowski_bound(d): M_K = (2/π)·√|Δ| (imag.) / (1/2)·√Δ (reell)
+    * class_group_structure(d): Gruppenstruktur Cl(K)
+    * is_pid(d): h(K)=1 ⟺ Hauptidealbereich
+    * unit_rank(poly): r = r1+r2-1 (Dirichletscher Einheitensatz)
+    * fundamental_units_quadratic(d): Fundamentaleinheit via Pell-Gleichung
+    * regulator_estimate(d): R_K = log|ε|
+    * QuadraticField(d): Klasse für Q(√d) mit allen Eigenschaften
+    * legendre_symbol_fast(a,p): Euler-Kriterium
+    * kronecker_symbol(a,n): Verallg. Jacobi-Symbol
+    * quadratic_reciprocity_law(p,q): Gaußsches QRG + Ergänzungssätze
+    * hilbert_class_field_degree(d): [H:K] = h(K)
+    * CyclotomicField(n): Q(ζ_n), degree()=φ(n), splitting_of_prime()
+    * cyclotomic_ring_of_integers(n): Z[ζ_n], monogen
+    * kummer_lifting(p,n): Kummer-Theorie für Fermat (reguläre/irreg. Primzahlen)
+    * p_adic_completion(poly,p): Lokale Körper K_p
+    * hensel_lifting_general(f,a0,p,steps): Newton-Iteration in Z_p
+    * local_norm_symbol(a,b,p): Hilbert-Symbol (a,b)_p
+    * dirichlet_class_number_formula(d): h = w√|Δ|/(2π) · L(1,χ_Δ)
+  - tests/test_algebraic_number_theory.py: 115 Tests in 10 Klassen — alle grün
+  - src/algebraic_number_theory.md: KaTeX-Dokumentation mit allen mathematischen Hintergründen
