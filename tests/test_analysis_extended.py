@@ -360,3 +360,135 @@ class TestCauchyPrincipalValue:
         # Aber wir testen P.V. ∫_{-1}^{1} 1/x dx = 0
         result = cauchy_principal_value(lambda x: 1.0 / x, -1.0, 1.0, 0.0)
         assert abs(result) < 1e-4
+
+
+# ===========================================================================
+# Tests für parallel_symbolic_compute (Build 69)
+# ===========================================================================
+
+class TestParallelSymbolicCompute:
+    """
+    @brief Tests für die parallel_symbolic_compute()-Funktion.
+    @description
+        Prüft korrekte Ergebnisse, Reihenfolge, Fehlerweiterleitung
+        und Grenzfälle (leere Liste, max_workers=1).
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    """
+
+    def test_einfache_integration(self):
+        """Parallele Integration von x^2 → x^3/3."""
+        import sympy as sp
+        from analysis import parallel_symbolic_compute
+        x = sp.Symbol('x')
+        tasks = [(sp.integrate, (x**2, x), {})]
+        results = parallel_symbolic_compute(tasks)
+        assert len(results) == 1
+        assert sp.simplify(results[0] - x**3/3) == 0
+
+    def test_ableitung(self):
+        """Parallele Ableitung von sin(x) → cos(x)."""
+        import sympy as sp
+        from analysis import parallel_symbolic_compute
+        x = sp.Symbol('x')
+        tasks = [(sp.diff, (sp.sin(x), x), {})]
+        results = parallel_symbolic_compute(tasks)
+        assert sp.simplify(results[0] - sp.cos(x)) == 0
+
+    def test_faktorisierung(self):
+        """Parallele Faktorisierung von x^2-1 → (x-1)(x+1)."""
+        import sympy as sp
+        from analysis import parallel_symbolic_compute
+        x = sp.Symbol('x')
+        tasks = [(sp.factor, (x**2 - 1,), {})]
+        results = parallel_symbolic_compute(tasks)
+        assert sp.expand(results[0]) == sp.expand((x-1)*(x+1))
+
+    def test_mehrere_tasks_gleichzeitig(self):
+        """Drei Tasks gleichzeitig – korrekte Reihenfolge garantiert."""
+        import sympy as sp
+        from analysis import parallel_symbolic_compute
+        x = sp.Symbol('x')
+        tasks = [
+            (sp.integrate, (x**2, x), {}),
+            (sp.diff,      (sp.sin(x), x), {}),
+            (sp.factor,    (x**2 - 1,), {}),
+        ]
+        results = parallel_symbolic_compute(tasks)
+        assert len(results) == 3
+        # Reihenfolge: Integration, Ableitung, Faktorisierung
+        assert sp.simplify(results[0] - x**3/3) == 0
+        assert sp.simplify(results[1] - sp.cos(x)) == 0
+        assert sp.expand(results[2]) == sp.expand((x-1)*(x+1))
+
+    def test_reihenfolge_bleibt_erhalten(self):
+        """Reihenfolge der Ergebnisse entspricht Reihenfolge der Tasks."""
+        import sympy as sp
+        from analysis import parallel_symbolic_compute
+        x = sp.Symbol('x')
+        # Unterschiedlich schnelle Operationen
+        tasks = [
+            (sp.expand, ((x+1)**10,), {}),   # Schnell
+            (sp.factor, (x**20 - 1,), {}),   # Langsamer
+            (sp.sqrt,   (sp.Integer(144),), {}),  # Sehr schnell
+        ]
+        results = parallel_symbolic_compute(tasks)
+        # Erster Eintrag muss (x+1)^10-Expansion sein
+        assert results[0] == sp.expand((x+1)**10)
+        # Dritter Eintrag muss 12 sein
+        assert results[2] == 12
+
+    def test_leere_task_liste(self):
+        """Leere Liste → leeres Ergebnis, kein Fehler."""
+        from analysis import parallel_symbolic_compute
+        results = parallel_symbolic_compute([])
+        assert results == []
+
+    def test_max_workers_ein(self):
+        """max_workers=1 → sequentiell, aber gleiche Ergebnisse."""
+        import sympy as sp
+        from analysis import parallel_symbolic_compute
+        x = sp.Symbol('x')
+        tasks = [
+            (sp.integrate, (x, x), {}),
+            (sp.diff,      (x**3, x), {}),
+        ]
+        results = parallel_symbolic_compute(tasks, max_workers=1)
+        assert len(results) == 2
+        assert sp.simplify(results[0] - x**2/2) == 0
+        assert sp.simplify(results[1] - 3*x**2) == 0
+
+    def test_kwargs_werden_uebergeben(self):
+        """kwargs-Parameter werden korrekt an die Funktion weitergegeben."""
+        import sympy as sp
+        from analysis import parallel_symbolic_compute
+        x = sp.Symbol('x')
+        # sp.expand_trig via kwargs: deep=True expandiert verschachtelte Ausdrücke
+        # Wir nutzen sp.integrate mit 'conds' kwarg als kontrollierbares Beispiel.
+        # Zweite Ableitung korrekt als positionales Argument: diff(sin(x), x, 2)
+        tasks = [(sp.diff, (sp.sin(x), x, 2), {})]
+        results = parallel_symbolic_compute(tasks)
+        # d²/dx² sin(x) = -sin(x)
+        assert sp.simplify(results[0] + sp.sin(x)) == 0
+
+    def test_numerische_funktion(self):
+        """Auch nicht-SymPy Funktionen werden unterstützt."""
+        from analysis import parallel_symbolic_compute
+        import math
+        tasks = [
+            (math.sqrt,  (4.0,), {}),
+            (math.factorial, (5,), {}),
+        ]
+        results = parallel_symbolic_compute(tasks)
+        assert abs(results[0] - 2.0) < 1e-10
+        assert results[1] == 120
+
+    def test_fehler_wird_weitergeleitet(self):
+        """Ausnahmen in Tasks werden korrekt weitergeleitet."""
+        from analysis import parallel_symbolic_compute
+        import pytest
+        def fehlerhaft():
+            raise ValueError("Testfehler")
+        tasks = [(fehlerhaft, (), {})]
+        with pytest.raises(ValueError, match="Testfehler"):
+            parallel_symbolic_compute(tasks)

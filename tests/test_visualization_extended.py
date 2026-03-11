@@ -901,3 +901,226 @@ class TestAdaptivePlot:
         )
         assert isinstance(fig, plt.Figure)
         plt.close(fig)
+
+
+# ===========================================================================
+# Tests für export_figure (Build 69)
+# ===========================================================================
+
+class TestExportFigure:
+    """
+    @brief Tests für die export_figure()-Funktion.
+    @description
+        Prüft Export nach PNG, SVG, PDF – einzeln und kombiniert –
+        sowie Standardverhalten und DPI-Parameter.
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    """
+
+    def _make_fig(self):
+        """Hilfsmethode: einfache Test-Figure erzeugen."""
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots()
+        ax.plot([0, 1], [0, 1])
+        return fig
+
+    def test_alle_drei_formate(self, tmp_path):
+        """Alle drei Standard-Formate werden erzeugt."""
+        from visualization import export_figure
+        import matplotlib.pyplot as plt
+        fig = self._make_fig()
+        base = str(tmp_path / "export_alle")
+        result = export_figure(fig, base)
+        plt.close(fig)
+        assert set(result.keys()) == {"png", "svg", "pdf"}
+        for fmt, path in result.items():
+            import os
+            assert os.path.exists(path), f"Datei für {fmt} fehlt: {path}"
+            assert os.path.getsize(path) > 0, f"Datei für {fmt} ist leer"
+
+    def test_nur_png(self, tmp_path):
+        """Nur PNG-Export wenn formats=['png']."""
+        from visualization import export_figure
+        import matplotlib.pyplot as plt, os
+        fig = self._make_fig()
+        result = export_figure(fig, str(tmp_path / "nur_png"), formats=["png"])
+        plt.close(fig)
+        assert list(result.keys()) == ["png"]
+        assert os.path.exists(result["png"])
+
+    def test_nur_svg(self, tmp_path):
+        """Nur SVG-Export – Vektorformat für LaTeX."""
+        from visualization import export_figure
+        import matplotlib.pyplot as plt, os
+        fig = self._make_fig()
+        result = export_figure(fig, str(tmp_path / "nur_svg"), formats=["svg"])
+        plt.close(fig)
+        assert "svg" in result
+        # SVG-Datei muss XML-Header enthalten
+        with open(result["svg"], "r", encoding="utf-8") as f:
+            inhalt = f.read(200)
+        assert "<?xml" in inhalt or "<svg" in inhalt
+
+    def test_nur_pdf(self, tmp_path):
+        """Nur PDF-Export – für LaTeX \\includegraphics geeignet."""
+        from visualization import export_figure
+        import matplotlib.pyplot as plt, os
+        fig = self._make_fig()
+        result = export_figure(fig, str(tmp_path / "nur_pdf"), formats=["pdf"])
+        plt.close(fig)
+        assert "pdf" in result
+        # PDF-Datei beginnt mit %PDF
+        with open(result["pdf"], "rb") as f:
+            header = f.read(4)
+        assert header == b"%PDF"
+
+    def test_png_svg_ohne_pdf(self, tmp_path):
+        """PNG + SVG ohne PDF – teilweise Auswahl."""
+        from visualization import export_figure
+        import matplotlib.pyplot as plt
+        fig = self._make_fig()
+        result = export_figure(fig, str(tmp_path / "png_svg"), formats=["png", "svg"])
+        plt.close(fig)
+        assert set(result.keys()) == {"png", "svg"}
+        assert "pdf" not in result
+
+    def test_rueckgabe_absolute_pfade(self, tmp_path):
+        """Rückgabe enthält absolute Pfade."""
+        from visualization import export_figure
+        import matplotlib.pyplot as plt, os
+        fig = self._make_fig()
+        result = export_figure(fig, str(tmp_path / "abs_pfad"), formats=["png"])
+        plt.close(fig)
+        assert os.path.isabs(result["png"])
+
+    def test_dpi_parameter(self, tmp_path):
+        """Höheres DPI erzeugt größere PNG-Datei."""
+        from visualization import export_figure
+        import matplotlib.pyplot as plt, os
+        fig_lo = self._make_fig()
+        result_lo = export_figure(fig_lo, str(tmp_path / "dpi_lo"), formats=["png"], dpi=50)
+        plt.close(fig_lo)
+        fig_hi = self._make_fig()
+        result_hi = export_figure(fig_hi, str(tmp_path / "dpi_hi"), formats=["png"], dpi=300)
+        plt.close(fig_hi)
+        size_lo = os.path.getsize(result_lo["png"])
+        size_hi = os.path.getsize(result_hi["png"])
+        assert size_hi > size_lo, "Höheres DPI soll größere Datei erzeugen"
+
+    def test_leere_formats_liste(self, tmp_path):
+        """Leere formats-Liste → kein Fehler, leeres Dict zurück."""
+        from visualization import export_figure
+        import matplotlib.pyplot as plt
+        fig = self._make_fig()
+        result = export_figure(fig, str(tmp_path / "leer"), formats=[])
+        plt.close(fig)
+        assert result == {}
+
+
+# ===========================================================================
+# Tests für plot_cantor_set (Build 69)
+# ===========================================================================
+
+class TestPlotCantorSet:
+    """
+    @brief Tests für die plot_cantor_set()-Funktion.
+    @description
+        Prüft korrekte Anzahl von Intervallen je Stufe,
+        Rückgabetyp und Grenzfälle.
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    """
+
+    def test_rueckgabetyp(self):
+        """Rückgabe ist matplotlib Figure."""
+        import matplotlib
+        matplotlib.use('Agg')
+        from visualization import plot_cantor_set
+        import matplotlib.pyplot as plt
+        fig = plot_cantor_set(steps=3)
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+    def test_stufe_null(self):
+        """steps=0 → Einheitsintervall, keine Iteration."""
+        import matplotlib
+        matplotlib.use('Agg')
+        from visualization import plot_cantor_set
+        import matplotlib.pyplot as plt
+        fig = plot_cantor_set(steps=0)
+        assert fig is not None
+        plt.close(fig)
+
+    def test_standardschritte(self):
+        """Standardmäßig 6 Schritte, kein Fehler."""
+        import matplotlib
+        matplotlib.use('Agg')
+        from visualization import plot_cantor_set
+        import matplotlib.pyplot as plt
+        fig = plot_cantor_set()
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+    def test_acht_schritte(self):
+        """steps=8 → sehr viele Intervalle, kein Fehler."""
+        import matplotlib
+        matplotlib.use('Agg')
+        from visualization import plot_cantor_set
+        import matplotlib.pyplot as plt
+        fig = plot_cantor_set(steps=8)
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+    def test_intervallanzahl_korrekt(self):
+        """Nach k Schritten müssen genau 2^k Intervalle vorhanden sein."""
+        # broken_barh erzeugt in matplotlib >= 3.8 PolyCollection statt
+        # BrokenBarHCollection; wir zählen die Collections (eine je Stufe).
+        import matplotlib
+        matplotlib.use('Agg')
+        from visualization import plot_cantor_set
+        import matplotlib.pyplot as plt
+        steps = 4
+        fig = plot_cantor_set(steps=steps)
+        ax = fig.axes[0]
+        # Eine Collection pro Iterationsstufe (Stufe 0 bis steps)
+        assert len(ax.collections) == steps + 1
+        plt.close(fig)
+
+    def test_figsize_parameter(self):
+        """figsize-Parameter wird korrekt weitergegeben."""
+        import matplotlib
+        matplotlib.use('Agg')
+        from visualization import plot_cantor_set
+        import matplotlib.pyplot as plt
+        fig = plot_cantor_set(steps=3, figsize=(10, 3))
+        w, h = fig.get_size_inches()
+        assert abs(w - 10) < 0.01 and abs(h - 3) < 0.01
+        plt.close(fig)
+
+    def test_x_achse_grenzen(self):
+        """x-Achse läuft von 0 bis 1 (Einheitsintervall)."""
+        import matplotlib
+        matplotlib.use('Agg')
+        from visualization import plot_cantor_set
+        import matplotlib.pyplot as plt
+        fig = plot_cantor_set(steps=3)
+        ax = fig.axes[0]
+        xlim = ax.get_xlim()
+        assert abs(xlim[0]) < 1e-9
+        assert abs(xlim[1] - 1.0) < 1e-9
+        plt.close(fig)
+
+    def test_speichern_als_png(self, tmp_path):
+        """Erzeugte Figure kann als PNG gespeichert werden."""
+        import matplotlib
+        matplotlib.use('Agg')
+        from visualization import plot_cantor_set
+        import matplotlib.pyplot as plt, os
+        fig = plot_cantor_set(steps=4)
+        pfad = str(tmp_path / "cantor.png")
+        fig.savefig(pfad)
+        plt.close(fig)
+        assert os.path.exists(pfad)
+        assert os.path.getsize(pfad) > 0

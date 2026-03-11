@@ -15,7 +15,7 @@
 
 @author Michael Fuhrmann
 @date 2026-03-05
-@lastModified 2026-03-10
+@lastModified 2026-03-11
 """
 
 import math
@@ -68,7 +68,7 @@ def _safe_parse(expr_str: str, local_vars: dict | None = None) -> sp.Expr:
     @param local_vars: Optionale lokale Variablen-Zuordnung
     @return: SymPy-Ausdruck
     @author Michael Fuhrmann
-    @lastModified: 2026-03-09
+    @lastModified: 2026-03-11
     """
     # Whitelist der erlaubten Funktionen und Symbole
     transformations = standard_transformations + (implicit_multiplication_application,)
@@ -87,9 +87,11 @@ def _safe_parse(expr_str: str, local_vars: dict | None = None) -> sp.Expr:
     try:
         return parse_expr(expr_str, local_dict=safe_locals, transformations=transformations)
     except Exception as parse_err:
-        # Fallback auf sympify für SymPy-interne Ausdrücke (z.B. bereits geparste Symbole)
-        # Warnung loggen: parse_expr scheiterte, sympify wird als unsicherere Alternative genutzt
-        _logger._logger.warning(
+        # Fallback auf sympify für SymPy-interne Ausdrücke (z.B. bereits geparste Symbole).
+        # WICHTIG: parse_expr ist sicher (keine eval()-Semantik), sympify ist unsicherer.
+        # Warnung über öffentliche MathLogger.warning()-Methode loggen, bevor Fallback greift.
+        # Dies ermöglicht dem Entwickler, fehlerhafte Eingaben im Log zu erkennen.
+        _logger.warning(
             f"_safe_parse: parse_expr schlug fehl für Ausdruck '{expr_str}' "
             f"({type(parse_err).__name__}: {parse_err}). "
             f"Fallback auf sp.sympify() – Bitte Eingabe prüfen."
@@ -1044,3 +1046,75 @@ def cauchy_principal_value(f: Callable[[float], float], a: float, b: float,
 
     # Cauchy-Hauptwert = Summe beider Teile
     return left_result + right_result
+
+
+# ===========================================================================
+# PARALLELES SYMBOLISCHES RECHNEN
+# ===========================================================================
+
+from concurrent.futures import ThreadPoolExecutor
+import os as _os
+
+
+def parallel_symbolic_compute(tasks: list, max_workers: int = None) -> list:
+    """
+    @file analysis.py
+    @brief Führt mehrere SymPy-Berechnungen parallel via ThreadPoolExecutor aus.
+    @description
+        Ermöglicht die gleichzeitige Ausführung mehrerer symbolischer Berechnungen
+        mit SymPy, indem Python-Threads genutzt werden.
+
+        Warum ThreadPoolExecutor statt ProcessPoolExecutor?
+        SymPy-Objekte (Expressions, Symbols, ...) sind nicht Pickle-serialisierbar
+        und können deshalb nicht direkt an Subprozesse übergeben werden.
+        Der GIL (Global Interpreter Lock) wird von SymPy bei vielen Operationen
+        (I/O, C-Extensions) freigegeben, sodass echte Parallelität möglich ist.
+
+        Aufbau eines Task-Tupels:
+            (callable, args_tuple, kwargs_dict)
+
+        Beispiele:
+            import sympy as sp
+            x = sp.Symbol('x')
+            tasks = [
+                (sp.integrate, (x**2, x), {}),
+                (sp.diff,      (sp.sin(x), x), {}),
+                (sp.factor,    (x**2 - 1,), {}),
+            ]
+            ergebnisse = parallel_symbolic_compute(tasks)
+            # ergebnisse: [x**3/3, cos(x), (x-1)*(x+1)]
+
+        Reihenfolge-Garantie:
+            Die Ergebnisliste ist in derselben Reihenfolge wie die tasks-Liste,
+            unabhängig davon, welche Berechnungen zuerst fertig wurden.
+
+    @param tasks:       Liste von (callable, args, kwargs)-Tupeln.
+                        - callable:  Jede aufrufbare SymPy-Funktion oder eigene Funktion.
+                        - args:      Tupel mit positionalen Argumenten (kann leer sein: ()).
+                        - kwargs:    Dict mit Schlüsselwort-Argumenten (kann leer sein: {}).
+    @param max_workers: Maximale Anzahl paralleler Threads.
+                        None (Standard) = Anzahl logischer CPU-Kerne.
+    @return             Liste der Bergebnisse in derselben Reihenfolge wie tasks.
+                        Auftretende Ausnahmen werden weitergeleitet (re-raised).
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    @lastModified 2026-03-11
+    """
+    # Standardmäßig so viele Threads wie logische CPU-Kerne (mindestens 4)
+    if max_workers is None:
+        max_workers = _os.cpu_count() or 4
+
+    def _run_task(task):
+        """Hilfsfunktion: Entpackt ein Task-Tupel und ruft die Funktion auf."""
+        func, args, kwargs = task
+        # Funktion mit positionalen und Schlüsselwort-Argumenten aufrufen
+        return func(*args, **kwargs)
+
+    # ThreadPoolExecutor: verwaltet den Thread-Pool automatisch (inkl. Cleanup)
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Alle Tasks gleichzeitig einreichen → Future-Objekte erzeugen
+        futures = [executor.submit(_run_task, t) for t in tasks]
+
+        # Ergebnisse in der ursprünglichen Reihenfolge einsammeln
+        # f.result() blockiert bis das Ergebnis vorliegt (oder wirft Exception)
+        return [f.result() for f in futures]

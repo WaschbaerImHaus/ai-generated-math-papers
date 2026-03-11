@@ -241,3 +241,57 @@
   * Harmonische Summe: Primzahlen 3..50
   * Quadratreste: -1 als QR, Doppelzählungsformel
   * Fermat via Wilson: Permutations- und Kürzungsargument
+
+2026-03-11 10:00 Build 68: Code-Qualität – Logging, Sicherheit, Refactoring-Verifikation
+
+## Aufgabe 1: analysis.py – _safe_parse() Logging verbessert
+- math_logger.py: Neue öffentliche Methode MathLogger.warning(message) hinzugefügt
+  - Vorher: Interner Zugriff via _logger._logger.warning() (private Indirektion)
+  - Nachher: Sauberer öffentlicher Aufruf _logger.warning() in _safe_parse()
+- analysis.py: Logging-Aufruf von `_logger._logger.warning(...)` → `_logger.warning(...)`
+  - Kommentar präzisiert: Fallback auf sp.sympify() nur wenn parse_expr() scheitert
+  - @lastModified auf 2026-03-11 aktualisiert
+
+## Aufgabe 2: repl.py – Sicherheitsaudit-Docblock aktualisiert
+- Verifikation: Keine eval()/exec()-Aufrufe in repl.py (AST-geprüft)
+- Sicherheitsaudit-Kommentar von Build 57 auf Build 68 aktualisiert
+
+## Aufgabe 3: euler_phi() – Bereits korrekt implementiert
+- Verifikation: euler_phi() nutzt prime_factorization() intern (lru_cache-gecacht)
+- Formel: φ(n) = n * ∏(1 - 1/p) für alle Primfaktoren p ∈ prime_factorization(n)
+- Kein Refactoring nötig
+
+## Aufgabe 4: christoffel_symbols() – Bereits gecacht
+- Verifikation: Manueller Dict-Cache _christoffel_cache mit (id(func), tuple(point), h)-Key
+- Cache-Treffer bestätigt: 2. Aufruf mit identischen Argumenten nutzt Cache (Größe bleibt 1)
+- FIFO-Strategie bei >1000 Einträgen
+- Kein Refactoring nötig
+
+---
+
+## Build 69 – 2026-03-11
+
+### Aufgabe 1: export_figure() in visualization.py
+- Neue Funktion `export_figure(fig, filepath, formats, dpi)` am Ende von visualization.py
+- Exportiert matplotlib-Figure in PNG, SVG und/oder PDF mit einem Aufruf
+- SVG und PDF LaTeX-kompatibel (`\includegraphics`, `\includesvg`)
+- Rückgabe: Dict Format → absoluter Dateipfad
+- 8 Tests in TestExportFigure (alle grün)
+
+### Aufgabe 2: plot_cantor_set() in visualization.py
+- Neue Funktion `plot_cantor_set(steps, figsize)` in visualization.py
+- Visualisiert Cantor-Menge (Mitteldrittels-Konstruktion), `steps` Iterationsstufen
+- Hausdorff-Dimension log(2)/log(3) ≈ 0.631 im Titel angezeigt
+- Farbkodierung: dunkler werdende Blautöne mit steigender Stufe
+- 8 Tests in TestPlotCantorSet (alle grün)
+- Korrektur: BrokenBarHCollection existiert in matplotlib ≥ 3.8 nicht mehr → PolyCollection
+
+### Aufgabe 3: parallel_symbolic_compute() in analysis.py
+- Neue Funktion `parallel_symbolic_compute(tasks, max_workers)` am Ende von analysis.py
+- ThreadPoolExecutor statt ProcessPool (SymPy-Objekte nicht Pickle-serialisierbar)
+- Aufbau: (callable, args_tuple, kwargs_dict)
+- Reihenfolge-Garantie der Ergebnisse
+- 10 Tests in TestParallelSymbolicCompute (alle grün)
+- Korrektur Test: sp.diff mit n=2 als kwarg gibt cos(x) → positionales Argument nötig
+
+### Testergebnis: 26/26 neue Tests grün

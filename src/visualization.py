@@ -4066,4 +4066,157 @@ def create_interactive_plot(
         except Exception:
             pass  # Headless-Modus: Keine Anzeige möglich
 
+
+# ===========================================================================
+# EXPORT: Figure in mehrere Formate speichern (PNG, SVG, PDF)
+# ===========================================================================
+
+def export_figure(fig, filepath: str, formats: list = None, dpi: int = 150) -> dict:
+    """
+    @file visualization.py
+    @brief Exportiert eine matplotlib-Figure in mehrere Formate gleichzeitig.
+    @description
+        Speichert eine matplotlib-Figure in einem oder mehreren Formaten
+        (PNG, SVG, PDF) mit einem einzigen Aufruf.
+
+        LaTeX-Kompatibilität:
+        - SVG und PDF eignen sich direkt für \\includegraphics in LaTeX-Dokumenten.
+          Bei pdflatex: PDF-Format nutzen.
+          Bei xelatex/lualatex: SVG über \\includesvg (svg-Paket) oder PDF.
+        - PNG für schnelle Vorschau oder Web-Einbindung.
+
+        Beispiel:
+            fig = plt.figure()
+            ax = fig.add_subplot(111)
+            ax.plot([1, 2, 3], [4, 5, 6])
+            ergebnisse = export_figure(fig, "/tmp/mein_plot", formats=["pdf", "svg"])
+            # ergebnisse: {"pdf": "/tmp/mein_plot.pdf", "svg": "/tmp/mein_plot.svg"}
+
+    @param fig:      matplotlib Figure-Objekt, das gespeichert werden soll.
+    @param filepath: Basispfad ohne Dateiendung (z.B. "/tmp/plot").
+                     Die Dateiendung wird automatisch je Format angehängt.
+    @param formats:  Liste der gewünschten Formate (Kleinbuchstaben).
+                     Erlaubte Werte: "png", "svg", "pdf".
+                     Standard: ["png", "svg", "pdf"] (alle drei).
+    @param dpi:      Auflösung in DPI für Rasterformate (PNG). Standard: 150.
+                     Vektorformate (SVG, PDF) ignorieren diesen Wert.
+    @return          Dictionary mit Format als Schlüssel und absolutem Dateipfad
+                     als Wert, z.B. {"png": "/tmp/plot.png", "svg": "/tmp/plot.svg"}.
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    @lastModified 2026-03-11
+    """
+    import os
+
+    # Standard: alle drei gängigen Formate exportieren
+    if formats is None:
+        formats = ["png", "svg", "pdf"]
+
+    # Ergebnis-Dictionary vorbereiten (Format → gespeicherter Pfad)
+    saved_files = {}
+
+    for fmt in formats:
+        # Vollständigen Dateipfad mit Endung zusammensetzen
+        full_path = filepath + "." + fmt
+
+        # Figure in das jeweilige Format exportieren
+        # bbox_inches="tight": Beschneidet leere Ränder automatisch
+        fig.savefig(full_path, format=fmt, dpi=dpi, bbox_inches="tight")
+
+        # Absoluten Pfad im Ergebnis-Dict speichern (plattformübergreifend)
+        saved_files[fmt] = os.path.abspath(full_path)
+
+    return saved_files
+
+
+# ===========================================================================
+# MASSTHEORIE: Cantor-Menge visualisieren
+# ===========================================================================
+
+def plot_cantor_set(steps: int = 6, figsize=(12, 4)) -> plt.Figure:
+    """
+    @file visualization.py
+    @brief Visualisiert die Cantor-Menge durch iteratives Entfernen des mittleren Drittels.
+    @description
+        Die Cantor-Menge C ist definiert als:
+
+            C = [0,1] \\ ⋃_{n=0}^{∞} ⋃_{k=0}^{3^n - 1} ((3k+1)/3^{n+1}, (3k+2)/3^{n+1})
+
+        d.h. beginnend mit [0,1] wird in jedem Schritt das offene mittlere Drittel
+        aus jedem verbleibenden Intervall entfernt.
+
+        Eigenschaften der Cantor-Menge:
+        - Überabzählbar (Mächtigkeit des Kontinuums)
+        - Lebesgue-Maß 0 (obwohl überabzählbar!)
+        - Hausdorff-Dimension: log(2)/log(3) ≈ 0.631 (echt gebrochen → Fraktal)
+        - Nirgends dicht, aber abgeschlossen und perfekt (jeder Punkt ist Häufungspunkt)
+
+        Jede Iterationsstufe wird als farbige horizontale Balkenreihe dargestellt.
+        Stufe 0 = voller Einheitsbalken, Stufe k = 2^k verbleibende Intervalle.
+
+    @param steps:   Anzahl der Iterationsschritte (sinnvoll: 0–8). Standard: 6.
+                    Bei steps > 8 werden die Intervalle zu schmal zum Erkennen.
+    @param figsize: Größe der Figure als (Breite, Höhe) in Zoll. Standard: (12, 4).
+    @return         matplotlib Figure-Objekt mit der Visualisierung.
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    @lastModified 2026-03-11
+    """
+    # Startintervall: das vollständige Einheitsintervall [0, 1]
+    intervals = [(0.0, 1.0)]
+
+    # Alle Iterationsstufen vorberechnen und speichern
+    # stages[0] = [(0.0, 1.0)], stages[1] = [(0.0, 1/3), (2/3, 1.0)], ...
+    stages = [list(intervals)]
+
+    for _ in range(steps):
+        # Nächste Stufe: mittleres Drittel aus jedem Intervall entfernen
+        next_intervals = []
+        for a, b in intervals:
+            # Länge des aktuellen Intervalls
+            length = b - a
+            # Linkes Drittel behalten: [a, a + length/3]
+            next_intervals.append((a, a + length / 3.0))
+            # Rechtes Drittel behalten: [b - length/3, b]
+            next_intervals.append((b - length / 3.0, b))
+        # Aktualisierte Intervalle für nächste Iteration übernehmen
+        intervals = next_intervals
+        stages.append(list(intervals))
+
+    # Figure und Achsen anlegen
+    fig, ax = plt.subplots(figsize=figsize)
+
+    # Farbpalette: dunkler werdende Blautöne je tiefer die Stufe
+    cmap = plt.get_cmap("Blues")
+
+    for step_idx, stage_intervals in enumerate(stages):
+        # Farbe: gleichmäßig über die Stufen verteilt (0.3–0.9 für guten Kontrast)
+        color = cmap(0.3 + 0.6 * step_idx / max(steps, 1))
+
+        # Intervalle als horizontale Balken darstellen
+        # broken_barh erwartet: [(x_start, x_width), ...] und (y_start, y_height)
+        bar_data = [(start, end - start) for start, end in stage_intervals]
+        ax.broken_barh(bar_data, (step_idx - 0.4, 0.8), facecolors=color, edgecolors='none')
+
+    # Achsenbeschriftungen und Formatierung
+    ax.set_xlim(0.0, 1.0)
+    ax.set_ylim(-0.6, steps + 0.6)
+    ax.set_xlabel('x ∈ [0, 1]', fontsize=12)
+    ax.set_ylabel('Iterationsstufe', fontsize=12)
+    ax.set_title(
+        f'Cantor-Menge (Mitteldrittels-Konstruktion, {steps} Schritte)\n'
+        f'Hausdorff-Dimension: log(2)/log(3) ≈ {(2**0.5):.4f} → '  # Platzhalter
+        f'{__import__("math").log(2) / __import__("math").log(3):.6f}',
+        fontsize=13
+    )
+
+    # y-Achse: Stufennummern als ganzzahlige Beschriftungen
+    ax.set_yticks(range(steps + 1))
+    ax.set_yticklabels([f'Stufe {i}  (2^{i}={2**i} Intervalle)' for i in range(steps + 1)],
+                       fontsize=8)
+    ax.grid(True, axis='x', alpha=0.3)
+
+    fig.tight_layout()
+    return fig
+
     return fig
