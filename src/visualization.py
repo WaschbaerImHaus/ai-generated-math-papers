@@ -17,9 +17,12 @@
     - Vektorfelddarstellung (Quiver, Stromlinien)
     - Phasenraum-Visualisierung (Phasenportrait, Bifurkationsdiagramm)
     - Fraktal-Generator (Mandelbrot, Julia, Sierpinski, Newton)
+    - Adaptiver Gitterplot (feineres Gitter nahe Nullstellen/Singularitäten)
+    - Interaktiver Plot mit matplotlib.widgets.Slider
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-08
+@lastModified 2026-03-11
 """
 
 import numpy as np
@@ -1034,7 +1037,7 @@ def animate_ode_trajectory(
     @param interval: Millisekunden zwischen Frames (Standard: 50)
     @param title: Animationstitel
     @return: FuncAnimation-Objekt
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # ODE lösen: t_eval liefert n_frames äquidistante Zeitpunkte
@@ -1143,7 +1146,7 @@ def animate_phase_portrait(
     @param output_path: Optionaler Speicherpfad (.gif)
     @param title: Animationstitel
     @return: FuncAnimation-Objekt
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     x_min, x_max = x_range
@@ -1289,7 +1292,7 @@ def animate_wave_equation(
     @param n_frames: Anzahl der Frames (Standard: 60)
     @param output_path: Optionaler Speicherpfad (.gif)
     @return: FuncAnimation-Objekt
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     x_min, x_max = x_range
@@ -1380,7 +1383,7 @@ def save_figure_svg(fig: plt.Figure, filepath: str, dpi: int = 300) -> str:
     @param filepath: Ausgabepfad (sollte auf .svg enden)
     @param dpi: Auflösung für Rasterelemente innerhalb der SVG (Standard: 300)
     @return: Absoluter Pfad der gespeicherten Datei
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Absoluten Pfad auflösen
@@ -1409,7 +1412,7 @@ def save_figure_pdf(fig: plt.Figure, filepath: str) -> str:
     @param fig: matplotlib Figure-Objekt
     @param filepath: Ausgabepfad (sollte auf .pdf enden)
     @return: Absoluter Pfad der gespeicherten Datei
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     abs_path = os.path.abspath(filepath)
@@ -1447,7 +1450,7 @@ def plot_and_export(
     @param title: Diagrammtitel
     @param format: Exportformat: 'svg' oder 'pdf'
     @return: Absoluter Pfad der gespeicherten Datei
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # x-Werte erzeugen, Funktion auswerten, ungültige Werte maskieren
@@ -1494,7 +1497,7 @@ def export_all_formats(fig: plt.Figure, base_path: str) -> dict:
     @param base_path: Basispfad OHNE Dateiendung
     @return: Dictionary mit Format als Schlüssel und absolutem Pfad als Wert:
              {'png': '/pfad/figur.png', 'svg': '/pfad/figur.svg', 'pdf': '/pfad/figur.pdf'}
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     abs_base = os.path.abspath(base_path)
@@ -1562,7 +1565,7 @@ def mandelbrot_smooth(
     @return: 2D float-Array (height × width) mit Smooth-Escape-Werten.
              Punkte in M (beschränkt) haben Wert max_iter.
              Außerhalb liegende Pixel haben Werte in [0, max_iter).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Komplexe Ebene diskretisieren: C[i,j] = (x_j) + i·(y_i)
@@ -1635,7 +1638,7 @@ def export_figure(fig: plt.Figure, path: str) -> str:
     @param fig: matplotlib Figure-Objekt, das exportiert werden soll
     @param path: Ausgabepfad inkl. Dateiname und Endung (.png/.svg/.pdf)
     @return: Absoluter Pfad der gespeicherten Datei
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     import os  # noqa: F811 – lokaler Import für Klarheit
@@ -1691,7 +1694,7 @@ def plot_gaussian_curvature_3d(
     @param resolution: Anzahl Gitterpunkte pro Parameterachse (Standard: 50)
     @return: matplotlib Figure-Objekt mit 3D-Surface-Plot
     @raises ValueError: wenn surface_name unbekannt ist
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Parameterwerte gleichmäßig verteilen
@@ -1823,7 +1826,7 @@ def plot_geodesic_on_sphere(
     @param direction: (dθ/dt, dφ/dt) Anfangsgeschwindigkeit im Parameterraum
     @param n_steps: Anzahl Integrationsschritte (Standard: 200)
     @return: matplotlib Figure-Objekt mit 3D-Sphäre und Geodäten-Pfad
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # --- Geodätengleichung auf S² als System 1. Ordnung ---
@@ -1930,7 +1933,7 @@ def plot_geodesic_on_torus(
     @param direction: (du/dt₀, dv/dt₀) Anfangsgeschwindigkeit im Parameterraum
     @param n_steps: Anzahl Integrationsschritte (Standard: 500)
     @return: matplotlib Figure-Objekt mit 3D-Torus und Geodäten-Pfad
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # --- Geodätengleichung auf dem Torus als System 1. Ordnung ---
@@ -2047,7 +2050,7 @@ def plot_function_2d_adaptive(
     @param return_points: Falls True, werden (x_array, y_array) zurückgegeben
                           statt einer Figure (für Tests)
     @return: matplotlib Figure-Objekt ODER (x_array, y_array) wenn return_points=True
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Sichere Auswertungsumgebung mit numpy-Funktionen
@@ -2160,7 +2163,7 @@ def interactive_plot(
     @param param_range: (param_min, param_max) – Wertebereich des Parameters.
     @param save_path: Speicherpfad für PNG (None = interaktiv anzeigen).
     @return: matplotlib.figure.Figure-Objekt.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     try:
@@ -2228,7 +2231,7 @@ def interactive_3d(
     @param n: Gitterpunkte pro Achse (n×n-Gitter).
     @param save_path: Speicherpfad (None = interaktiv anzeigen).
     @return: matplotlib.figure.Figure-Objekt.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     try:
@@ -2310,7 +2313,7 @@ def adaptive_plot(
     @param save_path: Speicherpfad (None = anzeigen).
     @param return_points: Wenn True, gibt (x, y) zurück statt Figure.
     @return: Figure oder (x_arr, y_arr) wenn return_points=True.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     # Anfangsgitter erstellen
@@ -2403,7 +2406,7 @@ def plot_gaussian_curvature(
     @param save_path: Speicherpfad (None = anzeigen).
     @param return_data: Wenn True, gibt (fig, K_values) zurück.
     @return: Figure oder (Figure, K_array).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     from mpl_toolkits.mplot3d import Axes3D
@@ -2536,7 +2539,7 @@ def plot_sphere_curvature(R: float = 1.0, n: int = 30, save_path: str = None):
     @param n: Gitterpunkte.
     @param save_path: Speicherpfad.
     @return: Figure.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     def sphere(u, v):
@@ -2568,7 +2571,7 @@ def plot_torus_curvature(R: float = 2.0, r: float = 1.0, n: int = 40, save_path:
     @param n: Gitterpunkte.
     @param save_path: Speicherpfad.
     @return: Figure.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     def torus(u, v):
@@ -2598,7 +2601,7 @@ def plot_saddle_curvature(n: int = 40, save_path: str = None):
     @param n: Gitterpunkte.
     @param save_path: Speicherpfad.
     @return: Figure.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     def saddle(u, v):
@@ -2649,7 +2652,7 @@ def animate_heat_equation(
     @param nt: Anzahl der Zeitschritte (und Animationsframes).
     @param save_path: Pfad zum Speichern der GIF-Animation.
     @return: matplotlib.animation.FuncAnimation-Objekt.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     import matplotlib.animation as animation
@@ -2766,7 +2769,7 @@ def plot_cantor_set(n_steps: int = 6, save_path: str = None, return_fig: bool = 
     @param save_path: Speicherpfad.
     @param return_fig: Wenn True, Figure zurückgeben.
     @return: Figure.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     # Cantor-Menge iterativ konstruieren
@@ -2831,7 +2834,7 @@ def plot_cantor_function(n: int = 100, save_path: str = None):
     @param n: Anzahl der Auswertungspunkte.
     @param save_path: Speicherpfad.
     @return: Figure.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     def cantor_val(x: float, depth: int = 20) -> float:
@@ -2915,7 +2918,7 @@ def plot_bessel_gallery(
     @param n: Anzahl der Auswertungspunkte.
     @param save_path: Speicherpfad.
     @return: Figure.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     if orders is None:
@@ -2979,7 +2982,7 @@ def plot_legendre_gallery(
     @param n: Anzahl der Auswertungspunkte.
     @param save_path: Speicherpfad.
     @return: Figure.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     if orders is None:
@@ -3034,7 +3037,7 @@ def sphere_surface(u: float, v: float, r: float = 1.0) -> tuple:
     @param v: Polarwinkel θ ∈ [0, π]
     @param r: Sphärenradius (Standard: 1.0)
     @return: Tuple (x, y, z)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     return (r * np.cos(u) * np.sin(v), r * np.sin(u) * np.sin(v), r * np.cos(v))
@@ -3057,7 +3060,7 @@ def torus_surface(u: float, v: float, R: float = 2.0, r: float = 1.0) -> tuple:
     @param R: Großradius (Standard: 2.0)
     @param r: Kleinradius (Standard: 1.0)
     @return: Tuple (x, y, z)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     return ((R + r * np.cos(v)) * np.cos(u),
@@ -3077,7 +3080,7 @@ def saddle_surface(u: float, v: float) -> tuple:
     @param u: Erste Parameterkoordinate
     @param v: Zweite Parameterkoordinate
     @return: Tuple (u, v, u²-v²)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     return (u, v, u ** 2 - v ** 2)
@@ -3105,7 +3108,7 @@ def _compute_gaussian_curvature_numerical(
     @param v_arr: 1D-Array der v-Werte
     @param h: Schrittweite für finite Differenzen (Standard: 1e-4)
     @return: 2D-Array der Krümmungswerte K(u, v)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     nu = len(u_arr)
@@ -3189,7 +3192,7 @@ def plot_gaussian_curvature_3d(
     @param resolution: Anzahl Gitterpunkte je Parameter (Standard: 50)
     @param save_path: Pfad zum Speichern (None → kein Speichern)
     @return: (fig, ax) - Figure und Axes3D
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     # Vordefinierte Flächen
@@ -3324,7 +3327,7 @@ def plot_geodesic_on_sphere(
     @param n_steps: Alternative zu steps (für Testkompatibilität)
     @param save_path: Pfad zum Speichern
     @return: matplotlib Figure
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     from scipy.integrate import solve_ivp
@@ -3432,7 +3435,7 @@ def plot_geodesic_on_torus(
     @param t_max: Endzeit der Integration
     @param save_path: Speicherpfad
     @return: matplotlib Figure
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     from scipy.integrate import solve_ivp
@@ -3527,7 +3530,7 @@ def animate_heat_equation(
     @param dt: Zeitschrittgröße (Standard: 0.001)
     @param save_path: Falls angegeben, GIF-Datei speichern
     @return: matplotlib.animation.FuncAnimation Objekt
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     import matplotlib.animation as mpl_animation
@@ -3615,7 +3618,7 @@ def animate_wave_equation_pde(
     @param nt: Anzahl Zeitschritte (Standard: 500)
     @param save_path: GIF-Speicherpfad
     @return: FuncAnimation Objekt
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     import matplotlib.animation as mpl_animation
@@ -3702,7 +3705,7 @@ def plot_special_functions_gallery(save_path: str = None) -> plt.Figure:
 
     @param save_path: Pfad zum Speichern (None → kein Speichern)
     @return: matplotlib Figure (3×1 Subplot-Grid)
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
     import scipy.special as sp
@@ -3766,5 +3769,301 @@ def plot_special_functions_gallery(save_path: str = None) -> plt.Figure:
 
     if save_path:
         fig.savefig(save_path, dpi=150, bbox_inches='tight')
+
+    return fig
+
+
+# ===========================================================================
+# ADAPTIVER GITTERPLOT
+# ===========================================================================
+
+def plot_adaptive_grid(
+    f: Callable,
+    xmin: float,
+    xmax: float,
+    tol: float = 1e-3,
+    max_depth: int = 12,
+    initial_points: int = 50,
+    save_path: str = None,
+    title: str = None,
+    return_fig: bool = True
+) -> plt.Figure:
+    """
+    @brief Adaptiver Gitterplot: feineres Gitter nahe Nullstellen und Singularitäten.
+    @description
+        Klassische äquidistante Gitter können Nullstellen oder Singularitäten
+        einer Funktion übersehen. Diese Funktion verwendet eine adaptive
+        Bisektionsstrategie:
+
+        Algorithmus:
+        1. Starte mit initial_points äquidistanten Punkten auf [xmin, xmax]
+        2. Für jedes Intervall [a, b]: Falls die lokale Variation > tol,
+           halbiere das Intervall (rekursive Bisektion)
+        3. Kriterien für Verfeinerung:
+           - |f(a) - f(b)| > tol (hohe Variation)
+           - Vorzeichenwechsel f(a)·f(b) < 0 (Nullstelle enthalten)
+           - Extremwertschätzung |f(m) - (f(a)+f(b))/2| > tol (Extremum)
+        4. Maximaltiefe max_depth verhindert unendliche Rekursion
+
+        Die resultierenden Punkte sind äquidistant in "wichtigen" Bereichen.
+
+    @param f              Zu plottende Funktion f(x)
+    @param xmin           Linke Grenze des Plotbereichs
+    @param xmax           Rechte Grenze des Plotbereichs
+    @param tol            Toleranz für Adaptivität (Standard: 1e-3)
+    @param max_depth      Maximale Rekursionstiefe (Standard: 12)
+    @param initial_points Anzahl der Startpunkte (Standard: 50)
+    @param save_path      Pfad zum Speichern (None = anzeigen)
+    @param title          Titel des Plots (None = automatisch)
+    @param return_fig     True = Figure zurückgeben, False = None
+    @return               matplotlib Figure-Objekt
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    """
+    # Adaptive Punktesammlung via iterativem Stack-basiertem Algorithmus
+    # (Stack statt Rekursion um RecursionError bei großem max_depth zu vermeiden)
+    x_points = set()
+
+    # Hilfsfunktion: Sicherer Funktionsaufruf (Singularitäten abfangen)
+    def safe_f(x: float) -> float | None:
+        """Ruft f(x) sicher auf; None bei Ausnahmen (Singularitäten)."""
+        try:
+            val = float(f(x))
+            # Inf/NaN als Singularität behandeln
+            if not math.isfinite(val):
+                return None
+            return val
+        except Exception:
+            return None
+
+    # Initiale Punktemenge: äquidistante Startpunkte
+    initial_x = np.linspace(xmin, xmax, initial_points)
+    x_points.update(initial_x.tolist())
+
+    # Stack-basierte Bisektion: [(a, b, tiefe), ...]
+    stack = [(initial_x[i], initial_x[i + 1], 0)
+             for i in range(len(initial_x) - 1)]
+
+    # Adaptive Verfeinerung
+    while stack:
+        a, b, depth = stack.pop()
+
+        # Maximale Tiefe erreicht → keine weitere Verfeinerung
+        if depth >= max_depth:
+            continue
+
+        # Mittelpunkt berechnen
+        mid = (a + b) / 2.0
+
+        # Funktionswerte an a, b, mid berechnen
+        fa = safe_f(a)
+        fb = safe_f(b)
+        fmid = safe_f(mid)
+
+        # Falls Singularitäten → immer verfeinern (bis max_depth)
+        if fa is None or fb is None or fmid is None:
+            x_points.add(mid)
+            stack.append((a, mid, depth + 1))
+            stack.append((mid, b, depth + 1))
+            continue
+
+        # Kriterium 1: Vorzeichenwechsel → Nullstelle im Intervall
+        has_sign_change = (fa * fb < 0)
+
+        # Kriterium 2: Lineare Interpolation weicht von Mittelpunkt ab
+        # Misst die Nicht-Linearität der Funktion im Intervall
+        linear_interpolation = (fa + fb) / 2.0
+        has_high_curvature = abs(fmid - linear_interpolation) > tol
+
+        # Kriterium 3: Großer absoluter Sprung zwischen den Endpunkten
+        has_large_jump = abs(fb - fa) > tol * max(1.0, abs(fa), abs(fb))
+
+        # Verfeinern falls eines der Kriterien erfüllt ist
+        if has_sign_change or has_high_curvature or has_large_jump:
+            # Mittelpunkt zur Punktemenge hinzufügen
+            x_points.add(mid)
+            # Beide Hälften auf den Stack legen
+            stack.append((a, mid, depth + 1))
+            stack.append((mid, b, depth + 1))
+
+    # Punkte sortieren und Funktionswerte berechnen
+    x_sorted = sorted(x_points)
+    x_plot = []
+    y_plot = []
+
+    for x in x_sorted:
+        y = safe_f(x)
+        if y is not None:
+            x_plot.append(x)
+            y_plot.append(y)
+
+    # Plot erstellen
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Funktion mit adaptivem Gitter plotten
+    ax.plot(x_plot, y_plot, 'b-', linewidth=1.5, label='f(x)')
+
+    # Nulllinien markieren
+    ax.axhline(0, color='k', linewidth=0.5, linestyle='--', alpha=0.5)
+
+    # Gitterpunkte als kleine Markierungen anzeigen (optional)
+    ax.plot(x_plot, y_plot, 'g.', markersize=2, alpha=0.3, label=f'{len(x_plot)} Gitterpunkte')
+
+    # Nullstellen grob markieren (Vorzeichenwechsel)
+    for i in range(len(y_plot) - 1):
+        if y_plot[i] * y_plot[i + 1] < 0:
+            # Lineare Interpolation der Nullstelle
+            x_zero = x_plot[i] - y_plot[i] * (x_plot[i + 1] - x_plot[i]) / (y_plot[i + 1] - y_plot[i])
+            ax.axvline(x_zero, color='r', linewidth=0.8, linestyle=':', alpha=0.6)
+
+    # Achsenbeschriftungen und Titel
+    ax.set_xlabel('x', fontsize=12)
+    ax.set_ylabel('f(x)', fontsize=12)
+    plot_title = title or f'Adaptiver Gitterplot von f(x) auf [{xmin}, {xmax}]'
+    ax.set_title(plot_title, fontsize=13)
+    ax.legend(fontsize=10)
+    ax.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+    elif not return_fig:
+        plt.show()
+        plt.close(fig)
+        return None
+
+    return fig
+
+
+# ===========================================================================
+# INTERAKTIVER PLOT MIT SLIDER
+# ===========================================================================
+
+def create_interactive_plot(
+    f: Callable,
+    xmin: float,
+    xmax: float,
+    param_name: str = 'a',
+    param_min: float = 0.0,
+    param_max: float = 2.0,
+    param_init: float = 1.0,
+    n_points: int = 500,
+    save_path: str = None,
+    title: str = None
+) -> plt.Figure:
+    """
+    @brief Interaktiver Plot mit matplotlib.widgets.Slider für Parameter.
+    @description
+        Erstellt einen 2D-Plot von f(x, param) mit einem Slider-Widget,
+        der den Parameter interaktiv ändert. Die Funktion wird als
+        f(x, param) interpretiert wobei param der Slider-Wert ist.
+
+        Hinweis: Der interaktive Slider funktioniert nur in interaktiven
+        Matplotlib-Backends (z.B. TkAgg, Qt5Agg). Im Headless/Agg-Modus
+        wird ein statischer Plot mit Slider-Bild erzeugt.
+
+        Die Funktion f muss zwei Argumente akzeptieren: f(x, param).
+        Beispiel: f = lambda x, a: a * np.sin(x)
+
+    @param f          Funktion f(x, param) mit zwei Argumenten
+    @param xmin       Linke Grenze
+    @param xmax       Rechte Grenze
+    @param param_name Name des Parameters (für Slider-Label)
+    @param param_min  Minimalwert des Parameters
+    @param param_max  Maximalwert des Parameters
+    @param param_init Startwert des Parameters
+    @param n_points   Anzahl der Stützpunkte
+    @param save_path  Pfad zum Speichern (None = plt.show())
+    @param title      Titel des Plots
+    @return           matplotlib Figure-Objekt
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    """
+    from matplotlib.widgets import Slider
+
+    # Ausgangspunkte berechnen
+    x_vals = np.linspace(xmin, xmax, n_points)
+
+    # Hilfsfunktion: f(x, param) sicher auswerten
+    def eval_f(param_val: float) -> np.ndarray:
+        """Berechnet f(x, param) für alle x-Werte."""
+        y = np.zeros(len(x_vals))
+        for i, xi in enumerate(x_vals):
+            try:
+                val = float(f(xi, param_val))
+                y[i] = val if math.isfinite(val) else np.nan
+            except Exception:
+                y[i] = np.nan
+        return y
+
+    # Figure mit Platz für den Slider erstellen
+    # Unteres Drittel für den Slider reservieren
+    fig, ax = plt.subplots(figsize=(10, 7))
+    plt.subplots_adjust(bottom=0.25)  # Platz für Slider unten
+
+    # Initialer Plot
+    y_init = eval_f(param_init)
+    line, = ax.plot(x_vals, y_init, 'b-', linewidth=2, label=f'f(x, {param_name}={param_init:.2f})')
+    ax.axhline(0, color='k', linewidth=0.5, linestyle='--', alpha=0.3)
+
+    # Achsenbeschriftungen
+    ax.set_xlabel('x', fontsize=12)
+    ax.set_ylabel('f(x)', fontsize=12)
+    ax.set_title(title or f'Interaktiver Plot f(x, {param_name})', fontsize=13)
+    ax.grid(True, alpha=0.3)
+
+    # y-Achse automatisch skalieren (Anfangswert)
+    y_finite = y_init[np.isfinite(y_init)]
+    if len(y_finite) > 0:
+        y_range = max(abs(y_finite.max()), abs(y_finite.min())) * 1.2
+        if y_range > 0:
+            ax.set_ylim(-y_range, y_range)
+
+    # Slider-Achse erstellen (unterhalb des Hauptplots)
+    slider_ax = fig.add_axes([0.15, 0.08, 0.70, 0.03])
+    slider = Slider(
+        ax=slider_ax,
+        label=param_name,
+        valmin=param_min,
+        valmax=param_max,
+        valinit=param_init,
+        color='steelblue'
+    )
+
+    # Callback-Funktion für Slider-Änderungen
+    def update_plot(val: float) -> None:
+        """Aktualisiert den Plot wenn der Slider bewegt wird."""
+        # Neuen y-Wert berechnen
+        y_new = eval_f(slider.val)
+        # Plot aktualisieren
+        line.set_ydata(y_new)
+        line.set_label(f'f(x, {param_name}={slider.val:.3f})')
+        ax.legend(fontsize=10)
+        # Automatische y-Skalierung
+        y_fin = y_new[np.isfinite(y_new)]
+        if len(y_fin) > 0:
+            yr = max(abs(y_fin.max()), abs(y_fin.min())) * 1.2
+            if yr > 0:
+                ax.set_ylim(-yr, yr)
+        # Zeichnen neu auslösen
+        fig.canvas.draw_idle()
+
+    # Slider an Callback anschließen
+    slider.on_changed(update_plot)
+
+    # Legende anzeigen
+    ax.legend(fontsize=10)
+
+    # Speichern oder anzeigen
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+    else:
+        # Interaktiv nur im richtigen Backend möglich
+        # Im Headless-Modus (Agg) wird plt.show() nichts anzeigen
+        try:
+            plt.show()
+        except Exception:
+            pass  # Headless-Modus: Keine Anzeige möglich
 
     return fig

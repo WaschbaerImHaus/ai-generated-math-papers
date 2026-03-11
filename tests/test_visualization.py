@@ -586,3 +586,76 @@ class TestEdgeCases:
 
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])
+
+
+# ---------------------------------------------------------------------------
+# NEUE FUNKTIONEN (Build 60): plot_adaptive_grid, create_interactive_plot
+# ---------------------------------------------------------------------------
+
+class TestPlotAdaptiveGrid:
+    """Tests für plot_adaptive_grid() (Build 60)."""
+
+    def test_returns_figure(self, tmp_path):
+        """plot_adaptive_grid gibt eine Figure zurück."""
+        import sys, os
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+        from visualization import plot_adaptive_grid
+        import math
+        fig = plot_adaptive_grid(math.sin, -math.pi, math.pi,
+                                 save_path=str(tmp_path / "adaptive.png"))
+        assert fig is not None
+
+    def test_saves_file(self, tmp_path):
+        """plot_adaptive_grid speichert die Datei korrekt."""
+        import sys, os
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+        from visualization import plot_adaptive_grid
+        import math
+        save_path = str(tmp_path / "adaptive_test.png")
+        plot_adaptive_grid(math.cos, 0, 2 * math.pi, save_path=save_path)
+        assert os.path.isfile(save_path)
+
+    def test_works_with_singularity(self, tmp_path):
+        """Adaptive Grid funktioniert nahe Singularitäten."""
+        import sys, os
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+        from visualization import plot_adaptive_grid
+        # 1/x hat Singularität bei x=0 – Bereich ohne 0
+        save_path = str(tmp_path / "singularity.png")
+        fig = plot_adaptive_grid(lambda x: 1.0 / x, 0.1, 2.0,
+                                 save_path=save_path)
+        assert fig is not None
+
+
+class TestCreateInteractivePlot:
+    """Tests für create_interactive_plot() (Build 60)."""
+
+    def test_returns_figure(self, tmp_path):
+        """create_interactive_plot gibt Figure zurück."""
+        import sys, os
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+        from visualization import create_interactive_plot
+        import math
+        save_path = str(tmp_path / "interactive.png")
+        fig = create_interactive_plot(
+            lambda x, a: a * math.sin(x),
+            xmin=-math.pi, xmax=math.pi,
+            param_name='a', param_min=0.1, param_max=3.0,
+            param_init=1.0, save_path=save_path
+        )
+        assert fig is not None
+
+    def test_saves_file(self, tmp_path):
+        """create_interactive_plot speichert die Datei."""
+        import sys, os
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+        from visualization import create_interactive_plot
+        import math
+        save_path = str(tmp_path / "interactive_save.png")
+        create_interactive_plot(
+            lambda x, a: a * x,
+            xmin=0.0, xmax=1.0,
+            param_name='slope',
+            save_path=save_path
+        )
+        assert os.path.isfile(save_path)
