@@ -16,6 +16,7 @@
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
 
 % -------------------------------------------------------
 % Custom commands
@@ -97,10 +98,7 @@ $\mathcal{O}$, $E$ is a smooth projective curve of genus~$1$.
 \label{def:j_invariant}
 The \emph{$j$-invariant} of $E: y^2 = x^3 + ax + b$ is
 \[
-  j(E) \;=\; -1728\,\frac{4a^3}{\Delta/(-16)}\cdot(-16)
-  \;=\; 1728\,\frac{4a^3}{4a^3 + 27b^2}.
-\]
-More explicitly: $j(E) = -1728\,\cdot\,\dfrac{(4a)^3}{\Delta}$.
+  j(E) \;=\; 1728\,\frac{4a^3}{4a^3 + 27b^2}.
 \end{definition}
 
 \begin{theorem}[Classification by $j$]
@@ -230,8 +228,8 @@ rational points on the relevant modular curves.
 \begin{itemize}
   \item $E: y^2 = x^3 - x$ has torsion $\Z/2\Z \times \Z/2\Z$
     (three 2-torsion points: $(0,0)$, $(1,0)$, $(-1,0)$).
-  \item $E: y^2 = x^3 - x^2$ (with $b = 0$, so $\Delta = 0$) is
-    singular; for $E: y^2 = x^3 + 1$, torsion is $\Z/6\Z$.
+  \item $E: y^2 = x^3 - x^2$ is singular (it has a node at the
+    origin, $\Delta = 0$); for $E: y^2 = x^3 + 1$, torsion is $\Z/6\Z$.
   \item $E: y^2 + y = x^3 - x^2 - 10x - 10$ has torsion $\Z/12\Z$
     (achieving the maximum cyclic order).
 \end{itemize}

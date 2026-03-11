@@ -118,56 +118,25 @@ has a rational point of infinite order, i.e.\ $\mathrm{rank}(E_n(\Q)) \ge 1$.
 Suppose $a^2 + b^2 = c^2$ and $ab/2 = n$ with $a,b,c \in \Q_{>0}$.
 Set
 \[
-  x = \left(\frac{c}{2}\right)^2, \quad
-  y = \frac{c(a^2 - b^2)}{8} \cdot \text{(a suitable sign choice)}.
+  x_0 = \frac{c^2}{4}, \quad y_0 = \frac{c(a^2 - b^2)}{8}.
 \]
-More precisely: the standard parametrization is
+We verify $(x_0, y_0) \in E_n$.  Since $c^2 = a^2 + b^2$ and $ab = 2n$:
 \[
-  x = \left(\frac{b+c}{2}\right)^2,
-  \quad
-  y = \frac{a \cdot b \cdot c}{2}\cdot\frac{1}{?}.
+  c^4 - 16n^2 \;=\; (a^2+b^2)^2 - (ab)^2
+  \;=\; a^4 - 2a^2b^2 + b^4 \;=\; (a^2-b^2)^2.
 \]
-We use the more elegant substitution: from $a^2 + b^2 = c^2$ and $ab = 2n$,
-the number $t = (c/2)^2$ satisfies
-$(t - (a/2)^2)(t - (b/2)^2) = ((a^2-b^2)/4)^2/4$,
-leading to the parametrization
-\[
-  (x,y) = \left(\left(\frac{c}{2}\right)^2,\; \frac{c(a^2-b^2)}{8}\right).
-\]
-Let us verify this gives a point on $E_n$.
-Set $x_0 = (c/2)^2$ and $y_0 = c(a^2-b^2)/8$.
+Therefore
 \begin{align*}
   x_0^3 - n^2 x_0
-  &= \frac{c^6}{8} - n^2\frac{c^2}{4}
-   = \frac{c^2}{8}\bigl(c^4 - 2n^2\bigr)
-   = \frac{c^2}{8}\bigl(c^4 - \tfrac{(ab)^2}{2}\bigr).
+  &= \frac{c^6}{64} - \frac{n^2 c^2}{4}
+   = \frac{c^2}{64}\bigl(c^4 - 16n^2\bigr)
+   = \frac{c^2(a^2-b^2)^2}{64}
+   = y_0^2. \quad \checkmark
 \end{align*}
-Since $a^2 + b^2 = c^2$, we have $c^4 = (a^2+b^2)^2 = a^4+2a^2b^2+b^4$
-and $(ab)^2 = 4n^2$.
-\[
-  c^4 - 2n^2 = a^4 + 2a^2b^2 + b^4 - \frac{a^2b^2}{2}
-  = a^4 + \frac{3}{2}a^2b^2 + b^4.
-\]
-Hmm, let us use the direct formula instead.
-The correct parametrization (see \cite{Koblitz1984}, Chapter~1) is:
-given a Pythagorean triple $(a,b,c)$ with $ab/2 = n$, set
-\[
-  u = \frac{a-b}{2}, \quad v = \frac{a+b}{2}.
-\]
-Then $v^2 - u^2 = ab$ and $u^2 + v^2 = (a^2+b^2)/2 + ... $.
-The cleanest route: from the identity
-\[
-  \left(\frac{c^2}{4}\right)^2 - n^2 \cdot \frac{c^2}{4}
-  = \left(\frac{c^2-2n}{4}\right)\left(\frac{c^2+2n}{4}\right) \cdot \frac{c^2}{4},
-\]
-one checks that $(c/2)^2$ solves $t^2 - n^2 = (c/2)^2 \cdot (c^2/4 - n^2)/(c^2/4)$,
-and the point $((a+b)^2/4, (a+b)(a-b)(c)/8)$ lies on $y^2 = x^3 - n^2 x$
-by direct algebra (verified in \cite{Silverman1992}, p.~222).
-
-The point has infinite order because one can verify (using the Nagell--Lutz
-theorem, Theorem~\ref{thm:torsion_En} below) that the torsion subgroup
-of $E_n$ has order $4$, and the point $(c^2/4, \ldots)$ has $y \ne 0$
-and is not in the torsion subgroup when $n$ is a proper congruent number.
+The point has infinite order: by Theorem~\ref{thm:torsion_En} below,
+$E_n(\Q)_{\mathrm{tors}} = \{O,(0,0),(\pm n, 0)\}$.
+Since $a \ne b$ (otherwise the triangle degenerates) and $c > 0$, we have
+$y_0 \ne 0$, so $(x_0,y_0)$ is not torsion.
 
 \textbf{(Point of infinite order $\Rightarrow$ congruent.)}
 Given $(x_0, y_0) \in E_n(\Q)$ with $y_0 \ne 0$, the formulas
@@ -228,9 +197,9 @@ For a squarefree positive integer $n$, define the counting functions:
 \begin{align*}
   A(n) &= \#\{(x,y,z) \in \Z^3 : 2x^2 + y^2 + 8z^2 = n\}, \\
   B(n) &= \#\{(x,y,z) \in \Z^3 : 2x^2 + y^2 + 32z^2 = n\}, \\
-  C(n) &= \#\{(x,y,z) \in \Z^3 : 8x^2 + 2y^2 + 16z^2 = n/2\}
+  C(n) &= \#\{(x,y,z) \in \Z^3 : 4x^2 + y^2 + 8z^2 = n/2\}
   \quad (n \text{ even}), \\
-  D(n) &= \#\{(x,y,z) \in \Z^3 : 8x^2 + 2y^2 + 64z^2 = n/2\}
+  D(n) &= \#\{(x,y,z) \in \Z^3 : 4x^2 + y^2 + 32z^2 = n/2\}
   \quad (n \text{ even}).
 \end{align*}
 \begin{enumerate}
@@ -285,21 +254,12 @@ This point has infinite order (it is not in $\{O,(0,0),(\pm 6,0)\}$
 and $2 \cdot (25/4, 35/8) \ne O$).
 
 \textbf{$n = 5$:} The right triangle $(3/2, 20/3, 41/6)$ has area $5$.
-The point $(x_0, y_0) = (41^2/4^2, \ldots) = (1681/16, \ldots)$... let us use
-the direct formula: $x_0 = (c/2)^2 = (41/6)^2/4 = ... $ Hmm, the
-substitution is: for the triple $(a,b,c) = (3/2, 20/3, 41/6)$,
-the point on $E_5: y^2 = x^3 - 25x$ is
-\[
-  x_0 = \Bigl(\frac{a+b}{2}\Bigr)^2
-      = \Bigl(\frac{3/2 + 20/3}{2}\Bigr)^2
-      = \Bigl(\frac{9/6 + 40/6}{2}\Bigr)^2
-      = \Bigl(\frac{49/6}{2}\Bigr)^2
-      = \Bigl(\frac{49}{12}\Bigr)^2
-      = \frac{2401}{144}.
-\]
-$y_0 = (a+b)(a-b) \cdot c / (2\cdot 2) = \ldots$ --- the explicit value is
-$y_0 = 7/2$ for the standard generator, but we can confirm $n=5$ is
-congruent by the existence of the triangle $(3/2, 20/3, 41/6)$.
+Verification: $(3/2)^2 + (20/3)^2 = 9/4 + 400/9 = 81/36 + 1600/36 = 1681/36 = (41/6)^2$
+and area $= (1/2)(3/2)(20/3) = 5$.  \checkmark
+A rational point of infinite order on $E_5: y^2 = x^3 - 25x$ is $(25/4, 75/8)$:
+$(75/8)^2 = 5625/64$ and $(25/4)^3 - 25\cdot(25/4) = 15625/64 - 10000/64 = 5625/64$.
+\checkmark
+This point is not torsion ($y \ne 0$ and $x = 25/4 \ne 0, \pm 5$), confirming $n = 5$ is congruent.
 
 \textbf{$n = 7$:} The right triangle $(35/12, 24/5, 337/60)$ has area $7$.
 Verification: legs $35/12$ and $24/5$, hypotenuse $\sqrt{(35/12)^2 + (24/5)^2}
@@ -309,26 +269,15 @@ Verification: legs $35/12$ and $24/5$, hypotenuse $\sqrt{(35/12)^2 + (24/5)^2}
 
 \begin{remark}[Status of $n = 1, 2, 3$]
 \begin{itemize}
-  \item Fermat proved $n=1$ is not congruent using infinite descent
-    (equivalent to the assertion that $y^2 = x^4 - 1$ has no rational
-    points with $y \ne 0$).
-  \item $n = 2, 3$: Tunnell's theorem, under BSD, predicts $A(2) \ne 2B(2)$
-    and $A(3) \ne 2B(3)$, meaning these are not congruent.
-    But this is not unconditionally proved.
-    Computed: $A(1) = 0$, $B(1) = 0$ (both empty), $C(2) = 2$, $D(2) = 1$.
-    Tunnell's criterion gives $C(2) = 2 = 2 \cdot 1 = 2D(2)$, predicting~$2$ is
-    congruent... this contradicts expectation, so let me note: $n=2$ is actually
-    expected to be non-congruent, and the formulae should be checked with the
-    corrected Tunnell criterion (the condition is $A(n) = 2B(n)$, and for
-    $n=3$ odd: $A(3) = 2$, $B(3) = 1$, giving $2 = 2 \cdot 1 = 2B(3)$,
-    which would predict $n=3$ is congruent --- but this is the unresolved case).
-    Precisely: Tunnell's theorem says: \emph{if} congruent, \emph{then} $A=2B$;
-    the converse requires BSD.
-    For $n=1$: $A(1) = 2$, $B(1) = 1$, giving $A(1) = 2 = 2B(1)$, but $n=1$
-    is NOT congruent, so the converse direction (which needs BSD) fails here
-    only if BSD fails for $E_1$ --- but BSD predicts $L(E_1,1) \ne 0$ and
-    $r=0$ for $E_1: y^2 = x^3 - x$ (consistent with $n=1$ not congruent).
+  \item $n=1$: Fermat proved non-congruent by infinite descent.
+    Tunnell's criterion confirms this: $A(1) = 2$, $B(1) = 2$,
+    so $A(1) = 2 \ne 4 = 2B(1)$.  BSD predicts $L(E_1,1) \ne 0$ and $\mathrm{rank}=0$.
+  \item $n=2$ (even): $C(2) = 2$, $D(2) = 2$, so $C(2) = 2 \ne 4 = 2D(2)$.
+    Under BSD, $n=2$ is not congruent.
+  \item $n=3$ (odd): $A(3) = 4$, $B(3) = 4$, so $A(3) = 4 \ne 8 = 2B(3)$.
+    Under BSD, $n=3$ is not congruent.
 \end{itemize}
+An unconditional proof that $n=2$ and $n=3$ are non-congruent remains open.
 \end{remark}
 
 % ================================================================
