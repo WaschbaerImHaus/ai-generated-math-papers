@@ -652,3 +652,26 @@ Bereits behoben (kein Handlungsbedarf):
 - BUG-B6-P28-EN-003: paper28 EN — Abstract: falsche Substitutionsvariable x=(b/2)² → x=(c/2)²
 - BUG-B6-P28-EN-004: paper28 EN — bibitem-Schlüssel Koblitz1993 → Koblitz1994 (2. Aufl. 1994)
 - BUG-B6-P28-DE-001: paper28 DE — Gleicher bibitem-Schlüssel-Fehler behoben
+
+## 2026-03-11 22:01 — Review-Bugs Batch 8: Papers 33–36 (Millennium-Probleme)
+
+Review aller 8 Dateien in papers/batch8/ auf formale Korrektheit, inhaltliche
+Fakten-Richtigkeit und EN/DE-Konsistenz.
+
+### Behobene Bugs:
+- BUG-B8-P33-EN-001: paper33 EN — fontenc/inputenc fehlten (DE hatte sie)
+- BUG-B8-P34-EN-001: paper34 EN — fontenc/inputenc fehlten (analog zu P33)
+- BUG-B8-P34-DE-001: paper34 DE — Grammatikfehler "unbewiesener" → "nicht bewiesen"
+- BUG-B8-P34-DE-002: paper34 DE — Tippfehler "Beweissstrategie" → "Beweisstrategie"
+- BUG-B8-P35-EN-001: paper35 EN — Euler-Produkt L(E,s)=∏L_p^{-1} → ∏L_p (doppeltes Inverses)
+- BUG-B8-P35-DE-001: paper35 DE — Euler-Produkt analog zu EN
+- BUG-B8-P36-EN-001: paper36 EN — Tabelle: "Leray 1934 smooth 2D" falsch → Leray schwach, Ladyzhenskaya glatt
+- BUG-B8-P36-DE-001: paper36 DE — Tabelle analog zu EN
+- BUG-B8-P36-EN-002: paper36 EN — bibkey ConstantinDoering1994 verwies auf 1995er Paper → 1994 korrigiert
+- BUG-B8-P36-DE-002: paper36 DE — Analog zu EN
+
+### Inhaltliche Verifikation (alle korrekt):
+- P33: de la Vallée Poussin 1899 ✓, explizite Formel ψ(x) ✓, >10^13 Nullstellen ✓, GRH für Dirichlet-L-Fkt. ✓
+- P34: abc-Definition c < rad(abc)^{1+ε} ✓, Mochizuki 2012 ✓, Scholze-Stix 2018 ✓, FLT für n≥6 ✓
+- P35: Coates-Wiles 1977 ✓, Gross-Zagier 1986 ✓, Kolyvagin 1989 ✓, starke BSD mit Sha/Torsion/Periode ✓
+- P36: Leray 1934 schwache Lösungen ✓, Ladyzhenskaya 2D ✓, CKN 1982 ✓, Tao 2016 ✓, K41 ✓

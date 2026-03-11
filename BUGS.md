@@ -5,6 +5,58 @@ _(keine bekannten Bugs)_
 
 ## Behobene Bugs
 
+### BUG-B8-P33-EN-001: paper33 EN — Fehlende fontenc/inputenc-Pakete
+- **Datei**: papers/batch8/paper33_riemann_hypothesis_analytic_en.tex
+- **Problem**: `\usepackage[T1]{fontenc}` und `\usepackage[utf8]{inputenc}` fehlten im EN-Paper (DE hatte sie)
+- **Behoben**: Beide Pakete nach `\usepackage{enumitem,booktabs,array}` eingefügt
+
+### BUG-B8-P34-EN-001: paper34 EN — Fehlende fontenc/inputenc-Pakete
+- **Datei**: papers/batch8/paper34_abc_conjecture_en.tex
+- **Problem**: `\usepackage[T1]{fontenc}` und `\usepackage[utf8]{inputenc}` fehlten im EN-Paper (DE hatte sie — Inkonsistenz zwischen EN und DE)
+- **Behoben**: Beide Pakete nach `\usepackage{enumitem,booktabs,array}` eingefügt
+
+### BUG-B8-P34-DE-001: paper34 DE — Grammatikfehler „unbewiesener"
+- **Datei**: papers/batch8/paper34_abc_vermutung_de.tex, Abschnitt 5
+- **Problem**: „gilt im Mainstream-Konsens als unbewiesener" — falsches Adjektiv im Prädikativum (kein Komparativ gemeint)
+- **Behoben**: „als unbewiesener" → „als nicht bewiesen"
+
+### BUG-B8-P34-DE-002: paper34 DE — Tippfehler „Beweissstrategie"
+- **Datei**: papers/batch8/paper34_abc_vermutung_de.tex, Abschnitt 4.2
+- **Problem**: Dreifaches „s" in „Beweissstrategie"
+- **Behoben**: „Beweissstrategie" → „Beweisstrategie"
+
+### BUG-B8-P35-EN-001: paper35 EN — Falsches Euler-Produkt mit doppeltem Inversen
+- **Datei**: papers/batch8/paper35_bsd_conjecture_en.tex, Definition in Abschnitt 2
+- **Problem**: `L(E,s) = ∏_p L_p(E,s)^{-1}` ist falsch. Die lokalen Faktoren `L_p(E,s)` sind bereits als `(1-a_p p^{-s}+...)^{-1}` (inverse) definiert. Das Produkt `∏_p L_p(E,s)` (ohne weiteres Inverses) ergibt korrekt die globale L-Funktion.
+- **Behoben**: `\prod_p L_p(E,s)^{-1}` → `\prod_p L_p(E,s)`
+
+### BUG-B8-P35-DE-001: paper35 DE — Falsches Euler-Produkt (analog EN)
+- **Datei**: papers/batch8/paper35_bsd_vermutung_de.tex, Definition in Abschnitt 2
+- **Problem**: Identischer Fehler wie BUG-B8-P35-EN-001
+- **Behoben**: `\prod_p L_p(E,s)^{-1}` → `\prod_p L_p(E,s)`
+
+### BUG-B8-P36-EN-001: paper36 EN — Falsche Attribuierung in Ergebnis-Tabelle (Leray vs. Ladyzhenskaya)
+- **Datei**: papers/batch8/paper36_navier_stokes_en.tex, Tabelle in Abschnitt 8
+- **Problem**: „2D Global, smooth (Leray 1934)" ist falsch. Leray 1934 bewies globale *schwache* Lösungen auch in 2D; die Existenz glatter globaler 2D-Lösungen bewies Ladyzhenskaya 1969.
+- **Behoben**: Tabelleneintrag korrigiert auf „Global weak (Leray 1934), smooth (Ladyzhenskaya 1969)"
+
+### BUG-B8-P36-DE-001: paper36 DE — Falsche Attribuierung in Ergebnis-Tabelle (analog EN)
+- **Datei**: papers/batch8/paper36_navier_stokes_de.tex, Tabelle in Abschnitt 8
+- **Problem**: Identisch zu BUG-B8-P36-EN-001
+- **Behoben**: „Global, glatt (Leray 1934)" → „Global schwach (Leray 1934), glatt (Ladyzhenskaya 1969)"
+
+### BUG-B8-P36-EN-002: paper36 EN — bibkey-Jahreszahl-Diskrepanz ConstantinDoering
+- **Datei**: papers/batch8/paper36_navier_stokes_en.tex, Bibliographie
+- **Problem**: `\bibitem{ConstantinDoering1994}` verwies auf Phys. Rev. E 51 (1995) — Jahreszahl und bibkey stimmten nicht überein
+- **Behoben**: Quellenangabe korrigiert auf das korrekte Paper von 1994 (Phys. Rev. E 49)
+
+### BUG-B8-P36-DE-002: paper36 DE — bibkey-Jahreszahl-Diskrepanz ConstantinDoering (analog EN)
+- **Datei**: papers/batch8/paper36_navier_stokes_de.tex, Bibliographie
+- **Problem**: Identisch zu BUG-B8-P36-EN-002
+- **Behoben**: Quellenangabe analog korrigiert
+
+
+
 ### BUG-B6-P28-EN-004 (Build 102): paper28 EN — Falscher bibitem-Schlüssel Koblitz
 - **Datei**: papers/batch6/paper28_congruent_numbers_bsd_en.tex
 - **Problem**: bibitem-Schlüssel `Koblitz1993` widersprach dem Erscheinungsjahr der 2. Auflage (1994)
