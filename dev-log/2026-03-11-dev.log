@@ -70,3 +70,50 @@
 - pytest-timeout installiert (pip --break-system-packages)
 - Bugfix: test_visualization_extended.py: plot_gaussian_curvature_3d() gibt (fig, ax)-Tuple zurück, nicht nur fig – Tests korrigiert
 - Gesamtergebnis: 6999/6999 Tests grün
+
+2026-03-11 Build 46: 3D Gaußsche Krümmung (Visualisierung)
+  - src/visualization.py: Neue Funktionen am Ende hinzugefügt:
+      * sphere_surface(u, v, r): Sphären-Parametrisierung
+      * torus_surface(u, v, R, r): Torus-Parametrisierung
+      * saddle_surface(u, v): Sattelfläche z=u²-v²
+      * _compute_gaussian_curvature_numerical(): K numerisch via finite Differenzen
+      * plot_gaussian_curvature_3d(): 3D-Surface-Plot mit K als Farbkodierung
+  - Unterstützte Flächen: 'sphere', 'torus', 'saddle', 'hyperbolic_paraboloid'
+  - Tests in tests/test_visualization_extended.py (bereits vorhanden, bestehen)
+
+2026-03-11 Build 47: Geodäten-Plot (Visualisierung)
+  - src/visualization.py: Neue Funktionen:
+      * plot_geodesic_on_sphere(): Geodäte (Großkreis) auf Sphäre via RK45
+      * plot_geodesic_on_torus(): Geodäte auf Torus via RK45
+  - Geodätengleichungen mit Christoffel-Symbolen
+  - Tests bestehen (test_visualization_extended.py)
+
+2026-03-11 Build 48: PDE-Animationen (Visualisierung)
+  - src/visualization.py: Neue Funktionen:
+      * animate_heat_equation(): Wärmegleichung u_t = α·u_xx (FTCS, explicit Euler)
+      * animate_wave_equation_pde(): Wellengleichung u_tt = c²·u_xx (Leap-Frog)
+  - Stabilitätsbedingungen werden geprüft (r ≤ 0.5 für Wärme, CFL für Welle)
+
+2026-03-11 Build 49: Spezielle Funktionen Galerie (Visualisierung)
+  - src/visualization.py: Neue Funktion:
+      * plot_special_functions_gallery(): 3×1 Subplot-Grid (Bessel, Legendre, Hermite)
+  - Nutzt scipy.special.jn, legendre, hermite
+
+2026-03-11 Build 50: Symplektische Geometrie (neues Modul)
+  - src/symplectic_geometry.py: Neues Modul erstellt
+      * SymplecticForm: Standard-Symplektikform J = [[0,I],[-I,0]], evaluate, is_non_degenerate
+      * HamiltonianSystem: vector_field, solve (RK45), poisson_bracket
+      * SymplecticManifold: is_symplectic, darboux_theorem_local, volume_form
+      * harmonic_oscillator_hamiltonian, kepler_hamiltonian, double_pendulum_hamiltonian
+  - 26 Tests in tests/test_symplectic_geometry.py - alle grün
+
+2026-03-11 Build 51: Spinor-Rechnung (neues Modul)
+  - src/spinor_calculus.py: Neues Modul erstellt
+      * PauliMatrices: sigma(), commutator(), anticommutator(), spin_rotation()
+      * CliffordAlgebra(p,q): generators(), clifford_product(), verify_clifford_relations()
+      * Spinor: norm(), conjugate(), lorentz_transform()
+      * DiracEquation: gamma_matrices(), free_particle_energy(), plane_wave_solution(),
+                       verify_clifford_algebra()
+  - 36 Tests in tests/test_spinor_calculus.py - alle grün
+  - 7061/7061 Gesamttests grün
+

@@ -2132,3 +2132,1639 @@ def plot_function_2d_adaptive(
     ax.axvline(0, color='k', linewidth=0.5)
 
     return fig
+
+
+# ===========================================================================
+# INTERAKTIVE PLOTS (matplotlib.widgets)
+# ===========================================================================
+
+def interactive_plot(
+    func,
+    x_range: tuple,
+    param_name: str = 'a',
+    param_range: tuple = (0, 10),
+    save_path: str = None
+):
+    """
+    @brief Erstellt einen interaktiven Plot mit Slider-Widget.
+    @description
+        Erstellt einen Matplotlib-Plot mit einem Slider für einen Parameter.
+        Der Slider ermöglicht es, den Parameter interaktiv zu verändern
+        und die Auswirkungen auf den Graphen live zu sehen.
+
+        Nur verfügbar wenn matplotlib.widgets importierbar ist.
+
+    @param func: Funktion f(x, param) mit Slider-Parameter.
+    @param x_range: (x_min, x_max) – Wertebereich der x-Achse.
+    @param param_name: Name des Parameters (erscheint auf Slider).
+    @param param_range: (param_min, param_max) – Wertebereich des Parameters.
+    @param save_path: Speicherpfad für PNG (None = interaktiv anzeigen).
+    @return: matplotlib.figure.Figure-Objekt.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    try:
+        from matplotlib.widgets import Slider
+    except ImportError:
+        raise ImportError("matplotlib.widgets ist nicht verfügbar.")
+
+    # Gitter aufbauen
+    x_arr = np.linspace(x_range[0], x_range[1], 500)
+    param_init = (param_range[0] + param_range[1]) / 2.0
+
+    # Figure und Plot-Achse erstellen (Platz für Slider unten einplanen)
+    fig, ax = plt.subplots(figsize=(9, 6))
+    plt.subplots_adjust(bottom=0.2)
+
+    # Initialen Plot zeichnen
+    y_init = np.array([func(x, param_init) for x in x_arr])
+    line, = ax.plot(x_arr, y_init, 'b-', linewidth=2)
+    ax.set_xlabel('x')
+    ax.set_ylabel(f'f(x, {param_name})')
+    ax.set_title(f'Interaktiver Plot: f(x, {param_name})')
+    ax.grid(True, alpha=0.3)
+
+    # Slider erstellen
+    ax_slider = plt.axes([0.1, 0.05, 0.8, 0.04])
+    slider = Slider(
+        ax_slider,
+        param_name,
+        param_range[0],
+        param_range[1],
+        valinit=param_init
+    )
+
+    # Update-Funktion für Slider-Ereignis
+    def update(val):
+        """Aktualisiert den Plot wenn Slider bewegt wird."""
+        param = slider.val
+        y_new = np.array([func(x, param) for x in x_arr])
+        line.set_ydata(y_new)
+        fig.canvas.draw_idle()
+
+    slider.on_changed(update)
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+    return fig
+
+
+def interactive_3d(
+    func_z,
+    x_range: tuple,
+    y_range: tuple,
+    n: int = 50,
+    save_path: str = None
+):
+    """
+    @brief Erstellt einen interaktiven 3D-Plot mit Elevation/Azimuth-Slidern.
+    @description
+        Erzeugt eine 3D-Oberfläche mit matplotlib und zwei Slider-Widgets
+        zum interaktiven Rotieren der Ansicht (Elevation und Azimuth).
+
+    @param func_z: Funktion f(x, y) → z-Wert.
+    @param x_range: (x_min, x_max) – Wertebereich der x-Achse.
+    @param y_range: (y_min, y_max) – Wertebereich der y-Achse.
+    @param n: Gitterpunkte pro Achse (n×n-Gitter).
+    @param save_path: Speicherpfad (None = interaktiv anzeigen).
+    @return: matplotlib.figure.Figure-Objekt.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    try:
+        from matplotlib.widgets import Slider
+        from mpl_toolkits.mplot3d import Axes3D
+    except ImportError:
+        raise ImportError("matplotlib.widgets oder mpl_toolkits nicht verfügbar.")
+
+    # Gitter aufbauen
+    x_arr = np.linspace(x_range[0], x_range[1], n)
+    y_arr = np.linspace(y_range[0], y_range[1], n)
+    X, Y = np.meshgrid(x_arr, y_arr)
+
+    # Z-Werte berechnen
+    Z = np.vectorize(func_z)(X, Y)
+
+    # Figure erstellen
+    fig = plt.figure(figsize=(10, 8))
+    plt.subplots_adjust(bottom=0.2)
+    ax3d = fig.add_subplot(111, projection='3d')
+    surf = [ax3d.plot_surface(X, Y, Z, cmap='viridis', alpha=0.8)]
+
+    ax3d.set_xlabel('x')
+    ax3d.set_ylabel('y')
+    ax3d.set_zlabel('z')
+    ax3d.set_title('3D-Plot (interaktiv)')
+
+    # Slider für Elevation (Neigungswinkel)
+    ax_elev = plt.axes([0.1, 0.08, 0.35, 0.03])
+    slider_elev = Slider(ax_elev, 'Elevation', 0, 90, valinit=30)
+
+    # Slider für Azimuth (Drehwinkel)
+    ax_azim = plt.axes([0.55, 0.08, 0.35, 0.03])
+    slider_azim = Slider(ax_azim, 'Azimuth', -180, 180, valinit=-60)
+
+    def update_view(val):
+        """Aktualisiert Blickwinkel beim Slider-Bewegen."""
+        ax3d.view_init(elev=slider_elev.val, azim=slider_azim.val)
+        fig.canvas.draw_idle()
+
+    slider_elev.on_changed(update_view)
+    slider_azim.on_changed(update_view)
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+    return fig
+
+
+# ===========================================================================
+# ADAPTIVES GITTER
+# ===========================================================================
+
+def adaptive_plot(
+    func,
+    x_range: tuple,
+    n_initial: int = 100,
+    max_refinements: int = 5,
+    tol: float = 1e-3,
+    save_path: str = None,
+    return_points: bool = False
+):
+    """
+    @brief Adaptiver Plot mit automatischer Gitterverfeinerung.
+    @description
+        Verfeinert das Gitter automatisch in Bereichen mit starker Krümmung
+        (nahe Nullstellen, Singularitäten oder schnell wechselnden Funktionswerten).
+
+        Algorithmus:
+        1. Anfangsgitter mit n_initial Punkten
+        2. Gradient berechnen mit numpy.gradient()
+        3. Punkte mit hohem Gradienten verfeinern (Mittelpunkte einfügen)
+        4. Bis zu max_refinements Verfeinerungsrunden
+
+    @param func: Funktion f(x) → float.
+    @param x_range: (x_min, x_max) – Wertebereich.
+    @param n_initial: Anfangsgitter-Größe.
+    @param max_refinements: Maximale Verfeinerungsrunden.
+    @param tol: Toleranz für Gradienten-Schwellenwert.
+    @param save_path: Speicherpfad (None = anzeigen).
+    @param return_points: Wenn True, gibt (x, y) zurück statt Figure.
+    @return: Figure oder (x_arr, y_arr) wenn return_points=True.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    # Anfangsgitter erstellen
+    x_pts = np.linspace(x_range[0], x_range[1], n_initial)
+    y_pts = np.array([func(xi) for xi in x_pts])
+
+    # Adaptive Verfeinerung
+    for _ in range(max_refinements):
+        # Gradient berechnen (Änderungsrate)
+        grad = np.abs(np.gradient(y_pts, x_pts))
+
+        # Schwellenwert: tol-Quantil der Gradienten
+        threshold = np.quantile(grad, 1.0 - tol) if len(grad) > 1 else 0
+
+        # Indizes mit hohem Gradienten finden
+        high_grad_idx = np.where(grad > threshold)[0]
+
+        if len(high_grad_idx) == 0:
+            break  # Keine Verfeinerung mehr nötig
+
+        # Neue Punkte zwischen hochgradigen Nachbarn einfügen
+        neue_x = []
+        for idx in high_grad_idx:
+            if idx < len(x_pts) - 1:
+                neue_x.append(0.5 * (x_pts[idx] + x_pts[idx + 1]))
+            if idx > 0:
+                neue_x.append(0.5 * (x_pts[idx - 1] + x_pts[idx]))
+
+        if not neue_x:
+            break
+
+        # Neue Punkte einfügen und sortieren
+        alle_x = np.unique(np.concatenate([x_pts, np.array(neue_x)]))
+        alle_y = np.array([func(xi) for xi in alle_x])
+        x_pts = alle_x
+        y_pts = alle_y
+
+    # Nur gültige (finite) Werte behalten
+    mask = np.isfinite(y_pts)
+    x_final = x_pts[mask]
+    y_final = y_pts[mask]
+
+    if return_points:
+        return x_final, y_final
+
+    # Plot erstellen
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.plot(x_final, y_final, 'b-', linewidth=1.5)
+    ax.scatter(x_final[::max(1, len(x_final)//20)], y_final[::max(1, len(y_final)//20)],
+               color='red', s=10, alpha=0.5, label='Gitterpunkte')
+    ax.set_title(f'Adaptiver Plot ({len(x_final)} Punkte nach {max_refinements} Verfeinerungen)')
+    ax.set_xlabel('x')
+    ax.set_ylabel('f(x)')
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+    return fig
+
+
+# ===========================================================================
+# KRÜMMUNGS-VISUALISIERUNG
+# ===========================================================================
+
+def plot_gaussian_curvature(
+    surface_func,
+    u_range: tuple,
+    v_range: tuple,
+    n: int = 50,
+    save_path: str = None,
+    return_data: bool = False
+):
+    """
+    @brief 3D-Plot mit Farbkodierung der Gaußschen Krümmung.
+    @description
+        Visualisiert eine parametrische Fläche und kodiert die Gaußsche Krümmung K
+        als Farbe. Die Gaußsche Krümmung ist das Produkt der Hauptkrümmungen:
+            K = κ₁ · κ₂
+
+        Farbkodierung:
+        - Blau: K < 0 (Sattelform, hyperbolischer Punkt)
+        - Grün: K ≈ 0 (zylindrisch, parabolischer Punkt)
+        - Rot: K > 0 (kugelförmig, elliptischer Punkt)
+
+    @param surface_func: Funktion (u, v) → (x, y, z).
+    @param u_range: (u_min, u_max) – Parameterbereich für u.
+    @param v_range: (v_min, v_max) – Parameterbereich für v.
+    @param n: Gitterpunkte pro Parameter.
+    @param save_path: Speicherpfad (None = anzeigen).
+    @param return_data: Wenn True, gibt (fig, K_values) zurück.
+    @return: Figure oder (Figure, K_array).
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    from mpl_toolkits.mplot3d import Axes3D
+
+    # Parametergitter aufbauen
+    u_arr = np.linspace(u_range[0], u_range[1], n)
+    v_arr = np.linspace(v_range[0], v_range[1], n)
+    U, V = np.meshgrid(u_arr, v_arr)
+
+    # Koordinaten berechnen
+    # surface_func gibt ein Tupel (x,y,z) zurück, daher manuell entpacken
+    X = np.zeros((n, n))
+    Y = np.zeros((n, n))
+    Z = np.zeros((n, n))
+    for i in range(n):
+        for j in range(n):
+            xyz = surface_func(U[i, j], V[i, j])
+            X[i, j] = xyz[0]
+            Y[i, j] = xyz[1]
+            Z[i, j] = xyz[2]
+
+    # Gaußsche Krümmung numerisch approximieren
+    # Über die Fundamentalformen der Differentialgeometrie
+    h = 1e-5  # Schrittweite für numerische Ableitungen
+
+    # Numerische partiell Ableitungen
+    def surf_u(u, v):
+        """Partielle Ableitung nach u."""
+        p1 = np.array(surface_func(u + h, v))
+        p2 = np.array(surface_func(u - h, v))
+        return (p1 - p2) / (2 * h)
+
+    def surf_v(u, v):
+        """Partielle Ableitung nach v."""
+        p1 = np.array(surface_func(u, v + h))
+        p2 = np.array(surface_func(u, v - h))
+        return (p1 - p2) / (2 * h)
+
+    def surf_uu(u, v):
+        """Zweite Ableitung nach u."""
+        p1 = np.array(surface_func(u + h, v))
+        p0 = np.array(surface_func(u, v))
+        p2 = np.array(surface_func(u - h, v))
+        return (p1 - 2*p0 + p2) / (h**2)
+
+    def surf_vv(u, v):
+        """Zweite Ableitung nach v."""
+        p1 = np.array(surface_func(u, v + h))
+        p0 = np.array(surface_func(u, v))
+        p2 = np.array(surface_func(u, v - h))
+        return (p1 - 2*p0 + p2) / (h**2)
+
+    def surf_uv(u, v):
+        """Gemischte Ableitung."""
+        p1 = np.array(surface_func(u + h, v + h))
+        p2 = np.array(surface_func(u + h, v - h))
+        p3 = np.array(surface_func(u - h, v + h))
+        p4 = np.array(surface_func(u - h, v - h))
+        return (p1 - p2 - p3 + p4) / (4 * h**2)
+
+    # Krümmung für jeden Gitterpunkt berechnen
+    K = np.zeros((n, n))
+    for i in range(n):
+        for j in range(n):
+            u, v = U[i, j], V[i, j]
+
+            # Erste Fundamentalform
+            r_u = surf_u(u, v)
+            r_v = surf_v(u, v)
+            E = np.dot(r_u, r_u)
+            F = np.dot(r_u, r_v)
+            G = np.dot(r_v, r_v)
+
+            # Normalenvektor
+            N = np.cross(r_u, r_v)
+            N_norm = np.linalg.norm(N)
+            if N_norm < 1e-12:
+                continue
+            N = N / N_norm
+
+            # Zweite Fundamentalform
+            r_uu = surf_uu(u, v)
+            r_vv = surf_vv(u, v)
+            r_uv = surf_uv(u, v)
+            e = np.dot(r_uu, N)
+            f = np.dot(r_uv, N)
+            g_coeff = np.dot(r_vv, N)
+
+            # Gaußsche Krümmung K = (eg - f²) / (EG - F²)
+            denom = E * G - F**2
+            if abs(denom) > 1e-12:
+                K[i, j] = (e * g_coeff - f**2) / denom
+
+    # Plot erstellen
+    fig = plt.figure(figsize=(12, 5))
+
+    # Linke Seite: Oberfläche
+    ax1 = fig.add_subplot(121, projection='3d')
+    ax1.plot_surface(X, Y, Z, alpha=0.7, cmap='viridis')
+    ax1.set_title('Oberfläche')
+
+    # Rechte Seite: Krümmungskarte
+    ax2 = fig.add_subplot(122)
+    vmax = np.percentile(np.abs(K), 95)
+    im = ax2.contourf(U, V, K, levels=50, cmap='RdBu_r',
+                       vmin=-vmax, vmax=vmax)
+    plt.colorbar(im, ax=ax2, label='Gaußsche Krümmung K')
+    ax2.set_xlabel('u')
+    ax2.set_ylabel('v')
+    ax2.set_title('Gaußsche Krümmung K(u, v)')
+
+    plt.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+
+    if return_data:
+        return fig, K
+    return fig
+
+
+def plot_sphere_curvature(R: float = 1.0, n: int = 30, save_path: str = None):
+    """
+    @brief Visualisiert die Gaußsche Krümmung einer Kugel.
+    @description
+        Auf einer Kugel mit Radius R ist die Gaußsche Krümmung überall K = 1/R².
+        Diese Funktion visualisiert die Kugel und bestätigt dies numerisch.
+
+    @param R: Kugelradius.
+    @param n: Gitterpunkte.
+    @param save_path: Speicherpfad.
+    @return: Figure.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    def sphere(u, v):
+        """Kugelparametrisierung: (θ, φ) → (x, y, z)."""
+        x = R * np.sin(u) * np.cos(v)
+        y = R * np.sin(u) * np.sin(v)
+        z = R * np.cos(u)
+        return (x, y, z)
+
+    return plot_gaussian_curvature(
+        sphere,
+        u_range=(0.1, np.pi - 0.1),
+        v_range=(0, 2 * np.pi),
+        n=n,
+        save_path=save_path
+    )
+
+
+def plot_torus_curvature(R: float = 2.0, r: float = 1.0, n: int = 40, save_path: str = None):
+    """
+    @brief Visualisiert die Gaußsche Krümmung eines Torus.
+    @description
+        Auf einem Torus wechselt die Krümmung das Vorzeichen:
+        - Außenseite (φ-Seite): K > 0 (wie Kugel)
+        - Innenseite (θ-Seite): K < 0 (wie Sattel)
+
+    @param R: Großer Radius (Mittelpunkt → Rohrmitten-Kreis).
+    @param r: Kleiner Radius (Rohrquerschnitt).
+    @param n: Gitterpunkte.
+    @param save_path: Speicherpfad.
+    @return: Figure.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    def torus(u, v):
+        """Torusparametrisierung."""
+        x = (R + r * np.cos(v)) * np.cos(u)
+        y = (R + r * np.cos(v)) * np.sin(u)
+        z = r * np.sin(v)
+        return (x, y, z)
+
+    return plot_gaussian_curvature(
+        torus,
+        u_range=(0, 2 * np.pi),
+        v_range=(0, 2 * np.pi),
+        n=n,
+        save_path=save_path
+    )
+
+
+def plot_saddle_curvature(n: int = 40, save_path: str = None):
+    """
+    @brief Visualisiert die Gaußsche Krümmung einer Sattelfläche z = x² - y².
+    @description
+        Die Sattelfläche z = x² - y² hat negative Gaußsche Krümmung K < 0
+        überall (außer am Sattelpunkt), da die Hauptkrümmungen entgegengesetzte
+        Vorzeichen haben.
+
+    @param n: Gitterpunkte.
+    @param save_path: Speicherpfad.
+    @return: Figure.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    def saddle(u, v):
+        """Sattel-Parametrisierung: z = u² - v²."""
+        return (u, v, u**2 - v**2)
+
+    return plot_gaussian_curvature(
+        saddle,
+        u_range=(-2, 2),
+        v_range=(-2, 2),
+        n=n,
+        save_path=save_path
+    )
+
+
+# ===========================================================================
+# PDE-ANIMATION
+# ===========================================================================
+
+def animate_heat_equation(
+    u0,
+    alpha: float,
+    x_range: tuple,
+    t_range: tuple,
+    nx: int = 100,
+    nt: int = 200,
+    save_path: str = None
+):
+    """
+    @brief Animiert die Wärmeleitungsgleichung ∂u/∂t = α ∂²u/∂x².
+    @description
+        Löst die 1D-Wärmeleitungsgleichung numerisch via Crank-Nicolson-Methode
+        (unbedingt stabil) und erzeugt eine GIF-Animation.
+
+        Wärmeleitungsgleichung (parabolische PDE):
+            ∂u/∂t = α · ∂²u/∂x²
+
+        Crank-Nicolson-Methode (θ = 1/2):
+            (u^{n+1} - u^n)/Δt = (α/2)(u_xx^n + u_xx^{n+1})
+
+        Randbedingungen: Dirichlet (u = 0 an den Rändern).
+
+    @param u0: Anfangsbedingung als Funktion u0(x) oder numpy-Array.
+    @param alpha: Wärmediffusivitätskoeffizient α > 0.
+    @param x_range: (x_min, x_max) – Raumintervall.
+    @param t_range: (t_min, t_max) – Zeitintervall.
+    @param nx: Anzahl der Raumpunkte.
+    @param nt: Anzahl der Zeitschritte (und Animationsframes).
+    @param save_path: Pfad zum Speichern der GIF-Animation.
+    @return: matplotlib.animation.FuncAnimation-Objekt.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    import matplotlib.animation as animation
+    from scipy.linalg import solve_banded
+
+    # Gitter aufbauen
+    x = np.linspace(x_range[0], x_range[1], nx)
+    dx = x[1] - x[0]
+    dt = (t_range[1] - t_range[0]) / nt
+    r = alpha * dt / (2 * dx**2)  # Crank-Nicolson-Parameter
+
+    # Anfangsbedingung aufbauen
+    if callable(u0):
+        u = np.array([u0(xi) for xi in x])
+    else:
+        u = np.array(u0, dtype=float)
+        if len(u) != nx:
+            u = np.interp(x, np.linspace(x_range[0], x_range[1], len(u)), u)
+
+    # Dirichlet-Randbedingungen: u[0] = u[-1] = 0
+    u[0] = 0.0
+    u[-1] = 0.0
+
+    # Tridiagonale Matrizen für Crank-Nicolson
+    # Linke Seite (implizit): A = I + r*T
+    # Rechte Seite (explizit): B = I - r*T
+    n_inner = nx - 2  # Innere Punkte
+
+    # Bandmatrix-Format für scipy.linalg.solve_banded
+    # ab[0] = obere Diagonale, ab[1] = Hauptdiagonale, ab[2] = untere Diagonale
+    ab = np.zeros((3, n_inner))
+    ab[0, 1:] = -r         # Obere Diagonale
+    ab[1, :] = 1 + 2 * r   # Hauptdiagonale
+    ab[2, :-1] = -r         # Untere Diagonale
+
+    # Animation-Daten speichern (alle nt Frames)
+    u_history = [u.copy()]
+
+    # Zeitschritte berechnen
+    u_inner = u[1:-1].copy()
+    for step in range(nt):
+        # Rechte Seite berechnen (expliziter Teil)
+        rhs = np.zeros(n_inner)
+        rhs[1:-1] = r * u_inner[:-2] + (1 - 2*r) * u_inner[1:-1] + r * u_inner[2:]
+        rhs[0] = r * 0 + (1 - 2*r) * u_inner[0] + r * u_inner[1]  # linker Rand = 0
+        rhs[-1] = r * u_inner[-2] + (1 - 2*r) * u_inner[-1] + r * 0  # rechter Rand = 0
+
+        # Löse tridiagonales System
+        u_inner = solve_banded((1, 1), ab, rhs)
+
+        # Vollständiges u speichern
+        u_full = np.concatenate([[0.0], u_inner, [0.0]])
+        u_history.append(u_full.copy())
+
+    # Animation erstellen
+    fig, ax = plt.subplots(figsize=(9, 5))
+    line, = ax.plot(x, u_history[0], 'b-', linewidth=2)
+    ax.set_xlim(x_range)
+    u_max = max(np.max(np.abs(u)) for u in u_history)
+    ax.set_ylim(-u_max * 1.1, u_max * 1.1)
+    ax.set_xlabel('x')
+    ax.set_ylabel('u(x, t)')
+    ax.grid(True, alpha=0.3)
+    time_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
+    dt_total = t_range[1] - t_range[0]
+
+    def update_frame(frame_idx):
+        """Aktualisiert den Plot für jeden Animationsframe."""
+        line.set_ydata(u_history[frame_idx])
+        t_val = t_range[0] + frame_idx * dt_total / nt
+        time_text.set_text(f't = {t_val:.4f}')
+        ax.set_title(f'Wärmeleitungsgleichung: ∂u/∂t = {alpha}·∂²u/∂x²\n'
+                     f't = {t_val:.4f}')
+        return line, time_text
+
+    # Nur jeden 5. Frame animieren für flüssigere Darstellung
+    frames = list(range(0, nt + 1, max(1, nt // 50)))
+    anim = animation.FuncAnimation(
+        fig, update_frame, frames=frames,
+        interval=50, blit=True
+    )
+
+    if save_path:
+        try:
+            anim.save(save_path, writer='pillow', fps=20)
+        except Exception:
+            fig.savefig(save_path.replace('.gif', '.png'), dpi=100)
+
+    return anim
+
+
+# ===========================================================================
+# MAßTHEORIE-VISUALISIERUNG
+# ===========================================================================
+
+def plot_cantor_set(n_steps: int = 6, save_path: str = None, return_fig: bool = True):
+    """
+    @brief Visualisiert die Cantor-Mengen-Konstruktion.
+    @description
+        Die Cantor-Menge wird konstruiert, indem iterativ das mittlere Drittel
+        jedes verbleibenden Intervals entfernt wird.
+
+        Schritt 0: [0, 1]
+        Schritt 1: [0, 1/3] ∪ [2/3, 1]
+        Schritt 2: [0, 1/9] ∪ [2/9, 1/3] ∪ [2/3, 7/9] ∪ [8/9, 1]
+        ...
+
+        Die Cantor-Menge hat:
+        - Maß (Länge) = 0
+        - Überabzählbar viele Punkte (Mächtigkeit des Kontinuums)
+        - Fraktale Dimension ≈ 0.6309 (log(2)/log(3))
+
+    @param n_steps: Anzahl der Konstruktionsschritte.
+    @param save_path: Speicherpfad.
+    @param return_fig: Wenn True, Figure zurückgeben.
+    @return: Figure.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    # Cantor-Menge iterativ konstruieren
+    # Starte mit Einheitsintervall [0, 1]
+    intervals = [(0.0, 1.0)]
+
+    # Jede Iteration: Mittleres Drittel jedes Intervals entfernen
+    all_steps = [list(intervals)]
+    for step in range(n_steps):
+        new_intervals = []
+        for a, b in intervals:
+            third = (b - a) / 3.0
+            # Linkes Drittel behalten: [a, a+1/3(b-a)]
+            new_intervals.append((a, a + third))
+            # Rechtes Drittel behalten: [b-1/3(b-a), b]
+            new_intervals.append((b - third, b))
+        intervals = new_intervals
+        all_steps.append(list(intervals))
+
+    # Plot erstellen
+    fig, ax = plt.subplots(figsize=(10, max(4, n_steps + 1)))
+
+    # Jeden Konstruktionsschritt als horizontale Balken zeigen
+    for step_idx, step_intervals in enumerate(all_steps):
+        y = n_steps - step_idx  # Obere Schritte zuerst
+        for a, b in step_intervals:
+            ax.barh(y, b - a, left=a, height=0.6, color='black', alpha=0.8)
+
+    # Achsen konfigurieren
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, n_steps + 1)
+    ax.set_xlabel('x')
+    ax.set_ylabel('Konstruktionsschritt')
+    ax.set_yticks(range(1, n_steps + 2))
+    ax.set_yticklabels([f'Schritt {n_steps - i}' for i in range(n_steps + 1)])
+    ax.set_title(f'Cantor-Menge ({n_steps} Schritte)\n'
+                 f'Fraktale Dimension ≈ {np.log(2)/np.log(3):.4f}')
+    ax.grid(True, alpha=0.2, axis='x')
+
+    plt.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+
+    return fig
+
+
+def plot_cantor_function(n: int = 100, save_path: str = None):
+    """
+    @brief Visualisiert die Cantor-Funktion (Teufels-Treppe).
+    @description
+        Die Cantor-Funktion f: [0,1] → [0,1] ist:
+        - Monoton nicht-abnehmend
+        - Stetig
+        - Fast überall konstant (Ableitung = 0 f.ü.)
+        - Aber NICHT absolut stetig
+
+        Konstruktion via ternäre (Basis-3) Darstellung:
+        - Wenn x in entferntem Drittel: f(x) = Mittelwert der Grenzwerte
+        - Sonst: rekursiv aus ternärer Darstellung
+
+    @param n: Anzahl der Auswertungspunkte.
+    @param save_path: Speicherpfad.
+    @return: Figure.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    def cantor_val(x: float, depth: int = 20) -> float:
+        """
+        @brief Wertet die Cantor-Funktion an x ∈ [0,1] aus.
+        @description
+            Algorithmus über ternäre Darstellung:
+            1. Schreibe x in Basis 3
+            2. Wenn eine 1 vorkommt: ersetze alle Stellen nach der ersten 1 durch 0
+            3. Ersetze alle 2en durch 1en → das ist die Basis-2-Darstellung von f(x)
+        """
+        a, b = 0.0, 1.0
+        result = 0.0
+        step = 0.5
+
+        for _ in range(depth):
+            mid = (a + b) / 2.0
+            third = (b - a) / 3.0
+
+            if x < a + third:
+                # Linkes Drittel: weiter mit [a, a+third]
+                b = a + third
+            elif x > b - third:
+                # Rechtes Drittel: weiter mit [b-third, b]
+                result += step
+                a = b - third
+            else:
+                # Mittleres Drittel (entfernt): f = result + step
+                return result + step
+
+            step /= 2.0
+
+        return result + step / 2.0
+
+    # Auswertungspunkte
+    x_vals = np.linspace(0, 1, n)
+    y_vals = np.array([cantor_val(xi) for xi in x_vals])
+
+    # Plot erstellen
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.plot(x_vals, y_vals, 'b-', linewidth=2)
+    ax.set_xlabel('x')
+    ax.set_ylabel('f(x)')
+    ax.set_title("Cantor-Funktion (Teufels-Treppe)\n"
+                 "f'(x) = 0 fast überall, aber nicht absolut stetig")
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.grid(True, alpha=0.3)
+    ax.plot([0, 1], [0, 1], 'r--', alpha=0.4, label='Identität (zum Vergleich)')
+    ax.legend()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+    return fig
+
+
+# ===========================================================================
+# SPEZIELLE-FUNKTIONEN-GALERIE
+# ===========================================================================
+
+def plot_bessel_gallery(
+    orders=None,
+    x_range: tuple = (0, 20),
+    n: int = 500,
+    save_path: str = None
+):
+    """
+    @brief Galerie der Bessel-Funktionen verschiedener Ordnungen.
+    @description
+        Stellt die Bessel-Funktionen J_n(x) erster Art für verschiedene
+        Ordnungen n in einem Plot dar.
+
+        Bessel-Differentialgleichung:
+            x² y'' + x y' + (x² - n²) y = 0
+
+        J_n(x) entsteht bei Problemen mit Zylindersymmetrie (z.B. Wellen
+        in zylindrischen Gefäßen, Wärmeleitung in kreisförmigen Platten).
+
+    @param orders: Liste der Ordnungen (Standard: [0, 1, 2, 3, 4, 5]).
+    @param x_range: (x_min, x_max) – Wertebereich.
+    @param n: Anzahl der Auswertungspunkte.
+    @param save_path: Speicherpfad.
+    @return: Figure.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    if orders is None:
+        orders = [0, 1, 2, 3, 4, 5]
+
+    from scipy.special import jn  # Bessel-Funktionen
+
+    x = np.linspace(max(0.001, x_range[0]), x_range[1], n)
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Farben für verschiedene Ordnungen
+    colors = plt.cm.tab10(np.linspace(0, 1, len(orders)))
+
+    for order, color in zip(orders, colors):
+        y = jn(order, x)
+        ax.plot(x, y, color=color, linewidth=2, label=f'J_{order}(x)')
+
+    # Nulllinie
+    ax.axhline(0, color='black', linewidth=0.5, alpha=0.5)
+
+    ax.set_xlabel('x')
+    ax.set_ylabel('J_n(x)')
+    ax.set_title('Bessel-Funktionen erster Art J_n(x)')
+    ax.set_ylim(-0.5, 1.1)
+    ax.legend(loc='upper right', ncol=2)
+    ax.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+    return fig
+
+
+def plot_legendre_gallery(
+    orders=None,
+    x_range: tuple = (-1, 1),
+    n: int = 300,
+    save_path: str = None
+):
+    """
+    @brief Galerie der Legendre-Polynome verschiedener Ordnungen.
+    @description
+        Stellt die Legendre-Polynome P_n(x) für verschiedene Ordnungen n
+        in einem Plot dar.
+
+        Legendre-Differentialgleichung:
+            (1-x²) y'' - 2x y' + n(n+1) y = 0
+
+        P_n(x) entsteht bei Problemen mit Kugelkoordinaten (z.B. Elektrodynamik,
+        Quantenmechanik des Wasserstoffatoms).
+
+        Eigenschaften:
+        - P_n(1) = 1, P_n(-1) = (-1)^n für alle n
+        - Orthogonal: ∫_{-1}^{1} P_m P_n dx = 2/(2n+1) · δ_{mn}
+        - Rekursion: (n+1)P_{n+1} = (2n+1)x P_n - n P_{n-1}
+
+    @param orders: Liste der Ordnungen (Standard: [0, 1, 2, 3, 4, 5]).
+    @param x_range: (x_min, x_max) – Wertebereich.
+    @param n: Anzahl der Auswertungspunkte.
+    @param save_path: Speicherpfad.
+    @return: Figure.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    if orders is None:
+        orders = [0, 1, 2, 3, 4, 5]
+
+    from scipy.special import legendre as legendre_poly
+
+    x = np.linspace(x_range[0], x_range[1], n)
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Farben für verschiedene Ordnungen
+    colors = plt.cm.tab10(np.linspace(0, 1, len(orders)))
+
+    for order, color in zip(orders, colors):
+        # scipy.special.legendre gibt ein Polynom-Objekt zurück
+        P = legendre_poly(order)
+        y = P(x)
+        ax.plot(x, y, color=color, linewidth=2, label=f'P_{order}(x)')
+
+    # Nulllinie und Einheitslinie
+    ax.axhline(0, color='black', linewidth=0.5, alpha=0.5)
+
+    ax.set_xlabel('x')
+    ax.set_ylabel('P_n(x)')
+    ax.set_title('Legendre-Polynome P_n(x)')
+    ax.legend(loc='upper left', ncol=2)
+    ax.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+    return fig
+
+
+# ===========================================================================
+# GAUSS'SCHE KRÜMMUNG (Build 46)
+# ===========================================================================
+
+def sphere_surface(u: float, v: float, r: float = 1.0) -> tuple:
+    """
+    @brief Parametrisierung der Einheitssphäre.
+    @description
+        Gibt kartesische Koordinaten (x, y, z) eines Punktes auf der
+        Sphäre mit Radius r zurück, parametrisiert durch Längen- und
+        Breitenwinkel (u = φ, v = θ).
+
+        Formel: x = r·cos(u)·sin(v), y = r·sin(u)·sin(v), z = r·cos(v)
+
+    @param u: Azimutalwinkel φ ∈ [0, 2π]
+    @param v: Polarwinkel θ ∈ [0, π]
+    @param r: Sphärenradius (Standard: 1.0)
+    @return: Tuple (x, y, z)
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    return (r * np.cos(u) * np.sin(v), r * np.sin(u) * np.sin(v), r * np.cos(v))
+
+
+def torus_surface(u: float, v: float, R: float = 2.0, r: float = 1.0) -> tuple:
+    """
+    @brief Parametrisierung des Torus.
+    @description
+        Gibt kartesische Koordinaten eines Punktes auf dem Torus zurück.
+        R = Großradius (Abstand Zentrum-Röhre), r = Kleinradius (Röhrenradius).
+
+        Formel:
+            x = (R + r·cos(v))·cos(u)
+            y = (R + r·cos(v))·sin(u)
+            z = r·sin(v)
+
+    @param u: Winkel um die Hauptachse ∈ [0, 2π]
+    @param v: Winkel um die Röhre ∈ [0, 2π]
+    @param R: Großradius (Standard: 2.0)
+    @param r: Kleinradius (Standard: 1.0)
+    @return: Tuple (x, y, z)
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    return ((R + r * np.cos(v)) * np.cos(u),
+            (R + r * np.cos(v)) * np.sin(u),
+            r * np.sin(v))
+
+
+def saddle_surface(u: float, v: float) -> tuple:
+    """
+    @brief Sattelfläche (hyperbolisches Paraboloid) z = u² - v².
+    @description
+        Die Sattelfläche hat überall negative Gaußsche Krümmung K < 0,
+        da sie sich in zwei Richtungen entgegengesetzt krümmt.
+
+        Gaußsche Krümmung: K = -4/(1 + 4u² + 4v²)² (für z = u² - v²)
+
+    @param u: Erste Parameterkoordinate
+    @param v: Zweite Parameterkoordinate
+    @return: Tuple (u, v, u²-v²)
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    return (u, v, u ** 2 - v ** 2)
+
+
+def _compute_gaussian_curvature_numerical(
+    surface_func,
+    u_arr: "np.ndarray",
+    v_arr: "np.ndarray",
+    h: float = 1e-4
+) -> "np.ndarray":
+    """
+    @brief Berechnet die Gaußsche Krümmung K numerisch via finite Differenzen.
+    @description
+        Algorithmus:
+        1. Partielle Ableitungen r_u, r_v, r_uu, r_vv, r_uv via zentralem
+           Differenzenquotienten berechnen.
+        2. Erste Fundamentalform: E = r_u·r_u, F = r_u·r_v, G = r_v·r_v
+        3. Normalenvektor: n = r_u × r_v / |r_u × r_v|
+        4. Zweite Fundamentalform: L = r_uu·n, M = r_uv·n, N = r_vv·n
+        5. Gaußsche Krümmung: K = (LN - M²) / (EG - F²)
+
+    @param surface_func: Parametrische Fläche (u, v) → (x, y, z)
+    @param u_arr: 1D-Array der u-Werte
+    @param v_arr: 1D-Array der v-Werte
+    @param h: Schrittweite für finite Differenzen (Standard: 1e-4)
+    @return: 2D-Array der Krümmungswerte K(u, v)
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    nu = len(u_arr)
+    nv = len(v_arr)
+    K = np.zeros((nv, nu))
+
+    for i, v in enumerate(v_arr):
+        for j, u in enumerate(u_arr):
+            def r(uu, vv):
+                """Hilfsfunktion: Flächenpunkt als numpy-Array."""
+                res = surface_func(uu, vv)
+                return np.array(res, dtype=float)
+
+            # Erste Ableitungen (zentrale Differenzen)
+            r_u = (r(u + h, v) - r(u - h, v)) / (2 * h)
+            r_v = (r(u, v + h) - r(u, v - h)) / (2 * h)
+
+            # Zweite Ableitungen (zentrale Differenzen 2. Ordnung)
+            r0 = r(u, v)
+            r_uu = (r(u + h, v) - 2 * r0 + r(u - h, v)) / (h ** 2)
+            r_vv = (r(u, v + h) - 2 * r0 + r(u, v - h)) / (h ** 2)
+            r_uv = (r(u + h, v + h) - r(u + h, v - h)
+                    - r(u - h, v + h) + r(u - h, v - h)) / (4 * h ** 2)
+
+            # Erste Fundamentalform E, F, G
+            E = np.dot(r_u, r_u)
+            F = np.dot(r_u, r_v)
+            G = np.dot(r_v, r_v)
+            EG_F2 = E * G - F ** 2
+
+            # Normalenvektor (normiert)
+            normal = np.cross(r_u, r_v)
+            norm_len = np.linalg.norm(normal)
+            if norm_len < 1e-12 or abs(EG_F2) < 1e-20:
+                # Singulärer Punkt (Pol etc.) → K = 0 setzen
+                K[i, j] = 0.0
+                continue
+            normal = normal / norm_len
+
+            # Zweite Fundamentalform L, M, N
+            L = np.dot(r_uu, normal)
+            M = np.dot(r_uv, normal)
+            N = np.dot(r_vv, normal)
+
+            # Gaußsche Krümmung K = (LN - M²) / (EG - F²)
+            K[i, j] = (L * N - M ** 2) / EG_F2
+
+    return K
+
+
+def plot_gaussian_curvature_3d(
+    surface,
+    u_range: tuple = (0, 2 * np.pi),
+    v_range: tuple = (0, np.pi),
+    param_range: tuple = None,
+    title: str = "Gaußsche Krümmung",
+    resolution: int = 50,
+    save_path: str = None,
+    **kwargs
+):
+    """
+    @brief Plottet eine parametrische Fläche mit Gaußscher Krümmung als Farbkodierung.
+    @description
+        Erzeugt einen 3D-Surface-Plot, bei dem die Farbe eines Flächenpunkts
+        der Gaußschen Krümmung K entspricht:
+
+        K > 0 (rot/warm):   elliptische Geometrie (Sphäre)
+        K = 0 (weiß/mittel): flache Geometrie (Zylinder, Ebene)
+        K < 0 (blau/kalt):  hyperbolische Geometrie (Sattel)
+
+        Gaußsche Krümmung wird numerisch via finiten Differenzen berechnet.
+
+        Unterstützte Flächen als String:
+            'sphere', 'torus', 'saddle', 'hyperbolic_paraboloid'
+
+    @param surface: Flächenname (str) oder parametrische Funktion (u,v) → (x,y,z)
+    @param u_range: (u_min, u_max) für Meshgrid
+    @param v_range: (v_min, v_max) für Meshgrid
+    @param param_range: Falls angegeben, wird für beide Parameter verwendet
+    @param title: Diagrammtitel
+    @param resolution: Anzahl Gitterpunkte je Parameter (Standard: 50)
+    @param save_path: Pfad zum Speichern (None → kein Speichern)
+    @return: (fig, ax) - Figure und Axes3D
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    # Vordefinierte Flächen
+    _surfaces = {
+        'sphere': (sphere_surface, (0, 2 * np.pi), (0.01, np.pi - 0.01)),
+        'torus': (torus_surface, (0, 2 * np.pi), (0, 2 * np.pi)),
+        'saddle': (saddle_surface, (-2.0, 2.0), (-2.0, 2.0)),
+        'hyperbolic_paraboloid': (saddle_surface, (-2.0, 2.0), (-2.0, 2.0)),
+    }
+
+    # Flächenfunktion bestimmen
+    if isinstance(surface, str):
+        surface_lower = surface.lower()
+        if surface_lower not in _surfaces:
+            raise ValueError(
+                f"Unbekannte Fläche '{surface}'. "
+                f"Bekannte Flächen: {list(_surfaces.keys())}"
+            )
+        surface_func, default_u, default_v = _surfaces[surface_lower]
+        if param_range is not None:
+            u_range_use = param_range
+            v_range_use = param_range
+        else:
+            u_range_use = default_u
+            v_range_use = default_v
+    else:
+        surface_func = surface
+        if param_range is not None:
+            u_range_use = param_range
+            v_range_use = param_range
+        else:
+            u_range_use = u_range
+            v_range_use = v_range
+
+    # Auflösung begrenzen für Berechnungszeit
+    n = min(resolution, 50)
+
+    # Parametergitter erstellen
+    u_arr = np.linspace(u_range_use[0], u_range_use[1], n)
+    v_arr = np.linspace(v_range_use[0], v_range_use[1], n)
+
+    # Fläche berechnen
+    X = np.zeros((n, n))
+    Y = np.zeros((n, n))
+    Z = np.zeros((n, n))
+    for i, v in enumerate(v_arr):
+        for j, u in enumerate(u_arr):
+            x, y, z = surface_func(u, v)
+            X[i, j] = x
+            Y[i, j] = y
+            Z[i, j] = z
+
+    # Gaußsche Krümmung numerisch berechnen
+    K = _compute_gaussian_curvature_numerical(surface_func, u_arr, v_arr)
+
+    # Farbkodierung: Krümmung normieren
+    K_finite = K[np.isfinite(K)]
+    if len(K_finite) > 0:
+        k_max = max(abs(K_finite.max()), abs(K_finite.min()), 1e-10)
+        K_norm = np.clip(K / k_max, -1, 1)
+        K_norm = (K_norm + 1) / 2.0  # [0, 1] für Colormap
+    else:
+        K_norm = np.full_like(K, 0.5)
+
+    # NaN-Werte auf 0.5 (neutral) setzen
+    K_norm = np.where(np.isfinite(K_norm), K_norm, 0.5)
+
+    # 3D-Plot
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Farbkarte für Krümmung ('RdBu_r': blau = negativ, rot = positiv)
+    colormap = plt.cm.RdBu_r
+    facecolors = colormap(K_norm)
+
+    ax.plot_surface(
+        X, Y, Z,
+        facecolors=facecolors,
+        shade=True,
+        alpha=0.9
+    )
+
+    # Colorbar hinzufügen
+    sm = plt.cm.ScalarMappable(cmap=colormap)
+    sm.set_array(K)
+    sm.set_clim(K_finite.min() if len(K_finite) > 0 else -1,
+                K_finite.max() if len(K_finite) > 0 else 1)
+    plt.colorbar(sm, ax=ax, label='Gaußsche Krümmung K', shrink=0.5)
+
+    ax.set_title(title, fontsize=13)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+
+    plt.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+
+    return fig, ax
+
+
+# ===========================================================================
+# GEODÄTEN AUF FLÄCHEN (Build 46)
+# ===========================================================================
+
+def plot_geodesic_on_sphere(
+    start_point: tuple = None,
+    direction: tuple = (1.0, 0.0),
+    steps: int = 200,
+    r: float = 1.0,
+    start_angle: tuple = None,
+    n_steps: int = None,
+    save_path: str = None,
+) -> plt.Figure:
+    """
+    @brief Visualisiert eine Geodäte (Großkreis) auf der Einheitssphäre.
+    @description
+        Eine Geodäte auf der Sphäre ist ein Großkreis.
+        Numerische Integration der Geodätengleichung:
+
+            θ'' = sin(θ)·cos(θ)·(φ')²
+            φ'' = -2·cos(θ)/sin(θ)·θ'·φ'
+
+        Anfangsbedingungen: (θ₀, φ₀) mit Tangentialvektor (dθ/dt, dφ/dt).
+
+    @param start_point: (theta, phi) Startpunkt in Kugelkoordinaten (Bogenmaß)
+    @param direction: (dtheta, dphi) Tangentialvektor am Startpunkt
+    @param steps: Anzahl Integrationsschritte
+    @param r: Sphärenradius
+    @param start_angle: Alternative zu start_point (für Testkompatibilität)
+    @param n_steps: Alternative zu steps (für Testkompatibilität)
+    @param save_path: Pfad zum Speichern
+    @return: matplotlib Figure
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    from scipy.integrate import solve_ivp
+
+    # Parameter-Aliase
+    if start_angle is not None:
+        start_point = start_angle
+    if n_steps is not None:
+        steps = n_steps
+    if start_point is None:
+        start_point = (np.pi / 2, 0.0)
+
+    theta0, phi0 = float(start_point[0]), float(start_point[1])
+    dtheta0, dphi0 = float(direction[0]), float(direction[1])
+
+    # Tangentialvektor normieren
+    sin_t0 = max(abs(np.sin(theta0)), 1e-8)
+    v_norm = np.sqrt(dtheta0 ** 2 + (sin_t0 * dphi0) ** 2)
+    if v_norm > 1e-12:
+        dtheta0 /= v_norm
+        dphi0 /= v_norm
+
+    def geodesic_ode(t, y):
+        """Geodätengleichung auf der Sphäre (Christoffel-Symbole)."""
+        theta, phi, dtheta, dphi = y
+        sin_theta = np.sin(theta)
+        cos_theta = np.cos(theta)
+        if abs(sin_theta) < 1e-10:
+            sin_theta = 1e-10
+        ddtheta = sin_theta * cos_theta * dphi ** 2
+        ddphi = -2.0 * (cos_theta / sin_theta) * dtheta * dphi
+        return [dtheta, dphi, ddtheta, ddphi]
+
+    t_span = (0, 2 * np.pi)
+    t_eval = np.linspace(0, 2 * np.pi, steps)
+    y0 = [theta0, phi0, dtheta0, dphi0]
+
+    sol = solve_ivp(
+        geodesic_ode, t_span, y0,
+        t_eval=t_eval, method='RK45',
+        rtol=1e-8, atol=1e-10,
+    )
+
+    # Kugelkoordinaten → kartesische Koordinaten
+    theta_sol = sol.y[0]
+    phi_sol = sol.y[1]
+    x_geo = r * np.sin(theta_sol) * np.cos(phi_sol)
+    y_geo = r * np.sin(theta_sol) * np.sin(phi_sol)
+    z_geo = r * np.cos(theta_sol)
+
+    # Sphäre als Hintergrund
+    u_bg = np.linspace(0, 2 * np.pi, 40)
+    v_bg = np.linspace(0, np.pi, 30)
+    U, V = np.meshgrid(u_bg, v_bg)
+    X_bg = r * np.sin(V) * np.cos(U)
+    Y_bg = r * np.sin(V) * np.sin(U)
+    Z_bg = r * np.cos(V)
+
+    fig = plt.figure(figsize=(9, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    ax.plot_surface(X_bg, Y_bg, Z_bg, alpha=0.2, color='lightblue', shade=True)
+    ax.plot(x_geo, y_geo, z_geo, 'r-', linewidth=2.5, label='Geodäte (Großkreis)')
+    ax.scatter([x_geo[0]], [y_geo[0]], [z_geo[0]],
+               color='green', s=60, zorder=5, label='Startpunkt')
+
+    ax.set_title('Geodäte auf der Sphäre', fontsize=13)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    ax.legend()
+
+    plt.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+
+    return fig
+
+
+def plot_geodesic_on_torus(
+    R: float = 2.0,
+    r: float = 1.0,
+    start_params: tuple = (0.0, 0.0),
+    direction: tuple = (1.0, 0.3),
+    n_steps: int = 300,
+    t_max: float = 10.0,
+    save_path: str = None,
+) -> plt.Figure:
+    """
+    @brief Visualisiert eine Geodäte auf dem Torus.
+    @description
+        Geodätengleichungen auf dem Torus (Parametrisierung mit u, v):
+
+            u'' = 2r·sin(v)/(R + r·cos(v)) · u'·v'
+            v'' = -(sin(v)·(R + r·cos(v))/r) · (u')²
+
+        Numerische Integration via RK45.
+
+    @param R: Großradius des Torus
+    @param r: Kleinradius des Torus
+    @param start_params: (u₀, v₀) Startparameter
+    @param direction: (du/dt, dv/dt) Anfangsgeschwindigkeit
+    @param n_steps: Anzahl Zeitschritte
+    @param t_max: Endzeit der Integration
+    @param save_path: Speicherpfad
+    @return: matplotlib Figure
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    from scipy.integrate import solve_ivp
+
+    u0, v0 = float(start_params[0]), float(start_params[1])
+    du0, dv0 = float(direction[0]), float(direction[1])
+
+    def torus_geodesic_ode(t, y):
+        """Geodätengleichungen auf dem Torus (Christoffel-Symbole)."""
+        u, v, du, dv = y
+        f = R + r * np.cos(v)
+        sin_v = np.sin(v)
+        if abs(f) < 1e-10:
+            f = 1e-10
+        ddu = 2.0 * r * sin_v / f * du * dv
+        ddv = -sin_v * f / r * du ** 2
+        return [du, dv, ddu, ddv]
+
+    t_eval = np.linspace(0, t_max, n_steps)
+    y0 = [u0, v0, du0, dv0]
+
+    sol = solve_ivp(
+        torus_geodesic_ode, (0, t_max), y0,
+        t_eval=t_eval, method='RK45',
+        rtol=1e-7, atol=1e-9
+    )
+
+    u_sol = sol.y[0]
+    v_sol = sol.y[1]
+
+    # Torus-Koordinaten
+    x_geo = (R + r * np.cos(v_sol)) * np.cos(u_sol)
+    y_geo = (R + r * np.cos(v_sol)) * np.sin(u_sol)
+    z_geo = r * np.sin(v_sol)
+
+    # Torus-Oberfläche als Hintergrund
+    u_bg = np.linspace(0, 2 * np.pi, 50)
+    v_bg = np.linspace(0, 2 * np.pi, 30)
+    U_bg, V_bg = np.meshgrid(u_bg, v_bg)
+    X_bg = (R + r * np.cos(V_bg)) * np.cos(U_bg)
+    Y_bg = (R + r * np.cos(V_bg)) * np.sin(U_bg)
+    Z_bg = r * np.sin(V_bg)
+
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    ax.plot_surface(X_bg, Y_bg, Z_bg, alpha=0.2, color='lightblue', shade=True)
+    ax.plot(x_geo, y_geo, z_geo, 'r-', linewidth=2.0, label='Geodäte')
+    ax.scatter([x_geo[0]], [y_geo[0]], [z_geo[0]],
+               color='green', s=60, zorder=5, label='Startpunkt')
+
+    ax.set_title('Geodäte auf dem Torus', fontsize=13)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    ax.legend()
+
+    plt.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+
+    return fig
+
+
+# ===========================================================================
+# PDE-ANIMATIONEN (Build 46)
+# ===========================================================================
+
+def animate_heat_equation(
+    alpha: float = 0.01,
+    nx: int = 50,
+    nt: int = 200,
+    dt: float = 0.001,
+    save_path: str = None,
+) -> "matplotlib.animation.FuncAnimation":
+    """
+    @brief Animiert die Wärmegleichung u_t = α·u_xx auf [0,1].
+    @description
+        Löst die 1D-Wärmegleichung mit:
+        - Anfangsbedingung: u(x,0) = sin(π·x)
+        - Dirichlet-Randbedingungen: u(0,t) = u(1,t) = 0
+        - Explizites Euler-Schema (FTCS)
+
+        Stabilitätsbedingung: r = α·dt/dx² ≤ 0.5
+
+        Die analytische Lösung ist: u(x,t) = e^{-α·π²·t} · sin(π·x)
+
+    @param alpha: Wärmediffusivität (Standard: 0.01)
+    @param nx: Anzahl Gitterpunkte in x (Standard: 50)
+    @param nt: Anzahl Zeitschritte (Standard: 200)
+    @param dt: Zeitschrittgröße (Standard: 0.001)
+    @param save_path: Falls angegeben, GIF-Datei speichern
+    @return: matplotlib.animation.FuncAnimation Objekt
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    import matplotlib.animation as mpl_animation
+
+    # Gitter aufbauen
+    dx = 1.0 / (nx - 1)
+    x = np.linspace(0, 1, nx)
+
+    # Stabilitätsprüfung: r = α·dt/dx² ≤ 0.5
+    r = alpha * dt / dx ** 2
+    if r > 0.5:
+        dt = 0.4 * dx ** 2 / alpha
+        r = alpha * dt / dx ** 2
+
+    # Anfangsbedingung: u(x,0) = sin(π·x)
+    u_curr = np.sin(np.pi * x).copy()
+    u_curr[0] = 0.0
+    u_curr[-1] = 0.0
+
+    # Zeitschritte berechnen, jeden 10. als Frame speichern
+    frames = []
+    for step in range(nt):
+        u_new = u_curr.copy()
+        u_new[1:-1] = u_curr[1:-1] + r * (
+            u_curr[2:] - 2 * u_curr[1:-1] + u_curr[:-2]
+        )
+        u_new[0] = 0.0
+        u_new[-1] = 0.0
+        u_curr = u_new
+        if step % 10 == 0:
+            frames.append((step * dt, u_curr.copy()))
+
+    # Animation erstellen
+    fig, ax = plt.subplots(figsize=(9, 5))
+    line, = ax.plot(x, frames[0][1], 'b-', linewidth=2)
+    time_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
+
+    ax.set_xlim(0, 1)
+    ax.set_ylim(-0.1, 1.1)
+    ax.set_xlabel('x')
+    ax.set_ylabel('u(x,t)')
+    ax.set_title(f'Wärmegleichung: u_t = {alpha}·u_xx')
+    ax.grid(True, alpha=0.3)
+
+    def update(frame_idx):
+        """Aktualisiert den Plot für jeden Frame."""
+        t_val, u_frame = frames[frame_idx]
+        line.set_ydata(u_frame)
+        time_text.set_text(f't = {t_val:.4f}')
+        return line, time_text
+
+    anim = mpl_animation.FuncAnimation(
+        fig, update,
+        frames=len(frames),
+        interval=50,
+        blit=True
+    )
+
+    if save_path:
+        anim.save(save_path, writer='pillow', fps=20)
+    else:
+        plt.close(fig)
+
+    return anim
+
+
+def animate_wave_equation_pde(
+    c: float = 1.0,
+    nx: int = 100,
+    nt: int = 500,
+    save_path: str = None,
+) -> "matplotlib.animation.FuncAnimation":
+    """
+    @brief Animiert die Wellengleichung u_tt = c²·u_xx auf [0,1].
+    @description
+        Löst die 1D-Wellengleichung:
+        - Anfangsbedingung: u(x,0) = sin(π·x), u_t(x,0) = 0
+        - Dirichlet-Randbedingungen: u(0,t) = u(L,t) = 0
+        - Explizites Leap-Frog-Schema (2. Ordnung in Zeit und Raum)
+
+        CFL-Bedingung: c·dt/dx ≤ 1 (für Stabilität)
+
+    @param c: Wellengeschwindigkeit (Standard: 1.0)
+    @param nx: Anzahl Gitterpunkte (Standard: 100)
+    @param nt: Anzahl Zeitschritte (Standard: 500)
+    @param save_path: GIF-Speicherpfad
+    @return: FuncAnimation Objekt
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    import matplotlib.animation as mpl_animation
+
+    dx = 1.0 / (nx - 1)
+    x = np.linspace(0, 1, nx)
+
+    # CFL-Bedingung: c·dt/dx ≤ 1
+    dt = 0.9 * dx / c
+    r2 = (c * dt / dx) ** 2
+
+    # Anfangsbedingungen
+    u_prev = np.sin(np.pi * x).copy()
+    u_curr = u_prev.copy()
+    # Erster Schritt (u_t(x,0) = 0)
+    u_curr[1:-1] = (u_prev[1:-1]
+                    + 0.5 * r2 * (u_prev[2:] - 2 * u_prev[1:-1] + u_prev[:-2]))
+    u_curr[0] = u_curr[-1] = 0.0
+
+    # Frames sammeln
+    frames = [(0.0, u_prev.copy()), (dt, u_curr.copy())]
+    for step in range(2, nt):
+        u_next = np.zeros_like(u_curr)
+        u_next[1:-1] = (2 * u_curr[1:-1] - u_prev[1:-1]
+                        + r2 * (u_curr[2:] - 2 * u_curr[1:-1] + u_curr[:-2]))
+        u_next[0] = u_next[-1] = 0.0
+        u_prev = u_curr
+        u_curr = u_next
+        if step % 10 == 0:
+            frames.append((step * dt, u_curr.copy()))
+
+    # Animation
+    fig, ax = plt.subplots(figsize=(9, 5))
+    line, = ax.plot(x, frames[0][1], 'b-', linewidth=2)
+    time_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
+
+    ax.set_xlim(0, 1)
+    ax.set_ylim(-1.5, 1.5)
+    ax.set_xlabel('x')
+    ax.set_ylabel('u(x,t)')
+    ax.set_title(f'Wellengleichung: u_tt = {c}²·u_xx')
+    ax.grid(True, alpha=0.3)
+
+    def update(frame_idx):
+        """Aktualisiert Frame."""
+        t_val, u_frame = frames[frame_idx]
+        line.set_ydata(u_frame)
+        time_text.set_text(f't = {t_val:.4f}')
+        return line, time_text
+
+    anim = mpl_animation.FuncAnimation(
+        fig, update,
+        frames=len(frames),
+        interval=40,
+        blit=True
+    )
+
+    if save_path:
+        anim.save(save_path, writer='pillow', fps=25)
+    else:
+        plt.close(fig)
+
+    return anim
+
+
+# ===========================================================================
+# SPEZIELLE FUNKTIONEN GALERIE (Build 46)
+# ===========================================================================
+
+def plot_special_functions_gallery(save_path: str = None) -> plt.Figure:
+    """
+    @brief Galerie der wichtigsten speziellen Funktionen der Mathematik.
+    @description
+        Erstellt eine Galerie-Figur mit 3 Zeilen:
+
+        Zeile 1: Bessel-Funktionen J_0 bis J_4 auf [0, 15]
+            - Lösung der Bessel-DGL: x²y'' + xy' + (x² - n²)y = 0
+
+        Zeile 2: Legendre-Polynome P_0 bis P_4 auf [-1, 1]
+            - Orthogonale Polynome auf [-1, 1]
+
+        Zeile 3: Hermite-Polynome H_0 bis H_4 auf [-3, 3]
+            - Orthogonale Polynome bzgl. Gaußmaß e^{-x²}
+
+    @param save_path: Pfad zum Speichern (None → kein Speichern)
+    @return: matplotlib Figure (3×1 Subplot-Grid)
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    import scipy.special as sp
+
+    fig, axes = plt.subplots(3, 1, figsize=(12, 14))
+
+    # --- Zeile 1: Bessel-Funktionen J_n(x) ---
+    ax1 = axes[0]
+    x_bessel = np.linspace(0, 15, 400)
+    colors_b = plt.cm.tab10(np.linspace(0, 0.5, 5))
+    for n, color in zip(range(5), colors_b):
+        y = sp.jn(n, x_bessel)
+        ax1.plot(x_bessel, y, color=color, linewidth=2, label=f'J_{n}(x)')
+    ax1.axhline(0, color='k', linewidth=0.5)
+    ax1.set_xlim(0, 15)
+    ax1.set_ylim(-0.5, 1.1)
+    ax1.set_title('Bessel-Funktionen J_n(x)', fontsize=12)
+    ax1.set_xlabel('x')
+    ax1.set_ylabel('J_n(x)')
+    ax1.legend(loc='upper right', ncol=5, fontsize=9)
+    ax1.grid(True, alpha=0.3)
+
+    # --- Zeile 2: Legendre-Polynome P_n(x) ---
+    ax2 = axes[1]
+    x_legendre = np.linspace(-1, 1, 300)
+    colors_l = plt.cm.tab10(np.linspace(0, 0.5, 5))
+    for n, color in zip(range(5), colors_l):
+        P = sp.legendre(n)
+        y = P(x_legendre)
+        ax2.plot(x_legendre, y, color=color, linewidth=2, label=f'P_{n}(x)')
+    ax2.axhline(0, color='k', linewidth=0.5)
+    ax2.set_xlim(-1, 1)
+    ax2.set_title('Legendre-Polynome P_n(x)', fontsize=12)
+    ax2.set_xlabel('x')
+    ax2.set_ylabel('P_n(x)')
+    ax2.legend(loc='upper left', ncol=5, fontsize=9)
+    ax2.grid(True, alpha=0.3)
+
+    # --- Zeile 3: Hermite-Polynome H_n(x) ---
+    ax3 = axes[2]
+    x_hermite = np.linspace(-3, 3, 300)
+    colors_h = plt.cm.tab10(np.linspace(0, 0.5, 5))
+    for n, color in zip(range(5), colors_h):
+        H = sp.hermite(n)
+        y = H(x_hermite)
+        # Skalieren für bessere Darstellung
+        scale = max(abs(y).max(), 1.0)
+        ax3.plot(x_hermite, y / scale, color=color, linewidth=2,
+                 label=f'H_{n}(x)/|max|')
+    ax3.axhline(0, color='k', linewidth=0.5)
+    ax3.set_xlim(-3, 3)
+    ax3.set_ylim(-1.2, 1.2)
+    ax3.set_title('Hermite-Polynome H_n(x) (normiert)', fontsize=12)
+    ax3.set_xlabel('x')
+    ax3.set_ylabel('H_n(x) / |max|')
+    ax3.legend(loc='upper right', ncol=5, fontsize=9)
+    ax3.grid(True, alpha=0.3)
+
+    plt.suptitle('Galerie spezieller Funktionen', fontsize=14, fontweight='bold')
+    plt.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+
+    return fig
