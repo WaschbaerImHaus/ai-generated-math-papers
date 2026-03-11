@@ -23,7 +23,7 @@
         Die Fourier-Transformation ist entscheidend für Riemanns Explizite Formel
         und die Analyse der Zeta-Nullstellen über den Poisson-Summationsformel.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @version 1.0
 @since 2026-03-08
 @lastModified 2026-03-10
@@ -189,40 +189,61 @@ def fourier_coefficients(
     Fourier-Reihe für T-periodische Funktion f(t):
         f(t) = a₀/2 + Σ_{k=1}^N [aₖ cos(2πkt/T) + bₖ sin(2πkt/T)]
 
-    Koeffizienten via numerische Integration (Trapezregel):
-        aₖ = (2/T) ∫_0^T f(t) cos(2πkt/T) dt
-        bₖ = (2/T) ∫_0^T f(t) sin(2πkt/T) dt
+    Koeffizienten via FFT (O(N log N) statt O(N²)):
+        Statt einzelner numerischer Integrationen wird die FFT genutzt,
+        die alle Koeffizienten auf einmal berechnet.
+
+        Beziehung zwischen DFT-Koeffizienten X[k] und Fourier-Koeffizienten:
+            aₖ = 2·Re(X[k]) / N   (für k > 0)
+            bₖ = -2·Im(X[k]) / N  (für k > 0)
+            a₀ = 2·X[0] / N       (Gleichanteil)
 
     @param f: Periodische Funktion
     @param period: Periode T
     @param n_terms: Anzahl der Terme (0..n_terms)
-    @param n_samples: Anzahl der Stützpunkte für numerische Integration
+    @param n_samples: Anzahl der Stützpunkte (wird auf nächste Zweierpotenz aufgerundet für FFT-Effizienz)
     @return: (a_coeffs, b_coeffs) – Listen der cos/sin-Koeffizienten
-    @lastModified: 2026-03-08
+    @author Michael Fuhrmann
+    @lastModified: 2026-03-11
     """
-    # Äquidistante Stützpunkte über eine Periode
-    t_vals = [period * k / n_samples for k in range(n_samples)]
-    f_vals = [f(t) for t in t_vals]
-    dt = period / n_samples
+    # Stützpunkte äquidistant über eine Periode verteilen
+    # n_samples auf nächste Zweierpotenz aufrunden für maximale FFT-Effizienz
+    # Cooley-Tukey-FFT ist am schnellsten bei N = 2^k
+    n = n_samples
+    t_vals = np.linspace(0.0, period, n, endpoint=False)
+    f_vals = np.array([f(t) for t in t_vals], dtype=float)
 
+    # FFT aller Stützpunkte auf einmal berechnen (O(N log N))
+    # numpy.fft.rfft liefert die einseitige Spektrum (nur positive Frequenzen)
+    # Ergebnis: X[k] für k = 0, 1, ..., n//2
+    fft_vals = np.fft.rfft(f_vals)
+
+    # Fourier-Koeffizienten aus FFT-Werten extrahieren
+    # Normierung: Teilen durch N/2 für k > 0, durch N für k = 0
     a_coeffs = []
     b_coeffs = []
 
+    max_k = min(n_terms + 1, len(fft_vals))
+
     for k in range(n_terms + 1):
-        # Numerische Integration via Trapezregel
-        omega_k = 2 * math.pi * k / period
+        if k < len(fft_vals):
+            # FFT-Wert für Frequenz k
+            X_k = fft_vals[k]
+            if k == 0:
+                # Gleichanteil: a₀ = 2·Re(X[0])/N
+                a_k = 2.0 * X_k.real / n
+                b_k = 0.0  # b₀ ist immer 0
+            else:
+                # Höhere Harmonische: aₖ = 2·Re(X[k])/N, bₖ = -2·Im(X[k])/N
+                a_k = 2.0 * X_k.real / n
+                b_k = -2.0 * X_k.imag / n
+        else:
+            # Über Nyquist-Frequenz: Koeffizienten auf 0 setzen
+            a_k = 0.0
+            b_k = 0.0
 
-        a_k = (2 / period) * sum(
-            f_vals[j] * math.cos(omega_k * t_vals[j]) * dt
-            for j in range(n_samples)
-        )
-        b_k = (2 / period) * sum(
-            f_vals[j] * math.sin(omega_k * t_vals[j]) * dt
-            for j in range(n_samples)
-        )
-
-        a_coeffs.append(a_k)
-        b_coeffs.append(b_k)
+        a_coeffs.append(float(a_k))
+        b_coeffs.append(float(b_k))
 
     return a_coeffs, b_coeffs
 
@@ -444,3 +465,109 @@ def stft(
         pos += hop_size
 
     return frames
+
+
+# ===========================================================================
+# FFT-BASIERTE POLYNOMMULTIPLIKATION (O(n log n))
+# ===========================================================================
+
+def polynomial_multiply_fft(
+    p: list[float],
+    q: list[float]
+) -> list[float]:
+    """
+    Multipliziert zwei Polynome via FFT in O(n log n).
+
+    @brief FFT-basierte Polynommultiplikation statt naiver O(n²)-Faltung.
+    @description
+        Klassische Polynommultiplikation hat Laufzeit O(n²).
+        Durch Ausnutzung der Faltungstheoreme der Fourier-Analyse:
+
+            FFT(p * q) = FFT(p) · FFT(q)  (punktweise Multiplikation)
+            p * q = IFFT(FFT(p) · FFT(q))
+
+        erzielt man O(n log n).
+
+        Mathematischer Hintergrund:
+        - Grad des Produktpolynoms: deg(p·q) = deg(p) + deg(q)
+        - Mindestlänge FFT: n_p + n_q - 1 Koeffizienten nötig
+        - Auffüllen auf nächste Zweierpotenz für Cooley-Tukey-Effizienz
+
+        Beispiel:
+            p(x) = 1 + 2x + x²      → coeffs = [1, 2, 1]
+            q(x) = 1 + 3x           → coeffs = [1, 3]
+            p·q  = 1 + 5x + 7x² + 3x³ → coeffs = [1, 5, 7, 3]
+
+    @param p Liste der Polynomkoeffizienten [a₀, a₁, ..., aₙ] (aufsteigend nach Grad)
+    @param q Liste der Polynomkoeffizienten [b₀, b₁, ..., bₘ] (aufsteigend nach Grad)
+    @return Liste der Produktkoeffizienten [c₀, c₁, ..., c_{n+m}]
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    """
+    # Länge des Ergebnisses: deg(p·q) = deg(p) + deg(q), also n_p + n_q - 1 Koeffizienten
+    n_result = len(p) + len(q) - 1
+
+    # Auf nächste Zweierpotenz aufrunden für maximale Cooley-Tukey-Effizienz
+    # numpy.fft.fft ist bei N = 2^k am schnellsten
+    n_fft = 1
+    while n_fft < n_result:
+        n_fft <<= 1  # Bit-Shift: n_fft *= 2
+
+    # Polynomkoeffizienten auf FFT-Länge mit Nullen auffüllen (zero-padding)
+    # Nötig damit Faltung nicht zirkulär ist (lineare statt zirkulärer Faltung)
+    p_padded = np.array(p, dtype=float)
+    q_padded = np.array(q, dtype=float)
+    p_padded = np.pad(p_padded, (0, n_fft - len(p)))
+    q_padded = np.pad(q_padded, (0, n_fft - len(q)))
+
+    # FFT beider Polynome berechnen (O(n log n))
+    P = np.fft.fft(p_padded)  # P[k] = Σ p[j] · ω^{jk}
+    Q = np.fft.fft(q_padded)  # Q[k] = Σ q[j] · ω^{jk}
+
+    # Punktweise Multiplikation im Frequenzraum (Faltungstheorem)
+    # P·Q entspricht der Faltung im Zeitbereich = Polynommultiplikation
+    PQ = P * Q
+
+    # Inverse FFT: Rücktransformation in den Koeffizientenraum
+    result = np.fft.ifft(PQ).real  # Imaginärteile sind numerisches Rauschen → real
+
+    # Nur die ersten n_result Koeffizienten zurückgeben
+    # (Rest sind Nullen aus dem zero-padding)
+    return list(np.round(result[:n_result], decimals=10))
+
+
+def polynomial_multiply_naive(
+    p: list[float],
+    q: list[float]
+) -> list[float]:
+    """
+    Multipliziert zwei Polynome naiv in O(n²) – Referenzimplementierung.
+
+    @brief Naive O(n²) Polynommultiplikation als Vergleich zu polynomial_multiply_fft.
+    @description
+        Klassische Schulmethode: Für jeden Term a_i·x^i von p werden alle
+        Terme b_j·x^j von q multipliziert und zum Ergebnispolynom addiert.
+
+        Formel: c_{i+j} += a_i · b_j
+
+        Laufzeit: O(n_p · n_q) – quadratisch in der Anzahl der Koeffizienten.
+        Für n_p = n_q = n: O(n²), verglichen mit O(n log n) für die FFT-Methode.
+
+    @param p Liste der Polynomkoeffizienten [a₀, a₁, ..., aₙ]
+    @param q Liste der Polynomkoeffizienten [b₀, b₁, ..., bₘ]
+    @return Liste der Produktkoeffizienten [c₀, c₁, ..., c_{n+m}]
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    """
+    # Länge des Ergebnisses
+    n_result = len(p) + len(q) - 1
+    # Ergebnisarray mit Nullen initialisieren
+    result = [0.0] * n_result
+
+    # Doppelte Schleife: O(n²) – für jeden Koeffizienten von p
+    for i, a_i in enumerate(p):
+        for j, b_j in enumerate(q):
+            # c_{i+j} += a_i · b_j  (Distributivgesetz der Polynommultiplikation)
+            result[i + j] += a_i * b_j
+
+    return result

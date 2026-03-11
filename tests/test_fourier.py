@@ -21,7 +21,8 @@ from fourier import (
     dft, idft, fft, ifft, fft_padded,
     fourier_coefficients, fourier_series_eval,
     window_hanning, window_hamming, window_blackman, apply_window,
-    power_spectrum, dominant_frequency, stft
+    power_spectrum, dominant_frequency, stft,
+    polynomial_multiply_fft, polynomial_multiply_naive
 )
 
 
@@ -332,3 +333,81 @@ class TestSpectralAnalysis:
         frames = stft(x, window_size=8, hop_size=4)
         for frame in frames:
             assert len(frame) == 8
+
+
+# ---------------------------------------------------------------------------
+# FFT-BASIERTE POLYNOMMULTIPLIKATION (Build 58)
+# ---------------------------------------------------------------------------
+
+class TestPolynomialMultiplyFFT:
+    """Tests für die FFT-basierte Polynommultiplikation."""
+
+    def test_multiply_linear_times_linear(self):
+        """(1 + x) * (1 + x) = 1 + 2x + x²"""
+        p = [1.0, 1.0]  # 1 + x
+        q = [1.0, 1.0]  # 1 + x
+        result = polynomial_multiply_fft(p, q)
+        assert len(result) == 3
+        assert abs(result[0] - 1.0) < 1e-8
+        assert abs(result[1] - 2.0) < 1e-8
+        assert abs(result[2] - 1.0) < 1e-8
+
+    def test_multiply_by_constant(self):
+        """Multiplikation mit Konstante: 3 * (1 + 2x) = 3 + 6x"""
+        p = [3.0]
+        q = [1.0, 2.0]
+        result = polynomial_multiply_fft(p, q)
+        assert len(result) == 2
+        assert abs(result[0] - 3.0) < 1e-8
+        assert abs(result[1] - 6.0) < 1e-8
+
+    def test_multiply_quadratic_times_linear(self):
+        """(x² + 2x + 1) * (x + 1) = x³ + 3x² + 3x + 1"""
+        p = [1.0, 2.0, 1.0]  # 1 + 2x + x²
+        q = [1.0, 1.0]       # 1 + x
+        result = polynomial_multiply_fft(p, q)
+        assert len(result) == 4
+        assert abs(result[0] - 1.0) < 1e-8  # Koeffizient von x⁰
+        assert abs(result[1] - 3.0) < 1e-8  # Koeffizient von x¹
+        assert abs(result[2] - 3.0) < 1e-8  # Koeffizient von x²
+        assert abs(result[3] - 1.0) < 1e-8  # Koeffizient von x³
+
+    def test_multiply_agrees_with_naive(self):
+        """FFT-Methode stimmt mit naiver Methode überein."""
+        p = [1.0, -2.0, 3.0]
+        q = [4.0, 0.0, -1.0, 2.0]
+        fft_result = polynomial_multiply_fft(p, q)
+        naive_result = polynomial_multiply_naive(p, q)
+        assert len(fft_result) == len(naive_result)
+        for r_fft, r_naive in zip(fft_result, naive_result):
+            assert abs(r_fft - r_naive) < 1e-8
+
+    def test_multiply_large_polynomials(self):
+        """FFT-Multiplikation großer Polynome."""
+        import random
+        random.seed(42)
+        n = 64
+        p = [float(random.randint(-10, 10)) for _ in range(n)]
+        q = [float(random.randint(-10, 10)) for _ in range(n)]
+        fft_result = polynomial_multiply_fft(p, q)
+        naive_result = polynomial_multiply_naive(p, q)
+        assert len(fft_result) == 2 * n - 1
+        for r_fft, r_naive in zip(fft_result, naive_result):
+            assert abs(r_fft - r_naive) < 1e-5
+
+    def test_multiply_single_element(self):
+        """Multiplikation zweier Konstanten."""
+        p = [5.0]
+        q = [7.0]
+        result = polynomial_multiply_fft(p, q)
+        assert len(result) == 1
+        assert abs(result[0] - 35.0) < 1e-8
+
+    def test_naive_multiply_linear(self):
+        """Naive Methode: (1 + x) * (1 + x) = 1 + 2x + x²"""
+        p = [1.0, 1.0]
+        q = [1.0, 1.0]
+        result = polynomial_multiply_naive(p, q)
+        assert abs(result[0] - 1.0) < 1e-10
+        assert abs(result[1] - 2.0) < 1e-10
+        assert abs(result[2] - 1.0) < 1e-10
