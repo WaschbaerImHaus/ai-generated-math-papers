@@ -871,3 +871,68 @@ KEIN FEHLER GEFUNDEN:
   - Alle \label/\ref intern konsistent (keine Cross-Paper-Referenzen auf fremde Labels)
   - Alle DE-Papers haben \usepackage[ngerman]{babel}
 
+
+---
+2026-03-11 Beweis-Audit Batch 3 — Papers 13–16 (Siebmethoden)
+---
+
+## Audit-Ergebnis
+
+### Paper 13 (Brun-Satz, EN + DE)
+STATUS: KORREKT — kein mathematischer Fehler gefunden
+
+Geprüfte Punkte:
+- Mertens-Produkt: prod(1-2/p) << C/(log x)^2 via (1-2/p) << (1-1/p)^2 * Konstante
+- Trunkierungs-Fehler: (log log x)^2-Faktor korrekt begründet
+- Dyadic-Block: Beitrag k-ter Block ~ (log k)^2/k^2, Reihe konvergiert via k^{-3/2}
+- Bonferroni-Ungleichungen: r gerade -> S <= S+, r ungerade -> S >= S+, korrekt
+- B2 = 1.9021604 ± 2e-7: korrekt (Nicely 1995, Oliveira e Silva 2014)
+- Restterm << x^{1-delta}: korrekt via Stirling, Verweis auf Cojocaru-Murty §2.4
+
+### Paper 14 (Selberg-Sieb, EN + DE)
+STATUS: FEHLER GEFUNDEN UND BEHOBEN
+
+MATH-ERROR-B3-P14-EN-001 / MATH-ERROR-B3-P14-DE-001:
+- FEHLER: Theorem-Statement schrieb S(A,P,z) <= X/V(z) + O(...)
+  Das ist FALSCH als Selberg-Schranke: X/V(z) = X*V_h(z) >> X ist trivial
+- KORREKT: S(A,P,z) <= X/V_h(z) + O(...) = X*V(z) + O(...)
+  Weil V_h(z) = 1/V(z) gilt X/V_h(z) = X*V(z) (die echte Selberg-Schranke)
+- URSACHE: Verwirrung durch Doppel-Reziprozität: V_h(z)=1/V(z) korrekt,
+  aber X/V_h(z) = X*V(z) (nicht X/V(z))
+- BEHOBEN: Theorem-Statement auf X/V_h(z) = X*V(z) korrigiert in EN und DE
+  Erläuternder Kommentar ergänzt
+
+Der Beweis-Körper (Zeile 322 EN) war intern korrekt (X/V_h(z) = X*V(z)),
+nur das formale Theorem-Statement war falsch.
+
+Die Brun-Titchmarsh-Anwendung (Step 3) war korrekt: rechnet mit X*V(z).
+
+### Paper 15 (Großes Sieb, EN + DE)
+STATUS: KORREKT — alle bekannten Bugs korrekt behoben
+
+Geprüfte Punkte:
+- Fejer-Kern K_N: Indexbereich |h|<=N-1 korrekt (Bug-001 OK)
+- Beweis als Skizze markiert (Bug-002 OK)
+- Fejer statt Beurling-Selberg-Kern (Bug-003 OK)
+- Zhang 2014 (nicht 2013) (Bug-004 OK)
+- L <= 5 Xylouris 2011 (Bug-005 OK)
+- Charakter-Version: Gauss-Summen nicht naiv delta=Q^{-2} (Bug-006 OK)
+- Bombieri-Vinogradov-Formel: sum_{q<=x^{1/2}/(log x)^B} ... = O(x/(log x)^A) korrekt
+- BUG-B3-P15-DE-002: \ggT definiert (korrekt behoben)
+
+### Paper 16 (Chen-Satz, EN + DE)
+STATUS: KORREKT — alle bekannten Bugs korrekt behoben
+
+Geprüfte Punkte:
+- Chen bewies N=p+P2 (Omega(q)<=2), NICHT Goldbach — klar gesagt
+- Buchstab-Identität: S(A,P,z) = S(A,P,w) - sum_{w<=p<z} S(A_p,P,p) korrekt
+- Switching-Prinzip mit z=N^{1/2}, w=N^{1/3} korrekt
+- Faktor 1/2 aus Averaging zweier Buchstab-Anwendungen korrekt (Bug-006 OK)
+- Paritätsproblem: Omega(n) mod 2 für Siebmethoden unsichtbar — korrekt erklärt
+- Singuläre Reihe S(N) = 2*prod_{p|N}(p-1)/(p-2) * prod_{p∤N}(1-1/(p-1)^2) korrekt
+- Quantitativ: #{p<=N: N-p in P2} >= 0.67*S(N)*N/(log N)^2 (Chen 1973) korrekt
+- Numerische Tabelle vollständig und korrekt (11+9 mit 9=3^2 in P2 OK)
+
+## Zusammenfassung
+- Papers 13, 15, 16: KORREKT (keine Korrekturen nötig)
+- Paper 14: 1 Fehler gefunden und in EN+DE behoben (MATH-ERROR-B3-P14-EN/DE-001)

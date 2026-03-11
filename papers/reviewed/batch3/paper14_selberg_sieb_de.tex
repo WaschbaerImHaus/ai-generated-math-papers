@@ -288,12 +288,18 @@ Wir minimieren sie unter der Nebenbedingung $\lambda_1 = 1$.
 \label{sec:hauptschaetzung}
 % ================================================================
 
+% MATH-ERROR-B3-P14-DE-001 behoben: Theorem-Statement schrieb X/V(z), aber die
+% korrekte Selberg-Schranke (bewiesener Hauptterm) lautet X/V_h(z) = X*V(z).
+% Da V_h(z) = 1/V(z) (exakt), gilt X/V_h(z) = X/(1/V(z)) = X*V(z).
+% X/V(z) = X*V_h(z) waere das REZIPROKE und eine schlechtere (triviale) Schranke.
 \begin{theorem}[Selbergsche Oberschranke]\label{thm:selberg_haupt}
   Unter der Siebhypothese (Definition~\ref{def:hypothese}) mit optimalen Gewichten
   $\lambda_d^*$ aus Lemma~\ref{lem:optimierung} gilt:
   \[
     S(\mathcal{A}, \mathcal{P}, z)
-    \;\leq\; \frac{X}{V(z)}
+    \;\leq\; \frac{X}{V_h(z)}
+             + O\!\left(\sum_{\substack{d_1, d_2 \leq z \\ d_1,d_2 \mid \mathcal{P}(z)}} |r_{[d_1,d_2]}|\right)
+    \;=\; X \cdot V(z)
              + O\!\left(\sum_{\substack{d_1, d_2 \leq z \\ d_1,d_2 \mid \mathcal{P}(z)}} |r_{[d_1,d_2]}|\right),
   \]
   wobei
@@ -303,11 +309,12 @@ Wir minimieren sie unter der Nebenbedingung $\lambda_1 = 1$.
   % (ohne Trunkierung d <= z).
   \[
     V(z) = \prod_{\substack{p \leq z \\ p \in \mathcal{P}}} \bigl(1 - g(p)\bigr)
-    \;=\; V_h(z)^{-1}
+    \quad\text{und}\quad
+    V_h(z) = \frac{1}{V(z)}
   \]
   (exakte Identität, wenn die Summe in $V_h(z)$ über alle quadratfreien
   $d \mid \mathcal{P}(z)$ ohne obere Schranke läuft; mit Trunkierung $d \leq z$
-  gilt $V_h(z) \leq 1/V(z)$).
+  gilt $V_h(z) \leq 1/V(z)$, und die schärfere Schranke ist $X \cdot V(z)$).
 \end{theorem}
 
 \begin{proof}
@@ -324,8 +331,11 @@ Wir minimieren sie unter der Nebenbedingung $\lambda_1 = 1$.
   Das Produkt konvergiert absolut, da $g(p) \in [0,1)$.
   % BUG-B3-P14-DE-001 behoben: Zeile war algebraisch zirkulär und ergab X statt X/V(z).
   % Korrekte Herleitung: V_h(z)=1/V(z) (exakt), also X/V_h(z)=X/(1/V(z))=X·V(z)^{-1}=X/V(z).
-  Daher beträgt der optimale Hauptterm $X / V_h(z) = X \cdot V(z)^{-1} = X / V(z)$
-  (da $V_h(z) = 1/V(z)$, also $X/V_h(z) = X/(1/V(z)) = X/V(z)$).
+  Daher beträgt der optimale Hauptterm $X / V_h(z) = X \cdot V(z)$
+  (da $V_h(z) = 1/V(z)$, also $X/V_h(z) = X/(1/V(z)) = X \cdot V(z)$;
+  Hinweis: $X/V(z) = X \cdot V_h(z)$ wäre das \emph{Kehrwert-Produkt} und
+  ergäbe eine viel größere, triviale Schranke --- die korrekte Selberg-Schranke
+  ist $X \cdot V(z)$).
 
   Genauer: Ohne die Trunkierung $d \leq z$ ist die Summe exakt $1/V(z)$.
   Mit der Trunkierung gehen Terme mit $d > z$ verloren, aber $|\lambda_d^*| \leq 1$

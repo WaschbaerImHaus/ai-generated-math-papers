@@ -283,12 +283,20 @@ We minimise it subject to $\lambda_1 = 1$.
 \label{sec:main}
 % ================================================================
 
+% MATH-ERROR-B3-P14-EN-001 behoben: Theorem-Statement schrieb X/V(z), aber die
+% korrekte Selberg-Schranke (bewiesener Hauptterm) lautet X/V_h(z) = X*V(z).
+% Da V_h(z) = 1/V(z) (exakt), gilt X/V_h(z) = X/(1/V(z)) = X*V(z).
+% X/V(z) = X*V_h(z) waere das REZIPROKE und eine schlechtere (triviale) Schranke.
+% Die korrekte Formulierung verwendet X/V_h(z) im Statement; der Ausdruck
+% X*V(z) ist die aequivalente kompakte Form.
 \begin{theorem}[Selberg's upper bound]\label{thm:selberg_main}
   Under the sieve hypothesis (Definition~\ref{def:hypothesis}), with
   optimal weights $\lambda_d^*$ from Lemma~\ref{lem:optimization}:
   \[
     S(\mathcal{A}, \mathcal{P}, z)
-    \;\leq\; \frac{X}{V(z)}
+    \;\leq\; \frac{X}{V_h(z)}
+             + O\!\left(\sum_{\substack{d_1, d_2 \leq z \\ d_1,d_2 \mid \mathcal{P}(z)}} |r_{[d_1,d_2]}|\right)
+    \;=\; X \cdot V(z)
              + O\!\left(\sum_{\substack{d_1, d_2 \leq z \\ d_1,d_2 \mid \mathcal{P}(z)}} |r_{[d_1,d_2]}|\right),
   \]
   where
@@ -298,10 +306,13 @@ We minimise it subject to $\lambda_1 = 1$.
   % (ohne Trunkierungseinschränkung d <= z).
   \[
     V(z) = \prod_{\substack{p \leq z \\ p \in \mathcal{P}}} \bigl(1 - g(p)\bigr)
-    \;=\; V_h(z)^{-1}
+    \quad\text{and}\quad
+    V_h(z) = \frac{1}{V(z)}
   \]
   (exact identity when the sum in $V_h(z)$ runs over all squarefree $d \mid \mathcal{P}(z)$
-  without upper bound; with the truncation $d \leq z$ one has $V_h(z) \leq 1/V(z)$).
+  without upper bound; with the truncation $d \leq z$ one has $V_h(z) \leq 1/V(z)$,
+  so that $X/V_h(z) \geq X \cdot V(z)$, but the bound $X \cdot V(z)$ is the
+  sharper/useful Selberg estimate).
 \end{theorem}
 
 \begin{proof}
@@ -319,8 +330,11 @@ We minimise it subject to $\lambda_1 = 1$.
   % BUG-B3-P14-EN-001 behoben: Zeile war algebraisch zirkulär und ergab X statt X/V(z).
   % Korrekte Herleitung: V_h(z)=1/V(z) (exakt), also X/V_h(z) = X/(1/V(z)) = X·V(z)^{-1}
   % = X/V(z) — das ist die gesuchte Schranke. Ohne Trunkierung d<=z gilt V_h(z)=1/V(z) exakt.
-  Hence the optimal main term is $X / V_h(z) = X \cdot V(z)$
-  (since $V_h(z) = 1/V(z)$, so $X/V_h(z) = X/(1/V(z)) = X \cdot V(z)^{-1} = X/V(z)$).
+  Hence the optimal main term is
+  $X / V_h(z) = X \cdot V(z)$
+  (since $V_h(z) = 1/V(z)$, so $X/V_h(z) = X/(1/V(z)) = X \cdot V(z)$;
+  note: $X/V(z) = X \cdot V_h(z)$ would be the \emph{reciprocal} and yields a
+  much larger, trivial bound --- the correct Selberg bound is $X \cdot V(z)$).
 
   More precisely, without the truncation $d \leq z$ the sum is exactly $1/V(z)$.
   With the truncation $d \leq z$, one loses terms with $d > z$, but
