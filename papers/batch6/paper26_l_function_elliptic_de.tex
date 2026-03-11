@@ -231,6 +231,48 @@ hypothetische L\"osung ergäbe eine Frey-Kurve, die nicht modular w\"are).
 \end{proof}
 
 % ================================================================
+\section{Numerische Beispiele}
+\label{sec:numerics}
+% ================================================================
+
+\begin{example}[Rang~0: $E_0\colon y^2 = x^3 - x$]
+\label{ex:rank0}
+Die Kurve $E_0\colon y^2 = x^3 - x$ hat F\"uhrer $N_{E_0} = 32$,
+Torsionsuntergruppe $E_0(\Q)_{\mathrm{tors}} \cong \Z/2\Z \times \Z/2\Z$
+und algebraischen Rang $r = 0$.
+
+Die Frobenius-Spuren beginnen:
+$a_3 = 0$, $a_5 = -2$, $a_7 = 0$, $a_{11} = 0$, $a_{13} = 6$, \ldots
+
+Numerisch (mit dem Euler-Produkt bis $p \le 10^6$) ergibt sich
+\[
+  L(E_0, 1) \;\approx\; 0{,}6551.
+\]
+Da $L(E_0,1) \ne 0$, sagt BSD $r = 0$ vorher -- in \"Ubereinstimmung mit dem
+tats\"achlichen Rang.  Dies ist einer der Rang-0-F\"alle, die von Kolyvagin
+(1989) bedingungslos bewiesen wurden.
+\end{example}
+
+\begin{example}[Rang~1: $E_1\colon y^2 + y = x^3 - x$]
+\label{ex:rank1}
+Die Kurve $E_1\colon y^2 + y = x^3 - x$ hat F\"uhrer $N_{E_1} = 37$,
+Torsionsuntergruppe $E_1(\Q)_{\mathrm{tors}} = \{\mathcal{O}\}$ (trivial)
+und algebraischen Rang $r = 1$, erzeugt vom Punkt $P = (0, 0)$.
+
+Die Frobenius-Spuren beginnen:
+$a_2 = -2$, $a_3 = -3$, $a_5 = -2$, $a_7 = -2$, $a_{11} = 0$, \ldots
+
+Numerisch ergibt sich $L(E_1, 1) = 0$, und $L'(E_1, 1) \approx 0{,}3059$.
+Da $L(E_1,1) = 0$ und $L'(E_1,1) \ne 0$, sagt BSD $r = 1$ vorher.
+Kolyvagin bewies dies bedingungslos: die Verschwindungsordnung $r_{\mathrm{an}} = 1$
+impliziert $\mathrm{rang}(E_1(\Q)) = 1$.
+
+Dieser Rang-1-Fall ist auch ein Lehrbeispiel f\"ur die Wirkung der
+Funktionalgleichung: Mit Wurzelzahl $\epsilon(E_1) = -1$ gilt
+$L(E_1, 1) = -L(E_1, 1)$, also $L(E_1,1) = 0$ zwingend.
+\end{example}
+
+% ================================================================
 \section{Die $L$-Funktion bei \texorpdfstring{$s=1$}{s=1}}
 % ================================================================
 

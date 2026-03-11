@@ -575,3 +575,21 @@ Nicht betroffen (bereits in aktuellem Stand korrekt):
 - BUG-B4-P20-DE-TABLE-MISSING: Tabelle bereits vorhanden
 - BUG-B6-P25-DE-003: Remark über unbeschränkte Ränge bereits vorhanden
 - BUG-B6-P26-DE-001: Tabelle für a₅-Berechnung bereits vorhanden
+
+2026-03-11 $(date +%H:%M) Build 99: Review-Bugs Papers 18–28 behoben (Restmenge)
+
+BUG-P18-EN-001: \ref{thm:S_positive} → \ref{thm:sing_lower} in paper18_vinogradov_three_primes.tex
+BUG-P18-DE-001: \newtheorem{proposition}[theorem]{Proposition} in Präambel hinzugefügt
+BUG-P18-DE-002: Bibitem-Key Winogradow1937 → Vinogradov1937 vereinheitlicht
+BUG-P21-DE-001: Tippfehler "Beweissskizze" → "Beweisskizze" korrigiert
+BUG-P25-EN-001: Fehlendes \] in j-Invarianten-Definition eingefügt (LaTeX-Compilefehler behoben)
+BUG-P26-DE-002: Abschnitt "Numerische Beispiele" (ex:rank0, ex:rank1) in DE Paper 26 hinzugefügt
+BUG-P28-DE-001: Grammatikfehler im Beweis von thm:equiv behoben ("liefert...liegt" → "liefert...Wir zeigen, dass P ∈ En")
+BUG-P28-DE-002: Koblitz1993 Bibitem korrigiert: GTM 97 → GTM 114, "A Course in Number Theory and Cryptography"
+
+Bereits behoben (kein Handlungsbedarf):
+- BUG-P18-DE-003: IwaniecKowalski bereits vorhanden (false positive)
+- BUG-P19-DE-001/002: Bereits in Build 96/97 behoben
+- BUG-P20-DE-002: vermutung/beispiel envs bereits in Präambel definiert
+- BUG-P25-DE-001: DE-Datei hatte \] bereits korrekt
+- BUG-P26-DE-001: Band 141 in DE korrekt (Taylor-Wiles 1995 = Ann.Math. 141)
