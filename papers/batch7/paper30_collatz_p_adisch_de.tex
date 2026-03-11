@@ -139,8 +139,11 @@ ab, sodass $T$ $\mathbb{Z}_2$ in sich abbildet.
 \end{theorem}
 
 \begin{proof}
-Stetigkeit von $x \mapsto x/2$ auf $2\mathbb{Z}_2$: Falls $|x - y|_2 \leq 2^{-N}$,
-so gilt $|x/2 - y/2|_2 = |x-y|_2/2 \leq 2^{-N-1}$.
+Stetigkeit von $x \mapsto x/2$ auf $2\mathbb{Z}_2$: Schreibe $x = 2u$, $y = 2v$
+mit $u, v \in \mathbb{Z}_2$. Dann gilt $|x - y|_2 = |2|_2 \cdot |u-v|_2 = \tfrac{1}{2}|u-v|_2$.
+Falls $|x - y|_2 \leq 2^{-N}$, so folgt $|u-v|_2 \leq 2^{-N+1}$, und
+$|x/2 - y/2|_2 = |u - v|_2 \leq 2^{-N+1}$.
+Also ist $T$ stetig auf $2\mathbb{Z}_2$ (da $T(x) = u \in \mathbb{Z}_2$).
 Stetigkeit von $x \mapsto 3x+1$ auf $\mathbb{Z}_2^{\text{ungerade}}$:
 $|3x+1 - (3y+1)|_2 = |3(x-y)|_2 = |3|_2 \cdot |x-y|_2 = |x-y|_2 \leq 2^{-N}$
 für $|x-y|_2 \leq 2^{-N}$, da $3$ eine Einheit in $\mathbb{Z}_2$ ist

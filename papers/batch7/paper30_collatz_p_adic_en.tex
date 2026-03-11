@@ -133,8 +133,12 @@ to $\mathbb{Z}_2$.
 \end{theorem}
 
 \begin{proof}
-Continuity of $x \mapsto x/2$ on $2\mathbb{Z}_2$: if $|x - y|_2 \leq 2^{-N}$, then
-$|x/2 - y/2|_2 = |x-y|_2/2 \leq 2^{-N-1}$.
+Continuity of $x \mapsto x/2$ on $2\mathbb{Z}_2$: write $x = 2u$, $y = 2v$ with
+$u, v \in \mathbb{Z}_2$. Then $|x - y|_2 = |2|_2 \cdot |u-v|_2 = \tfrac{1}{2}|u-v|_2$.
+So if $|x - y|_2 \leq 2^{-N}$, then $|u-v|_2 \leq 2^{-N+1}$, and
+$|x/2 - y/2|_2 = |u - v|_2 \leq 2^{-N+1}$.
+Thus $T$ is continuous on $2\mathbb{Z}_2$ (both $u$ and $v$ belong to
+$\mathbb{Z}_2$, so $T(x) = u \in \mathbb{Z}_2$).
 Continuity of $x \mapsto 3x+1$ on $\mathbb{Z}_2^{\text{odd}}$:
 $|3x+1 - (3y+1)|_2 = |3(x-y)|_2 = |3|_2 \cdot |x-y|_2 = |x-y|_2 \leq 2^{-N}$
 for $|x-y|_2 \leq 2^{-N}$, since $3$ is a unit in $\mathbb{Z}_2$ ($\gcd(3,2)=1$

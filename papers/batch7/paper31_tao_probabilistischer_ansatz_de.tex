@@ -107,33 +107,35 @@ Damit: $\Pr[E(m) = k] = \Pr[E(m) \geq k] - \Pr[E(m) \geq k+1] = 2^{-(k-1)} - 2^{
 \end{proof}
 
 \begin{definition}[Logarithmischer Zufallswalk]\label{def:zufallswalk}
-Um die ``Größe'' der Syrakus-Iterationen zu modellieren, wird der Logarithmus genommen.
-Für ungerades $m$ gilt:
+Um die ``Größe'' der Syrakus-Iterationen zu modellieren, wird der natürliche Logarithmus
+($\log = \ln$) genommen. Für ungerades $m$ gilt:
 \[
-  \log S(m) \;=\; \log m + \log 3 - E(m) \log 2 + O(1/m).
+  \ln S(m) \;=\; \ln m + \ln 3 - E(m) \ln 2 + O(1/m).
 \]
-Die Inkremente $X_k = \log 3 - E_k \log 2$ (wobei $E_k = E(S^{k-1}(m))$) bilden die
+Die Inkremente $X_k = \ln 3 - E_k \ln 2$ (wobei $E_k = E(S^{k-1}(m))$) bilden die
 einzelnen Schritte des Zufallswalks. Der Erwartungswert ist:
 \[
-  \mathbb{E}[X_k] \;=\; \log 3 - \log 2 \cdot \mathbb{E}[E_k] = \log 3 - 2\log 2 = \log(3/4) < 0.
+  \mathbb{E}[X_k] \;=\; \ln 3 - \ln 2 \cdot \mathbb{E}[E_k] = \ln 3 - 2\ln 2 = \ln(3/4) < 0.
 \]
-Da $\log(3/4) \approx -0{,}288 < 0$, hat der Walk einen strikten negativen Drift.
+Da $\ln(3/4) \approx -0{,}288 < 0$, hat der Walk einen strikten negativen Drift.
+In der Basis-2-Schreibweise gilt äquivalent $\log_2(3/4) = \log_2 3 - 2 \approx -0{,}415$
+pro Syrakus-Schritt; beide Formulierungen beschreiben denselben Abwärtstrend.
 \end{definition}
 
 \begin{theorem}[Negativer Drift impliziert fast sichere Konvergenz]\label{thm:drift}
-Seien $(X_k)_{k \geq 1}$ i.i.d.-Zufallsvariablen mit $\mathbb{E}[X_1] = \log(3/4) < 0$.
+Seien $(X_k)_{k \geq 1}$ i.i.d.-Zufallsvariablen mit $\mathbb{E}[X_1] = \ln(3/4) < 0$.
 Dann gilt für den Zufallswalk $W_n = \sum_{k=1}^n X_k$: $W_n \to -\infty$ fast sicher.
 Insbesondere fällt der Walk für jede feste Schranke $L$ mit Wahrscheinlichkeit 1
 schließlich unter $L$.
 \end{theorem}
 
 \begin{proof}
-Dies folgt unmittelbar aus dem starken Gesetz der großen Zahlen: $W_n/n \to \mathbb{E}[X_1] < 0$
+Dies folgt unmittelbar aus dem starken Gesetz der großen Zahlen: $W_n/n \to \mathbb{E}[X_1] = \ln(3/4) < 0$
 fast sicher. Da $\mathbb{E}[X_1] < 0$, gilt $W_n \to -\infty$ f.s.
 \end{proof}
 
 \begin{remark}\label{rem:nicht_unabhaengig}
-Die entscheidende Schwierigkeit liegt darin, dass die Schritte $X_k = \log 3 - E(S^{k-1}(m)) \log 2$
+Die entscheidende Schwierigkeit liegt darin, dass die Schritte $X_k = \ln 3 - E(S^{k-1}(m)) \ln 2$
 \emph{nicht} unabhängig sind: die Verteilung von $E(S^k(m))$ hängt vom Wert von $S^k(m)$
 ab, der wiederum von der gesamten Bahn-Geschichte abhängt. Taos Hauptbeitrag besteht
 darin, diese Abhängigkeiten mittels Fourier-Analysis zu behandeln.

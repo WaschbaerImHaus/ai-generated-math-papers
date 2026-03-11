@@ -103,32 +103,35 @@ Thus $\Pr[E(m) = k] = \Pr[E(m) \geq k] - \Pr[E(m) \geq k+1] = 2^{-(k-1)} - 2^{-k
 \end{proof}
 
 \begin{definition}[Log-scale random walk]\label{def:rw}
-To model the ``size'' of the Syracuse iterates, take logarithms. For odd $m$,
+To model the ``size'' of the Syracuse iterates, take natural logarithms ($\log = \ln$).
+For odd $m$,
 \[
-  \log S(m) \;=\; \log m + \log 3 - E(m) \log 2 + O(1/m).
+  \ln S(m) \;=\; \ln m + \ln 3 - E(m) \ln 2 + O(1/m).
 \]
-The increments $X_k = \log 3 - E_k \log 2$ (where $E_k = E(S^{k-1}(m))$) form the
+The increments $X_k = \ln 3 - E_k \ln 2$ (where $E_k = E(S^{k-1}(m))$) form the
 individual steps of the random walk. The expected value is
 \[
-  \mathbb{E}[X_k] \;=\; \log 3 - \log 2 \cdot \mathbb{E}[E_k] = \log 3 - \log 2 \cdot 2 = \log 3 - 2\log 2 = \log(3/4) < 0.
+  \mathbb{E}[X_k] \;=\; \ln 3 - \ln 2 \cdot \mathbb{E}[E_k] = \ln 3 - 2\ln 2 = \ln(3/4) < 0.
 \]
-Since $\log(3/4) \approx -0.288 < 0$, the walk has a strict negative drift.
+Since $\ln(3/4) \approx -0.288 < 0$, the walk has a strict negative drift.
+An equivalent formulation in base-2 logarithms gives $\log_2(3/4) = \log_2 3 - 2 \approx -0.415$
+per Syracuse step; both formulations express the same downward drift.
 \end{definition}
 
 \begin{theorem}[Negative drift implies convergence a.s.]\label{thm:drift}
-Let $(X_k)_{k \geq 1}$ be i.i.d.\ random variables with $\mathbb{E}[X_1] = \log(3/4) < 0$.
+Let $(X_k)_{k \geq 1}$ be i.i.d.\ random variables with $\mathbb{E}[X_1] = \ln(3/4) < 0$.
 Then the random walk $W_n = \sum_{k=1}^n X_k$ satisfies $W_n \to -\infty$ almost surely.
 In particular, for any fixed threshold $L$, the walk eventually falls below $L$ with
 probability 1.
 \end{theorem}
 
 \begin{proof}
-This is an immediate consequence of the strong law of large numbers: $W_n/n \to \mathbb{E}[X_1] < 0$
+This is an immediate consequence of the strong law of large numbers: $W_n/n \to \mathbb{E}[X_1] = \ln(3/4) < 0$
 almost surely. Since $\mathbb{E}[X_1] < 0$, we have $W_n \to -\infty$ a.s.
 \end{proof}
 
 \begin{remark}\label{rem:not_independent}
-The crucial difficulty is that the steps $X_k = \log 3 - E(S^{k-1}(m)) \log 2$ are
+The crucial difficulty is that the steps $X_k = \ln 3 - E(S^{k-1}(m)) \ln 2$ are
 \emph{not} independent: the distribution of $E(S^k(m))$ depends on the value of
 $S^k(m)$, which depends on the entire history of the orbit. Tao's main contribution
 is to handle these dependencies via Fourier analysis.
