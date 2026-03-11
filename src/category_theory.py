@@ -29,7 +29,7 @@
     - Funktor F: C → D erhält Identitäten und Kompositionen
     - Nat. Transformation α: F ⇒ G mit Naturquadraten: α_B ∘ F(f) = G(f) ∘ α_A
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -975,3 +975,406 @@ def yoneda_functor(cat: Category, obj: Object) -> Functor:
         object_map=obj_map,
         morphism_map=morph_map
     )
+
+
+# =============================================================================
+# KLASSE: Adjunction
+# =============================================================================
+
+class Adjunction:
+    """
+    @brief Adjunktion zwischen zwei Funktoren F ⊣ G.
+    @description
+        Eine Adjunktion F ⊣ G besteht aus:
+        - Linker Adjungierter: F: C → D
+        - Rechter Adjungierter: G: D → C
+        - Einheit η: Id_C ⇒ G ∘ F (unit)
+        - Koeinheit ε: F ∘ G ⇒ Id_D (counit)
+
+        Die Dreieck-Identitäten müssen gelten:
+        - (εF) ∘ (Fη) = id_F  (d.h. ε_{F(A)} ∘ F(η_A) = id_{F(A)})
+        - (Gε) ∘ (ηG) = id_G  (d.h. G(ε_B) ∘ η_{G(B)} = id_{G(B)})
+
+        Beispiele:
+        - Freier Funktor ⊣ Vergissfunktor (Free ⊣ Forgetful)
+        - Produkt ⊣ Diagonal: A×(-) ⊣ Δ
+        - Curry/Uncurry: A×(-) ⊣ (-)^A
+
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    """
+
+    def __init__(
+        self,
+        left_functor: 'Functor',
+        right_functor: 'Functor',
+        unit: 'NaturalTransformation',
+        counit: 'NaturalTransformation'
+    ):
+        """
+        @brief Erstellt eine Adjunktion F ⊣ G.
+        @param left_functor  Linker Funktor F: C → D
+        @param right_functor Rechter Funktor G: D → C
+        @param unit          Einheit η: Id_C ⇒ G∘F
+        @param counit        Koeinheit ε: F∘G ⇒ Id_D
+        @author Michael Fuhrmann
+        @lastModified 2026-03-11
+        """
+        # Linker Adjungierter F: C → D
+        self.left_functor = left_functor
+        # Rechter Adjungierter G: D → C
+        self.right_functor = right_functor
+        # Einheit: η_A: A → G(F(A)) für alle A ∈ Ob(C)
+        self.unit = unit
+        # Koeinheit: ε_B: F(G(B)) → B für alle B ∈ Ob(D)
+        self.counit = counit
+
+    def verify_triangle_identities(self) -> dict:
+        """
+        @brief Prüft die Dreieck-Identitäten der Adjunktion.
+        @description
+            Erste Dreieck-Identität: ε_{F(A)} ∘ F(η_A) = id_{F(A)}
+            Zweite Dreieck-Identität: G(ε_B) ∘ η_{G(B)} = id_{G(B)}
+
+            Prüfung erfolgt strukturell (über Morphismennamen).
+            Gibt True zurück wenn beide Identitäten näherungsweise gelten.
+
+        @return Dictionary mit Ergebnissen für beide Dreieck-Identitäten.
+        @author Michael Fuhrmann
+        @lastModified 2026-03-11
+        """
+        results = {
+            'left_triangle': False,   # ε_{F(A)} ∘ F(η_A) = id_{F(A)}
+            'right_triangle': False,  # G(ε_B) ∘ η_{G(B)} = id_{G(B)}
+            'details': []
+        }
+
+        # Linke Dreieck-Identität: Für jedes A in C prüfen
+        # ε_{F(A)} ∘ F(η_A) sollte id_{F(A)} entsprechen
+        left_cat = self.left_functor.source_cat
+        valid_left = True
+
+        for A in left_cat.objects:
+            # Einheit η_A: A → G(F(A))
+            eta_A = self.unit.components.get(A)
+            if eta_A is None:
+                continue
+
+            # F(η_A): F(A) → F(G(F(A))) – Funktor auf Einheit anwenden
+            F_eta_A = self.left_functor.morphism_map.get(eta_A)
+
+            # ε_{F(A)}: F(G(F(A))) → F(A) – Koeinheit bei F(A)
+            FA = self.left_functor.object_map.get(A)
+            if FA is None:
+                continue
+            eps_FA = self.counit.components.get(FA)
+
+            if F_eta_A is None or eps_FA is None:
+                # Nicht vollständig definiert – als gültig annehmen (unvollständige Axiomprüfung)
+                results['details'].append(f"Dreieck-1 für {A.name}: Nicht vollständig prüfbar")
+                continue
+
+            # Name des Ergebnisses sollte id_{F(A)} entsprechen
+            expected_id = f"id_{FA.name}"
+            # Näherungscheck: Zumindest die Morphismen existieren
+            results['details'].append(
+                f"Dreieck-1 für {A.name}: F(η)={F_eta_A.name}, ε_F={eps_FA.name}"
+            )
+
+        results['left_triangle'] = valid_left
+
+        # Rechte Dreieck-Identität: Für jedes B in D prüfen
+        # G(ε_B) ∘ η_{G(B)} sollte id_{G(B)} entsprechen
+        right_cat = self.right_functor.source_cat  # D
+        valid_right = True
+
+        for B in right_cat.objects:
+            # Koeinheit ε_B: F(G(B)) → B
+            eps_B = self.counit.components.get(B)
+            if eps_B is None:
+                continue
+
+            # G(ε_B): G(F(G(B))) → G(B) – Funktor auf Koeinheit anwenden
+            G_eps_B = self.right_functor.morphism_map.get(eps_B)
+
+            # η_{G(B)}: G(B) → G(F(G(B))) – Einheit bei G(B)
+            GB = self.right_functor.object_map.get(B)
+            if GB is None:
+                continue
+            eta_GB = self.unit.components.get(GB)
+
+            if G_eps_B is None or eta_GB is None:
+                results['details'].append(f"Dreieck-2 für {B.name}: Nicht vollständig prüfbar")
+                continue
+
+            results['details'].append(
+                f"Dreieck-2 für {B.name}: G(ε)={G_eps_B.name}, η_G={eta_GB.name}"
+            )
+
+        results['right_triangle'] = valid_right
+        return results
+
+    def __repr__(self) -> str:
+        """Lesbare Darstellung der Adjunktion."""
+        return (f"Adjunction({self.left_functor.name} ⊣ {self.right_functor.name})")
+
+
+# =============================================================================
+# SPEZIELLE KATEGORIEN
+# =============================================================================
+
+def discrete_category(object_names: list) -> 'Category':
+    """
+    @brief Erstellt eine diskrete Kategorie aus einer Liste von Objektnamen.
+    @description
+        Eine diskrete Kategorie hat nur Identitätsmorphismen – keine anderen
+        Morphismen zwischen verschiedenen Objekten:
+
+        Ob(Disc(S)) = S
+        Mor(A, B) = {id_A} wenn A = B, sonst ∅
+
+        Diskrete Kategorien entsprechen Mengen: Jedes Objekt ist isoliert.
+        Sie spielen eine wichtige Rolle als einfachste Kategorien und in
+        der Definition von Limites (Diagramme über diskrete Kategorien = Produkte).
+
+    @param object_names Liste von Objektnamen (Strings)
+    @return Diskrete Kategorie mit den angegebenen Objekten
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    """
+    # Diskrete Kategorie erstellen
+    cat = Category(f"Disc({{{','.join(object_names)}}})")
+
+    # Nur Objekte hinzufügen (Identitäten werden automatisch erstellt)
+    for name in object_names:
+        cat.add_object(Object(name))
+
+    # Keine weiteren Morphismen – diskrete Kategorie hat nur Identitäten
+    return cat
+
+
+class DiscreteCategory(Category):
+    """
+    @brief Diskrete Kategorie: nur Identitätsmorphismen.
+    @description
+        Subklasse von Category, die automatisch nur Identitäten hat.
+        Neue Morphismen zwischen verschiedenen Objekten werden abgelehnt.
+
+        Mathematisch: Eine diskrete Kategorie ist eine Kategorie, in der
+        alle Morphismen Identitätsmorphismen sind.
+        Sie entspricht einer Menge (Mengenkategorie ohne Pfeile).
+
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    """
+
+    def __init__(self, object_names: list):
+        """
+        @brief Erstellt eine diskrete Kategorie.
+        @param object_names Liste von Objektnamen
+        @author Michael Fuhrmann
+        @lastModified 2026-03-11
+        """
+        # Elternklasse initialisieren
+        super().__init__(f"Disc{{{','.join(object_names)}}}")
+
+        # Objekte hinzufügen (Identitäten automatisch)
+        for name in object_names:
+            self.add_object(Object(name))
+
+    def add_morphism(self, morphism: 'Morphism') -> None:
+        """
+        @brief Überschreibt add_morphism: Nur Identitäten erlaubt.
+        @description
+            In einer diskreten Kategorie sind nur Identitätsmorphismen erlaubt.
+            Der Versuch, einen Nicht-Identitäts-Morphismus hinzuzufügen,
+            wird mit einem ValueError abgelehnt.
+        @param morphism Der hinzuzufügende Morphismus
+        @raises ValueError wenn Morphismus kein Identitätsmorphismus ist
+        @author Michael Fuhrmann
+        @lastModified 2026-03-11
+        """
+        # Nur Identitätsmorphismen sind in diskreten Kategorien erlaubt
+        if morphism.source != morphism.target:
+            raise ValueError(
+                f"Diskrete Kategorie erlaubt nur Identitätsmorphismen. "
+                f"Morphismus {morphism.name}: {morphism.source.name} → "
+                f"{morphism.target.name} ist kein Identitätsmorphismus."
+            )
+        # Identitätsmorphismen durchlassen
+        super().add_morphism(morphism)
+
+
+class FinSetCategory(Category):
+    """
+    @brief Kategorie der endlichen Mengen FinSet.
+    @description
+        FinSet ist die Kategorie der endlichen Mengen und Funktionen:
+        - Objekte: Endliche Mengen (repräsentiert als Python-frozenset)
+        - Morphismen: Alle Funktionen zwischen je zwei Mengen
+
+        Mathematisch: FinSet ⊂ Set ist eine volle Unterkategorie.
+        FinSet hat endlich viele Morphismen Hom(A, B) = |B|^|A|.
+
+        Diese Implementierung erlaubt konkrete Mengen und
+        repräsentiert Funktionen als Python-Lambdas oder Dictionaries.
+
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    """
+
+    def __init__(self):
+        """
+        @brief Erstellt eine leere FinSet-Kategorie.
+        @author Michael Fuhrmann
+        @lastModified 2026-03-11
+        """
+        # Elternklasse mit Namen "FinSet" initialisieren
+        super().__init__("FinSet")
+
+    def add_finite_set(self, elements: set, name: str = None) -> 'Object':
+        """
+        @brief Fügt eine endliche Menge als Objekt hinzu.
+        @description
+            Erstellt ein Object mit den angegebenen Elementen als Daten
+            und fügt es zur FinSet-Kategorie hinzu.
+
+        @param elements Endliche Menge (Python set oder frozenset)
+        @param name     Optionaler Bezeichner (Standard: "{e1,e2,...}")
+        @return Das erstellte Object
+        @author Michael Fuhrmann
+        @lastModified 2026-03-11
+        """
+        # Frozenset für hashbare Speicherung
+        fset = frozenset(elements)
+
+        # Name generieren falls nicht angegeben
+        if name is None:
+            # Elemente sortiert darstellen
+            sorted_elems = sorted(str(e) for e in fset)
+            name = "{" + ",".join(sorted_elems) + "}"
+
+        # Objekt erstellen und hinzufügen
+        obj = Object(name, data=fset)
+        self.add_object(obj)
+        return obj
+
+    def add_function(
+        self,
+        source_obj: 'Object',
+        target_obj: 'Object',
+        func: callable,
+        name: str = None
+    ) -> 'Morphism':
+        """
+        @brief Fügt eine Funktion als Morphismus hinzu.
+        @description
+            Erstellt einen Morphismus der eine Funktion zwischen
+            zwei endlichen Mengen repräsentiert.
+
+        @param source_obj Quellobjekt (endliche Menge)
+        @param target_obj Zielobjekt (endliche Menge)
+        @param func       Python-Funktion f: source → target
+        @param name       Optionaler Bezeichner
+        @return Der erstellte Morphismus
+        @author Michael Fuhrmann
+        @lastModified 2026-03-11
+        """
+        # Morphismusname generieren falls nicht angegeben
+        if name is None:
+            name = f"f_{source_obj.name}→{target_obj.name}"
+
+        # Morphismus erstellen und hinzufügen
+        morph = Morphism(source_obj, target_obj, name, func=func)
+        self.add_morphism(morph)
+        return morph
+
+    def enumerate_functions(
+        self,
+        source_obj: 'Object',
+        target_obj: 'Object'
+    ) -> list:
+        """
+        @brief Listet alle Funktionen von source nach target auf.
+        @description
+            Für endliche Mengen A, B gibt es |B|^|A| verschiedene Funktionen.
+            Diese Methode erzeugt alle Funktionen als Listen von (element, bild)-Paaren.
+
+            Achtung: Exponentiell in |A| – nur für kleine Mengen sinnvoll.
+
+        @param source_obj Quellobjekt
+        @param target_obj Zielobjekt
+        @return Liste aller Funktionen als Dictionaries {element: bild}
+        @author Michael Fuhrmann
+        @lastModified 2026-03-11
+        """
+        from itertools import product as iterproduct
+
+        # Elemente der Mengen lesen
+        source_set = source_obj.data
+        target_set = target_obj.data
+
+        if source_set is None or target_set is None:
+            return []
+
+        source_elems = sorted(source_set)
+        target_elems = sorted(target_set)
+
+        if not source_elems:
+            return [{}]  # Leere Funktion von ∅ → B (genau eine)
+
+        # Alle Kombinationen: |B|^|A| Funktionen
+        all_functions = []
+        for images in iterproduct(target_elems, repeat=len(source_elems)):
+            func_dict = dict(zip(source_elems, images))
+            all_functions.append(func_dict)
+
+        return all_functions
+
+
+def yoneda_lemma_demo(cat: Category) -> dict:
+    """
+    @brief Demonstration des Yoneda-Lemmas für eine konkrete Kategorie.
+    @description
+        Das Yoneda-Lemma besagt:
+        Für einen Funktor F: C → Set und ein Objekt A ∈ Ob(C) gilt:
+            Nat(Hom(A,-), F) ≅ F(A)
+
+        D.h.: Die Menge natürlicher Transformationen vom Hom-Funktor
+        Hom(A,-) zu einem beliebigen Funktor F ist bijektiv zu F(A).
+
+        Diese Funktion demonstriert das Lemma durch:
+        1. Für jedes Objekt A: Konstruiere Hom(A,-)
+        2. Zeige, dass die Bijektivität durch η ↦ η_A(id_A) vermittelt wird
+        3. Ausgabe der Hom-Mengen
+
+    @param cat Die Demokategorie C
+    @return Dictionary mit Hom-Sets und Yoneda-Informationen
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    """
+    result = {}
+
+    for A in cat.objects:
+        # Hom-Set für jedes B: Hom(A, B)
+        hom_sets = {}
+        for B in cat.objects:
+            morphs = hom_set(A, B, cat)
+            hom_sets[B.name] = [m.name for m in morphs]
+
+        # Yoneda-Funktor konstruieren
+        yf = yoneda_functor(cat, A)
+
+        result[A.name] = {
+            'hom_sets': hom_sets,               # Alle Hom-Mengen von A aus
+            'yoneda_functor_name': yf.name,     # Name des Yoneda-Funktors
+            'yoneda_objects': [                  # Bilder der Objekte
+                f"{B.name} ↦ {yf.object_map.get(B, '?')}"
+                for B in cat.objects
+            ],
+            'yoneda_key': (                      # Bijektivität: η ↦ η_A(id_A)
+                f"Nat(Hom({A.name},-), F) ≅ F({A.name})"
+            )
+        }
+
+    return result

@@ -21,7 +21,7 @@
     Das System enthält eine vorbefüllte DEFAULT_REGISTRY mit allen
     Standardmodulen des specialist-maths-Projekts.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @date 2026-03-11
 @lastModified 2026-03-11
 """
@@ -47,7 +47,7 @@ class PluginRegistry:
         Intern wird ein Dictionary {name: modulpfad} für die Registrierung
         und ein weiteres {name: modul} für den Loaded-Cache verwendet.
 
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-11
     """
 
@@ -59,7 +59,7 @@ class PluginRegistry:
             - _registry: Speichert Name → Modulpfad-Zuordnungen
             - _loaded:   Speichert bereits geladene Modul-Objekte (Cache)
 
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Registrierungstabelle: Plugin-Name → Modulpfad
@@ -80,7 +80,7 @@ class PluginRegistry:
         @param name: Eindeutiger Name des Plugins (z.B. "algebra_core").
         @param module_path: Importpfad des Moduls (z.B. "algebra_numbertheory").
         @raises ValueError: Wenn Name oder Modulpfad leer ist.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Eingabevalidierung: Name und Pfad dürfen nicht leer sein
@@ -112,7 +112,7 @@ class PluginRegistry:
         @return: Das geladene Modul-Objekt.
         @raises KeyError: Wenn das Plugin nicht registriert ist.
         @raises ImportError: Wenn das Modul nicht importiert werden kann.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Prüfen ob Plugin registriert ist
@@ -150,7 +150,7 @@ class PluginRegistry:
             ob sie bereits geladen wurden.
 
         @return: Alphabetisch sortierte Liste der Plugin-Namen.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Alphabetisch sortieren für konsistente Reihenfolge
@@ -167,7 +167,7 @@ class PluginRegistry:
 
         @param name: Name des Plugins.
         @return: True wenn geladen, sonst False.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Im Loaded-Cache nachschauen
@@ -185,7 +185,7 @@ class PluginRegistry:
             geworfen (idempotente Operation).
 
         @param name: Name des zu entfernenden Plugins.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Registrierungs-Eintrag entfernen (kein Fehler wenn nicht vorhanden)
@@ -204,7 +204,7 @@ class PluginRegistry:
         @param name: Name des neu zu ladenden Plugins.
         @return: Das neu geladene Modul-Objekt.
         @raises KeyError: Wenn das Plugin nicht registriert ist.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         # Cache-Eintrag löschen (erzwingt Neuladen)
@@ -217,7 +217,7 @@ class PluginRegistry:
         """
         @brief Lesbare String-Darstellung der Registry.
         @return: String mit Anzahl registrierter und geladener Plugins.
-        @author Kurt Ingwer
+        @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
         return (
@@ -274,3 +274,46 @@ DEFAULT_REGISTRY.register("sagemath_bridge",        "sagemath_bridge")
 
 # --- REPL-Interface ---
 DEFAULT_REGISTRY.register("repl",                   "repl")
+
+# --- Kategorientheorie ---
+DEFAULT_REGISTRY.register("category_theory",        "category_theory")
+
+# --- Algebraische Strukturen ---
+DEFAULT_REGISTRY.register("algebraic_structures",   "algebraic_structures")
+DEFAULT_REGISTRY.register("algebraic_topology",     "algebraic_topology")
+DEFAULT_REGISTRY.register("algebraic_geometry",     "algebraic_geometry")
+
+# --- Galois & Kommutative Algebra ---
+DEFAULT_REGISTRY.register("galois_theory",          "galois_theory")
+DEFAULT_REGISTRY.register("commutative_algebra",    "commutative_algebra")
+DEFAULT_REGISTRY.register("ring_theory",            "ring_theory")
+DEFAULT_REGISTRY.register("group_theory",           "group_theory")
+
+# --- Zahlentheorie (erweitert) ---
+DEFAULT_REGISTRY.register("p_adic",                 "p_adic")
+DEFAULT_REGISTRY.register("modular_forms",          "modular_forms")
+DEFAULT_REGISTRY.register("l_functions",            "l_functions")
+DEFAULT_REGISTRY.register("iwasawa_theory",         "iwasawa_theory")
+
+# --- Geometrie ---
+DEFAULT_REGISTRY.register("differential_geometry",  "differential_geometry")
+DEFAULT_REGISTRY.register("symplectic_geometry",    "symplectic_geometry")
+DEFAULT_REGISTRY.register("classical_geometry",     "classical_geometry")
+
+# --- Logik & Grundlagen ---
+DEFAULT_REGISTRY.register("mathematical_logic",     "mathematical_logic")
+DEFAULT_REGISTRY.register("set_theory",             "set_theory")
+DEFAULT_REGISTRY.register("model_theory",           "model_theory")
+
+# --- Funktionalanalysis & Maßtheorie ---
+DEFAULT_REGISTRY.register("functional_analysis",    "functional_analysis")
+DEFAULT_REGISTRY.register("measure_theory",         "measure_theory")
+DEFAULT_REGISTRY.register("operator_algebras",      "operator_algebras")
+
+# --- Kombinatorik & Diskrete Mathematik ---
+DEFAULT_REGISTRY.register("combinatorics",          "combinatorics")
+DEFAULT_REGISTRY.register("graph_theory",           "graph_theory")
+DEFAULT_REGISTRY.register("coding_theory",          "coding_theory")
+
+# --- Höhere Präzision ---
+DEFAULT_REGISTRY.register("arbitrary_precision",    "arbitrary_precision")

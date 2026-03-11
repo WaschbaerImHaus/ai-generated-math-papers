@@ -29,7 +29,9 @@ from category_theory import (
     Object, Morphism, Category, Functor, NaturalTransformation,
     set_category, group_category, opposite_category, product_category,
     is_isomorphism, is_epimorphism, is_monomorphism,
-    hom_set, yoneda_functor
+    hom_set, yoneda_functor,
+    Adjunction, DiscreteCategory, FinSetCategory,
+    discrete_category, yoneda_lemma_demo
 )
 
 
@@ -591,3 +593,217 @@ class TestFreeFunctions:
         target_obj_names = [o.name for o in h_A.target_cat.objects]
         assert f"Hom(A,A)" in target_obj_names
         assert f"Hom(A,B)" in target_obj_names
+
+
+# =============================================================================
+# TESTS: DiscreteCategory (Build 59)
+# =============================================================================
+
+class TestDiscreteCategory:
+    """Tests für die diskrete Kategorie."""
+
+    def test_discrete_category_creation(self):
+        """Diskrete Kategorie wird mit Objekten erstellt."""
+        dc = DiscreteCategory(["X", "Y", "Z"])
+        assert len(dc.objects) == 3
+        obj_names = [o.name for o in dc.objects]
+        assert "X" in obj_names
+        assert "Y" in obj_names
+        assert "Z" in obj_names
+
+    def test_discrete_category_has_only_identities(self):
+        """Diskrete Kategorie hat nur Identitätsmorphismen."""
+        dc = DiscreteCategory(["A", "B"])
+        # Genau 2 Identitätsmorphismen (einer pro Objekt)
+        assert len(dc.morphisms) == 2
+        for m in dc.morphisms:
+            assert m.source == m.target  # Nur Identitäten
+
+    def test_discrete_category_reject_non_identity(self):
+        """Nicht-Identitätsmorphismen werden abgelehnt."""
+        dc = DiscreteCategory(["A", "B"])
+        A = dc.objects[0]
+        B = dc.objects[1]
+        bad_morph = Morphism(A, B, "f")
+        with pytest.raises(ValueError):
+            dc.add_morphism(bad_morph)
+
+    def test_discrete_category_function(self):
+        """discrete_category() erstellt korrekte diskrete Kategorie."""
+        cat = discrete_category(["P", "Q"])
+        assert len(cat.objects) == 2
+        # Alle Morphismen sind Identitäten
+        for m in cat.morphisms:
+            assert m.source == m.target
+
+    def test_discrete_category_identity_accessible(self):
+        """Identitätsmorphismen sind über identity() abrufbar."""
+        dc = DiscreteCategory(["M"])
+        M = dc.objects[0]
+        id_M = dc.identity(M)
+        assert id_M.source == M
+        assert id_M.target == M
+
+
+# =============================================================================
+# TESTS: FinSetCategory (Build 59)
+# =============================================================================
+
+class TestFinSetCategory:
+    """Tests für die Kategorie der endlichen Mengen."""
+
+    def test_finset_creation(self):
+        """FinSet-Kategorie wird erstellt."""
+        fsc = FinSetCategory()
+        assert fsc.name == "FinSet"
+        assert len(fsc.objects) == 0
+
+    def test_finset_add_set(self):
+        """Endliche Menge wird als Objekt hinzugefügt."""
+        fsc = FinSetCategory()
+        obj = fsc.add_finite_set({1, 2, 3}, name="A")
+        assert obj in fsc.objects
+        assert obj.data == frozenset({1, 2, 3})
+
+    def test_finset_auto_name(self):
+        """Automatischer Name wird korrekt generiert."""
+        fsc = FinSetCategory()
+        obj = fsc.add_finite_set({1, 2})
+        # Name sollte Elemente enthalten
+        assert "1" in obj.name or "2" in obj.name
+
+    def test_finset_add_function(self):
+        """Funktion zwischen Mengen wird als Morphismus hinzugefügt."""
+        fsc = FinSetCategory()
+        A = fsc.add_finite_set({1, 2}, name="A")
+        B = fsc.add_finite_set({3, 4, 5}, name="B")
+        f = fsc.add_function(A, B, lambda x: x + 2, name="plus2")
+        assert f in fsc.morphisms
+        assert f.source == A
+        assert f.target == B
+
+    def test_finset_enumerate_functions(self):
+        """Alle Funktionen zwischen kleinen Mengen werden aufgezählt."""
+        fsc = FinSetCategory()
+        A = fsc.add_finite_set({1, 2}, name="A")
+        B = fsc.add_finite_set({0, 1}, name="B")
+        funcs = fsc.enumerate_functions(A, B)
+        # |B|^|A| = 2^2 = 4 Funktionen
+        assert len(funcs) == 4
+
+    def test_finset_empty_source_enumerate(self):
+        """Funktion von der leeren Menge: genau eine (leere Funktion)."""
+        fsc = FinSetCategory()
+        empty = fsc.add_finite_set(set(), name="Empty")
+        B = fsc.add_finite_set({1, 2}, name="B")
+        funcs = fsc.enumerate_functions(empty, B)
+        assert len(funcs) == 1
+        assert funcs[0] == {}
+
+
+# =============================================================================
+# TESTS: Adjunction (Build 59)
+# =============================================================================
+
+class TestAdjunction:
+    """Tests für Adjunktionen."""
+
+    def _build_simple_adjunction(self):
+        """Erstellt eine minimale Test-Adjunktion."""
+        # Quellkategorie C mit einem Objekt
+        C = Category("C")
+        A = Object("A")
+        C.add_object(A)
+
+        # Zielkategorie D mit einem Objekt
+        D = Category("D")
+        FA = Object("FA")
+        D.add_object(FA)
+
+        # F: C → D (linker Adjungierter)
+        F = Functor("F", C, D, {A: FA}, {C.identity(A): D.identity(FA)})
+        # G: D → C (rechter Adjungierter)
+        G = Functor("G", D, C, {FA: A}, {D.identity(FA): C.identity(A)})
+
+        # Einheit η: Id_C ⇒ G∘F – für jedes A: η_A: A → G(F(A)) = A
+        eta_A = Morphism(A, A, "eta_A", func=lambda x: x)
+        C.add_morphism(eta_A)
+        unit = NaturalTransformation("eta", F, F, {A: eta_A})  # vereinfacht
+
+        # Koeinheit ε: F∘G ⇒ Id_D – für FA: ε_FA: F(G(FA)) = FA → FA
+        eps_FA = Morphism(FA, FA, "eps_FA", func=lambda x: x)
+        D.add_morphism(eps_FA)
+        counit = NaturalTransformation("eps", G, G, {FA: eps_FA})  # vereinfacht
+
+        adj = Adjunction(F, G, unit, counit)
+        return adj, C, D, F, G
+
+    def test_adjunction_creation(self):
+        """Adjunktion wird erstellt."""
+        adj, C, D, F, G = self._build_simple_adjunction()
+        assert adj.left_functor is F
+        assert adj.right_functor is G
+
+    def test_adjunction_repr(self):
+        """Lesbare Darstellung der Adjunktion."""
+        adj, *_ = self._build_simple_adjunction()
+        r = repr(adj)
+        assert "⊣" in r
+        assert "F" in r
+
+    def test_adjunction_triangle_identities(self):
+        """Dreieck-Identitäten werden geprüft."""
+        adj, *_ = self._build_simple_adjunction()
+        result = adj.verify_triangle_identities()
+        # Beide Dreieck-Identitäten sollten prüfbar sein
+        assert 'left_triangle' in result
+        assert 'right_triangle' in result
+        assert isinstance(result['left_triangle'], bool)
+
+
+# =============================================================================
+# TESTS: Yoneda-Lemma-Demonstration (Build 59)
+# =============================================================================
+
+class TestYonedaLemmaDemo:
+    """Tests für die Yoneda-Lemma-Demonstration."""
+
+    def test_yoneda_demo_structure(self):
+        """yoneda_lemma_demo() gibt korrektes Dictionary zurück."""
+        cat = Category("C")
+        A = Object("A")
+        B = Object("B")
+        cat.add_object(A)
+        cat.add_object(B)
+        f = Morphism(A, B, "f")
+        cat.add_morphism(f)
+
+        result = yoneda_lemma_demo(cat)
+        # Ein Eintrag pro Objekt
+        assert "A" in result
+        assert "B" in result
+
+    def test_yoneda_demo_hom_sets(self):
+        """Hom-Sets werden korrekt berechnet."""
+        cat = Category("C")
+        A = Object("A")
+        B = Object("B")
+        cat.add_object(A)
+        cat.add_object(B)
+        f = Morphism(A, B, "f")
+        cat.add_morphism(f)
+
+        result = yoneda_lemma_demo(cat)
+        # Hom(A, B) sollte 'f' enthalten
+        assert "B" in result["A"]["hom_sets"]
+        assert "f" in result["A"]["hom_sets"]["B"]
+
+    def test_yoneda_key_formula(self):
+        """Yoneda-Schlüsselformel wird korrekt dargestellt."""
+        cat = Category("C")
+        A = Object("A")
+        cat.add_object(A)
+
+        result = yoneda_lemma_demo(cat)
+        assert "yoneda_key" in result["A"]
+        assert "Nat" in result["A"]["yoneda_key"]
