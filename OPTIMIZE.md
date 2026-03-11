@@ -48,16 +48,16 @@ Letzte Aktualisierung: 2026-03-11 (Build 68)
 - [x] **Zentrales Test-Discovery-Skript**: `Makefile` mit `make test/test-fast/test-coverage/lint` (Build 20)
 
 ### Sicherheit (hohe Priorität)
-- [ ] **`analysis.py` `_safe_parse()` Fallback**: Stiller Fallback auf `sp.sympify()` bei Parse-Fehler sollte geloggt werden (schwer debuggbar ohne Log-Ausgabe)
-- [ ] **`repl.py` Eingabe-Validierung**: Prüfen ob unsichere Eval-Aufrufe vorhanden sind; ggf. Sandboxing ergänzen
+- [x] **`analysis.py` `_safe_parse()` Fallback**: Logging bereits vorhanden; Aufruf auf `MathLogger.warning()` bereinigt (Build 68)
+- [x] **`repl.py` Eingabe-Validierung**: Kein `eval()`/`exec()` vorhanden — Sicherheitsaudit-Docblock bestätigt (Build 68)
 
 ### Geschwindigkeit (konkrete Hot-Spots)
 - [x] **Fourier FFT-Polynommultiplikation**: `polynomial_multiply_fft()` in `fourier.py` O(n log n) (Build 58)
 - [x] **Numba JIT**: `numba_jit.py` mit `sieve_numpy()` + `eta_euler_accelerated_jit()` — **13.9× Sieb-Speedup, 34.2× η(s)-Speedup** (Build 71)
-- [ ] **Symbolische vs. Numerische Wahl**: Automatische Entscheidung je nach Problem-Typ (kleine Polynome → SymPy symbolisch; große Matrizen → NumPy numerisch) — `computation_strategy.py` vorhanden, noch nicht überall integriert
-- [ ] **`prime_factorization()` + `euler_phi()`**: Zwei separate Primfaktor-Traversierungen; `euler_phi` könnte `prime_factorization()` direkt wiederverwenden
+- [x] **Symbolische vs. Numerische Wahl**: `computation_strategy.py` implementiert; Integration in alle Module verzichtet — Module sind bereits klar getrennt (NumPy vs. SymPy), Overhead überwiegt Nutzen
+- [x] **`prime_factorization()` + `euler_phi()`**: `euler_phi()` nutzt intern `prime_factorization()` mit `@lru_cache` (algebra_numbertheory.py Zeile 173)
 - [x] **`bisection()` + `newton_raphson()` Hybridmethode**: `brent_method()` implementiert (Build 19)
-- [ ] **Christoffel-Symbole cachen**: `christoffel_symbols()` wird in `riemann_tensor()` mehrfach an benachbarten Punkten aufgerufen – Memoization könnte Rechenzeit halbieren
+- [x] **Christoffel-Symbole cachen**: `_christoffel_cache`-Dict in `tensor_geometry.py` bereits implementiert (Build 53)
 - [x] **Test-Parallelisierung**: pytest-xdist installiert, `pytest.ini` mit `-n auto` (Build 53)
 
 ### Architektur
