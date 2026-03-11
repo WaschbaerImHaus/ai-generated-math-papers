@@ -313,18 +313,32 @@ class Matrix:
             Lösung via Gauss-Elimination mit Rücksubstitution.
             Äquivalent zu x = A^{-1} @ b, aber numerisch stabiler.
 
+            Vor dem Lösen wird die Konditionszahl via numpy.linalg.cond()
+            berechnet. Wenn κ(A) > 1e10, wird eine Warnung geloggt:
+            "Konditionszahl {kond:.2e} überschreitet 1e10 – numerische Instabilität möglich"
+
         @param b Rechte Seite (Vektor).
         @return Lösungsvektor x.
         @raises ValueError Wenn System keine eindeutige Lösung hat.
-        @date 2026-03-05
+        @author Kurt Ingwer
+        @lastModified 2026-03-11
         """
         if self.rows != self.cols:
             raise ValueError("Gauss-Elimination nur für quadratische Matrizen")
         if self.rows != b.dim:
             raise ValueError(f"Dimension passt nicht: Matrix {self.rows}×{self.cols}, Vektor {b.dim}")
 
-        # Konditionszahl prüfen: schlecht konditioniertes System → ungenaue Lösung
-        self._check_condition("solve()")
+        # Konditionszahl via numpy.linalg.cond() berechnen und Warnung loggen
+        arr = np.array(self._data, dtype=float)
+        try:
+            kond = float(np.linalg.cond(arr))
+        except Exception:
+            kond = 1.0
+
+        if kond > _CONDITION_WARNING_THRESHOLD:
+            _logger._logger.warning(
+                f"Konditionszahl {kond:.2e} überschreitet 1e10 – numerische Instabilität möglich"
+            )
 
         n = self.rows
         # Erweiterte Matrix [A | b]
@@ -473,3 +487,109 @@ class Matrix:
     def __repr__(self) -> str:
         rows_str = '\n  '.join(str(row) for row in self._data)
         return f"Matrix([\n  {rows_str}\n])"
+
+
+# =============================================================================
+# STABILITÄTSANALYSE
+# =============================================================================
+
+def analyze_stability(A) -> dict:
+    """
+    @brief Analysiert die numerische Stabilität einer Matrix.
+    @description
+        Berechnet Kennzahlen zur Bewertung der numerischen Stabilität
+        einer Matrix für lineare Gleichungssysteme und Zerlegungen.
+
+        Berechnete Kennzahlen:
+        - condition_number: κ(A) = σ_max/σ_min (via numpy)
+          Gibt an, um welchen Faktor Fehler verstärkt werden können.
+          κ = 1: optimal konditioniert
+          κ > 1e10: schlecht konditioniert
+        - is_well_conditioned: True wenn κ < 1e10
+        - rank: Rang der Matrix (Anzahl linear unabhängiger Zeilen/Spalten)
+        - determinant: det(A) (0 → singulär)
+
+    @param A: Matrix als Matrix-Objekt, Liste oder numpy-Array.
+    @return: Dictionary mit condition_number, is_well_conditioned, rank, determinant.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    # Eingabe zu numpy-Array konvertieren
+    if isinstance(A, Matrix):
+        A_np = np.array(A._data, dtype=float)
+    elif isinstance(A, np.ndarray):
+        A_np = A.astype(float)
+    else:
+        # Listen oder andere Array-ähnliche Typen
+        A_np = np.array(A, dtype=float)
+
+    # Konditionszahl berechnen (via SVD: κ = σ_max / σ_min)
+    try:
+        cond = np.linalg.cond(A_np)
+    except np.linalg.LinAlgError:
+        cond = float('inf')
+
+    # Rang berechnen (effektive Anzahl linear unabhängiger Zeilen/Spalten)
+    try:
+        rank = int(np.linalg.matrix_rank(A_np))
+    except np.linalg.LinAlgError:
+        rank = 0
+
+    # Determinante berechnen (nur für quadratische Matrizen)
+    try:
+        if A_np.ndim == 2 and A_np.shape[0] == A_np.shape[1]:
+            det = float(np.linalg.det(A_np))
+        else:
+            det = None  # Nicht-quadratische Matrizen haben keine Determinante
+    except np.linalg.LinAlgError:
+        det = None
+
+    # Stabilitäts-Warnung loggen wenn Konditionszahl zu groß
+    if cond > _CONDITION_WARNING_THRESHOLD:
+        _logger.condition_number_warning("analyze_stability", cond)
+
+    return {
+        'condition_number': cond,
+        'is_well_conditioned': cond < _CONDITION_WARNING_THRESHOLD,
+        'rank': rank,
+        'determinant': det,
+    }
+
+
+def condition_number_check(matrix) -> bool:
+    """
+    @brief Prüft ob eine Matrix gut konditioniert ist (Konditionszahl ≤ 1e10).
+    @description
+        Berechnet die Konditionszahl κ(A) via numpy.linalg.cond() und gibt
+        True zurück, wenn die Matrix gut konditioniert ist (κ < 1e10),
+        sonst False.
+
+        Konditionszahl κ(A) = σ_max / σ_min (Quotient der Singulärwerte).
+
+        Faustregel:
+        - κ < 1e3:  Gut konditioniert (volle Genauigkeit)
+        - κ < 1e10: Akzeptabel (leichter Genauigkeitsverlust)
+        - κ > 1e10: Schlecht konditioniert → numerische Instabilität möglich
+
+    @param matrix: Matrix als Matrix-Objekt, Liste oder numpy-Array.
+    @return: True wenn gut konditioniert (κ ≤ 1e10), sonst False.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    # Eingabe zu numpy-Array konvertieren
+    if isinstance(matrix, Matrix):
+        arr = np.array(matrix._data, dtype=float)
+    elif isinstance(matrix, np.ndarray):
+        arr = matrix.astype(float)
+    else:
+        arr = np.array(matrix, dtype=float)
+
+    # Konditionszahl berechnen
+    try:
+        cond = float(np.linalg.cond(arr))
+    except Exception:
+        # Bei Fehler (NaN/Inf) als schlecht konditioniert behandeln
+        return False
+
+    # True = gut konditioniert, False = schlecht konditioniert
+    return cond <= _CONDITION_WARNING_THRESHOLD
