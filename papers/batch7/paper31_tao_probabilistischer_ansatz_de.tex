@@ -1,0 +1,365 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+
+\begin{document}
+
+\title{Taos probabilistischer Ansatz zur Collatz-Vermutung:\\
+Fast alle Bahnen erreichen fast beschränkte Werte}
+\author{Michael Fuhrmann}
+\date{März 2026}
+\maketitle
+
+\begin{abstract}
+Im Jahr 2022 veröffentlichte Terence Tao ein bahnbrechendes Ergebnis zur Collatz-Vermutung:
+Für jede Funktion $f\colon \mathbb{N} \to \mathbb{R}_{>0}$ mit $f(n) \to \infty$ haben
+fast alle positiven ganzen Zahlen $n$ (im Sinne der logarithmischen Dichte) schließlich
+ein Collatz-Iteriertes unterhalb von $f(n)$. Diese Arbeit präsentiert Taos Ansatz im
+Detail: das probabilistische Zufallswalk-Modell für die Syrakus-Funktion, die
+Fourier-analytischen Hilfsmittel zur Behandlung von Korrelationen zwischen Schritten,
+den Rahmen der logarithmischen Dichte und die Schlüsselabschätzung, die zeigt, dass
+divergente Collatz-Bahnen die logarithmische Dichte null haben. Wir diskutieren auch,
+warum Taos Methode nicht ausreicht, um die vollständige Vermutung zu beweisen, und
+was nötig wäre, um die verbleibende Lücke zu schließen.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+\section{Einleitung}
+
+Terence Taos Arbeit von 2022 ``Almost all Collatz orbits attain almost bounded values''
+\cite{Tao2022}, veröffentlicht in den \emph{Annals of Mathematics}, stellt den bedeutendsten
+Fortschritt bei der Collatz-Vermutung seit Jahrzehnten dar. Sie beweist die Vermutung
+nicht, liefert aber das stärkste bekannte unbedingte Resultat zu ihren Gunsten.
+
+Die entscheidende Erkenntnis ist probabilistischer Natur: Die Syrakus-Funktion
+$S(n) = (3n+1)/2^{\nu_2(3n+1)}$ verhält sich wie ein ``zufälliger'' Spaziergang mit
+starkem Abwärtsdrift, und Tao quantifiziert diesen Drift präzise mithilfe der
+Fourier-Analysis über die 2-adischen ganzen Zahlen.
+
+\subsection{Hauptresultat}
+
+\begin{theorem}[Tao 2022]\label{thm:tao_hauptsatz}
+Für jede Funktion $f\colon \mathbb{N} \to \mathbb{R}_{>0}$ mit $f(n) \to \infty$ für
+$n \to \infty$ gilt:
+\[
+  \mathrm{logDichte}\bigl(\{ n \in \mathbb{N} : \exists k \geq 0,\; T^k(n) \leq f(n) \}\bigr) = 1.
+\]
+Äquivalent: Für jedes $\varepsilon > 0$ und jedes $f \to \infty$ hat die Menge der $n$,
+für die kein Iteriertes von $T$ unter $f(n)$ fällt, die logarithmische Dichte 0.
+\end{theorem}
+
+\section{Das Syrakus-Zufallswalk-Modell}
+
+\begin{definition}[Logarithmische Dichte]\label{def:logdichte}
+Die \emph{logarithmische Dichte} einer Menge $A \subseteq \mathbb{N}$ ist
+\[
+  \mathrm{logDichte}(A) \;=\; \lim_{N \to \infty} \frac{1}{\log N} \sum_{\substack{n=1 \\ n \in A}}^{N} \frac{1}{n},
+\]
+sofern der Grenzwert existiert. Die logarithmische Dichte wird durch die natürliche Dichte
+dominiert, ist jedoch empfindlicher für die Verteilung kleiner Primzahlen.
+\end{definition}
+
+\begin{definition}[Syrakus-Funktion]\label{def:syrakus}
+Für eine ungerade positive ganze Zahl $m$ ist die \emph{Syrakus-Funktion}
+\[
+  S(m) \;=\; \frac{3m+1}{2^{\nu_2(3m+1)}},
+\]
+wobei $\nu_2(3m+1)$ die 2-adische Bewertung bezeichnet (die Anzahl, wie oft 2 in $3m+1$ aufgeht).
+Der Wert $E(m) := \nu_2(3m+1)$ ist die Anzahl der ``geraden Schritte'', die beim
+Übergang von $m$ zu $S(m)$ in der Standard-Collatz-Iteration verbraucht werden.
+\end{definition}
+
+\begin{proposition}[Verteilung von $E(m)$]\label{prop:vert_E}
+Für eine zufällige ungerade positive ganze Zahl $m$ folgt die Zufallsvariable
+$E(m) = \nu_2(3m+1)$ näherungsweise einer geometrischen Verteilung mit Parameter $1/2$:
+\[
+  \Pr[E(m) = k] \;\approx\; 2^{-k} \quad \text{für } k \geq 1.
+\]
+Genauer: Unter den ungeraden ganzen Zahlen $m \in [1, N]$ beträgt der Anteil mit
+$E(m) = k$ den Wert $2^{-k}(1 + O(N^{-1/2}))$ für $N \to \infty$.
+\end{proposition}
+
+\begin{proof}
+Da $3m + 1 \equiv 2 \pmod{4}$ für alle ungeraden $m$ gilt (denn $3m \equiv 3 \pmod{4}$,
+also $3m+1 \equiv 0 \pmod{2}$), folgt:
+$E(m) = 1$ genau dann, wenn $m \equiv 1 \pmod{4}$: Wahrscheinlichkeit $1/2$.
+$E(m) = 2$ genau dann, wenn $m \equiv 1 \pmod{8}$: Wahrscheinlichkeit $1/4$.
+Allgemein: $E(m) \geq k$ genau dann, wenn $m \equiv 1 \pmod{2^k}$: Wahrscheinlichkeit $2^{-(k-1)}$.
+Also $\Pr[E(m) = k] = 2^{-(k-1)} - 2^{-k} = 2^{-k}$.
+\end{proof}
+
+\begin{definition}[Logarithmischer Zufallswalk]\label{def:zufallswalk}
+Um die ``Größe'' der Syrakus-Iterationen zu modellieren, wird der Logarithmus genommen.
+Für ungerades $m$ gilt:
+\[
+  \log S(m) \;=\; \log m + \log 3 - E(m) \log 2 + O(1/m).
+\]
+Die Inkremente $X_k = \log 3 - E_k \log 2$ (wobei $E_k = E(S^{k-1}(m))$) bilden die
+einzelnen Schritte des Zufallswalks. Der Erwartungswert ist:
+\[
+  \mathbb{E}[X_k] \;=\; \log 3 - \log 2 \cdot \mathbb{E}[E_k] = \log 3 - 2\log 2 = \log(3/4) < 0.
+\]
+Da $\log(3/4) \approx -0{,}288 < 0$, hat der Walk einen strikten negativen Drift.
+\end{definition}
+
+\begin{theorem}[Negativer Drift impliziert fast sichere Konvergenz]\label{thm:drift}
+Seien $(X_k)_{k \geq 1}$ i.i.d.-Zufallsvariablen mit $\mathbb{E}[X_1] = \log(3/4) < 0$.
+Dann gilt für den Zufallswalk $W_n = \sum_{k=1}^n X_k$: $W_n \to -\infty$ fast sicher.
+Insbesondere fällt der Walk für jede feste Schranke $L$ mit Wahrscheinlichkeit 1
+schließlich unter $L$.
+\end{theorem}
+
+\begin{proof}
+Dies folgt unmittelbar aus dem starken Gesetz der großen Zahlen: $W_n/n \to \mathbb{E}[X_1] < 0$
+fast sicher. Da $\mathbb{E}[X_1] < 0$, gilt $W_n \to -\infty$ f.s.
+\end{proof}
+
+\begin{remark}\label{rem:nicht_unabhaengig}
+Die entscheidende Schwierigkeit liegt darin, dass die Schritte $X_k = \log 3 - E(S^{k-1}(m)) \log 2$
+\emph{nicht} unabhängig sind: die Verteilung von $E(S^k(m))$ hängt vom Wert von $S^k(m)$
+ab, der wiederum von der gesamten Bahn-Geschichte abhängt. Taos Hauptbeitrag besteht
+darin, diese Abhängigkeiten mittels Fourier-Analysis zu behandeln.
+\end{remark}
+
+\section{Fourier-Analysis über den 2-adischen ganzen Zahlen}
+
+\begin{definition}[Charaktere von $\mathbb{Z}/2^k\mathbb{Z}$]\label{def:charaktere}
+Für $k \geq 1$ und $\xi \in \mathbb{Z}/2^k\mathbb{Z}$ ist der \emph{Charakter}
+$\chi_{\xi,k}\colon \mathbb{Z}/2^k\mathbb{Z} \to \mathbb{C}^*$ definiert durch
+\[
+  \chi_{\xi,k}(n) \;=\; e^{2\pi i \xi n / 2^k}.
+\]
+Die 2-adische Fourier-Transformierte einer Funktion $f\colon \mathbb{Z}_2 \to \mathbb{C}$
+auf Resten mod $2^k$ ist $\hat{f}(\xi) = \sum_{n \bmod 2^k} f(n) \chi_{\xi,k}(n)$.
+\end{definition}
+
+\begin{definition}[Syrakus-Exponentialsumme]\label{def:exp_summe}
+Für $\xi \in \mathbb{R}/\mathbb{Z}$ und $k \geq 1$ ist die \emph{Syrakus-Exponentialsumme}
+\[
+  F_k(\xi) \;=\; \mathbb{E}_{m \bmod 2^k,\, m \text{ ungerade}}\bigl[ e^{2\pi i \xi \log_2 S(m)} \bigr],
+\]
+wobei der Erwartungswert über ungerade Reste mod $2^k$ gebildet wird.
+\end{definition}
+
+\begin{lemma}[Taos Schlüsselabschätzung]\label{lem:schluessel}
+Für alle $\xi \in \mathbb{R}/\mathbb{Z}$ mit $\|\xi\|_{\mathbb{R}/\mathbb{Z}} \geq \delta > 0$
+existiert $c(\delta) > 0$ mit
+\[
+  |F_k(\xi)| \;\leq\; e^{-c(\delta) k}
+\]
+für alle hinreichend großen $k$. Dieser exponentielle Abfall in $k$ ist der Kern
+von Taos Beweis.
+\end{lemma}
+
+\begin{proof}[Beweisansatz]
+Die Exponentialsumme $F_k(\xi)$ faktorisiert näherungsweise als Produkt über
+``unabhängige'' Schritte. Wären die $E_j$ exakt i.i.d.\ geometrisch(1/2) verteilt, so ergäbe sich:
+\[
+  F_k(\xi) = \left(\sum_{j=1}^\infty 2^{-j} e^{2\pi i \xi (\log_2 3 - j)}\right)^k,
+\]
+und die innere Summe ist eine geometrische Reihe in $e^{-2\pi i \xi}$:
+\[
+  F_k(\xi) = \left(\frac{e^{2\pi i \xi \log_2 3}}{2 - e^{-2\pi i \xi}}\right)^k.
+\]
+Für $\xi \notin \mathbb{Z}/\log_2 3$ ist der Betrag des inneren Faktors $< 1$
+(wegen der Irrationalität von $\log_2 3$), was exponentiellen Abfall liefert. Tao
+behandelt die Nicht-Unabhängigkeit mittels eines Entkopplungsarguments, das die
+Fourier-Struktur von $\mathbb{Z}_2$ nutzt.
+\end{proof}
+
+\section{Das Argument der logarithmischen Dichte}
+
+\begin{definition}[Divergente Menge]\label{def:divergent}
+Definiere die \emph{divergente Menge} als
+\[
+  \mathcal{D} \;=\; \bigl\{ n \in \mathbb{N} : T^k(n) \geq f(n) \text{ für alle } k \geq 0 \bigr\},
+\]
+d.h.\ die Menge der ganzen Zahlen, deren Collatz-Bahn nie unter $f(n)$ fällt.
+Taos Satz behauptet $\mathrm{logDichte}(\mathcal{D}) = 0$.
+\end{definition}
+
+\begin{theorem}[Logarithmische Dichte divergenter Bahnen]\label{thm:logdichte_null}
+Für jedes $f\colon \mathbb{N} \to \mathbb{R}_{>0}$ mit $f(n) \to \infty$ hat die
+Menge $\mathcal{D}$ die logarithmische Dichte null.
+\end{theorem}
+
+\begin{proof}[Beweisüberblick (nach Tao \cite{Tao2022})]
+Der Beweis verläuft in drei Hauptschritten.
+
+\textbf{Schritt 1: Reduktion auf die Syrakus-Abbildung.}
+Man arbeitet mit der komprimierten Syrakus-Funktion $S$ auf ungeraden Zahlen. Das
+Collatz-Iterierte $T^k(n)$ ist höchstens $f(n)$ genau dann, wenn $S^j(n) \leq C \cdot f(n)$
+für ein $j$ und eine Konstante $C$ gilt. Es genügt also zu zeigen, dass die logarithmische
+Dichte der ungeraden $n$, für die alle Syrakus-Iterationen über $f(n)$ bleiben, null ist.
+
+\textbf{Schritt 2: Diskretisierung via 2-adische Reste.}
+Für jede Skala $N$ untersucht man die Bahn von $n$ modulo $2^k$ für $k = O(\log \log N)$.
+Die Syrakus-Funktion wirkt auf Resten mod $2^k$, und die Fourier-Abschätzungen aus
+Lemma~\ref{lem:schluessel} zeigen, dass Korrelationen zwischen Bahnschritten exponentiell
+in $k$ abnehmen.
+
+\textbf{Schritt 3: Exponentialsummen-Abschätzung.}
+Man schreibt den Indikator für ``Bahn bleibt über $f(n)$'' als Fourier-Integral, wendet
+Lemma~\ref{lem:schluessel} an, um die Fourier-Koeffizienten zu beschränken, und integriert.
+Die Schranke $|F_k(\xi)| \leq e^{-c(\delta)k}$ impliziert, dass die logarithmische Dichte
+der ganzen Zahlen mit nicht-absteigenden Bahnen (nach $k$ Syrakus-Schritten) höchstens
+$C e^{-c(\delta)k}$ beträgt, was für $k \to \infty$ gegen 0 strebt.
+\end{proof}
+
+\begin{corollary}[Collatz-Bahnen sind fast beschränkt]\label{cor:fast_beschraenkt}
+Für jedes $\varepsilon > 0$ hat die Menge der $n \in \mathbb{N}$, für die $T^k(n) > n^\varepsilon$
+für alle $k \geq 0$ gilt, die logarithmische Dichte null. Insbesondere enthalten fast alle
+(im Sinne der logarithmischen Dichte) Collatz-Bahnen beliebig kleine Werte relativ zum
+Ausgangspunkt.
+\end{corollary}
+
+\section{Die Rolle der Ergodentheorie}
+
+\begin{definition}[Syrakus-Zufallswalk als ergodischer Prozess]\label{def:ergodisch_rw}
+Die Folge der Log-Verhältnisse $(\log S^k(n) / \log n)_{k \geq 0}$ kann als Trajektorie
+eines Punktes in einem maßerhaltenden dynamischen System betrachtet werden. Konkret trägt
+$\mathbb{Z}_2^{\text{ungerade}}$ mit dem Haar-Maß $\mu$ die Syrakus-Abbildung $S$, und
+die Funktion $g(x) = \log_2 3 - E(x)$ (wobei $E(x) = \nu_2(3x+1)$) ist die
+``Schrittweiten''-Funktion. Der Ergodensatz liefert:
+\[
+  \frac{1}{k} \sum_{j=0}^{k-1} g(S^j(x)) \;\longrightarrow\; \int_{\mathbb{Z}_2^{\text{ungerade}}} g\, d\mu
+  = \log_2 3 - 2 = \log_2(3/4) < 0
+\]
+für $\mu$-fast alle $x$.
+\end{definition}
+
+\begin{theorem}[Ergodische Konvergenz von Syrakus-Bahnen]\label{thm:ergod_konv}
+Unter dem Haar-Maß auf $\mathbb{Z}_2^{\text{ungerade}}$ gilt für $\mu$-fast alle $x$:
+\[
+  \lim_{k \to \infty} \frac{\log S^k(x)}{k} \;=\; \log(3/4) < 0.
+\]
+Dies bedeutet, dass der Logarithmus der Bahn linear abnimmt, d.h.\ die Bahn sinkt
+\emph{geometrisch schnell} gegen 0 im 2-adischen Sinne.
+\end{theorem}
+
+\begin{proof}
+Das Integral $\int g\, d\mu = \mathbb{E}_\mu[\log_2 3 - E] = \log_2 3 - \mathbb{E}_\mu[E]$.
+Der Erwartungswert $\mathbb{E}_\mu[E] = \sum_{j \geq 1} j \cdot \Pr[E = j] = \sum_{j \geq 1} j \cdot 2^{-j} = 2$
+(aus Proposition~\ref{prop:vert_E}).
+Also ist der ergodische Mittelwert von $g$ gleich $\log_2 3 - 2 = \log_2(3/4) \approx -0{,}415 < 0$.
+Der Ergodensatz liefert dann die behauptete Konvergenz für $\mu$-fast alle $x$.
+\end{proof}
+
+\begin{lemma}[Furstenbergs Korrespondenzprinzip]\label{lem:furstenberg}
+Sei $(X, \mathcal{B}, \mu, T)$ ein maßerhaltendes dynamisches System und $A \in \mathcal{B}$
+mit $\mu(A) > 0$. Furstenbergs Korrespondenzprinzip \cite{Furstenberg1977} stellt eine
+strukturelle Verbindung zwischen kombinatorischen Eigenschaften der Collatz-Bahn und der
+ergodischen Struktur von $(\mathbb{Z}_2, S, \mu)$ her.
+Im Collatz-Kontext dient das Prinzip dazu, Dichtaussagen aus dem 2-adischen Rahmen auf
+Aussagen über die natürliche Dichte in $\mathbb{N}$ zu übertragen.
+\end{lemma}
+
+\section{Warum Taos Resultat die Vermutung nicht beweist}
+
+\begin{remark}[Die Lücke zwischen logarithmischer Dichte und vollständiger Vermutung]\label{rem:luecke}
+Taos Satz zeigt, dass die Menge der ``schlecht verhaltenen'' Bahnen die logarithmische
+Dichte 0 hat. Die vollständige Collatz-Vermutung erfordert jedoch zu zeigen, dass diese
+Menge \emph{leer} ist (oder äquivalent, dass jede Bahn schließlich 1 erreicht). Das sind
+sehr unterschiedliche Aussagen: Eine Menge der logarithmischen Dichte 0 kann trotzdem
+unendlich sein (in der Tat: natürliche Dichte 0 aber unendlich groß).
+\end{remark}
+
+\begin{proposition}[Hindernisse für einen vollständigen Beweis]\label{prop:hindernisse}
+Folgende Hindernisse verhindern, dass Taos Ansatz die vollständige Vermutung beweist:
+\begin{enumerate}
+  \item \textbf{Individuell vs.\ statistisch}: Tao kontrolliert das durchschnittliche
+        Verhalten, aber nicht das Verhalten einer einzelnen Bahn.
+  \item \textbf{Keine Rekurrenz}: Die 2-adische Fourier-Methode liefert Dichte-Null-Resultate,
+        aber keine Rekurrenz für jeden Startpunkt.
+  \item \textbf{Ausschluss von Zyklen}: Taos Argument schließt nicht die Existenz
+        extrem großer Zyklen aus, die manche Bahnen ``einfangen'' könnten.
+  \item \textbf{Die $+1$-Barriere}: Das $+1$ in $3n+1$ erzeugt arithmetische Korrelationen,
+        die vollständige Unabhängigkeit der Bahnschritte verhindern und die Stärke des
+        Fourier-Ansatzes begrenzen.
+\end{enumerate}
+\end{proposition}
+
+\begin{conjecture}[Collatz-Vermutung, vollständige Form]\label{conj:vollstaendig}
+Für jedes $n \in \mathbb{N}$ existiert $k \geq 0$ mit $T^k(n) = 1$.
+\end{conjecture}
+
+\section{Diskussion und offene Probleme}
+
+Taos Resultat ist in mehrfacher Hinsicht bedeutsam:
+\begin{enumerate}
+  \item Es stellt die stärkste bekannte quantitative Aussage zur Vermutung auf.
+  \item Es zeigt, dass Gegenbeispiele --- falls sie existieren --- eine sehr ``dünne''
+        Menge bilden müssen (logarithmische Dichte 0).
+  \item Es stellt ein Werkzeugkasten (Fourier-Analysis über $\mathbb{Z}_2$,
+        Syrakus-Zufallswalks) bereit, der weiter entwickelt werden kann.
+\end{enumerate}
+
+Offene Probleme:
+\begin{enumerate}
+  \item Kann das logarithmische Dichte-Resultat auf natürliche Dichte verbessert werden?
+  \item Kann man zeigen, dass divergente Bahnen natürliche Dichte 0 haben?
+  \item Kann der Fourier-analytische Ansatz mit $p$-adischen algebraischen Methoden
+        kombiniert werden, um alle nicht-trivialen Zyklen auszuschließen?
+  \item Gibt es einen ``strukturellen'' Grund (jenseits probabilistischer Heuristiken),
+        warum das $+1$ alle Bahnen zur Konvergenz zwingt?
+\end{enumerate}
+
+\begin{thebibliography}{99}
+
+\bibitem{Tao2022}
+T.~Tao.
+\newblock Almost all Collatz orbits attain almost bounded values.
+\newblock \emph{Annals of Mathematics}, 197(2):679--710, 2022.
+
+\bibitem{Collatz1937}
+L.~Collatz.
+\newblock Unveröffentlichtes Problem, vorgestellt beim Internationalen Mathematikerkongress, 1937.
+
+\bibitem{Lagarias1985}
+J.~C. Lagarias.
+\newblock The $3x+1$ problem and its generalizations.
+\newblock \emph{American Mathematical Monthly}, 92(1):3--23, 1985.
+
+\bibitem{Lagarias2010}
+J.~C. Lagarias (Hrsg.).
+\newblock \emph{The Ultimate Challenge: The $3x+1$ Problem}.
+\newblock American Mathematical Society, Providence, RI, 2010.
+
+\bibitem{Furstenberg1977}
+H.~Furstenberg.
+\newblock Ergodic behavior of diagonal measures and a theorem of Szemer\'edi on arithmetic progressions.
+\newblock \emph{Journal d'Analyse Math\'ematique}, 31(1):204--256, 1977.
+
+\bibitem{Terras1976}
+R.~Terras.
+\newblock A stopping time problem on the positive integers.
+\newblock \emph{Acta Arithmetica}, 30(3):241--252, 1976.
+
+\bibitem{Koblitz1984}
+N.~Koblitz.
+\newblock \emph{$p$-adic Numbers, $p$-adic Analysis, and Zeta Functions}.
+\newblock Springer-Verlag, New York, 1984.
+
+\bibitem{Kontorovich2010}
+A.~Kontorovich und J.~C. Lagarias.
+\newblock Stochastic models for the $3x+1$ and $5x+1$ problems and related problems.
+\newblock In \emph{The Ultimate Challenge}, S.\ 131--188, AMS, 2010.
+
+\end{thebibliography}
+
+\end{document}

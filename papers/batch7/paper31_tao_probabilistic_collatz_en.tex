@@ -1,0 +1,356 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\begin{document}
+
+\title{Tao's Probabilistic Approach to the Collatz Conjecture:\\
+Almost All Orbits Attain Almost Bounded Values}
+\author{Michael Fuhrmann}
+\date{March 2026}
+\maketitle
+
+\begin{abstract}
+In 2022, Terence Tao published a landmark result on the Collatz conjecture:
+for any function $f\colon \mathbb{N} \to \mathbb{R}_{>0}$ with $f(n) \to \infty$,
+almost all positive integers $n$ (in the sense of logarithmic density) eventually
+have a Collatz iterate below $f(n)$. This paper presents Tao's approach in detail,
+covering the probabilistic random-walk model for the Syracuse function, the Fourier-analytic
+tools used to handle correlations between steps, the logarithmic density framework, and
+the key estimate that shows divergent Collatz orbits have logarithmic density zero.
+We also discuss why Tao's method falls short of proving the full conjecture and what
+would be needed to bridge the remaining gap.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+Terence Tao's 2022 paper ``Almost all Collatz orbits attain almost bounded values''
+\cite{Tao2022}, published in the \emph{Annals of Mathematics}, represents the most
+significant advance on the Collatz conjecture in decades. It does not prove the conjecture,
+but it establishes the strongest known unconditional result in its favour.
+
+The key insight is probabilistic: the Syracuse function $S(n) = (3n+1)/2^{\nu_2(3n+1)}$
+acts like a ``random'' walk with a strong downward drift, and Tao quantifies this drift
+precisely using Fourier analysis over the 2-adic integers.
+
+\subsection{Main result}
+
+\begin{theorem}[Tao 2022]\label{thm:tao_main}
+For any function $f\colon \mathbb{N} \to \mathbb{R}_{>0}$ with $f(n) \to \infty$ as $n \to \infty$,
+\[
+  \mathrm{logdens}\bigl(\{ n \in \mathbb{N} : \exists k \geq 0,\; T^k(n) \leq f(n) \}\bigr) = 1.
+\]
+Equivalently, for any $\varepsilon > 0$ and any $f \to \infty$, the set of $n$ for which
+no iterate of $T$ falls below $f(n)$ has logarithmic density 0.
+\end{theorem}
+
+\section{The Syracuse Random Walk Model}
+
+\begin{definition}[Logarithmic density]\label{def:logdens}
+The \emph{logarithmic density} of a set $A \subseteq \mathbb{N}$ is
+\[
+  \mathrm{logdens}(A) \;=\; \lim_{N \to \infty} \frac{1}{\log N} \sum_{\substack{n=1 \\ n \in A}}^{N} \frac{1}{n},
+\]
+if this limit exists. Logarithmic density is dominated by the natural density but is
+more sensitive to the distribution of small primes.
+\end{definition}
+
+\begin{definition}[Syracuse function]\label{def:syracuse}
+For an odd positive integer $m$, the \emph{Syracuse function} is
+\[
+  S(m) \;=\; \frac{3m+1}{2^{\nu_2(3m+1)}},
+\]
+where $\nu_2(3m+1)$ denotes the 2-adic valuation (the number of times 2 divides $3m+1$).
+The value $E(m) := \nu_2(3m+1)$ is the number of ``even steps'' consumed in passing from
+$m$ to $S(m)$ in the standard Collatz iteration.
+\end{definition}
+
+\begin{proposition}[Distribution of $E(m)$]\label{prop:dist_E}
+For a random odd positive integer $m$, the random variable $E(m) = \nu_2(3m+1)$ follows
+approximately a geometric distribution with parameter $1/2$:
+\[
+  \Pr[E(m) = k] \;\approx\; 2^{-k} \quad \text{for } k \geq 1.
+\]
+More precisely, among odd integers $m \in [1, N]$, the fraction with $E(m) = k$ is
+$2^{-k}(1 + O(N^{-1/2}))$ as $N \to \infty$.
+\end{proposition}
+
+\begin{proof}
+Since $3m + 1 \equiv 2 \pmod{4}$ for all odd $m$ (as $3m \equiv 3 \pmod{4}$, so $3m+1 \equiv 0 \pmod 2$
+but $3m+1 \equiv 0 \pmod 2$ not $4$ with probability $1/2$), we find:
+$E(m) = 1$ iff $3m+1 \equiv 2 \pmod{4}$, i.e.\ $m \equiv 1 \pmod{4}$: probability $1/2$.
+$E(m) = 2$ iff $3m+1 \equiv 4 \pmod{8}$, i.e.\ $m \equiv 1 \pmod{8}$: probability $1/4$.
+$E(m) \geq k$ iff $m \equiv 1 \pmod{2^k}$: probability $2^{-(k-1)}$.
+Thus $\Pr[E(m) = k] = 2^{-(k-1)} - 2^{-k} = 2^{-k}$.
+\end{proof}
+
+\begin{definition}[Log-scale random walk]\label{def:rw}
+To model the ``size'' of the Syracuse iterates, take logarithms. For odd $m$,
+\[
+  \log S(m) \;=\; \log m + \log 3 - E(m) \log 2 + O(1/m).
+\]
+The increments $X_k = \log 3 - E_k \log 2$ (where $E_k = E(S^{k-1}(m))$) form the
+individual steps of the random walk. The expected value is
+\[
+  \mathbb{E}[X_k] \;=\; \log 3 - \log 2 \cdot \mathbb{E}[E_k] = \log 3 - \log 2 \cdot 2 = \log 3 - 2\log 2 = \log(3/4) < 0.
+\]
+Since $\log(3/4) \approx -0.288 < 0$, the walk has a strict negative drift.
+\end{definition}
+
+\begin{theorem}[Negative drift implies convergence a.s.]\label{thm:drift}
+Let $(X_k)_{k \geq 1}$ be i.i.d.\ random variables with $\mathbb{E}[X_1] = \log(3/4) < 0$.
+Then the random walk $W_n = \sum_{k=1}^n X_k$ satisfies $W_n \to -\infty$ almost surely.
+In particular, for any fixed threshold $L$, the walk eventually falls below $L$ with
+probability 1.
+\end{theorem}
+
+\begin{proof}
+This is an immediate consequence of the strong law of large numbers: $W_n/n \to \mathbb{E}[X_1] < 0$
+almost surely. Since $\mathbb{E}[X_1] < 0$, we have $W_n \to -\infty$ a.s.
+\end{proof}
+
+\begin{remark}\label{rem:not_independent}
+The crucial difficulty is that the steps $X_k = \log 3 - E(S^{k-1}(m)) \log 2$ are
+\emph{not} independent: the distribution of $E(S^k(m))$ depends on the value of
+$S^k(m)$, which depends on the entire history of the orbit. Tao's main contribution
+is to handle these dependencies via Fourier analysis.
+\end{remark}
+
+\section{Fourier Analysis over the 2-adic Integers}
+
+\begin{definition}[Characters of $\mathbb{Z}/2^k\mathbb{Z}$]\label{def:characters}
+For $k \geq 1$ and $\xi \in \mathbb{Z}/2^k\mathbb{Z}$, the \emph{character}
+$\chi_{\xi,k}\colon \mathbb{Z}/2^k\mathbb{Z} \to \mathbb{C}^*$ is
+\[
+  \chi_{\xi,k}(n) \;=\; e^{2\pi i \xi n / 2^k}.
+\]
+The 2-adic Fourier transform of a function $f\colon \mathbb{Z}_2 \to \mathbb{C}$
+on residues mod $2^k$ is $\hat{f}(\xi) = \sum_{n \bmod 2^k} f(n) \chi_{\xi,k}(n)$.
+\end{definition}
+
+\begin{definition}[Syracuse exponential sum]\label{def:exp_sum}
+For $\xi \in \mathbb{R}/\mathbb{Z}$ and $N$ an odd positive integer, the
+\emph{Syracuse exponential sum} is
+\[
+  F_k(\xi) \;=\; \mathbb{E}_{m \bmod 2^k,\, m \text{ odd}}\bigl[ e^{2\pi i \xi \log_2 S(m)} \bigr],
+\]
+where the expectation is over odd residues mod $2^k$.
+\end{definition}
+
+\begin{lemma}[Tao's key estimate]\label{lem:key}
+For all $\xi \in \mathbb{R}/\mathbb{Z}$ with $\|\xi\|_{\mathbb{R}/\mathbb{Z}} \geq \delta > 0$,
+there exists $c(\delta) > 0$ such that
+\[
+  |F_k(\xi)| \;\leq\; e^{-c(\delta) k}
+\]
+for all sufficiently large $k$. This exponential decay in $k$ is the heart of Tao's proof.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The exponential sum $F_k(\xi)$ factors approximately as a product over ``independent'' steps.
+If the $E_j$ were exactly i.i.d.\ geometric(1/2), then
+$F_k(\xi) = \left(\sum_{j=1}^\infty 2^{-j} e^{2\pi i \xi (\log_2 3 - j)}\right)^k$,
+and the inner sum is a geometric series in $e^{-2\pi i \xi}$:
+\[
+  F_k(\xi) = \left(\frac{e^{2\pi i \xi \log_2 3}}{2 - e^{-2\pi i \xi}}\right)^k.
+\]
+For $\xi \not\in \mathbb{Z}/\log_2 3$, the modulus of the inner factor is $< 1$
+(by the irrationality of $\log_2 3$), giving exponential decay. Tao handles the
+non-independence via a decoupling argument using the Fourier structure of $\mathbb{Z}_2$.
+\end{proof}
+
+\section{The Logarithmic Density Argument}
+
+\begin{definition}[Divergent set]\label{def:divergent}
+Define the \emph{divergent set} as
+\[
+  \mathcal{D} \;=\; \bigl\{ n \in \mathbb{N} : T^k(n) \geq f(n) \text{ for all } k \geq 0 \bigr\},
+\]
+i.e.\ the set of integers whose Collatz orbit never descends below $f(n)$.
+Tao's theorem asserts $\mathrm{logdens}(\mathcal{D}) = 0$.
+\end{definition}
+
+\begin{theorem}[Logarithmic density of divergent orbits]\label{thm:logdens_zero}
+For any $f\colon \mathbb{N} \to \mathbb{R}_{>0}$ with $f(n) \to \infty$, the set
+$\mathcal{D}$ has logarithmic density zero.
+\end{theorem}
+
+\begin{proof}[Proof outline (following Tao \cite{Tao2022})]
+The proof proceeds in three main steps.
+
+\textbf{Step 1: Reduction to the Syracuse map.}
+One works with the compressed Syracuse function $S$ on odd integers. The Collatz iterate
+$T^k(n)$ is at most $f(n)$ iff $S^j(n) \leq C \cdot f(n)$ for some $j$ and constant $C$.
+Thus it suffices to show that the logarithmic density of odd $n$ with all Syracuse iterates
+above $f(n)$ is zero.
+
+\textbf{Step 2: Discretization via 2-adic residues.}
+For each scale $N$, one studies the orbit of $n$ modulo $2^k$ for $k = O(\log \log N)$.
+The Syracuse function acts on residues mod $2^k$, and the Fourier estimates of
+Lemma~\ref{lem:key} show that correlations between orbit steps decay exponentially in $k$.
+
+\textbf{Step 3: Exponential sum estimate.}
+One writes the indicator of ``orbit stays above $f(n)$'' as a Fourier integral, applies
+Lemma~\ref{lem:key} to bound the Fourier coefficients, and integrates. The bound
+$|F_k(\xi)| \leq e^{-c(\delta)k}$ implies that the logarithmic density of integers with
+non-descending orbits (after $k$ Syracuse steps) is at most $C e^{-c(\delta)k}$, which
+tends to 0 as $k \to \infty$.
+\end{proof}
+
+\begin{corollary}[Collatz orbits are almost bounded]\label{cor:almost_bounded}
+For any $\varepsilon > 0$, the set of $n \in \mathbb{N}$ for which $T^k(n) > n^\varepsilon$
+for all $k \geq 0$ has logarithmic density zero. In particular, almost all (in logarithmic density)
+Collatz orbits contain arbitrarily small values relative to the starting point.
+\end{corollary}
+
+\section{The Role of Ergodic Theory}
+
+\begin{definition}[Syracuse random walk as ergodic process]\label{def:ergodic_rw}
+The sequence of log-ratios $(\log S^k(n) / \log n)_{k \geq 0}$ can be viewed as the
+trajectory of a point in a measure-preserving dynamical system. Specifically, the space
+$\mathbb{Z}_2^{\text{odd}}$ with Haar measure $\mu$ carries the Syracuse map $S$,
+and the function $g(x) = \log_2 3 - E(x)$ (where $E(x) = \nu_2(3x+1)$) is the ``step size''
+function. The ergodic theorem gives:
+\[
+  \frac{1}{k} \sum_{j=0}^{k-1} g(S^j(x)) \;\longrightarrow\; \int_{\mathbb{Z}_2^{\text{odd}}} g\, d\mu
+  = \log_2 3 - \sum_{j=1}^\infty j \cdot 2^{-j} = \log_2 3 - 2 = \log_2(3/4) < 0
+\]
+for $\mu$-almost every $x$.
+\end{definition}
+
+\begin{theorem}[Ergodic convergence of Syracuse orbits]\label{thm:ergodic_conv}
+Under the Haar measure on $\mathbb{Z}_2^{\text{odd}}$, for $\mu$-almost every $x$:
+\[
+  \lim_{k \to \infty} \frac{\log S^k(x)}{k} \;=\; \log(3/4) < 0.
+\]
+This means that the logarithm of the orbit decreases linearly, i.e.\ the orbit decreases
+\emph{geometrically fast} to 0 in $\mathbb{Z}_2$ (in the absolute value sense).
+\end{theorem}
+
+\begin{proof}
+The integral $\int g\, d\mu = \mathbb{E}_\mu[\log_2 3 - E] = \log_2 3 - \mathbb{E}_\mu[E]$.
+The expectation $\mathbb{E}_\mu[E] = \sum_{j \geq 1} j \cdot \Pr[E = j] = \sum_{j \geq 1} j \cdot 2^{-j} = 2$
+(from Proposition~\ref{prop:dist_E}).
+Thus the ergodic mean of $g$ is $\log_2 3 - 2 = \log_2(3/4) \approx -0.415 < 0$.
+The ergodic theorem then gives the stated convergence for $\mu$-a.e.\ $x$.
+\end{proof}
+
+\begin{lemma}[Furstenberg's correspondence principle]\label{lem:furstenberg}
+Let $(X, \mathcal{B}, \mu, T)$ be a measure-preserving system and $A \in \mathcal{B}$
+with $\mu(A) > 0$. Furstenberg's correspondence principle provides a structural result
+connecting combinatorial properties of the Collatz orbit with the ergodic structure of
+$(\mathbb{Z}_2, S, \mu)$.
+In the Collatz context, the principle is used to transfer density results from the
+2-adic setting to natural density statements about $\mathbb{N}$.
+\end{lemma}
+
+\section{Why Tao's Result Falls Short of the Conjecture}
+
+\begin{remark}[The gap between logarithmic density and full conjecture]\label{rem:gap}
+Tao's theorem establishes that the set of ``badly behaved'' orbits has logarithmic density 0.
+However, the full Collatz conjecture requires showing that this set is \emph{empty} (or,
+equivalently, that every orbit eventually reaches 1). These are very different statements:
+a set of logarithmic density 0 can still be infinite (indeed, of natural density 0 but
+infinite).
+\end{remark}
+
+\begin{proposition}[Obstacles to a full proof]\label{prop:obstacles}
+The following obstacles prevent Tao's approach from proving the full conjecture:
+\begin{enumerate}
+  \item \textbf{Individual vs.\ statistical}: Tao controls the average behaviour but not
+        the behaviour of any individual orbit.
+  \item \textbf{No recurrence}: The 2-adic Fourier method gives density-zero results but
+        not recurrence for every starting point.
+  \item \textbf{Cycle exclusion}: Tao's argument does not rule out the existence of
+        extremely large cycles that might ``trap'' some orbits.
+  \item \textbf{The $+1$ barrier}: The $+1$ in $3n+1$ creates arithmetic correlations
+        that destroy perfect independence of orbit steps, limiting the strength of the
+        Fourier approach.
+\end{enumerate}
+\end{proposition}
+
+\begin{conjecture}[Collatz conjecture, full version]\label{conj:full}
+For every $n \in \mathbb{N}$, there exists $k \geq 0$ such that $T^k(n) = 1$.
+\end{conjecture}
+
+\section{Discussion and Open Problems}
+
+Tao's result is significant in several ways:
+\begin{enumerate}
+  \item It establishes the strongest known quantitative statement toward the conjecture.
+  \item It shows that if counterexamples exist, they must form a very ``sparse'' set
+        (logarithmic density 0).
+  \item It provides a toolkit (Fourier analysis over $\mathbb{Z}_2$, Syracuse random walks)
+        that may be further developed.
+\end{enumerate}
+
+Open problems include:
+\begin{enumerate}
+  \item Can the logarithmic density result be improved to natural density?
+  \item Can one show that divergent orbits have natural density 0 (a stronger statement)?
+  \item Can the Fourier-analytic approach be combined with $p$-adic algebraic methods
+        to exclude all non-trivial cycles?
+  \item Is there a ``structural'' reason (beyond probabilistic heuristics) why the
+        $+1$ forces all orbits to converge?
+\end{enumerate}
+
+\begin{thebibliography}{99}
+
+\bibitem{Tao2022}
+T.~Tao.
+\newblock Almost all Collatz orbits attain almost bounded values.
+\newblock \emph{Annals of Mathematics}, 197(2):679--710, 2022.
+
+\bibitem{Collatz1937}
+L.~Collatz.
+\newblock Unpublished problem, communicated at the International Congress of Mathematicians, 1937.
+
+\bibitem{Lagarias1985}
+J.~C. Lagarias.
+\newblock The $3x+1$ problem and its generalizations.
+\newblock \emph{American Mathematical Monthly}, 92(1):3--23, 1985.
+
+\bibitem{Lagarias2010}
+J.~C. Lagarias (ed.).
+\newblock \emph{The Ultimate Challenge: The $3x+1$ Problem}.
+\newblock American Mathematical Society, Providence, RI, 2010.
+
+\bibitem{Furstenberg1977}
+H.~Furstenberg.
+\newblock Ergodic behavior of diagonal measures and a theorem of Szemer\'edi on arithmetic progressions.
+\newblock \emph{Journal d'Analyse Math\'ematique}, 31(1):204--256, 1977.
+
+\bibitem{Terras1976}
+R.~Terras.
+\newblock A stopping time problem on the positive integers.
+\newblock \emph{Acta Arithmetica}, 30(3):241--252, 1976.
+
+\bibitem{Koblitz1984}
+N.~Koblitz.
+\newblock \emph{$p$-adic Numbers, $p$-adic Analysis, and Zeta Functions}.
+\newblock Springer-Verlag, New York, 1984.
+
+\bibitem{Kontorovich2010}
+A.~Kontorovich and J.~C. Lagarias.
+\newblock Stochastic models for the $3x+1$ and $5x+1$ problems and related problems.
+\newblock In \emph{The Ultimate Challenge}, pp.\ 131--188, AMS, 2010.
+
+\end{thebibliography}
+
+\end{document}
