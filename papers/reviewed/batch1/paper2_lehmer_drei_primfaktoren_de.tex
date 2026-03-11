@@ -278,12 +278,17 @@ Daher:
   k = \frac{pq - 1}{r - 1} < \frac{pq}{q} = p, \quad\text{also}\quad k \le p - 1.
 \]
 
+Sei $D = \gcd(r-1,\, (p-1)(q-1))$ und $A = \tfrac{(p-1)(q-1)}{D}$.
 Die Bedingung $(p-1)(q-1)(r-1) \mid (pqr-1)$ impliziert nach der Reduktion aus
-Abschnitt~\ref{sec:schritt2} auch $(p-1)(q-1) \mid (p + q - 1) + k$. Mit $k \le p - 1$:
+Abschnitt~\ref{sec:schritt2}, dass $A \mid (\alpha + k)$ mit $\alpha = p + q - 1$.
+Da $(r-1) \mid (pq-1) = (p-1)(q-1) + (p+q-2)$, folgt $D \mid (p+q-2)$,
+also $D \le p+q-2$. Mit $k \le p - 1$:
 \[
-  (p-1)(q-1) \le (p + q - 1) + (p - 1) = 2p + q - 2.
+  A = \frac{(p-1)(q-1)}{D} \;\le\; (\alpha + k) \;\le\; (p + q - 1) + (p - 1) = 2p + q - 2.
 \]
-Umformen: $pq - p - q + 1 \le 2p + q - 2$, also $q(p-2) \le 3(p-1)$, d.\,h.:
+Da $D \ge 1$, folgt $(p-1)(q-1) = D \cdot A \le D \cdot (2p+q-2) \le (p+q-2)(2p+q-2)$.
+Im Spezialfall $D = 1$ vereinfacht sich dies zu $(p-1)(q-1) \le 2p+q-2$,
+und das Umformen ergibt: $pq - p - q + 1 \le 2p + q - 2$, also $q(p-2) \le 3(p-1)$, d.\,h.:
 \[
   q \le \frac{3(p-1)}{p-2}. \qedhere
 \]

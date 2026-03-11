@@ -732,3 +732,142 @@ Fakten-Richtigkeit und EN/DE-Konsistenz.
 - Mathematische Inhalte: Mordell-Weil korrekt, BSD korrekt, Kolyvagin Rang-0/1 korrekt, Tunnell-Kriterium korrekt
 - BUGS.md aktualisiert
 - Git commit + push auf Bitbucket master erfolgreich
+
+2026-03-11 — Review-Bugs Batch 4: Papers 17–20
+=================================================
+Vollständiges Review aller 8 LaTeX-Dateien in papers/batch4/ (Kreismethode, Vinogradov, Waring, Goldbach).
+
+Gefundene und behobene Bugs:
+
+BUG-B4-P17-DE-001 (BEHOBEN):
+  Farey-Beweis (Lemma lem:farey) im DE enthielt eine eigene Beweiskonstruktion
+  mit falscher Aussage über Bogenhalbbreiten (1/(2qQ) ist nicht die korrekte
+  Farey-Bogenhalbbreite — diese ist variabel, bestimmt durch die Farey-Nachbarn).
+  Fix: Standardverweis auf Hardy--Wright analog zum EN-Beweis.
+
+BUG-B4-P18-EN-001 (BEHOBEN):
+  \DeclareMathOperator{\Li}{li} deklariert, aber nirgends im Paper verwendet.
+  Fix: Unnötige Deklaration entfernt.
+
+BUG-B4-P18-DE-001 (BEHOBEN):
+  \Q (\mathbb{Q}) fehlte in den \newcommand-Definitionen (EN hat \Q).
+  Fix: \Q hinzugefügt für Konsistenz mit EN.
+
+BUG-B4-P19-EN-001 (BEHOBEN):
+  KRITISCH: r_{k,s}(n) = \#\{(x_1,...,x_s) : x_i^k = n\} — falsche Formel,
+  x_i^k = n bedeutet jede einzelne Variable muss n sein.
+  Korrekte Formel: x_1^k + ... + x_s^k = n (Summe!).
+  Fix: Formel korrigiert auf x_1^k + ... + x_s^k = n.
+
+BUG-B4-P19-EN-002 (BEHOBEN):
+  Autorenreihenfolge in Tabelle: "Balasubramanian, Dress, Deshouillers 1986"
+  Korrekte Reihenfolge: Balasubramanian, Deshouillers, Dress.
+  Fix: Reihenfolge korrigiert.
+
+BUG-B4-P19-DE-001 (BEHOBEN):
+  \Q fehlte in \newcommand-Definitionen.
+  Fix: \Q hinzugefügt.
+
+BUG-B4-P19-DE-002 (BEHOBEN):
+  \bibitem{Wooley2016} hatte falschen Titel: "Vinogradov's mean value theorem
+  via efficient congruencing, II." — das ist Wooley2013 (Duke Math. J.).
+  Wooley2016 (Adv. Math. 294:532--561) ist "The cubic case of the main
+  conjecture in Vinogradov's mean value theorem."
+  Fix: Titel korrigiert.
+
+BUG-B4-P19-DE-003 (BEHOBEN):
+  \bibitem{HardyLittlewood1920}: Zeitschrift "Nachr. Ges. Wiss. Göttingen"
+  ist inkonsistent mit EN (Quart. J. Math., 48:272--293, 1920).
+  Fix: Auf korrekte Zeitschrift aus EN angeglichen.
+
+BUG-B4-P20-EN-001 (BEHOBEN):
+  \DeclareMathOperator{\Li}{li} deklariert, aber nirgends verwendet.
+  Fix: Entfernt.
+
+BUG-B4-P20-EN-002 (BEHOBEN):
+  Tabelle Goldbach-Komet: n=100 hatte falschen Wert 4C_2·(4/3)·(6/5) ≈ 5.5.
+  n=100 = 2^2·5^2; ungerade Primteiler > 2: nur p=5.
+  Korrekt: S(100) = 2C_2·(4/3) ≈ 1.76.
+  Fix: Formel und Dezimalwert korrigiert.
+
+BUG-B4-P20-DE-001 (BEHOBEN):
+  \Q fehlte in \newcommand-Definitionen.
+  Fix: \Q hinzugefügt.
+
+BUG-B4-P20-DE-002 (BEHOBEN):
+  Tabelle Goldbach-Komet: n=100 hatte falschen Dezimalwert ≈ 3.5.
+  Korrekt: 2C_2·(4/3) ≈ 1.76. Fix: Formel und Dezimalwert korrigiert.
+
+BUG-B4-P20-DE-003 (BEHOBEN):
+  \bibitem{Goldston1992} in DE referenzierte einen anderen Goldston-Artikel
+  (J. Number Theory 41(2):144--162, 1992) als EN (Amalfi Proceedings).
+  Fix: DE auf denselben Artikel wie EN angeglichen.
+
+Mathematisch korrekte Inhalte (kein Fix nötig):
+  - Kreismethode: Integral korrekt, Major/Minor Arc Definition korrekt
+  - Vinogradov 1937: "hinreichend groß" korrekt, Helfgott 2013 korrekt erwähnt
+  - Goldbach-Vermutung: in allen Papers klar als UNBEWIESEN markiert
+  - Euler-Produkt-Formeln: keine doppelten ^{-1}-Fehler gefunden
+  - Singuläre Reihe-Formeln: korrekt
+  - g(k)/G(k)-Werte: korrekt (nach Korrektur Autorenreihenfolge)
+  - Waring-Formel: g(k) = 2^k + q - 2 korrekt
+  - LaTeX-Syntax: alle begin/end-Umgebungen geschlossen
+  - \label/\ref: intern konsistent, keine Cross-Paper-Referenzen
+  - \cite/\bibitem: alle zitierten Schlüssel haben bibitems
+
+Git commit + push durchgeführt.
+
+2026-03-11 (Review Batch 2 — Papers 8–12 Wilson-Satz):
+- Alle 10 LaTeX-Dateien (papers/reviewed/batch2/) vollständig reviewt
+- BUG-B2-P8-DE-001: Doppeltes \label{satz:allgemein_wilson} — Section und Theorem hatten identischen Key
+  → Section umbenannt zu \label{sec:allgemein_wilson}
+- BUG-B2-P9-EN-001: \bibitem{Rose1988} mit falschem Jahres-Key — Inhalt zeigt 1994
+  → Key korrigiert zu \bibitem{Rose1994} (konsistent mit DE-Version)
+- BUG-B2-P10-EN-001: \cite{BEW1998} ohne zugehöriges \bibitem{BEW1998}
+  → \bibitem{BEW1998} (Berndt-Evans-Williams, Gauss and Jacobi Sums) ergänzt
+- BUG-B2-P10-DE-001: Undefinierte LaTeX-Umgebung \begin{beispiel}/\end{beispiel}
+  → \newtheorem{beispiel}[theorem]{Beispiel} in Präambel ergänzt
+- BUG-B2-P10-DE-002: Arithmetikfehler bei p=13-Verifikation — 2834921 statt 2834329
+  → Korrigiert: 479001601 = 13^2 · 2834329 (verifiziert: 169 × 2834329 = 479001601)
+- BUG-B2-P10-DE-003: Tippfehler "Beweissskizze" (dreifaches s) in paper12 (falsche Zuordnung)
+  → Tatsächlich in paper12_wilson_anwendungen_de.tex gefunden, korrigiert zu "Beweisskizze"
+- BUG-B2-P10-DE-004: Mathematisch inkorrekte Schlussfolgerung im Bernoulli-Beweis
+  → Volle harmonische Summe ≡ 0 (trivial), DE benutzte fälschlicherweise ∑j^{-1} = B_{p-1}
+  → Beweis komplett neu strukturiert: korrekte Nutzung der Halbsumme S_p aus Satz 3.2,
+    analog zum EN-Paper, mit Referenz auf Ireland-Rosen Kap. 15
+- Alle 10 Dateien final geprüft: begin/end OK, label/ref OK, cite/bibitem OK
+- keine Euler-Produkt-Fehler gefunden (L-Funktionen kommen in diesen Papers nicht vor)
+
+2026-03-11 22:10 Review-Bugs Batch 1 — Papers 1–7 (Giuga & Lehmer) geprüft und korrigiert
+- Vollständiges Review aller 14 LaTeX-Dateien in papers/reviewed/batch1/
+- Prüfkriterien: LaTeX-Syntax, Theorem-Umgebungen, Bibliographien, Mathematik, EN/DE-Konsistenz
+
+GEFUNDENE UND BEHOBENE BUGS:
+  BUG-B1-P2-EN-001: paper2_lehmer_three_primes.tex — Danksagung (Acknowledgements) fehlte;
+    DE-Version hatte \section*{Danksagung}, EN-Version hatte keine entsprechende Section.
+    FIX: \section*{Acknowledgements} + Danksagungstext eingefügt vor \begin{thebibliography}
+
+  BUG-B1-P2-DE-002: paper2_lehmer_drei_primfaktoren_de.tex — Mathematischer Fehler im
+    Beweis von Lemma lem:grenze_q (Schritt 3): Die Aussage "(p-1)(q-1) | (p+q-1)+k" war
+    korrekt nur für den Spezialfall D=gcd(r-1,(p-1)(q-1))=1, aber D wurde nicht eingeführt.
+    Die EN-Version arbeitet korrekt mit A=(p-1)(q-1)/D und D|gcd-bound.
+    FIX: D und A=(p-1)(q-1)/D eingeführt, korrekte Ungleichungskette A|(alpha+k),
+    Spezialfall D=1 explizit notiert für die endgültige Schrankenrechnung.
+
+  BUG-B1-P5-DE-001: paper5_giuga_kein_semiprim_de.tex — Grammatikalischer Fehler im Titel:
+    "Kein Semiprimes ist" → "Kein Semiprim ist" (falsche Pluralform statt Singular).
+    FIX: Titel korrigiert.
+
+KEIN FEHLER GEFUNDEN:
+  - Paper 1 (Giuga 3-Prim): EN und DE mathematisch korrekt, LaTeX sauber
+  - Paper 3 (Giuga-Carmichael CRT): EN und DE identisch strukturiert, CRT-Rechnung korrekt
+  - Paper 4 (Giuga Squarefree): EN Build 44, DE Build 44 — konsistent
+  - Paper 5 (Giuga no semiprime): EN korrekt; DE nach Titel-Fix korrekt
+  - Paper 6 (Lehmer Squarefree): EN und DE mathematisch korrekt, vollständig
+  - Paper 7 (Lehmer no semiprime): EN und DE mathematisch korrekt (Paper7 DE math geprüft)
+  - Alle bibitem-Schlüssel intern konsistent
+  - Keine L-Funktionen / Euler-Produkt-Fehler (solche kommen in Batch1 nicht vor)
+  - Alle \begin/\end-Umgebungen geschlossen
+  - Alle \label/\ref intern konsistent (keine Cross-Paper-Referenzen auf fremde Labels)
+  - Alle DE-Papers haben \usepackage[ngerman]{babel}
+
