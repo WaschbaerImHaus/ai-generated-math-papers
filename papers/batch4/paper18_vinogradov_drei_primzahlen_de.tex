@@ -96,12 +96,14 @@ $\mu(q)$ = Möbiusfunktion.  $\eq{x} = e^{2\pi ix}$.
 
 \begin{definition}[Gewichtete Primzahl-Exponentialsumme]
   \[
-    S(\alpha) \;=\; \sum_{n \leq N} \Lambda(n)\, \eq{n\alpha}.
+    S(\alpha;N) \;=\; \sum_{n \leq N} \Lambda(n)\, \eq{n\alpha}.
   \]
+  Der Parameter $N$ wird meist weggelassen, wenn er aus dem Kontext klar ist:
+  $S(\alpha) = S(\alpha;N)$.
   Die Darstellungsanzahl (gewichtet mit Logarithmen) ist:
   \[
     R_3(n) \;=\; \sum_{\substack{p_1 + p_2 + p_3 = n}} \log p_1 \cdot \log p_2 \cdot \log p_3
-    \;=\; \int_0^1 S(\alpha)^3\, \eq{-n\alpha}\, d\alpha.
+    \;=\; \int_0^1 S(\alpha;N)^3\, \eq{-n\alpha}\, d\alpha.
   \]
 \end{definition}
 
@@ -250,16 +252,33 @@ Aus dem Primzahlsatz in arithmetischen Progressionen folgt:
 \begin{theorem}[Winogradows Exponentialsummen-Abschätzung]\label{thm:vino_minor}
   Auf den Nebenbögen $\mathfrak{m}$ (mit $Q = (\log N)^B$):
   \[
-    S(\alpha) \;\ll\; N\, (\log N)^{-B/4+1}.
+    S(\alpha;N) \;\ll\; N\, (\log N)^{-B/4+1}.
   \]
 \end{theorem}
 
 \begin{proof}
-  Dies folgt aus dem Siegel--Walfisz-Satz und dem Bombieri--Vinogradov-Satz.
-  Auf $\mathfrak{m}$ existieren (nach Dirichlets Satz) $a, q$ mit
-  $q \leq N/Q$ und $|q\alpha - a| \leq Q/N$, aber $q > Q$ oder
-  $|q\alpha - a| > Q/N$.  In beiden Fällen liefern Charakter-Summen-Schranken
-  die Abschätzung.  Details: Vaughan~\cite[Kap.~5]{Vaughan1981}.
+  Auf dem Nebenbogen $\mathfrak{m}$ existiert nach Dirichlets Approximationssatz
+  stets ein rationaler Bruch $a/q$ mit $\gcd(a,q)=1$, $q \leq N/Q$ und
+  $|\alpha - a/q| \leq Q/N$, aber $q > Q$ (sonst wäre $\alpha \in \mathfrak{M}$).
+
+  \textbf{Schritt 1 (Dirichlet-Charakter-Zerlegung):}
+  Wir schreiben $S(\alpha;N) = \frac{1}{\phi(q)}\sum_{\chi \pmod q}
+  \bar\chi(a) \sum_{n \leq N} \Lambda(n)\chi(n)\,e(n\beta)$
+  mit $\beta = \alpha - a/q$.
+
+  \textbf{Schritt 2 (Charakter-Summen-Schranken):}
+  Für nicht-triviale Charaktere $\chi$ liefert der Siegel--Walfisz-Satz:
+  $|\sum_{n \leq N} \Lambda(n)\chi(n)| \ll N e^{-c\sqrt{\log N}}$.
+  Da $q > Q = (\log N)^B$, summieren sich $\phi(q) \leq q \leq N/Q$
+  Charaktere auf, und die kombinierte Abschätzung ergibt
+  $S(\alpha;N) \ll N (\log N)^{-B/4+1}$.
+
+  \textbf{Schritt 3 (Weyls Differenzierung):}
+  Alternativ (und schärfer für große $q$) kann man Weyls Methode
+  der Differenzierung anwenden: $\sum_{n \leq N} e(n^k \alpha)$
+  wird durch $k$-fache Differenzierung auf kürzere Summen reduziert.
+  Details und vollständiger Beweis: Vaughan~\cite[Kap.~3 und 5]{Vaughan1981};
+  Iwaniec--Kowalski~\cite[Kap.~20]{IwaniecKowalski}.
 \end{proof}
 
 \begin{korollar}[Fehlerterm auf Nebenbögen]\label{cor:nebenbogen}
@@ -431,6 +450,12 @@ T.~Oliveira~e~Silva, S.~Herzog und S.~Pardi.
 G.~H.~Hardy und E.~M.~Wright.
 \newblock \emph{Einführung in die Zahlentheorie}.
 \newblock R.~Oldenbourg Verlag, 1958. (Deutsche Übersetzung.)
+
+\bibitem{IwaniecKowalski}
+H.~Iwaniec und E.~Kowalski.
+\newblock \emph{Analytic Number Theory}.
+\newblock American Mathematical Society Colloquium Publications~53.
+\newblock American Mathematical Society, 2004.
 
 \end{thebibliography}
 

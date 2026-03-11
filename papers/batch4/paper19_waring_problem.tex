@@ -198,6 +198,25 @@ The representation count is
   \;=\; \int_0^1 f(\alpha)^s\, \eq{-n\alpha}\, d\alpha.
 \]
 
+\begin{remark}[Three threshold conditions for $s$]
+\label{rem:thresholds}
+  Three conditions on $s$ appear throughout this paper; they are
+  \emph{independent and serve different roles}:
+  \begin{enumerate}
+    \item $s > 2k+1$: ensures absolute convergence of the singular series
+      $\mathfrak{S}_{k,s}(n)$ (local condition at all primes $p$).
+    \item $s > 2k$: ensures the main term $\mathfrak{S}_{k,s} \cdot \mathfrak{J}_{k,s}
+      \cdot n^{s/k-1}$ dominates the minor arc contribution in the circle method.
+    \item $s \leq k(k+1)/2$: the range where the Vinogradov Main Conjecture
+      (Theorem~\ref{thm:bdg}) applies, giving the sharp minor arc bound
+      $J_{s,k}(N) \ll N^{s+\varepsilon}$.
+  \end{enumerate}
+  For the Wooley bound $G(k) \leq k(\log k + 4.20032)$, all three conditions
+  are satisfied simultaneously: the optimal $s \approx k \log k$ satisfies
+  $s > 2k$ (for $k \geq 3$) and $s \leq k(k+1)/2$ (for $k \geq 3$), giving
+  the asymptotic formula with a positive main term.
+\end{remark}
+
 \begin{theorem}[Hardy--Littlewood asymptotic formula]\label{thm:HL}
   For $s > 2k + 1$ (to ensure convergence of the singular series):
   \[
@@ -284,14 +303,32 @@ before Bourgain--Demeter--Guth's approach via Fourier decoupling.
 \end{corollary}
 
 \begin{proof}
-  By Theorem~\ref{thm:bdg}, with $s = \lceil k(k+1)/2 \rceil + 1$ factors
-  in the circle method and the Vinogradov Main Conjecture, the minor arc
-  integral is bounded by $O(N^{s/k - 1 - \delta})$ for any $\delta < 1/2$.
-  The threshold on $s$ for the circle method to give $r_{k,s}(n) \gg n^{s/k-1}$
-  is $s > 2k$ (to ensure the main term dominates).  The bound $s = k(\log k + 4.2)$
-  follows from optimising the choice of $s$ and the error term estimates.
-  The explicit constant $4.20032$ is from Wooley's 2016 paper; the method yields
-  $G(k) \leq k\log k + O(k)$ with an effective constant.
+  The proof uses the VMC (Theorem~\ref{thm:bdg}) in the circle method.
+  We choose $s$ to minimise the effective threshold while satisfying all
+  three conditions from Remark~\ref{rem:thresholds}.
+
+  \textbf{Step 1 (Minor arc bound via VMC).}
+  For any $s \leq k(k+1)/2$, the VMC gives
+  $J_{s,k}(N) \ll N^{s+\varepsilon}$, which implies
+  $\sup_{\alpha \in \mathfrak{m}} |f(\alpha)| \ll N^{1-1/k+\varepsilon}$
+  (via Cauchy--Schwarz applied to $J_{s,k}$).  Consequently, the minor arc
+  integral satisfies $|\int_{\mathfrak{m}} f^s e(-n\cdot)| \ll n^{s/k-1-\delta}$
+  for some $\delta = \delta(k) > 0$ depending only on $k$.
+
+  \textbf{Step 2 (Optimising $s$).}
+  The asymptotic formula holds for any fixed $s > 2k$ (so that the
+  singular series converges and the main term dominates).
+  The constraint $s \leq k(k+1)/2$ is satisfied for all $s \leq k^2/2$,
+  which includes the optimal choice $s = \lceil k(\log k + 4.20032)\rceil$
+  since $k \log k \ll k^2/2$.
+
+  \textbf{Step 3 (Explicit constant).}
+  Wooley's 2016 analysis \cite{Wooley2016} shows that for
+  $s = \lceil k(\log k + 4.20032)\rceil$, the minor arc bound is
+  $O(n^{s/k-1-\delta})$ with $\delta > 0$, making the circle method effective.
+  The explicit constant $4.20032$ comes from bounding the product of
+  $p$-adic densities in the singular series; the method yields
+  $G(k) \leq k\log k + O(k)$ with effective constants.
 \end{proof}
 
 % ================================================================

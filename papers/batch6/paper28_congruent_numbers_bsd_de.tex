@@ -174,8 +174,9 @@ die drei $2$-Torsionspunkte $(0,0)$, $(n,0)$, $(-n,0)$ ergeben.
 Zusammen mit $\mathcal{O}$ bilden sie $\Z/2\Z \times \Z/2\Z$.
 
 Keine weiteren Torsionspunkte existieren: Nach Nagell--Lutz m\"usste ein
-Torsionspunkt $(x_0, y_0)$ mit $y_0 \ne 0$ die Bedingung $y_0^2 \mid \Delta$
-(mit $\Delta = 64n^6$) erf\"ullen und $x_0, y_0 \in \Z$ (Nagell--Lutz).
+Torsionspunkt $(x_0, y_0)$ mit $y_0 \ne 0$ die Bedingung $y_0^2 \mid (4a^3 + 27b^2)$
+erf\"ullen (mit $a = -n^2$, $b = 0$, also $4a^3 + 27b^2 = -4n^6$, d.\,h.\
+$y_0^2 \mid 4n^6$), und es m\"ussen $x_0, y_0 \in \Z$ gelten (Nagell--Lutz).
 Eine vollst\"andige Fallunterscheidung zeigt, dass keine weiteren
 ganzzahligen Punkte auf $E_n$ existieren; vgl.\ \cite{Silverman1992}.
 \end{proof}
@@ -258,7 +259,8 @@ Fl\"ache $= (1/2)(35/12)(24/5) = (1/2)(840/60) = (1/2)(14) = 7$. \checkmark
 \begin{remark}[Status von $n = 1, 2, 3$]
 \begin{itemize}
   \item Fermat bewies mittels unendlichem Abstieg, dass $n=1$ nicht kongruent
-    ist (\"aquivalent: $y^2 = x^4 - 1$ hat keine rationalen Punkte mit $y\ne 0$).
+    ist. \"Aquivalent dazu hat die kongruente Zahlkurve $E_1\colon y^2 = x^3 - x$
+    keinen rationalen Punkt unendlicher Ordnung (d.\,h.\ $\mathrm{rang}(E_1(\Q)) = 0$).
   \item $n = 2, 3$: Tunnells Satz sagt unter BSD vorher, dass $A(2) \ne 2B(2)$
     und $A(3) \ne 2B(3)$, was $n=2,3$ nicht-kongruent bedeutet.
     Dies ist aber noch nicht bedingungslos bewiesen.
@@ -337,6 +339,12 @@ Springer, New York, 1986.
 J.~W.~S.~Cassels,
 \emph{Lectures on Elliptic Curves},
 Cambridge University Press, 1991.
+
+\bibitem{Koblitz1993}
+N.~Koblitz,
+\emph{Introduction to Elliptic Curves and Modular Forms}, 2.~Aufl.,
+Graduate Texts in Mathematics~97,
+Springer, New York, 1993.
 
 \end{thebibliography}
 

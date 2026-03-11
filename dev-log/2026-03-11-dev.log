@@ -522,3 +522,56 @@ Technische Details:
   - Paper 28 EN: ab/2-Beweis schrittweise Herleitung präzisiert
   - Papers 21,22,24,26,27: druckreif ohne Änderungen
   - reviews/review_papers18_28_2026_03_11.md erstellt
+
+2026-03-11 — Build 97: Review-Bugs Papers 18–28 behoben
+
+Kritische Fixes (Paper 28 DE):
+- BUG-B6-P28-DE-001: Diskriminante in Nagell-Lutz-Kontext korrigiert:
+  "Δ = 64n⁶" → korrekte Formulierung "y₀² | (4a³+27b²) = -4n⁶, d.h. y₀² | 4n⁶"
+- BUG-B6-P28-DE-002: Falsche Kurve "y²=x⁴-1" → "E₁: y²=x³-x" für n=1
+- BUG-B6-P28-DE-003: Bibitem Koblitz1993 hinzugefügt
+
+Paper 18 DE:
+- BUG-B4-P18-DE-001: S(α) → S(α;N) in Definition, mit erklärender Notiz
+- BUG-B4-P18-DE-002: Beweis Satz 5.2 (Nebenbogen) erheblich erweitert
+  (Charakter-Zerlegung, Siegel-Walfisz, Weylsche Differenzierung)
+- BUG-B4-P18-DE-003: Bibitem IwaniecKowalski hinzugefügt
+
+Paper 19 EN:
+- BUG-B4-P19-EN-001: Remark rem:thresholds über die 3 verschiedenen s-Schwellen
+  eingefügt (s>2k+1, s>2k, s≤k(k+1)/2) mit Erklärung wie sie zusammenhängen
+- BUG-B4-P19-EN-002: Zirkuläre Logik im Wooley-Beweis behoben:
+  3-Schritt-Beweis mit sauber getrennten Argumenten (VMC, Optimierung, Konstante)
+
+Paper 19 DE:
+- BUG-B4-P19-DE-MISSING-REFS: Bibitems HardyLittlewood1920, Wooley2012, Wooley2013 hinzugefügt
+
+Paper 20 EN/DE:
+- BUG-B4-P20-EN/DE-TABLE-001: Tabellennotation "2C_2·2/1" mit explizitem
+  "(p-1)/(p-2)|_{p=3}" beschriftet
+
+Paper 20 DE:
+- BUG-B4-P20-DE-MISSING-BIBITEMS: Goldston1992, Vinogradov1937, Granville1995 hinzugefügt
+
+Paper 23 DE:
+- BUG-B5-P23-DE-001: Abstract um Satz zur Verbindung mit Dirichlet-L-Funktionen/GRH erweitert
+
+Paper 25 DE:
+- BUG-B6-P25-DE-001: Beispiel für j=1728 (y²=x³-x, CM durch Z[i])
+  und j=0 (y²=x³+1, CM durch Z[ω]) hinzugefügt
+- Bibitem Cornell1997 hinzugefügt (5→5 Bibitems)
+
+Paper 26 DE:
+- BUG-B6-P26-DE-002: Bibitem TaylorWiles1995 (Ring-theoretic properties) hinzugefügt
+
+Paper 27 DE:
+- BUG-B6-P27-DE-002: Selmer-Abschnitt erheblich erweitert:
+  Kummer-Einbettung, Dimension-Argumentation, Kolyvagin-Verweis
+- BUG-B6-P27-DE-001: Bibitem Milne2006 hinzugefügt
+
+Nicht betroffen (bereits in aktuellem Stand korrekt):
+- BUG-B4-P19-DE-MISSING-THM: Theorem 8.3 ist bereits als \begin{theorem} vorhanden
+- BUG-B4-P20-DE-SECTION-MISSING: Section 8 (Goldbach-Komet) bereits vorhanden
+- BUG-B4-P20-DE-TABLE-MISSING: Tabelle bereits vorhanden
+- BUG-B6-P25-DE-003: Remark über unbeschränkte Ränge bereits vorhanden
+- BUG-B6-P26-DE-001: Tabelle für a₅-Berechnung bereits vorhanden

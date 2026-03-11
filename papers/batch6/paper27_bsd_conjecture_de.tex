@@ -248,14 +248,22 @@ Schritte:
 \section{Abstieg und die Selmer-Gruppe}
 % ================================================================
 
-\begin{remark}[Berechnung des Selmer-Raums]
+\begin{remark}[Berechnung des Selmer-Raums und Abstieg]
 Praktisch berechnet man den Rang durch einen \emph{2-Abstieg}:
 Dies liefert den \emph{Selmer-Raum} $\mathrm{Sel}_2(E/\Q)$ in der exakten Folge
 \[
   0 \to E(\Q)/2E(\Q) \to \mathrm{Sel}_2(E/\Q) \to \Sha(E/\Q)[2] \to 0.
 \]
-Falls $\Sha(E/\Q) = 0$, ergibt sich der Rang direkt aus der Dimension des
-Selmer-Raums.
+Die Abbildung $E(\Q)/2E(\Q) \to \mathrm{Sel}_2(E/\Q)$ ist die
+\emph{Kummer-Einbettung}, die jeden Punkt $P$ durch die $2$-Isogenie-Bilder
+lokal beschreibt.  Der Selmer-Raum ist eine endliche $\mathbb{F}_2$-Vektorraum,
+der lokal-global-l\"osbare Homomorphismen erfasst; seine Dimension gibt eine
+obere Schranke f\"ur $r + \dim_{\mathbb{F}_2} \Sha(E/\Q)[2]$.
+
+Unter der Annahme $\Sha(E/\Q) = 0$ ergibt sich der Rang $r$ direkt als
+$r = \dim_{\mathbb{F}_2} \mathrm{Sel}_2(E/\Q)$.
+Kolyvagin \cite{Kolyvagin1990} zeigte: wenn $L(E,1) \ne 0$ oder $L'(E,1) \ne 0$,
+dann ist $\Sha(E/\Q)$ endlich und $r \le 1$.
 \end{remark}
 
 % ================================================================
@@ -309,6 +317,12 @@ Springer, New York, 1986.
 A.~Wiles,
 Modular elliptic curves and Fermat's last theorem,
 \emph{Ann.\ of Math.}\ (2) \textbf{142} (1995), 443--551.
+
+\bibitem{Milne2006}
+J.~S.~Milne,
+\emph{Elliptic Curves},
+BookSurge Publishing, 2006.
+Verf\"ugbar unter: \texttt{https://www.jmilne.org/math/Books/EC.pdf}.
 
 \end{thebibliography}
 
