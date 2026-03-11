@@ -207,7 +207,7 @@
         <!-- === Gruppe: Zahlentheorie === -->
         <div class="nav-group">
             <input type="checkbox" id="nav-zahlen"
-                {% if request.path in ['/number_theory', '/analytic_nt', '/modular_forms', '/elliptic', '/l_functions', '/p_adic', '/iwasawa'] %}checked{% endif %}>
+                {% if request.path in ['/number_theory', '/analytic_nt', '/modular_forms', '/elliptic', '/l_functions', '/p_adic', '/iwasawa', '/langlands', '/collatz'] %}checked{% endif %}>
             <label class="nav-group-label" for="nav-zahlen">Zahlentheorie</label>
             <div class="nav-group-content">
                 <ul class="nav-list">
@@ -231,6 +231,12 @@
                     </a></li>
                     <li><a href="/iwasawa" class="nav-link {% if '/iwasawa' in request.path %}active{% endif %}">
                         &#923; Iwasawa-Theorie
+                    </a></li>
+                    <li><a href="/langlands" class="nav-link {% if request.path == '/langlands' %}active{% endif %}">
+                        &#120131; Langlands-Programm
+                    </a></li>
+                    <li><a href="/collatz" class="nav-link {% if request.path == '/collatz' %}active{% endif %}">
+                        &#8594; Collatz-Visualisierung
                     </a></li>
                 </ul>
             </div>

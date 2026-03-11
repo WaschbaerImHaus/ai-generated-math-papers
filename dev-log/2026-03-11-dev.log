@@ -1,4 +1,24 @@
 
+2026-03-11 19:48 Build 107: Webapp — Langlands-Programm + Collatz-Visualisierung Seiten
+- src/webapp/templates/langlands.html: Neue interaktive Seite für Langlands-Programm
+  - Formular: Primzahl p und Hecke-Eigenwert a_p
+  - Zeigt Satake-Parameter α, β, Discriminante, Ramanujan-Schranke |α|=√p, Typ
+  - Korrespondenztabelle für y² = x³ - x (Leiter N=32, erste 10 Primzahlen)
+- src/webapp/templates/collatz.html: Neue interaktive Seite für Collatz-Visualisierung
+  - Formular: Startzahl n ∈ [1, 10000]
+  - Orbit-Diagramm als Base64-PNG mit Farbverlauf (matplotlib)
+  - Stoppzeiten-Streuplot für n=1..N (Modus B)
+  - Statistik: Stoppzeit, Maximalwert, Orbit-Länge
+- src/webapp/app.py: 4 neue Routen hinzugefügt:
+  - GET /langlands → langlands.html
+  - GET /collatz → collatz.html
+  - POST /api/langlands/local_parameter → Satake-Parameter berechnen
+  - GET /api/langlands/correspondence_table → Tabelle für 10 Primzahlen
+  - POST /api/collatz/orbit → Orbit + Plot (Modus A) oder Stoppzeiten (Modus B)
+  - Import-Block für langlands_program und proof_theory (collatz)
+- src/webapp/templates/base.html: Navigation Zahlentheorie-Gruppe erweitert
+  - /langlands und /collatz als neue Menüpunkte
+
 2026-03-11 07:40 Build 44: Deutsche Papierversionen erstellt
 - paper1_giuga_drei_primfaktoren_de.tex: Deutsche Version des Giuga-3-Prim-Papers
 - paper2_lehmer_drei_primfaktoren_de.tex: Deutsche Version des Lehmer-3-Prim-Papers

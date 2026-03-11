@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %}Collatz-Visualisierung – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file collatz.html
+    @brief Template für die interaktive Collatz-Visualisierungs-Seite.
+    @description
+        Zeigt den Collatz-Orbit als matplotlib-Diagramm (Base64-PNG),
+        Stoppzeit und maximalen Wert. Nutzt /api/collatz/orbit (POST).
+        Eingabe: Startzahl n im Bereich 1–10000.
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    @lastModified 2026-03-11
+-->
+<div class="page-header">
+    <h1>Collatz-Vermutung (3n+1-Problem)</h1>
+    <p class="page-desc">
+        Die <strong>Collatz-Vermutung</strong> (1937) besagt: Für jede positive ganze Zahl $n$
+        erreicht die Folge $f(n) = \frac{n}{2}$ (n gerade) bzw. $f(n) = 3n+1$ (n ungerade)
+        nach endlich vielen Schritten die Zahl $1$. Die Vermutung gilt für alle
+        getesteten Zahlen bis $2^{68}$, ist aber bisher unbewiesen.
+        Die <strong>Stoppzeit</strong> $\sigma(n)$ ist die Anzahl der Schritte bis 1.
+    </p>
+</div>
+
+<!-- === Berechnung 1: Collatz-Orbit === -->
+<div class="card">
+    <h2>Collatz-Orbit berechnen und visualisieren</h2>
+    <p>
+        Gib eine Startzahl $n \in [1, 10000]$ ein. Das Diagramm zeigt die vollständige
+        Folge $(n, f(n), f^2(n), \ldots, 1)$ mit der Stoppzeit $\sigma(n)$ und
+        dem globalen Maximum $\max_k f^k(n)$.
+    </p>
+    <div class="input-row">
+        <label for="cz-n">Startzahl $n$:</label>
+        <input type="number" id="cz-n" class="input-field" value="27" min="1" max="10000" step="1">
+    </div>
+    <button class="btn" onclick="calcCollatzOrbit()">Orbit berechnen &amp; plotten</button>
+    <div id="cz-stats" class="result-area"></div>
+    <div id="cz-plot" style="margin-top:16px; text-align:center;"></div>
+</div>
+
+<!-- === Berechnung 2: Stoppzeit-Vergleich === -->
+<div class="card">
+    <h2>Stoppzeiten $\sigma(n)$ für $n = 1, \ldots, N$ vergleichen</h2>
+    <p>
+        Das Diagramm zeigt alle Stoppzeiten $\sigma(n)$ als Streuplot und
+        identifiziert die Zahl mit der längsten Stoppzeit im Bereich.
+        Rekord bis 10000: $n = 6171$ mit $\sigma = 261$ Schritten.
+    </p>
+    <div class="input-row">
+        <label for="cz-n-max">$N$ (max. 10000):</label>
+        <input type="number" id="cz-n-max" class="input-field" value="200" min="2" max="10000" step="1">
+    </div>
+    <button class="btn" onclick="calcStoppingTimes()">Stoppzeiten berechnen</button>
+    <div id="cz-times-stats" class="result-area"></div>
+    <div id="cz-times-plot" style="margin-top:16px; text-align:center;"></div>
+</div>
+
+<!-- === Info-Box: Mathematischer Hintergrund === -->
+<div class="card">
+    <h2>Mathematischer Hintergrund</h2>
+    <p>
+        <strong>Formale Definition:</strong>
+        $$T(n) = \begin{cases} n/2 & \text{falls } n \equiv 0 \pmod{2} \\ 3n+1 & \text{falls } n \equiv 1 \pmod{2} \end{cases}$$
+    </p>
+    <p>
+        <strong>Stoppzeit:</strong> $\sigma(n) = \min\{k \geq 0 : T^k(n) = 1\}$<br>
+        <strong>Totale Stoppzeit:</strong> $\lambda(n) = \min\{k \geq 0 : T^k(n) &lt; n\}$
+    </p>
+    <p>
+        <strong>Bekannte Rekorde (Stoppzeit):</strong>
+        $n = 27$: $\sigma = 111$, Maximum = $9232$.
+        $n = 6171$: $\sigma = 261$ (Rekord bis 10000).
+    </p>
+    <p>
+        <strong>Ergodische Perspektive:</strong>
+        Nach Tao (2019) gilt die Collatz-Vermutung "fast sicher" in einem maßtheoretischen Sinne:
+        Fast alle Orbits fallen unter jede divergente Funktion.
+    </p>
+    <p>
+        <strong>2-adische Perspektive:</strong>
+        Im 2-adischen Zahlensystem $\mathbb{Z}_2$ lässt sich $T$ als Kontraktion verstehen;
+        der Fixpunkt $1 \leftrightarrow \ldots 111_2$ entspricht dem Orbit-Endpunkt.
+    </p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /**
+     * Berechnet den Collatz-Orbit für eine Startzahl n.
+     * Sendet POST an /api/collatz/orbit und zeigt Plot + Statistiken.
+     */
+    async function calcCollatzOrbit() {
+        const n = parseInt(document.getElementById('cz-n').value);
+        const statsDiv = document.getElementById('cz-stats');
+        const plotDiv  = document.getElementById('cz-plot');
+
+        // Validierung
+        if (n < 1 || n > 10000) {
+            showError(statsDiv, 'n muss im Bereich 1–10000 liegen.');
+            plotDiv.innerHTML = '';
+            return;
+        }
+
+        statsDiv.innerHTML = '<div class="loading">Berechne Orbit...</div>';
+        plotDiv.innerHTML  = '';
+
+        try {
+            const data = await apiPost('/api/collatz/orbit', { n });
+            if (data.error) { showError(statsDiv, data.error); return; }
+
+            // Statistik-Anzeige
+            showResult(statsDiv, `
+                <strong>Collatz-Orbit für $n = ${n}$</strong><br><br>
+                <table style="width:100%; border-collapse:collapse;">
+                    <tr><td style="padding:4px 8px; color:#a6adc8;">Stoppzeit $\\sigma(n)$</td>
+                        <td><code>${data.stopping_time}</code> Schritte</td></tr>
+                    <tr><td style="padding:4px 8px; color:#a6adc8;">Maximaler Wert</td>
+                        <td><code>${data.max_value}</code></td></tr>
+                    <tr><td style="padding:4px 8px; color:#a6adc8;">Orbit-Länge</td>
+                        <td><code>${data.orbit_length}</code> Elemente (inkl. Startzahl und 1)</td></tr>
+                    <tr><td style="padding:4px 8px; color:#a6adc8;">Erste 10 Glieder</td>
+                        <td><code>${data.orbit_preview}</code></td></tr>
+                </table>
+            `);
+
+            // Diagramm anzeigen (Base64-PNG)
+            if (data.plot_b64) {
+                plotDiv.innerHTML = `
+                    <img src="data:image/png;base64,${data.plot_b64}"
+                         alt="Collatz-Orbit für n=${n}"
+                         style="max-width:100%; border-radius:8px; border:1px solid #45475a;">`;
+            }
+        } catch (e) {
+            showError(statsDiv, e.message);
+        }
+    }
+
+    /**
+     * Berechnet die Stoppzeiten für n=1..N und zeigt Streuplot.
+     * Sendet POST an /api/collatz/orbit mit mode='stopping_times'.
+     */
+    async function calcStoppingTimes() {
+        const n_max   = parseInt(document.getElementById('cz-n-max').value);
+        const statsDiv = document.getElementById('cz-times-stats');
+        const plotDiv  = document.getElementById('cz-times-plot');
+
+        if (n_max < 2 || n_max > 10000) {
+            showError(statsDiv, 'N muss im Bereich 2–10000 liegen.');
+            plotDiv.innerHTML = '';
+            return;
+        }
+
+        statsDiv.innerHTML = '<div class="loading">Berechne Stoppzeiten...</div>';
+        plotDiv.innerHTML  = '';
+
+        try {
+            const data = await apiPost('/api/collatz/orbit', { n: 1, n_max });
+            if (data.error) { showError(statsDiv, data.error); return; }
+
+            // Statistik
+            showResult(statsDiv, `
+                <strong>Stoppzeiten $\\sigma(n)$ für $n = 1, \\ldots, ${n_max}$</strong><br><br>
+                <table style="width:100%; border-collapse:collapse;">
+                    <tr><td style="padding:4px 8px; color:#a6adc8;">Max. Stoppzeit</td>
+                        <td><code>${data.max_stopping_time}</code> bei $n = ${data.max_stopping_n}$</td></tr>
+                    <tr><td style="padding:4px 8px; color:#a6adc8;">Mittlere Stoppzeit</td>
+                        <td><code>${data.avg_stopping_time.toFixed(2)}</code></td></tr>
+                </table>
+            `);
+
+            // Diagramm
+            if (data.plot_b64) {
+                plotDiv.innerHTML = `
+                    <img src="data:image/png;base64,${data.plot_b64}"
+                         alt="Stoppzeiten für n=1..${n_max}"
+                         style="max-width:100%; border-radius:8px; border:1px solid #45475a;">`;
+            }
+        } catch (e) {
+            showError(statsDiv, e.message);
+        }
+    }
+</script>
+{% endblock %}

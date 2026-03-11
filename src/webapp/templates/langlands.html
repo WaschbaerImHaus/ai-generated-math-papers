@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block title %}Langlands-Programm – Mathematik-Spezialist{% endblock %}
+
+{% block content %}
+<!--
+    @file langlands.html
+    @brief Template für die interaktive Langlands-Programm-Seite.
+    @description
+        Zeigt lokale Langlands-Parameter (Satake-Parameter α, β),
+        Ramanujan-Schranken und eine Korrespondenztabelle für die
+        ersten 10 Primzahlen. Nutzt /api/langlands/local_parameter
+        und /api/langlands/correspondence_table.
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    @lastModified 2026-03-11
+-->
+<div class="page-header">
+    <h1>Langlands-Programm</h1>
+    <p class="page-desc">
+        Das Langlands-Programm verbindet Zahlentheorie (Galois-Darstellungen),
+        automorphe Formen (Modulformen auf $\mathrm{GL}_n$) und
+        Darstellungstheorie. Zentrale Aussage: Für jede elliptische Kurve $E/\mathbb{Q}$
+        gibt es eine Modulform $f \in S_2(\Gamma_0(N))$ mit gleichen
+        Hecke-Eigenwerten $a_p = p+1-\#E(\mathbb{F}_p)$ (Modularitätssatz).
+        Die lokalen Satake-Parameter $\alpha_p, \beta_p$ erfüllen
+        $\alpha_p + \beta_p = a_p$, $\alpha_p \cdot \beta_p = p$
+        und die Ramanujan-Vermutung $|\alpha_p| = \sqrt{p}$.
+    </p>
+</div>
+
+<!-- === Berechnung 1: Lokaler Langlands-Parameter === -->
+<div class="card">
+    <h2>Lokaler Langlands-Parameter</h2>
+    <p>
+        Gegeben eine Primzahl $p$ und den Hecke-Eigenwert $a_p$ (Frobenius-Spur),
+        berechnet sich das charakteristische Polynom der Satake-Parameter als
+        $X^2 - a_p X + p = 0$. Die Diskriminante $\Delta = a_p^2 - 4p$ bestimmt
+        den Typ der lokalen Darstellung.
+    </p>
+    <div class="input-row">
+        <label for="lp-p">Primzahl $p$:</label>
+        <input type="number" id="lp-p" class="input-field" value="7" min="2" step="1">
+    </div>
+    <div class="input-row">
+        <label for="lp-ap">Hecke-Eigenwert $a_p$:</label>
+        <input type="number" id="lp-ap" class="input-field" value="0" step="1">
+    </div>
+    <button class="btn" onclick="calcLocalParam()">Parameter berechnen</button>
+    <div id="lp-result" class="result-area"></div>
+</div>
+
+<!-- === Berechnung 2: Korrespondenztabelle === -->
+<div class="card">
+    <h2>Langlands-Korrespondenztabelle für $E\!: y^2 = x^3 - x$ (Leiter $N=32$)</h2>
+    <p>
+        Für die elliptische Kurve $y^2 = x^3 - x$ sind die $a_p$-Koeffizienten bekannt:
+        $p \equiv 3 \pmod{4}$: $a_p = 0$; $p \equiv 1 \pmod{4}$: $a_p = 2\operatorname{Re}(\pi_p)$
+        mit $\pi_p \in \mathbb{Z}[i]$, $\pi_p \bar\pi_p = p$, $\pi_p \equiv 1 \pmod{(1+i)^3}$.
+        Die Tabelle zeigt die Satake-Parameter $\alpha_p, \beta_p$ und prüft
+        die Ramanujan-Petersson-Vermutung $|\alpha_p| = \sqrt{p}$.
+    </p>
+    <button class="btn" onclick="loadCorrespondenceTable()">Tabelle laden</button>
+    <div id="ct-result" class="result-area"></div>
+</div>
+
+<!-- === Info-Box: Mathematischer Hintergrund === -->
+<div class="card">
+    <h2>Mathematischer Hintergrund</h2>
+    <p>
+        <strong>Satake-Isomorphismus:</strong>
+        Für $G = \mathrm{GL}_2(\mathbb{Q}_p)$, $K = \mathrm{GL}_2(\mathbb{Z}_p)$
+        gilt $\mathcal{H}(G\mathbin{/\!/}K) \cong \mathbb{C}[\alpha_p^{\pm 1}, \beta_p^{\pm 1}]^{S_2}$.
+    </p>
+    <p>
+        <strong>Typ der Darstellung</strong> (abhängig von $\Delta = a_p^2 - 4p$):
+    </p>
+    <ul>
+        <li><strong>Elliptisch</strong> ($\Delta < 0$): $\alpha_p, \beta_p \in \mathbb{C} \setminus \mathbb{R}$,
+            $|\alpha_p| = \sqrt{p}$ (Ramanujan erfüllt)</li>
+        <li><strong>Parabolisch</strong> ($\Delta = 0$): $\alpha_p = \beta_p \in \mathbb{R}$
+            (ramifiziert, Sonderfall)</li>
+        <li><strong>Hyperbolisch</strong> ($\Delta > 0$): $\alpha_p, \beta_p \in \mathbb{R}$
+            (schlechte Reduktion, unramifiziert)</li>
+    </ul>
+    <p>
+        <strong>Funktionalgleichung:</strong>
+        $\Lambda(\pi, s) = \varepsilon(\pi) \cdot \Lambda(\check\pi, 1-s)$,
+        wobei $\varepsilon(\pi, s) = \varepsilon(\pi, \tfrac{1}{2}) \cdot N^{\tfrac{1}{2}-s}$.
+    </p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /**
+     * Berechnet den lokalen Langlands-Parameter für (p, a_p).
+     * Sendet POST an /api/langlands/local_parameter.
+     */
+    async function calcLocalParam() {
+        const p = parseInt(document.getElementById('lp-p').value);
+        const a_p = parseFloat(document.getElementById('lp-ap').value);
+        const res = document.getElementById('lp-result');
+        res.innerHTML = '<div class="loading">Berechne...</div>';
+
+        try {
+            const data = await apiPost('/api/langlands/local_parameter', { p, a_p });
+            if (data.error) { showError(res, data.error); return; }
+
+            // Satake-Parameter formatieren
+            const alphaStr = `${data.alpha_re.toFixed(6)} + ${data.alpha_im.toFixed(6)}i`;
+            const betaStr  = `${data.beta_re.toFixed(6)} - ${data.beta_im.toFixed(6)}i`;
+            const sqrtP    = Math.sqrt(p).toFixed(6);
+            const ramIcon  = data.ramanujan_satisfied ? '&#10003; Ja' : '&#10007; Nein';
+            const ramClass = data.ramanujan_satisfied ? 'color:#a6e3a1' : 'color:#f38ba8';
+
+            showResult(res, `
+                <strong>Lokaler Langlands-Parameter für $p=${p}$, $a_p=${a_p}$</strong><br><br>
+                <table style="width:100%; border-collapse:collapse;">
+                    <tr><td style="padding:4px 8px; color:#a6adc8;">Diskriminante $\\Delta = a_p^2 - 4p$</td>
+                        <td><code>${data.discriminant.toFixed(4)}</code></td></tr>
+                    <tr><td style="padding:4px 8px; color:#a6adc8;">Typ</td>
+                        <td><code>${data.type}</code></td></tr>
+                    <tr><td style="padding:4px 8px; color:#a6adc8;">$\\alpha_p$</td>
+                        <td><code>${alphaStr}</code></td></tr>
+                    <tr><td style="padding:4px 8px; color:#a6adc8;">$\\beta_p$</td>
+                        <td><code>${betaStr}</code></td></tr>
+                    <tr><td style="padding:4px 8px; color:#a6adc8;">$|\\alpha_p|$</td>
+                        <td><code>${data.alpha_abs.toFixed(8)}</code></td></tr>
+                    <tr><td style="padding:4px 8px; color:#a6adc8;">$\\sqrt{p}$ (Ramanujan-Schranke)</td>
+                        <td><code>${sqrtP}</code></td></tr>
+                    <tr><td style="padding:4px 8px; color:#a6adc8;">Ramanujan-Vermutung erfüllt?</td>
+                        <td style="${ramClass}"><strong>${ramIcon}</strong></td></tr>
+                </table>
+            `);
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+
+    /**
+     * Lädt die Langlands-Korrespondenztabelle für die ersten 10 Primzahlen.
+     * Sendet GET an /api/langlands/correspondence_table.
+     */
+    async function loadCorrespondenceTable() {
+        const res = document.getElementById('ct-result');
+        res.innerHTML = '<div class="loading">Lade Tabelle...</div>';
+
+        try {
+            const response = await fetch('/api/langlands/correspondence_table');
+            const data = await response.json();
+            if (data.error) { showError(res, data.error); return; }
+
+            // Tabellenzeilen bauen
+            let rows = '';
+            for (const row of data.table) {
+                const ramIcon = row.ramanujan ? '&#10003;' : '&#10007;';
+                const ramColor = row.ramanujan ? '#a6e3a1' : '#f38ba8';
+                rows += `
+                    <tr>
+                        <td style="text-align:center;">${row.p}</td>
+                        <td style="text-align:center;">${row.a_p}</td>
+                        <td><code>${row.alpha_re.toFixed(4)}+${row.alpha_im.toFixed(4)}i</code></td>
+                        <td><code>${row.beta_re.toFixed(4)}-${row.beta_im.toFixed(4)}i</code></td>
+                        <td style="text-align:center;"><code>${row.alpha_abs.toFixed(4)}</code></td>
+                        <td style="text-align:center;"><code>${row.sqrt_p.toFixed(4)}</code></td>
+                        <td style="text-align:center; color:${ramColor};">${ramIcon}</td>
+                        <td style="text-align:center; font-size:0.8em;">${row.type}</td>
+                    </tr>`;
+            }
+
+            res.innerHTML = `<div class="result-success">
+                <strong>Langlands-Korrespondenztabelle ($y^2 = x^3 - x$, $N=32$)</strong><br><br>
+                <div style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:0.9em;">
+                    <thead>
+                        <tr style="background:#313244; color:#cdd6f4;">
+                            <th style="padding:6px 8px;">$p$</th>
+                            <th style="padding:6px 8px;">$a_p$</th>
+                            <th style="padding:6px 8px;">$\\alpha_p$</th>
+                            <th style="padding:6px 8px;">$\\beta_p$</th>
+                            <th style="padding:6px 8px;">$|\\alpha_p|$</th>
+                            <th style="padding:6px 8px;">$\\sqrt{p}$</th>
+                            <th style="padding:6px 8px;">Ramanujan</th>
+                            <th style="padding:6px 8px;">Typ</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color:#cdd6f4;">
+                        ${rows}
+                    </tbody>
+                </table>
+                </div>
+            </div>`;
+
+            // KaTeX neu rendern
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(res, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        } catch (e) {
+            showError(res, e.message);
+        }
+    }
+</script>
+{% endblock %}

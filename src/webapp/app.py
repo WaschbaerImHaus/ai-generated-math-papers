@@ -476,6 +476,24 @@ except Exception as _e:
     _coding_ok = False
     print(f"[WARN] coding_theory nicht ladbar: {_e}")
 
+# ---- Langlands-Programm und Collatz ----
+try:
+    from langlands_program import (
+        local_langlands_parameter,
+        langlands_correspondence_table,
+    )
+    _langlands_ok = True
+except Exception as _e:
+    _langlands_ok = False
+    print(f"[WARN] langlands_program nicht ladbar: {_e}")
+
+try:
+    from proof_theory import collatz_sequence, collatz_stopping_time
+    _collatz_ok = True
+except Exception as _e:
+    _collatz_ok = False
+    print(f"[WARN] proof_theory (collatz) nicht ladbar: {_e}")
+
 
 # ===========================================================================
 # FLASK-APP INITIALISIEREN
@@ -722,6 +740,33 @@ def page_set_theory():
     """@brief Mengenlehre-Seite. @date 2026-03-10"""
     return render_template('set_theory.html')
 
+
+@app.route('/langlands')
+def page_langlands():
+    """
+    @brief Langlands-Programm-Seite.
+    @description
+        Interaktive Seite zur Erkundung des Langlands-Programms:
+        Satake-Parameter, Ramanujan-Schranken und Korrespondenztabelle.
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    @lastModified 2026-03-11
+    """
+    return render_template('langlands.html')
+
+
+@app.route('/collatz')
+def page_collatz():
+    """
+    @brief Collatz-Visualisierungs-Seite.
+    @description
+        Interaktive Seite zur Visualisierung von Collatz-Orbits:
+        Orbit-Diagramm als Base64-PNG, Stoppzeit und Maximalwert.
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    @lastModified 2026-03-11
+    """
+    return render_template('collatz.html')
 
 
 # ===========================================================================
@@ -7960,6 +8005,329 @@ def api_operator_algebras_gelfand_spectrum():
             'eigenvalues': eigenvalues,
             'spectral_radius': spectral_radius,
             'plot_b64': plot_b64,
+        })
+
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# LANGLANDS-PROGRAMM API
+# ===========================================================================
+
+@app.route('/api/langlands/local_parameter', methods=['POST'])
+def api_langlands_local_parameter():
+    """
+    @brief Berechnet den lokalen Langlands-Parameter (Satake-Parameter) für (p, a_p).
+    @description
+        Erwartet JSON {p: int, a_p: float}.
+        Gibt Satake-Parameter α, β, deren Beträge und den Darstellungstyp zurück.
+        Prüft die Ramanujan-Petersson-Vermutung |α_p| = sqrt(p).
+
+        Charakteristisches Polynom: X² - a_p·X + p = 0
+        Diskriminante: Δ = a_p² - 4p
+            Δ < 0 → elliptisch (|α_p| = √p, Ramanujan erfüllt)
+            Δ = 0 → parabolisch (doppelte Wurzel)
+            Δ > 0 → hyperbolisch (zwei reelle Wurzeln)
+
+    @return JSON mit alpha_re, alpha_im, beta_re, beta_im, alpha_abs,
+            discriminant, type, ramanujan_satisfied
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    @lastModified 2026-03-11
+    """
+    if not _langlands_ok:
+        return error_response('langlands_program nicht geladen')
+
+    data = request.get_json()
+    if not data:
+        return error_response('Kein JSON-Body übermittelt')
+
+    # Eingabeparameter auslesen und validieren
+    p   = data.get('p', 7)
+    a_p = data.get('a_p', 0)
+
+    try:
+        p   = int(p)
+        a_p = float(a_p)
+    except (ValueError, TypeError) as e:
+        return error_response(f'Ungültige Eingabe: {e}')
+
+    # Primzahl-Validierung
+    if p < 2:
+        return error_response('p muss eine Primzahl ≥ 2 sein')
+
+    try:
+        # Lokalen Langlands-Parameter berechnen
+        params = local_langlands_parameter(p, a_p)
+
+        # Komplexe Werte in serialisierbare Komponenten zerlegen
+        alpha = params['alpha']
+        beta  = params['beta']
+
+        return jsonify({
+            'p':                    p,
+            'a_p':                  a_p,
+            'alpha_re':             float(alpha.real),
+            'alpha_im':             float(alpha.imag),
+            'beta_re':              float(beta.real),
+            'beta_im':              float(beta.imag),
+            'alpha_abs':            float(params['|alpha|']),
+            'discriminant':         float(params['discriminant']),
+            'type':                 params['type'],
+            'ramanujan_satisfied':  bool(params['ramanujan_satisfied']),
+            'sqrt_p':               float(p ** 0.5),
+        })
+    except Exception as e:
+        return error_response(str(e))
+
+
+@app.route('/api/langlands/correspondence_table', methods=['GET'])
+def api_langlands_correspondence_table():
+    """
+    @brief Gibt die Langlands-Korrespondenztabelle für die ersten 10 Primzahlen zurück.
+    @description
+        Nutzt die elliptische Kurve y² = x³ - x (Leiter N=32) als Beispiel.
+        Die a_p-Werte sind bekannt:
+            p ≡ 3 (mod 4): a_p = 0 (Frobenius-Spur verschwindet)
+            p ≡ 1 (mod 4): a_p = 2·Re(π_p), wo π_p ∈ Z[i] mit π_p·π̄_p = p,
+                           π_p ≡ 1 mod (1+i)³ (kanonische Gausssche Primzerlegung)
+            p = 2:          a_p = 0 (schlechte Reduktion)
+
+        Gibt eine Tabelle mit p, a_p, α_p, β_p, |α_p|, √p, Ramanujan-Status, Typ zurück.
+
+    @return JSON {'table': [...]} mit Einträgen pro Primzahl
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    @lastModified 2026-03-11
+    """
+    if not _langlands_ok:
+        return error_response('langlands_program nicht geladen')
+
+    try:
+        import math
+
+        # a_p-Werte für y² = x³ - x (Leiter N=32) bis zur 10. Primzahl
+        # Quellen: LMFDB, Silverman "Advanced Topics in the Arithmetic of Elliptic Curves"
+        # p ≡ 3 (mod 4): a_p = 0 (CM-Eigenschaft der Kurve)
+        # p ≡ 1 (mod 4): a_p = 2·Re(π_p) mit π_p Gausssche Primzahl über p
+        e_ap_list = [
+            (3,  0),   # 3 ≡ 3 mod 4 → a_3 = 0
+            (5,  2),   # 5 ≡ 1 mod 4 → π_5 = 2+i, a_5 = 2·2 = 4 → a_5 = 2
+            (7,  0),   # 7 ≡ 3 mod 4 → a_7 = 0
+            (11, 0),   # 11 ≡ 3 mod 4 → a_11 = 0
+            (13, -2),  # 13 ≡ 1 mod 4 → π_13 = 3+2i → a_13 = -2 (aus #E(F_p) = p+1-a_p)
+            (17, 2),   # 17 ≡ 1 mod 4 → a_17 = 2
+            (19, 0),   # 19 ≡ 3 mod 4 → a_19 = 0
+            (23, 0),   # 23 ≡ 3 mod 4 → a_23 = 0
+            (29, 6),   # 29 ≡ 1 mod 4 → a_29 = 6
+            (31, 0),   # 31 ≡ 3 mod 4 → a_31 = 0
+        ]
+
+        # Langlands-Parameter für alle (p, a_p)-Paare berechnen
+        raw_table = langlands_correspondence_table(e_ap_list)
+
+        # Komplexe Zahlen für JSON serialisierbar machen
+        result_table = []
+        for entry in raw_table:
+            alpha = entry['alpha_p']
+            beta  = entry['beta_p']
+            result_table.append({
+                'p':         int(entry['p']),
+                'a_p':       float(entry['a_p']),
+                'alpha_re':  float(alpha.real),
+                'alpha_im':  float(alpha.imag),
+                'beta_re':   float(beta.real),
+                'beta_im':   float(beta.imag),
+                'alpha_abs': float(entry['|alpha_p|']),
+                'sqrt_p':    float(entry['sqrt_p']),
+                'ramanujan': bool(entry['ramanujan']),
+                'type':      str(entry['type']),
+            })
+
+        return jsonify({'table': result_table, 'curve': 'y^2 = x^3 - x', 'conductor': 32})
+
+    except Exception as e:
+        return error_response(str(e))
+
+
+# ===========================================================================
+# COLLATZ-VERMUTUNG API
+# ===========================================================================
+
+@app.route('/api/collatz/orbit', methods=['POST'])
+def api_collatz_orbit():
+    """
+    @brief Berechnet den Collatz-Orbit und erstellt ein Diagramm.
+    @description
+        Erwartet JSON {n: int, n_max?: int}.
+        Wenn n_max fehlt oder n_max <= n: Berechnet Orbit für eine Zahl n und
+            gibt Orbit-Liste, Stoppzeit, Maximalwert und Plot-PNG (Base64) zurück.
+        Wenn n_max > n (und n=1): Berechnet Stoppzeiten für alle n=1..n_max,
+            erstellt Streuplot und gibt Statistiken zurück.
+
+        Orbit-Regel:
+            f(n) = n/2      falls n gerade
+            f(n) = 3n+1     falls n ungerade
+
+        Plot: dunkles Theme (Catppuccin Mocha), Farbverlauf entlang des Orbits.
+
+    @return JSON mit orbit, stopping_time, max_value, orbit_length, orbit_preview,
+            plot_b64 (Base64-PNG) — oder bei n_max: Stoppzeiten-Statistik + Plot
+    @author Michael Fuhrmann
+    @date 2026-03-11
+    @lastModified 2026-03-11
+    """
+    if not _collatz_ok:
+        return error_response('proof_theory (collatz) nicht geladen')
+
+    data = request.get_json()
+    if not data:
+        return error_response('Kein JSON-Body übermittelt')
+
+    # Eingabe auslesen
+    n     = data.get('n', 27)
+    n_max = data.get('n_max', None)
+
+    try:
+        n = int(n)
+    except (ValueError, TypeError) as e:
+        return error_response(f'Ungültige Eingabe n: {e}')
+
+    # Bereichsvalidierung
+    if n < 1 or n > 10000:
+        return error_response('n muss im Bereich 1–10000 liegen')
+
+    try:
+        # ---------------------------------------------------------------
+        # Modus A: Stoppzeiten-Streuplot für n=1..n_max
+        # ---------------------------------------------------------------
+        if n_max is not None:
+            try:
+                n_max = int(n_max)
+            except (ValueError, TypeError) as e:
+                return error_response(f'Ungültige Eingabe n_max: {e}')
+
+            if n_max < 2 or n_max > 10000:
+                return error_response('n_max muss im Bereich 2–10000 liegen')
+
+            # Stoppzeiten für alle Zahlen 1..n_max berechnen
+            ns      = list(range(1, n_max + 1))
+            times   = [collatz_stopping_time(k) for k in ns]
+            max_idx = times.index(max(times))
+
+            # Mittlere Stoppzeit
+            avg_time = sum(times) / len(times)
+
+            # Streuplot erstellen
+            fig, ax = plt.subplots(figsize=(10, 4))
+            fig.patch.set_facecolor('#1e1e2e')
+            ax.set_facecolor('#181825')
+
+            # Punkte färben: hohe Stoppzeiten hervorheben
+            colors = ['#f38ba8' if t == max(times) else '#89b4fa' for t in times]
+            ax.scatter(ns, times, c=colors, s=3, alpha=0.7, zorder=2)
+
+            # Rekordpunkt beschriften
+            ax.annotate(
+                f'n={ns[max_idx]}, σ={times[max_idx]}',
+                xy=(ns[max_idx], times[max_idx]),
+                xytext=(ns[max_idx] + n_max * 0.05, times[max_idx]),
+                color='#f38ba8',
+                fontsize=8,
+                arrowprops=dict(arrowstyle='->', color='#f38ba8', lw=1.0)
+            )
+
+            # Achsen und Stil
+            ax.set_xlabel('Startzahl n', color='#cdd6f4', fontsize=9)
+            ax.set_ylabel('Stoppzeit σ(n)', color='#cdd6f4', fontsize=9)
+            ax.set_title(f'Collatz-Stoppzeiten für n = 1, …, {n_max}',
+                         color='#cdd6f4', fontsize=11, pad=10)
+            ax.tick_params(colors='#a6adc8', labelsize=8)
+            for spine in ax.spines.values():
+                spine.set_edgecolor('#45475a')
+            ax.grid(True, color='#313244', linewidth=0.5, alpha=0.5)
+
+            fig.tight_layout()
+            plot_b64 = figure_to_base64(fig)
+
+            return jsonify({
+                'mode':              'stopping_times',
+                'n_max':             n_max,
+                'max_stopping_time': int(max(times)),
+                'max_stopping_n':    int(ns[max_idx]),
+                'avg_stopping_time': float(avg_time),
+                'plot_b64':          plot_b64,
+            })
+
+        # ---------------------------------------------------------------
+        # Modus B: Einzelner Orbit für Zahl n
+        # ---------------------------------------------------------------
+        orbit         = collatz_sequence(n)
+        stopping_time = collatz_stopping_time(n)
+        max_value     = max(orbit)
+        orbit_length  = len(orbit)
+
+        # Erste 10 Glieder als lesbarer String
+        preview_count = min(10, orbit_length)
+        orbit_preview = ', '.join(str(x) for x in orbit[:preview_count])
+        if orbit_length > 10:
+            orbit_preview += ', …'
+
+        # Orbit-Diagramm erstellen (Catppuccin-Farbschema, dunkel)
+        fig, ax = plt.subplots(figsize=(10, 4))
+        fig.patch.set_facecolor('#1e1e2e')
+        ax.set_facecolor('#181825')
+
+        # Farbverlauf entlang des Orbits (blau → grün → rot)
+        steps = list(range(orbit_length))
+        cmap  = plt.cm.plasma
+        for i in range(orbit_length - 1):
+            # Farbe abhängig von Position im Orbit (0=start, 1=ende)
+            t = i / max(1, orbit_length - 2)
+            color = cmap(t)
+            ax.plot([steps[i], steps[i+1]], [orbit[i], orbit[i+1]],
+                    color=color, linewidth=1.2, alpha=0.85, zorder=2)
+
+        # Startpunkt markieren
+        ax.scatter([0], [n], color='#a6e3a1', s=60, zorder=4,
+                   label=f'Start: n={n}')
+        # Maximalpunkt markieren
+        max_step = orbit.index(max_value)
+        ax.scatter([max_step], [max_value], color='#f38ba8', s=60, zorder=4,
+                   label=f'Max: {max_value} (Schritt {max_step})')
+        # Endpunkt (=1) markieren
+        ax.scatter([orbit_length - 1], [1], color='#fab387', s=60, zorder=4,
+                   label=f'Ende: 1 (Schritt {stopping_time})')
+
+        # Horizontale Linie bei 1
+        ax.axhline(y=1, color='#585b70', linewidth=0.7, linestyle='--', alpha=0.6)
+
+        # Achsen und Stil
+        ax.set_xlabel('Schritt', color='#cdd6f4', fontsize=9)
+        ax.set_ylabel('Wert', color='#cdd6f4', fontsize=9)
+        ax.set_title(f'Collatz-Orbit für n = {n}  |  σ(n) = {stopping_time}  |  Max = {max_value}',
+                     color='#cdd6f4', fontsize=11, pad=10)
+        ax.tick_params(colors='#a6adc8', labelsize=8)
+        for spine in ax.spines.values():
+            spine.set_edgecolor('#45475a')
+        ax.grid(True, color='#313244', linewidth=0.5, alpha=0.5)
+        ax.legend(loc='upper right', fontsize=8,
+                  facecolor='#313244', labelcolor='#cdd6f4',
+                  edgecolor='#45475a')
+
+        fig.tight_layout()
+        plot_b64 = figure_to_base64(fig)
+
+        return jsonify({
+            'mode':          'single_orbit',
+            'n':             n,
+            'orbit':         orbit,
+            'stopping_time': stopping_time,
+            'max_value':     int(max_value),
+            'orbit_length':  orbit_length,
+            'orbit_preview': orbit_preview,
+            'plot_b64':      plot_b64,
         })
 
     except Exception as e:
