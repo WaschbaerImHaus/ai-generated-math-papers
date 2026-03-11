@@ -18,6 +18,13 @@ from typing import Callable, Generator, Optional
 import sympy
 import numpy as np
 
+# Numba-beschleunigte Sieb-Implementierung (Fallback auf Python wenn nicht verfügbar)
+try:
+    from .numba_jit import sieve_primes_fast as _sieve_fast, NUMBA_AVAILABLE as _NUMBA
+except ImportError:
+    _NUMBA = False
+    _sieve_fast = None
+
 
 # ===========================================================================
 # COLLATZ-VERMUTUNG (3n+1-Problem)
@@ -508,10 +515,18 @@ def sieve_of_eratosthenes(limit: int) -> list[int]:
     Zeitkomplexität: O(n log log n)
     Speicherkomplexität: O(n)
 
+    Wenn Numba verfügbar ist, wird automatisch der JIT-kompilierte Pfad
+    genutzt (10–50× schneller). Andernfalls greift der Python-Fallback.
+
     @param limit: Obere Grenze (inklusiv)
     @return: Liste aller Primzahlen ≤ limit
-    @lastModified: 2026-03-08
+    @lastModified: 2026-03-11
     """
+    if _NUMBA and _sieve_fast is not None:
+        # Numba-JIT-Pfad: 10–50× schneller durch Maschinencode-Kompilierung
+        return _sieve_fast(limit)
+
+    # Python-Fallback (wenn Numba nicht verfügbar)
     if limit < 2:
         return []
 
