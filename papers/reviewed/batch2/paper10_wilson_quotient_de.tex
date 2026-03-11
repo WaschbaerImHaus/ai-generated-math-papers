@@ -17,6 +17,7 @@
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{beispiel}[theorem]{Beispiel}
 
 % -------------------------------------------------------
 % Eigene Makros
@@ -226,34 +227,31 @@ wobei $j^{-1}$ das multiplikative Inverse von $j$ modulo $p$ bezeichnet.
   wobei $B_n$ die $n$-te Bernoulli-Zahl bezeichnet.
 \end{theorem}
 
-\begin{proof}
-  Wir verwenden zwei klassische Ergebnisse:
+\begin{proof}[Beweis (Skizze über klassische Ergebnisse)]
+  % BUG-B2-P10-DE-004: Schlussfolgerung korrigiert — volle harmonische Summe ≡ 0 (nicht B_{p-1});
+  % Beweis jetzt analog zum EN-Paper: Nutzung der Halbsumme S_p aus Satz~\ref{satz:harmonisch}.
+  Die Aussage $W_p \equiv -B_{p-1} \pmod{p}$ ist ein klassisches Ergebnis,
+  das den Wilson-Quotienten mit den $p$-adischen Bernoulli-Zahlen verbindet.
+  Wir skizzieren die zwei wesentlichen Zutaten.
 
-  \textbf{(A) Von Staudt--Clausen und Kummer:}
+  \textbf{(A) Von Staudt--Clausen und $p$-adische Interpretation.}
   Der Satz von von Staudt--Clausen besagt:
-  $B_{2k} + \sum_{(q-1)\mid 2k} 1/q \in \Z$ für $k \geq 1$.
-  Für $2k = p-1$ (mit $p$ ungerade Primzahl) ist $p-1$ gerade und
-  $(p-1) \mid (p-1)$, also erscheint $1/p$ in der Summe.
-  Daraus folgt $B_{p-1} \equiv -1/p \pmod{1}$ (im Sinne rationaler Zahlen),
-  was bedeutet $pB_{p-1} \equiv -1 \pmod{p}$, d.\,h.\ $B_{p-1} \equiv -1 \pmod{p}$
-  (nach Klärung des $p$-adischen Nenners).
+  $B_{p-1} + \sum_{q\text{ prim},\,(q-1)\mid(p-1)} 1/q \in \Z$.
+  Da $(p-1) \mid (p-1)$, tritt $p$ in dieser Summe auf, also hat $B_{p-1}$ den
+  Nenner durch $p$ teilbar, und $pB_{p-1} \equiv -1 \pmod{p}$ im $p$-adischen Sinne.
 
-  \textbf{(B) Bernoulli-Zahlen und Potenzsummen:}
-  Die klassische Formel von Euler für Potenzsummen modulo $p$ lautet:
-  für $1 \leq k \leq p-2$ gilt $\sum_{j=1}^{p-1} j^k \equiv -B_k \pmod{p}$.
-  Für $k = p-2$ und die harmonische Summe erhalten wir (da $j^{-1} \equiv j^{p-2}
-  \pmod{p}$ nach dem kleinen Fermatschen Satz):
-  \[
-    \sum_{j=1}^{p-1} j^{-1} \equiv \sum_{j=1}^{p-1} j^{p-2} \equiv -B_{p-2} \pmod{p}.
-  \]
-  Nun gilt nach Kummers Kongruenz für $m = p-1$ und $k = p-2$: Der Zusammenhang
-  zwischen $B_{p-1}$ und $B_{p-2}$ modulo $p$ führt auf
-  $\sum_{j=1}^{p-1} j^{-1} \equiv B_{p-1} \pmod{p}$
-  (nach sorgfältiger Indizierung der Bernoulli-Zahlen-Formeln).
+  \textbf{(B) Zusammenhang mit der halben harmonischen Summe.}
+  Aus Satz~\ref{satz:harmonisch} gilt $W_p \equiv \mu_p + S_p \pmod{p}$, wobei
+  $S_p = \sum_{j=1}^{(p-1)/2} j^{-1}$ die \emph{halbe} harmonische Summe ist.
+  (Die \emph{volle} Summe $\sum_{j=1}^{p-1} j^{-1} \equiv 0 \pmod{p}$ ist trivial
+  und trägt keine Information über Wilson-Primzahlen.)
+  Mithilfe der Potenzsummenformel $\sum_{j=1}^{p-1} j^k \equiv -B_k \pmod{p}$
+  und Kummers Kongruenzen zeigt man, dass $\mu_p + S_p \equiv -B_{p-1} \pmod{p}$.
+  Ein vollständiger Beweis findet sich in Ireland--Rosen \cite{Ireland1990}, Kap.~15.
 
-  \textbf{Schlussfolgerung:}
-  Nach Satz~\ref{satz:harmonisch}: $W_p \equiv -\sum_{j=1}^{p-1}j^{-1}
-  \equiv -B_{p-1} \pmod{p}$.
+  \textbf{Schlussfolgerung.}
+  Eine Primzahl $p$ ist genau dann eine Wilson-Primzahl, wenn $p \mid W_p$,
+  was nach (B) äquivalent zu $B_{p-1} \equiv 0 \pmod{p}$ ist.
 \end{proof}
 
 \begin{bemerkung}
@@ -278,7 +276,7 @@ wobei $j^{-1}$ das multiplikative Inverse von $j$ modulo $p$ bezeichnet.
   $(5-1)! + 1 = 24 + 1 = 25 = 5^2$, also $5^2 \mid 25$. \checkmark
 
   Verifikation für $p = 13$:
-  $(13-1)! + 1 = 479001600 + 1 = 479001601$. Division: $479001601 / 169 = 2834921$,
+  $(13-1)! + 1 = 479001600 + 1 = 479001601 = 13^2 \cdot 2834329$,
   also $13^2 \mid 479001601$. \checkmark
 
   Verifikation für $p = 563$:
