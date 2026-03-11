@@ -511,3 +511,14 @@ Technische Details:
   - Paper 28 DE: Tunnell C(n) 8x²+2y²+16z²→4x²+y²+8z², D(n) 8x²+2y²+64z²→4x²+y²+32z² (kritischer Fehler behoben)
   - Paper 28 EN: Nagell-Lutz y₀²|-4n⁶ → y₀²|4n⁶ (Betrag genommen, Division durch Negatives vermieden)
   - Alle anderen gemeldeten Bugs (Paper 18 EN/DE Vorzeichen, Paper 18 DE Fallunterscheidung, Paper 20 Tabelle, Paper 19 Querverweise, Paper 27 DE Verifikationsaussage) waren bereits behoben
+
+2026-03-11 Build 96: Vollständiger Review Papers 18–28 + Bugfixes
+  - Paper 18 EN+DE: c₂(n)=e^{πin} → c₂(n)=(-1)^n (klarer Ausdruck)
+  - Paper 20 EN: c₂(n)=2-1 → c₂(n)=(-1)^n=1 (korrekte Begründung)
+  - Paper 20 DE: c₂(n)=1 (da n≡0 mod 2) → c₂(n)=(-1)^n=1 (klar)
+  - Paper 23 EN: Perron-Formel "not an integer" → "not a prime power"
+  - Paper 23 DE: ψ(x)-Definition dritte Form Σ_p ⌊log_p x⌋·log p ergänzt
+  - Paper 25 EN: j=1728 Doppeleintrag bereinigt
+  - Paper 28 EN: ab/2-Beweis schrittweise Herleitung präzisiert
+  - Papers 21,22,24,26,27: druckreif ohne Änderungen
+  - reviews/review_papers18_28_2026_03_11.md erstellt
