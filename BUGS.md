@@ -178,6 +178,21 @@ _(keine bekannten Bugs)_
 - **Problem**: `≥ 1·(p-1) - 1 = p-2 ≥ 1` war zu schwach
 - **Behoben**: Auf `≥ 1 \cdot p - 1 = p-1 \ge 2 > 0` verschärft
 
+### BUG-B1-P2-EN-001 (Build 116, Review Batch 1): paper2 EN — Acknowledgements fehlte
+- **Datei**: papers/reviewed/batch1/paper2_lehmer_three_primes.tex
+- **Problem**: DE-Version hatte \section*{Danksagung}, EN-Version fehlte entsprechende \section*{Acknowledgements}
+- **Behoben**: Acknowledgements-Section vor Bibliographie eingefügt
+
+### BUG-B1-P2-DE-002 (Build 116, Review Batch 1): paper2 DE — Falscher Divisor in Lemma lem:grenze_q
+- **Datei**: papers/reviewed/batch1/paper2_lehmer_drei_primfaktoren_de.tex
+- **Problem**: Schritt 3 benutzte "(p-1)(q-1) | (p+q-1)+k" statt des korrekten "A=(p-1)(q-1)/D | (p+q-1)+k" mit D=gcd(r-1,(p-1)(q-1))
+- **Behoben**: D und A=(p-1)(q-1)/D eingeführt; Spezialfall D=1 für Schranke explizit benannt
+
+### BUG-B1-P5-DE-001 (Build 116, Review Batch 1): paper5 DE — Grammatikfehler im Titel
+- **Datei**: papers/reviewed/batch1/paper5_giuga_kein_semiprim_de.tex
+- **Problem**: Titel lautete "Kein Semiprimes ist" (falsche Pluralform)
+- **Behoben**: Titel korrigiert zu "Kein Semiprim ist"
+
 ### BUG-011 (Build 62): test_config.py – Falscher Autor-Wert
 - **Datei**: tests/test_config.py
 - **Problem**: TestMetadata::test_author_value prüfte auf 'Kurt Ingwer' statt 'Michael Fuhrmann'
