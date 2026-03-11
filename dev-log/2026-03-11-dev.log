@@ -366,3 +366,20 @@
     * dirichlet_class_number_formula(d): h = w√|Δ|/(2π) · L(1,χ_Δ)
   - tests/test_algebraic_number_theory.py: 115 Tests in 10 Klassen — alle grün
   - src/algebraic_number_theory.md: KaTeX-Dokumentation mit allen mathematischen Hintergründen
+2026-03-11 $(date +%H:%M) Build 85: Eigenständiges Ergodentheorie-Modul
+  NEU: src/ergodic_theory.py — umfassendes Modul mit 7 Hauptklassen + 5 Hilfsfunktionen
+    - MeasurePreservingSystem: orbit(), is_measure_preserving(), is_ergodic(), ergodic_decomposition()
+    - BirkhoffErgodicTheorem: birkhoff_ergodic_theorem(), von_neumann_mean_ergodic(), ergodic_average_convergence()
+    - ErgodicEntropy: partition_entropy(), metric_entropy(), topological_entropy(), variational_principle_check()
+    - MixingProperties: correlation_function(), is_mixing(), is_weak_mixing(), mixing_rate_estimate()
+    - CollatzErgodicSystem: collatz_map/iteration/stopping_time/total_stopping_time, collatz_density_tao(),
+        collatz_lyapunov_exponent(), collatz_theoretical_lyapunov(), collatz_2adic_analysis(),
+        collatz_ergodic_model(), collatz_stopping_time_distribution()
+    - FurstenbergTheory: upper_density(), furstenberg_correspondence(), szemeredi_via_ergodic(), van_der_waerden_bound()
+    - ShiftSystem: shift(), is_in_shift_space(), count_words(), entropy_shift_sft(), zeta_function_shift()
+    - SubshiftOfFiniteType: is_irreducible(), is_mixing(), entropy(), parry_measure(), generate_sequence()
+    - Hilfsfunktionen: doubling_map, circle_rotation, tent_map, logistic_map_r4, gauss_map
+  NEU: tests/test_ergodic_theory.py — 119 Tests, alle grün
+  NEU: src/ergodic_theory.md — KaTeX-Dokumentation mit Formeln
+  Mathematik: Birkhoff (1931), von Neumann (1932), KS-Entropie, Tao-Collatz (2019),
+    Furstenberg-Korrespondenz, Szemerédi-Theorem, Golden-Mean-Shift
