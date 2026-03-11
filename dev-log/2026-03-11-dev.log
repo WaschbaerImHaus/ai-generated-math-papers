@@ -64,3 +64,9 @@
 - Makefile: test/test-fast/test-coverage an Aufgabenvorgaben angepasst (absoluter Pfad, -n auto, --timeout=60)
 - pytest.ini: -n auto bereits konfiguriert, bestätigt
 - pytest-xdist 3.8.0 bereits installiert
+
+2026-03-11 Build 53: Benchmark-Regressions-Tests + Bugfix visualization
+- test_benchmark_regression.py: Bereits vollständig implementiert, alle 5 Tests grün
+- pytest-timeout installiert (pip --break-system-packages)
+- Bugfix: test_visualization_extended.py: plot_gaussian_curvature_3d() gibt (fig, ax)-Tuple zurück, nicht nur fig – Tests korrigiert
+- Gesamtergebnis: 6999/6999 Tests grün

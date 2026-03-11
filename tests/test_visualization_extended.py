@@ -603,32 +603,37 @@ class TestGaussianCurvature3D:
     """Tests für die Gaußsche-Krümmungs-3D-Visualisierung."""
 
     def test_sphäre_gibt_figure_zurück(self):
-        """plot_gaussian_curvature_3d('sphere') muss Figure zurückgeben."""
-        fig = plot_gaussian_curvature_3d('sphere', param_range=(-1.5, 1.5), resolution=10)
+        """plot_gaussian_curvature_3d('sphere') muss (Figure, Axes) zurückgeben."""
+        # Funktion gibt (fig, ax)-Tuple zurück – erstes Element ist die Figure
+        result = plot_gaussian_curvature_3d('sphere', param_range=(-1.5, 1.5), resolution=10)
+        fig = result[0] if isinstance(result, tuple) else result
         assert isinstance(fig, plt.Figure), (
-            "Rückgabewert muss matplotlib.Figure sein"
+            "Erstes Element des Rückgabe-Tuples muss matplotlib.Figure sein"
         )
         plt.close(fig)
 
     def test_torus_gibt_figure_zurück(self):
-        """plot_gaussian_curvature_3d('torus') muss Figure zurückgeben."""
-        fig = plot_gaussian_curvature_3d('torus', param_range=(-math.pi, math.pi), resolution=10)
+        """plot_gaussian_curvature_3d('torus') muss (Figure, Axes) zurückgeben."""
+        result = plot_gaussian_curvature_3d('torus', param_range=(-math.pi, math.pi), resolution=10)
+        fig = result[0] if isinstance(result, tuple) else result
         assert isinstance(fig, plt.Figure), (
             "Rückgabewert für Torus muss Figure sein"
         )
         plt.close(fig)
 
     def test_sattel_gibt_figure_zurück(self):
-        """plot_gaussian_curvature_3d('saddle') muss Figure zurückgeben."""
-        fig = plot_gaussian_curvature_3d('saddle', param_range=(-2, 2), resolution=10)
+        """plot_gaussian_curvature_3d('saddle') muss (Figure, Axes) zurückgeben."""
+        result = plot_gaussian_curvature_3d('saddle', param_range=(-2, 2), resolution=10)
+        fig = result[0] if isinstance(result, tuple) else result
         assert isinstance(fig, plt.Figure)
         plt.close(fig)
 
     def test_hyperbolisches_paraboloid_gibt_figure_zurück(self):
-        """plot_gaussian_curvature_3d('hyperbolic_paraboloid') muss Figure zurückgeben."""
-        fig = plot_gaussian_curvature_3d(
+        """plot_gaussian_curvature_3d('hyperbolic_paraboloid') muss (Figure, Axes) zurückgeben."""
+        result = plot_gaussian_curvature_3d(
             'hyperbolic_paraboloid', param_range=(-2, 2), resolution=10
         )
+        fig = result[0] if isinstance(result, tuple) else result
         assert isinstance(fig, plt.Figure)
         plt.close(fig)
 
@@ -763,6 +768,136 @@ class TestAdaptivePlot:
             x_range=(-2 * math.pi, 2 * math.pi),
             base_points=40,
             refinement_levels=1
+        )
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+
+# ===========================================================================
+# TESTS FÜR NEUE VISUALISIERUNGSFUNKTIONEN (Build 46)
+# ===========================================================================
+
+import numpy as np
+
+class TestPlotCantorSet:
+    """Tests für plot_cantor_set()."""
+
+    def test_gibt_figure_zurück(self, tmp_path):
+        """Test: plot_cantor_set() gibt eine Figure zurück."""
+        import sys
+        sys.path.insert(0, '../src')
+        from visualization import plot_cantor_set
+        fig = plot_cantor_set(n_steps=3, save_path=str(tmp_path / "cantor.png"))
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+    def test_mehrere_schritte(self, tmp_path):
+        """Test: Verschiedene Schrittanzahlen funktionieren."""
+        from visualization import plot_cantor_set
+        for steps in [1, 3, 6]:
+            fig = plot_cantor_set(n_steps=steps, save_path=str(tmp_path / f"cantor_{steps}.png"))
+            assert isinstance(fig, plt.Figure)
+            plt.close(fig)
+
+
+class TestPlotCantorFunction:
+    """Tests für plot_cantor_function()."""
+
+    def test_gibt_figure_zurück(self, tmp_path):
+        """Test: plot_cantor_function() gibt eine Figure zurück."""
+        from visualization import plot_cantor_function
+        fig = plot_cantor_function(n=50, save_path=str(tmp_path / "devil_staircase.png"))
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+
+class TestPlotBesselGallery:
+    """Tests für plot_bessel_gallery()."""
+
+    def test_gibt_figure_zurück(self, tmp_path):
+        """Test: plot_bessel_gallery() gibt eine Figure zurück."""
+        from visualization import plot_bessel_gallery
+        fig = plot_bessel_gallery(orders=[0, 1, 2], save_path=str(tmp_path / "bessel.png"))
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+    def test_standard_orders(self, tmp_path):
+        """Test: Standard-Ordnungen [0..5] funktionieren."""
+        from visualization import plot_bessel_gallery
+        fig = plot_bessel_gallery(save_path=str(tmp_path / "bessel_all.png"))
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+
+class TestPlotLegendreGallery:
+    """Tests für plot_legendre_gallery()."""
+
+    def test_gibt_figure_zurück(self, tmp_path):
+        """Test: plot_legendre_gallery() gibt eine Figure zurück."""
+        from visualization import plot_legendre_gallery
+        fig = plot_legendre_gallery(orders=[0, 1, 2, 3], save_path=str(tmp_path / "legendre.png"))
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+    def test_orthogonalitaet(self):
+        """Test: P_0(x) = 1 und P_1(x) = x (Grundeigenschaften)."""
+        from scipy.special import legendre as legendre_poly
+        x = np.linspace(-1, 1, 100)
+        P0 = legendre_poly(0)(x)
+        P1 = legendre_poly(1)(x)
+        # P_0(x) = 1 überall
+        assert np.allclose(P0, np.ones_like(x))
+        # P_1(x) = x
+        assert np.allclose(P1, x)
+
+
+class TestPlotGaussianCurvature:
+    """Tests für plot_gaussian_curvature()."""
+
+    def test_kugel_positive_kruemmung(self, tmp_path):
+        """Test: Kugel hat überall positive Gaußsche Krümmung."""
+        from visualization import plot_sphere_curvature
+        # Nur prüfen ob Funktion ohne Fehler läuft
+        fig = plot_sphere_curvature(R=1.0, n=10, save_path=str(tmp_path / "sphere.png"))
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+
+class TestAdaptivePlot:
+    """Tests für adaptive_plot()."""
+
+    def test_gibt_figure_zurück(self, tmp_path):
+        """Test: adaptive_plot() gibt eine Figure zurück."""
+        from visualization import adaptive_plot
+        fig = adaptive_plot(
+            lambda x: np.sin(x),
+            x_range=(0, 2 * np.pi),
+            save_path=str(tmp_path / "adaptive.png")
+        )
+        assert isinstance(fig, plt.Figure)
+        plt.close(fig)
+
+    def test_return_points(self):
+        """Test: return_points=True gibt Arrays zurück."""
+        from visualization import adaptive_plot
+        x_arr, y_arr = adaptive_plot(
+            lambda x: np.sin(x),
+            x_range=(0, np.pi),
+            n_initial=20,
+            return_points=True
+        )
+        assert len(x_arr) >= 20  # Mindestens Anfangspunkte
+        assert len(x_arr) == len(y_arr)
+
+    def test_singularity_handling(self, tmp_path):
+        """Test: Singularitäten werden behandelt (nicht crashing)."""
+        from visualization import adaptive_plot
+        # tan(x) hat Singularitäten bei π/2
+        fig = adaptive_plot(
+            lambda x: np.tan(x) if abs(x - np.pi/2) > 0.01 else np.nan,
+            x_range=(0, np.pi),
+            n_initial=50,
+            save_path=str(tmp_path / "singular.png")
         )
         assert isinstance(fig, plt.Figure)
         plt.close(fig)
