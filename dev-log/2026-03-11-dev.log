@@ -675,3 +675,47 @@ Fakten-Richtigkeit und EN/DE-Konsistenz.
 - P34: abc-Definition c < rad(abc)^{1+ε} ✓, Mochizuki 2012 ✓, Scholze-Stix 2018 ✓, FLT für n≥6 ✓
 - P35: Coates-Wiles 1977 ✓, Gross-Zagier 1986 ✓, Kolyvagin 1989 ✓, starke BSD mit Sha/Torsion/Periode ✓
 - P36: Leray 1934 schwache Lösungen ✓, Ladyzhenskaya 2D ✓, CKN 1982 ✓, Tao 2016 ✓, K41 ✓
+
+---
+
+## 2026-03-11 — Re-Review Batch 7 Papers 29–32 (v2)
+
+### Gefundene und behobene Bugs
+
+**BUG-B7-P29-EN-001-v2** — Paper 29 EN, Theorem 3.1 (Unique known cycle)
+- Problem: Trivialzyklus wurde als `{1, 2}` beschrieben (fehlt 4), dann als `1→4→2→1`
+- Fix: Korrigiert zu `{1, 4, 2}` (Period 3): T(1)=4, T(4)=2, T(2)=1
+
+**BUG-B7-P29-DE-001-v2** — Paper 29 DE, Proposition 3.1 (Zyklusstrukturgleichung)
+- Problem: Gleichung in Form `2^E m_0 = 3^a m_0 + C` (inkonsistent mit EN-Version und Literatur)
+- Fix: Vereinheitlicht zu `(2^E - 3^a) m_0 = C > 0` (Standardform nach Lagarias)
+
+**BUG-B7-P30-EN-001-v2** — Paper 30 EN, Theorem 4.1 (Fixed points of T in Z_2)
+- Problem: Behauptete `x = -1/2` als Fixpunkt in Z_2, aber `|-1/2|_2 = 2 > 1`, also liegt -1/2 NICHT in Z_2
+- Zusätzlich: Falsche Identität `sum_{k=1}^inf 2^k = -1/2`; korrekt ist `sum_{k=1}^inf 2^k = -2` in Z_2
+- Fix: Theorem korrigiert: T hat genau einen Fixpunkt in Z_2: x=0. S hat zusätzlich x=-1.
+
+**BUG-B7-P30-DE-001-v2** — Paper 30 DE, Satz 4.1 (Fixpunkte von T in Z_2)
+- Problem: Gleicher Fehler wie EN-Version
+- Fix: Analoge Korrektur wie EN
+
+**BUG-B7-P30-EN-002-v2** — Paper 30 EN, Theorem 3.1 (Continuity of T), Proof
+- Problem: `|3x+1 - (3y+1)|_2 = 3|x-y|_2` — mathematisch falsch. Da 3 eine Einheit in Z_2 ist, gilt |3|_2 = 1, also |3(x-y)|_2 = |x-y|_2
+- Fix: Korrigiert zu `= |3(x-y)|_2 = |3|_2 · |x-y|_2 = |x-y|_2`
+
+**BUG-B7-P30-DE-002-v2** — Paper 30 DE, Satz 3.1 (Stetigkeit von T), Beweis
+- Problem: Gleicher Fehler wie EN
+- Fix: Analoge Korrektur wie EN
+
+### Verifizierte korrekte Stellen
+- Tao 2022: "Forum of Mathematics, Sigma, 10:e72, 2022" — korrekt in allen 8 Papers
+- Trivialzyklus `1→4→2→1` — korrekt dargestellt (nach Korrekturen)
+- Haar-Maß: μ(T^{-1}(2Z_2)) = 3/4 ≠ 1/2 — korrekt berechnet in Paper 30 und 32
+- Kongruenzbedingung E(m)=1: m ≡ 3 (mod 4) — korrekt in Papers 31 EN und DE
+- log(3/4) Drift: -0.288 (ln) und -0.415 (log_2) — beide korrekt und konsistent
+- Zyklusgleichung (2^E - 3^a)m_0 = C > 0 — mathematisch verifiziert
+- \usepackage[ngerman]{babel} — vorhanden in allen DE-Papers
+- Alle \bibitem-Schlüssel konsistent
+- Alle Sections mit Inhalt gefüllt, keine TODO-Marken
+- EN/DE Konsistenz: gleiche mathematische Tiefe, gleiche Sections/Theoreme
+

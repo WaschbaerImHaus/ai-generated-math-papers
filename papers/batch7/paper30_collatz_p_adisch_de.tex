@@ -142,11 +142,12 @@ ab, sodass $T$ $\mathbb{Z}_2$ in sich abbildet.
 Stetigkeit von $x \mapsto x/2$ auf $2\mathbb{Z}_2$: Falls $|x - y|_2 \leq 2^{-N}$,
 so gilt $|x/2 - y/2|_2 = |x-y|_2/2 \leq 2^{-N-1}$.
 Stetigkeit von $x \mapsto 3x+1$ auf $\mathbb{Z}_2^{\text{ungerade}}$:
-$|3x+1 - (3y+1)|_2 = 3|x-y|_2 \leq 3 \cdot 2^{-N}$ für $|x-y|_2 \leq 2^{-N}$.
-Da $3$ eine Einheit in $\mathbb{Z}_2$ ist (weil $\gcd(3,2)=1$), ist die Multiplikation
-mit 3 ein Homöomorphismus. Die Funktion $T$ ist daher auf beiden Teilen stetig, und
-da diese Teile offen und abgeschlossen (kloffen) in $\mathbb{Z}_2$ sind, ist $T$ auf
-ganz $\mathbb{Z}_2$ stetig.
+$|3x+1 - (3y+1)|_2 = |3(x-y)|_2 = |3|_2 \cdot |x-y|_2 = |x-y|_2 \leq 2^{-N}$
+für $|x-y|_2 \leq 2^{-N}$, da $3$ eine Einheit in $\mathbb{Z}_2$ ist
+($\gcd(3,2)=1$ impliziert $|3|_2 = 1$), also ist die Multiplikation mit 3 eine
+Isometrie und insbesondere ein Homöomorphismus. Die Funktion $T$ ist daher auf
+beiden Teilen stetig, und da diese Teile offen und abgeschlossen (kloffen) in
+$\mathbb{Z}_2$ sind, ist $T$ auf ganz $\mathbb{Z}_2$ stetig.
 \end{proof}
 
 \begin{definition}[Syrakus-Funktion auf $\mathbb{Z}_2^{\text{ungerade}}$]\label{def:S_fort}
@@ -176,23 +177,30 @@ die Bijektion zwischen 2-adischen Stellen und Bahnstruktur.
 
 \section{Fixpunkte und periodische Bahnen in $\mathbb{Z}_2$}\label{sec:fixpunkte}
 
-\begin{theorem}[Fixpunkte von $T$ in $\mathbb{Z}_2$]\label{thm:fixpunkte}
-Die Fixpunkte von $T$ in $\mathbb{Z}_2$ sind:
+\begin{theorem}[Fixpunkte von $T$ und $S$ in $\mathbb{Z}_2$]\label{thm:fixpunkte}
+Die Fixpunkte sind:
 \begin{enumerate}
-  \item[(i)] Gerade Fixpunkte: $T(x) = x/2 = x$ impliziert $x = 0$.
-  \item[(ii)] Ungerade Fixpunkte: $T(x) = 3x+1 = x$ impliziert $x = -1/2$, was dem
-              2-adischen Element $-1/2 = \sum_{k=1}^\infty 2^k = \ldots 11111110_2 \in \mathbb{Z}_2$
-              entspricht.
+  \item[(i)] Gerader Fixpunkt von $T$: $T(x) = x/2 = x$ impliziert $x = 0$.
+  \item[(ii)] Ungerade Fixpunkte von $T$: Die Gleichung $T(x) = 3x+1 = x$ liefert $x = -1/2$.
+              Da jedoch $|-1/2|_2 = 2 > 1$, gilt $-1/2 \notin \mathbb{Z}_2$. Also hat $T$
+              \emph{keinen} ungeraden Fixpunkt in $\mathbb{Z}_2$.
+  \item[(iii)] Ungerader Fixpunkt von $S$: Für die Syrakus-Funktion (komprimierte Form)
+              $S(x) = (3x+1)/2^{\nu_2(3x+1)}$ gilt im Fall $\nu_2(3x+1)=1$: $S(x) = x$
+              ergibt $3x+1 = 2x$, also $x = -1$.
+              Da $|-1|_2 = 1$, liegt $-1 \in \mathbb{Z}_2^{\text{ungerade}}$
+              mit der Darstellung $-1 = \sum_{k=0}^\infty 2^k = \ldots 11111111_2$.
 \end{enumerate}
-Also hat $T$ genau zwei Fixpunkte in $\mathbb{Z}_2$: $x = 0$ (gerade) und $x = -1/2$ (ungerade).
+Also hat $T$ genau einen Fixpunkt in $\mathbb{Z}_2$: $x = 0$.
+Die komprimierte Syrakus-Abbildung $S$ hat zusätzlich den Fixpunkt $x = -1$.
 \end{theorem}
 
 \begin{proof}
-(i) $x = T(x) = x/2$ impliziert $x/2 = 0$, also $x = 0$.\\
-(ii) $x = T(x) = 3x+1$ impliziert $-2x = 1$, also $x = -1/2$.
-In $\mathbb{Z}_2$ ist $-1/2$ eine wohldefinierte 2-adische ganze Zahl, denn
-$-1 = \sum_{k=0}^\infty 2^k$ (die 2-adische Darstellung von $-1$), und Division durch 2
-ergibt $-1/2 = \sum_{k=1}^\infty 2^k$.
+(i) $x = T(x) = x/2$ impliziert $x = 0$.\\
+(ii) $x = T(x) = 3x+1$ ergibt $x = -1/2$, aber $\nu_2(-1/2) = -1$, also $|-1/2|_2 = 2 > 1$
+und $-1/2 \notin \mathbb{Z}_2$.\\
+Hinweis: $\sum_{k=1}^\infty 2^k = 2 \cdot \sum_{k=0}^\infty 2^k = 2 \cdot (-1) = -2$ in
+$\mathbb{Z}_2$ (nicht $-1/2$). Das Element $-1/2$ liegt in $\mathbb{Q}_2 \setminus \mathbb{Z}_2$.\\
+(iii) $S(-1) = (3 \cdot (-1) + 1)/2^{\nu_2(-2)} = (-2)/2 = -1$, was $-1$ als Fixpunkt von $S$ bestätigt.
 \end{proof}
 
 \begin{theorem}[Periodische Bahnen in $\mathbb{Z}_2$]\label{thm:periodisch}
@@ -326,7 +334,7 @@ das Collatz-Problem. Wesentliche Ergebnisse:
 \begin{itemize}
   \item Die Collatz-Funktion $T$ setzt sich zu einer stetigen Selbstabbildung von
         $\mathbb{Z}_2$ fort.
-  \item Fixpunkte in $\mathbb{Z}_2$: $x=0$ und $x=-1/2$; der triviale positive Zyklus ist $\{1, 4, 2\}$.
+  \item $T$ hat genau einen Fixpunkt in $\mathbb{Z}_2$: $x=0$. Die Syrakus-Abbildung $S$ hat zusätzlich den Fixpunkt $x=-1$. Der triviale positive Zyklus ist $\{1, 4, 2\}$.
   \item Die Paritätsfolge von $x$ kodiert die gesamte Collatz-Bahnstruktur.
   \item Der Syrakus-Darstellungssatz verbindet 2-adische Entwicklungen mit der Bahngeometrie.
   \item $T$ ist nicht maßerhaltend bezüglich des Haar-Maßes, aber $S$ ist ergodisch.

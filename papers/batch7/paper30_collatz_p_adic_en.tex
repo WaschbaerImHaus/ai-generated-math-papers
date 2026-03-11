@@ -136,8 +136,9 @@ to $\mathbb{Z}_2$.
 Continuity of $x \mapsto x/2$ on $2\mathbb{Z}_2$: if $|x - y|_2 \leq 2^{-N}$, then
 $|x/2 - y/2|_2 = |x-y|_2/2 \leq 2^{-N-1}$.
 Continuity of $x \mapsto 3x+1$ on $\mathbb{Z}_2^{\text{odd}}$:
-$|3x+1 - (3y+1)|_2 = 3|x-y|_2 \leq 3 \cdot 2^{-N}$ for $|x-y|_2 \leq 2^{-N}$.
-Since $3$ is a unit in $\mathbb{Z}_2$ (as $\gcd(3,2)=1$), multiplication by 3 is a
+$|3x+1 - (3y+1)|_2 = |3(x-y)|_2 = |3|_2 \cdot |x-y|_2 = |x-y|_2 \leq 2^{-N}$
+for $|x-y|_2 \leq 2^{-N}$, since $3$ is a unit in $\mathbb{Z}_2$ ($\gcd(3,2)=1$
+implies $|3|_2 = 1$), so multiplication by 3 is an isometry and in particular a
 homeomorphism. The function $T$ is therefore continuous on both pieces, and the pieces
 are open and closed (clopen) in $\mathbb{Z}_2$, so $T$ is continuous on all of $\mathbb{Z}_2$.
 \end{proof}
@@ -169,22 +170,30 @@ the parity sequence, establishing the bijection between 2-adic digits and orbit 
 
 \section{Fixed Points and Periodic Orbits in $\mathbb{Z}_2$}\label{sec:fixed}
 
-\begin{theorem}[Fixed points of $T$ in $\mathbb{Z}_2$]\label{thm:fixed}
-The fixed points of $T$ in $\mathbb{Z}_2$ satisfy:
+\begin{theorem}[Fixed points of $T$ and $S$ in $\mathbb{Z}_2$]\label{thm:fixed}
+The fixed points satisfy:
 \begin{enumerate}
-  \item[(i)] Even fixed points: $T(x) = x/2 = x$ implies $x = 0$.
-  \item[(ii)] Odd fixed points: $T(x) = 3x+1 = x$ implies $x = -1/2$, which corresponds
-              to the 2-adic element $-1/2 = \sum_{k=1}^\infty 2^k = \ldots 11111110_2 \in \mathbb{Z}_2$.
+  \item[(i)] Even fixed point of $T$: $T(x) = x/2 = x$ implies $x = 0$.
+  \item[(ii)] Odd fixed points of $T$: The equation $T(x) = 3x+1 = x$ gives $x = -1/2$.
+              However, $|-1/2|_2 = 2 > 1$, so $-1/2 \notin \mathbb{Z}_2$. Therefore
+              $T$ has \emph{no} odd fixed point in $\mathbb{Z}_2$.
+  \item[(iii)] Odd fixed point of $S$: For the Syracuse (compressed) function
+              $S(x) = (3x+1)/2^{\nu_2(3x+1)}$, restricting to the first-order case
+              $\nu_2(3x+1)=1$ gives $S(x) = (3x+1)/2 = x$, hence $x = -1$.
+              Since $|-1|_2 = 1$, we have $-1 \in \mathbb{Z}_2^{\text{odd}}$,
+              with representation $-1 = \sum_{k=0}^\infty 2^k = \ldots 11111111_2$.
 \end{enumerate}
-Thus $T$ has two fixed points in $\mathbb{Z}_2$: $x = 0$ (even) and $x = -1/2$ (odd).
+Thus $T$ has exactly one fixed point in $\mathbb{Z}_2$: $x = 0$.
+The compressed Syracuse map $S$ additionally has the fixed point $x = -1$.
 \end{theorem}
 
 \begin{proof}
-(i) $x = T(x) = x/2$ implies $x/2 = 0$, so $x = 0$.
-(ii) $x = T(x) = 3x+1$ implies $-2x = 1$, so $x = -1/2$.
-In $\mathbb{Z}_2$, $-1/2$ is a well-defined 2-adic integer because
-$-1 = \sum_{k=0}^\infty 2^k$ (the 2-adic representation of $-1$), and dividing by 2 gives
-$-1/2 = \sum_{k=1}^\infty 2^k$.
+(i) $x = T(x) = x/2$ implies $x = 0$.\\
+(ii) $x = T(x) = 3x+1$ gives $x = -1/2$, but $\nu_2(-1/2) = -1$, so $|-1/2|_2 = 2 > 1$
+and $-1/2 \notin \mathbb{Z}_2$.
+Note: $\sum_{k=1}^\infty 2^k = 2\cdot\sum_{k=0}^\infty 2^k = 2\cdot(-1) = -2$ in $\mathbb{Z}_2$,
+not $-1/2$. The element $-1/2$ lies in $\mathbb{Q}_2 \setminus \mathbb{Z}_2$.\\
+(iii) $S(-1) = (3(-1)+1)/2^{\nu_2(-2)} = (-2)/2 = -1$, confirming $-1$ is a fixed point of $S$.
 \end{proof}
 
 \begin{theorem}[Periodic orbits in $\mathbb{Z}_2$]\label{thm:periodic}
@@ -314,7 +323,7 @@ The 2-adic integers provide a natural and powerful setting for the Collatz probl
 Key results include:
 \begin{itemize}
   \item The Collatz function $T$ extends to a continuous self-map of $\mathbb{Z}_2$.
-  \item Fixed points in $\mathbb{Z}_2$ are $x=0$ and $x=-1/2$; the trivial positive cycle is $\{1, 4, 2\}$.
+  \item $T$ has exactly one fixed point in $\mathbb{Z}_2$: $x=0$. The Syracuse map $S$ additionally has the fixed point $x=-1$. The trivial positive cycle is $\{1, 4, 2\}$.
   \item The parity sequence of $x$ encodes the entire Collatz orbit structure.
   \item The Syracuse representation theorem connects 2-adic expansions to orbit geometry.
   \item $T$ is not measure-preserving with respect to Haar measure, but $S$ is ergodic.
