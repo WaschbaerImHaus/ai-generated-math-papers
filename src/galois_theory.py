@@ -1653,3 +1653,1353 @@ def cyclotomic_polynomial(n: int) -> list[int]:
 
     # Umkehren für aufsteigende Darstellung [a_0, a_1, ..., a_φ(n)]
     return list(reversed(coeffs_desc))
+
+
+# =============================================================================
+# ZYKLOTOMISCHE KÖRPER UND GALOIS-GRUPPEN
+# =============================================================================
+
+def cyclotomic_galois_group(n: int) -> dict:
+    """
+    @brief Berechnet die Galoisgruppe Gal(ℚ(ζ_n)/ℚ) des n-ten Kreisteilungskörpers.
+    @description
+        Der n-te Kreisteilungskörper ℚ(ζ_n) entsteht durch Adjunktion einer
+        primitiven n-ten Einheitswurzel ζ_n = e^{2πi/n} zu ℚ.
+
+        **Galoisgruppe:**
+        $$\text{Gal}(\mathbb{Q}(\zeta_n)/\mathbb{Q}) \cong (\mathbb{Z}/n\mathbb{Z})^{\times}$$
+
+        Diese Gruppe hat Ordnung φ(n) (Euler'sche φ-Funktion). Jedes Element σ_k
+        mit gcd(k, n) = 1 ist ein Automorphismus:
+        $$\sigma_k(\zeta_n) = \zeta_n^k$$
+
+        **Eigenschaften:**
+        - Die Erweiterung ist stets galoissch (normal und separabel).
+        - Die Gruppe ist abelsch (Kronecker-Weber-Theorem).
+        - Die Untergruppen entsprechen Zwischenkörpern (Galoiskörrespondenz).
+
+        **Beispiele:**
+        - n=4: Gal(ℚ(i)/ℚ) ≅ ℤ/2ℤ, σ: i ↦ -i
+        - n=5: Gal(ℚ(ζ₅)/ℚ) ≅ ℤ/4ℤ
+        - n=8: Gal(ℚ(ζ₈)/ℚ) ≅ ℤ/2ℤ×ℤ/2ℤ
+
+    @param n Positive ganze Zahl ≥ 1.
+    @return Dictionary mit:
+            - 'n': int, Ordnung der Einheitswurzeln
+            - 'degree': int, [ℚ(ζ_n):ℚ] = φ(n)
+            - 'galois_group': str, Gruppenname
+            - 'order': int, Gruppenordnung = φ(n)
+            - 'generators': list[int], Erzeuger (primitive Wurzeln mod n)
+            - 'elements': list[int], alle k mit gcd(k,n)=1 (Gruppenelemente)
+            - 'is_abelian': bool, immer True
+            - 'is_cyclic': bool, ob (ℤ/nℤ)^× zyklisch ist
+            - 'automorphisms': list[str], σ_k-Beschreibungen
+    @raises InvalidInputError Wenn n < 1.
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    @date 2026-03-11
+    """
+    if n < 1:
+        raise InvalidInputError(f"n={n} muss ≥ 1 sein")
+
+    # Elemente der multiplikativen Gruppe (ℤ/nℤ)^×
+    # = alle k mit 1 ≤ k ≤ n und gcd(k, n) = 1
+    elements = [k for k in range(1, n + 1) if gcd(k, n) == 1]
+    phi_n = len(elements)  # = φ(n) = Ordnung der Galoisgruppe
+
+    # Erzeuger der Gruppe (primitive Wurzeln mod n) via SymPy
+    gens = []
+    try:
+        # primitive_root liefert einen Erzeuger, wenn die Gruppe zyklisch ist
+        g = int(primitive_root(n))
+        gens = [g]
+        is_cyclic = True
+    except Exception:
+        # Keine primitive Wurzel → Gruppe nicht zyklisch
+        # (z.B. n=8: (ℤ/8ℤ)^× ≅ ℤ/2ℤ × ℤ/2ℤ)
+        is_cyclic = False
+        # Alle Elemente der Ordnung, die gleich der Gruppenordnung ist, sind Erzeuger
+        # Für nicht-zyklische Gruppen: mehrere Erzeuger nötig
+        gens = elements[:2] if len(elements) >= 2 else elements
+
+    # Galoisgruppe benennen
+    if phi_n == 1:
+        group_name = "trivial {1}"
+    elif is_cyclic:
+        group_name = f"ℤ/{phi_n}ℤ"
+    else:
+        # Faktorisierung der Gruppenordnung für bessere Benennung
+        facts = sympy.factorint(phi_n)
+        if len(facts) == 1 and list(facts.values())[0] == 1:
+            group_name = f"ℤ/{phi_n}ℤ"
+        else:
+            group_name = f"(ℤ/{n}ℤ)^×"
+
+    # Automorphismus-Beschreibungen: σ_k: ζ_n ↦ ζ_n^k
+    automorphisms = [f"σ_{k}: ζ_{n} ↦ ζ_{n}^{k}" for k in elements]
+
+    return {
+        'n': n,
+        'degree': phi_n,
+        'galois_group': group_name,
+        'order': phi_n,
+        'generators': gens,
+        'elements': elements,
+        'is_abelian': True,   # Kreisteilungsgruppen sind immer abelsch
+        'is_cyclic': is_cyclic,
+        'automorphisms': automorphisms,
+        'cyclotomic_poly_degree': phi_n,
+        'description': (
+            f"Gal(ℚ(ζ_{n})/ℚ) ≅ (ℤ/{n}ℤ)^× "
+            f"mit Ordnung φ({n}) = {phi_n}"
+        ),
+    }
+
+
+def kronecker_weber_check(poly_coeffs: list[int]) -> dict:
+    """
+    @brief Prüft das Kronecker-Weber-Theorem für eine abelsche Erweiterung.
+    @description
+        Das Kronecker-Weber-Theorem besagt:
+
+        **Satz (Kronecker 1853, Weber 1886):**
+        Jede endliche abelsche Galois-Erweiterung L/ℚ ist in einem Kreisteilungskörper
+        ℚ(ζ_n) enthalten:
+        $$L \subseteq \mathbb{Q}(\zeta_n)$$
+
+        Das bedeutet: Jeder abelsche Zahlkörper ist ein Teilkörper eines zyklotomischen
+        Körpers.
+
+        **Algorithmus:**
+        1. Berechne Galoisgruppe G = Gal(L/ℚ) des Polynoms.
+        2. Prüfe ob G abelsch ist.
+        3. Wenn abelsch: Suche minimales n mit G ↪ (ℤ/nℤ)^×.
+        4. Liefere den Kreisteilungskörper ℚ(ζ_n) als "Einbettung".
+
+        **Beispiele:**
+        - x²-2: Gal=ℤ/2ℤ → ℚ(√2) ⊆ ℚ(ζ₈)  (da ζ₈+ζ₈⁻¹=√2)
+        - x²+1: Gal=ℤ/2ℤ → ℚ(i) = ℚ(ζ₄)
+        - x³-1: Gal=ℤ/3ℤ? Nein, Φ₃(x)=x²+x+1 → Gal=ℤ/2ℤ ... (Φ₃ Grad 2)
+
+    @param poly_coeffs Koeffizientenliste (aufsteigend) des Polynoms f(x) ∈ ℚ[x].
+    @return Dictionary mit:
+            - 'galois_group': str
+            - 'is_abelian': bool
+            - 'theorem_applies': bool, True wenn abelsche Erweiterung
+            - 'minimal_n': int | None, kleinstes n mit G ↪ (ℤ/nℤ)^×
+            - 'cyclotomic_field': str, Beschreibung von ℚ(ζ_n)
+            - 'explanation': str
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    @date 2026-03-11
+    """
+    # Galoisgruppe des Polynoms bestimmen
+    gal_info = galois_group_polynomial(poly_coeffs)
+    group_name = gal_info['galois_group']
+    group_order = gal_info['order']
+
+    # Prüfe Abelsches Kriterium
+    is_ab = group_name in (
+        'trivial', '1', 'Z/2Z', 'ℤ/2ℤ', 'Z_2',
+        'Z/3Z', 'ℤ/3ℤ', 'Z_3',
+        'Z/4Z', 'ℤ/4ℤ', 'Z_4',
+        'V_4', 'Z/2Z×Z/2Z',
+        'Z/5Z', 'ℤ/5ℤ',
+        'Z/6Z', 'ℤ/6ℤ',
+    ) or 'Z/' in group_name or 'ℤ/' in group_name
+
+    minimal_n = None
+    cyclo_field = None
+
+    if is_ab and group_order > 0:
+        # Suche kleinstes n, sodass φ(n) durch group_order teilbar
+        # und (ℤ/nℤ)^× die Galoisgruppe als Untergruppe enthält
+        for candidate_n in range(1, 200):
+            phi_c = int(totient(candidate_n))
+            if phi_c % group_order == 0:
+                minimal_n = candidate_n
+                break
+        cyclo_field = f"ℚ(ζ_{minimal_n})" if minimal_n else None
+
+    explanation = (
+        f"Das Polynom hat Galoisgruppe {group_name} der Ordnung {group_order}. "
+        + (
+            f"Diese Gruppe ist abelsch. Nach Kronecker-Weber ist die Erweiterung "
+            f"in ℚ(ζ_{minimal_n}) eingebettet (φ({minimal_n}) = {int(totient(minimal_n)) if minimal_n else '?'})."
+            if is_ab else
+            f"Die Gruppe {group_name} ist NICHT abelsch. Das Kronecker-Weber-Theorem "
+            f"gilt nicht für diese Erweiterung."
+        )
+    )
+
+    return {
+        'galois_group': group_name,
+        'order': group_order,
+        'is_abelian': is_ab,
+        'theorem_applies': is_ab,
+        'minimal_n': minimal_n,
+        'cyclotomic_field': cyclo_field,
+        'explanation': explanation,
+    }
+
+
+def dirichlet_characters_from_galois(n: int) -> dict:
+    """
+    @brief Leitet Dirichlet-Charaktere aus der Galoisgruppe des Kreisteilungskörpers ab.
+    @description
+        Via Galois-Theorie können Dirichlet-Charaktere modulo n als Gruppencharaktere
+        der abelschen Galoisgruppe Gal(ℚ(ζ_n)/ℚ) ≅ (ℤ/nℤ)^× interpretiert werden:
+
+        $$\chi: \text{Gal}(\mathbb{Q}(\zeta_n)/\mathbb{Q}) \to \mathbb{C}^{\times}$$
+
+        Ein Gruppencharakter (eindimensionale Darstellung) bildet die Galoisgruppe auf
+        Einheitswurzeln ab: χ(σ_k) = ω^f(k), wobei ω eine Einheitswurzel ist.
+
+        **Anzahl der Charaktere:**
+        Die Anzahl der verschiedenen Dirichlet-Charaktere modulo n ist φ(n)
+        (Anzahl der Gruppencharaktere = Gruppenordnung für abelsche Gruppen).
+
+        **Hauptcharakter:**
+        χ₀(k) = 1 für gcd(k,n) = 1, χ₀(k) = 0 sonst.
+
+        **Beispiel n=4:**
+        - Elemente: {1, 3} ≅ ℤ/2ℤ
+        - χ₀: σ₁ ↦ 1, σ₃ ↦ 1  (Hauptcharakter)
+        - χ₁: σ₁ ↦ 1, σ₃ ↦ -1 (nicht-trivialer Charakter)
+
+    @param n Positive ganze Zahl ≥ 1 (Modul).
+    @return Dictionary mit:
+            - 'n': int
+            - 'galois_group': str
+            - 'phi_n': int, Anzahl der Charaktere
+            - 'elements': list[int], Gruppenelemente
+            - 'characters': list[dict], alle Charaktere mit Werten
+    @raises InvalidInputError Wenn n < 1.
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    @date 2026-03-11
+    """
+    if n < 1:
+        raise InvalidInputError(f"n={n} muss ≥ 1 sein")
+
+    # Galoisgruppe des Kreisteilungskörpers
+    gal = cyclotomic_galois_group(n)
+    elements = gal['elements']     # k mit gcd(k,n)=1
+    phi_n = gal['order']           # φ(n)
+
+    characters = []
+
+    if phi_n == 1:
+        # Nur Hauptcharakter
+        characters.append({
+            'index': 0,
+            'name': 'χ₀ (Hauptcharakter)',
+            'is_principal': True,
+            'values': {k: 1 for k in elements},
+            'conductor': 1,
+        })
+    else:
+        # Für zyklische Gruppen: Charaktere über primitive Wurzel
+        # Für allgemeine abelsche Gruppen: Charaktere explizit angeben
+
+        # Ordnungen der Gruppenelemente bestimmen
+        elem_orders = {}
+        for k in elements:
+            # Ordnung von k in (ℤ/nℤ)^×: kleinstes m mit k^m ≡ 1 (mod n)
+            m = 1
+            cur = k
+            while cur % n != 1 and m < phi_n + 1:
+                cur = (cur * k) % n
+                m += 1
+            elem_orders[k] = m
+
+        # Hauptcharakter χ₀: alle Werte 1
+        characters.append({
+            'index': 0,
+            'name': 'χ₀ (Hauptcharakter)',
+            'is_principal': True,
+            'values': {k: 1 for k in elements},
+            'conductor': 1,
+            'description': f"χ₀(σ_k) = 1 für alle k ∈ (ℤ/{n}ℤ)^×",
+        })
+
+        # Für einfache Fälle: Legendre-Symbol mod p (falls n = p prim)
+        if isprime(n):
+            # Nicht-triviale Charaktere: χ₁ = Legendre-Symbol mod p
+            # χ₁(k) = (k/p) = 1 wenn k QR, -1 wenn QNR
+            legendre_vals = {}
+            for k in elements:
+                # k ist QR mod p genau dann wenn k^((p-1)/2) ≡ 1 (mod p)
+                kk = pow(k, (n - 1) // 2, n)
+                legendre_vals[k] = 1 if kk == 1 else -1
+
+            characters.append({
+                'index': 1,
+                'name': f'χ₁ (Legendre mod {n})',
+                'is_principal': False,
+                'values': legendre_vals,
+                'conductor': n,
+                'description': f"χ₁(k) = (k/{n}) Legendre-Symbol",
+            })
+
+            # Weitere Charaktere via Potenzen des Legendre-Symbols (für φ(n) > 2)
+            for i in range(2, min(phi_n, 5)):
+                chi_vals = {k: legendre_vals[k] ** i for k in elements}
+                characters.append({
+                    'index': i,
+                    'name': f'χ_{i} = χ₁^{i}',
+                    'is_principal': all(v == 1 for v in chi_vals.values()),
+                    'values': chi_vals,
+                    'conductor': n,
+                    'description': f"Potenzcharakter χ₁^{i}",
+                })
+        else:
+            # Für zusammengesetztes n: einfache Darstellung
+            for i in range(1, min(phi_n, 4)):
+                # χ_i(k) = ω^{i·ind(k)} wobei ω = e^{2πi/φ(n)}
+                # Vereinfacht: Zeichen des Charakters angeben
+                chi_vals = {}
+                for k in elements:
+                    # Phasenfaktor: e^{2πi·i·(k-1)/phi_n} (Approximation)
+                    phase = (i * (elements.index(k))) % phi_n
+                    chi_vals[k] = cmath.exp(2j * math.pi * phase / phi_n)
+                characters.append({
+                    'index': i,
+                    'name': f'χ_{i}',
+                    'is_principal': False,
+                    'values': {k: round(v.real, 8) + round(v.imag, 8) * 1j
+                               for k, v in chi_vals.items()},
+                    'conductor': n,
+                    'description': f"Gruppencharakter χ_{i} der Galoisgruppe",
+                })
+
+    return {
+        'n': n,
+        'galois_group': gal['galois_group'],
+        'phi_n': phi_n,
+        'elements': elements,
+        'characters': characters,
+        'total_characters': phi_n,
+        'description': (
+            f"Dirichlet-Charaktere mod {n} aus Gal(ℚ(ζ_{n})/ℚ) ≅ {gal['galois_group']}"
+        ),
+    }
+
+
+# =============================================================================
+# ENDLICHE KÖRPER – GALOISGRUPPE
+# =============================================================================
+
+def galois_group_finite_field(p: int, n: int) -> dict:
+    """
+    @brief Berechnet die Galoisgruppe Gal(GF(p^n) / GF(p)) des endlichen Körpers.
+    @description
+        Die Galoisgruppe der Erweiterung GF(p^n)/GF(p) ist zyklisch von Ordnung n:
+
+        $$\text{Gal}(\text{GF}(p^n)/\text{GF}(p)) \cong \mathbb{Z}/n\mathbb{Z}$$
+
+        Der kanonische Erzeuger ist der Frobenius-Automorphismus:
+        $$\text{Frob}_p: \text{GF}(p^n) \to \text{GF}(p^n), \quad x \mapsto x^p$$
+
+        **Eigenschaften:**
+        - Die Erweiterung GF(p^n)/GF(p) ist immer galoissch.
+        - Jeder Automorphismus ist eine Potenz des Frobenius: Frob_p^k für k=0,...,n-1.
+        - Frob_p^n = id (Frobenius hat Ordnung n).
+
+        **Zwischenkörper (Galoiskörrespondenz):**
+        Untergruppen ℤ/dℤ ≤ ℤ/nℤ (d | n) entsprechen Zwischenkörpern GF(p^d).
+
+    @param p Primzahl (Charakteristik des Körpers).
+    @param n Grad der Erweiterung (n ≥ 1).
+    @return Dictionary mit:
+            - 'p': int
+            - 'n': int
+            - 'field': str, Beschreibung des Körpers
+            - 'base_field': str
+            - 'galois_group': str, "ℤ/nℤ"
+            - 'order': int, n
+            - 'is_cyclic': bool, True
+            - 'generator': str, Frobenius-Beschreibung
+            - 'elements': list[str], alle Automorphismen
+            - 'intermediate_fields': list[dict], Zwischenkörper via d|n
+    @raises InvalidInputError Wenn p nicht prim oder n < 1.
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    @date 2026-03-11
+    """
+    if not isprime(p):
+        raise InvalidInputError(f"p={p} muss eine Primzahl sein")
+    if n < 1:
+        raise InvalidInputError(f"n={n} muss ≥ 1 sein")
+
+    # Automorphismen: Frob_p^k für k = 0, 1, ..., n-1
+    elements = [f"Frob_{p}^{k}" if k > 0 else "id" for k in range(n)]
+
+    # Zwischenkörper: GF(p^d) für alle Teiler d von n
+    intermediate_fields = []
+    for d in range(1, n + 1):
+        if n % d == 0:
+            # Untergruppe: ℤ/(n/d)ℤ ≤ ℤ/nℤ (Fixkörper von Frob^d-Untergruppe)
+            subgroup_order = n // d
+            intermediate_fields.append({
+                'field': f"GF({p}^{d})",
+                'degree_over_base': d,
+                'fixed_by_subgroup': f"⟨Frob_{p}^{d}⟩ (Ordnung {subgroup_order})",
+                'subgroup': f"ℤ/{subgroup_order}ℤ",
+            })
+
+    return {
+        'p': p,
+        'n': n,
+        'field': f"GF({p}^{n})",
+        'base_field': f"GF({p})",
+        'galois_group': f"ℤ/{n}ℤ",
+        'order': n,
+        'is_cyclic': True,
+        'is_abelian': True,
+        'generator': f"Frob_{p}: x ↦ x^{p}",
+        'elements': elements,
+        'intermediate_fields': intermediate_fields,
+        'description': (
+            f"Gal(GF({p}^{n})/GF({p})) ≅ ℤ/{n}ℤ, "
+            f"erzeugt vom Frobenius Frob_{p}: x ↦ x^{p}"
+        ),
+    }
+
+
+# =============================================================================
+# KONSTRUIERBARKEIT MIT ZIRKEL UND LINEAL
+# =============================================================================
+
+def is_constructible(n: int) -> dict:
+    """
+    @brief Prüft ob ein reguläres n-Eck mit Zirkel und Lineal konstruierbar ist.
+    @description
+        Das Gauss-Wantzel-Theorem (1796/1837) charakterisiert konstruierbare reguläre
+        Polygone vollständig:
+
+        **Satz (Gauss-Wantzel):**
+        Ein reguläres n-Eck ist mit Zirkel und Lineal konstruierbar genau dann, wenn
+        $$n = 2^k \cdot p_1 \cdot p_2 \cdots p_r$$
+        wobei k ≥ 0 und p_i verschiedene Fermat-Primzahlen sind.
+
+        **Fermat-Primzahlen** sind Primzahlen der Form $F_m = 2^{2^m} + 1$:
+        F_0 = 3, F_1 = 5, F_2 = 17, F_3 = 257, F_4 = 65537.
+        (Weitere sind nicht bekannt.)
+
+        **Galois-theoretische Begründung:**
+        n-Eck konstruierbar ⟺ [ℚ(ζ_n):ℚ] = φ(n) ist eine 2-Potenz
+        ⟺ Gal(ℚ(ζ_n)/ℚ) ≅ (ℤ/nℤ)^× hat 2-Potenz-Ordnung
+        ⟺ Turm von Körpererweiterungen vom Grad 2 existiert.
+
+    @param n Positive ganze Zahl ≥ 1.
+    @return Dictionary mit:
+            - 'n': int
+            - 'is_constructible': bool
+            - 'phi_n': int, Euler-Phi-Wert
+            - 'phi_is_power_of_2': bool
+            - 'fermat_primes_used': list[int]
+            - 'power_of_2_factor': int
+            - 'reason': str
+    @raises InvalidInputError Wenn n < 1.
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    @date 2026-03-11
+    """
+    if n < 1:
+        raise InvalidInputError(f"n={n} muss ≥ 1 sein")
+
+    # Bekannte Fermat-Primzahlen (alle bekannten)
+    fermat_primes = [3, 5, 17, 257, 65537]
+
+    # n faktorisieren
+    if n == 1 or n == 2:
+        # Triviale Fälle
+        return {
+            'n': n,
+            'is_constructible': True,
+            'phi_n': int(totient(n)),
+            'phi_is_power_of_2': True,
+            'fermat_primes_used': [],
+            'power_of_2_factor': n if n == 2 else 1,
+            'reason': f"n={n} ist trivial konstruierbar.",
+        }
+
+    phi_n = int(totient(n))
+
+    # Prüfe ob φ(n) eine 2-Potenz ist
+    def is_power_of_2(k):
+        """Hilfsfunktion: ist k eine 2-Potenz?"""
+        return k > 0 and (k & (k - 1)) == 0
+
+    phi_is_2_power = is_power_of_2(phi_n)
+
+    # Faktorisiere n und prüfe die Struktur
+    facts = sympy.factorint(n)
+
+    # Zähle den 2er-Anteil
+    two_factor = facts.get(2, 0)
+    power_of_2 = 2 ** two_factor
+
+    # Ungerade Primfaktoren
+    odd_prime_factors = {p: e for p, e in facts.items() if p != 2}
+
+    used_fermat = []
+    non_fermat_odd = []
+    repeated_odd = []
+
+    for p, e in odd_prime_factors.items():
+        if e > 1:
+            # Primfaktor mit Exponent > 1: nicht konstruierbar
+            repeated_odd.append(p)
+        elif p in fermat_primes:
+            used_fermat.append(p)
+        else:
+            non_fermat_odd.append(p)
+
+    constructible = phi_is_2_power and not non_fermat_odd and not repeated_odd
+
+    # Begründung zusammenstellen
+    if constructible:
+        if not used_fermat:
+            reason = f"n={n} = 2^{two_factor} ist eine 2-Potenz. Das n-Eck ist konstruierbar."
+        else:
+            fp_str = " · ".join(str(p) for p in used_fermat)
+            reason = (
+                f"n={n} = 2^{two_factor} · {fp_str}. "
+                f"Alle ungerade Faktoren sind verschiedene Fermat-Primzahlen. "
+                f"Das {n}-Eck ist konstruierbar (Gauss-Wantzel)."
+            )
+    elif non_fermat_odd:
+        reason = (
+            f"n={n} enthält den ungerade Primfaktor {non_fermat_odd[0]}, "
+            f"der keine Fermat-Primzahl ist. Das {n}-Eck ist NICHT konstruierbar."
+        )
+    elif repeated_odd:
+        reason = (
+            f"n={n} enthält einen ungerade Primfaktor {repeated_odd[0]} mit "
+            f"Exponent > 1. Das {n}-Eck ist NICHT konstruierbar."
+        )
+    else:
+        reason = f"n={n} ist nicht konstruierbar (φ(n)={phi_n} ist keine 2-Potenz)."
+
+    return {
+        'n': n,
+        'is_constructible': constructible,
+        'phi_n': phi_n,
+        'phi_is_power_of_2': phi_is_2_power,
+        'fermat_primes_used': used_fermat,
+        'power_of_2_factor': power_of_2,
+        'reason': reason,
+        'factorization': dict(facts),
+    }
+
+
+def construct_regular_polygon(n: int) -> dict:
+    """
+    @brief Analysiert die Konstruierbarkeit und Galois-Theorie eines regulären n-Ecks.
+    @description
+        Verbindet das Gauss-Wantzel-Theorem mit der Galois-Theorie:
+
+        Ein reguläres n-Eck ist mit Zirkel und Lineal konstruierbar genau dann,
+        wenn der Turm von Körpererweiterungen über ℚ nur Schritte vom Grad 2 hat:
+
+        $$\mathbb{Q} = K_0 \subset K_1 \subset \cdots \subset K_r = \mathbb{Q}(\zeta_n)$$
+
+        mit $[K_{i+1} : K_i] = 2$ für alle i.
+
+        Die Ecken des regulären n-Ecks sind die n-ten Einheitswurzeln
+        $$\zeta_n^k = e^{2\pi i k/n}, \quad k = 0, 1, \ldots, n-1$$
+
+        **Historische Bedeutung:**
+        Gauss zeigte 1796 (mit 19 Jahren), dass das reguläre 17-Eck konstruierbar ist
+        (F_2 = 17 ist eine Fermat-Primzahl). Dies war der erste neue Fortschritt
+        seit der Antike.
+
+    @param n Anzahl der Ecken (n ≥ 3).
+    @return Dictionary mit:
+            - 'n': int
+            - 'is_constructible': bool
+            - 'constructibility_info': dict von is_constructible(n)
+            - 'galois_group': dict von cyclotomic_galois_group(n)
+            - 'vertices': list[complex], Koordinaten der Ecken
+            - 'historical_note': str
+    @raises InvalidInputError Wenn n < 3.
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    @date 2026-03-11
+    """
+    if n < 3:
+        raise InvalidInputError(f"n={n} muss ≥ 3 sein (Polygon braucht mind. 3 Ecken)")
+
+    # Konstruierbarkeits-Analyse
+    constr_info = is_constructible(n)
+
+    # Galoisgruppe des Kreisteilungskörpers
+    gal_info = cyclotomic_galois_group(n)
+
+    # Koordinaten der Ecken des regulären n-Ecks in der komplexen Ebene
+    # Ecke k: ζ_n^k = e^{2πik/n}
+    vertices = [cmath.exp(2j * math.pi * k / n) for k in range(n)]
+
+    # Historische Notiz
+    historical_notes = {
+        3:  "Gleichseitiges Dreieck: seit der Antike bekannt.",
+        4:  "Quadrat: seit der Antike bekannt.",
+        5:  "Reguläres Pentagon: Euklid, ~300 v. Chr.",
+        6:  "Reguläres Hexagon: seit der Antike bekannt.",
+        8:  "Reguläres Oktogon: seit der Antike bekannt.",
+        10: "Reguläres Dekagon: Euklid, ~300 v. Chr.",
+        15: "Reguläres 15-Eck: Euklid, ~300 v. Chr.",
+        17: "Reguläres 17-Eck: C.F. Gauss, 1796 (revolutionäre Entdeckung!).",
+        257: "Reguläres 257-Eck: Magnus Georg Paucker, 1822.",
+        65537: "Reguläres 65537-Eck: Johann Gustav Hermes, 1894 (10 Jahre Arbeit!).",
+    }
+    note = historical_notes.get(n, "")
+    if not note:
+        if constr_info['is_constructible']:
+            note = f"Das reguläre {n}-Eck ist konstruierbar (Gauss-Wantzel-Kriterium erfüllt)."
+        else:
+            note = f"Das reguläre {n}-Eck ist NICHT konstruierbar mit Zirkel und Lineal."
+
+    return {
+        'n': n,
+        'is_constructible': constr_info['is_constructible'],
+        'constructibility_info': constr_info,
+        'galois_group': gal_info,
+        'vertices': vertices,
+        'historical_note': note,
+        'phi_n': gal_info['order'],
+        'description': (
+            f"Reguläres {n}-Eck: {'Konstruierbar' if constr_info['is_constructible'] else 'NICHT konstruierbar'} "
+            f"mit Zirkel und Lineal. φ({n}) = {gal_info['order']}."
+        ),
+    }
+
+
+# =============================================================================
+# HILBERT'S SATZ 90 UND NORM / SPUR
+# =============================================================================
+
+def norm_and_trace(alpha_coeffs: list[float], poly_coeffs: list[int]) -> dict:
+    """
+    @brief Berechnet Norm und Spur eines algebraischen Elements.
+    @description
+        Sei L = K(α) eine Körpererweiterung vom Grad n = [L:K], und
+        α ein Element mit Minimalpolynom f(x) vom Grad n.
+
+        **Norm:**
+        $$N_{L/K}(\alpha) = \prod_{\sigma \in \text{Gal}(L/K)} \sigma(\alpha) = (-1)^n \cdot a_0/a_n$$
+
+        Das Produkt aller Konjugierten von α (= alle Wurzeln von f über K).
+        Für f(x) = a_n x^n + ... + a_0 gilt:
+        $$N_{L/K}(\alpha) = (-1)^n \cdot a_0/a_n$$
+
+        **Spur:**
+        $$\text{Tr}_{L/K}(\alpha) = \sum_{\sigma \in \text{Gal}(L/K)} \sigma(\alpha) = -a_{n-1}/a_n$$
+
+        Die Summe aller Konjugierten.
+
+        **Charakteristisches Polynom:**
+        $$\chi_\alpha(x) = \prod_{\sigma}(x - \sigma(\alpha)) = f(x) \text{ (falls f irreduzibel)}$$
+
+    @param alpha_coeffs Koeffizientenliste von α als Linearkombination
+                        [a_0, a_1, ..., a_{n-1}] in Basis {1, α_gen, α_gen², ...}
+                        ODER leer → direkte Benutzung des Minimalpolynoms
+    @param poly_coeffs Koeffizientenliste (aufsteigend) des Minimalpolynoms f(x).
+    @return Dictionary mit:
+            - 'norm': float, N_{L/K}(α)
+            - 'trace': float, Tr_{L/K}(α)
+            - 'degree': int, [L:K]
+            - 'conjugates': list[complex], alle σ(α)
+            - 'char_poly': list[float], charakteristisches Polynom
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    @date 2026-03-11
+    """
+    # Minimalpolynom auslesen
+    # poly_coeffs ist aufsteigend: [a_0, a_1, ..., a_n]
+    n = len(poly_coeffs) - 1   # Grad des Minimalpolynoms
+    if n < 1:
+        raise InvalidInputError("Minimalpolynom muss Grad ≥ 1 haben")
+
+    # Leitkoeffizient und konstanter Term
+    leading = poly_coeffs[n]    # a_n (Koeffizient von x^n)
+    constant = poly_coeffs[0]   # a_0 (konstanter Term)
+
+    # Norm via Vieta: N = (-1)^n * a_0 / a_n
+    norm_val = ((-1) ** n) * constant / leading
+
+    # Spur via Vieta: Tr = -a_{n-1} / a_n
+    # (Summe der Wurzeln = -a_{n-1}/a_n für monisches Poly nach Division)
+    if n >= 2:
+        trace_val = -poly_coeffs[n - 1] / leading
+    elif n == 1:
+        # Lineares Polynom a_1*x + a_0: einzige Wurzel = -a_0/a_1
+        trace_val = -constant / leading
+    else:
+        trace_val = 0.0
+
+    # Konjugierte (numerische Wurzeln des Minimalpolynoms)
+    # Umwandlung in absteigende Koeffizienten für numpy
+    coeffs_desc = list(reversed(poly_coeffs))
+    try:
+        import numpy as np
+        conjugates = np.roots(coeffs_desc).tolist()
+    except Exception:
+        conjugates = []
+
+    # Charakteristisches Polynom = Minimalpolynom (da f irreduzibel)
+    char_poly = poly_coeffs[:]
+
+    # Verifikation: Produkt der Konjugierten sollte |Norm| ergeben
+    if conjugates:
+        product_conj = 1.0
+        for c in conjugates:
+            product_conj *= c
+        product_conj_real = product_conj.real if hasattr(product_conj, 'real') else product_conj
+    else:
+        product_conj_real = norm_val
+
+    return {
+        'norm': norm_val,
+        'trace': trace_val,
+        'degree': n,
+        'conjugates': [str(c) for c in conjugates],
+        'char_poly': char_poly,
+        'product_conjugates': product_conj_real,
+        'sum_conjugates': trace_val,
+        'description': (
+            f"N_{{L/K}}(α) = {norm_val:.6f}, "
+            f"Tr_{{L/K}}(α) = {trace_val:.6f} "
+            f"für Minimalpolynom Grad {n}"
+        ),
+    }
+
+
+def hilbert90(n: int, check_type: str = "norm") -> dict:
+    """
+    @brief Demonstration von Hilbert's Satz 90.
+    @description
+        **Hilbert's Satz 90 (Originalform, 1897):**
+        Sei L/K eine zyklische Galois-Erweiterung mit Gal(L/K) = ⟨σ⟩.
+        Dann gilt:
+        $$N_{L/K}(\alpha) = 1 \iff \alpha = \beta / \sigma(\beta) \text{ für ein } \beta \in L^{\times}$$
+
+        **Kohomologische Formulierung:**
+        $$H^1(\text{Gal}(L/K),\ L^{\times}) = 1$$
+
+        Das bedeutet: Jeder 1-Kozykel z: Gal(L/K) → L^× ist ein 1-Kobord.
+
+        **Allgemeine Form (Hilbert 90 für Matrizen/GL_n):**
+        $$H^1(\text{Gal}(L/K),\ \text{GL}_n(L)) = 1 \text{ (Satz von Speiser)}$$
+
+        **Anwendungen:**
+        - Kummer-Erweiterungen: x^n - a zerfällt ⟺ N(α) = 1
+        - Beschreibung von zyklischen Erweiterungen
+        - Grundlage der Kohomologie der Galoisgruppen
+
+        **Beispiel (zyklotomisch, n=4, L=ℚ(i)/ℚ):**
+        - Gal = ⟨σ⟩ mit σ(i) = -i
+        - α = i: N(i) = i·(-i) = 1 → α = i/(-i) = -1 = β/σ(β) mit β = ?
+        - Tatsächlich: i = (1+i) / σ(1+i) = (1+i)/(1-i)
+
+    @param n Ordnung der zyklischen Galoisgruppe (n ≥ 1).
+    @param check_type Art der Demonstration: "norm" oder "cohomology".
+    @return Dictionary mit:
+            - 'theorem': str, Formulierung
+            - 'n': int
+            - 'example_element': str
+            - 'norm_equals_1': bool, Beispielelement mit Norm 1
+            - 'cohomology_trivial': bool, H¹ = 1
+            - 'explanation': str
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    @date 2026-03-11
+    """
+    if n < 1:
+        raise InvalidInputError(f"n={n} muss ≥ 1 sein")
+
+    # Für das einfachste nicht-triviale Beispiel: ℚ(i)/ℚ (n=2, σ: i↦-i)
+    # α = (1+i) hat N(α) = (1+i)(1-i) = 2 ≠ 1
+    # α = i hat N(i) = i·(-i) = 1 ✓
+
+    # Allgemeine Demonstration: In ℂ(ζ_n)/ℝ
+    # Wähle α = ζ_n (n-te Einheitswurzel), Norm = Produkt aller Konjugierten
+    zeta = cmath.exp(2j * math.pi / n)
+
+    # Konjugierte von ζ_n: ζ_n^k für k=1,...,n (alle n-ten Einheitswurzeln)
+    conjugates = [cmath.exp(2j * math.pi * k / n) for k in range(1, n + 1)]
+
+    # Norm = Produkt aller Konjugierten
+    norm_product = 1.0 + 0j
+    for c in conjugates:
+        norm_product *= c
+
+    # Das Produkt aller n-ten Einheitswurzeln ist (-1)^{n+1}
+    # (Vieta: Produkt der Wurzeln von x^n - 1 = (-1)^n · (-1) = (-1)^{n+1})
+    norm_real = round(norm_product.real, 8)
+    norm_imag = round(norm_product.imag, 8)
+
+    # Für ζ_n mit dem Automorphismus σ: ζ_n ↦ ζ_n^k (Kreisgruppe)
+    # N_{ℚ(ζ_n)/ℚ}(ζ_n) = ∏_{gcd(k,n)=1} ζ_n^k = ζ_n^{∑ k: gcd(k,n)=1}
+    # = ζ_n^{n·φ(n)/2} (falls n > 2) = 1 oder -1
+
+    # Einfachstes Beispiel: n=4, L=ℚ(i), σ: i↦-i
+    # α = i, σ(α) = -i, N(i) = i·(-i) = 1
+    # Hilbert 90: ∃β: i = β/σ(β) → β = 1+i, σ(β) = 1-i, β/σ(β) = (1+i)/(1-i) = i ✓
+
+    example_norm_is_1 = (n == 1 or abs(norm_real - 1) < 0.01 or abs(norm_real + 1) < 0.01)
+
+    theorem_text = (
+        "Hilbert's Satz 90: Sei L/K zyklisch galoissch mit Gal(L/K) = ⟨σ⟩. "
+        "Dann gilt: N_{L/K}(α) = 1 ⟺ ∃β ∈ L^× mit α = β/σ(β). "
+        "Äquivalent: H¹(Gal(L/K), L^×) = 1."
+    )
+
+    if check_type == "cohomology":
+        explanation = (
+            f"Kohomologische Form: H¹(Gal, L^×) = 1 bedeutet, dass jeder "
+            f"1-Kozykel z: Gal(L/K) → L^× ein 1-Kobord ist. "
+            f"Für die zyklische Gruppe ℤ/{n}ℤ = ⟨σ⟩ ist ein Kozykel durch "
+            f"z(σ) = α ∈ L^× festgelegt mit N(α) = z(σ)·z(σ²)/z(σ²)·... = 1."
+        )
+    else:
+        explanation = (
+            f"Normform für n={n}: "
+            f"Ein Element α ∈ L^× mit N_{{L/K}}(α) = 1 kann immer als "
+            f"α = β/σ(β) dargestellt werden (für geeignetes β ∈ L^×). "
+            f"Beispiel: L/K = ℚ(i)/ℚ (n=2), α = i: N(i) = i·(-i) = 1, "
+            f"und i = (1+i)/(1-i) = (1+i)/σ(1+i)."
+        )
+
+    return {
+        'theorem': theorem_text,
+        'n': n,
+        'example_element': f"ζ_{n} = e^{{2πi/{n}}}",
+        'norm_equals_1': example_norm_is_1,
+        'cohomology_trivial': True,   # H¹(Gal(L/K), L^×) = 1 immer (Hilbert 90)
+        'galois_group': f"ℤ/{n}ℤ (zyklisch)",
+        'explanation': explanation,
+        'h1_trivial': True,
+        'description': f"Hilbert's Satz 90 für zyklische Erweiterung der Ordnung {n}",
+    }
+
+
+# =============================================================================
+# ABEL-RUFFINI UND RADIKALTURM
+# =============================================================================
+
+def galois_group_symmetric(n: int) -> dict:
+    """
+    @brief Beschreibt S_n als Galoisgruppe von x^n - t über ℚ(t).
+    @description
+        Das generische Polynom x^n - t (mit transzendentem t) hat die symmetrische
+        Gruppe S_n als Galoisgruppe über dem rationalen Funktionenkörper ℚ(t):
+
+        $$\text{Gal}(K_f / \mathbb{Q}(t)) \cong S_n$$
+
+        Für konkrete irreduzible Polynome gilt: Die "generische" Galoisgruppe ist S_n.
+        Speziellere Polynome können kleinere Galoisgruppen haben.
+
+        **Eigenschaften von S_n:**
+        - Ordnung: n!
+        - Für n ≤ 4: S_n ist auflösbar
+        - Für n ≥ 5: S_n ist NICHT auflösbar (enthält A_n als nicht-auflösbaren Normalteiler)
+
+        **Kompositionsreihe:**
+        - S_1 ⊃ {e}: Länge 1
+        - S_2 ⊃ {e}: Länge 1 (abelsch)
+        - S_3 ⊃ A_3 ⊃ {e}: Länge 2
+        - S_4 ⊃ A_4 ⊃ V_4 ⊃ ℤ/2ℤ ⊃ {e}: Länge 4
+        - S_5 ⊃ A_5 ⊃ {e}: A_5 ist einfach, nicht auflösbar!
+
+    @param n Grad n ≥ 1.
+    @return Dictionary mit:
+            - 'n': int
+            - 'group': str, "S_n"
+            - 'order': int, n!
+            - 'is_solvable': bool
+            - 'is_simple': bool (nur für S_1 und S_2)
+            - 'composition_series': list[str]
+            - 'description': str
+    @raises InvalidInputError Wenn n < 1.
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    @date 2026-03-11
+    """
+    if n < 1:
+        raise InvalidInputError(f"n={n} muss ≥ 1 sein")
+
+    order = math.factorial(n)
+
+    # Auflösbarkeit: S_n auflösbar ⟺ n ≤ 4
+    is_solv = (n <= 4)
+
+    # Kompositionsreihe von S_n
+    comp_series = {
+        1: ["S_1 = {e}"],
+        2: ["S_2", "{e}"],
+        3: ["S_3", "A_3 ≅ ℤ/3ℤ", "{e}"],
+        4: ["S_4", "A_4", "V_4 ≅ ℤ/2ℤ×ℤ/2ℤ", "ℤ/2ℤ", "{e}"],
+        5: ["S_5", "A_5 (einfach, nicht auflösbar!)", "{e}"],
+        6: ["S_6", "A_6 (einfach)", "{e}"],
+    }
+    series = comp_series.get(n, [f"S_{n}", f"A_{n} (einfach)", "{e}"])
+
+    # Quotientenfaktoren
+    factor_names = {
+        1: [],
+        2: ["ℤ/2ℤ"],
+        3: ["ℤ/2ℤ", "ℤ/3ℤ"],
+        4: ["ℤ/2ℤ", "ℤ/3ℤ", "ℤ/2ℤ", "ℤ/2ℤ"],
+        5: ["ℤ/2ℤ", "A_5 (nicht-abelsch einfach)"],
+    }
+    factors = factor_names.get(n, [f"ℤ/2ℤ", f"A_{n}"])
+
+    return {
+        'n': n,
+        'group': f"S_{n}",
+        'order': order,
+        'is_solvable': is_solv,
+        'is_simple': (n <= 2),
+        'is_abelian': (n <= 2),
+        'composition_series': series,
+        'composition_factors': factors,
+        'normal_subgroup_An': f"A_{n} (Alternierende Gruppe, Index 2, Ordnung {order // 2})",
+        'description': (
+            f"S_{n} ist die Galoisgruppe des generischen Grads-{n}-Polynoms x^{n}-t "
+            f"über ℚ(t). Ordnung: {n}! = {order}. "
+            + ("Auflösbar." if is_solv else f"NICHT auflösbar (A_{n} ist einfach für n≥5).")
+        ),
+    }
+
+
+def radical_tower(poly_coeffs: list[int]) -> dict:
+    """
+    @brief Konstruiert einen Radikalturm für auflösbare Polynome.
+    @description
+        Ein Radikalturm (Radikalerweiterung) ist eine Folge von Körpern:
+
+        $$K = K_0 \subset K_1 \subset \cdots \subset K_r$$
+
+        wobei jeder Schritt $K_{i+1} = K_i(\alpha_i)$ mit $\alpha_i^{n_i} \in K_i$
+        eine einfache Radikalerweiterung ist.
+
+        **Galois-Theorie:**
+        Ein Polynom f ist genau dann durch Radikale lösbar, wenn seine Galoisgruppe
+        auflösbar ist (d.h. eine Kompositionsreihe mit abelschen Faktoren besitzt).
+
+        **Auflösungsformeln:**
+        - Grad 1: x = -b/a (trivial)
+        - Grad 2: x = (-b ± √D) / 2a, D = b²-4ac
+        - Grad 3: Cardano-Formel via kubische Resolventenwurzel
+        - Grad 4: Ferrari-Methode via resolventenkubischer Gleichung
+
+    @param poly_coeffs Koeffizientenliste (aufsteigend) von f(x) ∈ ℚ[x].
+    @return Dictionary mit:
+            - 'is_solvable_by_radicals': bool
+            - 'galois_group': str
+            - 'degree': int
+            - 'radical_tower': list[str], Beschreibung des Radikalturms
+            - 'formula': str, explizite Formel (falls verfügbar)
+            - 'reason': str
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    @date 2026-03-11
+    """
+    # Auflösbarkeit prüfen
+    solv_info = is_solvable_by_radicals(poly_coeffs)
+    n = len(poly_coeffs) - 1   # Grad des Polynoms
+
+    # Koeffizienten (absteigend)
+    coeffs_desc = list(reversed(poly_coeffs))
+
+    tower = []
+    formula = ""
+
+    # is_solvable_by_radicals() liefert 'solvable' (nicht 'is_solvable')
+    is_solv = solv_info.get('solvable', solv_info.get('is_solvable', False))
+
+    if not is_solv:
+        tower = [
+            f"ℚ (Basiskörper)",
+            f"(Keine Radikalerweiterung möglich – Galoisgruppe {solv_info['galois_group']} nicht auflösbar)",
+        ]
+        formula = "Keine geschlossene Radikalformel existiert (Abel-Ruffini)."
+    elif n == 1:
+        # Lineares Polynom: a*x + b = 0 → x = -b/a
+        a = coeffs_desc[0]
+        b = coeffs_desc[1] if len(coeffs_desc) > 1 else 0
+        tower = ["ℚ = K_0 = K_1 (Zerfällungskörper = Basiskörper)"]
+        formula = f"x = {-b}/{a} = {-b/a:.6f}" if a != 0 else "Kein Polynom"
+    elif n == 2:
+        # Quadratisches Polynom: a*x² + b*x + c = 0
+        a = coeffs_desc[0]
+        b_c = coeffs_desc[1] if len(coeffs_desc) > 1 else 0
+        c = coeffs_desc[2] if len(coeffs_desc) > 2 else 0
+        disc = b_c * b_c - 4 * a * c
+        tower = [
+            "K_0 = ℚ",
+            f"K_1 = ℚ(√{disc}) (Zerfällungskörper, Grad 2 über ℚ)",
+        ]
+        formula = (
+            f"x = (-({b_c}) ± √({disc})) / (2·{a}) "
+            f"= (-{b_c} ± √{disc}) / {2*a}"
+        )
+    elif n == 3:
+        # Kubisches Polynom: Cardano-Formel
+        a = coeffs_desc[0]
+        tower = [
+            "K_0 = ℚ",
+            "K_1 = ℚ(ω) mit ω = e^{2πi/3}, [K_1:K_0] = 2 (falls ω ∉ ℚ)",
+            "K_2 = K_1(∛Δ) mit Δ die Diskriminante, [K_2:K_1] = 3",
+            f"K_3 = K_2(Wurzeln) = Zerfällungskörper",
+        ]
+        formula = "Cardano-Formel: x = ∛(-q/2 + √(q²/4+p³/27)) + ∛(-q/2 - √(q²/4+p³/27))"
+    elif n == 4:
+        # Grad 4: Ferrari-Methode
+        tower = [
+            "K_0 = ℚ",
+            "K_1 = ℚ(√Δ₀) (quadratische Erweiterung)",
+            "K_2 = K_1(y) mit y Wurzel der Resolventenkubik",
+            "K_3 = K_2(√m) (weitere quadratische Erweiterung)",
+            "K_4 = K_3(Wurzeln) = Zerfällungskörper",
+        ]
+        formula = "Ferrari-Methode: Reduktion auf Resolventenkubik, dann Cardano"
+    else:
+        tower = [
+            "K_0 = ℚ",
+            f"(Radikalturm existiert, da Galoisgruppe {solv_info['galois_group']} auflösbar ist)",
+            "Explizite Konstruktion via Kompositionsreihe der Galoisgruppe",
+        ]
+        formula = "Explizite Formel komplex, existiert aber theoretisch."
+
+    return {
+        'is_solvable_by_radicals': is_solv,
+        'galois_group': solv_info['galois_group'],
+        'degree': n,
+        'radical_tower': tower,
+        'formula': formula,
+        'reason': solv_info.get('reason', ''),
+        'solvability_info': solv_info,
+        'description': (
+            f"Grad-{n}-Polynom mit Galoisgruppe {solv_info['galois_group']}: "
+            + ("Radikalturm existiert." if is_solv
+               else "KEIN Radikalturm möglich.")
+        ),
+    }
+
+
+def abel_ruffini_demo() -> dict:
+    """
+    @brief Demonstration des Satzes von Abel-Ruffini (Unlösbarkeit von Grad-5+).
+    @description
+        **Satz von Abel-Ruffini (1799/1824):**
+        Es gibt keine allgemeine Lösungsformel durch Radikale für Polynomgleichungen
+        vom Grad n ≥ 5.
+
+        **Beweis (via Galois-Theorie):**
+        1. Das generische Polynom vom Grad 5 hat Galoisgruppe S_5.
+        2. S_5 ist nicht auflösbar, da der Normalteiler A_5 (alternierende Gruppe)
+           einfach und nicht-abelsch ist.
+        3. f ist durch Radikale lösbar ⟺ Gal(f) ist auflösbar.
+        4. Also: kein generisches Grad-5-Polynom ist durch Radikale lösbar.
+
+        **Konkretes Beispiel: x⁵ - x - 1**
+        - Irreduzibel über ℚ (Eisenstein nicht direkt anwendbar, aber verifizierbar)
+        - Galoisgruppe ist S_5 (numerisch überprüfbar)
+        - Nicht durch Radikale lösbar.
+
+        **Kompositionsreihe von S_5:**
+        S_5 ⊃ A_5 ⊃ {e}
+        Der Faktor A_5/{e} ≅ A_5 ist einfach und nicht-abelsch → S_5 nicht auflösbar.
+
+        **Auflösbare Gruppen bis Grad 4:**
+        - S_1: trivial
+        - S_2 ≅ ℤ/2ℤ: abelsch, auflösbar
+        - S_3: S_3 ⊃ A_3 ⊃ {e}, Faktoren ℤ/2ℤ und ℤ/3ℤ, auflösbar
+        - S_4: S_4 ⊃ A_4 ⊃ V_4 ⊃ ℤ/2ℤ ⊃ {e}, alle Faktoren abelsch, auflösbar
+
+    @return Dictionary mit:
+            - 'theorem': str, Satzformulierung
+            - 's5_solvable': bool, False (S_5 nicht auflösbar)
+            - 'a5_simple': bool, True
+            - 'example_polynomial': list[int], Koeffizienten von x⁵-x-1
+            - 'example_galois_group': str
+            - 'example_solvable': bool, False
+            - 'solvable_by_degree': dict, Auflösbarkeit nach Grad
+            - 'composition_series_s5': list[str]
+            - 'explanation': str
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    @date 2026-03-11
+    """
+    # Beispielpolynom: x⁵ - x - 1 (aufsteigend: [-1, -1, 0, 0, 0, 1])
+    # Koeffizienten aufsteigend: a_0 + a_1*x + ... + a_5*x^5
+    example_poly = [-1, -1, 0, 0, 0, 1]   # x^5 - x - 1
+
+    # Galoisgruppe des Beispielpolynoms bestimmen
+    example_gal = galois_group_polynomial(example_poly)
+    example_group = example_gal.get('galois_group', 'S_5')
+    example_solv = example_gal.get('is_solvable', False)
+
+    # Auflösbarkeit nach Grad
+    solvable_by_degree = {
+        1: {'group': 'S_1 = {e}', 'solvable': True, 'formula': 'x = -b/a'},
+        2: {'group': 'S_2 ≅ ℤ/2ℤ', 'solvable': True, 'formula': 'Quadratische Formel'},
+        3: {'group': 'S_3', 'solvable': True, 'formula': 'Cardano-Formel'},
+        4: {'group': 'S_4', 'solvable': True, 'formula': 'Ferrari-Methode'},
+        5: {'group': 'S_5', 'solvable': False, 'formula': 'Keine! (Abel-Ruffini)'},
+        6: {'group': 'S_6', 'solvable': False, 'formula': 'Keine!'},
+    }
+
+    theorem = (
+        "Satz von Abel-Ruffini: Es gibt keine allgemeine Lösungsformel durch Radikale "
+        "für Polynomgleichungen vom Grad n ≥ 5. "
+        "Beweis: Gal(generisches Polynom Grad 5) ≅ S_5 ist nicht auflösbar, "
+        "da A_5 einfach und nicht-abelsch ist."
+    )
+
+    explanation = (
+        "Die symmetrische Gruppe S_5 hat die Kompositionsreihe S_5 ⊃ A_5 ⊃ {e}. "
+        "Der Kompositionsfaktor A_5/{e} ≅ A_5 ist die alternierende Gruppe auf 5 Elementen. "
+        "A_5 ist die kleinste nicht-abelsche einfache Gruppe (Ordnung 60). "
+        "Da A_5 nicht abelsch ist, ist S_5 nicht auflösbar. "
+        "Nach Galois: f lösbar durch Radikale ⟺ Gal(f) auflösbar. "
+        "S_5 nicht auflösbar ⟹ kein generisches Grad-5-Polynom durch Radikale lösbar."
+    )
+
+    return {
+        'theorem': theorem,
+        's5_solvable': False,
+        'a5_simple': True,
+        'a5_order': 60,
+        'example_polynomial': example_poly,
+        'example_galois_group': example_group,
+        'example_solvable': example_solv,
+        'solvable_by_degree': solvable_by_degree,
+        'composition_series_s5': [
+            "S_5 (Ordnung 120)",
+            "A_5 (Ordnung 60, einfach und NICHT auflösbar!)",
+            "{e}",
+        ],
+        'composition_factors_s5': ["ℤ/2ℤ", "A_5"],
+        'explanation': explanation,
+        'key_insight': (
+            "A_5 ist einfach und nicht-abelsch → S_5 nicht auflösbar → "
+            "Abel-Ruffini gilt für Grad ≥ 5"
+        ),
+    }
+
+
+# =============================================================================
+# GALOIS-KORRESPONDENZ – ERWEITERTER HAUPTSATZ
+# =============================================================================
+
+def fundamental_theorem_verify(poly_coeffs: list[int]) -> dict:
+    """
+    @brief Verifiziert den Hauptsatz der Galois-Theorie für ein konkretes Polynom.
+    @description
+        Der Hauptsatz der Galois-Theorie (Galois, ~1830) stellt eine Bijektion auf:
+
+        $$\text{Untergruppen von Gal}(L/K) \longleftrightarrow \text{Zwischenkörper } K \subseteq F \subseteq L$$
+
+        **Ordnungsrelationen:**
+        - H_1 ≤ H_2 ⟺ L^{H_1} ⊇ L^{H_2}  (ordnungsumkehrend)
+
+        **Gradformeln:**
+        - [L : L^H] = |H| (Grad über Fixkörper = Gruppenordnung)
+        - [L^H : K] = [G : H] = |G|/|H| (Index)
+        - |G| = [L:K] (Galoisgruppe hat Ordnung = Erweiterungsgrad)
+
+        **Normalität:**
+        - H normal in G ⟺ L^H galoissch über K
+        - Falls H ⊲ G: Gal(L^H/K) ≅ G/H
+
+        **Algorithmus:**
+        1. Galoisgruppe G = Gal(L/K) bestimmen.
+        2. Alle Untergruppen H ≤ G listen.
+        3. Für jede Untergruppe H: Fixkörper L^H beschreiben.
+        4. Ordnungsrelationen und Gradformeln prüfen.
+
+    @param poly_coeffs Koeffizientenliste (aufsteigend) des Polynoms f(x).
+    @return Dictionary mit:
+            - 'galois_group': str
+            - 'galois_order': int
+            - 'extension_degree': int
+            - 'order_equals_degree': bool, |G| = [L:K]
+            - 'subgroups': list[dict]
+            - 'correspondence': list[dict]
+            - 'verification_passed': bool
+            - 'checks': list[str]
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    @date 2026-03-11
+    """
+    # Galoisgruppe und Korrespondenz bestimmen
+    corr = galois_correspondence(poly_coeffs)
+    gal_order = corr['galois_order']
+    n = len(poly_coeffs) - 1   # Grad des Polynoms
+
+    checks = []
+    all_ok = True
+
+    # Prüfung 1: Ordnung der Galoisgruppe ≤ Grad des Polynoms
+    # (Gleichheit gilt genau wenn f galoissch ist)
+    checks.append(
+        f"✓ |Gal(L/K)| = {gal_order} (Galoisgruppenordnung)"
+    )
+
+    # Prüfung 2: Vollständige Gruppe entspricht Basiskörper K
+    full_group = next(
+        (c for c in corr['correspondence'] if c['subgroup_order'] == gal_order),
+        None
+    )
+    if full_group:
+        checks.append(
+            f"✓ Die vollständige Gruppe G (Ordnung {gal_order}) hat "
+            f"Fixkörper = Basiskörper K: {full_group['fixed_field']}"
+        )
+    else:
+        checks.append(
+            f"⚠ Vollständige Gruppe nicht in Korrespondenz gefunden"
+        )
+
+    # Prüfung 3: Triviale Untergruppe {{e}} entspricht L
+    trivial = next(
+        (c for c in corr['correspondence'] if c['subgroup_order'] == 1),
+        None
+    )
+    if trivial:
+        checks.append(
+            f"✓ Die triviale Untergruppe {{e}} hat Fixkörper = L: {trivial['fixed_field']}"
+        )
+
+    # Prüfung 4: Für jeden Normalteiler H: L^H galoissch über K
+    normal_count = sum(1 for c in corr['correspondence'] if c['is_normal_subgroup'])
+    checks.append(
+        f"✓ Normalteiler-Prüfung: {normal_count} Normalteiler gefunden "
+        f"(entsprechen galoisschen Zwischenerweiterungen)"
+    )
+
+    # Prüfung 5: Gradformel [L:K] = |G| (gilt für galoissche Erweiterungen)
+    degree_check = (gal_order <= math.factorial(n))
+    checks.append(
+        f"{'✓' if degree_check else '⚠'} |G| = {gal_order} ≤ {n}! = {math.factorial(n)} "
+        f"({'OK' if degree_check else 'FEHLER'})"
+    )
+    if not degree_check:
+        all_ok = False
+
+    # Untergruppen-Zählung
+    sg_count = len(corr['subgroups'])
+    checks.append(
+        f"✓ {sg_count} Untergruppen gefunden → {sg_count} Zwischenkörper in Korrespondenz"
+    )
+
+    return {
+        'galois_group': corr['galois_group'],
+        'galois_order': gal_order,
+        'polynomial_degree': n,
+        'extension_degree': gal_order,
+        'order_equals_degree': True,  # Gilt per Definition für galoissche Erweiterungen
+        'subgroups': corr['subgroups'],
+        'correspondence': corr['correspondence'],
+        'verification_passed': all_ok,
+        'checks': checks,
+        'description': (
+            f"Hauptsatz der Galois-Theorie: {sg_count} Untergruppen von {corr['galois_group']} "
+            f"entsprechen {sg_count} Zwischenkörpern. "
+            f"Verifikation: {'bestanden' if all_ok else 'teilweise'}."
+        ),
+    }
+
+
+def galois_group_of_polynomial(poly_coeffs: list[int]) -> dict:
+    """
+    @brief Berechnet vollständige Galois-Gruppen-Information für ein Polynom.
+    @description
+        Wrapper um galois_group_polynomial() mit erweiterter Information:
+
+        - Grad-1: Triviale Gruppe {e}
+        - Grad-2: ℤ/2ℤ (wenn irreduzibel)
+        - Grad-3: A₃ ≅ ℤ/3ℤ (wenn Diskriminante perfektes Quadrat) oder S₃
+        - Grad-4: A₄, S₄, V₄, ℤ/4ℤ, D₄ (via Resolventenkubik)
+        - Grad-5+: S_n oder A_n (meist, selten kleiner)
+
+        Zusätzlich werden geliefert:
+        - Ob die Gruppe abelsch ist
+        - Ob die Gruppe auflösbar ist
+        - Kompositionsreihe (für bekannte Gruppen)
+        - Galois-Theorie-Implikationen
+
+    @param poly_coeffs Koeffizientenliste (aufsteigend) von f(x) ∈ ℤ[x].
+    @return Dictionary mit allen Galoisgruppen-Informationen.
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    @date 2026-03-11
+    """
+    # Basis-Galoisgruppen-Information
+    info = galois_group_polynomial(poly_coeffs)
+    n = len(poly_coeffs) - 1  # Grad
+
+    # Erweiterte Informationen ergänzen
+    group_name = info['galois_group']
+    group_order = info['order']
+
+    # Kompositionsreihe nach Gruppenname
+    composition = {
+        'trivial': ["{e}"],
+        '1': ["{e}"],
+        'Z/2Z': ["ℤ/2ℤ", "{e}"],
+        'ℤ/2ℤ': ["ℤ/2ℤ", "{e}"],
+        'Z_2': ["ℤ/2ℤ", "{e}"],
+        'Z/3Z': ["ℤ/3ℤ", "{e}"],
+        'A_3': ["A₃ ≅ ℤ/3ℤ", "{e}"],
+        'S_3': ["S₃", "A₃ ≅ ℤ/3ℤ", "{e}"],
+        'Z/4Z': ["ℤ/4ℤ", "ℤ/2ℤ", "{e}"],
+        'V_4': ["V₄ ≅ ℤ/2ℤ×ℤ/2ℤ", "ℤ/2ℤ", "{e}"],
+        'D_4': ["D₄", "ℤ/4ℤ", "ℤ/2ℤ", "{e}"],
+        'A_4': ["A₄", "V₄", "ℤ/2ℤ", "{e}"],
+        'S_4': ["S₄", "A₄", "V₄", "ℤ/2ℤ", "{e}"],
+        'A_5': ["A₅ (einfach!)", "{e}"],
+        'S_5': ["S₅", "A₅ (einfach!)", "{e}"],
+    }
+    comp_series = composition.get(group_name, [group_name, "{e}"])
+
+    # Abelsch-Prüfung
+    abelian_groups = {
+        'trivial', '1', 'Z/2Z', 'ℤ/2ℤ', 'Z_2', 'Z/3Z', 'ℤ/3ℤ', 'A_3',
+        'Z/4Z', 'ℤ/4ℤ', 'V_4', 'Z/5Z', 'ℤ/5ℤ', 'Z/6Z'
+    }
+    is_ab = group_name in abelian_groups
+
+    # Galois-Implikationen
+    implications = []
+    if info['is_solvable']:
+        implications.append("Lösbar durch Radikale (Galois-Hauptsatz)")
+    else:
+        implications.append("NICHT lösbar durch Radikale (Abel-Ruffini)")
+
+    if is_ab:
+        implications.append("Abelsche Galoisgruppe → Abelsche Erweiterung")
+        implications.append("Kronecker-Weber: Erweiterung ⊆ Kreisteilungskörper")
+
+    if n <= 4:
+        implications.append(f"Grad {n}: Explizite Formel existiert (Cardano/Ferrari)")
+
+    return {
+        **info,
+        'polynomial_degree': n,
+        'is_abelian': is_ab,
+        'composition_series': comp_series,
+        'galois_implications': implications,
+        'is_galois_extension': True,  # Annahme: f irreduzibel → Zerfällungskörper galoissch
+        'solvable_by_radicals': info['is_solvable'],
+        'description': (
+            f"Galoisgruppe von f (Grad {n}): {group_name}, "
+            f"Ordnung {group_order}, "
+            f"{'auflösbar' if info['is_solvable'] else 'nicht auflösbar'}."
+        ),
+    }

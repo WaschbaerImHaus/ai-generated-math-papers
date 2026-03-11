@@ -383,3 +383,23 @@
   NEU: src/ergodic_theory.md — KaTeX-Dokumentation mit Formeln
   Mathematik: Birkhoff (1931), von Neumann (1932), KS-Entropie, Tao-Collatz (2019),
     Furstenberg-Korrespondenz, Szemerédi-Theorem, Golden-Mean-Shift
+
+2026-03-11 Build 84: Galois-Theorie-Modul vollständig erweitert
+- src/galois_theory.py: 13 neue Funktionen hinzugefügt:
+  - cyclotomic_galois_group(n): Gal(Q(zeta_n)/Q) ≅ (Z/nZ)^× mit Erzeuger, Automorphismen
+  - kronecker_weber_check(f): Abelsche Erweiterung → Einbettung in Q(zeta_n)
+  - dirichlet_characters_from_galois(n): Gruppencharaktere als Dirichlet-Charaktere mod n
+  - galois_group_finite_field(p,n): Gal(GF(p^n)/GF(p)) ≅ Z/nZ, Frobenius-Erzeuger
+  - is_constructible(n): Gauss-Wantzel-Kriterium (Fermat-Primzahlen, 2-Potenz φ(n))
+  - construct_regular_polygon(n): Vollständige Polygon-Analyse mit Ecken im C
+  - norm_and_trace(alpha, poly): N_{L/K} und Tr_{L/K} via Vieta-Formeln
+  - hilbert90(n): Demonstration H^1(Gal, L^×) = 1 (kohomologisch + Normform)
+  - galois_group_symmetric(n): S_n Kompositionsreihe, Auflösbarkeit, Ordnung n!
+  - radical_tower(f): Radikalturm mit expliziter Formel (Grad 1-4) oder Beschreibung
+  - abel_ruffini_demo(): S_5 nicht auflösbar, A_5 einfach, Auflösbarkeit nach Grad
+  - fundamental_theorem_verify(f): Hauptsatz-Verifikation mit Prüfliste
+  - galois_group_of_polynomial(f): Erweiterte Galoisgruppen-Info mit Implikationen
+- tests/test_galois_theory.py: 94 neue Tests in 13 neuen Klassen → 184 Tests total, alle grün
+- src/galois_theory.md: Vollständige KaTeX-Dokumentation aktualisiert (Build 84)
+- Bugfix: radical_tower() nutzte 'is_solvable' statt 'solvable' (Key-Fehler behoben)
+- Testkorrektur: N_{Q(sqrt2)/Q}(sqrt2) = -2 (Vieta-Formel, nicht +2)
