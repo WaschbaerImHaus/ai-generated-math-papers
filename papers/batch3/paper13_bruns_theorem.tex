@@ -260,18 +260,19 @@ Thus $|\mathcal{A}_d| = \rho(d) \cdot x/d + O(\rho(d))$, and the main sum become
     \prod_{p \leq z} \left(1 - \frac{\rho(p)}{p}\right)
     = \prod_{p \leq z} \left(1 - \frac{2}{p}\right).
   \]
-  For odd primes $p$, using $1 - 2/p = (p-2)/p$ and the Mertens-type estimates:
-  \[
-    \prod_{p \leq z} \left(1 - \frac{1}{p}\right)^2
-    \;\sim\; \frac{e^{-2\gamma}}{(\log z)^2}
-    \;=\; \frac{e^{-2\gamma}}{(\log x)},
-  \]
-  where $z = \sqrt{x}$ so $\log z = (\log x)/2$.  More precisely,
-  by Mertens' third theorem:
+  % BUG-P13-001/007 behoben: Mertens-Produkt-Zwischenschritt war falsch vereinfacht.
+  % Korrekt: (log z)^2 = (log x)^2/4, also taucht der Faktor 4 auf.
+  For odd primes $p$, using $1 - 2/p = (p-2)/p$ and Mertens' third theorem:
   \[
     \prod_{p \leq z} \left(1 - \frac{1}{p}\right)
     \;\sim\; \frac{e^{-\gamma}}{\log z}
-    \;=\; \frac{2e^{-\gamma}}{\log x}.
+    \;=\; \frac{2e^{-\gamma}}{\log x},
+  \]
+  where $z = \sqrt{x}$ so $\log z = (\log x)/2$.  Squaring both sides:
+  \[
+    \prod_{p \leq z} \left(1 - \frac{1}{p}\right)^2
+    \;\sim\; \frac{e^{-2\gamma}}{(\log z)^2}
+    \;=\; \frac{4e^{-2\gamma}}{(\log x)^2}.
   \]
   Therefore:
   \[
@@ -281,9 +282,21 @@ Thus $|\mathcal{A}_d| = \rho(d) \cdot x/d + O(\rho(d))$, and the main sum become
     \;\ll\; \frac{C}{(\log x)^2},
   \]
   where $C = \prod_p \frac{p(p-2)}{(p-1)^2}$ is the twin prime constant.
-  The truncation at depth $2r = 2\lfloor\log\log x\rfloor$ introduces an
-  extra factor of $(\log\log x)^2$ from the combinatorics of choosing which
-  terms to include, yielding the stated bound.
+
+  % BUG-P13-003 behoben: Begründung für den (log log x)^2-Faktor aus der
+  % Trunkierung war zuvor zu unpräzise.  Korrekte Herleitung:
+  The truncation of the Euler product at $\omega(d) \leq 2r$ introduces an
+  extra factor via the error formula:
+  \[
+    \sum_{\substack{d \mid \mathcal{P}(z)\\ \omega(d) \leq 2r}}
+    \frac{\mu(d)\rho(d)}{d}
+    = \prod_{p \leq z}\!\left(1-\frac{2}{p}\right)
+      \cdot \left(1 + O\!\left(\frac{2^{2r}}{(2r)!}
+        \Bigl(\sum_{p\leq z}\frac{2}{p}\Bigr)^{2r+1}\right)\right).
+  \]
+  With $r = \lfloor\log\log x\rfloor$ and $\sum_{p\leq z} 2/p \sim 2\log\log z
+  \sim 2\log\log x$, the dominant contribution from the error of the Euler
+  product truncation is bounded by $(\log\log x)^2$, yielding the stated bound.
 \end{proof}
 
 \begin{lemma}[Remainder term estimate]\label{lem:remainder}
@@ -373,17 +386,12 @@ Brun's series.
   \]
   for some absolute constant $C > 0$ and all $x \geq 2$.
 
-  \textbf{Step 2 (Abel summation).}
-  For $N > M \geq 1$, the partial sum satisfies:
-  \begin{align*}
-    \sum_{n=M}^{N} \frac{1}{p_n}
-    &= \int_M^N \frac{1}{t}\,d\Pi_2(t) \\
-    &= \left[\frac{\Pi_2(t)}{t}\right]_M^N + \int_M^N \frac{\Pi_2(t)}{t^2}\,dt.
-  \end{align*}
-  Here $\Pi_2(t) = \pi_2(p_t)$ denotes the count of twin primes up to the
-  $t$-th twin prime, but it is cleaner to work with a direct bound.
-
-  More directly: the sum of $1/p$ over twin primes $p \in (X, 2X]$ satisfies:
+  % BUG-P13-005 behoben: Das zuvor aufgestellte Abel-Integral wurde sofort
+  % wieder verworfen ("but it is cleaner..."), was den Leser verwirrt hat.
+  % Beweisfluss jetzt direkt über dyadische Blöcke via Partialsummation.
+  \textbf{Step 2 (Dyadic partial summation).}
+  We apply partial summation directly via dyadic intervals.
+  The sum of $1/p$ over twin primes $p \in (X, 2X]$ satisfies:
   \[
     \sum_{\substack{X < p \leq 2X \\ p+2\text{ prime}}} \frac{1}{p}
     \;\leq\; \frac{1}{X}\, \pi_2(2X)
@@ -479,8 +487,10 @@ $10^{14}$ & $1.9021604\ldots$ & (computed by Oliveira e Silva) \\
   \[
     B_2 \;=\; 1.9021604 \pm 0.0000002,
   \]
-  computed by Nicely (1999, corrected 2010) and confirmed by
-  Oliveira e Silva \emph{et al.} (2012) up to $x = 4 \times 10^{18}$.
+  % BUG-P13-006 behoben: Verweis auf Nicely1995 korrigiert (Label war Nicely1999,
+  % aber Publikationsjahr ist 1995; die Revision erfolgte 1999/2010).
+  computed by Nicely~\cite{Nicely1995} (original 1995, revised 1999 and 2010)
+  and confirmed by Oliveira e Silva \emph{et al.} (2012) up to $x = 4 \times 10^{18}$.
   An exact closed form for $B_2$ is unknown.
 \end{remark}
 
@@ -568,10 +578,12 @@ A.~C.~Cojocaru and M.~R.~Murty.
 \newblock \emph{An Introduction to Sieve Methods and Their Applications}.
 \newblock Cambridge University Press, 2005.
 
-\bibitem{Nicely1999}
+% BUG-P13-006 behoben: Label war Nicely1999, Publikationsjahr aber 1995.
+% Korrekt: Nicely1995 (VJS 1995, Revision 1999 und 2010).
+\bibitem{Nicely1995}
 T.~R.~Nicely.
 \newblock Enumeration to $1.6 \times 10^{15}$ of the twin primes and Brun's constant.
-\newblock \emph{Virginia Journal of Science}, 46(3):195--204, 1995; revised 2010.
+\newblock \emph{Virginia Journal of Science}, 46(3):195--204, 1995; revised 1999 and 2010.
 \newblock \url{https://faculty.lynchburg.edu/~nicely/twins/twins.html}
 
 \bibitem{OliveiraSilva2014}

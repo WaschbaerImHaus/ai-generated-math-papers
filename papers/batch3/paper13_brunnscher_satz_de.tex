@@ -261,14 +261,22 @@ Hauptsumme nimmt die Form an:
     \prod_{p \leq z} \left(1 - \frac{\rho(p)}{p}\right)
     = \prod_{p \leq z} \left(1 - \frac{2}{p}\right)
   \]
-  ab.  Für ungerade Primzahlen gilt $1 - 2/p = (p-2)/p$.  Mit dem Mertensschen
+  ab.  % BUG-P13-001/007 behoben: Mertens-Produkt-Zwischenschritt war falsch vereinfacht.
+  % Korrekt: (log z)^2 = (log x)^2/4, also taucht der Faktor 4 auf.
+  Für ungerade Primzahlen gilt $1 - 2/p = (p-2)/p$.  Mit dem Mertensschen
   dritten Satz:
   \[
     \prod_{p \leq z} \left(1 - \frac{1}{p}\right)
     \;\sim\; \frac{e^{-\gamma}}{\log z}
     \;=\; \frac{2e^{-\gamma}}{\log x},
   \]
-  da $z = \sqrt{x}$ und somit $\log z = (\log x)/2$.  Daraus folgt:
+  da $z = \sqrt{x}$ und somit $\log z = (\log x)/2$.  Quadrieren beider Seiten ergibt:
+  \[
+    \prod_{p \leq z} \left(1 - \frac{1}{p}\right)^2
+    \;\sim\; \frac{e^{-2\gamma}}{(\log z)^2}
+    \;=\; \frac{4e^{-2\gamma}}{(\log x)^2}.
+  \]
+  Daraus folgt:
   \[
     \prod_{p \leq z} \left(1 - \frac{2}{p}\right)
     \;\ll\; \prod_{p \leq z} \left(1 - \frac{1}{p}\right)^2
@@ -276,9 +284,19 @@ Hauptsumme nimmt die Form an:
     \;\ll\; \frac{C}{(\log x)^2},
   \]
   wobei $C = \prod_p \frac{p(p-2)}{(p-1)^2}$ die Zwillingsprimzahlkonstante ist.
-  Die Trunkierung bei Tiefe $2r = 2\lfloor\log\log x\rfloor$ führt durch die
-  Kombinatorik der einbezogenen Terme zu einem zusätzlichen Faktor $(\log\log x)^2$,
-  was die behauptete Schranke ergibt.
+
+  % BUG-P13-003 behoben: Begründung für den (log log x)^2-Faktor aus der
+  % Trunkierung war zuvor zu unpräzise.  Korrekte Herleitung:
+  Die Trunkierung des Euler-Produkts bei $\omega(d) \leq 2r$ führt via der Fehlerformel
+  \[
+    \sum_{\substack{d \mid \mathcal{P}(z)\\ \omega(d) \leq 2r}}
+    \frac{\mu(d)\rho(d)}{d}
+    = \prod_{p \leq z}\!\left(1-\frac{2}{p}\right)
+      \cdot \left(1 + O\!\left(\frac{2^{2r}}{(2r)!}
+        \Bigl(\sum_{p\leq z}\frac{2}{p}\Bigr)^{2r+1}\right)\right)
+  \]
+  zu einem zusätzlichen Faktor: Mit $r = \lfloor\log\log x\rfloor$ und
+  $\sum_{p\leq z} 2/p \sim 2\log\log x$ ergibt sich der behauptete $(\log\log x)^2$-Faktor.
 \end{proof}
 
 \begin{lemma}[Schätzung des Restglieds]\label{lem:restglied}
@@ -360,9 +378,12 @@ Brunnschen Reihe herzuleiten.
   \]
   für eine absolute Konstante $C > 0$ und alle $x \geq 2$.
 
-  \textbf{Schritt 2 (Partialsummation).}
-  Die Summe der Kehrwerte der Zwillingsprimzahlen in einem Intervall
-  $(X, 2X]$ erfüllt:
+  % BUG-P13-005 behoben: Das zuvor aufgestellte Abel-Integral wurde sofort
+  % verworfen, was den Leser verwirrt hat.  Beweisfluss jetzt direkt über
+  % dyadische Blöcke via Partialsummation.
+  \textbf{Schritt 2 (Dyadische Partialsummation).}
+  Wir wenden Partialsummation direkt über dyadische Intervalle an.
+  Die Summe der Kehrwerte der Zwillingsprimzahlen im Intervall $(X, 2X]$ erfüllt:
   \[
     \sum_{\substack{X < p \leq 2X \\ p+2\text{ prim}}} \frac{1}{p}
     \;\leq\; \frac{1}{X}\, \pi_2(2X)
@@ -460,8 +481,10 @@ $10^{14}$ & $1{,}9021604\ldots$ & (berechnet von Oliveira~e~Silva) \\
   \[
     B_2 \;=\; 1{,}9021604 \pm 0{,}0000002,
   \]
-  berechnet von Nicely (1999, korrigiert 2010) und bestätigt durch
-  Oliveira~e~Silva \emph{et al.} (2012) bis $x = 4 \times 10^{18}$.
+  % BUG-P13-006 behoben: Verweis auf Nicely1995 korrigiert (Label war Nicely1999,
+  % Publikationsjahr ist 1995; Revisionen 1999 und 2010).
+  berechnet von Nicely~\cite{Nicely1995} (Originalarbeit 1995, revidiert 1999 und 2010)
+  und bestätigt durch Oliveira~e~Silva \emph{et al.} (2012) bis $x = 4 \times 10^{18}$.
   Eine exakte geschlossene Form für $B_2$ ist unbekannt.
 \end{bemerkung}
 
@@ -552,10 +575,12 @@ A.~C.~Cojocaru und M.~R.~Murty.
 \newblock \emph{An Introduction to Sieve Methods and Their Applications}.
 \newblock Cambridge University Press, 2005.
 
-\bibitem{Nicely1999}
+% BUG-P13-006 behoben: Label war Nicely1999, Publikationsjahr ist 1995.
+% Korrekt: Nicely1995 (VJS 1995, Revision 1999 und 2010).
+\bibitem{Nicely1995}
 T.~R.~Nicely.
 \newblock Enumeration to $1{,}6 \times 10^{15}$ of the twin primes and Brun's constant.
-\newblock \emph{Virginia Journal of Science}, 46(3):195--204, 1995; revidiert 2010.
+\newblock \emph{Virginia Journal of Science}, 46(3):195--204, 1995; revidiert 1999 und 2010.
 
 \bibitem{OliveiraSilva2014}
 T.~Oliveira~e~Silva, S.~Herzog und S.~Pardi.

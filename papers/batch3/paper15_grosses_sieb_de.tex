@@ -52,8 +52,10 @@ $\alpha_1,\ldots,\alpha_R \in \R/\Z$ gilt
   \;\leq\;
   \bigl(N + Q^{2}\bigr)\sum_{n=M}^{M+N}|a_n|^{2},
 \]
-wobei $Q = \delta^{-1}$.  Der Beweis verwendet einen nicht-negativen
-trigonometrischen Kern nach Beurling und Selberg.  Anschließend leiten
+% BUG-P15-003 behoben (DE): "Beurling und Selberg" → "Féjer" im Abstract –
+% der verwendete Kern K_N = N^{-1}|Σe(nα)|² ist der Féjer-Kern.
+wobei $Q = \delta^{-1}$.  Der Beweis verwendet den nicht-negativen
+trigonometrischen Féjer-Kern.  Anschließend leiten
 wir die Charakter-Version (Korollar~\ref{kor:charakter_sieb}) her und
 skizzieren den Beweis des Satzes von Bombieri--Vinogradov, welcher zeigt,
 dass die Riemannsche Hypothese für Dirichlet-$L$-Funktionen \emph{im Mittel}
@@ -139,12 +141,15 @@ ganzen Zahl.
 
 Der Kern des Beweises ist eine nicht-negative Kernfunktion.
 
+% BUG-P15-001 behoben (DE): Indexbereich |h| ≤ N → |h| ≤ N-1 korrigiert –
+% die explizite Berechnung ergibt Terme nur bis |h| ≤ N-1; für |h|=N
+% wäre der Koeffizient (1-N/N)=0 (verschwindend). Standard-Féjer-Kern läuft bis N-1.
 \begin{lemma}[Nicht-negativer trigonometrischer Kern]\label{lem:kern}
   Für eine positive ganze Zahl $N$ definiere
   \[
     K_N(\alpha)
     \;:=\;
-    \sum_{|h| \leq N}\!\Bigl(1 - \frac{|h|}{N}\Bigr)\eexp{h\alpha}
+    \sum_{|h| \leq N-1}\!\Bigl(1 - \frac{|h|}{N}\Bigr)\eexp{h\alpha}
     \;=\;
     \frac{1}{N}\Bigl|\sum_{n=1}^{N}\eexp{n\alpha}\Bigr|^{2}.
   \]
@@ -183,7 +188,10 @@ Jetzt beweisen wir die Hauptungleichung.
   \]
 \end{theorem}
 
-\begin{proof}
+% BUG-P15-002 behoben (DE): \begin{proof} → \begin{proof}[Beweisskizze], da
+% Schritt 2 (Poisson-Abschätzung) und Schritt 3 (Kernungleichung) nicht
+% vollständig bewiesen werden. Vollständiger Beweis: Montgomery-Vaughan (1973).
+\begin{proof}[Beweisskizze (vollständiger Beweis: Montgomery--Vaughan \cite{MV1973})]
   \textbf{Schritt 1: Reduktion auf eine quadratische Form.}
   Setze $S(\alpha) := \sum_{n=M}^{M+N}a_n\eexp{n\alpha}$.  Wir möchten
   $\sum_r |S(\alpha_r)|^2$ nach oben abschätzen:
@@ -274,21 +282,28 @@ Exponentialfunktionen.
   wobei $\sum^*$ die Summation über primitive Charaktere bezeichnet.
 \end{korollar}
 
-\begin{proof}
+% BUG-P15-006 behoben (DE): Beweis als Skizze markiert und korrektes Argument
+% erklärt. Naives Einsetzen δ=Q^{-2} in Satz 3.2 würde (N+Q^4) ergeben;
+% der korrekte Weg nutzt Gauß-Summen und die Anzahl der Farey-Punkte ~Q^2.
+\begin{proof}[Beweisskizze]
   Jeder primitive Charakter $\chi\bmod q$ lässt sich über die Gauß-Summe
   ausdrücken: $\chi(n) = \tau(\bar\chi)^{-1}\sum_{a=1}^{q}\bar\chi(a)
   \eexp{an/q}$, wobei $|\tau(\bar\chi)|^2 = q$.
 
-  Nach Einsetzen und Anwendung der Orthogoanlität der Charaktere wird die
+  Nach Einsetzen und Anwendung der Orthogonalität der Charaktere wird die
   Summe über primitive $\chi\bmod q$ zu einer Summe über $\phi(q)$
   verschiedene Exponentialsummen an Punkten $\alpha = a/q$.  Die Punkte
   $\{a/q : q \leq Q, \ggT(a,q) = 1\}$ (Farey-Brüche) bilden nach
   Lemma~\ref{lem:farey} eine $Q^{-2}$-separierte Folge.
 
-  Anwendung von Satz~\ref{thm:grosses_sieb} auf die Farey-Punkte mit
-  Separation $\delta = Q^{-2}$, gefolgt von Summation über alle primitiven
-  Charaktere und Anpassung mit $|\tau(\bar\chi)|^{-2} = q^{-1}$, ergibt
-  die behauptete Schranke.  \qedhere
+  % Korrekte Argumentation: Satz 3.2 wird mit der Gauß-Summen-Darstellung und
+  % der Schranke Σ_{q≤Q} φ(q) ≤ Q^2 (Gesamtzahl der Farey-Punkte) sowie dem
+  % Normierungsfaktor |τ(χ̄)|^{-2} = q^{-1} angewendet, was direkt (N+Q^2)
+  % ergibt — ohne den Parameter zu quadrieren.
+  Speziell wendet man Satz~\ref{thm:grosses_sieb} mit der Gauß-Summen-Entwicklung
+  an und nutzt, dass $\sum_{q \leq Q}\phi(q) \leq Q^2$ (Gesamtzahl der
+  Farey-Brüche bis $Q$) zusammen mit dem Gewicht $|\tau(\bar\chi)|^{-2} = q^{-1}$
+  die behauptete Schranke $(N+Q^2)$ ergibt.  \qedhere
 \end{proof}
 
 % ================================================================
@@ -377,7 +392,9 @@ Summation zum Übergang von $\psi$ zu $\pi$ folgt das Ergebnis.  \qed
     \;=\; O_\varepsilon\!\left(\frac{x}{(\log x)^A}\right).
   \]
   Dies ist die \emph{Vermutung von Elliott--Halberstam} und bleibt offen.
-  Teilfortschritt: Zhang (2013) und das Polymath-Projekt zeigten, dass eine
+  % BUG-P15-004 behoben (DE): "Zhang (2013)" → "Zhang (2014)" – Druckjahr in
+  % Ann. of Math. 179(3) ist 2014; Bibliographie trägt ebenfalls 2014.
+  Teilfortschritt: Zhang (2014) und das Polymath-Projekt zeigten, dass eine
   abgeschwächte Version (mit $q \leq x^{1/2+\delta}$ für kleine $\delta > 0$
   und glatten Moduln) ausreicht, um beschränkte Primzahllücken zu beweisen.
 \end{bemerkung}
@@ -393,10 +410,11 @@ Summation zum Übergang von $\psi$ zu $\pi$ folgt das Ergebnis.  \qed
   Nullstellendichtesatzes zeigt man, dass der nullstellenfreie Bereich von
   $L(s,\chi)$ breit genug ist (keine Nullstellen mit
   $\operatorname{Re}(s) > 1 - c/\log q$, mit Ausnahme möglicherweise einer
+  % BUG-P15-005 behoben (DE): L ≤ 5,5 (Heath-Brown 1992, veraltet) →
+  % L ≤ 5 (Xylouris 2011) als aktuell bester bekannter Wert.
   reellen ``Siegel-Nullstelle''), so dass die von-Mangoldt-Explizit-Formel
   eine Primzahl in $[1, q^L]$ für eine effektive Konstante $L$ liefert.
-  Der aktuelle Bestwert aus Heath-Browns Nullstellendichtemethoden ist
-  $L \leq 5{,}5$.
+  Der aktuelle Bestwert ist $L \leq 5$ (Xylouris, 2011 \cite{Xylouris2011}).
 \end{proof}
 
 % ================================================================
@@ -461,10 +479,18 @@ Yu.~V.~Linnik.
   I.~The basic theorem.
 \newblock \emph{Rec.\ Math.\ [Mat.\ Sb.] N.S.}, 15(57):139--178, 1944.
 
-\bibitem{Zhang2013}
+% BUG-P15-004 behoben (DE): Zhang2013 → Zhang2014 (Druckjahr 2014).
+\bibitem{Zhang2014}
 Y.~Zhang.
 \newblock Bounded gaps between primes.
 \newblock \emph{Ann.\ of Math.}, 179(3):1121--1174, 2014.
+
+% BUG-P15-005 behoben (DE): Xylouris (2011) als Beleg für L ≤ 5 hinzugefügt.
+\bibitem{Xylouris2011}
+T.~Xylouris.
+\newblock On the least prime in an arithmetic progression and estimates for
+  the zeros of Dirichlet $L$-functions.
+\newblock \emph{Acta Arith.}, 150:65--91, 2011.
 
 \end{thebibliography}
 

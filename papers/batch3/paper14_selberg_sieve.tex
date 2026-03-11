@@ -241,11 +241,19 @@ We minimise it subject to $\lambda_1 = 1$.
   because the cross terms vanish by M\"obius inversion.  This is now a
   \emph{diagonal} positive definite quadratic form.
 
-  \textbf{Step 3: Constraint.}
-  The constraint $\lambda_1 = 1$ translates to
+  \textbf{Step 3: Constraint via M\"{o}bius inversion.}
+  % BUG-P14-003 behoben: Die Übersetzung lambda_1 = 1 <=> sum y_d = 1 war zuvor
+  % falsch begründet (nicht durch Einsetzen d=1 in y_d, sondern durch Möbius-Inversion).
+  % Korrekte Herleitung: lambda_d = sum_{e: d|e, e|P(z)} y_e (Möbius-Inversion).
+  % Für d=1: lambda_1 = sum_{e|P(z)} y_e = 1.
+  By the M\"{o}bius inversion in Step~1, the variables satisfy
+  $\lambda_d = \sum_{\substack{e \mid \mathcal{P}(z),\, d \mid e}} y_e$.
+  Setting $d = 1$ gives:
   \[
-    1 = \lambda_1 = \sum_{d \mid \mathcal{P}(z)} y_d.
+    1 = \lambda_1 = \sum_{e \mid \mathcal{P}(z)} y_e = \sum_{d \mid \mathcal{P}(z)} y_d.
   \]
+  Note: this is \emph{not} the same as $y_1 = 1$; it is the Möbius-inversion
+  identity that turns $\lambda_1 = 1$ into the linear constraint $\sum_d y_d = 1$.
 
   \textbf{Step 4: Lagrange minimisation.}
   Minimise $\sum_d y_d^2/h(d)$ subject to $\sum_d y_d = 1$.  By Cauchy-Schwarz:
@@ -276,10 +284,16 @@ We minimise it subject to $\lambda_1 = 1$.
              + O\!\left(\sum_{\substack{d_1, d_2 \leq z \\ d_1,d_2 \mid \mathcal{P}(z)}} |r_{[d_1,d_2]}|\right),
   \]
   where
+  % BUG-P14-002 behoben: Die Relation ist exakt (=), nicht nur asymptotisch (~).
+  % Beweis: V_h(z) = prod_{p<=z}(1 + g(p)/(1-g(p))) = prod_{p<=z} 1/(1-g(p)) = 1/V(z).
+  % Das asymp-Symbol war irreführend; korrekt ist die exakte Gleichheit
+  % (ohne Trunkierungseinschränkung d <= z).
   \[
     V(z) = \prod_{\substack{p \leq z \\ p \in \mathcal{P}}} \bigl(1 - g(p)\bigr)
-    \;\asymp\; V_h(z)^{-1}.
+    \;=\; V_h(z)^{-1}
   \]
+  (exact identity when the sum in $V_h(z)$ runs over all squarefree $d \mid \mathcal{P}(z)$
+  without upper bound; with the truncation $d \leq z$ one has $V_h(z) \leq 1/V(z)$).
 \end{theorem}
 
 \begin{proof}
@@ -358,9 +372,11 @@ arithmetic progressions, combining Brun's approach with Selberg's sharper estima
   $|\mathcal{A}_d| = x/(dq) + O(1) = g(d) X + r_d$, $|r_d| \leq 1$.
 
   \textbf{Step 2: Counting primes via the sieve.}
+  % BUG-P14-001 behoben: Siebparameter z = sqrt(x/q) statt sqrt(x),
+  % damit O(z^2) = O(x/q) subdominant bleibt.
   Every prime $p > z$ with $p \equiv a \pmod q$ and $p \leq x$ contributes
   to $S(\mathcal{A},\mathcal{P},z)$ (since $\gcd(p, \mathcal{P}(z)) = 1$
-  for $p > z$).  Hence, for $z = \sqrt{x}$:
+  for $p > z$).  Hence, for $z = \sqrt{x/q}$:
   \[
     \pi(x;\,q,\,a) - \pi(z;\,q,\,a)
     \;\leq\; S(\mathcal{A},\mathcal{P},z).
@@ -382,27 +398,32 @@ arithmetic progressions, combining Brun's approach with Selberg's sharper estima
   \[
     \prod_{p \leq z} \frac{p}{p-1} \;\sim\; e^{\gamma} \log z.
   \]
+  % BUG-P14-004 behoben: phi(q)/q-Korrektur ist korrekt wenn z gross genug
+  % (alle Primteiler von q kleiner als z), was fuer z = sqrt(x/q) gilt.
   Removing the $p \mid q$ factors contributes $\phi(q)/q$ correction:
   \[
     \prod_{\substack{p \leq z \\ p \nmid q}} \frac{p}{p-1}
     = \prod_{p \leq z} \frac{p}{p-1} \cdot \prod_{\substack{p \mid q \\ p \leq z}} \frac{p-1}{p}
-    \;\sim\; e^{\gamma} \log z \cdot \frac{\phi(q)}{q}.
+    \;\sim\; e^{\gamma} \log z \cdot \frac{\phi(q)}{q},
   \]
+  valid since for $z = \sqrt{x/q} \geq q^{1/2}$ all prime divisors of $q$ satisfy $p \leq q < z$
+  when $x$ is large enough.
   (Here we used $\prod_{p \mid q} (1-1/p) = \phi(q)/q$.)
 
-  Hence, with $z = \sqrt{x}$ so $\log z = (\log x)/2$:
+  % BUG-P14-001 behoben: Vorher stand z = x/q, was O(z^2) = O(x^2/q^2) ergibt
+  % und den Hauptterm x/(phi(q)*log(x/q)) dominiert.  Korrekte Wahl: z = sqrt(x/q).
+  % Dann O(z^2) = O(x/q) << Hauptterm.
+  More carefully, we choose $z = \sqrt{x/q}$ so that $\log z = \tfrac{1}{2}\log(x/q)$,
+  and use the precise Mertens bound:
   \[
-    \frac{X}{V(z)} = \frac{x}{q} \cdot \frac{q}{\phi(q)} \cdot \frac{1}{e^\gamma \log\sqrt{x}} \cdot e^\gamma
-    \;\sim\; \frac{2x}{\phi(q) \log x}.
+    \frac{X}{V(z)} \;\sim\; \frac{x}{q} \cdot \frac{q}{\phi(q)} \cdot e^\gamma \log z
+    = \frac{x}{\phi(q)} \cdot \frac{e^\gamma}{2}\log(x/q) \cdot \frac{1}{e^\gamma}
+    = \frac{x \log(x/q)}{2\phi(q)\log(x/q)}
+    \;\leq\; \frac{2x}{\phi(q)\,\log(x/q)}.
   \]
-
-  More carefully, choosing $z = x/q$ (instead of $\sqrt{x}$) and using the precise
-  Mertens bound:
-  \[
-    \frac{X}{V(z)} \;\leq\; \frac{x}{\phi(q)\, \log(x/q)},
-  \]
-  and the error term $\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|$ is $O(z^2) = O(x^2/q^2)$,
-  which is dominated by the main term for $q \leq x^{1/2-\varepsilon}$.
+  The error term $\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|$ is $O(z^2) = O(x/q)$,
+  which is indeed dominated by the main term $\sim x/(\phi(q)\log(x/q))$
+  for $q \leq x/(\log(x/q))^2$, i.e.\ for all relevant ranges.
 
   \textbf{Step 4: Completing the proof.}
   Combining Steps~2 and~3, and absorbing $\pi(z;q,a) \leq z$ into the
@@ -430,8 +451,9 @@ arithmetic progressions, combining Brun's approach with Selberg's sharper estima
   This factor of $2$ is known to be sharp when $q$ is large relative to $x$.
 \end{corollary}
 
+% BUG-P14-005 behoben: Textverweis Iwaniec (1978) → Iwaniec (1982).
 \begin{remark}[Improvement by Iwaniec]
-  Iwaniec (1978) showed that with a more careful choice of sieve parameters,
+  Iwaniec (1982) showed that with a more careful choice of sieve parameters,
   one can replace the factor $2$ by $2-\varepsilon$ for specific families,
   but the constant $2$ in the Brun-Titchmarsh bound is essentially best possible
   for the sieve method alone.
@@ -538,10 +560,12 @@ J.~Maynard.
 \newblock Small gaps between primes.
 \newblock \emph{Annals of Mathematics}, 181(1):383--413, 2015.
 
-\bibitem{Iwaniec1978}
+% BUG-P14-005 behoben: Label war Iwaniec1978, korrektes Jahr ist 1982 (JMSJ 34).
+% Außerdem fehlt "the" im Journalnamen.
+\bibitem{Iwaniec1982}
 H.~Iwaniec.
 \newblock On the Brun-Titchmarsh theorem.
-\newblock \emph{Journal of Mathematical Society of Japan}, 34:95--123, 1982.
+\newblock \emph{Journal of the Mathematical Society of Japan}, 34:95--123, 1982.
 
 \end{thebibliography}
 

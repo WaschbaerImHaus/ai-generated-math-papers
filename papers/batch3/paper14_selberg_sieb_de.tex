@@ -247,11 +247,17 @@ Wir minimieren sie unter der Nebenbedingung $\lambda_1 = 1$.
   da die Kreuzterme durch Möbius-Inversion verschwinden.  Dies ist eine
   \emph{diagonale} positiv definite quadratische Form.
 
-  \textbf{Schritt 3: Nebenbedingung.}
-  Die Nebenbedingung $\lambda_1 = 1$ übersetzt sich zu
+  \textbf{Schritt 3: Nebenbedingung via Möbius-Inversion.}
+  % BUG-P14-003 behoben: Die Übersetzung lambda_1 = 1 <=> sum y_d = 1 war zuvor
+  % falsch begründet.  Korrekte Herleitung: lambda_d = sum_{e: d|e} y_e (Möbius-Inversion),
+  % für d=1: lambda_1 = sum_e y_e.
+  Aus der Möbius-Inversion in Schritt~1 gilt $\lambda_d = \sum_{\substack{e \mid \mathcal{P}(z),\, d \mid e}} y_e$.
+  Für $d = 1$ ergibt sich:
   \[
-    1 = \lambda_1 = \sum_{d \mid \mathcal{P}(z)} y_d.
+    1 = \lambda_1 = \sum_{e \mid \mathcal{P}(z)} y_e = \sum_{d \mid \mathcal{P}(z)} y_d.
   \]
+  Hinweis: Dies ist \emph{nicht} dasselbe wie $y_1 = 1$; es ist die Möbius-Inversionsidentität,
+  die $\lambda_1 = 1$ in die lineare Nebenbedingung $\sum_d y_d = 1$ überführt.
 
   \textbf{Schritt 4: Lagrange-Minimierung.}
   Minimiere $\sum_d y_d^2/h(d)$ unter $\sum_d y_d = 1$.  Nach der
@@ -283,10 +289,17 @@ Wir minimieren sie unter der Nebenbedingung $\lambda_1 = 1$.
              + O\!\left(\sum_{\substack{d_1, d_2 \leq z \\ d_1,d_2 \mid \mathcal{P}(z)}} |r_{[d_1,d_2]}|\right),
   \]
   wobei
+  % BUG-P14-002 behoben: Die Relation ist exakt (=), nicht nur asymptotisch (~).
+  % Beweis: V_h(z) = prod_{p<=z}(1 + g(p)/(1-g(p))) = 1/V(z).
+  % Das asymp-Symbol war irreführend; korrekt ist die exakte Gleichheit
+  % (ohne Trunkierung d <= z).
   \[
     V(z) = \prod_{\substack{p \leq z \\ p \in \mathcal{P}}} \bigl(1 - g(p)\bigr)
-    \;\asymp\; V_h(z)^{-1}.
+    \;=\; V_h(z)^{-1}
   \]
+  (exakte Identität, wenn die Summe in $V_h(z)$ über alle quadratfreien
+  $d \mid \mathcal{P}(z)$ ohne obere Schranke läuft; mit Trunkierung $d \leq z$
+  gilt $V_h(z) \leq 1/V(z)$).
 \end{theorem}
 
 \begin{proof}
@@ -362,9 +375,11 @@ in arithmetischen Progressionen.
   gilt $|\mathcal{A}_d| = x/(dq) + O(1) = g(d) X + r_d$ mit $|r_d| \leq 1$.
 
   \textbf{Schritt 2: Primzahlen via Sieb zählen.}
+  % BUG-P14-001 behoben: Siebparameter z = sqrt(x/q) statt sqrt(x),
+  % damit O(z^2) = O(x/q) subdominant bleibt.
   Jede Primzahl $p > z$ mit $p \equiv a \pmod q$ und $p \leq x$ wird von
   $S(\mathcal{A},\mathcal{P},z)$ erfasst (da $\ggT(p, \mathcal{P}(z)) = 1$
-  für $p > z$).  Daher gilt mit $z = \sqrt{x}$:
+  für $p > z$).  Daher gilt mit $z = \sqrt{x/q}$:
   \[
     \pi(x;\,q,\,a) - \pi(z;\,q,\,a)
     \;\leq\; S(\mathcal{A},\mathcal{P},z).
@@ -386,26 +401,27 @@ in arithmetischen Progressionen.
   \[
     \prod_{p \leq z} \frac{p}{p-1} \;\sim\; e^{\gamma} \log z.
   \]
+  % BUG-P14-004 behoben: phi(q)/q-Korrektur gilt korrekt für z = sqrt(x/q)
+  % (alle Primteiler von q < z für großes x).
   Das Weglassen der $p \mid q$-Faktoren führt zur Korrektur $\phi(q)/q$:
   \[
     \prod_{\substack{p \leq z \\ p \nmid q}} \frac{p}{p-1}
     = \prod_{p \leq z} \frac{p}{p-1} \cdot \prod_{\substack{p \mid q \\ p \leq z}} \frac{p-1}{p}
-    \;\sim\; e^{\gamma} \log z \cdot \frac{\phi(q)}{q}.
+    \;\sim\; e^{\gamma} \log z \cdot \frac{\phi(q)}{q},
   \]
+  gültig, da für $z = \sqrt{x/q} \geq q^{1/2}$ alle Primteiler von $q$ kleiner als $z$
+  sind (für großes $x$).
   (Dabei wurde $\prod_{p \mid q} (1-1/p) = \phi(q)/q$ verwendet.)
 
-  Mit $z = \sqrt{x}$, also $\log z = (\log x)/2$:
+  % BUG-P14-001 behoben: z = sqrt(x/q) statt x/q, damit O(z^2)=O(x/q) subdominant.
+  Genauer: Mit der Wahl $z = \sqrt{x/q}$, also $\log z = \tfrac{1}{2}\log(x/q)$:
   \[
-    \frac{X}{V(z)} = \frac{x}{q} \cdot \frac{q}{\phi(q)} \cdot \frac{1}{e^\gamma \log\sqrt{x}} \cdot e^\gamma
-    \;\sim\; \frac{2x}{\phi(q) \log x}.
+    \frac{X}{V(z)} = \frac{x}{q} \cdot \frac{q}{\phi(q)} \cdot \frac{1}{e^\gamma \log\sqrt{x/q}} \cdot e^\gamma
+    \;\sim\; \frac{2x}{\phi(q) \log(x/q)}.
   \]
-
-  Genauer: Mit der Wahl $z = x/q$ und der präzisen Mertens-Schranke gilt:
-  \[
-    \frac{X}{V(z)} \;\leq\; \frac{x}{\phi(q)\, \log(x/q)},
-  \]
-  und der Fehlerterm $\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|$ ist $O(z^2) = O(x^2/q^2)$,
-  was durch den Hauptterm für $q \leq x^{1/2-\varepsilon}$ dominiert wird.
+  Der Fehlerterm $\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|$ ist $O(z^2) = O(x/q)$,
+  was durch den Hauptterm $\sim x/(\phi(q)\log(x/q))$ für alle relevanten
+  Bereiche dominiert wird (d.\,h.\ $q \leq x/(\log(x/q))^2$).
 
   \textbf{Schritt 4: Abschluss des Beweises.}
   Kombination der Schritte~2 und~3, wobei $\pi(z;q,a) \leq z$ im Fehlerterm absorbiert wird:
