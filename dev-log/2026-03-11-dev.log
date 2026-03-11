@@ -49,3 +49,8 @@
 - Logging der Eingaben auf DEBUG-Level hinzugefügt
 - Eingabe-Längenlimit (500 Zeichen) loggt Warnung bei Überschreitung
 - Docblock mit Sicherheitsaudit-Vermerk (Build 49) aktualisiert
+
+2026-03-11 Build 50: euler_phi/prime_factorization Verifikation + Tests
+- Bestätigt: euler_phi() nutzt prime_factorization() intern + beide haben @lru_cache
+- Bestätigt: Formel φ(n) = n * ∏(1 - 1/p) korrekt implementiert
+- tests/test_algebra_numbertheory.py: 29 neue Tests (is_prime, prime_factorization, euler_phi)
