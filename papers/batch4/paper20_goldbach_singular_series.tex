@@ -231,11 +231,11 @@ where $c_q(n) = \sum_{\gcd(a,q)=1} \eq{an/q}$ is the Ramanujan sum.
   For odd $n$: the factor at $p = 2$ changes.  Since $n$ is odd,
   $2 \nmid n$, so $c_2(n) = -1$ and the $p=2$ factor becomes
   $1 + (-1)/1 = 0$.  Hence $\mathfrak{S}(n) = 0$ for odd $n$,
-  which is correct: two odd primes sum to an even number, so an
-  odd $n \geq 5$ is not the sum of two odd primes (and $n = p + 2$
-  would require $p$ even, i.e.\ $p = 2$, giving $n = 2 + 2 = 4$, odd only for...
-  actually this shows directly that odd numbers $> 2$ are not sums of
-  two primes without the factor $2$).
+  which is correct: any representation $n = p + q$ with both $p, q$ odd primes
+  gives $n \equiv 1 + 1 \equiv 0 \pmod{2}$, so $n$ must be even.
+  Conversely, $n = 2 + p$ for an odd prime $p$ is possible only if $n - 2$ is prime,
+  not guaranteed for all odd $n$.  The vanishing of $\mathfrak{S}(n)$ encodes
+  this arithmetic obstruction.
 \end{remark}
 
 % ================================================================
@@ -248,12 +248,12 @@ where $c_q(n) = \sum_{\gcd(a,q)=1} \eq{an/q}$ is the Ramanujan sum.
 \toprule
 $n$ & $\mathfrak{S}(n)$ (exact) & $\mathfrak{S}(n)$ (decimal) & $r_2(n)$ (actual) & Note \\
 \midrule
-4  & $2 C_2 \cdot \frac{2}{1} = 4C_2$ & $2.6407\ldots$ & 1 & $2+2$ \\
-6  & $2 C_2 \cdot \frac{2}{1} \cdot \frac{4}{3} = \frac{16 C_2}{3}$ & $3.5209\ldots$ & 1 & $3+3$ \\
-8  & $2 C_2 \cdot \frac{2}{1} = 4C_2$ & $2.6407\ldots$ & 1 & $3+5$ \\
-10 & $2 C_2 \cdot \frac{2}{1} \cdot \frac{4}{3} = \frac{16C_2}{3}$ & $3.5209\ldots$ & 2 & $3+7, 5+5$ \\
-12 & $2 C_2 \cdot \frac{2}{1} \cdot \frac{4}{3} \cdot \frac{6}{5}$ & $4.2251\ldots$ & 1 & $5+7$ \\
-30 & $2 C_2 \cdot \frac{2}{1}\cdot\frac{4}{3}\cdot\frac{6}{5}$ & $\approx 5.1$ & 3 & $7+23,11+19,13+17$ \\
+4  & $2C_2$ & $1.3203\ldots$ & 1 & $2+2$ \\
+6  & $2 C_2 \cdot \frac{2}{1} = 4C_2$ & $2.6407\ldots$ & 1 & $3+3$ \\
+8  & $2C_2$ & $1.3203\ldots$ & 1 & $3+5$ \\
+10 & $2 C_2 \cdot \frac{4}{3} = \frac{8C_2}{3}$ & $1.7604\ldots$ & 2 & $3+7, 5+5$ \\
+12 & $2 C_2 \cdot \frac{2}{1} = 4C_2$ & $2.6407\ldots$ & 1 & $5+7$ \\
+30 & $2 C_2 \cdot \frac{2}{1}\cdot\frac{4}{3} = \frac{16C_2}{3}$ & $3.5209\ldots$ & 3 & $7+23,11+19,13+17$ \\
 \bottomrule
 \end{tabular}
 \end{center}

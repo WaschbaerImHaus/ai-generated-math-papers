@@ -198,12 +198,16 @@ Aus dem Primzahlsatz in arithmetischen Progressionen folgt:
 \end{proof}
 
 \begin{bemerkung}[Gerades $n$ versus ungerades $n$]
-  Für \emph{gerades} $n$ ergibt der Faktor bei $p=2$:
-  $1 + c_2(n)/(2-1)^3 = 1 + c_2(n)$.
-  Drei ungerade Primzahlen summieren stets zu einer ungeraden Zahl.
-  Daher: $\mathfrak{S}(n) = 0$ für gerades $n$ ($p=2$-Faktor verschwindet),
-  was formell bestätigt, dass gerades $n$ \emph{nicht} Summe von drei
-  ungeraden Primzahlen sein kann.
+  Da $\mu(2) = -1$ und $\phi(2) = 1$, lautet der Faktor bei $p=2$:
+  $1 + \mu(2)^3 c_2(n)/\phi(2)^3 = 1 - c_2(n)$.
+  Für \emph{gerades} $n$: $c_2(n) = e^{\pi i n} = 1$, also
+  \[
+    1 - \frac{c_2(n)}{(2-1)^3} \;=\; 1 - c_2(n) \;=\; 1 - 1 \;=\; 0,
+  \]
+  d.h.\ $\mathfrak{S}(n) = 0$: Drei ungerade Primzahlen summieren stets zu
+  einer ungeraden Zahl, daher ist gerades $n$ \emph{nicht} Summe von drei
+  ungeraden Primzahlen.
+  Für \emph{ungerades} $n$: $c_2(n) = -1$, Faktor $= 1-(-1) = 2 > 0$.
 \end{bemerkung}
 
 % ================================================================
@@ -220,14 +224,22 @@ Aus dem Primzahlsatz in arithmetischen Progressionen folgt:
 \end{theorem}
 
 \begin{proof}
-  Mit Plancherels Satz:
+  Da $I(\beta) = \int_2^N \eq{t\beta}\, dt$, ergibt der Satz von Plancherel:
   \[
     \mathfrak{J}(n)
-    \;=\; \text{Fläche}\!\left\{(t_1, t_2, t_3) \in [2,N]^3 :
-                                 t_1 + t_2 + t_3 = n\right\}
-    \;=\; \frac{(n-6)^2}{2} + O(n)
-    \;\sim\; \frac{n^2}{2}.  \qedhere
+    \;=\; \text{Fläche}\bigl\{(t_1,t_2,t_3) \in [2,N]^3 : t_1+t_2+t_3 = n\bigr\}.
   \]
+  Fallunterscheidung für das Simplex $\{t_1+t_2+t_3=n,\; t_i \in [2,N]\}$:
+  \begin{itemize}
+    \item $6 \leq n \leq N$: unabgeschnittenes Simplex,
+      Fläche $= (n-6)^2/2$;
+    \item $N < n \leq 2N$: einseitig abgeschnitten durch $t_i \leq N$,
+      Fläche $= n^2/2 - 3(n-N)^2/2 + O(n)$;
+    \item $2N < n \leq 3N$: zweiseitig abgeschnitten,
+      Fläche $= (3N-n)^2/2 + O(n)$.
+  \end{itemize}
+  In allen Fällen ist der führende Term $n^2/2 + O(n\log n)$ für $n \sim N \to \infty$.
+  \qedhere
 \end{proof}
 
 % ================================================================

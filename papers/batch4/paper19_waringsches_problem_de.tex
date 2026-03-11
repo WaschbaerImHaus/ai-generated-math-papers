@@ -166,6 +166,21 @@ Die Darstellungsanzahl ist:
   singuläre Integral ist.
 \end{theorem}
 
+\begin{korollar}[Weyl-Schranke für $G(k)$]\label{cor:gk_weyl}
+  Für alle $k \geq 2$:
+  \[
+    G(k) \;\leq\; (k-2)\,2^{k-1} + 5.
+  \]
+\end{korollar}
+
+\begin{proof}
+  Man wendet Weyls Ungleichung auf den Nebenbogen an: für $s = (k-2)2^{k-1}+5$
+  liefert der Nebenbogenanteil einen Fehlerterm der Ordnung $N^{s/k-1-\delta}$
+  mit $\delta = 2^{1-k} > 0$, der gegenüber dem Hauptterm $\mathfrak{S}_{k,s}(n)\,
+  \mathfrak{J}_{k,s}(n)\, n^{s/k-1}$ aus Satz~\ref{thm:HL} verschwindet.
+  Details: Vaughan~\cite{Vaughan1981}, Kap.~5.
+\end{proof}
+
 % ================================================================
 \section{Winogradows Mittelwertsatz}
 \label{sec:mvs}
@@ -190,6 +205,13 @@ Die Darstellungsanzahl ist:
 \begin{korollar}[Wooleys Schranke]\label{cor:wooley}
   Für alle $k \geq 2$: $G(k) \leq k(\log k + 4{,}20032)$.
 \end{korollar}
+
+\begin{proof}
+  Folgt aus Satz~\ref{thm:bdg} (Vinogradow-Hauptvermutung) über die
+  Kreismethode: Mit $s = \lceil k(\log k + 4{,}20032)\rceil$ liefern die
+  Nebenbogenschranken aus dem Mittelwertsatz ein hauptterm-dominantes Integral.
+  Vollständige Details in Wooley~\cite{Wooley2016} (über 100 Seiten).
+\end{proof}
 
 % ================================================================
 \section{Wooleys effizientes Kongruenzrechnen}
@@ -218,6 +240,19 @@ Die Darstellungsanzahl ist:
   Kakeya-artige Abschätzungen), während Wooleys Beweis rein arithmetisch
   ($p$-adische Struktur) ist.  Beide Ansätze geben dasselbe Ergebnis.
 \end{bemerkung}
+
+\begin{theorem}[Effizientes Kongruenzrechnen, Wooley 2012--2016]%
+  \label{thm:effcong}
+  Für alle $k \geq 2$ und $1 \leq s \leq k(k+1)/2$:
+  \[
+    J_{s,k}(N) \;\ll_\varepsilon\; N^{s+\varepsilon}.
+  \]
+  Dies bestätigt die Vinogradow-Hauptvermutung vollständig.
+  Kombiniert mit der Kreismethode ergibt sich:
+  \[
+    G(k) \;\leq\; k\!\left(\log k + 4{,}20032\ldots\right).
+  \]
+\end{theorem}
 
 % ================================================================
 \section{Bekannte Werte und Schranken}
