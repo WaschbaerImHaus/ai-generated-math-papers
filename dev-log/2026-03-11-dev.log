@@ -301,3 +301,9 @@
 2026-03-11 10:50:43   - paper16_chen_theorem.tex: Chens Satz (1+2), Buchstab-Identität, Paritätsproblem, EN
 2026-03-11 10:50:43   - paper16_chen_satz_de.tex: Vollständige deutsche Übersetzung
 2026-03-11 10:50:43   - Verzeichnis papers/batch3/ angelegt
+
+2026-03-11 10:51:27 [Build 74] Batch 3 Siebmethoden-Papers erstellt:
+  - papers/batch3/paper13_bruns_theorem.tex (EN, Brunnscher Satz)
+  - papers/batch3/paper13_brunnscher_satz_de.tex (DE, Brunnscher Satz)
+  - papers/batch3/paper14_selberg_sieve.tex (EN, Selbergs Sieb)
+  - papers/batch3/paper14_selberg_sieb_de.tex (DE, Selbergs Sieb)

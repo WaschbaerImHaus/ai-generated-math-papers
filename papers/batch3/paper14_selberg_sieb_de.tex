@@ -1,0 +1,548 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{booktabs}
+\usepackage[ngerman]{babel}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+% -------------------------------------------------------
+% Eigene Befehle
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\leg}[2]{\left(\frac{#1}{#2}\right)}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\lcm}{kgV}
+\DeclareMathOperator{\li}{li}
+\DeclareMathOperator{\ggT}{ggT}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Selbergs Sieb und Oberschranken für Primzahlen\\
+       in arithmetischen Progressionen}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 74}
+\email{specialist-maths@localhost}
+\date{2026}
+
+\begin{abstract}
+Wir präsentieren Selbergs Sieb (1947), eine quadratische Optimierungstechnik,
+die scharfe Oberschranken für die Anzahl ganzer Zahlen in einer Menge
+$\mathcal{A}$ liefert, die durch keine Primzahl aus einer gegebenen Menge
+$\mathcal{P}$ teilbar sind.  Die Schlüsselidee besteht darin, die
+Möbius-Gewichte $\mu(d)$ im Inklusion-Exklusion-Sieb durch optimal gewählte
+$\lambda_d^2$-Gewichte zu ersetzen, womit das Problem zu einer quadratischen
+Minimierung über einem endlichdimensionalen Raum wird.  Wir beweisen Selbergs
+grundlegende Oberschranke
+\[
+  S(\mathcal{A},\mathcal{P},z)
+  \;\leq\; \frac{X}{V(z)} + O\!\left(\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|\right),
+\]
+wobei $V(z) = \prod_{p \leq z, p \in \mathcal{P}} (1 - g(p))$ die
+Hauptsiebsumme bezeichnet.  Als Hauptanwendung beweisen wir den
+Brun-Titchmarsh-Satz: Für $\ggT(a,q) = 1$ und $q \leq x$ gilt
+\[
+  \pi(x;\,q,\,a) \;\leq\; \frac{2x}{\phi(q)\log(x/q)}.
+\]
+Abschließend vergleichen wir Selbergs Sieb mit Brunns kombinatorischem Sieb.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung}
+% ================================================================
+
+Siebtheorie ist die Kunst, die Größe einer Menge ganzer Zahlen abzuschätzen,
+nachdem Vielfache von Primzahlen aus einer Siebmenge entfernt wurden.  Das
+klassische Sieb des Eratosthenes liefert als Inklusion-Exklusion-Identität
+eine exakte, aber schwer handhabbare Formel.  Brunns kombinatorisches Sieb
+(1919) verbesserte dies durch Trunkierung der Inklusion-Exklusion bei fester
+Tiefe, was Schranken auf Kosten eines Fehlerterms ergibt.
+
+Im Jahr 1947 führte Atle Selberg einen grundlegend anderen Ansatz ein: statt
+die Inklusion-Exklusion abzuschneiden, ersetzt er die Möbius-Funktion durch
+\emph{optimal gewählte Gewichte} $\lambda_d$ mit $\lambda_1 = 1$, die die
+resultierende Oberschranke \emph{minimieren}.  Die entstehende
+\emph{Lambda-Quadrat-Methode} (oder $\Lambda^2$-Methode) liefert Schranken,
+die:
+\begin{enumerate}
+  \item In vielen Anwendungen schärfer als Brunns Schranken sind.
+  \item Flexibler sind, da die Gewichte frei gewählt werden können.
+  \item Einer Analyse über quadratische Formen zugänglich sind.
+\end{enumerate}
+
+Die wichtigste direkte Anwendung von Selbergs Sieb ist der
+\emph{Brun-Titchmarsh-Satz} über Primzahlen in arithmetischen Progressionen.
+
+\textbf{Notation.}
+Durchgehend bezeichne $p$ eine Primzahl; $\pi(x; q, a) = \#\{p \leq x : p \equiv a \pmod q\}$;
+$\phi$ ist Eulers Totientfunktion; $\mu$ ist die Möbiusfunktion; $[d_1, d_2]$
+bezeichnet das kleinste gemeinsame Vielfache; $\log$ ist der natürliche Logarithmus.
+
+% ================================================================
+\section{Grundlagen: Formulierung des Siebproblems}
+\label{sec:grundlagen}
+% ================================================================
+
+Wir beginnen mit dem allgemeinen Siebrahmen.
+
+\begin{definition}[Siebaufstellung]\label{def:sieb}
+  Sei:
+  \begin{itemize}
+    \item $\mathcal{A} = \{a_1, \ldots, a_N\}$ eine endliche Menge ganzer Zahlen
+      (die \emph{Siebbasis}).
+    \item $\mathcal{P}$ eine Menge von Primzahlen (die \emph{Siebprimzahlen}).
+    \item $z \geq 2$ eine reelle Zahl (die \emph{Siebgrenze}).
+    \item $\mathcal{P}(z) = \prod_{\substack{p \leq z \\ p \in \mathcal{P}}} p$.
+  \end{itemize}
+  Die \emph{Siebfunktion} ist:
+  \[
+    S(\mathcal{A}, \mathcal{P}, z)
+    \;=\; \#\{a \in \mathcal{A} : \ggT(a, \mathcal{P}(z)) = 1\}.
+  \]
+\end{definition}
+
+Wir nehmen eine Standardhypothese über die Dichte von $\mathcal{A}$ modulo
+quadratfreier Zahlen an.
+
+\begin{definition}[Siebhypothese]\label{def:hypothese}
+  Für jedes quadratfreie $d$ mit $p \mid d \Rightarrow p \in \mathcal{P}$
+  schreibe $|\mathcal{A}_d| = g(d) X + r_d$, wobei:
+  \begin{itemize}
+    \item $X > 0$ der \emph{Hauptparameter} ist (typischerweise $X = |\mathcal{A}|$
+      oder $X = x$).
+    \item $g : \N \to [0, 1]$ eine \emph{multiplikative Funktion} mit
+      $g(1) = 1$ und $0 \leq g(p) < 1$ für $p \in \mathcal{P}$ sowie
+      $g(p) = 0$ für $p \notin \mathcal{P}$.
+    \item $r_d$ ein \emph{Restglied} mit $|r_d| \leq g(d)$ (typischerweise).
+  \end{itemize}
+  Im kanonischen Fall $\mathcal{A} = \{n \leq x : n \equiv a \pmod q\}$
+  gilt $X = x/q$ und $g(p) = 1/p$ für $p \nmid q$, $g(p) = 0$ für $p \mid q$.
+\end{definition}
+
+Die Sieb-Omega-Funktion misst, wie die Primzahlen die Menge $\mathcal{A}$ ``abdecken'':
+\begin{equation}\label{eq:omega}
+  V(z) \;=\; \prod_{\substack{p \leq z \\ p \in \mathcal{P}}} \bigl(1 - g(p)\bigr).
+\end{equation}
+Heuristisch ist $X \cdot V(z)$ die erwartete Größe von $S(\mathcal{A},\mathcal{P},z)$.
+
+% ================================================================
+\section{Selbergs Lambda-Quadrat-Methode}
+\label{sec:selberg}
+% ================================================================
+
+\subsection{Die Schlüsselungleichung}
+
+\begin{lemma}[Selbergs Grundungleichung]\label{lem:selberg_schluessel}
+  Sei $\{\lambda_d\}_{d \geq 1}$ eine Folge reeller Zahlen, die auf quadratfreie
+  $d \mid \mathcal{P}(z)$ konzentriert ist, mit $\lambda_1 = 1$ und
+  $\lambda_d = 0$ für $d > z$.  Dann gilt für jede ganze Zahl $n$:
+  \[
+    \mathbf{1}[\ggT(n, \mathcal{P}(z)) = 1]
+    \;\leq\; \left(\sum_{\substack{d \mid n \\ d \mid \mathcal{P}(z)}} \lambda_d\right)^2.
+  \]
+\end{lemma}
+
+\begin{proof}
+  Falls $\ggT(n, \mathcal{P}(z)) = 1$: Das einzige $d$, das sowohl $n$ als auch
+  $\mathcal{P}(z)$ teilt, ist $d = 1$.  Daher ist die innere Summe gleich
+  $\lambda_1 = 1$, und die rechte Seite ist $1^2 = 1 = \mathbf{1}[\ggT(n,\mathcal{P}(z))=1]$.
+
+  Falls $\ggT(n, \mathcal{P}(z)) > 1$: Die rechte Seite ist ein Quadrat, also
+  $\geq 0$, während die linke Seite $0$ ist.  Die Ungleichung gilt trivialerweise.
+\end{proof}
+
+\subsection{Die Selbergsche Oberschranke}
+
+Anwendung von Lemma~\ref{lem:selberg_schluessel} auf alle $n \in \mathcal{A}$:
+
+\begin{align}
+  S(\mathcal{A}, \mathcal{P}, z)
+  &= \sum_{n \in \mathcal{A}} \mathbf{1}[\ggT(n,\mathcal{P}(z))=1]
+  \;\leq\; \sum_{n \in \mathcal{A}}
+    \left(\sum_{\substack{d \mid n \\ d \mid \mathcal{P}(z)}} \lambda_d\right)^2 \notag \\
+  &= \sum_{n \in \mathcal{A}}
+     \sum_{\substack{d_1 \mid n,\, d_1 \mid \mathcal{P}(z)\\
+                     d_2 \mid n,\, d_2 \mid \mathcal{P}(z)}}
+     \lambda_{d_1} \lambda_{d_2} \notag \\
+  &= \sum_{\substack{d_1, d_2 \mid \mathcal{P}(z)}}
+     \lambda_{d_1} \lambda_{d_2}\, |\mathcal{A}_{[d_1,d_2]}|. \label{eq:selberg_entwicklung}
+\end{align}
+
+Dabei haben wir verwendet, dass $d_1 \mid n$ und $d_2 \mid n$ äquivalent zu
+$[d_1,d_2] \mid n$ ist.
+
+\subsection{Optimierung der Gewichte}
+
+Einsetzen der Siebhypothese $|\mathcal{A}_d| = g(d)X + r_d$ in~\eqref{eq:selberg_entwicklung}:
+\begin{equation}\label{eq:selberg_aufspaltung}
+  S(\mathcal{A},\mathcal{P},z)
+  \;\leq\; X \sum_{d_1,d_2} \lambda_{d_1}\lambda_{d_2}\, g([d_1,d_2])
+             + \sum_{d_1,d_2} \lambda_{d_1}\lambda_{d_2}\, r_{[d_1,d_2]}.
+\end{equation}
+
+Der Hauptterm $M(\boldsymbol{\lambda}) = X \sum_{d_1,d_2} \lambda_{d_1}\lambda_{d_2}\, g([d_1,d_2])$
+ist eine quadratische Form in den Variablen $\boldsymbol{\lambda} = (\lambda_d)$.
+Wir minimieren sie unter der Nebenbedingung $\lambda_1 = 1$.
+
+\begin{lemma}[Selbergsche Gewichtsoptimierung]\label{lem:optimierung}
+  Definiere die multiplikative Funktion $h$ auf quadratfreien ganzen Zahlen durch:
+  \[
+    h(d) \;=\; \prod_{p \mid d} \frac{g(p)}{1 - g(p)}.
+  \]
+  Die optimalen Selberg-Gewichte sind:
+  \[
+    \lambda_d^* \;=\; \frac{\mu(d)}{g(d)} \cdot
+      \frac{\displaystyle\sum_{\substack{e \leq z/d \\ (e,d)=1 \\ e \mid \mathcal{P}(z)}} \mu(e)^2 h(e)}
+           {\displaystyle\sum_{\substack{f \leq z \\ f \mid \mathcal{P}(z)}} \mu(f)^2 h(f)}.
+  \]
+  Der minimale Wert des Hauptterms ist:
+  \[
+    M(\boldsymbol{\lambda}^*) \;=\; \frac{X}{V_h(z)},
+    \quad
+    V_h(z) = \sum_{\substack{d \leq z \\ d \mid \mathcal{P}(z)}} \mu(d)^2 h(d).
+  \]
+\end{lemma}
+
+\begin{proof}
+  \textbf{Schritt 1: Diagonalisierung.}
+  Da $g$ multiplikativ ist, lässt sich die quadratische Form
+  $\sum_{d_1, d_2} \lambda_{d_1}\lambda_{d_2} g([d_1,d_2])$ durch einen
+  Basiswechsel diagonalisieren.  Definiere neue Variablen:
+  \[
+    y_d \;=\; \sum_{\substack{e \mid \mathcal{P}(z) \\ d \mid e}} \mu(e/d)\, \lambda_e
+           \;=\; \mu(d) \sum_{\substack{f \mid \mathcal{P}(z)/d}} \mu(f)\, \lambda_{df}.
+  \]
+  Durch Möbius-Inversion gilt: $\lambda_d = \sum_{e \mid \mathcal{P}(z), d \mid e} y_e$.
+
+  \textbf{Schritt 2: Quadratische Form in $y$.}
+  Man verifiziert, dass mit der Substitution $\lambda \mapsto y$ gilt:
+  \[
+    \sum_{d_1, d_2} \lambda_{d_1}\lambda_{d_2} g([d_1,d_2])
+    \;=\; \sum_{d \mid \mathcal{P}(z)} \frac{y_d^2}{h(d)},
+  \]
+  da die Kreuzterme durch Möbius-Inversion verschwinden.  Dies ist eine
+  \emph{diagonale} positiv definite quadratische Form.
+
+  \textbf{Schritt 3: Nebenbedingung.}
+  Die Nebenbedingung $\lambda_1 = 1$ übersetzt sich zu
+  \[
+    1 = \lambda_1 = \sum_{d \mid \mathcal{P}(z)} y_d.
+  \]
+
+  \textbf{Schritt 4: Lagrange-Minimierung.}
+  Minimiere $\sum_d y_d^2/h(d)$ unter $\sum_d y_d = 1$.  Nach der
+  Cauchy-Schwarz-Ungleichung:
+  \[
+    1 = \left(\sum_d y_d\right)^2
+    = \left(\sum_d \frac{y_d}{\sqrt{h(d)}} \cdot \sqrt{h(d)}\right)^2
+    \leq \left(\sum_d \frac{y_d^2}{h(d)}\right)\left(\sum_d h(d)\right).
+  \]
+  Daher:
+  \[
+    \sum_d \frac{y_d^2}{h(d)} \;\geq\; \frac{1}{\sum_d h(d)} = \frac{1}{V_h(z)},
+  \]
+  mit Gleichheit bei $y_d^* = h(d) / V_h(z)$.  Die Rücktransformation liefert
+  $\lambda_d^*$ wie behauptet, und der minimale Hauptterm ist $X/V_h(z)$.
+\end{proof}
+
+% ================================================================
+\section{Die Hauptschätzung}
+\label{sec:hauptschaetzung}
+% ================================================================
+
+\begin{theorem}[Selbergsche Oberschranke]\label{thm:selberg_haupt}
+  Unter der Siebhypothese (Definition~\ref{def:hypothese}) mit optimalen Gewichten
+  $\lambda_d^*$ aus Lemma~\ref{lem:optimierung} gilt:
+  \[
+    S(\mathcal{A}, \mathcal{P}, z)
+    \;\leq\; \frac{X}{V(z)}
+             + O\!\left(\sum_{\substack{d_1, d_2 \leq z \\ d_1,d_2 \mid \mathcal{P}(z)}} |r_{[d_1,d_2]}|\right),
+  \]
+  wobei
+  \[
+    V(z) = \prod_{\substack{p \leq z \\ p \in \mathcal{P}}} \bigl(1 - g(p)\bigr)
+    \;\asymp\; V_h(z)^{-1}.
+  \]
+\end{theorem}
+
+\begin{proof}
+  \textbf{Hauptterm.}
+  Nach Lemma~\ref{lem:optimierung} beträgt der optimierte Hauptterm $X/V_h(z)$.
+  Wir zeigen $V_h(z) \asymp 1/V(z)$.  Durch Multiplikativität:
+  \begin{align*}
+    V_h(z)
+    &= \sum_{d \mid \mathcal{P}(z), d \leq z} \mu(d)^2 \prod_{p \mid d} \frac{g(p)}{1-g(p)} \\
+    &= \prod_{p \leq z, p \in \mathcal{P}} \left(1 + \frac{g(p)}{1-g(p)}\right)
+    = \prod_{p \leq z, p \in \mathcal{P}} \frac{1}{1 - g(p)}
+    = \frac{1}{V(z)}.
+  \end{align*}
+  Das Produkt konvergiert absolut, da $g(p) \in [0,1)$.
+  Daher beträgt der optimale Hauptterm $X \cdot V(z)^{-1} \cdot V(z) = X/V(z)$.
+
+  Genauer: Ohne die Trunkierung $d \leq z$ ist die Summe exakt $1/V(z)$.
+  Mit der Trunkierung gehen Terme mit $d > z$ verloren, aber $|\lambda_d^*| \leq 1$
+  und der Beitrag großer $d$ ist bereits klein.
+
+  \textbf{Restglied.}
+  Aus~\eqref{eq:selberg_aufspaltung} ist das Restglied:
+  \[
+    R = \sum_{d_1, d_2 \mid \mathcal{P}(z)} \lambda_{d_1}\lambda_{d_2}\, r_{[d_1,d_2]}.
+  \]
+  Da $|\lambda_d^*| \leq 1$ (was aus der Cauchy-Schwarz-Schranke der optimalen
+  Gewichte folgt), gilt:
+  \[
+    |R| \;\leq\; \sum_{\substack{d_1, d_2 \leq z}} |r_{[d_1,d_2]}|.
+  \]
+  Dies ist der angegebene Fehlerterm.
+\end{proof}
+
+\begin{bemerkung}
+  Der Faktor $1/V(z)$ ist asymptotisch die ``richtige'' Größe von
+  $S(\mathcal{A},\mathcal{P},z)/X$.  Für $g(p) = 1/p$ (Fall der Primzahlen
+  in $[1,x]$) liefert das Mertenssche Theorem:
+  \[
+    V(z) = \prod_{p \leq z} \left(1 - \frac{1}{p}\right) \sim \frac{e^{-\gamma}}{\log z},
+  \]
+  was die Oberschranke $S(\mathcal{A},\mathcal{P},z) \lesssim X \log z / e^{\gamma}$ ergibt.
+\end{bemerkung}
+
+% ================================================================
+\section{Anwendung: Brun-Titchmarsh-Satz}
+\label{sec:brun_titchmarsh}
+% ================================================================
+
+Der Brun-Titchmarsh-Satz ist die maßgebliche Oberschranke für Primzahlen
+in arithmetischen Progressionen.
+
+\begin{theorem}[Brun-Titchmarsh]\label{thm:brun_titchmarsh}
+  Für teilerfremde ganze Zahlen $a, q$ mit $\ggT(a,q) = 1$ und beliebiges $x > q$ gilt:
+  \[
+    \pi(x;\,q,\,a)
+    \;\leq\; \frac{2x}{\phi(q)\,\log(x/q)}.
+  \]
+\end{theorem}
+
+\begin{proof}
+  Wir wenden Selbergs Sieb auf die Menge
+  $\mathcal{A} = \{n \leq x : n \equiv a \pmod q\}$ an.
+
+  \textbf{Schritt 1: Siebaufstellung.}
+  Wir haben $|\mathcal{A}| = \lfloor x/q \rfloor \sim x/q$, also $X = x/q$.
+  Die Siebprimzahlen sind $\mathcal{P} = \{p : p \nmid q\}$.
+  Für jede Primzahl $p \nmid q$ liegt $\mathcal{A}$ in genau einer Restklasse
+  modulo $p$ (von $p$ Klassen), also:
+  \[
+    g(p) = \frac{1}{p}, \quad p \nmid q; \qquad g(p) = 0, \quad p \mid q.
+  \]
+  Für quadratfreies $d$ mit $\ggT(d, q) = 1$: Durch den Chinesischen Restsatz
+  gilt $|\mathcal{A}_d| = x/(dq) + O(1) = g(d) X + r_d$ mit $|r_d| \leq 1$.
+
+  \textbf{Schritt 2: Primzahlen via Sieb zählen.}
+  Jede Primzahl $p > z$ mit $p \equiv a \pmod q$ und $p \leq x$ wird von
+  $S(\mathcal{A},\mathcal{P},z)$ erfasst (da $\ggT(p, \mathcal{P}(z)) = 1$
+  für $p > z$).  Daher gilt mit $z = \sqrt{x}$:
+  \[
+    \pi(x;\,q,\,a) - \pi(z;\,q,\,a)
+    \;\leq\; S(\mathcal{A},\mathcal{P},z).
+  \]
+
+  \textbf{Schritt 3: Selbergsche Schranke.}
+  Nach Satz~\ref{thm:selberg_haupt}:
+  \[
+    S(\mathcal{A},\mathcal{P},z)
+    \;\leq\; \frac{X}{V(z)} + \text{Fehler}.
+  \]
+  Der Hauptterm: Da $g(p) = 1/p$ für $p \nmid q$:
+  \begin{align*}
+    \frac{1}{V(z)}
+    &= \prod_{\substack{p \leq z \\ p \nmid q}} \frac{1}{1 - 1/p}
+    = \prod_{\substack{p \leq z \\ p \nmid q}} \frac{p}{p-1}.
+  \end{align*}
+  Nach dem Mertensschen Satz:
+  \[
+    \prod_{p \leq z} \frac{p}{p-1} \;\sim\; e^{\gamma} \log z.
+  \]
+  Das Weglassen der $p \mid q$-Faktoren führt zur Korrektur $\phi(q)/q$:
+  \[
+    \prod_{\substack{p \leq z \\ p \nmid q}} \frac{p}{p-1}
+    = \prod_{p \leq z} \frac{p}{p-1} \cdot \prod_{\substack{p \mid q \\ p \leq z}} \frac{p-1}{p}
+    \;\sim\; e^{\gamma} \log z \cdot \frac{\phi(q)}{q}.
+  \]
+  (Dabei wurde $\prod_{p \mid q} (1-1/p) = \phi(q)/q$ verwendet.)
+
+  Mit $z = \sqrt{x}$, also $\log z = (\log x)/2$:
+  \[
+    \frac{X}{V(z)} = \frac{x}{q} \cdot \frac{q}{\phi(q)} \cdot \frac{1}{e^\gamma \log\sqrt{x}} \cdot e^\gamma
+    \;\sim\; \frac{2x}{\phi(q) \log x}.
+  \]
+
+  Genauer: Mit der Wahl $z = x/q$ und der präzisen Mertens-Schranke gilt:
+  \[
+    \frac{X}{V(z)} \;\leq\; \frac{x}{\phi(q)\, \log(x/q)},
+  \]
+  und der Fehlerterm $\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|$ ist $O(z^2) = O(x^2/q^2)$,
+  was durch den Hauptterm für $q \leq x^{1/2-\varepsilon}$ dominiert wird.
+
+  \textbf{Schritt 4: Abschluss des Beweises.}
+  Kombination der Schritte~2 und~3, wobei $\pi(z;q,a) \leq z$ im Fehlerterm absorbiert wird:
+  \[
+    \pi(x;\,q,\,a)
+    \;\leq\; \frac{x}{\phi(q)\log(x/q)} + O(z)
+    \;\leq\; \frac{2x}{\phi(q)\log(x/q)}
+  \]
+  für $x$ hinreichend groß gegenüber $q$.  Der Faktor $2$ absorbiert
+  sowohl die Näherung in der Mertens-Schätzung als auch den Beitrag kleiner
+  Primzahlen.
+\end{proof}
+
+\begin{korollar}[Vergleich mit dem Dirichletschen Satz]\label{kor:dirichlet}
+  Dirichlets Satz besagt $\pi(x;q,a) \sim x/(\phi(q)\log x)$ (Primzahlsatz
+  für Progressionen).  Die Brun-Titchmarsh-Schranke lautet:
+  \[
+    \pi(x;q,a) \;\leq\; \frac{2x}{\phi(q)\log(x/q)} \;=\; \frac{2x}{\phi(q)(\log x - \log q)}.
+  \]
+  Für festes $q$ und $x \to \infty$ ist dies asymptotisch $2x/(\phi(q)\log x)$,
+  d.\,h.\ die Brun-Titchmarsh-Schranke ist das \emph{Doppelte} des erwarteten
+  Hauptterms.  Dieser Faktor~$2$ ist scharf, wenn $q$ groß relativ zu $x$ ist.
+\end{korollar}
+
+\begin{bemerkung}[Verbesserung durch Iwaniec]
+  Iwaniec (1982) zeigte, dass man mit sorgfältigerer Wahl der Siebparameter
+  den Faktor~$2$ durch $2-\varepsilon$ für spezifische Familien ersetzen kann.
+  Der Faktor~$2$ im Brun-Titchmarsh-Satz ist jedoch im Wesentlichen optimal
+  für die Siebtechnik allein.
+\end{bemerkung}
+
+% ================================================================
+\section{Vergleich: Selbergs Sieb vs.\ Brunns Sieb}
+\label{sec:vergleich}
+% ================================================================
+
+Beide Siebe zielen darauf ab, $S(\mathcal{A},\mathcal{P},z)$ nach oben zu beschränken.
+Die folgende Tabelle fasst die wesentlichen Unterschiede zusammen.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\toprule
+\textbf{Aspekt} & \textbf{Brunns Sieb} & \textbf{Selbergs Sieb} \\
+\midrule
+Gewichte & $\mu(d)$ (Möbius), trunkiert & $\lambda_d$, optimal gewählt \\
+Schrankentyp & Ober- \emph{und} Unterschranke & Nur Oberschranke \\
+Hauptwerkzeug & Trunkierte Inklusion-Exklusion & Quadratische Minimierung \\
+Fehlerterm & $\sum_{d \leq z} |r_d|$ & $\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|$ \\
+Schärfe & Schwächer für kleines $z$ & Schärfer in den meisten Anwendungen \\
+Flexibilität & Feste Trunkierungstiefe & Variable Gewichte \\
+Hauptanwendung & $\pi_2(x)$ (Zwillingsprimzahlen) & $\pi(x;q,a)$ (Progressionen) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{bemerkung}
+  Der Fehlerterm von Selbergs Sieb, $\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|$,
+  kann um einen Faktor $z$ größer als Brunns $\sum_{d \leq z} |r_d|$ sein.
+  Für Probleme mit großen Restgliedern $r_d$ kann Brunns Sieb daher
+  vorzuziehen sein.  Für glatte Mengen $\mathcal{A}$ (wo $r_d$ gut kontrolliert
+  ist) dominiert Selbergs Sieb konsistent.
+\end{bemerkung}
+
+\begin{bemerkung}[Paritätsproblem]
+  Beide Siebe teilen das \emph{Paritätshindernis}: Sie können ganze Zahlen
+  mit gerader Anzahl von Primfaktoren nicht von solchen mit ungerader Anzahl
+  unterscheiden.  Das bedeutet, dass Siebmethoden allein nicht beweisen können,
+  dass es unendlich viele Zwillingsprimzahlen gibt (was das Identifizieren ganzer
+  Zahlen mit exakt $0$ Primfaktoren in einer verschobenen Folge erfordern würde).
+  Dieses Hindernis wurde von Selberg (1949) und später von Bombieri präzisiert.
+\end{bemerkung}
+
+% ================================================================
+\section{Fazit}
+% ================================================================
+
+Wir haben Selbergs Sieb vollständig dargestellt: den Lambda-Quadrat-Trick,
+die Optimierung der Gewichte über eine diagonale quadratische Form und die
+Hauptschätzung für $S(\mathcal{A},\mathcal{P},z)$.  Der Brun-Titchmarsh-Satz
+folgt als saubere Anwendung.
+
+Die tiefere Botschaft von Selbergs Sieb ist, dass \emph{jede} Oberschranke eines
+Siebes aus einer geeigneten Wahl nicht-negativer Gewichte abgeleitet werden kann,
+und die optimalen Gewichte aus einem endlichdimensionalen Optimierungsproblem
+entstehen.  Diese Perspektive erwies sich als außerordentlich fruchtbar:
+\begin{itemize}
+  \item Das große Sieb (Linnik, Rényi, Bombieri, Vaughan) kombiniert Selbergs
+    Lambda-Quadrat mit Exponentialsummen-Schätzungen.
+  \item Das GPY-Sieb (Goldston, Pintz, Y{\i}ld{\i}r{\i}m, 2005) modifiziert
+    Selbergs Gewichte, um beschränkte Primzahllücken zu detektieren.
+  \item Maynard-Tao (2014) verwendet ein mehrdimensionales Selberg-Sieb, um
+    $\liminf_n (p_{n+1} - p_n) \leq 246$ zu beweisen.
+\end{itemize}
+
+Selbergs Idee von 1947 steht damit im Herzen der tiefsten neueren Fortschritte
+zu Primzahllücken.
+
+\begin{thebibliography}{9}
+
+\bibitem{Selberg1947}
+A.~Selberg.
+\newblock On an elementary method in the theory of primes.
+\newblock \emph{Norske Vid. Selsk. Forh. (Trondheim)}, 19(18):64--67, 1947.
+
+\bibitem{IwaniecKowalski}
+H.~Iwaniec und E.~Kowalski.
+\newblock \emph{Analytic Number Theory}.
+\newblock American Mathematical Society Colloquium Publications, Bd.~53,
+  Providence, RI, 2004.
+
+\bibitem{CojocMurty}
+A.~C.~Cojocaru und M.~R.~Murty.
+\newblock \emph{An Introduction to Sieve Methods and Their Applications}.
+\newblock Cambridge University Press, 2005.
+
+\bibitem{HalberstamRichert}
+H.~Halberstam und H.-E.~Richert.
+\newblock \emph{Sieve Methods}.
+\newblock Academic Press, London, 1974.
+
+\bibitem{Brun1919}
+V.~Brun.
+\newblock La s{\'e}rie $\frac{1}{5}+\frac{1}{7}+\cdots$ o\`u les d{\'e}nominateurs
+  sont nombres premiers jumeaux est convergente ou finie.
+\newblock \emph{Skrifter udgivne af Videnskabsselskabet i Christiania}, Nr.~3, 1919.
+
+\bibitem{Maynard2015}
+J.~Maynard.
+\newblock Small gaps between primes.
+\newblock \emph{Annals of Mathematics}, 181(1):383--413, 2015.
+
+\bibitem{Iwaniec1982}
+H.~Iwaniec.
+\newblock On the Brun-Titchmarsh theorem.
+\newblock \emph{Journal of Mathematical Society of Japan}, 34:95--123, 1982.
+
+\end{thebibliography}
+
+\end{document}

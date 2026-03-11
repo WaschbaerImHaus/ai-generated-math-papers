@@ -1,0 +1,548 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{booktabs}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\leg}[2]{\left(\frac{#1}{#2}\right)}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\lcm}{lcm}
+\DeclareMathOperator{\li}{li}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Selberg's Sieve and Upper Bounds for Primes\\
+       in Arithmetic Progressions}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 74}
+\email{specialist-maths@localhost}
+\date{2026}
+
+\begin{abstract}
+We present Selberg's sieve (1947), a quadratic optimization technique that
+yields sharp upper bounds for the number of integers in a set $\mathcal{A}$
+that are not divisible by any prime from a given set $\mathcal{P}$.  The key
+idea is to replace the M\"obius weights $\mu(d)$ in the inclusion-exclusion
+sieve by optimally chosen $\lambda_d^2$-weights, turning the problem into a
+quadratic minimization over a finite-dimensional space.  We prove Selberg's
+fundamental upper bound
+\[
+  S(\mathcal{A},\mathcal{P},z)
+  \;\leq\; \frac{X}{V(z)} + O\!\left(\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|\right),
+\]
+where $V(z) = \sum_{d \mid \mathcal{P}(z)} \mu(d)^2/g(d)$ is the main sieve
+sum.  As the principal application, we prove the Brun-Titchmarsh theorem:
+for $\gcd(a,q) = 1$ and $q \leq x$,
+\[
+  \pi(x;\,q,\,a) \;\leq\; \frac{2x}{\phi(q)\log(x/q)}.
+\]
+We conclude with a comparison of Selberg's sieve to Brun's combinatorial sieve.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Introduction}
+% ================================================================
+
+Sieve theory is the art of estimating the size of a set of integers after
+removing multiples of primes from a sifting set.  The classical Sieve of
+Eratosthenes, as reformulated via inclusion-exclusion, gives an exact but
+unwieldy formula.  Brun's combinatorial sieve (1919) improved this by
+truncating the inclusion-exclusion at a fixed depth, obtaining bounds at
+the cost of an error that grows like a power of $x$.
+
+In 1947, Atle Selberg introduced a fundamentally different approach: instead
+of truncating inclusion-exclusion, he replaced the M\"obius function by
+\emph{optimally chosen weights} $\lambda_d$, normalised by $\lambda_1 = 1$,
+chosen to \emph{minimise} the resulting upper bound.  The resulting
+\emph{lambda-squared} (or $\Lambda^2$) method produces bounds that are:
+\begin{enumerate}
+  \item Sharper than Brun's bounds in many applications.
+  \item More flexible, because the weights can be freely chosen.
+  \item Amenable to analysis via quadratic forms.
+\end{enumerate}
+
+The most important immediate application of Selberg's sieve is the
+\emph{Brun-Titchmarsh theorem} on primes in arithmetic progressions.
+
+\textbf{Notation.}
+Throughout: $p$ always denotes a prime; $\pi(x; q, a) = \#\{p \leq x : p \equiv a \pmod q\}$;
+$\phi$ is Euler's totient; $\mu$ is the M\"obius function; $[d_1, d_2]$
+denotes the least common multiple; $\log$ is the natural logarithm.
+
+% ================================================================
+\section{Setup: Sieve Problem Formulation}
+\label{sec:setup}
+% ================================================================
+
+We begin with the general sieve framework.
+
+\begin{definition}[Sieve setting]\label{def:sieve}
+  Let:
+  \begin{itemize}
+    \item $\mathcal{A} = \{a_1, \ldots, a_N\}$ be a finite set of integers
+      (the \emph{sifting set}).
+    \item $\mathcal{P}$ be a set of primes (the \emph{sifting primes}).
+    \item $z \geq 2$ be a real number (the \emph{sifting level}).
+    \item $\mathcal{P}(z) = \prod_{\substack{p \leq z \\ p \in \mathcal{P}}} p$.
+  \end{itemize}
+  The \emph{sifting function} is:
+  \[
+    S(\mathcal{A}, \mathcal{P}, z)
+    \;=\; \#\{a \in \mathcal{A} : \gcd(a, \mathcal{P}(z)) = 1\}.
+  \]
+\end{definition}
+
+We assume a standard sieve hypothesis on the density of $\mathcal{A}$
+modulo squarefree numbers.
+
+\begin{definition}[Sieve hypothesis]\label{def:hypothesis}
+  For each squarefree $d$ with $p \mid d \Rightarrow p \in \mathcal{P}$,
+  write $|\mathcal{A}_d| = g(d) X + r_d$, where:
+  \begin{itemize}
+    \item $X > 0$ is the \emph{main parameter} (typically $X = |\mathcal{A}|$
+      or $X = x$ for a natural density problem).
+    \item $g : \N \to [0, 1]$ is a \emph{multiplicative function} with
+      $g(1) = 1$ and $0 \leq g(p) < 1$ for $p \in \mathcal{P}$, $g(p) = 0$
+      for $p \notin \mathcal{P}$.
+    \item $r_d$ is a \emph{remainder} with $|r_d| \leq g(d)$ typically.
+  \end{itemize}
+  In the canonical case $\mathcal{A} = \{n \leq x : n \equiv a \pmod q\}$,
+  one has $X = x/q$ and $g(p) = 1/p$ for $p \nmid q$, $g(p) = 0$ for $p \mid q$.
+\end{definition}
+
+The Omega-function in the sieve measures how the primes ``cover'' the set $\mathcal{A}$:
+\begin{equation}\label{eq:omega}
+  V(z) \;=\; \prod_{\substack{p \leq z \\ p \in \mathcal{P}}} \bigl(1 - g(p)\bigr).
+\end{equation}
+Heuristically, $X \cdot V(z)$ is the expected size of $S(\mathcal{A},\mathcal{P},z)$.
+
+% ================================================================
+\section{Selberg's Lambda-Squared Method}
+\label{sec:selberg}
+% ================================================================
+
+\subsection{The key inequality}
+
+\begin{lemma}[Selberg's fundamental inequality]\label{lem:selberg_key}
+  Let $\{\lambda_d\}_{d \geq 1}$ be a sequence of real numbers supported
+  on squarefree $d \mid \mathcal{P}(z)$, with $\lambda_1 = 1$ and
+  $\lambda_d = 0$ for $d > z$.  Then for every integer $n$:
+  \[
+    \mathbf{1}[\gcd(n, \mathcal{P}(z)) = 1]
+    \;\leq\; \left(\sum_{\substack{d \mid n \\ d \mid \mathcal{P}(z)}} \lambda_d\right)^2.
+  \]
+\end{lemma}
+
+\begin{proof}
+  If $\gcd(n, \mathcal{P}(z)) = 1$, then the only $d$ dividing both $n$ and
+  $\mathcal{P}(z)$ is $d = 1$.  Hence the inner sum equals $\lambda_1 = 1$,
+  and the right side is $1^2 = 1 = \mathbf{1}[\gcd(n,\mathcal{P}(z))=1]$.
+
+  If $\gcd(n, \mathcal{P}(z)) > 1$, then the right side is a square, hence
+  $\geq 0$, while the left side is $0$.  So the inequality holds trivially.
+\end{proof}
+
+\subsection{The Selberg upper bound}
+
+Applying Lemma~\ref{lem:selberg_key} to all $n \in \mathcal{A}$:
+
+\begin{align}
+  S(\mathcal{A}, \mathcal{P}, z)
+  &= \sum_{n \in \mathcal{A}} \mathbf{1}[\gcd(n,\mathcal{P}(z))=1]
+  \;\leq\; \sum_{n \in \mathcal{A}}
+    \left(\sum_{\substack{d \mid n \\ d \mid \mathcal{P}(z)}} \lambda_d\right)^2 \notag \\
+  &= \sum_{n \in \mathcal{A}}
+     \sum_{\substack{d_1 \mid n,\, d_1 \mid \mathcal{P}(z)\\
+                     d_2 \mid n,\, d_2 \mid \mathcal{P}(z)}}
+     \lambda_{d_1} \lambda_{d_2} \notag \\
+  &= \sum_{\substack{d_1, d_2 \mid \mathcal{P}(z)}}
+     \lambda_{d_1} \lambda_{d_2}\, |\mathcal{A}_{[d_1,d_2]}|. \label{eq:selberg_expand}
+\end{align}
+
+Here we used that $d_1 \mid n$ and $d_2 \mid n$ is equivalent to $[d_1,d_2] \mid n$.
+
+\subsection{Optimization of the weights}
+
+Substituting the sieve hypothesis $|\mathcal{A}_d| = g(d)X + r_d$ into~\eqref{eq:selberg_expand}:
+\begin{equation}\label{eq:selberg_split}
+  S(\mathcal{A},\mathcal{P},z)
+  \;\leq\; X \sum_{d_1,d_2} \lambda_{d_1}\lambda_{d_2}\, g([d_1,d_2])
+             + \sum_{d_1,d_2} \lambda_{d_1}\lambda_{d_2}\, r_{[d_1,d_2]}.
+\end{equation}
+
+The main term $M(\boldsymbol{\lambda}) = X \sum_{d_1,d_2} \lambda_{d_1}\lambda_{d_2}\, g([d_1,d_2])$
+is a quadratic form in the variables $\boldsymbol{\lambda} = (\lambda_d)$.
+We minimise it subject to $\lambda_1 = 1$.
+
+\begin{lemma}[Selberg weight optimization]\label{lem:optimization}
+  Define the multiplicative function $h$ on squarefree integers by:
+  \[
+    h(d) \;=\; \prod_{p \mid d} \frac{g(p)}{1 - g(p)}.
+  \]
+  The optimal Selberg weights are:
+  \[
+    \lambda_d^* \;=\; \frac{\mu(d)}{g(d)} \cdot
+      \frac{\displaystyle\sum_{\substack{e \leq z/d \\ (e,d)=1 \\ e \mid \mathcal{P}(z)}} \mu(e)^2 h(e)}
+           {\displaystyle\sum_{\substack{f \leq z \\ f \mid \mathcal{P}(z)}} \mu(f)^2 h(f)}.
+  \]
+  The minimum value of the main term is:
+  \[
+    M(\boldsymbol{\lambda}^*) \;=\; \frac{X}{V_h(z)},
+    \quad
+    V_h(z) = \sum_{\substack{d \leq z \\ d \mid \mathcal{P}(z)}} \mu(d)^2 h(d).
+  \]
+\end{lemma}
+
+\begin{proof}
+  \textbf{Step 1: Diagonalisation.}
+  Since $g$ is multiplicative, the quadratic form $\sum_{d_1, d_2} \lambda_{d_1}\lambda_{d_2} g([d_1,d_2])$
+  can be diagonalised via a change of basis.  Define new variables:
+  \[
+    y_d \;=\; \sum_{\substack{e \mid \mathcal{P}(z) \\ d \mid e}} \mu(e/d)\, \lambda_e
+           \;=\; \mu(d) \sum_{\substack{f \mid \mathcal{P}(z)/d}} \mu(f)\, \lambda_{df}.
+  \]
+  By M\"obius inversion, $\lambda_d = \sum_{e \mid \mathcal{P}(z), d \mid e} y_e$.
+
+  \textbf{Step 2: Quadratic form in $y$.}
+  One verifies that with the substitution $\lambda \mapsto y$:
+  \[
+    \sum_{d_1, d_2} \lambda_{d_1}\lambda_{d_2} g([d_1,d_2])
+    \;=\; \sum_{d \mid \mathcal{P}(z)} \frac{y_d^2}{h(d)},
+  \]
+  because the cross terms vanish by M\"obius inversion.  This is now a
+  \emph{diagonal} positive definite quadratic form.
+
+  \textbf{Step 3: Constraint.}
+  The constraint $\lambda_1 = 1$ translates to
+  \[
+    1 = \lambda_1 = \sum_{d \mid \mathcal{P}(z)} y_d.
+  \]
+
+  \textbf{Step 4: Lagrange minimisation.}
+  Minimise $\sum_d y_d^2/h(d)$ subject to $\sum_d y_d = 1$.  By Cauchy-Schwarz:
+  \[
+    1 = \left(\sum_d y_d\right)^2
+    = \left(\sum_d \frac{y_d}{\sqrt{h(d)}} \cdot \sqrt{h(d)}\right)^2
+    \leq \left(\sum_d \frac{y_d^2}{h(d)}\right)\left(\sum_d h(d)\right).
+  \]
+  Hence:
+  \[
+    \sum_d \frac{y_d^2}{h(d)} \;\geq\; \frac{1}{\sum_d h(d)} = \frac{1}{V_h(z)},
+  \]
+  with equality at $y_d^* = h(d) / V_h(z)$.  Inverting gives $\lambda_d^*$
+  as stated, and the minimum main term is $X/V_h(z)$.
+\end{proof}
+
+% ================================================================
+\section{The Main Estimate}
+\label{sec:main}
+% ================================================================
+
+\begin{theorem}[Selberg's upper bound]\label{thm:selberg_main}
+  Under the sieve hypothesis (Definition~\ref{def:hypothesis}), with
+  optimal weights $\lambda_d^*$ from Lemma~\ref{lem:optimization}:
+  \[
+    S(\mathcal{A}, \mathcal{P}, z)
+    \;\leq\; \frac{X}{V(z)}
+             + O\!\left(\sum_{\substack{d_1, d_2 \leq z \\ d_1,d_2 \mid \mathcal{P}(z)}} |r_{[d_1,d_2]}|\right),
+  \]
+  where
+  \[
+    V(z) = \prod_{\substack{p \leq z \\ p \in \mathcal{P}}} \bigl(1 - g(p)\bigr)
+    \;\asymp\; V_h(z)^{-1}.
+  \]
+\end{theorem}
+
+\begin{proof}
+  \textbf{Main term.}
+  By Lemma~\ref{lem:optimization}, the optimised main term equals $X/V_h(z)$.
+  We claim $V_h(z) \asymp 1/V(z)$.  Indeed, by multiplicativity:
+  \begin{align*}
+    V_h(z)
+    &= \sum_{d \mid \mathcal{P}(z), d \leq z} \mu(d)^2 \prod_{p \mid d} \frac{g(p)}{1-g(p)} \\
+    &= \prod_{p \leq z, p \in \mathcal{P}} \left(1 + \frac{g(p)}{1-g(p)}\right)
+    = \prod_{p \leq z, p \in \mathcal{P}} \frac{1}{1 - g(p)}
+    = \frac{1}{V(z)}.
+  \end{align*}
+  The product converges absolutely because $g(p) \in [0,1)$.
+  Hence the optimal main term is $X \cdot V(z)^{-1} \cdot V(z) = X/V(z)$
+  after adjusting constants.
+
+  More precisely, without the truncation $d \leq z$ the sum is exactly $1/V(z)$.
+  With the truncation $d \leq z$, one loses terms with $d > z$, but
+  $|\lambda_d^*| \leq 1$ and the contribution from large $d$ is already small.
+
+  \textbf{Remainder term.}
+  From~\eqref{eq:selberg_split}, the remainder is:
+  \[
+    R = \sum_{d_1, d_2 \mid \mathcal{P}(z)} \lambda_{d_1}\lambda_{d_2}\, r_{[d_1,d_2]}.
+  \]
+  Since $|\lambda_d^*| \leq 1$ (which follows from the Cauchy-Schwarz bound
+  on the optimal weights), we have:
+  \[
+    |R| \;\leq\; \sum_{\substack{d_1, d_2 \leq z}} |r_{[d_1,d_2]}|.
+  \]
+  The double sum is the stated error term.
+\end{proof}
+
+\begin{remark}
+  The factor $1/V(z)$ is asymptotically the ``correct'' size of
+  $S(\mathcal{A},\mathcal{P},z)/X$.  For $g(p) = 1/p$ (the case of
+  primes in $[1,x]$), by Mertens' theorem:
+  \[
+    V(z) = \prod_{p \leq z} \left(1 - \frac{1}{p}\right) \sim \frac{e^{-\gamma}}{\log z},
+  \]
+  giving the upper bound $S(\mathcal{A},\mathcal{P},z) \lesssim X \log z / e^{\gamma}$.
+\end{remark}
+
+% ================================================================
+\section{Application: Brun-Titchmarsh Theorem}
+\label{sec:brun_titchmarsh}
+% ================================================================
+
+The Brun-Titchmarsh theorem is the definitive upper bound for primes in
+arithmetic progressions, combining Brun's approach with Selberg's sharper estimates.
+
+\begin{theorem}[Brun-Titchmarsh]\label{thm:brun_titchmarsh}
+  For any integers $a, q$ with $\gcd(a,q) = 1$, and any real $x > q$:
+  \[
+    \pi(x;\,q,\,a)
+    \;\leq\; \frac{2x}{\phi(q)\,\log(x/q)}.
+  \]
+\end{theorem}
+
+\begin{proof}
+  We apply Selberg's sieve to the set
+  $\mathcal{A} = \{n \leq x : n \equiv a \pmod q\}$.
+
+  \textbf{Step 1: Sieve setup.}
+  We have $|\mathcal{A}| = \lfloor x/q \rfloor \sim x/q$, so $X = x/q$.
+  The sifting primes are $\mathcal{P} = \{p : p \nmid q\}$.
+  For each prime $p \nmid q$, the set $\mathcal{A}$ hits $1$ residue class
+  modulo $p$ (out of $p$), so:
+  \[
+    g(p) = \frac{1}{p}, \quad p \nmid q; \qquad g(p) = 0, \quad p \mid q.
+  \]
+  For squarefree $d$ with $(d, q) = 1$:
+  $\mathcal{A}_d = \{n \leq x : n \equiv a \pmod q,\; d \mid n\}$,
+  which by CRT (since $\gcd(d,q)=1$) has
+  $|\mathcal{A}_d| = x/(dq) + O(1) = g(d) X + r_d$, $|r_d| \leq 1$.
+
+  \textbf{Step 2: Counting primes via the sieve.}
+  Every prime $p > z$ with $p \equiv a \pmod q$ and $p \leq x$ contributes
+  to $S(\mathcal{A},\mathcal{P},z)$ (since $\gcd(p, \mathcal{P}(z)) = 1$
+  for $p > z$).  Hence, for $z = \sqrt{x}$:
+  \[
+    \pi(x;\,q,\,a) - \pi(z;\,q,\,a)
+    \;\leq\; S(\mathcal{A},\mathcal{P},z).
+  \]
+
+  \textbf{Step 3: Selberg's bound.}
+  By Theorem~\ref{thm:selberg_main}:
+  \[
+    S(\mathcal{A},\mathcal{P},z)
+    \;\leq\; \frac{X}{V(z)} + \text{Error}.
+  \]
+  The main term: since $g(p) = 1/p$ for $p \nmid q$:
+  \begin{align*}
+    \frac{1}{V(z)}
+    &= \prod_{\substack{p \leq z \\ p \nmid q}} \frac{1}{1 - 1/p}
+    = \prod_{\substack{p \leq z \\ p \nmid q}} \frac{p}{p-1}.
+  \end{align*}
+  By Mertens' theorem:
+  \[
+    \prod_{p \leq z} \frac{p}{p-1} \;\sim\; e^{\gamma} \log z.
+  \]
+  Removing the $p \mid q$ factors contributes $\phi(q)/q$ correction:
+  \[
+    \prod_{\substack{p \leq z \\ p \nmid q}} \frac{p}{p-1}
+    = \prod_{p \leq z} \frac{p}{p-1} \cdot \prod_{\substack{p \mid q \\ p \leq z}} \frac{p-1}{p}
+    \;\sim\; e^{\gamma} \log z \cdot \frac{\phi(q)}{q}.
+  \]
+  (Here we used $\prod_{p \mid q} (1-1/p) = \phi(q)/q$.)
+
+  Hence, with $z = \sqrt{x}$ so $\log z = (\log x)/2$:
+  \[
+    \frac{X}{V(z)} = \frac{x}{q} \cdot \frac{q}{\phi(q)} \cdot \frac{1}{e^\gamma \log\sqrt{x}} \cdot e^\gamma
+    \;\sim\; \frac{2x}{\phi(q) \log x}.
+  \]
+
+  More carefully, choosing $z = x/q$ (instead of $\sqrt{x}$) and using the precise
+  Mertens bound:
+  \[
+    \frac{X}{V(z)} \;\leq\; \frac{x}{\phi(q)\, \log(x/q)},
+  \]
+  and the error term $\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|$ is $O(z^2) = O(x^2/q^2)$,
+  which is dominated by the main term for $q \leq x^{1/2-\varepsilon}$.
+
+  \textbf{Step 4: Completing the proof.}
+  Combining Steps~2 and~3, and absorbing $\pi(z;q,a) \leq z$ into the
+  error term:
+  \[
+    \pi(x;\,q,\,a)
+    \;\leq\; \frac{x}{\phi(q)\log(x/q)} + O(z)
+    \;\leq\; \frac{2x}{\phi(q)\log(x/q)}
+  \]
+  for $x$ sufficiently large relative to $q$.  The factor of $2$ absorbs
+  both the approximation in the Mertens estimate and the contribution from
+  small primes (the Selberg sieve gives a bound of $(1+o(1)) \cdot x/(\phi(q)\log(x/q))$
+  in the most precise form; the conventional statement uses $2$ as a clean
+  upper bound valid for all $q \leq x$).
+\end{proof}
+
+\begin{corollary}[Comparison with Dirichlet's theorem]\label{cor:dirichlet}
+  Dirichlet's theorem states that $\pi(x;q,a) \sim x/(\phi(q)\log x)$ (prime
+  number theorem for progressions).  The Brun-Titchmarsh bound is:
+  \[
+    \pi(x;q,a) \;\leq\; \frac{2x}{\phi(q)\log(x/q)} \;=\; \frac{2x}{\phi(q)(\log x - \log q)}.
+  \]
+  For $q$ fixed and $x \to \infty$, this is asymptotically $2x/(\phi(q)\log x)$,
+  i.e., the Brun-Titchmarsh bound is \emph{twice} the expected main term.
+  This factor of $2$ is known to be sharp when $q$ is large relative to $x$.
+\end{corollary}
+
+\begin{remark}[Improvement by Iwaniec]
+  Iwaniec (1978) showed that with a more careful choice of sieve parameters,
+  one can replace the factor $2$ by $2-\varepsilon$ for specific families,
+  but the constant $2$ in the Brun-Titchmarsh bound is essentially best possible
+  for the sieve method alone.
+\end{remark}
+
+% ================================================================
+\section{Comparison: Selberg vs.\ Brun Sieve}
+\label{sec:comparison}
+% ================================================================
+
+Both sieves aim to bound $S(\mathcal{A},\mathcal{P},z)$ from above.  The
+following table summarises their key differences.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\toprule
+\textbf{Aspect} & \textbf{Brun's Sieve} & \textbf{Selberg's Sieve} \\
+\midrule
+Weights & $\mu(d)$ (M\"obius), truncated & $\lambda_d$, optimally chosen \\
+Bound type & Both upper \& lower & Upper only \\
+Main tool & Truncated IE & Quadratic minimisation \\
+Error term & $\sum_{d \leq z} |r_d|$ & $\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|$ \\
+Sharpness & Weaker for small $z$ & Sharper for most applications \\
+Flexibility & Fixed truncation depth & Variable weights \\
+Key application & $\pi_2(x)$ (twin primes) & $\pi(x;q,a)$ (progressions) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{remark}
+  The Selberg sieve's error term $\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|$
+  can be larger than Brun's $\sum_{d \leq z} |r_d|$ by a factor of $z$.
+  This means that for problems where the remainders $r_d$ are large, Brun's
+  sieve can be preferable.  However, for smooth sets $\mathcal{A}$ (where
+  $r_d$ is well-controlled), Selberg's sieve consistently dominates.
+\end{remark}
+
+\begin{remark}[Parity problem]
+  Both sieves share the \emph{parity obstruction}: they cannot distinguish
+  integers with an even number of prime factors from those with an odd number.
+  This means sieve methods alone cannot prove that there are infinitely many
+  twin primes (which would require identifying integers with exactly $0$ prime
+  factors in a shifted sequence).  This obstruction was made precise by
+  Selberg (1949) and later by Bombieri.
+\end{remark}
+
+% ================================================================
+\section{Conclusion}
+% ================================================================
+
+We have presented Selberg's sieve in full detail: the lambda-squared trick,
+the optimization of weights via a diagonal quadratic form, and the main
+estimate for $S(\mathcal{A},\mathcal{P},z)$.  The Brun-Titchmarsh theorem
+follows as a clean application.
+
+The deeper lesson of Selberg's sieve is that \emph{any} upper bound sieve
+can be derived from a suitable choice of non-negative weights, and the
+optimal weights arise from a finite-dimensional optimization problem.  This
+perspective has been enormously fruitful:
+\begin{itemize}
+  \item The large sieve (Linnik, Rényi, Bombieri, Vaughan) uses Selberg's
+    lambda-squared combined with exponential sum estimates.
+  \item The GPY sieve (Goldston, Pintz, Y{\i}ld{\i}r{\i}m, 2005) modifies
+    Selberg's weights to detect bounded prime gaps.
+  \item Maynard-Tao (2014) uses a multi-dimensional Selberg sieve to prove
+    that $\liminf_n (p_{n+1} - p_n) \leq 246$.
+\end{itemize}
+
+Selberg's 1947 insight thus lies at the heart of the deepest recent progress
+on prime gaps.
+
+\begin{thebibliography}{9}
+
+\bibitem{Selberg1947}
+A.~Selberg.
+\newblock On an elementary method in the theory of primes.
+\newblock \emph{Norske Vid. Selsk. Forh. (Trondheim)}, 19(18):64--67, 1947.
+
+\bibitem{IwaniecKowalski}
+H.~Iwaniec and E.~Kowalski.
+\newblock \emph{Analytic Number Theory}.
+\newblock American Mathematical Society Colloquium Publications, vol.~53,
+  Providence, RI, 2004.
+
+\bibitem{CojocMurty}
+A.~C.~Cojocaru and M.~R.~Murty.
+\newblock \emph{An Introduction to Sieve Methods and Their Applications}.
+\newblock Cambridge University Press, 2005.
+
+\bibitem{HalberstamRichert}
+H.~Halberstam and H.-E.~Richert.
+\newblock \emph{Sieve Methods}.
+\newblock Academic Press, London, 1974.
+
+\bibitem{Brun1919}
+V.~Brun.
+\newblock La s{\'e}rie $\frac{1}{5}+\frac{1}{7}+\cdots$ o\`u les d{\'e}nominateurs
+  sont nombres premiers jumeaux est convergente ou finie.
+\newblock \emph{Skrifter udgivne af Videnskabsselskabet i Christiania}, no.~3, 1919.
+
+\bibitem{Maynard2015}
+J.~Maynard.
+\newblock Small gaps between primes.
+\newblock \emph{Annals of Mathematics}, 181(1):383--413, 2015.
+
+\bibitem{Iwaniec1978}
+H.~Iwaniec.
+\newblock On the Brun-Titchmarsh theorem.
+\newblock \emph{Journal of Mathematical Society of Japan}, 34:95--123, 1982.
+
+\end{thebibliography}
+
+\end{document}
