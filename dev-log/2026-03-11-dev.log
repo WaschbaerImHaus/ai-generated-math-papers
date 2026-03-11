@@ -38,3 +38,8 @@
   (S≠{1..k} Term entfernt, korrekte Form mit ∅≠S⊊{1..k})
 - BUG-011 (EN): paper7_lehmer_no_semiprime.tex: redaktionellen Kommentar "Hmm — let us
   handle p=2 separately" entfernt, Beweis von eq:ineq sauber strukturiert
+
+2026-03-11 Build 48: SageMath Bridge – export_to_sage_string() + import_from_sage_string()
+- sagemath_bridge.py: export_to_sage_string(sympy_expr) → SageMath-kompatibler String
+- sagemath_bridge.py: import_from_sage_string(sage_str) → SymPy-Ausdruck (Fallback ohne SageMath)
+- tests/test_sagemath_bridge.py: 7 neue Tests für die neuen Funktionen
