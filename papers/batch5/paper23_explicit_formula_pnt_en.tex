@@ -193,8 +193,17 @@ $-\zeta'(s)/\zeta(s)$:
     has a simple pole with residue $-1$; contribution: $-x^1/1 \cdot (-1) = x$.
   \item Residues at non-trivial zeros $\rho$: each zero of $\zeta$ is a
     simple pole of $-\zeta'/\zeta$ with residue $1$; contribution: $-x^\rho/\rho$.
-  \item Trivial zeros at $s = -2m$: contribution:
-    $\sum_{m=1}^\infty x^{-2m}/(-2m) = \tfrac{1}{2}\log(1-x^{-2})$.
+  \item Trivial zeros at $s = -2m$ ($m=1,2,3,\ldots$):
+    $-\zeta'/\zeta$ has a simple pole at each $s = -2m$ with residue $+1$.
+    Perron's formula contributes $+x^{-2m}/(-2m)$ for each.
+    Summing:
+    $\displaystyle\sum_{m=1}^\infty \frac{x^{-2m}}{-2m}
+     = -\tfrac{1}{2}\sum_{m=1}^\infty \frac{(x^{-2})^m}{m}
+     = \tfrac{1}{2}\log(1-x^{-2})$
+    (using $\log(1-u)=-\sum_{m=1}^\infty u^m/m$).
+    This term appears in the formula as $-\tfrac{1}{2}\log(1-x^{-2})$
+    because we move it to the right-hand side; note $\log(1-x^{-2}) < 0$
+    for $x > 1$, so $-\tfrac{1}{2}\log(1-x^{-2}) > 0$ is a small positive correction.
   \item Contribution of the pole of $\Gamma$ at $s = 0$: $-\zeta'(0)/\zeta(0)$.
 \end{itemize}
 A fully rigorous proof (handling convergence carefully) is in

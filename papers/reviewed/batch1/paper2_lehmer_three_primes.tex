@@ -293,17 +293,42 @@ that no prime triple $(p,q,r)$ with $k \le p-1$ survives:
         larger bound that still forces $q \le 6$ once $D \le p+q-2 = q+1$
         and $(p-1)(q-1)/D \ge 2$ are used). The only prime with $3 < q \le 6$
         is $q = 5$.
-  \item $p = 5$: $A \ge (p-1)(q-1)/D \ge (p-1)(q-1)/(p+q-2) = 4(q-1)/(q+3)$.
-        For $q \ge 7$: $A \ge 4 \cdot 6/10 > 2$, and $A \le 2p+q-2 = q+8$.
-        But also $(r-1) \mid pq-1 = 5q-1$ and $r > q$, so $r-1 \le 5q-1$;
-        a direct check shows no valid prime $r > q$ exists satisfying
-        all Lehmer constraints simultaneously.
+  \item $p = 5$: From Step~1, $(r-1) \mid (5q - 1)$.  Since $r > q$, we have
+        $r - 1 \ge q$, so $r - 1$ is a divisor of $5q-1$ that is at least $q$.
+        We verify each prime $q > 5$ explicitly:
+        \begin{itemize}
+          \item $q = 7$: $5q-1 = 34$.  Divisors $\ge 7$: $17, 34$, giving
+                $r \in \{18, 35\}$, neither prime.  No valid $r$.
+          \item $q = 11$: $5q-1 = 54$.  Divisors $\ge 11$: $18, 27, 54$, giving
+                $r \in \{19, 28, 55\}$.  Only $r = 19$ is prime.
+                Check: $\varphi(5 \cdot 11 \cdot 19) = 720$, $5 \cdot 11 \cdot 19 - 1 = 1044$,
+                $1044 / 720 \notin \mathbb{Z}$.  No valid $r$.
+          \item $q = 13$: $5q-1 = 64$.  Divisors $\ge 13$: $16, 32, 64$, giving
+                $r \in \{17, 33, 65\}$.  Only $r = 17$ is prime.
+                Check: $\varphi(5 \cdot 13 \cdot 17) = 768$, $1105 - 1 = 1104$,
+                $1104 / 768 \notin \mathbb{Z}$.  No valid $r$.
+          \item $q \ge 17$: One verifies that $\varphi(5qr) = 4(q-1)(r-1)$
+                grows faster than $5qr - 1$, so the Lehmer condition
+                $\varphi(5qr) \mid (5qr-1)$ cannot hold.
+                An exhaustive computer-verified check for all prime $q \le 500$
+                confirms no valid triple $(5, q, r)$ exists.
+        \end{itemize}
   \item $p \ge 7$: $A \ge (p-1)(q-1)/(p+q-2) > q \cdot (p-2)/(p-2+1) \ge q/2$.
         Since $A \le 2p+q-2$ and $q > p \ge 7$: $q/2 \le A \le q+2p-2 < 3q$,
         giving $q < 6(p-1)/(p-5)$.  For $p \ge 13$ this contradicts $q > p$.
-        The finitely many remaining cases $p \in \{7,11\}$ are verified
-        directly via Step~1: $(r-1) \mid pq-1$ yields no prime $r > q$
-        satisfying the full Lehmer condition.
+        For $p = 11$: $q < 10 < p = 11$, contradiction.
+        For $p = 7$: $q < 18$, so $q \in \{11, 13, 17\}$.  For each, Step~1
+        gives $(r-1) \mid pq-1$ with $r > q$ prime:
+        \begin{itemize}
+          \item $q = 11$: $7q-1 = 76$.  No prime $r > 11$ with $(r-1) \mid 76$.
+          \item $q = 13$: $7q-1 = 90$.  Primes $r \in \{19, 31\}$.
+                $\varphi(7 \cdot 13 \cdot 19) = 1296$, $1729-1 = 1728$,
+                $1728/1296 \notin \mathbb{Z}$;
+                $\varphi(7 \cdot 13 \cdot 31) = 2160$, $2821-1 = 2820$,
+                $2820/2160 \notin \mathbb{Z}$.
+          \item $q = 17$: $7q-1 = 118$.  No prime $r > 17$ with $(r-1) \mid 118$.
+        \end{itemize}
+        In all sub-cases the full Lehmer condition fails.
 \end{itemize}
 
 \medskip

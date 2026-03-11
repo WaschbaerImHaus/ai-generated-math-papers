@@ -200,7 +200,17 @@ sammelt die Residuen der Polstellen und Nullstellen von $-\zeta'(s)/\zeta(s)$:
     also hat $-\zeta'/\zeta$ einen einfachen Pol mit Residuum $-1$;
     Beitrag: $x$.
   \item Residuen bei nicht-trivialen Nullstellen $\rho$: Beitrag $-x^\rho/\rho$.
-  \item Triviale Nullstellen $s = -2m$: Beitrag $\tfrac{1}{2}\log(1-x^{-2})$.
+  \item Triviale Nullstellen $s = -2m$ ($m=1,2,3,\ldots$):
+    $-\zeta'/\zeta$ hat bei jedem $s = -2m$ einen einfachen Pol mit Residuum $+1$.
+    Perrons Formel liefert den Beitrag $+x^{-2m}/(-2m)$ f\"ur jedes $m$.
+    Summation ergibt:
+    $\displaystyle\sum_{m=1}^\infty \frac{x^{-2m}}{-2m}
+     = -\tfrac{1}{2}\sum_{m=1}^\infty \frac{(x^{-2})^m}{m}
+     = \tfrac{1}{2}\log(1-x^{-2})$
+    (unter Verwendung von $\log(1-u)=-\sum u^m/m$).
+    In der Endformel erscheint dieser Term als $-\tfrac{1}{2}\log(1-x^{-2})$;
+    da $\log(1-x^{-2}) < 0$ f\"ur $x > 1$, ist $-\tfrac{1}{2}\log(1-x^{-2}) > 0$
+    eine kleine positive Korrektur.
   \item Polstelle bei $s = 0$: Beitrag $-\zeta'(0)/\zeta(0)$.
 \end{itemize}
 Vollst\"andiger Beweis in \cite{Davenport2000}, Kapitel~17.
@@ -225,8 +235,11 @@ Mertens (1898) beobachtete: F\"ur $\sigma > 1$ und reelles $t$:
   \log|\zeta^3(\sigma)\,\zeta^4(\sigma+it)\,\zeta(\sigma+2it)| \ge 0.
 \]
 Dies folgt aus $3 + 4\cos\theta + \cos 2\theta = 2(1+\cos\theta)^2 \ge 0$.
-W\"are $\zeta(1+it_0) = 0$, so w\"urde $\zeta^4$ f\"ur $\sigma \to 1^+$
-gegen null gehen und das Produkt w\"are $< 0$ -- Widerspruch.
+W\"are $\zeta(1+it_0) = 0$, so g\"alte f\"ur $\sigma \to 1^+$:
+$\log|\zeta^3(\sigma)| \approx +3\log\tfrac{1}{\sigma-1}$ (einfacher Pol),
+aber $\log|\zeta^4(\sigma+it_0)| \le -4\log\tfrac{1}{\sigma-1} + O(1)$
+(Nullstelle mindestens erster Ordnung).
+Da $4 > 3$, g\"inge die Gesamtsumme gegen $-\infty$ -- Widerspruch zu $\ge 0$.
 Also $\zeta(1+it) \ne 0$ f\"ur $t \ne 0$.
 
 \textbf{Schritt 2} (PZS aus nullstellenfreiem Gebiet):
