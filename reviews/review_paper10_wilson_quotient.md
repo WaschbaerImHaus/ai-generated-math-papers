@@ -68,6 +68,7 @@ Der zweite Term wird zu $S_p$ via harmonisches Teleskop-Argument.
 | BUG-B2-08 | ✅ Behoben | Theorem 3.1 (EN) mit trivial-null Formel ersetzt durch korrekte $\mu_p+S_p$-Formel |
 | BUG-B2-10 | ✅ Behoben | EN Zeile 298: Arithmetikfehler `479001601/169=2834921` (falsch); korrekt ist `13²·2834329=479001601`; verwirrenden Satz entfernt |
 | BUG-B2-11 | ✅ Behoben | DE-Version hatte BUG-B2-08 noch nicht: Satz `satz:harmonisch` nutzte volle harmonische Summe (stets ≡0); durch korrekte $\mu_p+S_p$-Formel ersetzt; Korollar (trivial-wahr) durch das korrekte Wilson-Primzahl-Kriterium ersetzt |
+| BUG-B2-12 | ✅ Behoben | EN Sektion 4 (Bernoulli): Teil (B) behauptete $\sum j^{-1} \equiv -(p-1)!\sum j^{p-2} \equiv -B_{p-1}$; korrekt wäre $\sum j^{-1} \equiv \sum j^{p-2} \equiv -B_{p-2}$ (nicht $-B_{p-1}$). Außerdem referenzierte „Combining" die alte Formel $W_p \equiv -\sum j^{-1}$ (längst ersetzte, durch $\mu_p+S_p$ abgelöste Formel). Proof komplett neu geschrieben als „klassisches Resultat per Kummer/von Staudt-Clausen; Beweis in Ireland-Rosen" |
 
 ---
 

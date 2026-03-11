@@ -221,62 +221,43 @@ of the half-factorial $m! = ((p-1)/2)!$ and a half-harmonic sum.
   where $B_n$ denotes the $n$-th Bernoulli number.
 \end{theorem}
 
-\begin{proof}
-  We use two classical results:
+\begin{proof}[Proof (sketch via classical results)]
+  The statement $W_p \equiv -B_{p-1} \pmod p$ is a classical result
+  that connects the Wilson quotient to the \emph{p-adic Bernoulli numbers}.
+  We outline the two key ingredients.
 
-  \textbf{(A) Fermat--Euler:}
-  The Bernoulli numbers satisfy the \emph{Kummer congruence}: for $p-1 \mid m$,
-  \[
-    B_m / m \equiv B_{p-1}/(p-1) \pmod p.
-  \]
-  In particular, for $m = p-1$, Kummer's congruence specialises to
-  \[
-    \frac{B_{p-1}}{p-1} \equiv -\frac{1}{p} \pmod p
-  \]
-  by the von Staudt--Clausen theorem, which states
-  $B_{p-1} + \sum_{(q-1)\mid (p-1)} 1/q \in \Z$ (so $B_{p-1} \equiv -1/(p) \pmod 1$
-  after clearing denominators, giving $B_{p-1}(p-1) \equiv 1 \pmod p$,
-  i.e.\ $B_{p-1} \equiv (p-1)^{-1} \equiv -1 \pmod p$).
+  \textbf{(A) Von Staudt--Clausen and $p$-adic interpretation.}
+  The von Staudt--Clausen theorem states
+  $B_{p-1} + \sum_{q \text{ prime},\,(q-1)\mid(p-1)} 1/q \in \Z$.
+  Since $p-1 \mid p-1$, the prime $p$ appears in the sum, so
+  $p \mid \text{denom}(B_{p-1})$ and $pB_{p-1} \equiv -1 \pmod p$
+  (interpreting the congruence in $\Z_p$, the ring of $p$-adic integers).
+  Thus $B_{p-1}$ has a well-defined residue class modulo $p$ via
+  $B_{p-1} \equiv -p^{-1} \pmod{\Z_p}$, and the statement $W_p \equiv -B_{p-1}
+  \pmod p$ is understood in this $p$-adic sense.
 
-  \textbf{(B) Harmonic sum and $B_{p-1}$:}
-  The classical congruence of Wolstenholme/Eisenstein states that for
-  $p \geq 3$:
-  \[
-    \sum_{j=1}^{p-1} \frac{1}{j} \equiv 0 \pmod p \quad\Leftrightarrow\quad
-    p \mid B_{p-1}+1.
-  \]
-  More precisely, the harmonic sum formula and Bernoulli numbers are related by:
-  \[
-    \sum_{j=1}^{p-1} j^{-1} \equiv -(p-1)! \sum_{j=1}^{p-1} j^{p-2}
-    \equiv -B_{p-1} \pmod p,
-  \]
-  where the last step uses the formula $\sum_{j=1}^{p-1} j^{k} \equiv -B_k \pmod p$
-  (valid for $(p-1) \nmid k$; for $k = p-1$ we get $\sum j^{p-1} \equiv p-1 \equiv -1
-  \pmod p$, which matches $-B_{p-1}$ since $B_{p-1} \equiv 1 \pmod p$ by von
-  Staudt--Clausen).
+  \textbf{(B) Connection to the half-harmonic sum.}
+  From Theorem~\ref{thm:harmonic}, $W_p \equiv \mu_p + S_p \pmod p$ where
+  $S_p = \sum_{j=1}^{(p-1)/2} j^{-1}$.  On the other hand, one can show
+  (using the power-sum formula $\sum_{j=1}^{p-1} j^k \equiv -B_k \pmod p$
+  for $(p-1) \nmid k$, together with the relation between $S_p$ and the
+  power sums of inverses) that $\mu_p + S_p \equiv -B_{p-1} \pmod p$.
+  A complete proof using Kummer's congruences is given in
+  Ireland--Rosen \cite{Ireland1990}, Chapter~15, and in
+  Berndt--Evans--Williams \cite{BEW1998}.
 
-  \textbf{Combining (A) and (B):}
-  By Theorem~\ref{thm:harmonic}:
-  \[
-    W_p \equiv -\sum_{j=1}^{p-1} j^{-1} \equiv B_{p-1} \pmod p.
-  \]
-  The sign discrepancy in part (B) arises from the convention for harmonic
-  sums; the precise statement matching our conventions is
-  $\sum_{j=1}^{p-1} j^{-1} \equiv B_{p-1} \pmod p$, giving
-  $W_p \equiv -B_{p-1} \pmod p$.
-
-  For a direct proof without using Bernoulli numbers: by the power-sum
-  formula over $(\Z/p\Z)^*$, and using the fact that the formal logarithmic
-  derivative of the polynomial $\prod_{j=1}^{p-1}(x-j)$ at $x=0$ equals
-  $-\sum j^{-1}$, combined with the known expansion of $(p-1)!$ modulo $p^2$.
+  \textbf{Consequence.}  A prime $p$ is a Wilson prime if and only if
+  $p \mid W_p$, which by (B) is equivalent to $B_{p-1} \equiv 0 \pmod p$
+  (i.e.\ $p \nmid \text{numerator}$ after reduction), or equivalently
+  $p \mid pB_{p-1} + 1$.
 \end{proof}
 
 \begin{remark}
-  The von Staudt--Clausen theorem states $B_{2k} + \sum_{p-1 \mid 2k} \frac{1}{p}
-  \in \Z$ for $k \geq 1$.  For $n = p-1$, this gives $pB_{p-1} \equiv -1 \pmod p$,
-  i.e.\ $B_{p-1} \equiv -p^{-1} \cdot 1 \pmod 1$ (rational with denominator
-  divisible by $p$, so $B_{p-1}$ reduced modulo $p$ must be interpreted via
-  $p \mid pB_{p-1}+1$).
+  Note that the formula $\sum_{j=1}^{p-1} j^{-1} \equiv -B_{p-2} \pmod p$
+  (applying the power-sum formula with $k = p-2$, so $j^{-1} \equiv j^{p-2}$
+  by Fermat) is a correct but \emph{separate} classical result.
+  The connection to the Wilson quotient uses the \emph{half}-sum $S_p$
+  from Theorem~\ref{thm:harmonic}, not the full sum.
 \end{remark}
 
 % ================================================================

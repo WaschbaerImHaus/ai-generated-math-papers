@@ -93,8 +93,8 @@ We show this is impossible:
 We distinguish two cases.
 
 \textbf{Case $p = 2$:} The condition $(p-1)(q-1) \mid (p+q-2)$ becomes $(q-1) \mid q$.
-Since $2q - 1 = 2(q-1) + 1$, we get $(q-1) \mid 1$, so $q - 1 = 1$, i.e.\ $q = 2 = p$.
-This contradicts $q > p$.
+Since $q = (q-1)+1$, we have $q \equiv 1 \pmod{q-1}$, so $(q-1) \mid 1$,
+hence $q-1 = 1$, i.e.\ $q = 2 = p$.  This contradicts $q > p$.
 
 \textbf{Case $p \ge 3$:} We have $p - 2 \ge 1$ and, since $q \ge p + 2 \ge 5$, also $q - 2 \ge 3 \ge 2$.
 Note that $(p-1)(q-1) - (p+q-2) = (p-2)(q-2) - 1$.  Therefore

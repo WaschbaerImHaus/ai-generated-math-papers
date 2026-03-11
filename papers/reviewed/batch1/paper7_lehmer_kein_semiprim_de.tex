@@ -87,8 +87,9 @@ Damit $(p-1)(q-1) \mid (pq-1)$ gilt, muss $(p-1)(q-1) \mid (p + q - 2)$ gelten.
 
 Wir zeigen, dass dies unmöglich ist:
 
-\textbf{Fall $p = 2$:} Die Bedingung lautet $(q-1) \mid (2q-1)$.
-Da $2q - 1 = 2(q-1) + 1$, folgt $(q-1) \mid 1$, also $q - 1 = 1$, d.\,h.\ $q = 2 = p$.
+\textbf{Fall $p = 2$:} Die Bedingung lautet $(q-1) \mid q$.
+Da $q = (q-1)+1$, gilt $q \equiv 1 \pmod{q-1}$, also $(q-1) \mid 1$,
+d.\,h.\ $q-1 = 1$, also $q = 2 = p$.
 Dies widerspricht $q > p$.
 
 \textbf{Fall $p \ge 3$:} Da $p$ und $q$ ungerade Primzahlen mit $q > p$ sind,

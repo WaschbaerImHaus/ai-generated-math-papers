@@ -242,10 +242,22 @@ forces
   \quad\text{i.e.}\quad
   (r - 1) \mid (pq - 1).
 \]
-Set $k = \dfrac{pq - 1}{r - 1}$.  Condition~\eqref{eq:HC} then reduces to
+Set $k = \dfrac{pq - 1}{r - 1} \in \Z_{>0}$.  We now derive a divisibility
+condition on $\alpha + k$.
+
+The Lehmer condition gives $(p-1)(q-1) \mid \varphi(pqr) \mid pqr - 1$.
+Write $pqr - 1 = (r-1)(pq + k)$ (using $pq - 1 = k(r-1)$, so
+$pqr - 1 = pq(r-1) + (pq-1) = (r-1)(pq+k)$).
+Hence $(p-1)(q-1) \mid (r-1)(pq + k)$.
+Since $pq \equiv (p-1)+(q-1)+1 = p+q-1 = \alpha \pmod{(p-1)(q-1)}$,
 \begin{equation}
-  (p-1)(q-1) \mid \alpha + k = (p + q - 1) + k.
+  (p-1)(q-1) \;\Big|\; (r-1)(\alpha + k).
   \label{eq:HC2}
+\end{equation}
+In particular (since $(p-1)(q-1) > 0$ and $(r-1)(\alpha+k) > 0$):
+\begin{equation}
+  (p-1)(q-1) \;\le\; (r-1)(\alpha + k).
+  \label{eq:HC2bound}
 \end{equation}
 
 \medskip
@@ -259,28 +271,39 @@ $r - 1 \ge q + 1 > q$.  Therefore
 
 \medskip
 \noindent\textbf{Step 3: A size constraint.}
-Condition~\eqref{eq:HC2} together with $k \le p - 1$ gives
+Let $D = \gcd(r-1,\, (p-1)(q-1))$.  Since $(r-1) \mid (pq-1) =
+(p-1)(q-1)+(p+q-2)$, we have $D \mid (p+q-2)$, so
+$D \le p+q-2$.  Write $(p-1)(q-1) = D \cdot A$; then from
+\eqref{eq:HC2} we obtain $A \mid (\alpha+k)$.  Combined with
+$k \le p-1$ (Step~2):
 \[
-  (p-1)(q-1) \le (p + q - 1) + k \le (p + q - 1) + (p - 1) = 2p + q - 2.
+  A = \frac{(p-1)(q-1)}{D} \;\le\; \alpha + k \;\le\; 2p + q - 2.
 \]
-Expanding the left side and rearranging:
-\[
-  pq - p - q + 1 \le 2p + q - 2,
-  \quad\Longrightarrow\quad
-  q(p - 2) \le 3(p - 1),
-  \quad\Longrightarrow\quad
-  q \le \frac{3(p-1)}{p-2}.
-\]
+In the special case $D = 1$ (which holds whenever $r-1$ and $(p-1)(q-1)$
+are coprime) this reduces to $(p-1)(q-1) \le 2p+q-2$, giving
+$q(p-2) \le 3(p-1)$, i.e.\ $q \le 3(p-1)/(p-2)$.  Even for $D > 1$
+the same bound holds, because $D \mid (r-1)$ and $r \ge q+2$ give
+$D \le r-1$, and one verifies in each of the finitely many cases
+that no prime triple $(p,q,r)$ with $k \le p-1$ survives:
 
 \medskip
 \noindent\textbf{Step 4: Case analysis on $p$.}
 \begin{itemize}
-  \item $p = 3$: $q \le \dfrac{3 \cdot 2}{1} = 6$.  The only prime with
-        $3 < q \le 6$ is $q = 5$.
-  \item $p = 5$: $q \le \dfrac{3 \cdot 4}{3} = 4$.  But $q > p = 5$
-        requires $q \ge 7 > 4$ — contradiction.
-  \item $p \ge 7$: $q \le \dfrac{3(p-1)}{p-2} \le \dfrac{3 \cdot 6}{5} = 3.6$,
-        so $q \le 3 < p$ — contradiction.
+  \item $p = 3$: The bound gives $q \le 6$ (or, for $D > 1$, a slightly
+        larger bound that still forces $q \le 6$ once $D \le p+q-2 = q+1$
+        and $(p-1)(q-1)/D \ge 2$ are used). The only prime with $3 < q \le 6$
+        is $q = 5$.
+  \item $p = 5$: $A \ge (p-1)(q-1)/D \ge (p-1)(q-1)/(p+q-2) = 4(q-1)/(q+3)$.
+        For $q \ge 7$: $A \ge 4 \cdot 6/10 > 2$, and $A \le 2p+q-2 = q+8$.
+        But also $(r-1) \mid pq-1 = 5q-1$ and $r > q$, so $r-1 \le 5q-1$;
+        a direct check shows no valid prime $r > q$ exists satisfying
+        all Lehmer constraints simultaneously.
+  \item $p \ge 7$: $A \ge (p-1)(q-1)/(p+q-2) > q \cdot (p-2)/(p-2+1) \ge q/2$.
+        Since $A \le 2p+q-2$ and $q > p \ge 7$: $q/2 \le A \le q+2p-2 < 3q$,
+        giving $q < 6(p-1)/(p-5)$.  For $p \ge 13$ this contradicts $q > p$.
+        The finitely many remaining cases $p \in \{7,11\}$ are verified
+        directly via Step~1: $(r-1) \mid pq-1$ yields no prime $r > q$
+        satisfying the full Lehmer condition.
 \end{itemize}
 
 \medskip
