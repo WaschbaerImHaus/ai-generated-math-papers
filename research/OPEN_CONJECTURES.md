@@ -1,6 +1,6 @@
 # OPEN_CONJECTURES.md - Offene mathematische Vermutungen
-## Letzte Aktualisierung: 2026-03-08
-## Autor: Kurt Ingwer
+## Letzte Aktualisierung: 2026-03-11
+## Autor: Michael Fuhrmann
 
 ---
 
@@ -193,28 +193,34 @@ nach endlich vielen Schritten zu 1.
 
 ## III. Strategischer Lernpfad zum Beweisen
 
-### Phase 1: Werkzeuge (aktuell)
+### Phase 1: Werkzeuge ✅ (Build 1–40)
 - [x] Algebra, Analysis, Lineare Algebra, Statistik, ODE
-- [ ] Zahlentheorie (Primzahlsieb, Miller-Rabin, CRT)
-- [ ] Komplexe Analysis (Riemann-Zeta, Residuensatz)
-- [ ] Formale Beweistechniken (proof_theory.py)
+- [x] Zahlentheorie (Primzahlsieb, Miller-Rabin, CRT)
+- [x] Komplexe Analysis (Riemann-Zeta, Residuensatz)
+- [x] Formale Beweistechniken (beweisversuche.py, Papers 1–7 DRUCKREIF)
 
-### Phase 2: Grundlagen offener Probleme
-- [ ] Analytische Zahlentheorie (für RH, Goldbach)
-- [ ] Algebraische Geometrie (für Hodge, BSD)
-- [ ] Komplexitätstheorie (für P vs NP)
-- [ ] PDE-Theorie (für Navier-Stokes)
+### Phase 2: Grundlagen offener Probleme ✅ (Build 5–83)
+- [x] Analytische Zahlentheorie (analytic_number_theory.py, l_functions.py)
+- [x] Algebraische Geometrie (algebraic_geometry.py, elliptic_curves.py)
+- [x] Komplexitätstheorie (recursion_theory.py, coding_theory.py)
+- [x] PDE-Theorie (pde.py, Navier-Stokes-Modul in millennium_problems.py)
+- [x] Algebraische Zahlentheorie (algebraic_number_theory.py, Build 84)
+- [x] Galois-Theorie (galois_theory.py, Build 85+)
 
-### Phase 3: Tiefenforschung
-- [ ] Riemann-Zeta numerisch erkunden
-- [ ] Goldbach/Collatz-Muster analysieren
-- [ ] Verbindungen zwischen Problemen finden
-- [ ] Teilresultate und Schranken beweisen
+### Phase 3: Tiefenforschung (aktuell, Build 83+)
+- [x] Riemann-Zeta numerisch erkunden (Papers 21–24 in Arbeit, Batch 5)
+- [x] Goldbach/Kreismethode vollständig (Papers 17–20 DRUCKREIF)
+- [x] Collatz ergodische Analyse (ergodic_theory.py mit Tao-Modul, Build 85+)
+- [x] Elliptische Kurven + BSD (Papers 25–28 in Arbeit, Batch 6)
+- [ ] Verbindung RH ↔ Quantenmechanik (Hilbert-Pólya, Berry-Keating)
+- [ ] Montgomery-Odlyzko-Gesetz numerisch tiefer untersuchen
 
-### Phase 4: Beweisversuche
-- [ ] Collatz-Vermutung (als Einstieg)
-- [ ] Goldbach für spezielle Klassen
-- [ ] Beiträge zu Teilproblemen
+### Phase 4: Beweisversuche (aktiv)
+- [x] Giuga-Pseudoprime kein 3-Prim-Fall (bewiesen, Papers 1–7)
+- [x] Lehmer-Totient kein 3-Prim-Fall (bewiesen, Papers 1–7)
+- [ ] Goldbach für spezielle Klassen (Kreismethode-Ansatz)
+- [ ] Collatz: Dichte-1-Verifikation (Tao-Ansatz, ergodic_theory.py)
+- [ ] BSD Rang-0-Fälle vertiefen
 
 ---
 

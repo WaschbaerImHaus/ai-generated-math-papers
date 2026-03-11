@@ -1,5 +1,5 @@
 # OPTIMIZED_WORKER.md - Mathematik-Spezialist
-## Aktualisiert: 2026-03-10 (Build 12)
+## Aktualisiert: 2026-03-11 (Build 83)
 
 ## Was ich über dieses Projekt weiß
 
@@ -10,9 +10,10 @@ Jedes Modul enthält Algorithmen mit ausführlicher mathematischer Dokumentation
 sodass der Code auch als Lernmaterial dient. Das Fernziel ist die Untersuchung
 der Millennium-Probleme (insbesondere Riemann-Hypothese und Goldbach-Vermutung).
 
-### Implementierter Stack (Build 12)
-- **Python 3.13** mit sympy 1.14, numpy 2.2, scipy 1.17, matplotlib 3.10, pytest 9.0, mpmath
-- **14 Python-Module**, 641+ Tests
+### Implementierter Stack (Build 83)
+- **Python 3.13** mit sympy 1.14, numpy 2.2, scipy 1.17, matplotlib 3.10, pytest 9.0, mpmath, numba
+- **93+ Python-Module**, 7000+ Tests (pytest-xdist: -n auto)
+- **Papers**: 20 Papers (Batches 1–4) alle DRUCKREIF, Batches 5+6 in Arbeit (Papers 21–28)
 
 | Modul | Kernfunktionen |
 |-------|---------------|
@@ -143,11 +144,13 @@ Strukturelle Analogie: Yang-Mills Wirkung ~ kinetische Energie in NS.
 **3-SAT ↔ Riemann-Hypothese**: Könnten NP-harte Probleme einen Zusammenhang mit
 analytischen Nullstellenproblemen haben? Freie Spekulation, aber interessant für Forschung.
 
-### Nächste Entwicklungsschritte (Build 13+)
-1. Jupyter-Integration: Interaktiver REPL-Modus für Millennium-Explorationen
-2. p-adische L-Funktionen: Kubota-Leopoldt, Iwasawa-Algebra
-3. Explizite Formel ψ(x) = x - Σ_{ρ} x^ρ/ρ - log(2π) vertiefen
-4. BSD: Elliptische-Kurven-Arithmetik (Gruppenstruktur, Punktaddition)
-5. Yang-Mills: SU(2) statt U(1) auf Gitter (2×2-Matrizen als Links)
-6. NumPy-Vektorisierung der Kern-Schleifen (10-100x Speed)
-7. Modulformen Vertiefung: Cusp-Formen (Γ₀(N)), Theta-Reihen θ(τ) = Σqⁿ²
+### Nächste Entwicklungsschritte (Build 84+)
+1. **algebraic_number_theory.py**: Dedekind-Ringe, Ideale, Klassenzahlen (Build 84)
+2. **ergodic_theory.py**: Collatz-Tao-Ansatz, Furstenberg-Korrespondenz (Build 85)
+3. **galois_theory.py**: Galois-Gruppen, Abel-Ruffini, Kronecker-Weber (Build 86)
+4. **Papers Batch 5** (21–24): Riemann-Hypothese-Serie
+5. **Papers Batch 6** (25–28): Elliptische Kurven + BSD
+6. **Papers Batch 7** (29–32): Collatz-Vermutung (Tao-Ansatz)
+7. **Papers Batch 8** (33–36): Modulformen + Shimura-Taniyama-Wiles
+8. Galois-Darstellungen: ρ: Gal(Q̄/Q) → GL_n(ℤ_p) für Langlands-Programm
+9. Ricci-Fluss (Perelmans Technik) für P4-Annäherung

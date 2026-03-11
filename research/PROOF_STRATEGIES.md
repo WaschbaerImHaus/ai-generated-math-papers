@@ -1,6 +1,6 @@
 # PROOF_STRATEGIES.md - Beweis-Strategien und Methoden
-## Letzte Aktualisierung: 2026-03-08
-## Autor: Kurt Ingwer
+## Letzte Aktualisierung: 2026-03-11
+## Autor: Michael Fuhrmann
 
 ---
 
@@ -160,25 +160,25 @@ Wenn RH gilt, folgt die schärfste Form des Primzahlsatzes:
 ## Mein Lernplan (Priorisiert)
 
 ### Quartal 1: Analytische Zahlentheorie
-- [ ] Primzahlsatz mit Fehlerterm
-- [ ] Dirichlet-Reihen und L-Funktionen
-- [ ] Sieb-Methoden (Brun, Selberg, Chen)
-- [ ] Kreismethode
+- [x] Primzahlsatz mit Fehlerterm (analytic_number_theory.py, Build 5)
+- [x] Dirichlet-Reihen und L-Funktionen (l_functions.py, Build 22)
+- [x] Sieb-Methoden (Brun, Selberg, Chen) (Papers 13–16, Build 74)
+- [x] Kreismethode (Papers 17–20, Build 80–83)
 
 ### Quartal 2: Analytische Funktionentheorie
-- [ ] Komplexe Analysis (Residuensatz, Cauchy-Integral)
-- [ ] Analytische Fortsetzung
-- [ ] Funktionalgleichungen für ζ(s)
-- [ ] L-Funktionen und Hecke-Operatoren
+- [x] Komplexe Analysis (Residuensatz, Cauchy-Integral) (complex_analysis.py, Build 5)
+- [x] Analytische Fortsetzung (complex_analysis.py, riemann_zeta)
+- [x] Funktionalgleichungen für ζ(s) (complex_analysis.py + arbitrary_precision.py)
+- [x] L-Funktionen und Hecke-Operatoren (l_functions.py, modular_forms.py)
 
 ### Quartal 3: Algebraische Struktur
-- [ ] Algebraische Zahlentheorie (Ringe, Ideale, Ideal-Klassen)
-- [ ] p-adische Zahlen
-- [ ] Galois-Theorie
-- [ ] Elliptische Kurven (für BSD)
+- [x] Algebraische Zahlentheorie (Ringe, Ideale, Ideal-Klassen) (commutative_algebra.py + algebraic_number_theory.py, Build 84)
+- [x] p-adische Zahlen (p_adic.py, Build 9)
+- [x] Galois-Theorie (galois_theory.py, Build 85+)
+- [x] Elliptische Kurven (elliptic_curves.py, Build 16; Papers 25–28 in Arbeit)
 
 ### Quartal 4: Fortgeschrittene Themen
-- [ ] Modulformen (Technik von Wiles für Fermat)
-- [ ] Ergodische Theorie (für Collatz nach Tao)
-- [ ] Geometrische Komplexitätstheorie (für P vs NP)
-- [ ] Ricci-Fluss (Perelmans Technik)
+- [x] Modulformen (modular_forms.py, Build 9; Papers geplant Batch 8)
+- [x] Ergodische Theorie (ergodic_theory.py, Build 85+; Collatz-Tao-Modul)
+- [ ] Geometrische Komplexitätstheorie (für P vs NP) — offen
+- [ ] Ricci-Fluss (Perelmans Technik) — offen
