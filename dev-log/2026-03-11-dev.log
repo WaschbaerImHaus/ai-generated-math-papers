@@ -54,3 +54,8 @@
 - Bestätigt: euler_phi() nutzt prime_factorization() intern + beide haben @lru_cache
 - Bestätigt: Formel φ(n) = n * ∏(1 - 1/p) korrekt implementiert
 - tests/test_algebra_numbertheory.py: 29 neue Tests (is_prime, prime_factorization, euler_phi)
+
+2026-03-11 Build 51: Christoffel-Symbole Caching – Hilfsfunktionen + Tests
+- tensor_geometry.py: clear_christoffel_cache() und get_christoffel_cache_size() hinzugefügt
+- Cache-Kommentare erweitert (Cache-Key-Schema, Größenlimit dokumentiert)
+- tests/test_tensor_geometry.py: 7 neue Caching-Tests (TestChristoffelCaching)

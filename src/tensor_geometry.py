@@ -27,6 +27,54 @@ import functools
 import numpy as np
 from typing import Callable
 
+# Manueller Cache für Christoffel-Symbole.
+# Dict: (id(metric_func), point_tuple, h) → Gamma-Array
+# Warum manuell statt lru_cache? numpy-Arrays sind nicht hashbar.
+# Daher konvertieren wir den Punkt zu einem tuple-of-floats als Cache-Key.
+# Cache-Schlüssel: (id(metric_func), tuple(float(p) for p in point), float(h))
+# Cache-Größe: maximal 1000 Einträge (FIFO-Strategie bei Überschreitung)
+_christoffel_cache: dict = {}
+
+
+def clear_christoffel_cache() -> int:
+    """
+    @brief Leert den Christoffel-Symbol-Cache vollständig.
+    @description
+        Entfernt alle gecachten Christoffel-Symbol-Berechnungen aus dem
+        globalen Cache. Nützlich wenn sich die Metriken dynamisch ändern
+        oder Speicher freigegeben werden soll.
+
+        Cache-Invalidierung ist notwendig wenn:
+        - Neue Metrik-Funktionen mit gleicher id() erstellt werden
+        - Speicher freigegeben werden soll
+        - Tests die Isolation zwischen Testfällen brauchen
+
+    @return: Anzahl der gelöschten Cache-Einträge.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    # Anzahl der Einträge vor dem Löschen merken
+    count = len(_christoffel_cache)
+
+    # Cache komplett leeren
+    _christoffel_cache.clear()
+
+    return count
+
+
+def get_christoffel_cache_size() -> int:
+    """
+    @brief Gibt die aktuelle Anzahl gecachter Christoffel-Berechnungen zurück.
+    @description
+        Hilfsfunktion zur Überwachung des Cache-Füllstands.
+        Nützlich für Tests und Performance-Analyse.
+
+    @return: Anzahl der gecachten Einträge.
+    @author Kurt Ingwer
+    @lastModified 2026-03-11
+    """
+    return len(_christoffel_cache)
+
 
 # ---------------------------------------------------------------------------
 # Klasse: Tensor
@@ -497,8 +545,17 @@ def christoffel_symbols(
     @param point: Koordinatenpunkt [x¹, x², ..., xⁿ].
     @param h: Schrittweite für numerische Ableitung.
     @return: Array Γ[k,i,j] der Form (n,n,n).
-    @lastModified 2026-03-10
+    @lastModified 2026-03-11
     """
+    # Cache-Key: (id der Metrik-Funktion, Punkt als tuple, Schrittweite)
+    # id(metric_func) ist für identische Funktionsobjekte eindeutig.
+    # Bei Lambdas/lokalen Funktionen ist id() ausreichend für praktischen Einsatz.
+    cache_key = (id(metric_func), tuple(float(p) for p in point), float(h))
+
+    # Cache-Treffer prüfen
+    if cache_key in _christoffel_cache:
+        return _christoffel_cache[cache_key]
+
     # Metrik und ihre Inverse am gegebenen Punkt
     g = metric_func(point)
     n = g.shape[0]
@@ -522,6 +579,15 @@ def christoffel_symbols(
                         + dg[j, i, l]  # ∂_j g_{il}
                         - dg[l, i, j]  # ∂_l g_{ij}
                     )
+
+    # Ergebnis im Cache speichern für zukünftige identische Anfragen
+    # Cache-Größe begrenzen (max. 1000 Einträge) um Speicherlecks zu vermeiden
+    if len(_christoffel_cache) > 1000:
+        # Ältesten Eintrag entfernen (FIFO-Strategie)
+        oldest_key = next(iter(_christoffel_cache))
+        del _christoffel_cache[oldest_key]
+
+    _christoffel_cache[cache_key] = Gamma
     return Gamma
 
 

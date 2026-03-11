@@ -23,6 +23,7 @@ import numpy as np
 import pytest
 import sys
 import os
+import time
 
 # Projektpfad einbinden
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
@@ -52,6 +53,9 @@ from tensor_geometry import (
     levi_civita_symbol,
     kronecker_delta,
     parallel_transport,
+    clear_christoffel_cache,
+    get_christoffel_cache_size,
+    _christoffel_cache,
 )
 
 
@@ -992,3 +996,98 @@ class TestEdgeCases:
         # Weit außen (r >> r_s = 6): g_tt ≈ -1
         g_far = metric([0.0, 1000.0])
         assert g_far[0, 0] == pytest.approx(-1.0, rel=0.01)
+
+
+# ===========================================================================
+# Tests: Christoffel-Symbol-Caching (Build 51)
+# ===========================================================================
+
+class TestChristoffelCaching:
+    """Tests für das Caching der Christoffel-Symbole."""
+
+    def setup_method(self):
+        """Cache vor jedem Test leeren für Isolation."""
+        clear_christoffel_cache()
+
+    def test_clear_cache_returns_count(self):
+        """Test: clear_christoffel_cache() gibt die Anzahl gelöschter Einträge zurück."""
+        # Einen Eintrag in den Cache schreiben
+        metric = flat_metric(2)
+        christoffel_symbols(metric, [0.0, 0.0])
+        count = clear_christoffel_cache()
+        assert count >= 1
+
+    def test_get_cache_size_empty(self):
+        """Test: get_christoffel_cache_size() gibt 0 nach dem Leeren zurück."""
+        clear_christoffel_cache()
+        assert get_christoffel_cache_size() == 0
+
+    def test_cache_hit_on_repeated_call(self):
+        """Test: Wiederholter Aufruf mit identischen Parametern trifft den Cache."""
+        metric = flat_metric(2)
+        point = [1.0, 2.0]
+
+        clear_christoffel_cache()
+        assert get_christoffel_cache_size() == 0
+
+        # Erster Aufruf: Cache miss
+        christoffel_symbols(metric, point)
+        assert get_christoffel_cache_size() == 1
+
+        # Zweiter Aufruf: Cache hit (Größe bleibt gleich)
+        christoffel_symbols(metric, point)
+        assert get_christoffel_cache_size() == 1
+
+    def test_cache_grows_for_different_points(self):
+        """Test: Cache wächst bei verschiedenen Punkten."""
+        metric = flat_metric(2)
+        clear_christoffel_cache()
+
+        christoffel_symbols(metric, [0.0, 0.0])
+        christoffel_symbols(metric, [1.0, 0.0])
+        christoffel_symbols(metric, [0.0, 1.0])
+
+        assert get_christoffel_cache_size() == 3
+
+    def test_cache_result_is_same_object(self):
+        """Test: Gecachtes Ergebnis ist dasselbe numpy-Array-Objekt."""
+        metric = flat_metric(2)
+        point = [0.5, 0.5]
+        clear_christoffel_cache()
+
+        result1 = christoffel_symbols(metric, point)
+        result2 = christoffel_symbols(metric, point)
+
+        # Exakt dasselbe Objekt (nicht nur gleiche Werte)
+        assert result1 is result2
+
+    def test_cache_speedup(self):
+        """Test: Gecachter Aufruf ist schneller als erster Aufruf."""
+        metric = sphere_metric()
+        point = [1.0471, 0.5]  # ≈ π/3, 0.5
+        clear_christoffel_cache()
+
+        # Erster Aufruf (Berechnung)
+        start1 = time.perf_counter()
+        christoffel_symbols(metric, point)
+        t1 = time.perf_counter() - start1
+
+        # Zweiter Aufruf (Cache)
+        start2 = time.perf_counter()
+        christoffel_symbols(metric, point)
+        t2 = time.perf_counter() - start2
+
+        # Cache sollte deutlich schneller sein
+        assert t2 < t1 or t2 < 1e-5  # Gecacht < 10 Mikrosekunden
+
+    def test_cache_key_includes_step_size(self):
+        """Test: Verschiedene Schrittweiten h erzeugen verschiedene Cache-Einträge."""
+        metric = flat_metric(2)
+        point = [1.0, 1.0]
+        clear_christoffel_cache()
+
+        christoffel_symbols(metric, point, h=1e-5)
+        christoffel_symbols(metric, point, h=1e-6)
+
+        # Zwei verschiedene h-Werte → zwei Cache-Einträge
+        assert get_christoffel_cache_size() == 2
