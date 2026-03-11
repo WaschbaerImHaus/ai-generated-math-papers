@@ -232,6 +232,26 @@ hypothetische L\"osung ergäbe eine Frey-Kurve, die nicht modular w\"are).
 \end{proof}
 
 % ================================================================
+\section{Die $L$-Funktion bei \texorpdfstring{$s=1$}{s=1}}
+% ================================================================
+
+\begin{definition}[Verschwindungsordnung und f\"uhrender Koeffizient]
+\label{def:order_vanishing}
+Die \emph{analytische Verschwindungsordnung} von $L(E,s)$ bei $s=1$ ist
+\[
+  r_{\mathrm{an}} \;=\; \ord_{s=1} L(E,s).
+\]
+Der \emph{f\"uhrende Koeffizient} ist
+$L^*(E,1) = \lim_{s \to 1} (s-1)^{-r_{\mathrm{an}}} L(E,s)$.
+Die BSD-Vermutung sagt $r_{\mathrm{an}} = r$ (der algebraische Rang) vorher.
+\end{definition}
+
+\begin{remark}[Parit\"at aus der Funktionalgleichung]
+F\"ur $\epsilon(E) = -1$ gibt die Funktionalgleichung~\eqref{eq:functional}
+$L(E,1) = -L(E,1)$, also $L(E,1) = 0$ und $r_{\mathrm{an}} \ge 1$.
+\end{remark}
+
+% ================================================================
 \section{Numerische Beispiele}
 \label{sec:numerics}
 % ================================================================
@@ -251,7 +271,7 @@ Numerisch (mit dem Euler-Produkt bis $p \le 10^6$) ergibt sich
 \]
 Da $L(E_0,1) \ne 0$, sagt BSD $r = 0$ vorher -- in \"Ubereinstimmung mit dem
 tats\"achlichen Rang.  Dies ist einer der Rang-0-F\"alle, die von Kolyvagin
-(1989) bedingungslos bewiesen wurden.
+(1990) bedingungslos bewiesen wurden.
 \end{example}
 
 \begin{example}[Rang~1: $E_1\colon y^2 + y = x^3 - x$]
@@ -272,26 +292,6 @@ Dieser Rang-1-Fall ist auch ein Lehrbeispiel f\"ur die Wirkung der
 Funktionalgleichung: Mit Wurzelzahl $\epsilon(E_1) = -1$ gilt
 $L(E_1, 1) = -L(E_1, 1)$, also $L(E_1,1) = 0$ zwingend.
 \end{example}
-
-% ================================================================
-\section{Die $L$-Funktion bei \texorpdfstring{$s=1$}{s=1}}
-% ================================================================
-
-\begin{definition}[Verschwindungsordnung und f\"uhrender Koeffizient]
-\label{def:order_vanishing}
-Die \emph{analytische Verschwindungsordnung} von $L(E,s)$ bei $s=1$ ist
-\[
-  r_{\mathrm{an}} \;=\; \ord_{s=1} L(E,s).
-\]
-Der \emph{f\"uhrende Koeffizient} ist
-$L^*(E,1) = \lim_{s \to 1} (s-1)^{-r_{\mathrm{an}}} L(E,s)$.
-Die BSD-Vermutung sagt $r_{\mathrm{an}} = r$ (der algebraische Rang) vorher.
-\end{definition}
-
-\begin{remark}[Parit\"at aus der Funktionalgleichung]
-F\"ur $\epsilon(E) = -1$ gibt die Funktionalgleichung~\eqref{eq:functional}
-$L(E,1) = -L(E,1)$, also $L(E,1) = 0$ und $r_{\mathrm{an}} \ge 1$.
-\end{remark}
 
 % ================================================================
 \section{Schlussfolgerung}
