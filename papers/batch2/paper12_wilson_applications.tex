@@ -260,10 +260,16 @@ of these classical results.
   \[
     1 + \frac{1}{2} + \cdots + \frac{1}{p-1} \equiv 0 \pmod{p^2}.
   \]
-  This is a deeper result and requires analysis modulo $p^2$, connecting it
-  to the Wilson quotient (see Paper~10 in this series).  A prime $p$ is a
-  Wilson prime if and only if the even stronger congruence modulo $p$ on the
-  Wilson quotient holds.
+  This is a deeper result and requires analysis modulo $p^2$.
+  A prime $p$ is called a \emph{Wilson prime} if $p \mid W_p$, where
+  $W_p = \bigl((p-1)!+1\bigr)/p$ is the Wilson quotient.
+  As shown in Paper~10 of this series, $W_p \equiv \mu_p + S_p \pmod{p}$,
+  where $\mu_p = \bigl((-1)^m(m!)^2+1\bigr)/p$,
+  $S_p = \sum_{j=1}^{m} j^{-1} \pmod{p}$, and $m = (p-1)/2$.
+  Hence $p$ is a Wilson prime iff $\mu_p + S_p \equiv 0 \pmod{p}$.
+  Note that the \emph{full} harmonic sum $\sum_{j=1}^{p-1} j^{-1} \equiv 0 \pmod p$
+  always (Theorem~\ref{thm:harmonic}), so only the \emph{half}-sum $S_p$
+  carries nontrivial information about Wilson primes.
 \end{remark}
 
 % ================================================================
