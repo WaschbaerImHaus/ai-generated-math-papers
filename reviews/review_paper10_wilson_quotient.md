@@ -65,10 +65,12 @@ Der zweite Term wird zu $S_p$ via harmonisches Teleskop-Argument.
 
 | ID | Status | Beschreibung |
 |----|--------|-------------|
-| BUG-B2-08 | ✅ Behoben | Theorem 3.1 mit trivial-null Formel ersetzt durch korrekte $\mu_p+S_p$-Formel |
+| BUG-B2-08 | ✅ Behoben | Theorem 3.1 (EN) mit trivial-null Formel ersetzt durch korrekte $\mu_p+S_p$-Formel |
+| BUG-B2-10 | ✅ Behoben | EN Zeile 298: Arithmetikfehler `479001601/169=2834921` (falsch); korrekt ist `13²·2834329=479001601`; verwirrenden Satz entfernt |
+| BUG-B2-11 | ✅ Behoben | DE-Version hatte BUG-B2-08 noch nicht: Satz `satz:harmonisch` nutzte volle harmonische Summe (stets ≡0); durch korrekte $\mu_p+S_p$-Formel ersetzt; Korollar (trivial-wahr) durch das korrekte Wilson-Primzahl-Kriterium ersetzt |
 
 ---
 
 ## Fazit
 
-Nach dem Fix von BUG-B2-08 ist Paper 10 mathematisch korrekt und gibt eine nicht-triviale Kongruenzformel für den Wilson-Quotienten. Die Verbindung zur halben harmonischen Summe $S_p = \sum_{j=1}^{(p-1)/2} j^{-1}$ ist mathematisch substanziell.
+Nach den Fixes ist Paper 10 (EN + DE) mathematisch korrekt und gibt eine nicht-triviale Kongruenzformel für den Wilson-Quotienten. Die Verbindung zur halben harmonischen Summe $S_p = \sum_{j=1}^{(p-1)/2} j^{-1}$ ist mathematisch substanziell.
