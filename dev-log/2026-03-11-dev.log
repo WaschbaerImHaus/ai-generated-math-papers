@@ -307,3 +307,14 @@
   - papers/batch3/paper13_brunnscher_satz_de.tex (DE, Brunnscher Satz)
   - papers/batch3/paper14_selberg_sieve.tex (EN, Selbergs Sieb)
   - papers/batch3/paper14_selberg_sieb_de.tex (DE, Selbergs Sieb)
+
+2026-03-11 $(date +%H:%M:%S) — Build 80: Batch 4 — Papers 17–20 (Kreismethode & Goldbach)
+  - paper17_circle_method.tex (EN): Hardy–Littlewood-Kreismethode, Exponentialsummen, Haupt-/Nebenbögen, Weyls Ungleichung
+  - paper17_kreismethode_de.tex (DE): Deutsche Version
+  - paper18_vinogradov_three_primes.tex (EN): Winogradows Drei-Primzahlen-Satz + Helfgott 2013
+  - paper18_vinogradov_drei_primzahlen_de.tex (DE): Deutsche Version
+  - paper19_waring_problem.tex (EN): Waringsches Problem, g(k)/G(k), Wooley Efficient Congruencing
+  - paper19_waringsches_problem_de.tex (DE): Deutsche Version
+  - paper20_goldbach_singular_series.tex (EN): Goldbach singuläre Reihe, Hypothesis H, Paritätsproblem
+  - paper20_goldbach_singulaere_reihe_de.tex (DE): Deutsche Version
+  Gesamt: 8 LaTeX-Dateien, Batch 4 komplett

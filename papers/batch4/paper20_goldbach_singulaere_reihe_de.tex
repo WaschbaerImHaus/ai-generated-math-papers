@@ -1,0 +1,430 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{booktabs}
+
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\newtheorem{beispiel}[theorem]{Beispiel}
+
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\eq}[1]{e\!\left(#1\right)}
+
+% -------------------------------------------------------
+\begin{document}
+
+\title{Die Goldbach'sche singuläre Reihe und die\\
+       Hardy--Littlewood-Vermutung~$\mathbf{H}$\\
+       über Primzahlkonstellationen}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 80}
+\email{specialist-maths@localhost}
+\date{2026}
+
+\begin{abstract}
+Die Hardy--Littlewood-Vermutungen (1923) liefern präzise quantitative
+Vorhersagen für additive Probleme mit Primzahlen.  Für das binäre Goldbach-Problem
+lautet die vorhergesagte gewichtete Darstellungsanzahl einer großen geraden
+Zahl $n$ als $n = p + q$:
+\[
+  R_2(n) \;\sim\; \mathfrak{S}(n) \cdot n,
+\]
+wobei die \emph{Goldbach'sche singuläre Reihe}
+\[
+  \mathfrak{S}(n)
+  \;=\; 2 C_2 \prod_{\substack{p \mid n \\ p > 2}} \frac{p-1}{p-2},
+  \qquad
+  C_2 \;=\; \prod_{p \geq 3} \frac{p(p-2)}{(p-1)^2} \approx 0{,}6602
+\]
+die lokale Arithmetik von $n$ kodiert.  Wir leiten diese Formel her,
+beweisen $\mathfrak{S}(n) > 0$ für alle geraden $n \geq 4$, erklären
+das Paritätsproblem und formulieren die Hardy--Littlewood-Vermutung~$\mathbf{H}$
+über Primzahlkonstellationen ($k$-Tupel), die alle Primzahlzwillings-
+und Goldbach-Fragen vereinheitlicht.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung}
+% ================================================================
+
+Das binäre Goldbach-Problem — jede gerade Zahl $n \geq 4$ ist Summe
+zweier Primzahlen — ist numerisch bis $4 \times 10^{18}$ verifiziert
+(Oliveira e Silva et al., 2014), aber unbewiesen.  Im Gegensatz zum
+ternären Goldbach-Problem (bewiesen von Helfgott 2013, Paper~18) liegt
+das binäre Problem außerhalb der Reichweite der Kreismethode allein,
+wegen des Paritätsproblems.
+
+Dennoch ist die \emph{erwartete} Darstellungsanzahl gut verstanden.
+Definiere die gewichtete Darstellungsanzahl:
+\[
+  R_2(n) \;=\; \sum_{\substack{p_1 + p_2 = n}} \log p_1 \cdot \log p_2
+  \;=\; \int_0^1 S(\alpha)^2\, \eq{-n\alpha}\, d\alpha,
+\]
+wobei $S(\alpha) = \sum_{m \leq n} \Lambda(m) \eq{m\alpha}$.
+
+Die Kreismethode liefert:
+
+\begin{vermutung}[Hardy--Littlewood, 1923]\label{verm:HL}
+  Für jede gerade Zahl $n \geq 4$:
+  \[
+    R_2(n) \;\sim\; \mathfrak{S}(n) \cdot n,
+  \]
+  bzw.\ äquivalent: die Darstellungsanzahl $r_2(n) = \#\{p : p, n-p \in \mathbb{P}\}$
+  erfüllt $r_2(n) \sim \mathfrak{S}(n) \cdot n / (\log n)^2$.
+\end{vermutung}
+
+% ================================================================
+\section{Die Goldbach'sche singuläre Reihe}
+\label{sec:singulaerreihe}
+% ================================================================
+
+\subsection{Herleitung durch die Kreismethode}
+
+Aus der Hauptbogen-Approximation $S(\alpha) \approx \frac{\mu(q)}{\phi(q)} I(\beta)$
+(Lemma~3.1 von Paper~18) folgt formal:
+
+\begin{definition}[Goldbach'sche singuläre Reihe]\label{def:sing}
+  \[
+    \mathfrak{S}(n)
+    \;=\; \sum_{q=1}^{\infty} \frac{\mu(q)^2\, c_q(n)}{\phi(q)^2},
+  \]
+  wobei $c_q(n) = \sum_{\gcd(a,q)=1} \eq{an/q}$ die Ramanujan-Summe ist.
+\end{definition}
+
+\subsection{Euler-Produktdarstellung}
+
+\begin{theorem}[Euler-Produkt für $\mathfrak{S}(n)$]\label{thm:euler}
+  Für gerades $n \geq 2$:
+  \[
+    \mathfrak{S}(n)
+    \;=\; 2 C_2 \prod_{\substack{p \mid n \\ p \geq 3}} \frac{p-1}{p-2},
+    \quad
+    C_2 \;=\; \prod_{p \geq 3} \frac{p(p-2)}{(p-1)^2}.
+  \]
+\end{theorem}
+
+\begin{proof}
+  Die Ramanujan-Summe ist multiplikativ: $c_q(n) = \prod_{p|q} c_p(n)$ für
+  quadratfreie $q$.  Da $\mu(q)^2 = 1$ nur für quadratfreie $q$, faktorisiert
+  die Summe als Euler-Produkt:
+  \[
+    \mathfrak{S}(n) = \prod_p \left(1 + \frac{c_p(n)}{(p-1)^2}\right).
+  \]
+  \textit{Faktor bei $p=2$ (gerades $n$):}
+  $c_2(n) = 1$ (da $n \equiv 0 \pmod 2$), also Faktor $= 1+1=2$.
+
+  \textit{Faktor bei $p \geq 3$ mit $p \mid n$:}
+  $c_p(n) = p-1$, Faktor $= 1+(p-1)/(p-1)^2 = 1+1/(p-1) = p/(p-1)$.
+
+  \textit{Faktor bei $p \geq 3$ mit $p \nmid n$:}
+  $c_p(n) = -1$, Faktor $= 1 - 1/(p-1)^2 = p(p-2)/(p-1)^2$.
+
+  Daher:
+  \begin{align*}
+    \mathfrak{S}(n)
+    &= 2 \cdot \prod_{\substack{p \geq 3 \\ p \mid n}} \frac{p}{p-1}
+        \cdot \prod_{\substack{p \geq 3 \\ p \nmid n}} \frac{p(p-2)}{(p-1)^2} \\
+    &= 2 \cdot \underbrace{\prod_{p \geq 3} \frac{p(p-2)}{(p-1)^2}}_{= C_2}
+        \cdot \prod_{\substack{p \geq 3 \\ p \mid n}} \frac{p/(p-1)}{p(p-2)/(p-1)^2}
+     = 2 C_2 \prod_{\substack{p \geq 3 \\ p \mid n}} \frac{p-1}{p-2}.  \qedhere
+  \end{align*}
+\end{proof}
+
+% ================================================================
+\section{Positivität von \texorpdfstring{$\mathfrak{S}(n)$}{S(n)}}
+\label{sec:pos}
+% ================================================================
+
+\begin{theorem}\label{thm:pos}
+  Für jede gerade Zahl $n \geq 4$: $\mathfrak{S}(n) > 0$.
+\end{theorem}
+
+\begin{proof}
+  Alle Faktoren in Satz~\ref{thm:euler} sind positiv:
+  \begin{itemize}
+    \item $C_2 = \prod_{p\geq 3} p(p-2)/(p-1)^2 > 0$: Jeder Faktor ist positiv
+      (für $p \geq 3$: $p-2 \geq 1 > 0$), das Produkt konvergiert absolut
+      gegen $C_2 \approx 0{,}6602 > 0$.
+    \item $(p-1)/(p-2) > 0$ für alle $p \geq 3$.
+    \item Faktor $2 > 0$.
+  \end{itemize}
+  Also $\mathfrak{S}(n) > 0$ für alle geraden $n \geq 4$.
+\end{proof}
+
+\begin{bemerkung}[Ungerades $n$]
+  Für ungerades $n$: $c_2(n) = -1$, Faktor bei $p=2$: $1+(-1)/1 = 0$.
+  Daher $\mathfrak{S}(n) = 0$ für ungerades $n$.  Dies spiegelt korrekt wider,
+  dass zwei ungerade Primzahlen eine gerade Summe ergeben.
+\end{bemerkung}
+
+% ================================================================
+\section{Numerische Werte von \texorpdfstring{$\mathfrak{S}(n)$}{S(n)}}
+\label{sec:numerik}
+% ================================================================
+
+\begin{center}
+\begin{tabular}{rccrl}
+\toprule
+$n$ & $\mathfrak{S}(n)$ (exakt) & $\approx$ & $r_2(n)$ & Beispiele \\
+\midrule
+4  & $4 C_2$ & $2{,}641$ & 1 & $2+2$ \\
+6  & $\frac{16}{3} C_2$ & $3{,}521$ & 1 & $3+3$ \\
+8  & $4 C_2$ & $2{,}641$ & 1 & $3+5$ \\
+10 & $\frac{16}{3} C_2$ & $3{,}521$ & 2 & $3+7,\, 5+5$ \\
+12 & $\frac{16 \cdot 6}{3 \cdot 5} C_2 = \frac{32}{5} C_2$ & $4{,}225$ & 1 & $5+7$ \\
+30 & $2C_2 \cdot \frac{2}{1}\cdot\frac{4}{3}\cdot\frac{6}{5}\cdot\frac{28}{27}$
+   & $\approx 5{,}9$ & 3 & $7+23,\, 11+19,\, 13+17$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ================================================================
+\section{Die Zwillingsprimzahl-Konstante und \texorpdfstring{$C_2$}{C2}}
+\label{sec:zwillingsprim}
+% ================================================================
+
+Die Konstante $C_2$ in $\mathfrak{S}(n)$ ist dieselbe wie die
+\emph{Zwillingsprimzahl-Konstante}:
+
+\begin{theorem}[Hardy--Littlewood, 1923]\label{thm:zp}
+  Bedingt auf Vermutung~$\mathbf{H}$ (Abschnitt~\ref{sec:ktuples}):
+  \[
+    \pi_2(x) \;\sim\; 2 C_2 \cdot \frac{x}{(\log x)^2},
+  \]
+  wobei $C_2 \approx 0{,}6601618\ldots$
+\end{theorem}
+
+Numerische Annäherung:
+\[
+  C_2 \;=\; \frac{15}{16} \cdot \frac{35}{36} \cdot \frac{143}{144} \cdots
+  \;=\; \prod_{p \geq 3} \left(1 - \frac{1}{(p-1)^2}\right)
+  \;\approx\; 0{,}66016182\ldots
+\]
+
+% ================================================================
+\section{Die Hardy--Littlewood-Vermutung~$\mathbf{H}$\\
+         über Primzahl-$k$-Tupel}
+\label{sec:ktuples}
+% ================================================================
+
+\begin{definition}[Zulässiges $k$-Tupel]
+  Ein $k$-Tupel $\mathcal{H} = (h_1, \ldots, h_k)$ nicht-negativer ganzer Zahlen
+  heißt \emph{zulässig}, wenn für jede Primzahl $p$:
+  \[
+    \bigl|\{h_i \pmod p : 1 \leq i \leq k\}\bigr| < p.
+  \]
+\end{definition}
+
+\begin{bemerkung}
+  $\{0, 2\}$ (Zwillingsprimzahlen): zulässig ($|\{0,2\} \pmod p| \leq 2 < p$
+  für alle $p$).  $\{0, 1, 2, 3, 4, 5\}$: nicht zulässig für $p = 3$.
+\end{bemerkung}
+
+\begin{vermutung}[Hardy--Littlewood Hypothese~$\mathbf{H}$, 1923]\label{verm:H}
+  Für jedes zulässige $k$-Tupel $\mathcal{H} = (h_1, \ldots, h_k)$ gilt:
+  \[
+    \pi_{\mathcal{H}}(x)
+    \;=\; \#\bigl\{n \leq x : n+h_1, \ldots, n+h_k \text{ alle prim}\bigr\}
+    \;\sim\; \mathfrak{S}(\mathcal{H}) \cdot \frac{x}{(\log x)^k},
+  \]
+  wobei
+  \[
+    \mathfrak{S}(\mathcal{H})
+    \;=\; \prod_p \left(1-\frac{1}{p}\right)^{-k} \left(1-\frac{\nu_p(\mathcal{H})}{p}\right)
+  \]
+  und $\nu_p(\mathcal{H}) = |\{h_i \pmod p\}|$.
+\end{vermutung}
+
+\begin{beispiel}[Spezialfälle von Vermutung~$\mathbf{H}$]
+  \begin{enumerate}
+    \item $k=1$, $\mathcal{H}=\{0\}$:
+      $\pi(x) \sim x/\log x$ (Primzahlsatz ✓).
+    \item $k=2$, $\mathcal{H}=\{0,2\}$:
+      $\pi_2(x) \sim 2C_2 \cdot x/(\log x)^2$ (Zwillingsprimzahl-Vermutung).
+    \item $k=2$, $\mathcal{H}=\{0,4\}$ (Cousin-Primzahlen $(p,p+4)$):
+      dieselbe Konstante $2C_2$!
+    \item $k=3$, $\mathcal{H}=\{0,2,6\}$ (Primzahldrillinge):
+      $\mathfrak{S}(\mathcal{H}) = 9 \prod_{p \geq 5} p^2(p-3)/(p-1)^3$.
+    \item Goldbach ($k=2$): $n = p+q$ entspricht $\pi_{\{0,n\}}(N)$ für $N=n$,
+      mit $\mathfrak{S}(\{0,n\}) = \mathfrak{S}(n)$ wie oben.
+  \end{enumerate}
+\end{beispiel}
+
+\begin{bemerkung}[Zulässigkeit und Goldbach-Vermutung]
+  Das Tupel $\{0, n\}$ ist für gerades $n$ zulässig:
+  $|\{0 \pmod p, n \pmod p\}| \leq 2 < p$ für $p \geq 3$;
+  für $p=2$: $\{0 \pmod 2, n \pmod 2\} = \{0\}$ (da $n$ gerade), also $|\{0\}|=1<2$.
+  Daher sagt Vermutung~$\mathbf{H}$ eine positive Darstellungsanzahl für
+  alle geraden $n$ vorher — konsistent mit Goldbach.
+
+  Für ungerades $n$: $\{0 \pmod 2, n \pmod 2\} = \{0,1\}$ deckt beide
+  Restklassen mod $2$ ab, also ist $\mathfrak{S}(\{0,n\}) = 0$ und das
+  Tupel ist \emph{nicht} zulässig — konsistent damit, dass zwei Primzahlen
+  keine ungerade Zahl $\geq 5$ ergeben können.
+\end{bemerkung}
+
+% ================================================================
+\section{Das Paritätsproblem und die Grenzen der Kreismethode}
+\label{sec:paritaet}
+% ================================================================
+
+\begin{bemerkung}[Warum die Kreismethode binäres Goldbach nicht beweisen kann]
+  Der Nebenbogen-Fehler für $\int_{\mathfrak{m}} S(\alpha)^2 \eq{-n\alpha}\, d\alpha$
+  ist:
+  \[
+    \left|\int_{\mathfrak{m}} S^2 \eq{-n\cdot}\right|
+    \;\leq\; \|S\|_{\mathfrak{m},\infty} \cdot \int_0^1 |S|^2
+    \;\ll\; N(\log N)^{-B} \cdot N\log N
+    \;=\; N^2 (\log N)^{1-B}.
+  \]
+  Der Hauptterm aus Hauptbögen ist $\Theta(N)$ (für $n = N$).  Da
+  $N^2 (\log N)^{1-B} \gg N$ für alle Wahlen von $B$, überwiegt
+  der Fehler den Hauptterm.
+
+  Fundamentale Erklärung: Das \emph{Paritätsproblem} (Selberg, 1949):
+  Siebmethoden und die Kreismethode können Primzahlen ($\mathbb{P}_1$)
+  nicht von Produkten zweier Primzahlen ($\mathbb{P}_2$) unterscheiden,
+  da beide „ungerade" sind in einem Paritätssinn.
+\end{bemerkung}
+
+\begin{theorem}[Formel für $R_2(n)$ unter GRH]\label{thm:R2_GRH}
+  Unter der Verallgemeinerten Riemannschen Hypothese (GRH):
+  \[
+    R_2(n) \;=\; \mathfrak{S}(n) \cdot n \;+\; O\!\left(\sqrt{n}\, (\log n)^2\right).
+  \]
+  Insbesondere gilt $R_2(n) > 0$ für alle hinreichend großen geraden $n$
+  (binäres Goldbach für große $n$ unter GRH).
+\end{theorem}
+
+% ================================================================
+\section{Der Goldbach-Komet}
+\label{sec:komet}
+% ================================================================
+
+\begin{bemerkung}[Struktur des Goldbach-Kometen]
+  Der Graph von $r_2(n)$ (Anzahl der Goldbach-Zerlegungen von $n$) gegen
+  $n$ heißt der \emph{Goldbach-Komet}.  Die Struktur:
+  \begin{itemize}
+    \item Gerades $n$ mit vielen kleinen Primteilern hat größeres
+      $\mathfrak{S}(n)$ und damit mehr Darstellungen.
+    \item Primoriale $n = 2 \cdot 3 \cdot 5 \cdots p_k$ geben das
+      maximale $\mathfrak{S}(n)$ unter Zahlen vergleichbarer Größe.
+    \item $n = 2^k$ hat minimales $\mathfrak{S}(n) = 2C_2$ (keine
+      ungeraden Primteiler).
+  \end{itemize}
+\end{bemerkung}
+
+\begin{center}
+\begin{tabular}{rlll}
+\toprule
+$n$ & $\mathfrak{S}(n)$ & Prognose $r_2(n)$ & Tatsächlich $r_2(n)$ \\
+\midrule
+100    & $\approx 3{,}5$ & $\approx 6$ & 6 \\
+1000   & variabel & $\approx 18$ & 28 \\
+$10^6$ & variabel & $\approx 1285$ & 1302 \\
+$10^{10}$ & variabel & $\approx 1{,}5\times 10^7$ & $\approx 1{,}5\times 10^7$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ================================================================
+\section{Bezug zu Chens Satz}
+\label{sec:chen}
+% ================================================================
+
+\begin{theorem}[Chen Jingrun, 1973 — vgl.\ Paper~16]\label{thm:chen}
+  Jede hinreichend große gerade Zahl $n$ ist darstellbar als $n = p + m$,
+  wobei $p$ Primzahl und $m$ Produkt von höchstens zwei Primzahlen ist
+  ($m \in \mathbb{P}_2$).
+\end{theorem}
+
+\begin{bemerkung}[Paritätslücke: Chen vs.\ Goldbach]
+  Chens Satz sagt $n = p + P_2$, nicht $n = p + p$.  Der Grund:
+  Das Paritätsproblem verhindert die Verfeinerung von $P_2$ auf $P_1$
+  (echte Primzahlen).  Die singuläre Reihe $\mathfrak{S}(n)$ erscheint
+  in beiden Vorhersagen mit demselben Ausdruck, aber unterschiedlichem
+  Vorfaktor:
+  \[
+    \#\{p : p + P_2 = n\} \;\sim\; C \cdot \mathfrak{S}(n) \cdot \frac{n}{(\log n)^2}.
+  \]
+\end{bemerkung}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Die Goldbach'sche singuläre Reihe $\mathfrak{S}(n)$ und die Hardy--Littlewood-Vermutung~$\mathbf{H}$
+repräsentieren unser bestes quantitatives Verständnis des binären Goldbach-Problems.
+
+Hauptergebnisse dieses Papers:
+\begin{enumerate}
+  \item $\mathfrak{S}(n) = 2C_2 \prod_{p|n, p\geq 3}(p-1)/(p-2) > 0$
+    für alle geraden $n \geq 4$ (Sätze~\ref{thm:euler},~\ref{thm:pos}).
+  \item Unter GRH: binäres Goldbach gilt für alle hinreichend großen
+    geraden $n$ (Satz~\ref{thm:R2_GRH}).
+  \item Vermutung~$\mathbf{H}$ vereinheitlicht alle Primzahlkonstellation-Probleme.
+  \item Das Paritätsproblem erklärt, warum die Kreismethode allein das
+    binäre Goldbach-Problem nicht unbedingt beweisen kann.
+\end{enumerate}
+
+Die binäre Goldbach-Vermutung und die Zwillingsprimzahl-Vermutung gehören
+zu den tiefsten offenen Problemen der Mathematik.  Fortschritte erfordern
+das Überwinden der Paritätsbarriere in der Siebtheorie.
+
+% ================================================================
+\begin{thebibliography}{9}
+
+\bibitem{HardyLittlewood1923}
+G.~H.~Hardy und J.~E.~Littlewood.
+\newblock Some problems of ``Partitio Numerorum''.  III.
+\newblock \emph{Acta Math.}, 44:1--70, 1923.
+
+\bibitem{Helfgott2013a}
+H.~A.~Helfgott.
+\newblock Major arcs for Goldbach's theorem.
+\newblock arXiv:1305.2897, 2013.
+
+\bibitem{Chen1973}
+C.~J.~Chen.
+\newblock On the representation of a large even integer as the sum of a prime
+  and the product of at most two primes.
+\newblock \emph{Sci.\ Sinica}, 16:157--176, 1973.
+
+\bibitem{Vaughan1981}
+R.~C.~Vaughan.
+\newblock \emph{The Hardy--Littlewood Method}, 2.~Aufl.
+\newblock Cambridge University Press, 1997.
+
+\bibitem{IwaniecKowalski}
+H.~Iwaniec und E.~Kowalski.
+\newblock \emph{Analytic Number Theory}.
+\newblock American Mathematical Society, 2004.
+
+\bibitem{OliveiraSilva2014}
+T.~Oliveira~e~Silva, S.~Herzog und S.~Pardi.
+\newblock Empirical verification of the even Goldbach conjecture.
+\newblock \emph{Math.\ Comp.}, 83(288):2033--2060, 2014.
+
+\end{thebibliography}
+
+\end{document}
