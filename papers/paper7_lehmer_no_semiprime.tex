@@ -1,0 +1,168 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\euler}{\varphi}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{No Semiprime Satisfies Lehmer's Totient Condition:\\ An Arithmetic Proof}
+
+\author{Kurt Ingwer}
+\address{Specialist Mathematics Project, Version Build 44}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Lehmer's totient problem asks whether $\euler(n) \mid (n-1)$ implies $n$ is prime.
+We prove that no semiprime $n = p \cdot q$ with $p < q$ prime satisfies this condition.
+The key identity is $pq - 1 \equiv p + q - 2 \pmod{(p-1)(q-1)}$: since $(p-1)(q-1) > p + q - 2$
+for $p \ge 2$, $q > p$, the quotient $(p-1)(q-1)$ cannot divide $pq - 1$.
+This eliminates semiprimes from Lehmer's problem and shows every Lehmer number
+(if one exists) has at least three distinct prime factors.
+\end{abstract}
+
+\maketitle
+
+% -------------------------------------------------------
+\section{Introduction}
+% -------------------------------------------------------
+
+Lehmer \cite{Lehmer1932} asked whether $\euler(n) \mid (n-1)$ forces $n$ to be prime.
+After establishing that any solution must be squarefree \cite{Ingwer2026sqfree},
+the next step is to rule out products of exactly two primes.
+
+For a squarefree $n = p_1 \cdots p_k$, the Lehmer condition becomes
+\[
+  (p_1-1)(p_2-1)\cdots(p_k-1) \mid p_1 p_2 \cdots p_k - 1.
+\]
+For $k = 2$ with $p < q$ prime, this is $(p-1)(q-1) \mid pq - 1$.
+
+% -------------------------------------------------------
+\section{Main Result}
+% -------------------------------------------------------
+
+\begin{theorem}
+\label{thm:nosemi}
+There is no semiprime $n = p \cdot q$ with $p < q$ prime satisfying
+$\euler(n) \mid (n-1)$.
+\end{theorem}
+
+\begin{proof}
+The condition $\euler(pq) \mid (pq - 1)$ is $(p-1)(q-1) \mid (pq - 1)$.
+
+We use the key identity:
+\begin{equation}
+  pq - 1 = (p-1)(q-1) + (p-1) + (q-1).
+  \label{eq:ident}
+\end{equation}
+
+\begin{proof}[Verification of \eqref{eq:ident}]
+$(p-1)(q-1) + (p-1) + (q-1) = pq - p - q + 1 + p - 1 + q - 1 = pq - 1$. \checkmark
+\end{proof}
+
+From~\eqref{eq:ident}:
+\[
+  pq - 1 \equiv (p-1) + (q-1) = p + q - 2 \pmod{(p-1)(q-1)}.
+\]
+For $(p-1)(q-1) \mid (pq-1)$, we need $(p-1)(q-1) \mid (p + q - 2)$.
+
+We show this is impossible:
+\begin{equation}
+  (p-1)(q-1) > p + q - 2 \quad \text{for } p \ge 2,\ q > p.
+  \label{eq:ineq}
+\end{equation}
+
+\begin{proof}[Proof of \eqref{eq:ineq}]
+$(p-1)(q-1) - (p+q-2) = pq - p - q + 1 - p - q + 2 = pq - 2p - 2q + 3$.
+
+For $p \ge 2$ and $q \ge p + 1 \ge 3$:
+\[
+  pq - 2p - 2q + 3 = p(q-2) - 2(q-1) + 1 \ge 2(q-2) - 2(q-1) + 1 = -2 + 1 = -1.
+\]
+More carefully: $pq - 2p - 2q + 3 = (p-2)(q-2) - 1$.
+For $p = 2$: $(p-2)(q-2) - 1 = -1 < 0$.
+Hmm — let us handle $p = 2$ separately.
+
+\textbf{Case $p = 2$:} The condition becomes $(q-1) \mid (2q-1)$.
+Since $2q - 1 = 2(q-1) + 1$, we get $(q-1) \mid 1$, so $q - 1 = 1$, i.e.\ $q = 2 = p$.
+This contradicts $q > p$.
+
+\textbf{Case $p \ge 3$:} Now $p - 2 \ge 1$ and $q - 2 \ge q - p \ge 2$ (since $q \ge p+2$
+for odd primes $p < q$).  Thus
+\[
+  (p-1)(q-1) - (p+q-2) = (p-2)(q-2) - 1 \ge 1 \cdot 2 - 1 = 1 > 0.
+\]
+So $(p-1)(q-1) > p + q - 2 \ge 1$, and hence $(p-1)(q-1) \nmid (p+q-2)$.
+\end{proof}
+
+In both cases, $(p-1)(q-1) \nmid (pq-1)$ — a contradiction.
+\end{proof}
+
+% -------------------------------------------------------
+\section{The Key Identity in Context}
+% -------------------------------------------------------
+
+\begin{remark}
+Identity~\eqref{eq:ident} generalises: for $n = p_1 \cdots p_k$ squarefree,
+\[
+  n - 1 = \euler(n) + \sum_{\substack{S \subseteq \{1,\ldots,k\} \\ S \ne \{1,\ldots,k\}}}
+            \prod_{i \in S}(p_i - 1) \cdot \prod_{i \notin S} \mathbf{1}.
+\]
+The key modular reduction $n - 1 \equiv \sum_{i=1}^{k}(p_i - 1) \pmod{\euler(n)}$
+holds for $k = 2$ and is the basis for the proof above.  For larger~$k$, the
+analysis becomes more involved.
+\end{remark}
+
+\begin{corollary}
+Every Lehmer number has at least three distinct prime factors.
+\end{corollary}
+
+\begin{proof}
+Squarefreeness \cite{Ingwer2026sqfree} rules out prime powers.
+Theorem~\ref{thm:nosemi} rules out products of two distinct primes.
+So at least three are needed.
+\end{proof}
+
+% -------------------------------------------------------
+\begin{thebibliography}{10}
+
+\bibitem{Lehmer1932}
+D.~H.~Lehmer,
+\emph{On Euler's totient function},
+Bull.\ Amer.\ Math.\ Soc.\ \textbf{38} (1932), 745--751.
+
+\bibitem{Cohen1980}
+G.~L.~Cohen and P.~Hagis,
+\emph{On the number of prime factors of $n$ if $\phi(n) \mid (n-1)$},
+Nieuw Arch.\ Wisk.\ (3) \textbf{28} (1980), 177--185.
+
+\bibitem{Ingwer2026sqfree}
+K.~Ingwer,
+\emph{Every solution to Lehmer's totient problem is squarefree},
+Specialist Mathematics Project (2026).
+
+\bibitem{Ingwer2026lehmer3}
+K.~Ingwer,
+\emph{Lehmer's totient problem for products of three primes},
+Specialist Mathematics Project (2026).
+
+\end{thebibliography}
+
+\end{document}

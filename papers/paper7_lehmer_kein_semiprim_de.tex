@@ -1,0 +1,157 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage[ngerman]{babel}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\euler}{\varphi}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Kein Semiprim erfüllt Lehmers Totient-Bedingung:\\ Ein arithmetischer Beweis}
+
+\author{Kurt Ingwer}
+\address{Specialist Mathematics Project, Version Build 44}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Lehmers Totient-Problem fragt, ob $\euler(n) \mid (n-1)$ die Primalität von~$n$ erzwingt.
+Wir beweisen, dass kein Semiprim $n = p \cdot q$ mit $p < q$ prim diese Bedingung erfüllt.
+Die Schlüsselidentität ist $pq - 1 \equiv p + q - 2 \pmod{(p-1)(q-1)}$: Da
+$(p-1)(q-1) > p + q - 2$ für $p \ge 2$, $q > p$, kann der Quotient $(p-1)(q-1)$
+die Zahl $pq - 1$ nicht teilen. Dies schließt Semiprimen aus Lehmers Problem aus
+und zeigt, dass jede Lehmer-Zahl (falls eine existiert) mindestens drei verschiedene
+Primfaktoren haben muss.
+\end{abstract}
+
+\maketitle
+
+% -------------------------------------------------------
+\section{Einleitung}
+% -------------------------------------------------------
+
+Lehmer \cite{Lehmer1932} fragte, ob $\euler(n) \mid (n-1)$ die Primalität von~$n$ erzwingt.
+Nachdem gezeigt wurde, dass jede Lösung quadratfrei sein muss \cite{Ingwer2026qfrei},
+ist der nächste Schritt, Produkte genau zweier Primzahlen auszuschließen.
+
+Für ein quadratfreies $n = p_1 \cdots p_k$ lautet die Lehmer-Bedingung
+\[
+  (p_1-1)(p_2-1)\cdots(p_k-1) \mid p_1 p_2 \cdots p_k - 1.
+\]
+Für $k = 2$ mit $p < q$ prim ist dies $(p-1)(q-1) \mid pq - 1$.
+
+% -------------------------------------------------------
+\section{Hauptresultat}
+% -------------------------------------------------------
+
+\begin{theorem}
+\label{thm:keinsemi}
+Es existiert kein Semiprim $n = p \cdot q$ mit $p < q$ prim, das
+$\euler(n) \mid (n-1)$ erfüllt.
+\end{theorem}
+
+\begin{proof}
+Die Bedingung $\euler(pq) \mid (pq - 1)$ lautet $(p-1)(q-1) \mid (pq - 1)$.
+
+Wir verwenden die Schlüsselidentität:
+\begin{equation}
+  pq - 1 = (p-1)(q-1) + (p-1) + (q-1).
+  \label{eq:ident}
+\end{equation}
+
+\begin{proof}[Verifikation von \eqref{eq:ident}]
+$(p-1)(q-1) + (p-1) + (q-1) = pq - p - q + 1 + p - 1 + q - 1 = pq - 1$. \checkmark
+\end{proof}
+
+Aus~\eqref{eq:ident} folgt:
+\[
+  pq - 1 \equiv (p-1) + (q-1) = p + q - 2 \pmod{(p-1)(q-1)}.
+\]
+Damit $(p-1)(q-1) \mid (pq-1)$ gilt, muss $(p-1)(q-1) \mid (p + q - 2)$ gelten.
+
+Wir zeigen, dass dies unmöglich ist:
+
+\textbf{Fall $p = 2$:} Die Bedingung lautet $(q-1) \mid (2q-1)$.
+Da $2q - 1 = 2(q-1) + 1$, folgt $(q-1) \mid 1$, also $q - 1 = 1$, d.\,h.\ $q = 2 = p$.
+Dies widerspricht $q > p$.
+
+\textbf{Fall $p \ge 3$:} Da $p$ und $q$ ungerade Primzahlen mit $q > p$ sind,
+gilt $q \ge p + 2$, also $q - 2 \ge p \ge 3$ und $p - 2 \ge 1$. Damit:
+\[
+  (p-1)(q-1) - (p+q-2) = (p-2)(q-2) - 1 \ge 1 \cdot (p-1) - 1 = p - 2 \ge 1 > 0.
+\]
+Also $(p-1)(q-1) > p + q - 2 \ge 1$, und daher $(p-1)(q-1) \nmid (p+q-2)$.
+
+In beiden Fällen gilt $(p-1)(q-1) \nmid (pq-1)$ — Widerspruch.
+\end{proof}
+
+% -------------------------------------------------------
+\section{Die Schlüsselidentität im Kontext}
+% -------------------------------------------------------
+
+\begin{remark}
+Identität~\eqref{eq:ident} verallgemeinert sich: Für $n = p_1 \cdots p_k$ quadratfrei gilt
+\[
+  n - 1 \equiv \sum_{i=1}^{k}(p_i - 1) \pmod{\euler(n)}.
+\]
+Dies ist die modulare Reduktion, die der obige Beweis für $k = 2$ nutzt.
+Für größeres~$k$ wird die Analyse aufwändiger, aber das Grundprinzip bleibt dasselbe.
+\end{remark}
+
+\begin{remark}
+Die Ungleichung $(p-1)(q-1) > p + q - 2$ ist äquivalent zu $(p-2)(q-2) > 1$,
+was für alle Primpaare $p \ge 3$, $q > p$ gilt (da $p - 2 \ge 1$ und $q - 2 \ge p - 1 \ge 2$).
+\end{remark}
+
+\begin{corollary}
+Jede Lehmer-Zahl hat mindestens drei verschiedene Primfaktoren.
+\end{corollary}
+
+\begin{proof}
+Quadratfreiheit \cite{Ingwer2026qfrei} schließt Primzahlpotenzen aus.
+Satz~\ref{thm:keinsemi} schließt Produkte zweier verschiedener Primzahlen aus.
+Also werden mindestens drei benötigt.
+\end{proof}
+
+% -------------------------------------------------------
+\begin{thebibliography}{10}
+
+\bibitem{Lehmer1932}
+D.~H.~Lehmer,
+\emph{On Euler's totient function},
+Bull.\ Amer.\ Math.\ Soc.\ \textbf{38} (1932), 745--751.
+
+\bibitem{Cohen1980}
+G.~L.~Cohen und P.~Hagis,
+\emph{On the number of prime factors of $n$ if $\phi(n) \mid (n-1)$},
+Nieuw Arch.\ Wisk.\ (3) \textbf{28} (1980), 177--185.
+
+\bibitem{Ingwer2026qfrei}
+K.~Ingwer,
+\emph{Jede Lösung von Lehmers Totient-Problem ist quadratfrei},
+Specialist Mathematics Project (2026).
+
+\bibitem{Ingwer2026lehmer3}
+K.~Ingwer,
+\emph{Lehmers Totient-Problem für Produkte dreier Primzahlen},
+Specialist Mathematics Project (2026).
+
+\end{thebibliography}
+
+\end{document}

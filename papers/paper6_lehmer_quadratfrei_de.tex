@@ -1,0 +1,168 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage[ngerman]{babel}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\euler}{\varphi}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Jede Lösung von Lehmers Totient-Problem ist quadratfrei:\\ Ein kurzer Beweis}
+
+\author{Kurt Ingwer}
+\address{Specialist Mathematics Project, Version Build 44}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Lehmers Totient-Problem (1932) fragt, ob die Bedingung $\euler(n) \mid (n-1)$
+die Primalität von~$n$ erzwingt. Eine zusammengesetzte Lösung würde als
+\emph{Lehmer-Zahl} bezeichnet. Wir geben einen kurzen, elementaren Beweis, dass
+jede Lehmer-Zahl quadratfrei sein muss. Das Argument besteht aus zwei Schritten:
+Falls $p^2 \mid n$, dann $p \mid \euler(n)$; zusammen mit $\euler(n) \mid (n-1)$
+folgt $p \mid (n-1)$; aber auch $p \mid n$, also $p \mid 1$, was unmöglich ist.
+Dieses Ergebnis ist grundlegend für das Studium von Lehmers Problem und impliziert,
+dass jedes potenzielle Gegenbeispiel ein Produkt verschiedener Primzahlen ist.
+\end{abstract}
+
+\maketitle
+
+% -------------------------------------------------------
+\section{Einleitung}
+% -------------------------------------------------------
+
+Im Jahre 1932 fragte Lehmer \cite{Lehmer1932}, ob die Kongruenz
+$\euler(n) \mid (n-1)$ (wobei $\euler$ die Eulersche Totient-Funktion ist)
+für eine zusammengesetzte ganze Zahl~$n$ gelten kann. Primzahlen erfüllen stets
+$\euler(p) = p-1 \mid p-1$; das Problem ist, ob dies die Primzahlen charakterisiert.
+
+\begin{definition}
+Eine zusammengesetzte ganze Zahl~$n$ mit $\euler(n) \mid (n-1)$ heißt
+\emph{Lehmer-Zahl} oder \emph{Lehmer-Pseudoprim}.
+\end{definition}
+
+Keine Lehmer-Zahl wurde jemals gefunden. Cohen und Hagis \cite{Cohen1980} bewiesen,
+dass eine solche Zahl mindestens~$13$ Primfaktoren haben muss; Banks und Luca
+\cite{Banks2009} verbesserten dies auf~$15$.
+
+Die vorliegende Notiz beweist die grundlegendste Struktureigenschaft: die Quadratfreiheit.
+
+% -------------------------------------------------------
+\section{Hauptresultat}
+% -------------------------------------------------------
+
+\begin{theorem}
+\label{thm:qfrei}
+Jede Lehmer-Zahl ist quadratfrei.
+\end{theorem}
+
+\begin{proof}
+Angenommen, $n$ ist eine Lehmer-Zahl und $p^2 \mid n$ für eine Primzahl~$p$.
+
+Da $p^2 \mid n$, gilt $p \mid \euler(n)$.
+(Zur Erinnerung: Falls $p^a \| n$ mit $a \ge 2$, dann teilt $p^{a-1}(p-1)$ die Zahl $\euler(n)$,
+insbesondere gilt also $p \mid \euler(n)$; schon für $a = 2$ liefert dies $p(p-1) \mid \euler(n)$.)
+
+Aus $\euler(n) \mid (n-1)$ und $p \mid \euler(n)$ folgt:
+\[
+  p \mid \euler(n) \mid (n-1), \quad \text{also} \quad p \mid (n-1).
+\]
+Aber auch $p \mid n$ (da $p^2 \mid n$), daher
+\[
+  p \mid n - (n-1) = 1.
+\]
+Dies ist unmöglich für $p \ge 2$ — Widerspruch.
+Folglich erfüllt keine Primzahl~$p$ die Bedingung $p^2 \mid n$, d.\,h.\ $n$ ist quadratfrei.
+\end{proof}
+
+\begin{remark}
+Dasselbe Argument gilt für die allgemeinere Bedingung $M \cdot \euler(n) = n - 1$
+für jedes feste positive ganze Zahl~$M$ (eine Verallgemeinerung, die von Hagis \cite{Hagis1988}
+untersucht wurde). Quadratfreiheit folgt identisch.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Folgerungen}
+% -------------------------------------------------------
+
+\begin{corollary}
+Jede Lehmer-Zahl hat die Form $n = p_1 p_2 \cdots p_k$ mit paarweise verschiedenen
+Primzahlen $p_1 < p_2 < \cdots < p_k$ und $k \ge 2$.
+\end{corollary}
+
+\begin{corollary}
+Für eine Lehmer-Zahl $n = p_1 \cdots p_k$ ist der Totient
+$\euler(n) = (p_1-1)(p_2-1)\cdots(p_k-1)$, und die Lehmer-Bedingung lautet
+\[
+  (p_1-1)(p_2-1)\cdots(p_k-1) \mid p_1 p_2 \cdots p_k - 1.
+\]
+\end{corollary}
+
+Diese explizite Form der Bedingung ist die Grundlage für alle weitere Analyse von
+Lehmer-Zahlen, einschließlich der Nachweise, dass kein Semiprim \cite{Ingwer2026b}
+und keine Dreiprimzahl \cite{Ingwer2026lehmer3} eine Lehmer-Zahl sein kann.
+
+% -------------------------------------------------------
+\section{Vergleich mit dem Giuga-Fall}
+% -------------------------------------------------------
+
+Die parallele Struktur mit Giuga-Pseudoprimen ist auffällig. Für beide Probleme:
+\begin{itemize}
+  \item Quadratfreiheit wird bewiesen, indem gezeigt wird, dass $p^2 \mid n$ zu $p \mid 1$ führt.
+  \item Für Giuga: $p^2 \mid n \Rightarrow p \mid \tfrac{n}{p} \Rightarrow \tfrac{n}{p}-1 \equiv -1 \pmod{p} \Rightarrow p \mid -1$.
+  \item Für Lehmer: $p^2 \mid n \Rightarrow p \mid \euler(n) \Rightarrow p \mid (n-1) \Rightarrow p \mid 1$.
+\end{itemize}
+Beide nutzen die fundamentale Unverträglichkeit zwischen $p \mid n$ und $p \mid (n-1)$.
+
+% -------------------------------------------------------
+\begin{thebibliography}{10}
+
+\bibitem{Lehmer1932}
+D.~H.~Lehmer,
+\emph{On Euler's totient function},
+Bull.\ Amer.\ Math.\ Soc.\ \textbf{38} (1932), 745--751.
+
+\bibitem{Cohen1980}
+G.~L.~Cohen und P.~Hagis,
+\emph{On the number of prime factors of $n$ if $\phi(n) \mid (n-1)$},
+Nieuw Arch.\ Wisk.\ (3) \textbf{28} (1980), 177--185.
+
+\bibitem{Hagis1988}
+P.~Hagis,
+\emph{On the equation $M \cdot \phi(n) = n - 1$},
+Nieuw Arch.\ Wisk.\ (4) \textbf{6} (1988), 255--261.
+
+\bibitem{Banks2009}
+W.~D.~Banks und F.~Luca,
+\emph{Composite integers $n$ for which $\phi(n) \mid n - 1$},
+Acta Math.\ Sin.\ (Engl.\ Ser.) \textbf{25} (2009), 1703--1710.
+
+\bibitem{Ingwer2026b}
+K.~Ingwer,
+\emph{Kein Semiprim erfüllt Lehmers Totient-Bedingung},
+Specialist Mathematics Project (2026).
+
+\bibitem{Ingwer2026lehmer3}
+K.~Ingwer,
+\emph{Lehmers Totient-Problem für Produkte dreier Primzahlen},
+Specialist Mathematics Project (2026).
+
+\end{thebibliography}
+
+\end{document}
