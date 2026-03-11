@@ -2,6 +2,7 @@
 \usepackage{amsmath,amsthm,amssymb,amsfonts}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
 \usepackage{hyperref}
 \usepackage{geometry}
 \geometry{margin=2.5cm}
@@ -42,7 +43,7 @@ was nötig wäre, um die verbleibende Lücke zu schließen.
 \section{Einleitung}
 
 Terence Taos Arbeit von 2022 ``Almost all Collatz orbits attain almost bounded values''
-\cite{Tao2022}, veröffentlicht in den \emph{Annals of Mathematics}, stellt den bedeutendsten
+\cite{Tao2022}, veröffentlicht in \emph{Forum of Mathematics, Sigma}, stellt den bedeutendsten
 Fortschritt bei der Collatz-Vermutung seit Jahrzehnten dar. Sie beweist die Vermutung
 nicht, liefert aber das stärkste bekannte unbedingte Resultat zu ihren Gunsten.
 
@@ -95,12 +96,14 @@ $E(m) = k$ den Wert $2^{-k}(1 + O(N^{-1/2}))$ für $N \to \infty$.
 \end{proposition}
 
 \begin{proof}
-Da $3m + 1 \equiv 2 \pmod{4}$ für alle ungeraden $m$ gilt (denn $3m \equiv 3 \pmod{4}$,
-also $3m+1 \equiv 0 \pmod{2}$), folgt:
-$E(m) = 1$ genau dann, wenn $m \equiv 1 \pmod{4}$: Wahrscheinlichkeit $1/2$.
-$E(m) = 2$ genau dann, wenn $m \equiv 1 \pmod{8}$: Wahrscheinlichkeit $1/4$.
-Allgemein: $E(m) \geq k$ genau dann, wenn $m \equiv 1 \pmod{2^k}$: Wahrscheinlichkeit $2^{-(k-1)}$.
-Also $\Pr[E(m) = k] = 2^{-(k-1)} - 2^{-k} = 2^{-k}$.
+Für eine ungerade ganze Zahl $m$ gilt $m \equiv 1$ oder $3 \pmod{4}$.
+Falls $m \equiv 3 \pmod{4}$: $3m+1 \equiv 10 \equiv 2 \pmod{4}$, also $\nu_2(3m+1) = 1$, d.h.\ $E(m)=1$.
+Falls $m \equiv 1 \pmod{4}$: $3m+1 \equiv 4 \equiv 0 \pmod{4}$, also $\nu_2(3m+1) \geq 2$, d.h.\ $E(m)\geq 2$.
+Also gilt $E(m) = 1$ genau dann, wenn $m \equiv 3 \pmod{4}$: Wahrscheinlichkeit $1/2$ unter ungeraden Zahlen.
+Allgemein: $E(m) \geq k$ genau dann, wenn $2^k \mid 3m+1$, was (da $\gcd(3,2)=1$) äquivalent ist zu
+$m \equiv r_k \pmod{2^k}$ für einen eindeutig bestimmten ungeraden Rest $r_k$.
+Dies tritt mit Wahrscheinlichkeit $2^{-(k-1)}$ unter ungeraden Zahlen auf.
+Damit: $\Pr[E(m) = k] = \Pr[E(m) \geq k] - \Pr[E(m) \geq k+1] = 2^{-(k-1)} - 2^{-k} = 2^{-k}$.
 \end{proof}
 
 \begin{definition}[Logarithmischer Zufallswalk]\label{def:zufallswalk}
@@ -305,7 +308,7 @@ Taos Resultat ist in mehrfacher Hinsicht bedeutsam:
   \item Es stellt die stärkste bekannte quantitative Aussage zur Vermutung auf.
   \item Es zeigt, dass Gegenbeispiele --- falls sie existieren --- eine sehr ``dünne''
         Menge bilden müssen (logarithmische Dichte 0).
-  \item Es stellt ein Werkzeugkasten (Fourier-Analysis über $\mathbb{Z}_2$,
+  \item Es stellt einen Werkzeugkasten (Fourier-Analysis über $\mathbb{Z}_2$,
         Syrakus-Zufallswalks) bereit, der weiter entwickelt werden kann.
 \end{enumerate}
 
@@ -324,7 +327,7 @@ Offene Probleme:
 \bibitem{Tao2022}
 T.~Tao.
 \newblock Almost all Collatz orbits attain almost bounded values.
-\newblock \emph{Annals of Mathematics}, 197(2):679--710, 2022.
+\newblock \emph{Forum of Mathematics, Sigma}, 10:e72, 2022.
 
 \bibitem{Collatz1937}
 L.~Collatz.

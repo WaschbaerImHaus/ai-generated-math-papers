@@ -94,21 +94,21 @@ $T^k(n) < n$, or $\infty$ if no such $k$ exists.
 \begin{proposition}[Existence of predecessors]\label{prop:pred}
 Every positive integer $n$ has at least one predecessor under $T$. Specifically:
 \begin{enumerate}
-  \item[(i)] $2n$ is always a predecessor of $n$ (via the even branch).
-  \item[(ii)] If $n \equiv 2 \pmod{3}$, then $(2n-1)/3$ is an odd predecessor of $n$.
+  \item[(i)] $2n$ is always a predecessor of $n$ (via the even branch): $T(2n) = n$.
+  \item[(ii)] If $n \equiv 2 \pmod{3}$, then $m = (2n-1)/3$ is a positive odd integer
+              satisfying $T(m) = 2n$ and $T(2n) = n$, so $m$ is a 2-step predecessor of $n$.
+              In particular, $n$ has an odd predecessor at distance 2 in the Collatz graph.
 \end{enumerate}
 \end{proposition}
 
 \begin{proof}
-(i) By definition $T(2n) = 2n/2 = n$.
-(ii) Suppose $m = (2n-1)/3$ is a positive integer. Then $3m = 2n - 1$, so $m$ is odd
-(since $3m + 1 = 2n$ is even), and $T(m) = 3m + 1 = 2n$. But then $T(2n) = n$, so
-$T^2(m) = n$. However, if additionally $2n - 1 \equiv 0 \pmod{3}$, i.e.\ $n \equiv 2 \pmod{3}$,
-then $(2n-1)/3 \in \mathbb{N}$ and $T((2n-1)/3) = n$ directly, since $(2n-1)/3$ is odd
-and $3 \cdot (2n-1)/3 + 1 = 2n - 1 + 1 = 2n$. Thus $T(2n) = n$. Actually the correct
-direct predecessor via the odd branch satisfies $3m + 1 = 2n$, giving $m = (2n-1)/3$,
-which is a positive integer iff $3 \mid (2n-1)$, i.e.\ $2n \equiv 1 \pmod{3}$, i.e.\
-$n \equiv 2 \pmod{3}$.
+(i) By definition $T(2n) = 2n/2 = n$.\\
+(ii) Set $m = (2n-1)/3$. This is a positive integer iff $3 \mid (2n-1)$, i.e.\
+$2n \equiv 1 \pmod{3}$, i.e.\ $n \equiv 2 \pmod{3}$. Since $3m = 2n-1$ is odd,
+$m$ itself is odd. Then $T(m) = 3m + 1 = (2n-1) + 1 = 2n$, and $T(2n) = n$.
+Thus $T^2(m) = n$, so $m$ is a 2-step predecessor of $n$.
+Note: the direct odd predecessor of $n$ via the odd branch would satisfy $3m + 1 = n$,
+i.e.\ $m = (n-1)/3$, which requires $n \equiv 1 \pmod{3}$ and $(n-1)/3$ to be odd.
 \end{proof}
 
 \section{Cycles and Fixed Points}
@@ -133,28 +133,24 @@ has been found.
 \end{remark}
 
 \begin{proposition}[Cycle structure equation]\label{prop:cycle_eq}
-A cycle of length $k$ containing $a$ odd elements and $b = k - a$ even elements satisfies
-\[
-  3^a \prod_{i \text{ odd step}} n_i = 2^b \prod_{i \text{ odd step}} n_i + (\text{correction terms}),
-\]
-or in the compressed form: a cycle of odd integers $m_0, \ldots, m_{a-1}$ under $S$
-with 2-adic valuations $e_0, \ldots, e_{a-1}$ (where $e_i = \nu_2(3m_i + 1)$) satisfies
+A cycle of odd integers $m_0, \ldots, m_{a-1}$ under $S$
+with 2-adic valuations $e_i = \nu_2(3m_i + 1)$ and $E = \sum_{i=0}^{a-1} e_i$ satisfies
 \begin{equation}\label{eq:cycle_cond}
-  \prod_{i=0}^{a-1} 2^{e_i} \;=\; 3^a.
+  (2^E - 3^a)\, m_0 \;=\; C \;>\; 0,
 \end{equation}
+where $C > 0$ is a positive integer (the ``carry'' term) depending on the intermediate values.
+In particular, every cycle of odd integers under $S$ requires $2^E > 3^a$.
 \end{proposition}
 
 \begin{proof}
 Under $S$, each step maps $m_i \mapsto (3m_i + 1)/2^{e_i}$. Composing all $a$ steps around the
-cycle gives $m_0 = (3^a m_0 + C) / 2^{e_0 + \cdots + e_{a-1}}$
-for some positive integer $C$ (the ``carry'' term). Since $m_0 > 0$ and the orbit is finite,
-we obtain
-$2^E m_0 = 3^a m_0 + C$,
-where $E = e_0 + \cdots + e_{a-1}$.
-For a genuine cycle (not a fixed point of $S^a$), one requires $2^E > 3^a$,
-which is impossible for $a \geq 2$ since $2^E = 3^a$ would need $E/a = \log_2 3 \approx 1.585$,
-an irrational ratio. Thus no exact cycle satisfying \eqref{eq:cycle_cond} exists among odd
-integers other than the trivial one. This shows that non-trivial cycles are highly constrained.
+cycle gives $m_0 = (3^a m_0 + C) / 2^E$
+for some positive integer $C$ (the ``carry'' term). Rearranging:
+$(2^E - 3^a) m_0 = C > 0$,
+so $2^E > 3^a$. Since $\log_2 3 \approx 1.585$ is irrational, $2^E \neq 3^a$ for all
+$E, a \in \mathbb{N}$, and the condition $2^E > 3^a$ requires $E/a > \log_2 3$,
+placing strong constraints on the 2-adic valuations $e_i$. This shows that non-trivial
+cycles, if they exist, are highly restricted and necessarily long.
 \end{proof}
 
 \section{Empirical Verification and Density Arguments}
@@ -244,7 +240,8 @@ the Collatz orbit of $n$ attains values that are almost bounded.
 \end{theorem}
 
 \begin{proof}[Proof outline]
-Tao's proof \cite{Tao2022} combines Fourier-analytic estimates on exponential sums
+Tao's proof \cite{Tao2022} (published in \emph{Forum of Mathematics, Sigma})
+combines Fourier-analytic estimates on exponential sums
 over the Syracuse map with ergodic-theoretic arguments. The main steps are:
 \begin{enumerate}
   \item Reduce to studying the Syracuse function $S$ on odd integers.
@@ -319,7 +316,7 @@ J.~C. Lagarias (ed.).
 \bibitem{Tao2022}
 T.~Tao.
 \newblock Almost all Collatz orbits attain almost bounded values.
-\newblock \emph{Annals of Mathematics}, 197(2):679--710, 2022.
+\newblock \emph{Forum of Mathematics, Sigma}, 10:e72, 2022.
 
 \bibitem{Terras1976}
 R.~Terras.

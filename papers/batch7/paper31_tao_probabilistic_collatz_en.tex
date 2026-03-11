@@ -41,7 +41,7 @@ would be needed to bridge the remaining gap.
 \section{Introduction}
 
 Terence Tao's 2022 paper ``Almost all Collatz orbits attain almost bounded values''
-\cite{Tao2022}, published in the \emph{Annals of Mathematics}, represents the most
+\cite{Tao2022}, published in \emph{Forum of Mathematics, Sigma}, represents the most
 significant advance on the Collatz conjecture in decades. It does not prove the conjecture,
 but it establishes the strongest known unconditional result in its favour.
 
@@ -92,12 +92,14 @@ $2^{-k}(1 + O(N^{-1/2}))$ as $N \to \infty$.
 \end{proposition}
 
 \begin{proof}
-Since $3m + 1 \equiv 2 \pmod{4}$ for all odd $m$ (as $3m \equiv 3 \pmod{4}$, so $3m+1 \equiv 0 \pmod 2$
-but $3m+1 \equiv 0 \pmod 2$ not $4$ with probability $1/2$), we find:
-$E(m) = 1$ iff $3m+1 \equiv 2 \pmod{4}$, i.e.\ $m \equiv 1 \pmod{4}$: probability $1/2$.
-$E(m) = 2$ iff $3m+1 \equiv 4 \pmod{8}$, i.e.\ $m \equiv 1 \pmod{8}$: probability $1/4$.
-$E(m) \geq k$ iff $m \equiv 1 \pmod{2^k}$: probability $2^{-(k-1)}$.
-Thus $\Pr[E(m) = k] = 2^{-(k-1)} - 2^{-k} = 2^{-k}$.
+For an odd integer $m$, we have $m \equiv 1$ or $3 \pmod{4}$.
+If $m \equiv 3 \pmod{4}$: $3m+1 \equiv 10 \equiv 2 \pmod{4}$, so $\nu_2(3m+1) = 1$, i.e.\ $E(m)=1$.
+If $m \equiv 1 \pmod{4}$: $3m+1 \equiv 4 \equiv 0 \pmod{4}$, so $\nu_2(3m+1) \geq 2$, i.e.\ $E(m)\geq 2$.
+Thus $E(m) = 1$ iff $m \equiv 3 \pmod{4}$: probability $1/2$ among odd integers.
+More generally, $E(m) \geq k$ iff $2^k \mid 3m+1$, which (since $\gcd(3,2)=1$) is equivalent to
+$m \equiv r_k \pmod{2^k}$ for a uniquely determined odd residue $r_k$.
+This happens with probability $2^{-(k-1)}$ among odd integers.
+Thus $\Pr[E(m) = k] = \Pr[E(m) \geq k] - \Pr[E(m) \geq k+1] = 2^{-(k-1)} - 2^{-k} = 2^{-k}$.
 \end{proof}
 
 \begin{definition}[Log-scale random walk]\label{def:rw}
@@ -315,7 +317,7 @@ Open problems include:
 \bibitem{Tao2022}
 T.~Tao.
 \newblock Almost all Collatz orbits attain almost bounded values.
-\newblock \emph{Annals of Mathematics}, 197(2):679--710, 2022.
+\newblock \emph{Forum of Mathematics, Sigma}, 10:e72, 2022.
 
 \bibitem{Collatz1937}
 L.~Collatz.

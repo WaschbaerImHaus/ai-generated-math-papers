@@ -2,6 +2,7 @@
 \usepackage{amsmath,amsthm,amssymb,amsfonts}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
 \usepackage{hyperref}
 \usepackage{geometry}
 \geometry{margin=2.5cm}
@@ -96,20 +97,24 @@ oder $\infty$, falls kein solches $k$ existiert.
 \begin{proposition}[Existenz von Vorgängern]\label{prop:pred}
 Jede positive ganze Zahl $n$ hat mindestens einen Vorgänger unter $T$. Genauer gilt:
 \begin{enumerate}
-  \item[(i)] $2n$ ist stets ein Vorgänger von $n$ (über den geraden Zweig).
-  \item[(ii)] Falls $n \equiv 2 \pmod{3}$, so ist $(2n-1)/3$ ein ungerader Vorgänger von $n$.
+  \item[(i)] $2n$ ist stets ein direkter Vorgänger von $n$ (über den geraden Zweig): $T(2n) = n$.
+  \item[(ii)] Falls $n \equiv 2 \pmod{3}$, so ist $m = (2n-1)/3$ eine positive ungerade
+              ganze Zahl mit $T(m) = 2n$ und $T(2n) = n$, also ist $m$ ein Vorgänger
+              von $n$ in zwei Schritten. Insbesondere hat $n$ einen ungeraden Vorgänger
+              im Abstand 2 im Collatz-Graphen.
 \end{enumerate}
 \end{proposition}
 
 \begin{proof}
 (i) Per Definition gilt $T(2n) = 2n/2 = n$.\\
-(ii) Sei $m = (2n-1)/3$ eine positive ganze Zahl. Dann ist $3m = 2n - 1$, also ist $m$
-ungerade (da $3m + 1 = 2n$ gerade ist), und es gilt $T(m) = 3m + 1 = 2n$.
-Die Zahl $(2n-1)/3$ liegt genau dann in $\mathbb{N}$, wenn $3 \mid (2n-1)$, also wenn
-$2n \equiv 1 \pmod{3}$, d.h.\ $n \equiv 2 \pmod{3}$. In diesem Fall ist
-$(2n-1)/3$ ungerade und $T((2n-1)/3) = 3 \cdot (2n-1)/3 + 1 = (2n-1) + 1 = 2n$,
-woraus $T(2n) = n$ folgt. Also ist $(2n-1)/3$ ein direkter Vorgänger von $n$ unter
-dem geraden Zweig nach dem ungeraden Schritt.
+(ii) Setze $m = (2n-1)/3$. Dies ist genau dann eine positive ganze Zahl, wenn
+$3 \mid (2n-1)$, d.h.\ $2n \equiv 1 \pmod{3}$, also $n \equiv 2 \pmod{3}$.
+Da $3m = 2n-1$ ungerade ist, ist $m$ selbst ungerade. Es gilt
+$T(m) = 3m + 1 = (2n-1) + 1 = 2n$ und $T(2n) = n$, also $T^2(m) = n$.
+Somit ist $m$ ein Vorgänger von $n$ in zwei Schritten.\\
+Hinweis: Ein direkter ungerader Vorgänger von $n$ über den ungeraden Zweig
+würde $3m + 1 = n$ erfüllen, d.h.\ $m = (n-1)/3$; dies erfordert $n \equiv 1 \pmod{3}$
+und $(n-1)/3$ ungerade.
 \end{proof}
 
 \section{Zyklen und Fixpunkte}
@@ -244,7 +249,8 @@ logarithmischen Dichte) nimmt die Collatz-Bahn von $n$ fast beschränkte Werte a
 \end{theorem}
 
 \begin{proof}[Beweisüberblick]
-Taos Beweis \cite{Tao2022} kombiniert Fourier-analytische Abschätzungen von
+Taos Beweis \cite{Tao2022} (veröffentlicht in \emph{Forum of Mathematics, Sigma})
+kombiniert Fourier-analytische Abschätzungen von
 Exponentialsummen über die Syrakus-Abbildung mit Methoden der Ergodentheorie:
 \begin{enumerate}
   \item Reduktion auf die Syrakus-Funktion $S$ auf ungeraden Zahlen.
@@ -323,7 +329,7 @@ J.~C. Lagarias (Hrsg.).
 \bibitem{Tao2022}
 T.~Tao.
 \newblock Almost all Collatz orbits attain almost bounded values.
-\newblock \emph{Annals of Mathematics}, 197(2):679--710, 2022.
+\newblock \emph{Forum of Mathematics, Sigma}, 10:e72, 2022.
 
 \bibitem{Terras1976}
 R.~Terras.

@@ -92,13 +92,13 @@ Haar measure $\mu$. Specifically, for the even integers $E = 2\mathbb{Z}_2$:
 \end{theorem}
 
 \begin{proof}
-$T^{-1}(E) = T^{-1}(2\mathbb{Z}_2)$. The preimage of $y \in 2\mathbb{Z}_2$ consists of:
-(a) $2y$ (from the even branch: $T(2y) = y \in 2\mathbb{Z}_2$... wait, $y$ must be in $2\mathbb{Z}_2$,
-so we need $T(n) \in 2\mathbb{Z}_2$, i.e.\ $T(n)$ is even.
-For the even branch: $T(n) = n/2$ is even iff $n \in 4\mathbb{Z}_2$. So the even branch
-contributes $\mu(4\mathbb{Z}_2) = 1/4$.
-For the odd branch: $T(n) = 3n+1$ is even always (since $n$ is odd, $3n$ is odd, $3n+1$ is even).
-So all odd integers map to even integers. Thus $\mu(T^{-1}(E)) = \mu(4\mathbb{Z}_2) + \mu(\mathbb{Z}_2^{\text{odd}}) = 1/4 + 1/2 = 3/4 \neq 1/2 = \mu(E)$.
+We compute $\mu(T^{-1}(E))$ where $E = 2\mathbb{Z}_2$ is the set of even elements,
+i.e.\ we need to find all $n \in \mathbb{Z}_2$ such that $T(n)$ is even.\\
+\emph{Even branch:} $T(n) = n/2$ is even iff $n/2 \in 2\mathbb{Z}_2$, i.e.\ $n \in 4\mathbb{Z}_2$.
+This contributes $\mu(4\mathbb{Z}_2) = 1/4$.\\
+\emph{Odd branch:} $T(n) = 3n+1$ for odd $n$. Since $n$ is odd, $3n$ is odd, so $3n+1$ is even.
+Thus every odd $n$ maps to an even integer, contributing $\mu(\mathbb{Z}_2^{\text{odd}}) = 1/2$.\\
+Therefore $\mu(T^{-1}(E)) = 1/4 + 1/2 = 3/4 \neq 1/2 = \mu(E)$, so $T$ does not preserve $\mu$.
 \end{proof}
 
 \begin{definition}[Invariant measure]\label{def:invariant}
@@ -368,7 +368,7 @@ J.~C. Lagarias (ed.).
 \bibitem{Tao2022}
 T.~Tao.
 \newblock Almost all Collatz orbits attain almost bounded values.
-\newblock \emph{Annals of Mathematics}, 197(2):679--710, 2022.
+\newblock \emph{Forum of Mathematics, Sigma}, 10:e72, 2022.
 
 \bibitem{Furstenberg1977}
 H.~Furstenberg.
