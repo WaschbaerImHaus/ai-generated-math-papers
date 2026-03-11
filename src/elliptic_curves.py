@@ -21,7 +21,7 @@
     - Wiles' Beweis des Grossen Fermatschen Satzes (Shimura-Taniyama-Wiles)
 
 @author Michael Fuhrmann
-@lastModified 2026-03-10
+@lastModified 2026-03-11 (Build 109: Migration auf math_helpers)
 """
 
 import math
@@ -29,6 +29,9 @@ import random
 import sympy as sp
 import numpy as np
 from typing import Optional, List, Tuple, Dict, Union
+
+# Zentrale Hilfsfunktionen aus math_helpers importieren (Rückwärtskompatibilität via Alias)
+from math_helpers import is_prime as _is_prime_helper
 
 
 # ---------------------------------------------------------------------------
@@ -69,22 +72,8 @@ def _extended_gcd(a: int, b: int) -> Tuple[int, int, int]:
     return g, y - (b // a) * x, x
 
 
-def _is_prime(n: int) -> bool:
-    """
-    Einfacher Primalitaetstest fuer kleine Zahlen.
-
-    @lastModified 2026-03-10
-    """
-    if n < 2:
-        return False
-    if n == 2:
-        return True
-    if n % 2 == 0:
-        return False
-    for i in range(3, int(math.isqrt(n)) + 1, 2):
-        if n % i == 0:
-            return False
-    return True
+# Alias für Rückwärtskompatibilität: _is_prime verweist auf math_helpers.is_prime
+_is_prime = _is_prime_helper
 
 
 def _sqrt_mod_p(a: int, p: int) -> Optional[int]:

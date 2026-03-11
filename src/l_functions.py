@@ -39,7 +39,7 @@
 @author Michael Fuhrmann
 @version 1.0
 @since 2026-03-10
-@lastModified 2026-03-10
+@lastModified 2026-03-11 (Build 109: Migration auf math_helpers)
 """
 
 import cmath
@@ -49,6 +49,13 @@ from functools import lru_cache
 
 # Projektinterne Ausnahmen
 from exceptions import InvalidInputError, DomainError
+
+# Zentrale Hilfsfunktionen aus math_helpers importieren (Rückwärtskompatibilität via Aliase)
+from math_helpers import (
+    is_prime as _is_prime,
+    euler_phi as _euler_totient,
+    gcd as _gcd,
+)
 
 
 # ===========================================================================
@@ -94,60 +101,6 @@ def _gamma_lanczos(z: complex) -> complex:
 
     t = z + g + 0.5
     return cmath.sqrt(2 * cmath.pi) * (t ** (z + 0.5)) * cmath.exp(-t) * x
-
-
-def _is_prime(n: int) -> bool:
-    """
-    @brief Primzahltest (Miller-Rabin-Näherung für kleine Zahlen).
-    @param n Zu prüfende natürliche Zahl
-    @return True wenn n prim, sonst False
-    @lastModified 2026-03-10
-    """
-    if n < 2:
-        return False
-    if n == 2:
-        return True
-    if n % 2 == 0:
-        return False
-    # Probedivision bis √n
-    for i in range(3, int(math.isqrt(n)) + 1, 2):
-        if n % i == 0:
-            return False
-    return True
-
-
-def _euler_totient(q: int) -> int:
-    """
-    @brief Eulersche Totientfunktion φ(q) = #{k: 1 ≤ k ≤ q, gcd(k,q)=1}.
-    @param q Positive ganze Zahl
-    @return φ(q)
-    @lastModified 2026-03-10
-    """
-    result = q
-    p = 2
-    temp = q
-    while p * p <= temp:
-        if temp % p == 0:
-            while temp % p == 0:
-                temp //= p
-            result -= result // p
-        p += 1
-    if temp > 1:
-        result -= result // temp
-    return result
-
-
-def _gcd(a: int, b: int) -> int:
-    """
-    @brief Größter gemeinsamer Teiler (euklidischer Algorithmus).
-    @param a Erste ganze Zahl
-    @param b Zweite ganze Zahl
-    @return gcd(a, b)
-    @lastModified 2026-03-10
-    """
-    while b:
-        a, b = b, a % b
-    return abs(a)
 
 
 def _primitive_root(q: int) -> Optional[int]:

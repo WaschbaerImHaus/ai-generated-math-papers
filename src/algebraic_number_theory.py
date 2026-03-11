@@ -44,7 +44,7 @@
     Idealklassengruppen und der Dirichletsche Einheitensatz.
 
 @author Michael Fuhrmann
-@lastModified 2026-03-11
+@lastModified 2026-03-11 (Build 109: Migration auf math_helpers)
 """
 
 import math
@@ -52,6 +52,15 @@ import cmath
 from fractions import Fraction
 from functools import lru_cache
 from typing import Optional
+
+# Zentrale Hilfsfunktionen aus math_helpers importieren (Rückwärtskompatibilität via Aliase)
+from math_helpers import (
+    is_prime as _is_prime,
+    prime_factorization as _prime_factorization,
+    euler_phi as _euler_totient,
+    gcd as _gcd,
+    legendre_symbol as _legendre_symbol,
+)
 
 # SymPy für symbolische Berechnungen
 try:
@@ -61,38 +70,6 @@ try:
     _SYMPY_AVAILABLE = True
 except ImportError:
     _SYMPY_AVAILABLE = False
-
-# ---------------------------------------------------------------------------
-# Hilfsfunktionen
-# ---------------------------------------------------------------------------
-
-@lru_cache(maxsize=512)
-def _is_prime(n: int) -> bool:
-    """
-    @brief Einfacher Primalitätstest (Miller-Rabin für große Zahlen).
-    @param n Zu prüfende Zahl
-    @return True wenn n prim
-    @lastModified 2026-03-11
-    """
-    if n < 2:
-        return False
-    if n == 2:
-        return True
-    if n % 2 == 0:
-        return False
-    # Deterministischer Miller-Rabin für n < 3.317e24 (Zeugen 2,3,5,7,11,13,17,19,23)
-    for a in [2, 3, 5, 7, 11, 13, 17, 19, 23]:
-        if n == a:
-            return True
-        if n % a == 0:
-            return False
-    # Trial division für kleine n
-    d = 3
-    while d * d <= n:
-        if n % d == 0:
-            return False
-        d += 2
-    return True
 
 
 @lru_cache(maxsize=256)
@@ -112,86 +89,6 @@ def _squarefree_part(d: int) -> int:
             d_abs //= p * p
         p += 1
     return sign * d_abs
-
-
-def _euler_totient(n: int) -> int:
-    """
-    @brief Euler'sche φ-Funktion: φ(n) = |{k : 1 ≤ k ≤ n, gcd(k,n)=1}|.
-    @description
-        Formel: φ(n) = n · ∏_{p|n} (1 - 1/p)
-    @param n Positive ganze Zahl
-    @return φ(n)
-    @lastModified 2026-03-11
-    """
-    if n == 1:
-        return 1
-    result = n
-    temp = n
-    d = 2
-    while d * d <= temp:
-        if temp % d == 0:
-            # Primfaktor d gefunden: multipliziere mit (1 - 1/d)
-            result -= result // d
-            while temp % d == 0:
-                temp //= d
-        d += 1
-    if temp > 1:
-        result -= result // temp
-    return result
-
-
-def _gcd(a: int, b: int) -> int:
-    """
-    @brief Größter gemeinsamer Teiler via Euklidischem Algorithmus.
-    @param a Erste ganze Zahl
-    @param b Zweite ganze Zahl
-    @return gcd(a, b)
-    @lastModified 2026-03-11
-    """
-    while b:
-        a, b = b, a % b
-    return abs(a)
-
-
-def _prime_factorization(n: int) -> dict[int, int]:
-    """
-    @brief Vollständige Primfaktorzerlegung von n.
-    @param n Positive ganze Zahl ≥ 2
-    @return Dict {Primfaktor: Exponent}
-    @lastModified 2026-03-11
-    """
-    factors: dict[int, int] = {}
-    d = 2
-    while d * d <= n:
-        while n % d == 0:
-            factors[d] = factors.get(d, 0) + 1
-            n //= d
-        d += 1
-    if n > 1:
-        factors[n] = factors.get(n, 0) + 1
-    return factors
-
-
-def _legendre_symbol(a: int, p: int) -> int:
-    """
-    @brief Legendre-Symbol (a/p) für ungerade Primzahl p.
-    @description
-        Euler-Kriterium: (a/p) ≡ a^{(p-1)/2} (mod p)
-        - Rückgabe 0: p | a
-        - Rückgabe 1: a ist quadratischer Rest mod p
-        - Rückgabe -1: a ist quadratischer Nichtrest mod p
-    @param a Ganzzahl
-    @param p Ungerade Primzahl
-    @return -1, 0 oder 1
-    @lastModified 2026-03-11
-    """
-    if p == 2:
-        return 0 if a % 2 == 0 else 1
-    a_mod = a % p
-    if a_mod == 0:
-        return 0
-    result = pow(a_mod, (p - 1) // 2, p)
-    return -1 if result == p - 1 else int(result)
 
 
 def _poly_mod_p(poly_coeffs: list[int], p: int) -> list[int]:

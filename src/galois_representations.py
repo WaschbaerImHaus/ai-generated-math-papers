@@ -49,7 +49,7 @@
 @author Michael Fuhrmann
 @version 1.0
 @since 2026-03-11
-@lastModified 2026-03-11
+@lastModified 2026-03-11 (Build 109: Migration auf math_helpers)
 """
 
 import math
@@ -65,50 +65,11 @@ from sympy import (
 )
 from sympy.abc import x as sym_x
 
-
-# ===========================================================================
-# HILFSFUNKTIONEN
-# ===========================================================================
-
-def _is_prime(n: int) -> bool:
-    """
-    @brief Primzahltest via Trial Division (für kleine n) und sympy (für große n).
-    @param n Zu testende Zahl
-    @return True wenn n eine Primzahl ist
-    @lastModified 2026-03-11
-    """
-    if n < 2:
-        return False
-    if n < 4:
-        return True
-    if n % 2 == 0 or n % 3 == 0:
-        return False
-    i = 5
-    while i * i <= n:
-        if n % i == 0 or n % (i + 2) == 0:
-            return False
-        i += 6
-    return True
-
-
-def _primes_up_to(n: int) -> List[int]:
-    """
-    @brief Erzeugt alle Primzahlen bis n via Sieb des Eratosthenes.
-    @param n Obere Schranke
-    @return Liste aller Primzahlen ≤ n
-    @lastModified 2026-03-11
-    """
-    if n < 2:
-        return []
-    # Sieb initialisieren
-    sieve = [True] * (n + 1)
-    sieve[0] = sieve[1] = False
-    for i in range(2, int(n**0.5) + 1):
-        if sieve[i]:
-            # Alle Vielfachen von i markieren
-            for j in range(i * i, n + 1, i):
-                sieve[j] = False
-    return [i for i in range(2, n + 1) if sieve[i]]
+# Zentrale Hilfsfunktionen aus math_helpers importieren (Rückwärtskompatibilität via Aliase)
+from math_helpers import (
+    is_prime as _is_prime,
+    primes_up_to as _primes_up_to,
+)
 
 
 def _sym_power_trace(alpha: complex, beta: complex, k: int) -> complex:
