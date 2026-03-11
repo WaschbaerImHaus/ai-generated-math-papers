@@ -29,6 +29,8 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\F}{\mathbb{F}}
+% BUG-B3-P16-DE-005 behoben: \ggT wurde in der Datei verwendet aber nicht definiert.
+\DeclareMathOperator{\ggT}{ggT}
 \DeclareMathOperator{\li}{li}
 \newcommand{\eexp}[1]{e\!\left(#1\right)}
 \newcommand{\Ptwo}{\mathcal{P}_2}
@@ -80,7 +82,8 @@ $N \geq 4$ Summe zweier Primzahlen ist.  Trotz ihrer Stellung als eines der
 ältesten ungelösten Probleme der Mathematik hat sie alle Beweisversuche
 widerstanden.
 
-Die Siebbmethoden des 20.~Jahrhunderts lieferten eine Reihe sukzessiv
+% BUG-B3-P16-DE-001 behoben: Tippfehler "Siebbmethoden" → "Siebmethoden" (doppeltes b).
+Die Siebmethoden des 20.~Jahrhunderts lieferten eine Reihe sukzessiv
 stärkerer Teilresultate, gemessen am \emph{Typ} $(k, \ell)$: Jede hinreichend
 große gerade Zahl $N$ ist Summe einer Zahl mit höchstens $k$ Primfaktoren
 und einer Zahl mit höchstens $\ell$ Primfaktoren.
@@ -268,7 +271,8 @@ erneut anwenden, um diesen Fehler abzuschätzen.
 
 \textbf{Bestandteil 1: Selbergs Sieb-Oberschranke.}
 Das Selberg-Sieb liefert eine Oberschranke für $S(\mathcal{A},\mathcal{P},z)$.
-Mit der Siebbdimension $\kappa = 1$ (da $\omega(p) \approx 1$ im Mittel),
+% BUG-B3-P16-DE-002 behoben: Tippfehler "Siebbdimension" → "Siebdimension".
+Mit der Siebdimension $\kappa = 1$ (da $\omega(p) \approx 1$ im Mittel),
 dem Siebniveau $D = N^{1/2}/(\log N)^B$ und dem Siebgrenzwert
 $\beta = (\log D)/(\log z)$ erhält man:
 \[
@@ -318,8 +322,9 @@ Nach sorgfältiger Abschätzung aller Fehlerterme und partieller Summation
 erhält man die untere Schranke mit der Konstante $c = 0{,}67$.  \qed
 
 \begin{bemerkung}
+  % BUG-B3-P16-DE-003 behoben: Tippfehler "estabelliert" → "etabliert".
   Die Konstante $0{,}67$ wurde von Chen \cite{Chen1973} selbst
-  estabelliert und später von anderen Autoren verfeinert.  Der derzeit
+  etabliert und später von anderen Autoren verfeinert.  Der derzeit
   beste Wert beträgt ungefähr $0{,}748$ (Pan Chengbiao, 1992).
 \end{bemerkung}
 
@@ -485,6 +490,13 @@ C.~Goldbach.
 V.~Brun.
 \newblock Le crible d'Eratosth\`{e}ne et le th\'{e}or\`{e}me de Goldbach.
 \newblock \emph{C.\ R.\ Acad.\ Sci.\ Paris}, 168:544--546, 1919.
+
+% BUG-B3-P16-DE-004 behoben: \bibitem{Iwaniec1980} fehlte in DE (in EN vorhanden).
+% Eintrag ergänzt für Konsistenz mit EN-Bibliographie.
+\bibitem{Iwaniec1980}
+H.~Iwaniec.
+\newblock Rosser's sieve.
+\newblock \emph{Acta Arith.}, 36:171--202, 1980.
 
 \bibitem{Pan1992}
 C.~Pan.

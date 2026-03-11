@@ -316,8 +316,11 @@ We minimise it subject to $\lambda_1 = 1$.
     = \frac{1}{V(z)}.
   \end{align*}
   The product converges absolutely because $g(p) \in [0,1)$.
-  Hence the optimal main term is $X \cdot V(z)^{-1} \cdot V(z) = X/V(z)$
-  after adjusting constants.
+  % BUG-B3-P14-EN-001 behoben: Zeile war algebraisch zirkulär und ergab X statt X/V(z).
+  % Korrekte Herleitung: V_h(z)=1/V(z) (exakt), also X/V_h(z) = X/(1/V(z)) = X·V(z)^{-1}
+  % = X/V(z) — das ist die gesuchte Schranke. Ohne Trunkierung d<=z gilt V_h(z)=1/V(z) exakt.
+  Hence the optimal main term is $X / V_h(z) = X \cdot V(z)$
+  (since $V_h(z) = 1/V(z)$, so $X/V_h(z) = X/(1/V(z)) = X \cdot V(z)^{-1} = X/V(z)$).
 
   More precisely, without the truncation $d \leq z$ the sum is exactly $1/V(z)$.
   With the truncation $d \leq z$, one loses terms with $d > z$, but
