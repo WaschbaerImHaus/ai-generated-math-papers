@@ -22,15 +22,26 @@
     - help             : Alle Befehle anzeigen
     - exit/quit        : REPL beenden
 
+    Sicherheitsaudit (Build 49, 2026-03-11):
+    - KEINE unsicheren eval() oder exec()-Aufrufe vorhanden.
+    - Benutzereingaben werden ausschließlich via command.split() aufgeteilt
+      und via json.loads() für JSON-Argumente geparst.
+    - json.loads() ist sicher: kein Code-Execution-Risiko.
+    - Funktionsnamen werden gegen eine feste Whitelist (func_map) geprüft.
+    - Eingaben werden auf max. 500 Zeichen begrenzt.
+    - Alle Eingaben werden auf DEBUG-Level geloggt.
+
 @author Kurt Ingwer
 @date 2026-03-09
-@version 1.0.0
+@version 1.1.0
+@lastModified 2026-03-11
 """
 
 import math
 import json
 import sys
 import os
+import logging
 from typing import Any, Optional
 
 # Pfad zum src-Verzeichnis hinzufügen
@@ -45,6 +56,15 @@ import linear_algebra
 import fourier
 import proof_theory
 import statistics_math
+
+# REPL-Logger für Sicherheits-Logging und Eingabe-Protokollierung
+# Alle Benutzereingaben werden auf DEBUG-Level geloggt
+_repl_logger = logging.getLogger("specialist_maths.repl")
+if not _repl_logger.handlers:
+    _handler = logging.StreamHandler()
+    _handler.setFormatter(logging.Formatter("[%(levelname)-7s] %(asctime)s REPL | %(message)s", datefmt="%H:%M:%S"))
+    _repl_logger.addHandler(_handler)
+_repl_logger.propagate = False
 
 
 def is_jupyter() -> bool:
@@ -317,6 +337,20 @@ class MathREPL:
         command = command.strip()
         if not command:
             return ""
+
+        # Eingabe-Längenlimit zum Schutz vor Denial-of-Service-Angriffen
+        # Sehr lange Eingaben könnten z.B. den JSON-Parser stark belasten
+        MAX_INPUT_LENGTH = 500
+        if len(command) > MAX_INPUT_LENGTH:
+            _repl_logger.warning(
+                f"Eingabe abgelehnt: zu lang ({len(command)} Zeichen, max {MAX_INPUT_LENGTH})"
+            )
+            return (f"Fehler: Eingabe zu lang ({len(command)} Zeichen). "
+                    f"Maximum ist {MAX_INPUT_LENGTH} Zeichen.")
+
+        # Alle Eingaben auf DEBUG-Level protokollieren (Sicherheits-Audit-Trail)
+        # Keine eval/exec-Aufrufe – nur split() und json.loads() für Parsing
+        _repl_logger.debug(f"Eingabe: {command!r}")
 
         # Befehl aufteilen
         parts = command.split()

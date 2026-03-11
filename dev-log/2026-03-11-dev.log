@@ -43,3 +43,9 @@
 - sagemath_bridge.py: export_to_sage_string(sympy_expr) → SageMath-kompatibler String
 - sagemath_bridge.py: import_from_sage_string(sage_str) → SymPy-Ausdruck (Fallback ohne SageMath)
 - tests/test_sagemath_bridge.py: 7 neue Tests für die neuen Funktionen
+
+2026-03-11 Build 49: repl.py Sicherheitsaudit
+- Kein eval/exec gefunden – alle Eingaben via split()/json.loads() verarbeitet
+- Logging der Eingaben auf DEBUG-Level hinzugefügt
+- Eingabe-Längenlimit (500 Zeichen) loggt Warnung bei Überschreitung
+- Docblock mit Sicherheitsaudit-Vermerk (Build 49) aktualisiert
