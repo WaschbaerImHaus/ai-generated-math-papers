@@ -344,3 +344,114 @@ class TestHelperFunctions:
         """√x für x < 0 wirft ValueError."""
         with pytest.raises(ValueError):
             sqrt_highprec(-1, digits=20)
+
+
+# ---------------------------------------------------------------------------
+# NEUE FUNKTIONEN (Build 61): zeta_zeros_mpmath, verify_riemann_hypothesis_mpmath, pi_mpmath
+# ---------------------------------------------------------------------------
+
+class TestZetaZerosMpmath:
+    """Tests für zeta_zeros_mpmath() (Build 61)."""
+
+    def test_first_zero_imaginary_part(self):
+        """Die erste Riemann-Nullstelle hat Im(s₁) ≈ 14.134..."""
+        from arbitrary_precision import zeta_zeros_mpmath
+        zeros = zeta_zeros_mpmath(1, prec=20)
+        assert len(zeros) == 1
+        import mpmath
+        t1 = float(mpmath.im(zeros[0]))
+        assert abs(t1 - 14.1347) < 0.001
+
+    def test_first_zero_real_part(self):
+        """Die erste Riemann-Nullstelle hat Re(s₁) = 0.5."""
+        from arbitrary_precision import zeta_zeros_mpmath
+        zeros = zeta_zeros_mpmath(1, prec=20)
+        import mpmath
+        sigma1 = float(mpmath.re(zeros[0]))
+        assert abs(sigma1 - 0.5) < 1e-6
+
+    def test_three_zeros_count(self):
+        """zeta_zeros_mpmath(3) gibt 3 Nullstellen zurück."""
+        from arbitrary_precision import zeta_zeros_mpmath
+        zeros = zeta_zeros_mpmath(3, prec=15)
+        assert len(zeros) == 3
+
+    def test_invalid_n(self):
+        """n < 1 wirft ValueError."""
+        from arbitrary_precision import zeta_zeros_mpmath
+        with pytest.raises(ValueError):
+            zeta_zeros_mpmath(0, prec=10)
+
+    def test_zeros_increasing_imaginary(self):
+        """Imaginärteile der Nullstellen sind aufsteigend."""
+        from arbitrary_precision import zeta_zeros_mpmath
+        import mpmath
+        zeros = zeta_zeros_mpmath(5, prec=15)
+        imag_parts = [float(mpmath.im(z)) for z in zeros]
+        assert imag_parts == sorted(imag_parts)
+
+
+class TestVerifyRiemannHypothesisMpmath:
+    """Tests für verify_riemann_hypothesis_mpmath() (Build 61)."""
+
+    def test_verify_first_5_zeros(self):
+        """Die ersten 5 Nullstellen liegen auf Re(s) = 1/2."""
+        from arbitrary_precision import verify_riemann_hypothesis_mpmath
+        result = verify_riemann_hypothesis_mpmath(5, prec=30)
+        assert result['n_checked'] == 5
+        assert result['all_on_critical_line'] is True
+        assert result['max_deviation'] < 1e-10
+
+    def test_result_keys(self):
+        """Ergebnis enthält alle erwarteten Schlüssel."""
+        from arbitrary_precision import verify_riemann_hypothesis_mpmath
+        result = verify_riemann_hypothesis_mpmath(3, prec=20)
+        assert 'n_checked' in result
+        assert 'all_on_critical_line' in result
+        assert 'max_deviation' in result
+        assert 'zeros' in result
+        assert 'real_parts' in result
+
+    def test_real_parts_are_half(self):
+        """Alle Realteile der ersten 3 Nullstellen sind ≈ 0.5."""
+        from arbitrary_precision import verify_riemann_hypothesis_mpmath
+        result = verify_riemann_hypothesis_mpmath(3, prec=30)
+        for rp in result['real_parts']:
+            assert abs(rp - 0.5) < 1e-8
+
+    def test_invalid_n_zeros(self):
+        """n_zeros < 1 wirft ValueError."""
+        from arbitrary_precision import verify_riemann_hypothesis_mpmath
+        with pytest.raises(ValueError):
+            verify_riemann_hypothesis_mpmath(0, prec=20)
+
+
+class TestPiMpmath:
+    """Tests für pi_mpmath() (Build 61)."""
+
+    def test_pi_starts_with_3(self):
+        """π beginnt mit 3."""
+        from arbitrary_precision import pi_mpmath
+        pi_str = pi_mpmath(prec=10)
+        assert pi_str.startswith("3.")
+
+    def test_pi_known_digits(self):
+        """π stimmt mit bekannten Stellen überein."""
+        from arbitrary_precision import pi_mpmath
+        pi_str = pi_mpmath(prec=15)
+        # π = 3.14159265358979...
+        pi_float = float(pi_str)
+        assert abs(pi_float - math.pi) < 1e-12
+
+    def test_pi_high_precision(self):
+        """π mit 50 Stellen hat korrekte Länge."""
+        from arbitrary_precision import pi_mpmath
+        pi_str = pi_mpmath(prec=50)
+        # String sollte mindestens 50 Zeichen haben
+        assert len(pi_str) >= 50
+
+    def test_pi_invalid_prec(self):
+        """prec < 1 wirft ValueError."""
+        from arbitrary_precision import pi_mpmath
+        with pytest.raises(ValueError):
+            pi_mpmath(prec=0)

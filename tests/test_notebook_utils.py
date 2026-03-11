@@ -251,3 +251,72 @@ class TestSaveNotebookDemo:
         cell_types = {c["cell_type"] for c in nb["cells"]}
         assert "code" in cell_types
         assert "markdown" in cell_types
+
+
+# ---------------------------------------------------------------------------
+# NEUE FUNKTIONEN (Build 61): display_matrix_html, display_polynomial_latex
+# ---------------------------------------------------------------------------
+
+class TestDisplayMatrixHtml:
+    """Tests für display_matrix_html() (Build 61)."""
+
+    def test_returns_html_string(self):
+        """display_matrix_html gibt HTML-String zurück."""
+        from notebook_utils import display_matrix_html
+        M = [[1, 2], [3, 4]]
+        result = display_matrix_html(M)
+        assert isinstance(result, str)
+        assert "<table" in result
+
+    def test_numpy_matrix(self):
+        """numpy-Array wird als HTML-Tabelle ausgegeben."""
+        import numpy as np
+        from notebook_utils import display_matrix_html
+        M = np.array([[1.0, 2.0], [3.0, 4.0]])
+        result = display_matrix_html(M)
+        assert "<td" in result
+
+    def test_html_contains_values(self):
+        """HTML-Ausgabe enthält die Matrixwerte."""
+        from notebook_utils import display_matrix_html
+        M = [[42, 7], [0, 99]]
+        result = display_matrix_html(M)
+        assert "42" in result
+        assert "99" in result
+
+    def test_identity_matrix(self):
+        """Einheitsmatrix wird korrekt ausgegeben."""
+        from notebook_utils import display_matrix_html
+        M = [[1, 0], [0, 1]]
+        result = display_matrix_html(M)
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+
+class TestDisplayPolynomialLatex:
+    """Tests für display_polynomial_latex() (Build 61)."""
+
+    def test_returns_string(self):
+        """display_polynomial_latex gibt String zurück."""
+        from notebook_utils import display_polynomial_latex
+        result = display_polynomial_latex([1, 2, 1])
+        assert isinstance(result, str)
+
+    def test_linear_polynomial(self):
+        """Lineares Polynom wird korrekt dargestellt."""
+        from notebook_utils import display_polynomial_latex
+        # [1, 2] → 2x + 1
+        result = display_polynomial_latex([1.0, 2.0])
+        assert "x" in result
+
+    def test_constant_polynomial(self):
+        """Konstante wird korrekt dargestellt."""
+        from notebook_utils import display_polynomial_latex
+        result = display_polynomial_latex([5.0])
+        assert "5" in result
+
+    def test_custom_variable(self):
+        """Benutzerdefinierte Variable wird verwendet."""
+        from notebook_utils import display_polynomial_latex
+        result = display_polynomial_latex([1.0, 1.0], variable='t')
+        assert "t" in result

@@ -26,7 +26,7 @@
     Alle Funktionen funktionieren auch ohne Jupyter – sie geben dann
     eine textuelle Darstellung aus.
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 @version 1.0.0
 """
@@ -52,7 +52,7 @@ def matrix_to_html(matrix) -> str:
 
     @param matrix  Zu formatierende Matrix (numpy-Array, Liste oder SymPy-Matrix).
     @return        HTML-String der Matrix-Tabelle.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Matrix in eine Liste von Listen umwandeln
@@ -87,7 +87,7 @@ def _matrix_to_rows(matrix) -> List[List[Any]]:
     @brief Konvertiert verschiedene Matrix-Formate in eine Liste von Zeilen.
     @param matrix  Eingabematrix (numpy, Liste oder SymPy).
     @return        Liste von Zeilen, jede Zeile eine Liste von Werten.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     try:
@@ -133,7 +133,7 @@ def _format_cell(value: Any) -> str:
     @brief Formatiert einen einzelnen Zellwert für HTML.
     @param value  Zellwert (Zahl, SymPy-Ausdruck, etc.).
     @return       Formatierter String.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     if isinstance(value, float):
@@ -161,7 +161,7 @@ def polynomial_to_latex(coeffs: List[float], variable: str = 'x') -> str:
     @param coeffs    Liste der Koeffizienten [a_0, a_1, ..., a_n].
     @param variable  Name der Variablen (Standard: 'x').
     @return          LaTeX-String des Polynoms.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     if not coeffs:
@@ -228,7 +228,7 @@ def result_to_html(result: Dict[str, Any]) -> str:
 
     @param result  Dictionary mit Berechnungsergebnissen.
     @return        HTML-String der formatierten Ausgabe.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     html_parts: List[str] = []
@@ -283,7 +283,7 @@ def display_math(expr) -> None:
         verwendet.
 
     @param expr  Mathematischer Ausdruck (SymPy, Zahl, String).
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Versuche LaTeX-Darstellung zu erzeugen
@@ -306,7 +306,7 @@ def _to_latex_str(expr) -> str:
     @brief Konvertiert einen Ausdruck in einen LaTeX-String.
     @param expr  Mathematischer Ausdruck.
     @return      LaTeX-String.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # SymPy-Ausdruck
@@ -348,7 +348,7 @@ def save_notebook_demo(output_path: str = "notebooks/demo.ipynb") -> None:
         Das Notebook kann direkt mit ``jupyter notebook`` geöffnet werden.
 
     @param output_path  Pfad zur Ausgabedatei (Standard: "notebooks/demo.ipynb").
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     # Ausgabeverzeichnis erstellen
@@ -375,7 +375,7 @@ def save_notebook_demo(output_path: str = "notebooks/demo.ipynb") -> None:
             _make_markdown_cell("# specialist-maths – Demo-Notebook\n\n"
                 "Dieses Notebook demonstriert die wichtigsten Funktionen des "
                 "specialist-maths Projekts.\n\n"
-                "**Autor:** Kurt Ingwer  \n"
+                "**Autor:** Michael Fuhrmann  \n"
                 "**Stand:** 2026-03-10"),
 
             _make_markdown_cell("## 1. Setup: Pfade und Imports"),
@@ -492,7 +492,7 @@ def _make_code_cell(source: str) -> Dict[str, Any]:
     @brief Erzeugt eine Code-Zelle für ein Jupyter-Notebook.
     @param source  Python-Quellcode der Zelle.
     @return        nbformat-konformes Dictionary.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     return {
@@ -504,12 +504,78 @@ def _make_code_cell(source: str) -> Dict[str, Any]:
     }
 
 
+def display_matrix_html(M) -> str:
+    """
+    @brief Zeigt eine Matrix als HTML-Tabelle an (Jupyter-kompatibel).
+    @description
+        Konvertiert eine Matrix (numpy-Array, Liste oder SymPy-Matrix) in
+        eine HTML-Tabelle und zeigt sie via IPython.display an.
+        Falls IPython nicht verfügbar ist, wird der HTML-String zurückgegeben.
+
+        Unterschied zu matrix_to_html(): Diese Funktion gibt das Ergebnis
+        direkt an display() weiter und gibt bei Jupyter nichts zurück,
+        bei Terminal-Betrieb den HTML-String.
+
+    @param M   Matrix (numpy-Array, Liste von Listen oder SymPy-Matrix)
+    @return    HTML-String (nur im Terminal-Modus), None in Jupyter
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    """
+    # HTML-Tabelle generieren
+    html_str = matrix_to_html(M)
+
+    # Versuche IPython-Anzeige (Jupyter-Notebook)
+    try:
+        from IPython.display import HTML, display  # type: ignore[import]
+        display(HTML(html_str))
+        return html_str  # Im Jupyter-Modus trotzdem zurückgeben (für Tests)
+    except ImportError:
+        # Terminal-Modus: HTML-String zurückgeben
+        return html_str
+    except Exception:
+        # Allgemeiner Fallback
+        return html_str
+
+
+def display_polynomial_latex(coeffs: List[float], variable: str = 'x') -> str:
+    """
+    @brief Zeigt ein Polynom als LaTeX-Formel an (Jupyter-kompatibel).
+    @description
+        Konvertiert eine Koeffizientenliste in einen LaTeX-String und
+        zeigt ihn via IPython.display.Math an.
+        Falls IPython nicht verfügbar ist, wird der LaTeX-String zurückgegeben.
+
+        Koeffizientenkonvention: coeffs[k] ist der Koeffizient von x^k.
+        Beispiel: coeffs=[6, -5, 1] → x² - 5x + 6
+
+    @param coeffs    Liste der Koeffizienten [a_0, a_1, ..., a_n]
+    @param variable  Name der Variablen (Standard: 'x')
+    @return          LaTeX-String des Polynoms
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    """
+    # LaTeX-String aus Koeffizienten erstellen
+    latex_str = polynomial_to_latex(coeffs, variable)
+
+    # Versuche IPython-Anzeige (Jupyter-Notebook)
+    try:
+        from IPython.display import Math, display  # type: ignore[import]
+        display(Math(latex_str))
+        return latex_str  # String trotzdem zurückgeben (für Tests)
+    except ImportError:
+        # Terminal-Modus: LaTeX-String zurückgeben
+        return latex_str
+    except Exception:
+        # Allgemeiner Fallback
+        return latex_str
+
+
 def _make_markdown_cell(source: str) -> Dict[str, Any]:
     """
     @brief Erzeugt eine Markdown-Zelle für ein Jupyter-Notebook.
     @param source  Markdown-Text der Zelle.
     @return        nbformat-konformes Dictionary.
-    @author Kurt Ingwer
+    @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
     return {

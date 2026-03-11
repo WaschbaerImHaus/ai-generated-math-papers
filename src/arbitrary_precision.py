@@ -21,7 +21,7 @@
     - Bernoulli-Zahlen: B_n = (-1)^n * n! * Summe_{k=0}^{n} (-1)^k * C(n,k) / (k+1)
     - Kettenbruchentwicklung: x = a_0 + 1/(a_1 + 1/(a_2 + ...))
 
-@author Kurt Ingwer
+@author Michael Fuhrmann
 @lastModified 2026-03-10
 """
 
@@ -405,3 +405,161 @@ def sqrt_highprec(x: float, digits: int = 50) -> str:
     result = mpmath.sqrt(x)
 
     return mpmath.nstr(result, digits)
+
+
+# =============================================================================
+# RIEMANN-NULLSTELLEN (mpmath)
+# =============================================================================
+
+def zeta_zeros_mpmath(n: int, prec: int = 50) -> list:
+    """
+    @brief Berechnet die ersten n Riemann-Nullstellen mit prec Dezimalstellen.
+    @description
+        Die Riemann-Hypothese besagt, dass alle nicht-trivialen Nullstellen
+        der Riemann-Zeta-Funktion ζ(s) auf der kritischen Geraden Re(s) = 1/2
+        liegen:
+            s_k = 1/2 + i·t_k,  t_k ∈ ℝ, t_k > 0
+
+        Die ersten bekannten Nullstellen t_k:
+            t_1 ≈ 14.1347...
+            t_2 ≈ 21.0220...
+            t_3 ≈ 25.0109...
+            ...
+
+        mpmath.zetazero(k) berechnet die k-te Nullstelle mit beliebiger
+        Genauigkeit.
+
+    @param n    Anzahl der zu berechnenden Nullstellen (muss ≥ 1 sein)
+    @param prec Anzahl der Dezimalstellen (Standard: 50)
+    @return Liste von mpmath-Zahlen: die ersten n Nullstellen 1/2 + i·t_k
+    @raises ValueError falls n < 1 oder prec < 1
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    """
+    # Eingabevalidierung
+    if n < 1:
+        raise ValueError(f"n muss mindestens 1 sein, erhalten: {n}")
+    if prec < 1:
+        raise ValueError(f"prec muss mindestens 1 sein, erhalten: {prec}")
+
+    # Präzision für alle Berechnungen setzen
+    mpmath.mp.dps = prec + 10  # Puffer für numerische Fehler
+
+    zeros = []
+    for k in range(1, n + 1):
+        # mpmath.zetazero(k): k-te Nullstelle der Riemann-Zeta-Funktion
+        # Gibt komplexe Zahl 1/2 + i·t_k zurück
+        zero = mpmath.zetazero(k)
+        zeros.append(zero)
+
+    return zeros
+
+
+def verify_riemann_hypothesis_mpmath(n_zeros: int, prec: int = 50) -> dict:
+    """
+    @brief Prüft Re(s) = 1/2 für die ersten n Nullstellen der Riemann-Zeta-Funktion.
+    @description
+        Die Riemann-Hypothese besagt: Alle nicht-trivialen Nullstellen von ζ(s)
+        haben Realteil 1/2. Diese Funktion prüft dies numerisch für die
+        ersten n_zeros Nullstellen mit prec Dezimalstellen Genauigkeit.
+
+        Vorgehen:
+        1. Berechne die k-te Nullstelle s_k = σ_k + i·t_k via zetazero(k)
+        2. Prüfe ob |σ_k - 1/2| < 10^{-prec/2}
+        3. Sammle Statistiken über alle Nullstellen
+
+        Ergebnis: Numerische Verifikation (kein mathematischer Beweis!).
+        Die Riemann-Hypothese ist noch unbewiesen.
+
+    @param n_zeros Anzahl der zu prüfenden Nullstellen (Standard: min. 1)
+    @param prec    Genauigkeit in Dezimalstellen (Standard: 50)
+    @return Dictionary mit Verifikationsergebnissen:
+            - 'n_checked': Anzahl geprüfter Nullstellen
+            - 'all_on_critical_line': True wenn alle auf Re=1/2
+            - 'max_deviation': Maximale Abweichung von 1/2
+            - 'zeros': Liste der Nullstellen als Strings
+            - 'real_parts': Realteile der Nullstellen
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    """
+    # Eingabevalidierung
+    if n_zeros < 1:
+        raise ValueError(f"n_zeros muss mindestens 1 sein, erhalten: {n_zeros}")
+
+    # Präzision setzen (Puffer für Rundungsfehler)
+    mpmath.mp.dps = prec + 15
+
+    # Toleranz: Abweichung kleiner als 10^{-(prec/2)} gilt als "auf der Geraden"
+    tolerance = mpmath.mpf(10) ** (-(prec // 2))
+
+    # Nullstellen berechnen und prüfen
+    zeros_list = zeta_zeros_mpmath(n_zeros, prec=prec + 10)
+
+    real_parts = []
+    deviations = []
+    max_deviation = mpmath.mpf(0)
+
+    for s_k in zeros_list:
+        # Realteil der Nullstelle
+        sigma_k = mpmath.re(s_k)
+        real_parts.append(float(sigma_k))
+
+        # Abweichung von 1/2
+        deviation = abs(sigma_k - mpmath.mpf('0.5'))
+        deviations.append(float(deviation))
+
+        # Maximum aktualisieren
+        if deviation > max_deviation:
+            max_deviation = deviation
+
+    # Prüfung: Alle Realteile innerhalb der Toleranz?
+    all_on_line = all(d < float(tolerance) for d in deviations)
+
+    return {
+        'n_checked': n_zeros,
+        'all_on_critical_line': all_on_line,
+        'max_deviation': float(max_deviation),
+        'tolerance': float(tolerance),
+        'zeros': [mpmath.nstr(z, min(prec, 20)) for z in zeros_list],
+        'real_parts': real_parts,
+        'imaginary_parts': [float(mpmath.im(z)) for z in zeros_list],
+        'hypothesis_consistent': all_on_line  # Numerisch konsistent (kein Beweis!)
+    }
+
+
+def pi_mpmath(prec: int = 100) -> str:
+    """
+    @brief Berechnet π auf prec Dezimalstellen via mpmath.
+    @description
+        mpmath verwendet den Chudnovsky-Algorithmus für sehr hohe Präzisionen
+        sowie AGM-basierte Methoden (Arithmetic-Geometric Mean).
+
+        Der Chudnovsky-Algorithmus hat Komplexität O(n·(log n)^3) für
+        n Dezimalstellen und ist damit einer der schnellsten bekannten.
+
+        Mathematische Identität hinter Chudnovsky:
+            1/π = (12/√(640320³)) · Σ_{k=0}^∞ (6k)!·(13591409+545140134k)
+                                                 / ((3k)!(k!)^3·(-640320³)^k)
+
+        Bekannte Werte:
+            π ≈ 3.14159265358979323846...
+            π auf 100 Stellen: 3.14159265358979323846...28841971693993751...
+
+    @param prec Anzahl der Dezimalstellen (Standard: 100)
+    @return π als Dezimalstring mit prec Stellen
+    @raises ValueError falls prec < 1
+    @author Michael Fuhrmann
+    @lastModified 2026-03-11
+    """
+    # Eingabevalidierung
+    if prec < 1:
+        raise ValueError(f"prec muss mindestens 1 sein, erhalten: {prec}")
+
+    # Präzision setzen (Puffer für Rundungsfehler beim Konvertieren)
+    mpmath.mp.dps = prec + 10
+
+    # π berechnen (mpmath nutzt intern den besten verfügbaren Algorithmus)
+    pi_val = mpmath.pi
+
+    # Als Dezimalstring mit genau prec signifikanten Stellen ausgeben
+    return mpmath.nstr(pi_val, prec)
