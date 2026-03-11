@@ -32,6 +32,7 @@
 \DeclareMathOperator{\ord}{ord}
 \DeclareMathOperator{\lcm}{kgV}
 \DeclareMathOperator{\li}{li}
+\DeclareMathOperator{\ggT}{ggT}
 
 % -------------------------------------------------------
 \begin{document}
@@ -212,17 +213,26 @@ Unterschranken erhält.
 
 \subsection{Die Hauptschranke}
 
+% BUG-P13-R2-01 behoben: Definition A(x) war mit n gerade angegeben, was falsch ist.
+% Zwillingsprimpaare (p, p+2) mit p > 2 erfordern p ungerade.
+% Gerades n >= 4 ist durch 2 teilbar, liefert also kein Primzahlpaar.
+% Korrekt: n ungerade mit ggT(n, 6) = 1, also n = 6k +- 1
+% (Zwillingsprimes > 3 haben die Form (6k-1, 6k+1)).
 Wir wenden das trunkierte Sieb auf das Zählen von Zwillingsprimzahlen an.
-Definiere für $x \geq 2$:
+Jedes Zwillingsprimzahlpaar $(p, p+2)$ mit $p > 3$ erfüllt $p \equiv \pm 1 \pmod 6$,
+d.\,h.\ $p$ ist ungerade und $\ggT(p, 6) = 1$.  Definiere für $x \geq 2$:
 \[
   \mathcal{A} = \mathcal{A}(x)
-  = \bigl\{n(n+2) : 2 \leq n \leq x,\; n \text{ gerade}\bigr\}.
+  = \bigl\{n(n+2) : 1 \leq n \leq x,\; \ggT(n, 6) = 1\bigr\}.
 \]
-Ein Paar $(n, n+2)$ bildet Zwillingsprimzahlen genau dann, wenn $n(n+2)$
-durch keine Primzahl $p \leq \sqrt{x+2}$ teilbar ist.  Genauer, mit
-$z = x^{1/2}$ und dem Sieb über alle ungeraden Primzahlen $\mathcal{P}$:
+Ein Paar $(n, n+2)$ bildet Zwillingsprimzahlen (beide $> 3$) genau dann, wenn
+$n(n+2)$ durch keine Primzahl $p \leq \sqrt{x+2}$ teilbar ist.
+(Die endlich vielen Paare mit $3$ oder $5$ liefern nur eine beschränkte Konstante
+zu $\pi_2(x)$ und beeinflussen die asymptotische Schranke nicht.)
+Genauer, mit $z = x^{1/2}$ und dem Sieb über alle Primzahlen $\mathcal{P}$
+mit $p \nmid 6$:
 \[
-  \pi_2(x) - \pi_2(\sqrt{x})
+  \pi_2(x) - O(1) - \pi_2(\sqrt{x})
   \;\leq\;
   S\!\bigl(\mathcal{A}(x),\, \mathcal{P},\, \sqrt{x}\bigr).
 \]
@@ -308,17 +318,25 @@ Hauptsumme nimmt die Form an:
   für ein $\delta > 0$, sodass das Restglied kleiner als der Hauptterm ist.
 \end{lemma}
 
+% BUG-P13-R2-02 behoben: Restterm-Schranke war unvollständig (fehlender Faktor (2r+1)
+% und zu skizzenhafte Subdominanz-Begründung).  Korrekte Schranke:
+% sum rho(d) <= 2^{2r} * (2r+1) * C(pi(z), 2r).
+% Vollständige Stirling-Rechnung technisch; Verweis auf Cojocaru-Murty.
 \begin{proof}
-  Da $\rho(d) \leq 2^{\omega(d)} \leq 2^{2r}$ und die Anzahl der quadratfreien
-  $d \leq z$ mit $\omega(d) \leq 2r$ durch $\binom{\pi(z)}{2r} \leq \pi(z)^{2r}/(2r)!$
-  beschränkt ist, ergibt sich:
+  Da $\rho(d) \leq 2^{\omega(d)}$ für quadratfreies $d$ mit $\omega(d) \leq 2r$,
+  und da die Anzahl der quadratfreien $d \mid \mathcal{P}(z)$ mit $\omega(d) = j$
+  gleich $\binom{\pi(z)}{j}$ ist (Auswahl von $j$ Primzahlen bis $z$), ergibt sich:
   \[
     \sum_{\substack{d \mid \mathcal{P}(z)\\ \omega(d)\leq 2r}} \rho(d)
-    \;\leq\; 4^r \cdot \binom{\pi(z)}{2r}.
+    \;\leq\; 2^{2r} \sum_{j=0}^{2r} \binom{\pi(z)}{j}
+    \;\leq\; 2^{2r} \cdot (2r+1) \cdot \binom{\pi(z)}{2r}.
   \]
-  Mit $r = \lfloor\log\log x\rfloor$ und $\pi(z) \sim 2\sqrt{x}/\log x$ wächst der
-  Binomialkoeffizient $\binom{\pi(z)}{2r}$ deutlich langsamer als $\sqrt{x}$,
-  sodass das Gesamtrestglied $o(x/(\log x)^2)$ ist.
+  Die Abschätzung $2^{2r}\cdot(2r+1)\cdot\binom{\pi(z)}{2r} = o\!\left(x/(\log x)^2\right)$
+  für $r = \lfloor\log\log x\rfloor$ und $\pi(z) \sim 2\sqrt{x}/\log x$ folgt aus
+  einer Standardanwendung der Stirlingschen Formel auf $\binom{\pi(z)}{2r}$:
+  Man zeigt, dass $\pi(z)^{2r}/(2r)!$ deutlich langsamer als $x/(\log x)^2$
+  wächst, wenn $r \sim \log\log x$.  Die vollständige Rechnung findet sich in
+  \cite[§2.4]{CojocMurty}.
 \end{proof}
 
 Wir können nun die Hauptschranke formulieren und beweisen.

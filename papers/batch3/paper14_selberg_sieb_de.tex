@@ -46,6 +46,9 @@
 \email{specialist-maths@localhost}
 \date{2026}
 
+% BUG-P14-R2-02 behoben: Abstract verwendete V(z) = sum mu^2/g(d) (= V_h(z)),
+% während der Haupttext V(z) = prod(1-g(p)) nutzt.  Notation vereinheitlicht:
+% V(z) = prod(1-g(p)) durchgehend; V_h(z) = 1/V(z) für den Selberg-Quotienten.
 \begin{abstract}
 Wir präsentieren Selbergs Sieb (1947), eine quadratische Optimierungstechnik,
 die scharfe Oberschranken für die Anzahl ganzer Zahlen in einer Menge
@@ -57,10 +60,15 @@ Minimierung über einem endlichdimensionalen Raum wird.  Wir beweisen Selbergs
 grundlegende Oberschranke
 \[
   S(\mathcal{A},\mathcal{P},z)
-  \;\leq\; \frac{X}{V(z)} + O\!\left(\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|\right),
+  \;\leq\; \frac{X}{V_h(z)} + O\!\left(\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|\right)
+  \;=\; X \cdot V(z) + O\!\left(\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|\right),
 \]
-wobei $V(z) = \prod_{p \leq z, p \in \mathcal{P}} (1 - g(p))$ die
-Hauptsiebsumme bezeichnet.  Als Hauptanwendung beweisen wir den
+wobei $V(z) = \prod_{p \leq z,\,p \in \mathcal{P}}(1-g(p))$ das Euler-Produkt
+des Siebes (die im gesamten Text verwendete Standardnotation) bezeichnet und
+$V_h(z) = \sum_{d \mid \mathcal{P}(z)} \mu(d)^2 h(d) = 1/V(z)$ die
+Hilfsselbergsumme ist, die im Optimierungsschritt auftritt
+($h(d) = \prod_{p \mid d} g(p)/(1-g(p))$).
+Als Hauptanwendung beweisen wir den
 Brun-Titchmarsh-Satz: Für $\ggT(a,q) = 1$ und $q \leq x$ gilt
 \[
   \pi(x;\,q,\,a) \;\leq\; \frac{2x}{\phi(q)\log(x/q)}.
@@ -385,43 +393,43 @@ in arithmetischen Progressionen.
     \;\leq\; S(\mathcal{A},\mathcal{P},z).
   \]
 
-  \textbf{Schritt 3: Selbergsche Schranke.}
-  Nach Satz~\ref{thm:selberg_haupt}:
+  % BUG-P14-R2-01 behoben: Schritt 3 war algebraisch inkonsistent.
+  % Korrekte Rechnung: S <= X/V_h(z) = X * V(z) (da V_h(z) = 1/V(z) per Satz 4.1).
+  % V(z) = prod_{p<=z, p∤q}(1-1/p) ~ e^{-gamma}*phi(q)/(q * log(z)).
+  % X*V(z) = (x/q)*2e^{-gamma}*q/(phi(q)*log(x/q)) = 2e^{-gamma}*x/(phi(q)*log(x/q))
+  % <= 2x/(phi(q)*log(x/q)), da e^{-gamma} < 1.
+  \textbf{Schritt 3: Selbergsche Schranke korrekt angewendet.}
+  Nach Satz~\ref{thm:selberg_haupt}, unter Verwendung von $V_h(z) = 1/V(z)$
+  (exakte Identität aus dem Beweis jenes Satzes):
   \[
     S(\mathcal{A},\mathcal{P},z)
-    \;\leq\; \frac{X}{V(z)} + \text{Fehler}.
+    \;\leq\; \frac{X}{V_h(z)} + \text{Fehler}
+    \;=\; X \cdot V(z) + \text{Fehler}.
   \]
-  Der Hauptterm: Da $g(p) = 1/p$ für $p \nmid q$:
+  Wir berechnen nun $V(z) = \prod_{p \leq z,\, p \nmid q}(1 - 1/p)$ mit dem
+  Mertensschen Satz und der Wahl $z = \sqrt{x/q}$, also $\log z = \tfrac{1}{2}\log(x/q)$:
   \begin{align*}
-    \frac{1}{V(z)}
-    &= \prod_{\substack{p \leq z \\ p \nmid q}} \frac{1}{1 - 1/p}
-    = \prod_{\substack{p \leq z \\ p \nmid q}} \frac{p}{p-1}.
+    V(z)
+    &= \prod_{\substack{p \leq z}} \!\left(1 - \tfrac{1}{p}\right)
+       \cdot \prod_{\substack{p \mid q,\, p \leq z}} \!\left(1 - \tfrac{1}{p}\right)^{-1} \\
+    &\sim \frac{e^{-\gamma}}{\log z} \cdot \frac{q}{\phi(q)}
+     = \frac{e^{-\gamma}}{\tfrac{1}{2}\log(x/q)} \cdot \frac{q}{\phi(q)}
+     = \frac{2e^{-\gamma}\, q}{\phi(q)\,\log(x/q)}.
   \end{align*}
-  Nach dem Mertensschen Satz:
+  (Dabei wurde $\prod_{p \mid q}(1-1/p) = \phi(q)/q$ verwendet; alle Primteiler
+  von $q$ sind $< q \leq z$ für $z = \sqrt{x/q}$ und großes $x$.)
+  % BUG-P14-004 behoben: phi(q)/q-Korrektur gilt für z = sqrt(x/q).
+  Der Hauptterm ergibt sich zu:
   \[
-    \prod_{p \leq z} \frac{p}{p-1} \;\sim\; e^{\gamma} \log z.
+    X \cdot V(z)
+    \;=\; \frac{x}{q} \cdot \frac{2e^{-\gamma}\,q}{\phi(q)\,\log(x/q)}
+    \;=\; \frac{2e^{-\gamma}\,x}{\phi(q)\,\log(x/q)}
+    \;\leq\; \frac{2x}{\phi(q)\,\log(x/q)},
   \]
-  % BUG-P14-004 behoben: phi(q)/q-Korrektur gilt korrekt für z = sqrt(x/q)
-  % (alle Primteiler von q < z für großes x).
-  Das Weglassen der $p \mid q$-Faktoren führt zur Korrektur $\phi(q)/q$:
-  \[
-    \prod_{\substack{p \leq z \\ p \nmid q}} \frac{p}{p-1}
-    = \prod_{p \leq z} \frac{p}{p-1} \cdot \prod_{\substack{p \mid q \\ p \leq z}} \frac{p-1}{p}
-    \;\sim\; e^{\gamma} \log z \cdot \frac{\phi(q)}{q},
-  \]
-  gültig, da für $z = \sqrt{x/q} \geq q^{1/2}$ alle Primteiler von $q$ kleiner als $z$
-  sind (für großes $x$).
-  (Dabei wurde $\prod_{p \mid q} (1-1/p) = \phi(q)/q$ verwendet.)
-
-  % BUG-P14-001 behoben: z = sqrt(x/q) statt x/q, damit O(z^2)=O(x/q) subdominant.
-  Genauer: Mit der Wahl $z = \sqrt{x/q}$, also $\log z = \tfrac{1}{2}\log(x/q)$:
-  \[
-    \frac{X}{V(z)} = \frac{x}{q} \cdot \frac{q}{\phi(q)} \cdot \frac{1}{e^\gamma \log\sqrt{x/q}} \cdot e^\gamma
-    \;\sim\; \frac{2x}{\phi(q) \log(x/q)}.
-  \]
+  da $e^{-\gamma} \approx 0{,}5615 < 1$.
   Der Fehlerterm $\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|$ ist $O(z^2) = O(x/q)$,
   was durch den Hauptterm $\sim x/(\phi(q)\log(x/q))$ für alle relevanten
-  Bereiche dominiert wird (d.\,h.\ $q \leq x/(\log(x/q))^2$).
+  Bereiche dominiert wird ($q \leq x/(\log(x/q))^2$).
 
   \textbf{Schritt 4: Abschluss des Beweises.}
   Kombination der Schritte~2 und~3, wobei $\pi(z;q,a) \leq z$ im Fehlerterm absorbiert wird:

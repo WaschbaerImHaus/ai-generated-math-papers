@@ -348,12 +348,18 @@ $N$ & Chen-Zerlegungen $N = p + q$, $q \in \Ptwo$ & Goldbach ($q$ prim) \\ \midr
 4   & $4 = 2 + 2$                                   & $2 + 2$ \\
 6   & $6 = 3 + 3$                                   & $3 + 3$ \\
 8   & $8 = 3 + 5$                                   & $3 + 5$ \\
-10  & $10 = 3 + 7 = 5 + 5 = 7 + 3$                & $3+7$, $5+5$ \\
+% Zweiter-Review-Fix (DE): Goldbach-Spalte N=10 war unvollständig – 7+3 fehlte.
+% 7 ist prim, 3 ist prim, also ist 7+3 eine valide Goldbach-Zerlegung.
+10  & $10 = 3 + 7 = 5 + 5 = 7 + 3$                & $3+7$, $5+5$, $7+3$ \\
 12  & $12 = 5 + 7 = 7 + 5$                         & $5+7$, $7+5$ \\
 14  & $14 = 3 + 11 = 7 + 7 = 11 + 3$              & $3+11$, $7+7$, $11+3$ \\
-16  & $16 = 3 + 13 = 5 + 11 = 13 + 3$             & $3+13$, $5+11$, $13+3$ \\
+% Zweiter-Review-Fix (DE): Goldbach-Spalte N=16 war unvollständig – 11+5 fehlte.
+% 11 ist prim, 5 ist prim → 11+5 ist eine valide Goldbach-Zerlegung.
+16  & $16 = 3 + 13 = 5 + 11 = 11 + 5 = 13 + 3$   & $3+13$, $5+11$, $11+5$, $13+3$ \\
 18  & $18 = 5 + 13 = 7 + 11 = 11 + 7 = 13 + 5$   & alle aufgelisteten \\
-20  & $20 = 3 + 17 = 7 + 13 = 13 + 7 = 17 + 3$   & alle aufgelisteten \\
+% Zweiter-Review-Fix (DE): Chen-Spalte N=20 war unvollständig – 11+9 fehlte.
+% 11 ist prim, 9 = 3² → Ω(9) = 2 → 9 ∈ P₂. Also ist 11+9 eine valide Chen-Zerlegung.
+20  & $20 = 3 + 17 = 7 + 13 = 11 + 9 = 13 + 7 = 17 + 3$ & alle aufgelisteten \\
 \bottomrule
 \end{tabular}
 \end{center}

@@ -233,7 +233,11 @@ Jetzt beweisen wir die Hauptungleichung.
   definiert durch $(Ta)_r = S(\alpha_r)$, hat adjungierte Abbildung
   $(T^* b)_n = \sum_r b_r \eexp{n\alpha_r}$.  Die Ungleichung
   $\|T\|^2 = \|T^*\|^2 = \|TT^*\|$ reduziert sich auf die Abschätzung der
-  Operatornorm der Gram-Matrix $G_{rs} = \sum_n \eexp{(r-s)\alpha_n}$.
+  % Zweiter-Review-Fix: Gram-Matrix-Notation korrigiert – r,s sind Indizes der
+  % Testpunkte α_r, α_s; n läuft über die Sequenz von M bis M+N.
+  % Falsch war: G_{rs} = Σ_n e((r-s)α_n)  (r-s suggeriert ganzzahligen Index)
+  % Korrekt ist: G_{rs} = Σ_{n=M}^{M+N} e((α_r - α_s)n)
+  Operatornorm der Gram-Matrix $G_{rs} = \sum_{n=M}^{M+N} \eexp{(\alpha_r - \alpha_s)n}$.
 
   Durch Anwendung der Separationsbedingung und des Kerns $K_N$ zeigt man
   für beliebige $(b_r)$:

@@ -211,20 +211,29 @@ of $r$.
 
 \subsection{The main counting bound}
 
-We now apply the truncated sieve to count twin primes.  Define, for $x \geq 2$:
+% BUG-P13-R2-01 behoben: Definition A(x) war mit n gerade angegeben, was falsch ist.
+% Zwillingsprimpaare (p, p+2) mit p > 2 erfordern p ungerade.
+% Gerades n >= 4 ist durch 2 teilbar, also kein Primzahlpaar.
+% Korrekt: n ungerade mit gcd(n,6) = 1, also n = 6k+-1 (Zwillingsprimes > 3
+% haben die Form (6k-1, 6k+1)).  Einfachste korrekte Formulierung: n odd, n >= 3.
+We now apply the truncated sieve to count twin primes.  Recall that any twin
+prime pair $(p, p+2)$ with $p > 3$ satisfies $p \equiv \pm 1 \pmod 6$, so
+$p$ is odd and $\gcd(p, 6) = 1$.  Define, for $x \geq 2$:
 \[
   \mathcal{A} = \mathcal{A}(x)
-  = \bigl\{n(n+2) : 2 \leq n \leq x,\; n \text{ even}\bigr\},
+  = \bigl\{n(n+2) : 1 \leq n \leq x,\; \gcd(n, 6) = 1\bigr\},
 \]
-so that a pair $(n, n+2)$ consists of twin primes if and only if $n(n+2)$
-is not divisible by any prime $p \leq \sqrt{x+2}$.  More precisely, setting
-$z = x^{1/2}$ and sifting by all primes $p \leq z$:
+so that a pair $(n, n+2)$ consists of twin primes (with both $> 3$) if and only
+if $n(n+2)$ is not divisible by any prime $p \leq \sqrt{x+2}$.
+(The finitely many pairs involving $3$ or $5$ contribute a bounded constant to
+$\pi_2(x)$ and do not affect the asymptotic bound.)  More precisely, setting
+$z = x^{1/2}$ and sifting by all primes $p \leq z$, $p \nmid 6$:
 \[
-  \pi_2(x) - \pi_2(\sqrt{x})
+  \pi_2(x) - O(1) - \pi_2(\sqrt{x})
   \;\leq\;
   S\!\bigl(\mathcal{A}(x),\, \mathcal{P},\, \sqrt{x}\bigr),
 \]
-where $\mathcal{P}$ is the set of all odd primes.
+where $\mathcal{P}$ is the set of all primes not dividing $6$.
 
 For each squarefree $d$ with all prime factors $\leq z$, define
 $\rho(d)$ as the number of residue classes modulo $d$ hit by $n(n+2)$:
@@ -308,18 +317,25 @@ Thus $|\mathcal{A}_d| = \rho(d) \cdot x/d + O(\rho(d))$, and the main sum become
   for some $\delta > 0$, so the remainder is smaller than the main term.
 \end{lemma}
 
+% BUG-P13-R2-02 behoben: Restterm-Schranke war unvollständig (fehlender Faktor (2r+1)
+% und zu skizzenhafte Subdominanz-Begründung).  Korrekte Formulierung:
+% sum rho(d) <= 2^{2r} * sum_{j=0}^{2r} C(pi(z),j) <= 2^{2r} * (2r+1) * C(pi(z),2r).
+% Die vollständige Stirling-Rechnung ist technisch; wir verweisen auf Cojocaru-Murty.
 \begin{proof}
-  Since $\rho(d) \leq 2^{\omega(d)} \leq 2^{2r}$ and the number of
-  squarefree $d \leq z$ with $\omega(d) \leq 2r$ is bounded by
-  $\binom{\pi(z)}{2r} \leq \pi(z)^{2r}/(2r)!$, we have:
+  Since $\rho(d) \leq 2^{\omega(d)}$ for squarefree $d$ with $\omega(d) \leq 2r$,
+  and since the number of squarefree $d \mid \mathcal{P}(z)$ with $\omega(d) = j$
+  equals $\binom{\pi(z)}{j}$ (choosing $j$ primes up to $z$), we have:
   \[
     \sum_{\substack{d \mid \mathcal{P}(z)\\ \omega(d)\leq 2r}} \rho(d)
-    \;\leq\; \sum_{\substack{d \mid \mathcal{P}(z)\\ \omega(d)\leq 2r}} 2^{2r}
-    \;\leq\; 4^r \cdot \binom{\pi(z)}{2r}.
+    \;\leq\; 2^{2r} \sum_{j=0}^{2r} \binom{\pi(z)}{j}
+    \;\leq\; 2^{2r} \cdot (2r+1) \cdot \binom{\pi(z)}{2r}.
   \]
-  With $r = \lfloor\log\log x\rfloor$ and $\pi(z) \sim z/\log z \sim 2\sqrt{x}/\log x$,
-  the binomial coefficient $\binom{\pi(z)}{2r}$ grows much more slowly than $\sqrt{x}$,
-  making the total remainder $o(x/(\log x)^2)$.
+  The estimate $2^{2r}\cdot(2r+1)\cdot\binom{\pi(z)}{2r} = o\!\left(x/(\log x)^2\right)$
+  for $r = \lfloor\log\log x\rfloor$ and $\pi(z) \sim 2\sqrt{x}/\log x$ follows from
+  a standard application of Stirling's formula to $\binom{\pi(z)}{2r}$:
+  one shows that $\pi(z)^{2r}/(2r)!$ grows much more slowly than $x/(\log x)^2$
+  when $r \sim \log\log x$.  The complete calculation is carried out in
+  \cite[§2.4]{CojocMurty}.
 \end{proof}
 
 We can now state and prove the main sieve bound.

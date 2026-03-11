@@ -44,6 +44,10 @@
 \email{specialist-maths@localhost}
 \date{2026}
 
+% BUG-P14-R2-02 behoben: Abstract verwendete V(z) = sum mu^2/g(d) (das ist V_h(z)),
+% während der Haupttext V(z) = prod(1-g(p)) benutzt.  Notation vereinheitlicht:
+% V(z) = prod(1-g(p)) durchgehend; V_h(z) = sum mu^2(d)/h(d) = 1/V(z) für den
+% internen Selberg-Quotienten.  Im Abstract nun korrekte Form X*V(z).
 \begin{abstract}
 We present Selberg's sieve (1947), a quadratic optimization technique that
 yields sharp upper bounds for the number of integers in a set $\mathcal{A}$
@@ -54,10 +58,14 @@ quadratic minimization over a finite-dimensional space.  We prove Selberg's
 fundamental upper bound
 \[
   S(\mathcal{A},\mathcal{P},z)
-  \;\leq\; \frac{X}{V(z)} + O\!\left(\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|\right),
+  \;\leq\; \frac{X}{V_h(z)} + O\!\left(\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|\right)
+  \;=\; X \cdot V(z) + O\!\left(\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|\right),
 \]
-where $V(z) = \sum_{d \mid \mathcal{P}(z)} \mu(d)^2/g(d)$ is the main sieve
-sum.  As the principal application, we prove the Brun-Titchmarsh theorem:
+where $V(z) = \prod_{p \leq z,\,p \in \mathcal{P}}(1-g(p))$ is the Euler product
+of the sieve (the standard notation used throughout), and
+$V_h(z) = \sum_{d \mid \mathcal{P}(z)} \mu(d)^2 h(d) = 1/V(z)$ is the
+auxiliary Selberg sum appearing in the optimization step ($h(d) = \prod_{p \mid d} g(p)/(1-g(p))$).
+As the principal application, we prove the Brun-Titchmarsh theorem:
 for $\gcd(a,q) = 1$ and $q \leq x$,
 \[
   \pi(x;\,q,\,a) \;\leq\; \frac{2x}{\phi(q)\log(x/q)}.
@@ -382,48 +390,44 @@ arithmetic progressions, combining Brun's approach with Selberg's sharper estima
     \;\leq\; S(\mathcal{A},\mathcal{P},z).
   \]
 
-  \textbf{Step 3: Selberg's bound.}
-  By Theorem~\ref{thm:selberg_main}:
+  % BUG-P14-R2-01 behoben: Schritt 3 war algebraisch inkonsistent.
+  % Korrekte Rechnung: S <= X/V_h(z) = X * V(z) (da V_h(z) = 1/V(z)).
+  % V(z) = prod_{p<=z, p∤q}(1-1/p) ~ e^{-gamma}*phi(q)/(q*log(z)).
+  % X*V(z) = (x/q) * e^{-gamma}*phi(q)*2/(q/(q)*log(x/q)) = 2e^{-gamma}*x/(phi(q)*log(x/q)).
+  % Da e^{-gamma} < 1, folgt X*V(z) < 2x/(phi(q)*log(x/q)).
+  \textbf{Step 3: Selberg's bound applied correctly.}
+  By Theorem~\ref{thm:selberg_main}, using $V_h(z) = 1/V(z)$ (exact identity
+  from the proof of that theorem):
   \[
     S(\mathcal{A},\mathcal{P},z)
-    \;\leq\; \frac{X}{V(z)} + \text{Error}.
+    \;\leq\; \frac{X}{V_h(z)} + \text{Error}
+    \;=\; X \cdot V(z) + \text{Error}.
   \]
-  The main term: since $g(p) = 1/p$ for $p \nmid q$:
+  We now compute $V(z) = \prod_{p \leq z,\, p \nmid q}(1 - 1/p)$ using Mertens'
+  theorem and the choice $z = \sqrt{x/q}$, so $\log z = \tfrac{1}{2}\log(x/q)$:
   \begin{align*}
-    \frac{1}{V(z)}
-    &= \prod_{\substack{p \leq z \\ p \nmid q}} \frac{1}{1 - 1/p}
-    = \prod_{\substack{p \leq z \\ p \nmid q}} \frac{p}{p-1}.
+    V(z)
+    &= \prod_{\substack{p \leq z}} \!\left(1 - \tfrac{1}{p}\right)
+       \cdot \prod_{\substack{p \mid q,\, p \leq z}} \!\left(1 - \tfrac{1}{p}\right)^{-1} \\
+    &\sim \frac{e^{-\gamma}}{\log z} \cdot \frac{q}{\phi(q)}
+     = \frac{e^{-\gamma}}{\tfrac{1}{2}\log(x/q)} \cdot \frac{q}{\phi(q)}
+     = \frac{2e^{-\gamma}\, q}{\phi(q)\,\log(x/q)}.
   \end{align*}
-  By Mertens' theorem:
+  (Here we used $\prod_{p \mid q}(1-1/p) = \phi(q)/q$, valid since all prime
+  divisors of $q$ are $< q \leq z$ for $z = \sqrt{x/q}$ and $x$ large.)
+  Therefore the main term is:
   \[
-    \prod_{p \leq z} \frac{p}{p-1} \;\sim\; e^{\gamma} \log z.
+    X \cdot V(z)
+    \;=\; \frac{x}{q} \cdot \frac{2e^{-\gamma}\,q}{\phi(q)\,\log(x/q)}
+    \;=\; \frac{2e^{-\gamma}\,x}{\phi(q)\,\log(x/q)}
+    \;\leq\; \frac{2x}{\phi(q)\,\log(x/q)},
   \]
-  % BUG-P14-004 behoben: phi(q)/q-Korrektur ist korrekt wenn z gross genug
-  % (alle Primteiler von q kleiner als z), was fuer z = sqrt(x/q) gilt.
-  Removing the $p \mid q$ factors contributes $\phi(q)/q$ correction:
-  \[
-    \prod_{\substack{p \leq z \\ p \nmid q}} \frac{p}{p-1}
-    = \prod_{p \leq z} \frac{p}{p-1} \cdot \prod_{\substack{p \mid q \\ p \leq z}} \frac{p-1}{p}
-    \;\sim\; e^{\gamma} \log z \cdot \frac{\phi(q)}{q},
-  \]
-  valid since for $z = \sqrt{x/q} \geq q^{1/2}$ all prime divisors of $q$ satisfy $p \leq q < z$
-  when $x$ is large enough.
-  (Here we used $\prod_{p \mid q} (1-1/p) = \phi(q)/q$.)
-
-  % BUG-P14-001 behoben: Vorher stand z = x/q, was O(z^2) = O(x^2/q^2) ergibt
-  % und den Hauptterm x/(phi(q)*log(x/q)) dominiert.  Korrekte Wahl: z = sqrt(x/q).
-  % Dann O(z^2) = O(x/q) << Hauptterm.
-  More carefully, we choose $z = \sqrt{x/q}$ so that $\log z = \tfrac{1}{2}\log(x/q)$,
-  and use the precise Mertens bound:
-  \[
-    \frac{X}{V(z)} \;\sim\; \frac{x}{q} \cdot \frac{q}{\phi(q)} \cdot e^\gamma \log z
-    = \frac{x}{\phi(q)} \cdot \frac{e^\gamma}{2}\log(x/q) \cdot \frac{1}{e^\gamma}
-    = \frac{x \log(x/q)}{2\phi(q)\log(x/q)}
-    \;\leq\; \frac{2x}{\phi(q)\,\log(x/q)}.
-  \]
+  since $e^{-\gamma} \approx 0.5615 < 1$.
+  % BUG-P14-004 behoben: phi(q)/q-Korrektur gilt für z = sqrt(x/q) (alle
+  % Primteiler von q erfüllen p < q <= z für großes x).
   The error term $\sum_{d_1,d_2 \leq z} |r_{[d_1,d_2]}|$ is $O(z^2) = O(x/q)$,
-  which is indeed dominated by the main term $\sim x/(\phi(q)\log(x/q))$
-  for $q \leq x/(\log(x/q))^2$, i.e.\ for all relevant ranges.
+  which is dominated by the main term $\sim x/(\phi(q)\log(x/q))$
+  for all relevant ranges $q \leq x/(\log(x/q))^2$.
 
   \textbf{Step 4: Completing the proof.}
   Combining Steps~2 and~3, and absorbing $\pi(z;q,a) \leq z$ into the

@@ -123,8 +123,12 @@ integer.
   Two distinct Farey fractions $a/q$ and $a'/q'$ with $q, q' \leq Q$
   satisfy $|a/q - a'/q'| = |aq' - a'q|/(qq') \geq 1/(qq') \geq 1/Q^2$,
   since $|aq'-a'q| \geq 1$ (they are distinct fractions).
-  Hence $\|\alpha_r - \alpha_s\| \geq Q^{-2} = \delta$ with $Q$ replaced
-  by $Q^2$ in the quality parameter, so the sequence is $Q^{-2}$-spaced.
+  % Zweiter-Review-Fix: Letzter Satz war selbstwidersprüchlich ("with Q replaced
+  % by Q²" implizierte δ=Q^{-4}, nicht δ=Q^{-2}). Ersetzt durch klare Aussage:
+  % die Farey-Folge ist Q^{-2}-separiert mit δ = Q^{-2}.
+  Thus the Farey sequence $\{a/q : q \leq Q,\, \gcd(a,q)=1\}$ is
+  $Q^{-2}$-spaced; equivalently, it may be treated as a $\delta$-spaced
+  sequence with $\delta = Q^{-2}$.
 \end{proof}
 
 % ================================================================
@@ -239,7 +243,11 @@ We now state and prove the main inequality.
   $(Ta)_r = S(\alpha_r)$ has adjoint $T^*$ given by
   $(T^* b)_n = \sum_r b_r \eexp{n\alpha_r}$.  The inequality
   $\|T\|^2 = \|T^*\|^2 = \|TT^*\|$ reduces to bounding the operator norm
-  of the Gram matrix $G_{rs} = \sum_n \eexp{(r-s)\alpha_n}$.
+  % Zweiter-Review-Fix: Gram-Matrix-Notation korrigiert – r,s sind Indizes der
+  % Testpunkte α_r, α_s; n läuft über die Sequenz von M bis M+N.
+  % Falsch war: G_{rs} = Σ_n e((r-s)α_n)  (r-s suggeriert ganzzahligen Index)
+  % Korrekt ist: G_{rs} = Σ_{n=M}^{M+N} e((α_r - α_s)n)
+  of the Gram matrix $G_{rs} = \sum_{n=M}^{M+N} \eexp{(\alpha_r - \alpha_s)n}$.
 
   One verifies, using the spacing condition and the kernel $K_N$, that for
   any $(b_r)$:
