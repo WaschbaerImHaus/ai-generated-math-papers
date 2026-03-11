@@ -486,3 +486,20 @@ Technische Details:
 - DE-Versionen mit \usepackage[ngerman]{babel}
 - Author: Michael Fuhrmann, Build 87
 - Alle Bibliografien vollständig (Riemann1859, Wiles1995, BSD1965, Tunnell1983, ...)
+
+2026-03-11 Build 92: Batch-4-Papers Review-Bugs behoben
+- BUG-B4-P18-EN-001: paper18_vinogradov_three_primes.tex — Remark 4.3: Inline-Formel
+  von $1 + \mu(2)^3 c_2(n)/\phi(2)^3$ auf $1 - c_2(n)/(2-1)^3$ vereinfacht
+  (Vorzeichen explizit, \mu-Faktor nicht mehr implizit)
+- BUG-B4-P18-DE-001: paper18_vinogradov_drei_primzahlen_de.tex — analoge Korrektur
+  in Bemerkung 4.3 (Remark zum geraden n)
+- Bestätigt: BUG-B4-P18-DE-002 (Fallunterscheidung Satz 5.1) bereits behoben —
+  alle 3 Fälle (n≤N, N<n≤2N, 2N<n≤3N) in DE vorhanden
+- Bestätigt: BUG-B4-P19-EN-001 bereits behoben — Definition 5.2 und Lemma 5.5 korrekt
+- Bestätigt: BUG-B4-P19-DE-001/002/003 bereits behoben — Korollar G(k), Wooley-Beweis,
+  formaler Satz für J_{s,k} alle vorhanden
+- Bestätigt: BUG-B4-P20-EN-001 bereits behoben — kein Satzfragment in Remark "Odd n"
+- Bestätigt: BUG-B4-P20-EN-002/DE-001 bereits behoben — Tabellenwerte korrekt
+  (n=4: 2C_2, n=6: 4C_2, n=8: 2C_2, n=10: 8C_2/3, n=12: 4C_2, n=30: 16C_2/3)
+- Bestätigt: BUG-010 (paper2 DE) bereits behoben — "Alternativer Beweis:" vorhanden
+- Bestätigt: BUG-011 (paper7 DE) bereits behoben — "p-1 \ge 2 > 0" vorhanden
