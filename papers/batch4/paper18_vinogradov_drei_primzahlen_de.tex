@@ -47,7 +47,7 @@ ganze Zahl $n$ als
 \]
 (Summe dreier Primzahlen) geschrieben werden kann.  Im Jahr 2013 lieferte
 Helfgott einen vollständig verifizierten Beweis, dass jede ungerade Zahl
-$n > 7$ Summe dreier Primzahlen ist.
+$n > 5$ Summe dreier Primzahlen ist.
 
 Dieser Beitrag beweist Winogradows Satz mittels der Hardy--Littlewood-Kreismethode
 (Paper~17).  Wir leiten die asymptotische Formel
@@ -83,8 +83,14 @@ die ternäre Vermutung nichts direkt über die binäre aus.
 \end{theorem}
 
 \begin{theorem}[Helfgott, 2013]\label{thm:helfgott}
-  Jede ungerade ganze Zahl $n > 7$ ist Summe dreier Primzahlen.
+  Jede ungerade ganze Zahl $n > 5$ ist Summe dreier Primzahlen.
 \end{theorem}
+
+\begin{bemerkung}
+  Die Schranke $n > 5$ ist scharf: $7 = 2+2+3$ ist Summe dreier Primzahlen,
+  $5$ dagegen nicht (da $5 = 2+2+1$ scheitert, weil $1$ keine Primzahl ist).
+  Die Formulierung $n > 7$ wäre falsch, da $n=7$ korrekt eingeschlossen werden muss.
+\end{bemerkung}
 
 \textbf{Notation.}
 $\Lambda(n) = \log p$ falls $n = p^k$ (Primzahlpotenz), sonst $0$
@@ -403,7 +409,7 @@ Helfgotts analytische Verbesserungen umfassen:
 Wir haben Winogradows Drei-Primzahlen-Satz bewiesen:
 
 \begin{center}
-\textit{Jede ungerade Zahl $n > 7$ ist Summe dreier Primzahlen.}\\
+\textit{Jede ungerade Zahl $n > 5$ ist Summe dreier Primzahlen.}\\
 \small (Helfgott, 2013)
 \end{center}
 

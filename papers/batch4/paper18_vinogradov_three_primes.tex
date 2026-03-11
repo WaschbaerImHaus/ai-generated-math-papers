@@ -44,7 +44,7 @@ odd integer $n$ can be written as
   n \;=\; p_1 + p_2 + p_3,
 \]
 the sum of three primes.  In 2013, Helfgott gave a complete, fully
-verified proof that every odd integer $n > 7$ is a sum of three primes,
+verified proof that every odd integer $n > 5$ is a sum of three primes,
 closing the ``sufficiently large'' gap by combining Vinogradov's analytic
 framework with extensive numerical verification for small $n$.
 
@@ -91,11 +91,17 @@ The original bound was $N_0 \approx 3^{3^{15}}$, far too large for direct
 verification.  A series of improvements reduced $N_0$, culminating in:
 
 \begin{theorem}[Helfgott, 2013]\label{thm:helfgott}
-  Every odd integer $n > 7$ is the sum of three primes.
+  Every odd integer $n > 5$ is the sum of three primes.
 \end{theorem}
 
+\begin{remark}
+  Note that $7 = 2+2+3$ is a sum of three primes, and $5$ is not
+  (since $5 = 2+2+1$ and $1$ is not prime, and $5 = 3+1+1$ fails similarly).
+  Thus ``$n > 5$'' is the sharp statement; ``$n > 7$'' would incorrectly exclude $n=7$.
+\end{remark}
+
 Helfgott's proof combines analytic estimates (valid for $n > e^{30}$)
-with a rigorous numerical computation for $7 < n \leq e^{30}$, using the
+with a rigorous numerical computation for $5 < n \leq e^{30}$, using the
 Goldbach comet data verified by Oliveira e Silva et al.\ up to $4 \times 10^{18}$.
 
 \textbf{Notation.}
@@ -470,7 +476,7 @@ the proof of the ternary Goldbach conjecture, one must:
 \end{enumerate}
 
 \begin{theorem}[Helfgott, 2013]\label{thm:helfgott_full}
-  Every odd integer $n$ with $7 < n \leq e^{30}$ is a sum of three primes.
+  Every odd integer $n$ with $5 < n \leq e^{30}$ is a sum of three primes.
   (Verified computationally, see~\cite{OliveiraSilva2014}.)
   The analytic proof of Theorem~\ref{cor:vinogradov} applies for
   $n > e^{30}$.
@@ -515,7 +521,7 @@ Helfgott's key analytical improvements over Vinogradov include:
 We have proved Vinogradov's three-prime theorem:
 
 \begin{theorem*}[Vinogradov--Helfgott]
-  Every odd integer $n > 7$ is a sum of three primes.
+  Every odd integer $n > 5$ is a sum of three primes.
 \end{theorem*}
 
 The proof has four components:
