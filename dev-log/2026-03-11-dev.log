@@ -1,0 +1,8 @@
+
+2026-03-11 $(date +%H:%M) Build 44: Deutsche Papierversionen erstellt
+- paper1_giuga_drei_primfaktoren_de.tex: Deutsche Version des Giuga-3-Prim-Papers
+- paper2_lehmer_drei_primfaktoren_de.tex: Deutsche Version des Lehmer-3-Prim-Papers
+- paper3_giuga_carmichael_de.tex: Deutsche Version des Giuga-Carmichael-CRT-Papers
+- Alle 3 deutschen Papers mit ngerman babel-Paket, deutschen Theoremumgebungen
+- Theorem→Satz, Lemma→Lemma, Corollary→Korollar, Remark→Bemerkung
+- Fachbegriffe: kgV statt lcm, schwache/starke Bedingung, Widerspruch usw.

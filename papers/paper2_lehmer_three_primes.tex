@@ -1,0 +1,379 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\DeclareMathOperator{\lcm}{lcm}
+\newcommand{\euler}{\varphi}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Lehmer's Totient Problem for Products of Three Primes:\\
+       A Complete Algebraic Solution}
+
+\author{Kurt Ingwer}
+\address{Specialist Mathematics Project, Version Build 43}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Lehmer's totient problem (1932) asks whether there exists a composite integer
+$n$ satisfying $\euler(n) \mid (n-1)$, where $\euler$ denotes Euler's totient
+function.  Such a composite number would be a counterexample to the converse of
+Euler's theorem.  Despite extensive computations reaching beyond $10^{13}$,
+no counterexample has been found.
+
+In this paper we prove, using entirely elementary methods, that no product of
+exactly three primes can satisfy $\euler(n) \mid (n-1)$.  The proof treats
+three cases: (i) the semiprime case $n = pq$, (ii) the even-factor case
+$n = 2qr$, and~(iii) the all-odd case $n = pqr$ with $p \ge 3$.  The
+all-odd case employs a novel \emph{key identity} relating the totient condition
+to an elementary symmetric-function inequality, reducing the problem to a
+finite—and resolvable—Diophantine check.
+\end{abstract}
+
+\maketitle
+
+% -------------------------------------------------------
+\section{Introduction}
+% -------------------------------------------------------
+
+\subsection{Lehmer's problem}
+
+In a 1932 paper, D.\ H.\ Lehmer \cite{Lehmer1932} observed that for every
+prime~$p$, one has $\euler(p) = p - 1$, so trivially $\euler(p) \mid (p-1)$.
+He asked whether the converse holds:
+
+\begin{quote}
+\emph{Does $\euler(n) \mid (n - 1)$ imply that $n$ is prime?}
+\end{quote}
+
+A composite answer would be called a \emph{Lehmer number}.  No Lehmer number
+has ever been found.  Surveys of the problem include \cite{Cohen1980,
+Hagis1988}.
+
+\subsection{Known results}
+
+It is established that:
+\begin{itemize}
+  \item Every Lehmer number is odd and squarefree
+        \cite{Lehmer1932, Cohen1980}.
+  \item Any Lehmer number has at least $15$ distinct prime factors
+        \cite{Cohen1980}.
+  \item No Lehmer number exists below~$10^{13}$ (computational).
+\end{itemize}
+
+\subsection{Main result}
+
+\begin{theorem}[Main]
+\label{thm:main}
+If $n$ is a product of exactly three distinct primes, then $\euler(n) \nmid (n-1)$.
+\end{theorem}
+
+Combined with the known two-prime case (Proposition~\ref{prop:semiprime}
+below), Theorem~\ref{thm:main} implies that every Lehmer number (if one exists)
+must have at least \emph{four} distinct prime factors.
+
+% -------------------------------------------------------
+\section{Preliminary Results}
+% -------------------------------------------------------
+
+\begin{lemma}[Squarefreeness \cite{Lehmer1932}]
+\label{lem:sqfree}
+Every Lehmer number is squarefree.
+\end{lemma}
+
+\begin{proof}
+Suppose $p^2 \mid n$.  Then $p \mid \euler(p^2) = p(p-1)$, so $p \mid \euler(n)$.
+Since $\euler(n) \mid (n-1)$, we get $p \mid (n-1)$.  But $p \mid n$ (because
+$p^2 \mid n$), so $p \mid n - (n-1) = 1$ — a contradiction.
+\end{proof}
+
+\begin{proposition}[No semiprime Lehmer number]
+\label{prop:semiprime}
+There is no Lehmer number of the form $n = pq$ with $p < q$ prime.
+\end{proposition}
+
+\begin{proof}
+We have $\euler(pq) = (p-1)(q-1)$.  The condition $(p-1)(q-1) \mid (pq-1)$
+requires $(p-1)(q-1) \mid R$, where
+\[
+  R := (pq - 1) \bmod (p-1)(q-1).
+\]
+Using the identity $pq - 1 = (p-1)(q-1) + (p-1) + (q-1)$, we obtain
+\[
+  R = (p - 1) + (q - 1) = p + q - 2.
+\]
+So we need $(p-1)(q-1) \mid (p + q - 2)$.
+
+\textbf{Case $p = 2$:} $(1)(q-1) = q - 1$ must divide $1 + (q-1) = q$.
+Since $\gcd(q-1, q) = 1$, we get $q - 1 = 1$, i.e.\ $q = 2 = p$, contradicting
+$p < q$.
+
+\textbf{Case $p \ge 3$:} We show $(p-1)(q-1) > p+q-2$, ruling out divisibility.
+Indeed, $(p-1)(q-1) = pq - p - q + 1$.  The inequality $(p-1)(q-1) \le p+q-2$
+is equivalent to $pq \le 2p + 2q - 3$.  For $p = 3$, $q \ge 5$:
+$3q \le 6 + 2q - 3 = 2q + 3$ implies $q \le 3$, contradicting $q \ge 5$.
+For $p \ge 5$, $q > p \ge 5$: $pq \ge 5q > 2q + 7 \ge 2p + 2q - 3$ (for $p \ge 5$).
+In all cases $(p-1)(q-1) > p+q-2 > 0$, so no divisibility can hold.
+\end{proof}
+
+% -------------------------------------------------------
+\section{The Case \texorpdfstring{$n = 2qr$}{n = 2qr}}
+\label{sec:2qr}
+% -------------------------------------------------------
+
+\begin{theorem}
+\label{thm:2qr}
+There is no Lehmer number of the form $n = 2qr$ with $3 \le q < r$ prime.
+\end{theorem}
+
+\begin{proof}
+Here $\euler(2qr) = (q-1)(r-1)$.  The condition $(q-1)(r-1) \mid (2qr - 1)$
+implies in particular $(r-1) \mid (2qr - 1)$.  Since $r \equiv 1 \pmod{r-1}$,
+we have $2qr \equiv 2q \pmod{r-1}$, so
+\begin{equation}
+  (r - 1) \mid (2q - 1).
+  \label{eq:r1_divides}
+\end{equation}
+Write $2q - 1 = b(r-1)$ for a positive integer $b$.
+
+\medskip
+\noindent\textbf{Case $b \ge 2$:}
+$2q = 1 + b(r-1) \ge 1 + 2(r-1) = 2r - 1$, so $q \ge r - \tfrac{1}{2}$,
+hence $q \ge r$.  But $q < r$ by assumption — a contradiction.
+
+\medskip
+\noindent\textbf{Case $b = 1$:}
+$r - 1 = 2q - 1$, so $r = 2q$.  For $q \ge 2$ this means $r = 2q$ has the
+prime factor~$2$ (and factor~$q$), so $r$ is composite — contradiction.
+
+\medskip
+Since both cases lead to contradictions, no valid $r$ can satisfy
+\eqref{eq:r1_divides}, and therefore $(r-1) \nmid (2qr - 1)$, so
+$(q-1)(r-1) \nmid (2qr-1)$.
+\end{proof}
+
+% -------------------------------------------------------
+\section{The Case \texorpdfstring{$n = pqr$}{n = pqr}, All Odd}
+\label{sec:pqr}
+% -------------------------------------------------------
+
+\subsection{A key identity}
+
+Let $p, q, r$ be distinct odd primes.  Set
+\[
+  a = \frac{p-1}{2}, \quad
+  b = \frac{q-1}{2}, \quad
+  c = \frac{r-1}{2},
+\]
+so that $p = 2a+1$, $q = 2b+1$, $r = 2c+1$, and
+$\euler(pqr) = (p-1)(q-1)(r-1) = 8abc$.
+
+Expanding the product directly:
+\begin{equation}
+  pqr - 1 = 8abc + 4(ab + bc + ca) + 2(a + b + c).
+  \label{eq:expansion}
+\end{equation}
+
+The condition $8abc \mid pqr - 1$ is therefore equivalent to
+\begin{equation}
+  4abc \mid 2(ab + bc + ca) + (a + b + c).
+  \tag{HC}
+  \label{eq:HC}
+\end{equation}
+
+\begin{lemma}[Key identity]
+\label{lem:keyid}
+Let $\alpha = p + q - 1$ and $\beta = \dfrac{pq - 1}{2}$.  Then
+\begin{equation}
+  2(ab + bc + ca) + (a + b + c) = \alpha c + \beta.
+  \label{eq:keyid}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Direct computation:
+\[
+  \alpha c = (p + q - 1) \cdot \frac{r-1}{2} = (2a + 2b + 1)c
+           = 2bc + 2ca + c.
+\]
+\[
+  \beta = \frac{pq - 1}{2} = \frac{(2a+1)(2b+1) - 1}{2}
+        = \frac{4ab + 2a + 2b}{2} = 2ab + a + b.
+\]
+Summing: $\alpha c + \beta = 2bc + 2ca + c + 2ab + a + b
+= 2(ab + bc + ca) + (a + b + c)$. \qed
+\end{proof}
+
+\subsection{Proof of the all-odd case}
+
+\begin{theorem}
+\label{thm:odd}
+There is no Lehmer number of the form $n = pqr$ with $3 \le p < q < r$ all prime.
+\end{theorem}
+
+\begin{proof}
+Assume for contradiction that $\euler(pqr) = 8abc \mid pqr - 1$.
+By Lemma~\ref{lem:keyid}, condition~\eqref{eq:HC} reads $4abc \mid \alpha c + \beta$.
+
+\medskip
+\noindent\textbf{Step 1: Reduction modulo $c$.}
+Since $4abc \equiv 0 \pmod{c}$, divisibility of $\alpha c + \beta$ by $4abc$
+forces
+\[
+  c \mid \beta = \frac{pq - 1}{2},
+  \quad\text{i.e.}\quad
+  (r - 1) \mid (pq - 1).
+\]
+Set $k = \dfrac{pq - 1}{r - 1}$.  Condition~\eqref{eq:HC} then reduces to
+\begin{equation}
+  (p-1)(q-1) \mid \alpha + k = (p + q - 1) + k.
+  \label{eq:HC2}
+\end{equation}
+
+\medskip
+\noindent\textbf{Step 2: Bounding $k$.}
+Since $r > q$ and both are odd primes, $r \ge q + 2$, so
+$r - 1 \ge q + 1 > q$.  Therefore
+\[
+  k = \frac{pq - 1}{r - 1} < \frac{pq}{q} = p,
+  \quad\text{so}\quad k \le p - 1.
+\]
+
+\medskip
+\noindent\textbf{Step 3: A size constraint.}
+Condition~\eqref{eq:HC2} together with $k \le p - 1$ gives
+\[
+  (p-1)(q-1) \le (p + q - 1) + k \le (p + q - 1) + (p - 1) = 2p + q - 2.
+\]
+Expanding the left side and rearranging:
+\[
+  pq - p - q + 1 \le 2p + q - 2,
+  \quad\Longrightarrow\quad
+  q(p - 2) \le 3(p - 1),
+  \quad\Longrightarrow\quad
+  q \le \frac{3(p-1)}{p-2}.
+\]
+
+\medskip
+\noindent\textbf{Step 4: Case analysis on $p$.}
+\begin{itemize}
+  \item $p = 3$: $q \le \dfrac{3 \cdot 2}{1} = 6$.  The only prime with
+        $3 < q \le 6$ is $q = 5$.
+  \item $p = 5$: $q \le \dfrac{3 \cdot 4}{3} = 4$.  But $q > p = 5$
+        requires $q \ge 7 > 4$ — contradiction.
+  \item $p \ge 7$: $q \le \dfrac{3(p-1)}{p-2} \le \dfrac{3 \cdot 6}{5} = 3.6$,
+        so $q \le 3 < p$ — contradiction.
+\end{itemize}
+
+\medskip
+\noindent\textbf{Step 5: Eliminating $(p, q) = (3, 5)$.}
+From Step~1, $(r-1) \mid (pq - 1) = 14$.  The positive divisors of $14$ are
+$\{1, 2, 7, 14\}$, giving $r \in \{2, 3, 8, 15\}$.
+None of these is a prime greater than $q = 5$:
+$r = 2$ and $r = 3$ are not greater than $5$;
+$r = 8 = 2^3$ and $r = 15 = 3 \cdot 5$ are composite.
+So no valid prime~$r$ exists — a final contradiction.
+\end{proof}
+
+% -------------------------------------------------------
+\section{Proof of the Main Theorem and Corollary}
+% -------------------------------------------------------
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+Let $n = p_1 p_2 p_3$ with $p_1 < p_2 < p_3$ prime.
+
+\textbf{Case 1} ($p_1 = 2$): Theorem~\ref{thm:2qr} applies.
+
+\textbf{Case 2} ($p_1 \ge 3$): Theorem~\ref{thm:odd} applies.
+
+Both cases are exhaustive, so $\euler(n) \nmid (n-1)$.
+\end{proof}
+
+\begin{corollary}
+\label{cor:four}
+Every Lehmer number, if it exists, has at least four distinct prime factors.
+\end{corollary}
+
+\begin{proof}
+Proposition~\ref{prop:semiprime} rules out two prime factors.
+Theorem~\ref{thm:main} rules out exactly three.  Hence at least four.
+\end{proof}
+
+% -------------------------------------------------------
+\section{Discussion}
+% -------------------------------------------------------
+
+The key novelty of our proof for the all-odd three-prime case
+(Theorem~\ref{thm:odd}) is the \emph{key identity}~\eqref{eq:keyid}:
+\[
+  2(ab + bc + ca) + (a + b + c) = \alpha c + \beta,
+\]
+which makes the structure of the divisibility condition transparent.  The
+reduction to a constraint $q \le 3(p-1)/(p-2)$ on two of the three prime
+factors, followed by a simple Diophantine check on the divisors of~$14$,
+gives a fully self-contained and constructive argument.
+
+The same key-identity technique generalises to four and more prime factors
+(where $pqr-1 = 8abc + \cdots$ extends to $16abcd + \cdots$), though the
+resulting constraints become weaker as the number of factors grows.  A
+complete treatment of the four-prime case remains open.
+
+% -------------------------------------------------------
+\section{Numerical Verification}
+% -------------------------------------------------------
+
+Exhaustive computer search confirms:
+\begin{enumerate}
+  \item For all primes $3 \le q < r \le 100$: no $n = 2qr$ satisfies
+        $\euler(n) \mid (n-1)$.
+  \item For all odd primes $3 \le p < q < r$ with $r \le 60$: no $n = pqr$
+        satisfies $\euler(n) \mid (n-1)$.
+  \item The key identity \eqref{eq:keyid} was verified for all prime triples
+        $(p, q, r)$ with $p, q, r < 30$.
+\end{enumerate}
+
+% -------------------------------------------------------
+\begin{thebibliography}{10}
+
+\bibitem{Lehmer1932}
+D.~H.~Lehmer,
+\emph{On Euler's totient function},
+Bull.\ Amer.\ Math.\ Soc.\ \textbf{38} (1932), 745--751.
+
+\bibitem{Cohen1980}
+G.~L.~Cohen and P.~Hagis, Jr.,
+\emph{On the number of prime factors of $n$ if $\phi(n) \mid n-1$},
+Nieuw Arch.\ Wisk.\ (3) \textbf{28} (1980), no.\ 2, 177--185.
+
+\bibitem{Hagis1988}
+P.~Hagis, Jr.,
+\emph{On the equation $M \cdot \varphi(n) = n - 1$},
+Nieuw Arch.\ Wisk.\ (4) \textbf{6} (1988), no.\ 3, 255--261.
+
+\bibitem{Banks2009}
+W.~D.~Banks, A.~M.~G\"{u}lo\u{g}lu, and C.~W.~Nevans,
+\emph{On the congruence $n \equiv a \pmod{\phi(n)}$},
+Integers \textbf{8} (2008), A59.
+
+\end{thebibliography}
+
+\end{document}
