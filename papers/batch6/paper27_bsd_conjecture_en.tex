@@ -1,0 +1,341 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\Sha}{\Sha}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{The Birch--Swinnerton-Dyer Conjecture}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 84}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+The Birch--Swinnerton-Dyer (BSD) conjecture is one of the seven Clay
+Millennium Prize Problems.
+It predicts a deep connection between the arithmetic of an elliptic curve
+$E/\Q$ (its rank $r$, torsion, and period lattice) and the analytic
+behaviour of its $L$-function $L(E,s)$ at $s=1$.
+
+We state the \emph{weak BSD}: $L(E,1) = 0 \iff E(\Q)$ is infinite.
+We state the \emph{strong BSD}: $\ord_{s=1}L(E,s) = r$, and give the
+full conjectural formula for the leading coefficient involving
+$\Omega_E$, the real period, the Tamagawa numbers $c_p$,
+the Tate--Shafarevich group $\Sha(E/\Q)$, and the regulator $R_E$.
+
+We describe the known cases: rank~$0$ and rank~$1$ (Coates--Wiles 1977,
+Kolyvagin 1990), and the heuristic numerical evidence via the
+Birch--Swinnerton-Dyer product $\prod_{p \le X} \#E(\Fp)/p \sim C(\log X)^r$.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Introduction}
+% ================================================================
+
+In the 1960s, Birch and Swinnerton-Dyer \cite{BSD1965} computed
+$\prod_{p \le X} \#E(\Fp)/p$ for many elliptic curves $E$ and observed
+numerically that this product grows like $C \cdot (\log X)^r$ where $r$
+is the rank of $E(\Q)$.
+This led them to conjecture that the order of vanishing of $L(E,s)$
+at $s = 1$ equals the rank.
+
+The conjecture is now split into two parts:
+the \emph{weak BSD} (rank = order of vanishing) and the
+\emph{strong BSD} (precise formula for the leading coefficient).
+
+% ================================================================
+\section{Weak BSD: Rank and the Order of Vanishing}
+% ================================================================
+
+\begin{conjecture}[Weak BSD]
+\label{conj:weak_bsd}
+Let $E$ be an elliptic curve over $\Q$ with rank $r = \mathrm{rank}\, E(\Q)$.
+Then
+\[
+  \ord_{s=1} L(E,s) \;=\; r.
+\]
+In particular:
+\begin{itemize}
+  \item $L(E,1) \ne 0 \iff r = 0 \iff E(\Q)$ is finite.
+  \item $L(E,1) = 0$ and $L'(E,1) \ne 0 \iff r = 1$.
+\end{itemize}
+\end{conjecture}
+
+\begin{remark}[Current status]
+The weak BSD is proved only in special cases:
+\begin{itemize}
+  \item Rank $0$: Coates--Wiles (1977) \cite{CoatesWiles1977} proved $r=0$
+    when $E$ has complex multiplication and $L(E,1) \ne 0$.
+  \item Kolyvagin (1990) \cite{Kolyvagin1990}: For a modular elliptic curve
+    with $L(E,1) \ne 0$, $E(\Q)$ is finite and $\Sha(E/\Q)$ is finite.
+    For $L'(E,1) \ne 0$ (and sign $-1$), $r = 1$.
+  \item Gross--Zagier (1986): Under certain conditions, $L'(E,1) \ne 0$
+    implies the existence of a rational point of infinite order.
+  \item The general case is open.
+\end{itemize}
+\end{remark}
+
+% ================================================================
+\section{The Tate--Shafarevich Group}
+% ================================================================
+
+\begin{definition}[Tate--Shafarevich group]
+\label{def:sha}
+Let $E/\Q$.  The \emph{Tate--Shafarevich group} is
+\[
+  \Sha(E/\Q) \;=\; \ker\!\Bigl(H^1(\Q, E) \to \prod_v H^1(\Q_v, E)\Bigr),
+\]
+where $v$ ranges over all places (primes $p$ and the archimedean place $\infty$),
+and $H^1(\Q, E)$ denotes the Galois cohomology.
+
+Intuitively, $\Sha(E/\Q)$ parametrizes torsors under $E$ that have
+points over every completion $\Q_v$ but no rational point over $\Q$
+--- i.e.\ failures of the Hasse local-global principle for $E$.
+\end{definition}
+
+\begin{proposition}[Basic properties of $\Sha$]
+\label{prop:sha_basic}
+\begin{enumerate}
+  \item[\textup{(i)}] $\Sha(E/\Q)$ is a torsion abelian group.
+  \item[\textup{(ii)}] $\Sha(E/\Q)$ is equipped with an alternating
+    (skew-symmetric) bilinear pairing (the Cassels--Tate pairing),
+    so the order $|\Sha(E/\Q)|$ is a perfect square (when finite).
+  \item[\textup{(iii)}] Under the assumption of BSD, $\Sha(E/\Q)$ is finite.
+  \item[\textup{(iv)}] Kolyvagin proved $\Sha(E/\Q)$ is finite when
+    $L(E,1) \ne 0$ or $L'(E,1) \ne 0$ (in the analytic rank $\le 1$ case).
+\end{enumerate}
+\end{proposition}
+
+% ================================================================
+\section{Strong BSD: The Leading Coefficient Formula}
+% ================================================================
+
+\begin{conjecture}[Strong BSD]
+\label{conj:strong_bsd}
+Let $E/\Q$ have rank $r$, real period $\Omega_E$, regulator $R_E$,
+Tate--Shafarevich group $\Sha(E/\Q)$ (assumed finite), torsion subgroup
+of order $|E(\Q)_{\mathrm{tors}}|$, and Tamagawa numbers $c_p = |E(\Q_p)/E_0(\Q_p)|$
+for each prime $p$ of bad reduction.  Then
+\begin{equation}
+  \label{eq:strong_bsd}
+  \lim_{s \to 1} \frac{L(E,s)}{(s-1)^r}
+  \;=\;
+  \frac{\Omega_E \cdot |\Sha(E/\Q)| \cdot R_E \cdot \prod_p c_p}
+       {|E(\Q)_{\mathrm{tors}}|^2}.
+\end{equation}
+\end{conjecture}
+
+\begin{remark}[The ingredients]
+\begin{itemize}
+  \item $\Omega_E = \int_{E(\R)} |\omega|$: the real period of the
+    N\'eron differential $\omega = dx/2y$.
+  \item $R_E = \det(\langle P_i, P_j\rangle)_{1 \le i,j \le r}$: the
+    N\'eron--Tate regulator, the determinant of the height pairing matrix
+    for a basis $\{P_1,\ldots,P_r\}$ of $E(\Q)/E(\Q)_{\mathrm{tors}}$.
+  \item $c_p = |E(\Q_p) / E_0(\Q_p)|$: the Tamagawa number at $p$
+    (the number of components of the N\'eron model at $p$).
+  \item $\Sha(E/\Q)$: the Tate--Shafarevich group.
+  \item $E(\Q)_{\mathrm{tors}}$: the torsion subgroup (Paper~25).
+\end{itemize}
+The strong BSD formula~\eqref{eq:strong_bsd} has been numerically verified
+for many curves but proved only for very special cases.
+\end{remark}
+
+% ================================================================
+\section{Numerical Evidence: The BSD Product}
+% ================================================================
+
+\begin{definition}[BSD heuristic product]
+\label{def:bsd_product}
+For $X > 0$, define the \emph{BSD heuristic product}
+\[
+  B_E(X) \;=\; \prod_{p \le X,\; p\text{ good}} \frac{\#E(\Fp)}{p}.
+\]
+\end{definition}
+
+\begin{theorem}[Birch--Swinnerton-Dyer numerical observation]
+\label{thm:bsd_numerical}
+Birch and Swinnerton-Dyer \cite{BSD1965} computed $B_E(X)$ for many curves
+and observed:
+\[
+  B_E(X) \;\sim\; C_E\,(\log X)^r \quad (X \to \infty),
+\]
+where $r = \mathrm{rank}\,E(\Q)$ and $C_E$ is a curve-dependent constant.
+\end{theorem}
+
+\begin{proof}[Heuristic justification]
+Using Hasse's theorem $\#E(\Fp) = p + 1 - a_p$ with $|a_p| \le 2\sqrt{p}$:
+\[
+  \frac{\#E(\Fp)}{p} = 1 + \frac{1}{p} - \frac{a_p}{p}
+  \approx 1 - \frac{a_p}{p}.
+\]
+The product $\prod_{p \le X}(1 - a_p/p)$ is related to $L(E,1)$ via
+the Euler product (in a formal sense).
+When $L(E,1) = 0$ (equivalently rank $r \ge 1$), the product diverges
+logarithmically, giving the observed $(\log X)^r$ growth.
+This heuristic is made precise by the relation
+\[
+  -\frac{d}{ds}\log L(E,s)\big|_{s=1} = \sum_p \frac{a_p \log p}{p}
+  + \text{lower order},
+\]
+which controls the growth of partial products.
+\end{proof}
+
+% ================================================================
+\section{Known Cases}
+% ================================================================
+
+\begin{theorem}[Coates--Wiles, 1977]
+\label{thm:coates_wiles}
+Let $E/\Q$ be an elliptic curve with complex multiplication by an
+imaginary quadratic field $K$.  If $L(E,1) \ne 0$, then $E(\Q)$ is finite.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The key tool is the theory of Euler systems for $E$ with complex multiplication.
+Coates and Wiles \cite{CoatesWiles1977} used a $p$-adic $L$-function and
+the arithmetic of the CM field to show that $L(E,1) \ne 0$ implies the
+$p^\infty$-Selmer group $\mathrm{Sel}_{p^\infty}(E/\Q)$ is finite for
+all primes $p$ dividing the CM period.  This forces $E(\Q)$ to be finite.
+\end{proof}
+
+\begin{theorem}[Kolyvagin, 1990]
+\label{thm:kolyvagin}
+Let $E/\Q$ be a modular elliptic curve.
+\begin{enumerate}
+  \item[\textup{(i)}] If $L(E,1) \ne 0$, then $r = 0$ (i.e.\ $E(\Q)$ is finite)
+    and $\Sha(E/\Q)$ is finite.
+  \item[\textup{(ii)}] If $L'(E,1) \ne 0$ (first derivative nonzero at $s=1$),
+    then $r = 1$ and $\Sha(E/\Q)$ is finite.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Kolyvagin's \cite{Kolyvagin1990} proof uses \emph{Euler systems} of Heegner points:
+points on $E$ coming from the theory of complex multiplication,
+satisfying a norm-compatible system as the field varies.
+The key steps:
+\begin{enumerate}
+  \item Gross--Zagier (1986): For $L'(E,1) \ne 0$, the Heegner point on $E$
+    is a point of infinite order.
+  \item Kolyvagin's descent: Using Euler system relations, the Selmer group
+    has the predicted structure.
+  \item The finiteness of $\Sha$ follows from the structure of the
+    Kolyvagin system.
+\end{enumerate}
+\end{proof}
+
+% ================================================================
+\section{The Tate--Shafarevich Group and Descent}
+% ================================================================
+
+\begin{remark}[Computing the Selmer group]
+In practice, one computes the rank by performing a \emph{2-descent}
+(or $n$-descent for larger $n$): this gives the \emph{Selmer group}
+$\mathrm{Sel}_2(E/\Q)$ fitting in the exact sequence
+\[
+  0 \to E(\Q)/2E(\Q) \to \mathrm{Sel}_2(E/\Q) \to \Sha(E/\Q)[2] \to 0.
+\]
+From the Selmer group, one obtains:
+\begin{align*}
+  r + \dim_{\mathbb{F}_2} \Sha[2]
+  &= \dim_{\mathbb{F}_2} \mathrm{Sel}_2(E/\Q) - \dim_{\mathbb{F}_2}E(\Q)_{\mathrm{tors}}[2].
+\end{align*}
+If $\Sha(E/\Q) = 0$, then $r = \dim_{\mathbb{F}_2} \mathrm{Sel}_2(E/\Q) - \ldots$
+gives the exact rank.
+\end{remark}
+
+% ================================================================
+\section{Conclusion}
+% ================================================================
+
+The Birch--Swinnerton-Dyer conjecture predicts a precise link between the
+arithmetic of $E(\Q)$ (rank, regulator, Tate--Shafarevich group) and the
+analytic behaviour of $L(E,s)$ at $s=1$.
+
+The weak form (rank = analytic rank) is proved only for analytic rank $\le 1$
+(Kolyvagin 1990).  The strong form~\eqref{eq:strong_bsd} has been verified
+numerically for thousands of curves but remains unproved in general.
+
+BSD is one of the seven Millennium Prize Problems; its resolution would
+represent a fundamental advance in our understanding of rational points
+on algebraic varieties.
+
+% ================================================================
+\begin{thebibliography}{10}
+
+\bibitem{BSD1965}
+B.~J.~Birch and H.~P.~F.~Swinnerton-Dyer,
+Notes on elliptic curves, II,
+\emph{J.\ Reine Angew.\ Math.}\ \textbf{218} (1965), 79--108.
+
+\bibitem{CoatesWiles1977}
+J.~Coates and A.~Wiles,
+On the conjecture of Birch and Swinnerton-Dyer,
+\emph{Invent.\ Math.}\ \textbf{39} (1977), 223--251.
+
+\bibitem{Kolyvagin1990}
+V.~A.~Kolyvagin,
+Euler systems,
+in: \emph{The Grothendieck Festschrift}, Vol.~II,
+Progr.\ Math.~87, Birkh\"auser, 1990, pp.~435--483.
+
+\bibitem{GrossZagier1986}
+B.~H.~Gross and D.~B.~Zagier,
+Heegner points and derivatives of $L$-series,
+\emph{Invent.\ Math.}\ \textbf{84} (1986), 225--320.
+
+\bibitem{Silverman1986}
+J.~H.~Silverman,
+\emph{The Arithmetic of Elliptic Curves},
+Graduate Texts in Mathematics~106,
+Springer, New York, 1986.
+
+\bibitem{Wiles1995}
+A.~Wiles,
+Modular elliptic curves and Fermat's last theorem,
+\emph{Ann.\ of Math.}\ (2) \textbf{142} (1995), 443--551.
+
+\bibitem{Milne2006}
+J.~S.~Milne,
+\emph{Elliptic Curves},
+BookSurge Publishing, 2006.
+Available at \url{https://www.jmilne.org/math/}.
+
+\end{thebibliography}
+
+\end{document}

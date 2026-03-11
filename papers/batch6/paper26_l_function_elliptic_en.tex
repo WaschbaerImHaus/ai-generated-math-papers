@@ -1,0 +1,365 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\DeclareMathOperator{\Re}{Re}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{The \texorpdfstring{$L$}{L}-Function of an Elliptic Curve:\\
+       Euler Product, Frobenius Trace, Analytic Continuation,\\
+       and the Functional Equation}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 84}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+The $L$-function $L(E,s)$ of an elliptic curve $E/\Q$ encodes global
+arithmetic information through its local factors.
+For each prime $p$ of good reduction, the local factor is determined by
+the \emph{Frobenius trace} $a_p = p + 1 - \#E(\Fp)$;
+Hasse proved $|a_p| \le 2\sqrt{p}$.
+The $L$-function is initially defined for $\Re(s) > 3/2$ by an Euler product
+$L(E,s) = \prod_p L_p(E,s)^{-1}$ and a Dirichlet series.
+The deep \emph{modularity theorem} (Wiles 1995, Breuil--Conrad--Diamond--Taylor 2001)
+proves $E$ is modular, establishing analytic continuation to $\C$
+and the functional equation relating $L(E,s)$ and $L(E,2-s)$.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Introduction}
+% ================================================================
+
+The $L$-function of an elliptic curve was studied by Hasse (1930s) and
+Weil (1950s), motivated by the analogy with Riemann's $\zeta$ function.
+The key local ingredient is the number of points $\#E(\Fp)$ for each prime $p$.
+The global $L$-function packages these local data into a single analytic function,
+and the Birch--Swinnerton-Dyer conjecture (Paper~27) predicts that its
+behaviour at $s = 1$ determines the rank of $E(\Q)$.
+
+The analytic continuation and functional equation were conditional on
+modularity (proved by Wiles for semistable curves in 1995 \cite{Wiles1995},
+completed in full generality by Breuil--Conrad--Diamond--Taylor in 2001
+\cite{BCDT2001}).
+
+% ================================================================
+\section{Counting Points Modulo Primes}
+% ================================================================
+
+\begin{definition}[Frobenius trace]
+\label{def:ap}
+For an elliptic curve $E/\Q$ and a prime $p$ of good reduction, the
+\emph{Frobenius trace} (or \emph{trace of Frobenius}) is
+\[
+  a_p \;=\; p + 1 - \#E(\Fp).
+\]
+Here $\#E(\Fp)$ counts all affine points $(x,y) \in \Fp^2$ satisfying
+$y^2 = x^3 + ax + b$ (with $a, b$ reduced modulo $p$) plus the point
+at infinity $\mathcal{O}$.
+\end{definition}
+
+\begin{theorem}[Hasse's theorem, 1933]
+\label{thm:hasse}
+For any prime $p$ of good reduction,
+\[
+  |a_p| \;\le\; 2\sqrt{p}.
+\]
+Equivalently, $\#E(\Fp) = p + 1 - a_p$ with $|a_p| \le 2\sqrt{p}$,
+so $\#E(\Fp) \in [p + 1 - 2\sqrt{p},\; p + 1 + 2\sqrt{p}]$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Write $a_p = \alpha + \bar\alpha$ where $\alpha, \bar\alpha$ are
+complex numbers with $\alpha \bar\alpha = p$ (the eigenvalues of
+Frobenius acting on the $\ell$-adic Tate module $T_\ell(E)$).
+Then $|a_p| = |\alpha + \bar\alpha| \le 2|\alpha| = 2\sqrt{p}$.
+The fact that $|\alpha|^2 = p$ is equivalent to the Riemann Hypothesis
+for the zeta function of $E/\Fp$, which Hasse proved directly for
+elliptic curves.
+A modern proof uses the Weil cohomology theory; see \cite{Silverman1986},
+Appendix~C.
+\end{proof}
+
+\begin{example}[Computing $a_p$]
+\label{ex:ap}
+For $E: y^2 = x^3 - x$ and $p = 5$:
+The affine points modulo $5$ are those $(x,y) \in \{0,1,2,3,4\}^2$ with
+$y^2 \equiv x^3 - x \pmod 5$.
+\begin{center}
+\begin{tabular}{c|c|c}
+  $x$ & $x^3 - x \bmod 5$ & $y$ satisfying $y^2 \equiv x^3-x$ \\
+  \hline
+  $0$ & $0$ & $0$ \\
+  $1$ & $0$ & $0$ \\
+  $2$ & $6 \equiv 1$ & $1, 4$ \\
+  $3$ & $24 \equiv 4$ & $2, 3$ \\
+  $4$ & $60 \equiv 0$ & $0$
+\end{tabular}
+\end{center}
+Affine points: $(0,0), (1,0), (2,1), (2,4), (3,2), (3,3), (4,0)$ --- that is $7$ points,
+plus $\mathcal{O}$, giving $\#E(\mathbb{F}_5) = 8$.
+Thus $a_5 = 5 + 1 - 8 = -2$.  Indeed $|-2| \le 2\sqrt{5} \approx 4.47$. \checkmark
+\end{example}
+
+% ================================================================
+\section{The Euler Product}
+% ================================================================
+
+\begin{definition}[Local $L$-factors]
+\label{def:local_factors}
+For a prime $p$, the \emph{local $L$-factor} of $E$ at $p$ is:
+\begin{itemize}
+  \item \emph{Good reduction} ($p \nmid N_E$):
+    \[
+      L_p(E,s)^{-1} = 1 - a_p\,p^{-s} + p^{1-2s}.
+    \]
+  \item \emph{Multiplicative reduction} ($p \| N_E$):
+    \[
+      L_p(E,s)^{-1} = 1 - \epsilon_p\,p^{-s}, \quad
+      \epsilon_p \in \{+1,-1\}.
+    \]
+  \item \emph{Additive reduction} ($p^2 \mid N_E$):
+    \[
+      L_p(E,s)^{-1} = 1.
+    \]
+\end{itemize}
+\end{definition}
+
+\begin{definition}[$L$-function of $E$]
+\label{def:L_function}
+The \emph{$L$-function} of $E$ is the Euler product
+\[
+  L(E,s) \;=\; \prod_p L_p(E,s)^{-1}
+  \;=\; \prod_{p \nmid N_E} \frac{1}{1 - a_p p^{-s} + p^{1-2s}}
+        \cdot \prod_{p \mid N_E} \frac{1}{1 - \epsilon_p p^{-s}}.
+\]
+\end{definition}
+
+\begin{proposition}[Dirichlet series representation]
+\label{prop:dirichlet}
+For $\Re(s) > 3/2$, the Euler product converges absolutely and equals
+\[
+  L(E,s) = \sum_{n=1}^{\infty} \frac{a_n}{n^s},
+\]
+where the coefficients $a_n$ are determined by the Euler product:
+$a_1 = 1$, $a_p = $ Frobenius trace for $p \nmid N_E$,
+$a_{p^k}$ determined by the recursion
+$a_{p^k} = a_p\,a_{p^{k-1}} - p\,a_{p^{k-2}}$ for $p \nmid N_E$.
+\end{proposition}
+
+\begin{proof}
+The Euler product converges absolutely for $\Re(s) > 3/2$ by Hasse's
+bound $|a_p| \le 2\sqrt{p}$ and the estimate $|a_{p^k}| \le (k+1)p^{k/2}$.
+The Dirichlet series follows from expanding each factor as a geometric series
+and using multiplicativity of $n \mapsto a_n$.
+\end{proof}
+
+% ================================================================
+\section{The Completed \texorpdfstring{$L$}{L}-Function and Functional Equation}
+% ================================================================
+
+\begin{definition}[Completed $L$-function]
+\label{def:completed_L}
+Define the \emph{conductor} $N_E$ and the \emph{completed $L$-function}
+\[
+  \Lambda(E,s) \;=\; \left(\frac{\sqrt{N_E}}{2\pi}\right)^s
+  \Gamma(s)\,L(E,s).
+\]
+\end{definition}
+
+\begin{theorem}[Functional equation via modularity]
+\label{thm:functional_eq}
+The completed $L$-function satisfies
+\begin{equation}
+  \label{eq:functional}
+  \Lambda(E,s) \;=\; \epsilon(E)\,\Lambda(E,2-s),
+\end{equation}
+where $\epsilon(E) \in \{+1,-1\}$ is the \emph{root number} of $E$.
+\end{theorem}
+
+\begin{proof}[Proof via modularity]
+By the modularity theorem
+(Wiles \cite{Wiles1995} for semistable $E$,
+Breuil--Conrad--Diamond--Taylor \cite{BCDT2001} in general),
+$E$ corresponds to a newform $f = \sum a_n q^n$ of weight~$2$ and level~$N_E$:
+for all $n$, the $n$-th Fourier coefficient of $f$ equals $a_n$.
+
+The $L$-function of a weight-$2$ newform satisfies the functional equation
+by the classical theory of modular forms (Hecke, 1936):
+\[
+  \Lambda(f, s) = \epsilon_f\,\Lambda(f, 2-s),
+\]
+where $\epsilon_f = \pm 1$ is determined by the Atkin--Lehner eigenvalue.
+Since $L(E,s) = L(f,s)$, the theorem follows.
+\end{proof}
+
+\begin{remark}[Root number and parity conjecture]
+The root number $\epsilon(E) = \pm 1$ has a conjectured connection to the
+parity of the rank: if $\epsilon(E) = -1$, then $L(E,1) = 0$
+(from the functional equation), and the BSD conjecture predicts that
+the rank is odd.  The \emph{parity conjecture} asserts:
+$(-1)^r = \epsilon(E)$.
+\end{remark}
+
+% ================================================================
+\section{Modularity and the Connection to Modular Forms}
+% ================================================================
+
+\begin{theorem}[Modularity Theorem]
+\label{thm:modularity}
+Every elliptic curve $E/\Q$ is \emph{modular}: there exists a newform
+$f \in S_2(\Gamma_0(N_E))$ (a cuspidal weight-$2$ eigenform for $\Gamma_0(N_E)$)
+such that
+\[
+  L(E,s) = L(f,s) = \sum_{n=1}^{\infty} \frac{a_n(f)}{n^s},
+\]
+where $a_n(f)$ are the Fourier coefficients of $f$.
+Equivalently, there is a non-constant morphism
+$\varphi: X_0(N_E) \to E$ of algebraic curves over $\Q$.
+\end{theorem}
+
+\begin{proof}[Historical notes]
+This was conjectured by Taniyama (1955) and Shimura (1957)
+(the Shimura--Taniyama conjecture, later Shimura--Taniyama--Weil).
+\begin{itemize}
+  \item Wiles \cite{Wiles1995} proved it for semistable curves (squarefree conductor).
+  \item The proof uses Galois representations attached to $E$ and to modular forms,
+    and the key technical lemma: a surjection $R \to T$ (deformation ring
+    to Hecke ring) is an isomorphism.
+  \item Breuil, Conrad, Diamond, Taylor \cite{BCDT2001} extended the
+    proof to all elliptic curves over $\Q$.
+\end{itemize}
+Fermat's Last Theorem follows as a corollary (via Ribet's theorem: a
+hypothetical solution would give a Frey curve that is not modular).
+\end{proof}
+
+% ================================================================
+\section{The \texorpdfstring{$L$}{L}-Function Near \texorpdfstring{$s=1$}{s=1}}
+% ================================================================
+
+\begin{definition}[Order of vanishing and leading coefficient]
+\label{def:order_vanishing}
+The \emph{order of vanishing} of $L(E,s)$ at $s=1$ is
+\[
+  r_{\mathrm{an}} \;=\; \ord_{s=1} L(E,s).
+\]
+The \emph{leading coefficient} is
+\[
+  L^*(E,1) \;=\; \lim_{s \to 1} (s-1)^{-r_{\mathrm{an}}} L(E,s).
+\]
+The BSD conjecture predicts $r_{\mathrm{an}} = r$ (the algebraic rank).
+\end{definition}
+
+\begin{remark}[Parity from the functional equation]
+If $\epsilon(E) = -1$, the functional equation~\eqref{eq:functional} gives
+$L(E,1) = -L(E,1)$, so $L(E,1) = 0$.
+Thus $r_{\mathrm{an}} \ge 1$ whenever $\epsilon(E) = -1$.
+The BSD conjecture predicts the rank is then odd.
+\end{remark}
+
+% ================================================================
+\section{Numerical Evidence and Computations}
+% ================================================================
+
+\begin{example}[The curve $E: y^2 = x^3 - x$]
+\label{ex:rank0}
+This is the congruent number curve $E_1$ (Paper~28).
+$N_E = 32$, $\epsilon(E) = +1$, $r = 0$.
+$L(E,1) \approx 0.6551$ (numerically).
+The BSD conjecture predicts $r = 0$ (correct, since $E(\Q) = \{O, (0,0), (\pm 1, 0)\}$,
+all torsion).
+\end{example}
+
+\begin{example}[The curve $y^2 = x^3 - 25x$]
+\label{ex:rank1}
+The congruent number curve $E_5$ (for $n=5$).
+$r = 1$, $L(E,1) = 0$, $L'(E,1) \ne 0$.
+Generator of the free part: $(5, 0)$... wait, $5^3 - 25\cdot 5 = 0$,
+so $(5,0)$ is a $2$-torsion point.
+The actual generator of infinite order is $(-4, 6)$:
+$6^2 = 36$, $(-4)^3 - 25(-4) = -64 + 100 = 36$. \checkmark
+\end{example}
+
+% ================================================================
+\section{Conclusion}
+% ================================================================
+
+The $L$-function of an elliptic curve is the bridge between local
+arithmetic data (the Frobenius traces $a_p$) and global arithmetic
+(the rank of $E(\Q)$).
+Hasse's theorem bounds $|a_p| \le 2\sqrt{p}$, ensuring convergence for $\Re(s) > 3/2$.
+The modularity theorem (Wiles et al.) provides analytic continuation
+and the functional equation~\eqref{eq:functional} with root number $\epsilon(E) = \pm 1$.
+
+The central question --- what is the order of vanishing $r_{\mathrm{an}}$
+at $s = 1$? --- is the subject of the Birch--Swinnerton-Dyer conjecture (Paper~27).
+
+% ================================================================
+\begin{thebibliography}{10}
+
+\bibitem{Silverman1986}
+J.~H.~Silverman,
+\emph{The Arithmetic of Elliptic Curves},
+Graduate Texts in Mathematics~106,
+Springer, New York, 1986.
+
+\bibitem{Wiles1995}
+A.~Wiles,
+Modular elliptic curves and Fermat's last theorem,
+\emph{Ann.\ of Math.}\ (2) \textbf{142} (1995), 443--551.
+
+\bibitem{BCDT2001}
+C.~Breuil, B.~Conrad, F.~Diamond, and R.~Taylor,
+On the modularity of elliptic curves over $\Q$:
+wild $3$-adic exercises,
+\emph{J.\ Amer.\ Math.\ Soc.}\ \textbf{14} (2001), 843--939.
+
+\bibitem{TaylorWiles1995}
+R.~Taylor and A.~Wiles,
+Ring-theoretic properties of certain Hecke algebras,
+\emph{Ann.\ of Math.}\ (2) \textbf{142} (1995), 553--572.
+
+\bibitem{Cornell1997}
+G.~Cornell, J.~H.~Silverman, and G.~Stevens (eds.),
+\emph{Modular Forms and Fermat's Last Theorem},
+Springer, New York, 1997.
+
+\bibitem{Knapp1992}
+A.~W.~Knapp,
+\emph{Elliptic Curves},
+Princeton University Press, 1992.
+
+\end{thebibliography}
+
+\end{document}

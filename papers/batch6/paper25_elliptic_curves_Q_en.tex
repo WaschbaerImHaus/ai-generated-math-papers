@@ -1,0 +1,410 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\gcd}{gcd}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Elliptic Curves over \texorpdfstring{$\Q$}{Q}:\\
+       Weierstra\ss\ Form, Group Law, Torsion, and the Mordell--Weil Theorem}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 84}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+An \emph{elliptic curve} over $\Q$ is a smooth projective curve of genus~$1$
+with a specified rational point, typically given in \emph{short Weierstra\ss\ form}
+$y^2 = x^3 + ax + b$ with $a, b \in \Q$ and non-zero discriminant
+$\Delta = -16(4a^3 + 27b^2) \ne 0$.
+We develop the theory systematically:
+the algebraic group structure via the \emph{chord-and-tangent law},
+the discriminant and \emph{$j$-invariant} classifying the curve up to isomorphism,
+the \emph{torsion subgroup} $E(\Q)_{\mathrm{tors}}$ (classified by
+Mazur's theorem into $15$ possible types),
+and the \emph{Mordell--Weil theorem} $E(\Q) \cong E(\Q)_{\mathrm{tors}} \oplus \Z^r$,
+which asserts that the group of rational points is finitely generated.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Introduction}
+% ================================================================
+
+Elliptic curves have become central to number theory, cryptography, and
+algebraic geometry.  They are the simplest non-trivial curves from the
+point of view of arithmetic: rational points on curves of genus~$0$
+are easily parametrized (conics), while genus~$\ge 2$ is governed by
+Faltings' theorem (finitely many rational points).  Genus~$1$ --- the elliptic
+case --- is rich: the set of rational points forms an abelian group,
+and determining this group is a deep arithmetic problem.
+
+Throughout this paper, $E$ denotes an elliptic curve over $\Q$ in short
+Weierstra\ss\ form unless otherwise specified.
+
+% ================================================================
+\section{Weierstra\ss\ Form and Basic Definitions}
+% ================================================================
+
+\begin{definition}[Short Weierstra\ss\ form]
+\label{def:weierstrass}
+An \emph{elliptic curve} over $\Q$ in \emph{short Weierstra\ss\ form} is
+a plane cubic curve
+\[
+  E: \quad y^2 = x^3 + ax + b
+\]
+with $a, b \in \Q$ and \emph{discriminant}
+\[
+  \Delta \;=\; -16\,(4a^3 + 27b^2) \;\ne\; 0.
+\]
+The condition $\Delta \ne 0$ ensures that $E$ is smooth (no cusps or nodes),
+i.e.\ it is a non-singular cubic.  Together with the \emph{point at infinity}
+$\mathcal{O}$, $E$ is a smooth projective curve of genus~$1$.
+\end{definition}
+
+\begin{definition}[$j$-invariant]
+\label{def:j_invariant}
+The \emph{$j$-invariant} of $E: y^2 = x^3 + ax + b$ is
+\[
+  j(E) \;=\; -1728\,\frac{4a^3}{\Delta/(-16)}\cdot(-16)
+  \;=\; 1728\,\frac{4a^3}{4a^3 + 27b^2}.
+\]
+More explicitly: $j(E) = -1728\,\cdot\,\dfrac{(4a)^3}{\Delta}$.
+\end{definition}
+
+\begin{theorem}[Classification by $j$]
+\label{thm:j_classification}
+Two elliptic curves $E$ and $E'$ over $\overline{\Q}$ (the algebraic closure)
+are isomorphic as elliptic curves if and only if $j(E) = j(E')$.
+Over $\Q$, the $j$-invariant determines the curve up to a \emph{twist}:
+curves with the same $j$-invariant may be non-isomorphic over $\Q$ but
+become isomorphic over $\overline{\Q}$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+An isomorphism $E \to E'$ of Weierstra\ss\ cubics (preserving $\mathcal{O}$)
+is given by $(x,y) \mapsto (u^2 x + r, u^3 y + u^2 sx + t)$ for
+$u \in \overline{\Q}^*$.  Under this map, $a \mapsto u^4 a'$ and
+$b \mapsto u^6 b'$, so $j = j'$.  Conversely, given $j$, there is a
+Weierstra\ss\ model with that $j$-value (see \cite{Silverman1986}, Ch.~III).
+\end{proof}
+
+\begin{example}[Important special curves]
+\begin{itemize}
+  \item $j = 1728$: curve $y^2 = x^3 - x$ (CM by $\Z[i]$, complex multiplication).
+  \item $j = 0$: curve $y^2 = x^3 + 1$ (CM by $\Z[\omega]$, $\omega = e^{2\pi i/3}$).
+  \item $j = 1728$: also parametrizes the curve of order-$4$ torsion points.
+\end{itemize}
+\end{example}
+
+% ================================================================
+\section{The Group Law: Chord-and-Tangent}
+% ================================================================
+
+\begin{theorem}[Group law on $E$]
+\label{thm:group_law}
+The set of points $E(\Q) = \{(x,y) \in \Q^2 : y^2 = x^3 + ax + b\} \cup \{\mathcal{O}\}$
+forms an abelian group with identity element $\mathcal{O}$ and
+the following addition law:
+
+\begin{enumerate}
+  \item[\textup{(i)}] $\mathcal{O}$ is the identity: $P + \mathcal{O} = P$ for all $P$.
+  \item[\textup{(ii)}] Inverse: $-(x,y) = (x,-y)$.
+  \item[\textup{(iii)}] Addition ($P \ne \pm Q$): Let $P = (x_1,y_1)$,
+    $Q = (x_2,y_2)$ with $P \ne -Q$.  The line through $P$ and $Q$
+    (or the tangent at $P$ if $P = Q$) meets $E$ in a third point $R'$,
+    and $P + Q = -R'$ (the reflection of $R'$).
+\end{enumerate}
+
+Explicitly, for $P = (x_1,y_1) \ne Q = (x_2,y_2)$:
+\begin{align}
+  \lambda &=
+  \begin{cases}
+    \dfrac{y_2 - y_1}{x_2 - x_1} & \text{if } x_1 \ne x_2 \quad\text{(chord)},\\[6pt]
+    \dfrac{3x_1^2 + a}{2y_1}     & \text{if } P = Q \quad\text{(tangent)},
+  \end{cases}
+  \label{eq:lambda} \\[4pt]
+  x_3 &= \lambda^2 - x_1 - x_2, \label{eq:x3} \\
+  y_3 &= \lambda(x_1 - x_3) - y_1. \label{eq:y3}
+\end{align}
+Then $P + Q = (x_3, y_3)$.
+\end{theorem}
+
+\begin{proof}
+We verify the chord case ($x_1 \ne x_2$).
+The line $y = \lambda(x-x_1) + y_1$ meets $y^2 = x^3 + ax + b$
+at the points with $x$-coordinates satisfying
+\[
+  (\lambda(x-x_1)+y_1)^2 = x^3 + ax + b.
+\]
+This is a cubic in $x$; by Vi\`ete's formulas, the sum of its three roots
+equals $\lambda^2$ (the coefficient of $x^2$ in the cubic on the right
+minus the expansion on the left).  Since $x_1$ and $x_2$ are two roots,
+the third is $x_3 = \lambda^2 - x_1 - x_2$.  Substituting into the line
+equation gives $y_3$, and we define $P+Q = (x_3,-y_3)$ (reflecting to
+put the neutral element at infinity).
+
+Associativity is the hardest part; it can be proved algebraically
+(by direct computation) or geometrically (B\'ezout's theorem applied to
+cubics through 9 points); see \cite{Silverman1986}, Chapter~III.
+\end{proof}
+
+\begin{remark}[Projective interpretation]
+In homogeneous coordinates $[X:Y:Z]$, the Weierstra\ss\ equation is
+$Y^2 Z = X^3 + aXZ^2 + bZ^3$, and $\mathcal{O} = [0:1:0]$.
+The group law is defined over any field, and the same formulas~\eqref{eq:lambda}--\eqref{eq:y3}
+hold.
+\end{remark}
+
+% ================================================================
+\section{The Torsion Subgroup}
+% ================================================================
+
+\begin{definition}[Torsion points]
+\label{def:torsion}
+A point $P \in E(\Q)$ is a \emph{torsion point} if $nP = \mathcal{O}$
+for some $n \ge 1$.  The \emph{torsion subgroup} is
+\[
+  E(\Q)_{\mathrm{tors}} \;=\; \{P \in E(\Q) : nP = \mathcal{O}
+  \text{ for some } n \ge 1\}.
+\]
+\end{definition}
+
+\begin{theorem}[Mazur's Torsion Theorem, 1977]
+\label{thm:mazur}
+Let $E$ be an elliptic curve over $\Q$.  Then $E(\Q)_{\mathrm{tors}}$
+is one of the following $15$ groups:
+\begin{align*}
+  &\Z/n\Z \quad (n = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12), \\
+  &\Z/2\Z \times \Z/2n\Z \quad (n = 1, 2, 3, 4).
+\end{align*}
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Mazur's original proof \cite{Mazur1977} uses the theory of modular curves
+$X_1(N)$ and Eisenstein ideals.
+The key steps are:
+(1) For any prime $\ell$, the $\ell$-torsion $E[\ell](\Q)$ is controlled
+by the modular curve $X_1(\ell)$, which has genus $\ge 1$ for $\ell \ge 11$
+(by Riemann--Hurwitz).
+(2) By Faltings' theorem (for genus $\ge 2$) or by explicit calculation
+(for genus $1$), $X_1(\ell)(\Q)$ is finite for $\ell \ge 11$.
+(3) Explicit computation rules out the remaining cases $\ell = 11$.
+The bound $n \le 12$ for cyclic torsion and $n \le 4$ for the
+$\Z/2 \times \Z/2n$ case is established by the classification of
+rational points on the relevant modular curves.
+\end{proof}
+
+\begin{example}[Torsion examples]
+\begin{itemize}
+  \item $E: y^2 = x^3 - x$ has torsion $\Z/2\Z \times \Z/2\Z$
+    (three 2-torsion points: $(0,0)$, $(1,0)$, $(-1,0)$).
+  \item $E: y^2 = x^3 - x^2$ (with $b = 0$, so $\Delta = 0$) is
+    singular; for $E: y^2 = x^3 + 1$, torsion is $\Z/6\Z$.
+  \item $E: y^2 + y = x^3 - x^2 - 10x - 10$ has torsion $\Z/12\Z$
+    (achieving the maximum cyclic order).
+\end{itemize}
+\end{example}
+
+\begin{theorem}[Nagell--Lutz theorem]
+\label{thm:nagell_lutz}
+Let $E: y^2 = x^3 + ax + b$ with $a, b \in \Z$.
+If $(x_0, y_0) \in E(\Q)$ is a torsion point, then $x_0, y_0 \in \Z$
+and either $y_0 = 0$ (point of order~$2$) or $y_0^2 \mid 4a^3 + 27b^2$.
+\end{theorem}
+
+\begin{proof}
+This follows from the theory of formal groups and reduction modulo primes.
+A self-contained proof using the integrality of the group law on
+integer Weierstra\ss\ models is in \cite{Silverman1986}, Chapter~VIII.
+\end{proof}
+
+% ================================================================
+\section{The Mordell--Weil Theorem}
+% ================================================================
+
+\begin{theorem}[Mordell--Weil Theorem]
+\label{thm:mordell_weil}
+For any elliptic curve $E$ over $\Q$, the group $E(\Q)$ of rational
+points is a finitely generated abelian group.  By the structure theorem
+for finitely generated abelian groups:
+\begin{equation}
+  \label{eq:mw}
+  E(\Q) \;\cong\; E(\Q)_{\mathrm{tors}} \;\oplus\; \Z^r,
+\end{equation}
+where $r \ge 0$ is the \emph{rank} of $E$ over $\Q$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Mordell (1922) proved this for $\Q$; Weil (1928) generalized to
+number fields.
+The proof has two main parts:
+
+\textbf{Part 1: Weak Mordell--Weil.}
+There exists $n \ge 2$ such that $E(\Q)/nE(\Q)$ is finite.
+(For $n = 2$: this follows from the fact that the $2$-descent map
+is injective into a finite group related to the Selmer group.)
+
+\textbf{Part 2: Descent.}
+Using a height function $h: E(\Q) \to \R_{\ge 0}$ satisfying:
+\begin{align}
+  h(P+Q) + h(P-Q) &= 2h(P) + 2h(Q) + O(1), \label{eq:parallelogram} \\
+  h(nP) &= n^2 h(P) + O(1), \label{eq:quadratic}
+\end{align}
+one shows that each coset of $nE(\Q)$ in $E(\Q)$ contains a representative
+of bounded height, and that sets of bounded height are finite.
+
+Together, Parts 1 and 2 show that $E(\Q)$ is generated by finitely many
+points plus the torsion subgroup.
+
+See \cite{Silverman1986}, Chapter VIII, for complete details.
+\end{proof}
+
+\begin{remark}[The rank problem]
+The \emph{rank} $r$ in~\eqref{eq:mw} is the most mysterious invariant
+of $E(\Q)$.  There is no known algorithm guaranteed to compute $r$.
+The Birch--Swinnerton-Dyer conjecture (Paper~27) predicts that
+$r = \ord_{s=1} L(E,s)$.
+
+Known records: curves with rank $\ge 28$ are known (Elkies 2006).
+It is not known whether ranks are unbounded.
+\end{remark}
+
+% ================================================================
+\section{Heights and the Canonical Height}
+% ================================================================
+
+\begin{definition}[Na\"ive height]
+\label{def:naive_height}
+For a rational point $P = (x, y) \in E(\Q)$ with $x = p/q$ in lowest terms,
+the \emph{na\"ive height} is $H(P) = \max(|p|, |q|)$ and
+the \emph{logarithmic na\"ive height} is $h(P) = \log H(P)$.
+\end{definition}
+
+\begin{theorem}[Canonical (N\'eron--Tate) height]
+\label{thm:neron_tate}
+There exists a unique function $\hat h: E(\Q) \to \R_{\ge 0}$, the
+\emph{canonical height} (or N\'eron--Tate height), satisfying:
+\begin{enumerate}
+  \item[\textup{(i)}] $\hat h(P) = h(P) + O(1)$ (bounded difference from na\"ive height).
+  \item[\textup{(ii)}] $\hat h(nP) = n^2 \hat h(P)$ (exactly quadratic).
+  \item[\textup{(iii)}] $\hat h(P) \ge 0$ with equality if and only if $P$
+    is a torsion point.
+\end{enumerate}
+The \emph{N\'eron--Tate bilinear form}
+$\langle P, Q \rangle = \hat h(P+Q) - \hat h(P) - \hat h(Q)$
+makes $E(\Q)/E(\Q)_{\mathrm{tors}} \otimes \R$ into a Euclidean space.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Define $\hat h(P) = \lim_{n\to\infty} h(2^n P)/4^n$.
+The parallelogram law~\eqref{eq:parallelogram} shows this limit exists
+and is independent of the na\"ive height chosen.
+Properties (i)--(iii) follow directly; see \cite{Silverman1986}, Chapter~VIII.
+\end{proof}
+
+% ================================================================
+\section{Reduction Modulo Primes}
+% ================================================================
+
+\begin{definition}[Good and bad reduction]
+\label{def:reduction}
+For a prime $p$ and $E: y^2 = x^3 + ax + b$ with $a, b \in \Z$,
+the \emph{reduction} $\tilde E$ modulo $p$ is the curve
+$y^2 = x^3 + \bar a x + \bar b$ over $\Fp$.
+\begin{itemize}
+  \item \emph{Good reduction} at $p$: $p \nmid \Delta$, so $\tilde E$ is smooth.
+  \item \emph{Multiplicative reduction} at $p$: $\tilde E$ has a node.
+  \item \emph{Additive reduction} at $p$: $\tilde E$ has a cusp.
+\end{itemize}
+The \emph{conductor} $N_E$ is $N_E = \prod_p p^{f_p}$, where $f_p \ge 1$
+for $p \mid \Delta$ and $f_p \ge 2$ for additive reduction.
+\end{definition}
+
+\begin{theorem}[N\'eron--Ogg--Shafarevich]
+\label{thm:NOS}
+The elliptic curve $E$ has good reduction at $p$ if and only if
+the $\ell$-adic Tate module $T_\ell(E)$ is unramified at $p$
+(for $\ell \ne p$).
+\end{theorem}
+
+% ================================================================
+\section{Conclusion}
+% ================================================================
+
+We have established the foundational theory of elliptic curves over $\Q$:
+the smooth cubic in Weierstra\ss\ form, the $j$-invariant classifying
+curves up to isomorphism, the abelian group structure given by the
+chord-and-tangent law, the complete classification of torsion by Mazur's
+theorem (15 types), and the Mordell--Weil theorem asserting that $E(\Q)$
+is finitely generated with structure $E(\Q)_{\mathrm{tors}} \oplus \Z^r$.
+
+The rank $r$ --- the number of independent infinite-order generators ---
+is the central mystery: it is predicted by the $L$-function $L(E,s)$
+(Paper~26) through the Birch--Swinnerton-Dyer conjecture (Paper~27),
+but remains largely uncomputed in general.
+
+% ================================================================
+\begin{thebibliography}{10}
+
+\bibitem{Silverman1986}
+J.~H.~Silverman,
+\emph{The Arithmetic of Elliptic Curves},
+Graduate Texts in Mathematics~106,
+Springer, New York, 1986.
+
+\bibitem{Cassels1991}
+J.~W.~S.~Cassels,
+\emph{Lectures on Elliptic Curves},
+London Mathematical Society Student Texts~24,
+Cambridge University Press, 1991.
+
+\bibitem{Mazur1977}
+B.~Mazur,
+Modular curves and the Eisenstein ideal,
+\emph{Inst.\ Hautes \'Etudes Sci.\ Publ.\ Math.}\ \textbf{47} (1977), 33--186.
+
+\bibitem{Cornell1997}
+G.~Cornell, J.~H.~Silverman, and G.~Stevens (eds.),
+\emph{Modular Forms and Fermat's Last Theorem},
+Springer, New York, 1997.
+
+\bibitem{Washington2008}
+L.~C.~Washington,
+\emph{Elliptic Curves: Number Theory and Cryptography}, 2nd~ed.,
+CRC Press, 2008.
+
+\end{thebibliography}
+
+\end{document}

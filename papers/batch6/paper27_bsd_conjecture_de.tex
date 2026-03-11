@@ -1,0 +1,314 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+
+% -------------------------------------------------------
+% Eigene Befehle
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\Sha}{\Sha}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Die Birch--Swinnerton-Dyer-Vermutung}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 84}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Die Birch--Swinnerton-Dyer-Vermutung (BSD) ist eine der sieben
+Millennium-Preisaufgaben des Clay Mathematics Institute.
+Sie sagt eine tiefe Verbindung zwischen der Arithmetik einer elliptischen
+Kurve $E/\Q$ (ihrem Rang $r$, Torsion, Periodenstruktur) und dem
+analytischen Verhalten ihrer $L$-Funktion $L(E,s)$ bei $s=1$ vorher.
+
+Wir formulieren die \emph{schwache BSD}: $L(E,1) = 0 \iff E(\Q)$ ist unendlich.
+Wir formulieren die \emph{starke BSD}: $\ord_{s=1}L(E,s) = r$, und geben
+die vollst\"andige Formel f\"ur den f\"uhrenden Koeffizienten mit $\Omega_E$,
+den Tamagawa-Zahlen $c_p$, der Tate--Shafarevich-Gruppe $\Sha(E/\Q)$
+und dem Regulator $R_E$.
+
+Bekannte Resultate: R\"ange $0$ und $1$
+(Coates--Wiles 1977, Kolyvagin 1990).
+Numerische Evidenz: $\prod_{p \le X} \#E(\Fp)/p \sim C(\log X)^r$.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung}
+% ================================================================
+
+In den 1960er Jahren berechneten Birch und Swinnerton-Dyer \cite{BSD1965}
+das Produkt $\prod_{p \le X} \#E(\Fp)/p$ f\"ur viele elliptische Kurven
+und beobachteten numerisch ein Wachstum wie $C \cdot (\log X)^r$,
+wobei $r$ der Rang von $E(\Q)$ ist.
+Dies f\"uhrte zu der Vermutung, dass die Verschwindungsordnung von
+$L(E,s)$ bei $s=1$ gleich dem Rang ist.
+
+% ================================================================
+\section{Schwache BSD: Rang und Verschwindungsordnung}
+% ================================================================
+
+\begin{conjecture}[Schwache BSD]
+\label{conj:weak_bsd}
+Sei $E$ eine elliptische Kurve \"uber $\Q$ mit Rang $r = \mathrm{rang}\,E(\Q)$.
+Dann gilt
+\[
+  \ord_{s=1} L(E,s) \;=\; r.
+\]
+Insbesondere:
+\begin{itemize}
+  \item $L(E,1) \ne 0 \iff r = 0 \iff E(\Q)$ ist endlich.
+  \item $L(E,1) = 0$ und $L'(E,1) \ne 0 \iff r = 1$.
+\end{itemize}
+\end{conjecture}
+
+\begin{remark}[Aktueller Stand]
+Die schwache BSD ist nur in Spezialf\"allen bewiesen:
+\begin{itemize}
+  \item Rang $0$: Coates--Wiles (1977) \cite{CoatesWiles1977} bewiesen $r=0$
+    f\"ur $E$ mit komplexer Multiplikation und $L(E,1) \ne 0$.
+  \item Kolyvagin (1990) \cite{Kolyvagin1990}: F\"ur modulare $E$ mit
+    $L(E,1) \ne 0$ sind $E(\Q)$ und $\Sha(E/\Q)$ endlich.
+    F\"ur $L'(E,1) \ne 0$ (und Vorzeichen $-1$) gilt $r = 1$.
+  \item Gross--Zagier (1986): Unter bestimmten Bedingungen impliziert
+    $L'(E,1) \ne 0$ die Existenz eines rationalen Punktes unendlicher Ordnung.
+  \item Der allgemeine Fall ist offen.
+\end{itemize}
+\end{remark}
+
+% ================================================================
+\section{Die Tate--Shafarevich-Gruppe}
+% ================================================================
+
+\begin{definition}[Tate--Shafarevich-Gruppe]
+\label{def:sha}
+Sei $E/\Q$. Die \emph{Tate--Shafarevich-Gruppe} ist
+\[
+  \Sha(E/\Q) \;=\; \ker\!\Bigl(H^1(\Q, E) \to \prod_v H^1(\Q_v, E)\Bigr),
+\]
+wobei $v$ alle Stellen (Primzahlen $p$ und die archimedische Stelle $\infty$)
+durchl\"auft.
+
+Anschaulich: $\Sha(E/\Q)$ parametrisiert Torsoren unter $E$, die \"uber
+jeder Vervollst\"andigung $\Q_v$ einen Punkt haben, aber keinen rationalen
+Punkt \"uber $\Q$ -- das sind Versagen des lokalen-globalen Prinzips f\"ur $E$.
+\end{definition}
+
+\begin{proposition}[Grundeigenschaften von $\Sha$]
+\label{prop:sha_basic}
+\begin{enumerate}
+  \item[\textup{(i)}] $\Sha(E/\Q)$ ist eine Torsions-abelsche Gruppe.
+  \item[\textup{(ii)}] Die Cassels--Tate-Paarung ist alternierend
+    (schiefsymmetrisch), also ist $|\Sha(E/\Q)|$ ein Quadrat (wenn endlich).
+  \item[\textup{(iii)}] Unter BSD-Annahme ist $\Sha(E/\Q)$ endlich.
+  \item[\textup{(iv)}] Kolyvagin bewies die Endlichkeit von $\Sha(E/\Q)$
+    f\"ur analytischen Rang $\le 1$.
+\end{enumerate}
+\end{proposition}
+
+% ================================================================
+\section{Starke BSD: Die Formel f\"ur den f\"uhrenden Koeffizienten}
+% ================================================================
+
+\begin{conjecture}[Starke BSD]
+\label{conj:strong_bsd}
+Sei $E/\Q$ mit Rang $r$, reeller Periode $\Omega_E$, Regulator $R_E$,
+endlicher Tate--Shafarevich-Gruppe $\Sha(E/\Q)$, Torsionsgruppe der
+Ordnung $|E(\Q)_{\mathrm{tors}}|$ und Tamagawa-Zahlen
+$c_p = |E(\Q_p)/E_0(\Q_p)|$ f\"ur Primzahlen $p$ schlechter Reduktion.
+Dann gilt:
+\begin{equation}
+  \label{eq:strong_bsd}
+  \lim_{s \to 1} \frac{L(E,s)}{(s-1)^r}
+  \;=\;
+  \frac{\Omega_E \cdot |\Sha(E/\Q)| \cdot R_E \cdot \prod_p c_p}
+       {|E(\Q)_{\mathrm{tors}}|^2}.
+\end{equation}
+\end{conjecture}
+
+\begin{remark}[Die Zutaten]
+\begin{itemize}
+  \item $\Omega_E = \int_{E(\R)} |\omega|$: die reelle Periode der
+    N\'eron-Differentialform $\omega = dx/2y$.
+  \item $R_E = \det(\langle P_i, P_j\rangle)$: der N\'eron--Tate-Regulator,
+    Determinante der H\"ohenpaarungsmatrix
+    f\"ur eine Basis $\{P_1,\ldots,P_r\}$ von $E(\Q)/E(\Q)_{\mathrm{tors}}$.
+  \item $c_p$: die Tamagawa-Zahl bei $p$ (Anzahl der Komponenten des
+    N\'eron-Modells bei $p$).
+  \item $\Sha(E/\Q)$: Tate--Shafarevich-Gruppe (ihr Quadrat ist die Ordnung).
+  \item $E(\Q)_{\mathrm{tors}}$: Torsionsuntergruppe (Paper~25).
+\end{itemize}
+\end{remark}
+
+% ================================================================
+\section{Numerische Evidenz: Das BSD-Produkt}
+% ================================================================
+
+\begin{definition}[BSD-Heuristikprodukt]
+\label{def:bsd_product}
+F\"ur $X > 0$ definieren wir das \emph{BSD-Heuristikprodukt}
+\[
+  B_E(X) \;=\; \prod_{\substack{p \le X\\ p\text{ gute Reduktion}}}
+  \frac{\#E(\Fp)}{p}.
+\]
+\end{definition}
+
+\begin{theorem}[Numerische Beobachtung von Birch--Swinnerton-Dyer]
+\label{thm:bsd_numerical}
+Birch und Swinnerton-Dyer \cite{BSD1965} berechneten $B_E(X)$ f\"ur viele
+Kurven und beobachteten:
+\[
+  B_E(X) \;\sim\; C_E\,(\log X)^r \quad (X \to \infty),
+\]
+wobei $r = \mathrm{rang}\,E(\Q)$ und $C_E$ eine kurvenabh\"angige Konstante ist.
+\end{theorem}
+
+\begin{proof}[Heuristische Begr\"undung]
+Mit Hasses Satz: $\#E(\Fp)/p = 1 + 1/p - a_p/p \approx 1 - a_p/p$.
+Das Produkt $\prod_{p \le X}(1-a_p/p)$ h\"angt mit $L(E,1)$ via dem
+Euler-Produkt zusammen.
+Wenn $L(E,1) = 0$ (Rang $r \ge 1$), divergiert das Produkt logarithmisch
+und ergibt das beobachtete $(\log X)^r$-Wachstum.
+\end{proof}
+
+% ================================================================
+\section{Bekannte Resultate}
+% ================================================================
+
+\begin{theorem}[Coates--Wiles, 1977]
+\label{thm:coates_wiles}
+Sei $E/\Q$ eine elliptische Kurve mit komplexer Multiplikation durch
+einen imagin\"ar-quadratischen K\"orper $K$.
+Falls $L(E,1) \ne 0$, so ist $E(\Q)$ endlich (Rang $r = 0$).
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Coates und Wiles \cite{CoatesWiles1977} verwendeten eine $p$-adische
+$L$-Funktion und die Arithmetik des CM-K\"orpers, um zu zeigen, dass
+$L(E,1) \ne 0$ die Endlichkeit des $p^\infty$-Selmer-Raums impliziert.
+\end{proof}
+
+\begin{theorem}[Kolyvagin, 1990]
+\label{thm:kolyvagin}
+Sei $E/\Q$ eine modulare elliptische Kurve.
+\begin{enumerate}
+  \item[\textup{(i)}] Falls $L(E,1) \ne 0$, so $r = 0$ und
+    $\Sha(E/\Q)$ ist endlich.
+  \item[\textup{(ii)}] Falls $L'(E,1) \ne 0$, so $r = 1$ und
+    $\Sha(E/\Q)$ ist endlich.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Kolyvagings Beweis \cite{Kolyvagin1990} verwendet \emph{Euler-Systeme}
+von Heegner-Punkten: Punkte auf $E$ aus der CM-Theorie, die ein
+normkompatibles System \"uber wachsenden K\"orpern bilden.
+Schritte:
+\begin{enumerate}
+  \item Gross--Zagier (1986): Bei $L'(E,1) \ne 0$ ist der Heegner-Punkt
+    auf $E$ ein Punkt unendlicher Ordnung.
+  \item Kolyvaginscher Abstieg: Euler-System-Relationen liefern die
+    vorhergesagte Struktur des Selmer-Raums.
+  \item Endlichkeit von $\Sha$ folgt aus der Kolyvagin-System-Struktur.
+\end{enumerate}
+\end{proof}
+
+% ================================================================
+\section{Abstieg und die Selmer-Gruppe}
+% ================================================================
+
+\begin{remark}[Berechnung des Selmer-Raums]
+Praktisch berechnet man den Rang durch einen \emph{2-Abstieg}:
+Dies liefert den \emph{Selmer-Raum} $\mathrm{Sel}_2(E/\Q)$ in der exakten Folge
+\[
+  0 \to E(\Q)/2E(\Q) \to \mathrm{Sel}_2(E/\Q) \to \Sha(E/\Q)[2] \to 0.
+\]
+Falls $\Sha(E/\Q) = 0$, ergibt sich der Rang direkt aus der Dimension des
+Selmer-Raums.
+\end{remark}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Die Birch--Swinnerton-Dyer-Vermutung sagt eine pr\"azise Verbindung zwischen
+der Arithmetik von $E(\Q)$ (Rang, Regulator, Tate--Shafarevich-Gruppe)
+und dem analytischen Verhalten von $L(E,s)$ bei $s=1$ vorher.
+
+Die schwache Form (Rang = analytischer Rang) ist nur f\"ur analytischen
+Rang $\le 1$ bewiesen (Kolyvagin 1990).
+Die starke Form~\eqref{eq:strong_bsd} wurde numerisch f\"ur tausende Kurven
+verifiziert, ist aber im Allgemeinen unbewiesen.
+
+BSD ist eine der sieben Millennium-Preisaufgaben; ihre L\"osung w\"urde
+ein fundamentales Verst\"andnis rationaler Punkte auf algebraischen
+Variet\"aten erm\"oglichen.
+
+% ================================================================
+\begin{thebibliography}{10}
+
+\bibitem{BSD1965}
+B.~J.~Birch und H.~P.~F.~Swinnerton-Dyer,
+Notes on elliptic curves, II,
+\emph{J.\ Reine Angew.\ Math.}\ \textbf{218} (1965), 79--108.
+
+\bibitem{CoatesWiles1977}
+J.~Coates und A.~Wiles,
+On the conjecture of Birch and Swinnerton-Dyer,
+\emph{Invent.\ Math.}\ \textbf{39} (1977), 223--251.
+
+\bibitem{Kolyvagin1990}
+V.~A.~Kolyvagin,
+Euler systems,
+in: \emph{The Grothendieck Festschrift}, Vol.~II,
+Progr.\ Math.~87, Birkh\"auser, 1990, S.~435--483.
+
+\bibitem{GrossZagier1986}
+B.~H.~Gross und D.~B.~Zagier,
+Heegner points and derivatives of $L$-series,
+\emph{Invent.\ Math.}\ \textbf{84} (1986), 225--320.
+
+\bibitem{Silverman1986}
+J.~H.~Silverman,
+\emph{The Arithmetic of Elliptic Curves},
+Graduate Texts in Mathematics~106,
+Springer, New York, 1986.
+
+\bibitem{Wiles1995}
+A.~Wiles,
+Modular elliptic curves and Fermat's last theorem,
+\emph{Ann.\ of Math.}\ (2) \textbf{142} (1995), 443--551.
+
+\end{thebibliography}
+
+\end{document}

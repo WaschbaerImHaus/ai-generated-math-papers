@@ -1,0 +1,350 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{example}[theorem]{Beispiel}
+
+% -------------------------------------------------------
+% Eigene Befehle
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\DeclareMathOperator{\ord}{ord}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Kongruente Zahlen, elliptische Kurven und BSD:\\
+       Eine konkrete Anwendung der Birch--Swinnerton-Dyer-Vermutung}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 84}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Eine positive ganze Zahl $n$ hei\ss t \emph{kongruente Zahl}, wenn sie
+die Fl\"ache eines rechtwinkligen Dreiecks mit rationalen Seiten ist.
+Dieses uralte Problem -- arabische Mathematiker im 10.~Jahrhundert --
+ist \"aquivalent zur Existenz eines rationalen Punktes unendlicher Ordnung
+auf der \emph{kongruenten Zahlkurve}
+$E_n: y^2 = x^3 - n^2 x$.
+
+Wir beweisen die \"Aquivalenz, bestimmen die Torsionsuntergruppe
+$E_n(\Q)_{\mathrm{tors}} \cong \Z/2\Z \times \Z/2\Z$
+und erkl\"aren Tunnells Satz (1983):
+Unter Annahme von BSD ist eine quadratfreie ganze Zahl $n$ genau dann
+kongruent, wenn
+\[
+  \#\{(x,y,z) \in \Z^3 : 2x^2 + y^2 + 8z^2 = n\}
+  = 2\,\#\{(x,y,z) \in \Z^3 : 2x^2 + y^2 + 32z^2 = n\}
+\]
+(f\"ur ungerades $n$; eine analoge Formel gilt f\"ur gerades $n$).
+Wir verifizieren, dass $5, 6, 7$ kongruent sind,
+und diskutieren den Status von $1, 2, 3$.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung: Was ist eine kongruente Zahl?}
+% ================================================================
+
+\begin{definition}[Kongruente Zahl]
+\label{def:congruent}
+Eine positive ganze Zahl $n$ hei\ss t \emph{kongruente Zahl}, wenn es ein
+rechtwinkliges Dreieck mit rationalen Seitenl\"angen $a, b, c$
+(wobei $c$ die Hypotenuse ist) gibt, dessen Fl\"ache $n$ betr\"agt:
+\[
+  a^2 + b^2 = c^2, \quad \frac{ab}{2} = n, \quad a, b, c \in \Q_{>0}.
+\]
+\end{definition}
+
+\begin{example}[Erste Beispiele]
+\begin{itemize}
+  \item $n = 6$: Das rechtwinklige Dreieck mit Katheten $3, 4$ und
+    Hypotenuse $5$ hat Fl\"ache $\tfrac{1}{2} \cdot 3 \cdot 4 = 6$.
+    Also ist $6$ eine kongruente Zahl.
+  \item $n = 5$: Das Dreieck mit Katheten $\tfrac{3}{2}$, $\tfrac{20}{3}$
+    und Hypotenuse $\tfrac{41}{6}$ hat Fl\"ache $5$.
+    Also ist $5$ kongruent.
+  \item $n = 7$: Das Dreieck mit Katheten $\tfrac{35}{12}$, $\tfrac{24}{5}$
+    und Hypotenuse $\tfrac{337}{60}$ hat Fl\"ache $7$.
+    Also ist $7$ kongruent.
+  \item $n = 1, 2, 3$: Vermutlich nicht kongruent, aber bisher nicht
+    bedingungslos bewiesen.
+\end{itemize}
+\end{example}
+
+\begin{remark}[Historische Notiz]
+Kongruente Zahlen wurden von arabischen Mathematikern im 10.~Jahrhundert
+studiert und auch von Fibonacci (1225).
+Fermat bewies, dass $1$ nicht kongruent ist, mittels unendlichem Abstieg --
+der erste dokumentierte Einsatz dieser Methode.
+\end{remark}
+
+% ================================================================
+\section{Die kongruente Zahlkurve}
+% ================================================================
+
+\begin{theorem}[\"Aquivalenz mit elliptischen Kurven]
+\label{thm:equiv}
+Eine positive quadratfreie ganze Zahl $n$ ist genau dann kongruent,
+wenn die elliptische Kurve
+\[
+  E_n: \quad y^2 = x^3 - n^2 x
+\]
+einen rationalen Punkt unendlicher Ordnung hat, d.\,h.\
+$\mathrm{rang}(E_n(\Q)) \ge 1$.
+\end{theorem}
+
+\begin{proof}
+\textbf{(Kongruent $\Rightarrow$ Punkt unendlicher Ordnung.)}
+Seien $a^2 + b^2 = c^2$ und $ab/2 = n$ mit $a,b,c \in \Q_{>0}$.
+Wir definieren
+\[
+  x_0 = \Bigl(\frac{a+b}{2}\Bigr)^2, \quad
+  y_0 = \frac{(a+b)^2 \cdot c}{8} \cdot \text{(geeignetes Vorzeichen)}.
+\]
+Die korrekte Standardparametrisierung (vgl.\ \cite{Koblitz1984}, Kapitel~1) ergibt:
+Aus $(a,b,c)$ mit $a^2+b^2=c^2$ und $ab=2n$ setzt man
+$x_0 = ((a^2+b^2)/2)$ nein -- die eleganteste Version ist:
+Der Punkt
+\[
+  P = \Bigl(\bigl(\tfrac{c}{2}\bigr)^2,\; \tfrac{c(a^2-b^2)}{8}\Bigr)
+\]
+liegt auf $E_n$, denn
+\[
+  \Bigl(\tfrac{c(a^2-b^2)}{8}\Bigr)^2
+  = \frac{c^2(a^2-b^2)^2}{64}
+\]
+und
+\[
+  \Bigl(\tfrac{c^2}{4}\Bigr)^3 - n^2\cdot\tfrac{c^2}{4}
+  = \frac{c^6}{64} - \frac{n^2 c^2}{4}
+  = \frac{c^2}{64}\bigl(c^4 - 16n^2\bigr).
+\]
+Mit $c^4 - 16n^2 = (a^2+b^2)^2 - (ab)^2 = (a^2-b^2)^2$ folgt
+$P \in E_n(\Q)$.
+
+Dieser Punkt liegt nicht in der Torsionsuntergruppe $\{O, (0,0), (\pm n, 0)\}$
+(da $y_0 = c(a^2-b^2)/8 \ne 0$ f\"ur ein \"achtes Pythagor\"aisches
+Tripel mit $a \ne b$), also hat er unendliche Ordnung.
+
+\textbf{(Punkt unendlicher Ordnung $\Rightarrow$ kongruent.)}
+Sei $(x_0,y_0) \in E_n(\Q)$ mit $y_0 \ne 0$. Die Zahlen
+\[
+  a = \left|\frac{x_0^2 - n^2}{y_0}\right|, \quad
+  b = \left|\frac{2nx_0}{y_0}\right|, \quad
+  c = \left|\frac{x_0^2 + n^2}{y_0}\right|
+\]
+erf\"ullen $a^2 + b^2 = c^2$ und $ab/2 = n$, wie man mit
+$y_0^2 = x_0^3 - n^2 x_0 = x_0(x_0^2-n^2)$ nachrechnet.
+\end{proof}
+
+% ================================================================
+\section{Die Torsionsuntergruppe von \texorpdfstring{$E_n$}{En}}
+% ================================================================
+
+\begin{theorem}[Torsion von $E_n$]
+\label{thm:torsion_En}
+F\"ur quadratfreies $n \ge 1$:
+\[
+  E_n(\Q)_{\mathrm{tors}} \;=\; \{\mathcal{O},\, (0,0),\, (n,0),\, (-n,0)\}
+  \;\cong\; \Z/2\Z \times \Z/2\Z.
+\]
+\end{theorem}
+
+\begin{proof}
+Die Kurve $E_n: y^2 = x(x-n)(x+n)$ hat drei rationale Wurzeln $0, n, -n$,
+die drei $2$-Torsionspunkte $(0,0)$, $(n,0)$, $(-n,0)$ ergeben.
+Zusammen mit $\mathcal{O}$ bilden sie $\Z/2\Z \times \Z/2\Z$.
+
+Keine weiteren Torsionspunkte existieren: Nach Nagell--Lutz m\"usste ein
+Torsionspunkt $(x_0, y_0)$ mit $y_0 \ne 0$ die Bedingung $y_0^2 \mid \Delta$
+(mit $\Delta = 64n^6$) erf\"ullen und $x_0, y_0 \in \Z$ (Nagell--Lutz).
+Eine vollst\"andige Fallunterscheidung zeigt, dass keine weiteren
+ganzzahligen Punkte auf $E_n$ existieren; vgl.\ \cite{Silverman1992}.
+\end{proof}
+
+\begin{corollary}
+$n$ ist kongruent $\iff$ $\mathrm{rang}(E_n(\Q)) \ge 1$
+$\iff$ $E_n(\Q) \ne E_n(\Q)_{\mathrm{tors}}$.
+\end{corollary}
+
+% ================================================================
+\section{Tunnells Satz}
+% ================================================================
+
+\begin{theorem}[Tunnell, 1983]
+\label{thm:tunnell}
+F\"ur eine quadratfreie positive ganze Zahl $n$ definiere:
+\begin{align*}
+  A(n) &= \#\{(x,y,z) \in \Z^3 : 2x^2 + y^2 + 8z^2 = n\}, \\
+  B(n) &= \#\{(x,y,z) \in \Z^3 : 2x^2 + y^2 + 32z^2 = n\}, \\
+  C(n) &= \#\{(x,y,z) \in \Z^3 : 8x^2 + 2y^2 + 16z^2 = n/2\}
+  \quad (n \text{ gerade}), \\
+  D(n) &= \#\{(x,y,z) \in \Z^3 : 8x^2 + 2y^2 + 64z^2 = n/2\}
+  \quad (n \text{ gerade}).
+\end{align*}
+\begin{enumerate}
+  \item[\textup{(i)}] Ist $n$ kongruent, so gilt:
+    $A(n) = 2B(n)$ (f\"ur ungerades $n$), bzw.\
+    $C(n) = 2D(n)$ (f\"ur gerades $n$).
+  \item[\textup{(ii)}] Umgekehrt (unter Annahme von BSD f\"ur $E_n$):
+    Falls $A(n) = 2B(n)$ (ungerades $n$) oder $C(n) = 2D(n)$ (gerades $n$),
+    dann ist $n$ kongruent.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Tunnell \cite{Tunnell1983} verwendete Modulformen vom Gewicht $3/2$ und
+die Theorie der Theta-Funktionen.
+Schritte:
+\begin{enumerate}
+  \item $L(E_n, 1)$ l\"asst sich durch Werte von Modulformen
+    ausdr\"ucken, die tern\"aren quadratischen Formen zugeordnet sind.
+  \item Via Shimuras Hebelungsatz und der Theorie halbganzzahliger
+    Modulformen ist $L(E_n,1)$ mit der Differenz $A(n)-2B(n)$ verkn\"upft.
+  \item Ist $n$ kongruent, so sagt BSD $L(E_n,1) = 0$ vorher,
+    was $A(n) = 2B(n)$ ergibt.
+  \item Die Umkehrung (Teil~(ii)) erfordert BSD f\"ur $E_n$:
+    Aus $A(n)=2B(n)$ folgt $L(E_n,1)=0$, und BSD impliziert
+    $\mathrm{rang}(E_n) \ge 1$, also ist $n$ kongruent.
+\end{enumerate}
+Vollst\"andiger Beweis in \cite{Tunnell1983} und \cite{Koblitz1984}.
+\end{proof}
+
+% ================================================================
+\section{Verifikation f\"ur kleine Werte}
+% ================================================================
+
+\begin{theorem}[Kongruente Zahlen: $n = 5, 6, 7$]
+\label{thm:small_examples}
+Die ganzen Zahlen $5, 6, 7$ sind kongruent.
+\end{theorem}
+
+\begin{proof}
+\textbf{$n = 6$:} Dreieck $(3, 4, 5)$, Fl\"ache $= 6$.
+Der zugeh\"orige Punkt auf $E_6: y^2 = x^3 - 36x$ ist $(25/4, 35/8)$.
+Probe: $(35/8)^2 = 1225/64$ und $(25/4)^3 - 36(25/4)
+= 15625/64 - 14400/64 = 1225/64$. \checkmark
+Dieser Punkt hat unendliche Ordnung (er liegt nicht in der Torsionsuntergruppe
+$\{O,(0,0),(\pm 6, 0)\}$).
+
+\textbf{$n = 5$:} Dreieck $(3/2, 20/3, 41/6)$, Fl\"ache $= 5$.
+Probe: $(3/2)^2 + (20/3)^2 = 9/4 + 400/9 = (81+1600)/36 = 1681/36 = (41/6)^2$. \checkmark
+Fl\"ache $= (1/2)(3/2)(20/3) = (1/2)(10) = 5$. \checkmark
+
+\textbf{$n = 7$:} Dreieck $(35/12, 24/5, 337/60)$, Fl\"ache $= 7$.
+Probe: $(35/12)^2 + (24/5)^2 = 1225/144 + 576/25 = (30625 + 82944)/3600
+= 113569/3600 = (337/60)^2$. \checkmark
+Fl\"ache $= (1/2)(35/12)(24/5) = (1/2)(840/60) = (1/2)(14) = 7$. \checkmark
+\end{proof}
+
+\begin{remark}[Status von $n = 1, 2, 3$]
+\begin{itemize}
+  \item Fermat bewies mittels unendlichem Abstieg, dass $n=1$ nicht kongruent
+    ist (\"aquivalent: $y^2 = x^4 - 1$ hat keine rationalen Punkte mit $y\ne 0$).
+  \item $n = 2, 3$: Tunnells Satz sagt unter BSD vorher, dass $A(2) \ne 2B(2)$
+    und $A(3) \ne 2B(3)$, was $n=2,3$ nicht-kongruent bedeutet.
+    Dies ist aber noch nicht bedingungslos bewiesen.
+  \item Die vollst\"andige bedingungslose L\"osung des kongruenten
+    Zahlenproblems f\"ur $n=1,2,3$ folgt aus einem Beweis von BSD
+    f\"ur die entsprechenden Kurven $E_1, E_2, E_3$.
+\end{itemize}
+\end{remark}
+
+% ================================================================
+\section{Verbindung zu BSD}
+% ================================================================
+
+\begin{theorem}[BSD und das kongruente Zahlenproblem]
+\label{thm:bsd_cong}
+Das kongruente Zahlenproblem ist unter BSD vollst\"andig gel\"ost:
+Eine quadratfreie positive ganze Zahl $n$ ist genau dann kongruent,
+wenn Tunnells Kriterium gilt: $A(n)=2B(n)$ (ungerades $n$) oder
+$C(n)=2D(n)$ (gerades $n$).
+\end{theorem}
+
+\begin{proof}
+\textbf{Richtung 1} ($n$ kongruent $\Rightarrow$ Kriterium):
+Dies ist Tunnells Satz~\ref{thm:tunnell}(i), bedingungslos.
+
+\textbf{Richtung 2} (Kriterium $\Rightarrow$ $n$ kongruent), bedingt durch BSD:
+Aus $A(n)=2B(n)$ folgt $L(E_n,1)=0$.
+Unter BSD: $L(E_n,1)=0$ impliziert $\mathrm{rang}(E_n)\ge 1$.
+Nach Satz~\ref{thm:equiv} ist $n$ damit kongruent.
+\end{proof}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Das kongruente Zahlenproblem, eines der \"altesten in der Mathematik,
+wird -- zumindest bedingt -- durch die Theorie elliptischer Kurven und
+BSD elegant gel\"ost.
+
+Die \"Aquivalenz zwischen $n$ kongruent und $\mathrm{rang}(E_n(\Q)) \ge 1$
+(Satz~\ref{thm:equiv}) reduziert das Problem auf die Arithmetik der
+Kurve $E_n: y^2 = x^3 - n^2 x$.
+Tunnells Satz liefert dann ein explizites, berechenbares Kriterium
+durch Repr\"asentationszahlen tern\"arer quadratischer Formen.
+
+Ein bedingungsloser Beweis, dass $n = 1, 2, 3$ nicht kongruent sind,
+folgt aus einem Beweis von BSD f\"ur diese Kurven.
+
+% ================================================================
+\begin{thebibliography}{10}
+
+\bibitem{Tunnell1983}
+J.~B.~Tunnell,
+A classical Diophantine problem and modular forms of weight $3/2$,
+\emph{Invent.\ Math.}\ \textbf{72} (1983), 323--334.
+
+\bibitem{Koblitz1984}
+N.~Koblitz,
+\emph{Introduction to Elliptic Curves and Modular Forms},
+Graduate Texts in Mathematics~97,
+Springer, New York, 1984.
+
+\bibitem{Silverman1992}
+J.~H.~Silverman und J.~Tate,
+\emph{Rational Points on Elliptic Curves},
+Undergraduate Texts in Mathematics,
+Springer, New York, 1992.
+
+\bibitem{Silverman1986}
+J.~H.~Silverman,
+\emph{The Arithmetic of Elliptic Curves},
+Graduate Texts in Mathematics~106,
+Springer, New York, 1986.
+
+\bibitem{Cassels1991}
+J.~W.~S.~Cassels,
+\emph{Lectures on Elliptic Curves},
+Cambridge University Press, 1991.
+
+\end{thebibliography}
+
+\end{document}

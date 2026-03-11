@@ -1,0 +1,367 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{example}[theorem]{Beispiel}
+
+% -------------------------------------------------------
+% Eigene Befehle
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\DeclareMathOperator{\ord}{ord}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Elliptische Kurven \"uber \texorpdfstring{$\Q$}{Q}:\\
+       Weierstra\ss-Form, Gruppengesetz, Torsion und der Satz von Mordell--Weil}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 84}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Eine \emph{elliptische Kurve} \"uber $\Q$ ist eine glatte projektive Kurve
+vom Geschlecht~$1$ mit einem ausgew\"ahlten rationalen Punkt, typischerweise
+in \emph{kurzer Weierstra\ss-Form} $y^2 = x^3 + ax + b$ mit $a, b \in \Q$
+und nicht-verschwindender Diskriminante $\Delta = -16(4a^3 + 27b^2) \ne 0$.
+Wir entwickeln die Theorie systematisch:
+die algebraische Gruppenstruktur durch das \emph{Sekanten-Tangenten-Gesetz},
+die Diskriminante und die \emph{$j$-Invariante},
+die \emph{Torsionsuntergruppe} $E(\Q)_{\mathrm{tors}}$ (klassifiziert durch
+Mazurs Satz in $15$ m\"ogliche Typen)
+und den \emph{Satz von Mordell--Weil}
+$E(\Q) \cong E(\Q)_{\mathrm{tors}} \oplus \Z^r$,
+der besagt, dass die Gruppe der rationalen Punkte endlich erzeugt ist.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung}
+% ================================================================
+
+Elliptische Kurven sind zentral f\"ur Zahlentheorie, Kryptographie und
+algebraische Geometrie.
+Sie sind die einfachsten nicht-trivialen Kurven aus arithmetischer Sicht:
+Rationale Punkte auf Kurven vom Geschlecht~$0$ sind leicht parametrisiert
+(Kegelschnitte), w\"ahrend Geschlecht~$\ge 2$ durch Faltings' Satz
+(endlich viele rationale Punkte) beherrscht wird.
+Geschlecht~$1$ -- der elliptische Fall -- ist reich:
+Die rationalen Punkte bilden eine abelsche Gruppe,
+und diese Gruppe zu bestimmen ist ein tiefes arithmetisches Problem.
+
+% ================================================================
+\section{Weierstra\ss-Form und grundlegende Definitionen}
+% ================================================================
+
+\begin{definition}[Kurze Weierstra\ss-Form]
+\label{def:weierstrass}
+Eine \emph{elliptische Kurve} \"uber $\Q$ in \emph{kurzer Weierstra\ss-Form} ist
+eine ebene kubische Kurve
+\[
+  E: \quad y^2 = x^3 + ax + b
+\]
+mit $a, b \in \Q$ und \emph{Diskriminante}
+\[
+  \Delta \;=\; -16\,(4a^3 + 27b^2) \;\ne\; 0.
+\]
+Die Bedingung $\Delta \ne 0$ sichert die Glattheit von $E$.
+Zusammen mit dem \emph{Punkt im Unendlichen} $\mathcal{O}$ ist $E$ eine
+glatte projektive Kurve vom Geschlecht~$1$.
+\end{definition}
+
+\begin{definition}[$j$-Invariante]
+\label{def:j_invariant}
+Die \emph{$j$-Invariante} von $E: y^2 = x^3 + ax + b$ ist
+\[
+  j(E) \;=\; 1728\,\frac{4a^3}{4a^3 + 27b^2}.
+\]
+\end{definition}
+
+\begin{theorem}[Klassifikation durch $j$]
+\label{thm:j_classification}
+Zwei elliptische Kurven $E$ und $E'$ \"uber $\overline{\Q}$ sind genau dann
+isomorph als elliptische Kurven, wenn $j(E) = j(E')$.
+\"Uber $\Q$ bestimmt die $j$-Invariante die Kurve bis auf einen
+\emph{Twist} (Verdrehung).
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Ein Isomorphismus $E \to E'$ von Weierstra\ss-Kurven wird durch
+$(x,y) \mapsto (u^2 x + r, u^3 y + u^2 sx + t)$ gegeben.
+Unter dieser Abbildung transformieren sich $a \mapsto u^4 a'$ und
+$b \mapsto u^6 b'$, woraus $j = j'$ folgt.
+Umgekehrt gibt es zu jedem $j$-Wert ein Weierstra\ss-Modell; vgl.\ \cite{Silverman1986}, Kap.~III.
+\end{proof}
+
+% ================================================================
+\section{Das Gruppengesetz: Sekanten-Tangenten-Regel}
+% ================================================================
+
+\begin{theorem}[Gruppengesetz auf $E$]
+\label{thm:group_law}
+Die Menge $E(\Q) = \{(x,y) \in \Q^2 : y^2 = x^3+ax+b\} \cup \{\mathcal{O}\}$
+bildet eine abelsche Gruppe mit neutralem Element $\mathcal{O}$ und
+folgender Additionsregel:
+
+\begin{enumerate}
+  \item[\textup{(i)}] $\mathcal{O}$ ist das neutrale Element.
+  \item[\textup{(ii)}] Inverses: $-(x,y) = (x,-y)$.
+  \item[\textup{(iii)}] Addition ($P \ne \pm Q$): Die Gerade durch $P = (x_1,y_1)$
+    und $Q = (x_2,y_2)$ (bzw.\ die Tangente an $E$ im Punkt $P$ falls $P=Q$)
+    trifft $E$ in einem dritten Punkt $R'$, und $P+Q = -R'$.
+\end{enumerate}
+
+Explizit: F\"ur $P = (x_1,y_1) \ne \pm Q = (x_2,y_2)$:
+\begin{align}
+  \lambda &=
+  \begin{cases}
+    \dfrac{y_2 - y_1}{x_2 - x_1} & \text{falls } x_1 \ne x_2
+      \quad\text{(Sekante)},\\[6pt]
+    \dfrac{3x_1^2 + a}{2y_1}     & \text{falls } P = Q
+      \quad\text{(Tangente)},
+  \end{cases}
+  \label{eq:lambda} \\[4pt]
+  x_3 &= \lambda^2 - x_1 - x_2, \label{eq:x3} \\
+  y_3 &= \lambda(x_1 - x_3) - y_1. \label{eq:y3}
+\end{align}
+Dann gilt $P + Q = (x_3, y_3)$.
+\end{theorem}
+
+\begin{proof}
+Wir verifizieren den Sekanten-Fall ($x_1 \ne x_2$).
+Die Gerade $y = \lambda(x-x_1)+y_1$ trifft $y^2 = x^3+ax+b$ in den Punkten
+mit $x$-Koordinaten, die das kubische Polynom
+\[
+  (\lambda(x-x_1)+y_1)^2 - x^3 - ax - b = 0
+\]
+erf\"ullen.
+Nach Vi\`etes Formeln ist die Summe der drei Wurzeln gleich $\lambda^2$
+(aus dem $x^2$-Koeffizienten).
+Da $x_1$ und $x_2$ zwei Wurzeln sind, gilt $x_3 = \lambda^2 - x_1 - x_2$.
+Einsetzen in die Geradengleichung liefert $y_3$.
+
+Die Assoziativit\"at kann algebraisch (direkte Rechnung) oder geometrisch
+(B\'ezout-Satz f\"ur Kubiken durch $9$ Punkte) bewiesen werden;
+vgl.\ \cite{Silverman1986}, Kapitel~III.
+\end{proof}
+
+% ================================================================
+\section{Die Torsionsuntergruppe}
+% ================================================================
+
+\begin{definition}[Torsionspunkte]
+\label{def:torsion}
+Ein Punkt $P \in E(\Q)$ hei\ss t \emph{Torsionspunkt}, falls $nP = \mathcal{O}$
+f\"ur ein $n \ge 1$ gilt. Die \emph{Torsionsuntergruppe} ist
+\[
+  E(\Q)_{\mathrm{tors}} \;=\; \{P \in E(\Q) : nP = \mathcal{O}
+  \text{ f\"ur ein } n \ge 1\}.
+\]
+\end{definition}
+
+\begin{theorem}[Mazurs Torsionssatz, 1977]
+\label{thm:mazur}
+Sei $E$ eine elliptische Kurve \"uber $\Q$. Dann ist $E(\Q)_{\mathrm{tors}}$
+eine der folgenden $15$ Gruppen:
+\begin{align*}
+  &\Z/n\Z \quad (n = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12), \\
+  &\Z/2\Z \times \Z/2n\Z \quad (n = 1, 2, 3, 4).
+\end{align*}
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Mazurs urspr\"unglicher Beweis \cite{Mazur1977} verwendet die Theorie der
+Modulkurven $X_1(N)$ und Eisenstein-Ideale.
+Schritte: (1) F\"ur eine Primzahl $\ell$ wird die $\ell$-Torsion durch
+$X_1(\ell)$ kontrolliert, die f\"ur $\ell \ge 11$ Geschlecht $\ge 2$ hat
+(Riemann--Hurwitz). (2) Nach Faltings' Satz (Geschlecht $\ge 2$) hat
+$X_1(\ell)(\Q)$ nur endlich viele Punkte. (3) Explizite Rechnung schliesst
+die restlichen F\"alle aus.
+\end{proof}
+
+\begin{example}[Torsionsbeispiele]
+\begin{itemize}
+  \item $E: y^2 = x^3 - x$ hat Torsion $\Z/2\Z \times \Z/2\Z$
+    (drei $2$-Torsionspunkte: $(0,0)$, $(1,0)$, $(-1,0)$).
+  \item $E: y^2 = x^3 + 1$ hat Torsion $\Z/6\Z$.
+  \item $E: y^2 + y = x^3 - x^2 - 10x - 10$ hat Torsion $\Z/12\Z$
+    (maximale zyklische Ordnung).
+\end{itemize}
+\end{example}
+
+\begin{theorem}[Satz von Nagell--Lutz]
+\label{thm:nagell_lutz}
+Sei $E: y^2 = x^3 + ax + b$ mit $a, b \in \Z$.
+Ist $(x_0, y_0) \in E(\Q)$ ein Torsionspunkt, so gilt $x_0, y_0 \in \Z$,
+und entweder $y_0 = 0$ (Punkt der Ordnung~$2$) oder $y_0^2 \mid 4a^3 + 27b^2$.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Folgt aus der Theorie formaler Gruppen und Reduktion modulo Primzahlen.
+Ein elementarer Beweis steht in \cite{Silverman1986}, Kapitel~VIII.
+\end{proof}
+
+% ================================================================
+\section{Der Satz von Mordell--Weil}
+% ================================================================
+
+\begin{theorem}[Satz von Mordell--Weil]
+\label{thm:mordell_weil}
+F\"ur jede elliptische Kurve $E$ \"uber $\Q$ ist $E(\Q)$ eine
+endlich erzeugte abelsche Gruppe.
+Nach dem Struktursatz f\"ur endlich erzeugte abelsche Gruppen gilt:
+\begin{equation}
+  \label{eq:mw}
+  E(\Q) \;\cong\; E(\Q)_{\mathrm{tors}} \;\oplus\; \Z^r,
+\end{equation}
+wobei $r \ge 0$ der \emph{Rang} von $E$ \"uber $\Q$ ist.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Mordell (1922) bewies dies f\"ur $\Q$; Weil (1928) verallgemeinerte es auf
+Zahlk\"orper.
+Der Beweis hat zwei Hauptteile:
+
+\textbf{Teil 1: Schwacher Mordell--Weil-Satz.}
+Es gibt $n \ge 2$ mit $E(\Q)/nE(\Q)$ endlich.
+(F\"ur $n=2$: Die $2$-Abstieg-Abbildung ist injektiv in eine endliche
+Gruppe, die mit dem Selmer-Raum zusammenh\"angt.)
+
+\textbf{Teil 2: Abstieg.}
+Mithilfe einer H\"ohenfunktion $h: E(\Q) \to \R_{\ge 0}$ mit
+\begin{align}
+  h(P+Q) + h(P-Q) &= 2h(P) + 2h(Q) + O(1), \\
+  h(nP) &= n^2 h(P) + O(1),
+\end{align}
+zeigt man, dass jede Nebenklasse von $nE(\Q)$ in $E(\Q)$ einen
+Repr\"asentanten beschr\"ankter H\"ohe enth\"alt und Mengen beschr\"ankter
+H\"ohe endlich sind.
+
+Details in \cite{Silverman1986}, Kapitel~VIII.
+\end{proof}
+
+\begin{remark}[Das Rang-Problem]
+Der \emph{Rang} $r$ in~\eqref{eq:mw} ist das geheimnisvollste Invariante
+von $E(\Q)$. Es gibt keinen bekannten Algorithmus, der garantiert $r$
+berechnet.
+Die Birch--Swinnerton-Dyer-Vermutung (Paper~27) sagt vorher:
+$r = \ord_{s=1} L(E,s)$.
+
+Bekannte Rekorde: Kurven mit Rang $\ge 28$ sind bekannt (Elkies 2006).
+Ob die R\"ange unbeschr\"ankt sind, ist unbekannt.
+\end{remark}
+
+% ================================================================
+\section{H\"ohen und die kanonische H\"ohe}
+% ================================================================
+
+\begin{definition}[Na\"ive H\"ohe]
+\label{def:naive_height}
+F\"ur $P = (x,y) \in E(\Q)$ mit $x = p/q$ (vollst\"andig gek\"urzt) ist
+die \emph{na\"ive H\"ohe} $H(P) = \max(|p|,|q|)$ und die
+\emph{logarithmische na\"ive H\"ohe} $h(P) = \log H(P)$.
+\end{definition}
+
+\begin{theorem}[Kanonische (N\'eron--Tate-)H\"ohe]
+\label{thm:neron_tate}
+Es gibt eine eindeutige Funktion $\hat h: E(\Q) \to \R_{\ge 0}$,
+die \emph{kanonische H\"ohe}, mit:
+\begin{enumerate}
+  \item[\textup{(i)}] $\hat h(P) = h(P) + O(1)$.
+  \item[\textup{(ii)}] $\hat h(nP) = n^2 \hat h(P)$ (exakt quadratisch).
+  \item[\textup{(iii)}] $\hat h(P) \ge 0$, mit Gleichheit genau f\"ur
+    Torsionspunkte.
+\end{enumerate}
+Die \emph{N\'eron--Tate-Bilinearform}
+$\langle P, Q \rangle = \hat h(P+Q) - \hat h(P) - \hat h(Q)$
+macht $E(\Q)/E(\Q)_{\mathrm{tors}} \otimes \R$ zu einem euklidischen Raum.
+\end{theorem}
+
+% ================================================================
+\section{Reduktion modulo Primzahlen}
+% ================================================================
+
+\begin{definition}[Gute und schlechte Reduktion]
+\label{def:reduction}
+F\"ur eine Primzahl $p$ ist die \emph{Reduktion} $\tilde E$ modulo $p$
+die Kurve $y^2 = x^3 + \bar a x + \bar b$ \"uber $\Fp$.
+\begin{itemize}
+  \item \emph{Gute Reduktion} bei $p$: $p \nmid \Delta$, d.\,h.\
+    $\tilde E$ ist glatt.
+  \item \emph{Multiplikative Reduktion} bei $p$: $\tilde E$ hat einen Knoten.
+  \item \emph{Additive Reduktion} bei $p$: $\tilde E$ hat eine Spitze.
+\end{itemize}
+Der \emph{F\"uhrer} $N_E = \prod_p p^{f_p}$ fasst das schlechte
+Reduktionsverhalten zusammen.
+\end{definition}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Wir haben die Grundlagen elliptischer Kurven \"uber $\Q$ entwickelt:
+die glatte Kubik in Weierstra\ss-Form, die $j$-Invariante,
+die abelsche Gruppenstruktur durch die Sekanten-Tangenten-Regel,
+die vollst\"andige Klassifikation der Torsion durch Mazurs Satz (15 Typen)
+und den Satz von Mordell--Weil mit Struktur
+$E(\Q)_{\mathrm{tors}} \oplus \Z^r$.
+
+Der Rang $r$ -- die Anzahl unabh\"angiger Erzeuger unendlicher Ordnung --
+ist das zentrale R\"atsel:
+Er wird durch die $L$-Funktion $L(E,s)$ (Paper~26) und die
+Birch--Swinnerton-Dyer-Vermutung (Paper~27) vorhergesagt,
+bleibt aber im Allgemeinen unberechenbar.
+
+% ================================================================
+\begin{thebibliography}{10}
+
+\bibitem{Silverman1986}
+J.~H.~Silverman,
+\emph{The Arithmetic of Elliptic Curves},
+Graduate Texts in Mathematics~106,
+Springer, New York, 1986.
+
+\bibitem{Cassels1991}
+J.~W.~S.~Cassels,
+\emph{Lectures on Elliptic Curves},
+London Mathematical Society Student Texts~24,
+Cambridge University Press, 1991.
+
+\bibitem{Mazur1977}
+B.~Mazur,
+Modular curves and the Eisenstein ideal,
+\emph{Inst.\ Hautes \'Etudes Sci.\ Publ.\ Math.}\ \textbf{47} (1977), 33--186.
+
+\bibitem{Washington2008}
+L.~C.~Washington,
+\emph{Elliptic Curves: Number Theory and Cryptography}, 2.~Aufl.,
+CRC Press, 2008.
+
+\end{thebibliography}
+
+\end{document}

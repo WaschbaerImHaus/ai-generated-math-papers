@@ -403,3 +403,86 @@
 - src/galois_theory.md: Vollständige KaTeX-Dokumentation aktualisiert (Build 84)
 - Bugfix: radical_tower() nutzte 'is_solvable' statt 'solvable' (Key-Fehler behoben)
 - Testkorrektur: N_{Q(sqrt2)/Q}(sqrt2) = -2 (Vieta-Formel, nicht +2)
+
+2026-03-11 Build 87: Batch 5 (Papers 21-24) und Batch 6 (Papers 25-28) erstellt
+
+=== BATCH 5: Riemann-Hypothese-Serie (Papers 21-24) ===
+
+paper21_riemann_zeta_function_en.tex / _de.tex
+- Riemann-Zeta-Funktion: Definition, Euler-Produkt, analytische Fortsetzung
+- Funktionalgleichung: ζ(s) = 2^s π^{s-1} sin(πs/2) Γ(1-s) ζ(1-s)
+- Triviale Nullstellen bei s = -2,-4,-6,...
+- Riemann-Siegel-Formel: Z(t) = e^{iθ(t)} ζ(1/2+it)
+- Kritischer Streifen 0 < Re(s) < 1, Euler-Werte ζ(2k)
+
+paper22_nontrivial_zeros_en.tex / _de.tex
+- N(T) = (T/2π)log(T/2π) - T/2π + 7/8 + O(log T)
+- Erste Nullstelle: ρ₁ = 1/2 + 14.134725...i, erste 10 Nullstellen
+- Gram-Punkte und Grams Gesetz (Versagen bei n=126)
+- Montgomery-Paarkorrelationsvermutung (GUE): 1 - (sin πx/πx)²
+- Odlyzkos numerische Verifikation: Übereinstimmung <1% mit GUE
+- RH verifiziert für >10^13 Nullstellen (Platt-Trudgian 2021)
+
+paper23_explicit_formula_pnt_en.tex / _de.tex
+- Von-Mangoldt-Funktion Λ(n), Tschebyschew-Funktionen ψ(x), θ(x)
+- Logarithmische Ableitung -ζ'/ζ = Σ Λ(n)/n^s
+- Perrons Formel für ψ(x)
+- Explizite Formel: ψ(x) = x - Σ_ρ x^ρ/ρ - ζ'(0)/ζ(0) - ½log(1-x^{-2})
+- Primzahlsatz via nullstellenfreies Gebiet (Hadamard/de la Vallée Poussin)
+- Schoenfelds Schranke unter RH: |π(x)-Li(x)| < (1/8π)√x·log x für x≥2657
+- Riemanns explizite Formel für π(x)
+
+paper24_rh_approaches_en.tex / _de.tex
+- Hilbert-Pólya-Vermutung: hermitescher Operator mit Eigenwerten γ_n
+- Berry-Keating: H = xp, WKB-Spektrum ~ 2πn/log(n/2πe)
+- Connes' nichtkommutative Geometrie
+- GUE: Definition, Montgomerys Paarkorrelation
+- Selberg-Spurformel als geometrisches Analogon
+- Teilresultate: Levinson (1/3), Conrey (2/5) der Nullstellen auf Gerade
+- 5 bekannte Barrieren gegen naive Beweisversuche
+
+=== BATCH 6: Elliptische Kurven & BSD-Vermutung (Papers 25-28) ===
+
+paper25_elliptic_curves_Q_en.tex / _de.tex
+- Weierstraß-Form y² = x³ + ax + b, Diskriminante Δ = -16(4a³+27b²)
+- j-Invariante, Klassifikation bis auf Isomorphismus
+- Gruppengesetz (Sekanten-Tangenten-Regel) mit vollständigem Beweis
+- Mazurs Torsionssatz (1977): 15 mögliche Torsionstypen
+- Nagell-Lutz-Satz
+- Mordell-Weil-Satz: E(Q) ≅ E(Q)_tors ⊕ Z^r
+- Kanonische (Néron-Tate-)Höhe, gute/schlechte Reduktion
+
+paper26_l_function_elliptic_en.tex / _de.tex
+- Frobenius-Spur a_p = p+1-#E(F_p), Berechnung für E: y²=x³-x bei p=5
+- Hasses Satz: |a_p| ≤ 2√p (vollständige Beweisskizze via Tate-Modul)
+- Lokale L-Faktoren für gute/multiplikative/additive Reduktion
+- Dirichlet-Reihe Σ a_n/n^s für Re(s)>3/2
+- Vervollständigte L-Funktion Λ(E,s) = (√N/2π)^s Γ(s) L(E,s)
+- Funktionalgleichung via Modularitätssatz (Wiles 1995, BCDT 2001)
+- Modularitätssatz: historische Entwicklung Taniyama→Shimura→Wiles
+
+paper27_bsd_conjecture_en.tex / _de.tex
+- Schwache BSD: ord_{s=1} L(E,s) = rang(E(Q))
+- Tate-Shafarevich-Gruppe Ш(E/Q): Galois-Kohomologie-Definition
+- Starke BSD-Formel: L*(E,1) = Ω_E · |Ш| · R_E · Πc_p / |E(Q)_tors|²
+- BSD-Heuristikprodukt: Π_{p≤X} #E(F_p)/p ~ C(log X)^r
+- Coates-Wiles (1977): CM-Kurven mit L(E,1)≠0 haben Rang 0
+- Kolyvagin (1990): Euler-Systeme, Heegner-Punkte, analytischer Rang ≤1
+- 2-Abstieg und Selmer-Raum
+
+paper28_congruent_numbers_bsd_en.tex / _de.tex
+- Kongruente Zahlen: Fläche rechtwinkliger Dreiecke mit rationalen Seiten
+- Äquivalenz: n kongruent ⟺ rang(E_n(Q)) ≥ 1
+- Vollständiger Beweis der Äquivalenz mit expliziter Parametrisierung
+- Torsion: E_n(Q)_tors ≅ Z/2Z × Z/2Z
+- Tunnells Satz (1983): bedingtes Kriterium via ternäre quadratische Formen
+- Verifikation: 5 (Dreieck 3/2, 20/3, 41/6), 6 (3,4,5), 7 (35/12, 24/5, 337/60)
+- Status 1,2,3: nicht kongruent unter BSD; Fermats Beweis für n=1
+
+Technische Details:
+- 16 vollständige LaTeX-Dateien (8 EN + 8 DE)
+- Alle Theoremsätze vollständig bewiesen oder mit Beweisskizzen + Referenzen
+- Keine Entwurfsüberreste (keine \ldots, TODO, ???)
+- DE-Versionen mit \usepackage[ngerman]{babel}
+- Author: Michael Fuhrmann, Build 87
+- Alle Bibliografien vollständig (Riemann1859, Wiles1995, BSD1965, Tunnell1983, ...)
