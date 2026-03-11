@@ -90,26 +90,18 @@ We show this is impossible:
 \end{equation}
 
 \begin{proof}[Proof of \eqref{eq:ineq}]
-$(p-1)(q-1) - (p+q-2) = pq - p - q + 1 - p - q + 2 = pq - 2p - 2q + 3$.
+We distinguish two cases.
 
-For $p \ge 2$ and $q \ge p + 1 \ge 3$:
-\[
-  pq - 2p - 2q + 3 = p(q-2) - 2(q-1) + 1 \ge 2(q-2) - 2(q-1) + 1 = -2 + 1 = -1.
-\]
-More carefully: $pq - 2p - 2q + 3 = (p-2)(q-2) - 1$.
-For $p = 2$: $(p-2)(q-2) - 1 = -1 < 0$.
-Hmm — let us handle $p = 2$ separately.
-
-\textbf{Case $p = 2$:} The condition becomes $(q-1) \mid (2q-1)$.
+\textbf{Case $p = 2$:} The condition $(p-1)(q-1) \mid (p+q-2)$ becomes $(q-1) \mid q$.
 Since $2q - 1 = 2(q-1) + 1$, we get $(q-1) \mid 1$, so $q - 1 = 1$, i.e.\ $q = 2 = p$.
 This contradicts $q > p$.
 
-\textbf{Case $p \ge 3$:} Now $p - 2 \ge 1$ and $q - 2 \ge q - p \ge 2$ (since $q \ge p+2$
-for odd primes $p < q$).  Thus
+\textbf{Case $p \ge 3$:} We have $p - 2 \ge 1$ and, since $q \ge p + 2 \ge 5$, also $q - 2 \ge 3 \ge 2$.
+Note that $(p-1)(q-1) - (p+q-2) = (p-2)(q-2) - 1$.  Therefore
 \[
   (p-1)(q-1) - (p+q-2) = (p-2)(q-2) - 1 \ge 1 \cdot 2 - 1 = 1 > 0.
 \]
-So $(p-1)(q-1) > p + q - 2 \ge 1$, and hence $(p-1)(q-1) \nmid (p+q-2)$.
+Hence $(p-1)(q-1) > p + q - 2 \ge 1$, and so $(p-1)(q-1) \nmid (p+q-2)$.
 \end{proof}
 
 In both cases, $(p-1)(q-1) \nmid (pq-1)$ — a contradiction.
@@ -122,8 +114,7 @@ In both cases, $(p-1)(q-1) \nmid (pq-1)$ — a contradiction.
 \begin{remark}
 Identity~\eqref{eq:ident} generalises: for $n = p_1 \cdots p_k$ squarefree,
 \[
-  n - 1 = \euler(n) + \sum_{\substack{S \subseteq \{1,\ldots,k\} \\ S \ne \{1,\ldots,k\}}}
-            \prod_{i \in S}(p_i - 1) \cdot \prod_{i \notin S} \mathbf{1}.
+  n - 1 = \varphi(n) + \sum_{\emptyset \ne S \subsetneq \{1,\ldots,k\}} \prod_{i \in S}(p_i - 1).
 \]
 The key modular reduction $n - 1 \equiv \sum_{i=1}^{k}(p_i - 1) \pmod{\euler(n)}$
 holds for $k = 2$ and is the basis for the proof above.  For larger~$k$, the

@@ -16,3 +16,25 @@
 - src/plugin_registry.py: PluginRegistry-Klasse mit register/load/list_plugins/is_loaded/unregister/reload
 - DEFAULT_REGISTRY mit 15 vorregistrierten Standardmodulen
 - tests/test_plugin_registry.py: 25 Tests in 5 Klassen
+
+2026-03-11 $(date +%H:%M) Build 46: Paper-Korrekturen laut Reviews (BUG-001 bis BUG-011)
+- BUG-001 (EN+DE): paper1_giuga_three_primes.tex + paper1_giuga_drei_primfaktoren_de.tex:
+  "Borwein, Borwein, Borwein und Giuga" → "Borwein, Borwein, Girgensohn und Parnes"
+- BUG-002 (EN+DE): paper1 beide Versionen: Bednarek-Referenz Fließtext ("Bednarek and Borwein" → "Bednarek"),
+  Bibliographie: "Preprint (2014)" → "Preprint, unpublished (2014)"
+- BUG-003 (EN+DE): paper1 beide Versionen: Formulierung in Schritt 3 präzisiert
+  "die kleinste ungerade Primzahl größer als p≥3" → "Da q>p≥3 gilt q≥5"
+- BUG-004 (EN): paper2_lehmer_three_primes.tex: Semiprim-Lemma-Beweis für p≥3
+  sauber via (p-2)(q-2)-1≥1>0 umgeschrieben
+- BUG-005 (DE): paper2_lehmer_drei_primfaktoren_de.tex: Arithmetikfehler beseitigt
+  "r = 2q-1+1-1 = 2q" → "aus r-1=2q-1 folgt r=2q"
+- BUG-006 (DE): paper2_lehmer_drei_primfaktoren_de.tex: Lemma 4.1 (Schranke für q)
+  durch korrekten Beweis via Schlüsselidentität und k≤p-1 ersetzt
+- BUG-007 (EN+DE): paper5 beide Versionen: \cite{Giuga1950} → \cite{Ingwer2026sqfree} (EN)
+  bzw. \cite{Ingwer2026qfrei} (DE) in Einleitung
+- BUG-008/009 (EN): paper5_giuga_no_semiprime.tex: "Bednarek and Borwein" → "Bednarek",
+  Bibliographie: "Preprint" → "Preprint, unpublished"
+- BUG-010 (EN): paper7_lehmer_no_semiprime.tex: falsche Summenformel im Remark korrigiert
+  (S≠{1..k} Term entfernt, korrekte Form mit ∅≠S⊊{1..k})
+- BUG-011 (EN): paper7_lehmer_no_semiprime.tex: redaktionellen Kommentar "Hmm — let us
+  handle p=2 separately" entfernt, Beweis von eq:ineq sauber strukturiert

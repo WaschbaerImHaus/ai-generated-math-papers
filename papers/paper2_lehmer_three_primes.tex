@@ -128,11 +128,10 @@ Since $\gcd(q-1, q) = 1$, we get $q - 1 = 1$, i.e.\ $q = 2 = p$, contradicting
 $p < q$.
 
 \textbf{Case $p \ge 3$:} We show $(p-1)(q-1) > p+q-2$, ruling out divisibility.
-Indeed, $(p-1)(q-1) = pq - p - q + 1$.  The inequality $(p-1)(q-1) \le p+q-2$
-is equivalent to $pq \le 2p + 2q - 3$.  For $p = 3$, $q \ge 5$:
-$3q \le 6 + 2q - 3 = 2q + 3$ implies $q \le 3$, contradicting $q \ge 5$.
-For $p \ge 5$, $q > p \ge 5$: $pq \ge 5q > 2q + 7 \ge 2p + 2q - 3$ (for $p \ge 5$).
-In all cases $(p-1)(q-1) > p+q-2 > 0$, so no divisibility can hold.
+Note that $(p-1)(q-1) - (p+q-2) = (p-2)(q-2) - 1$.
+Since $p \ge 3$ we have $p - 2 \ge 1$, and since $q \ge p + 2 \ge 5$ we have $q - 2 \ge 3 \ge 2$.
+Therefore $(p-2)(q-2) - 1 \ge 1 \cdot 2 - 1 = 1 > 0$.
+Hence $(p-1)(q-1) > p+q-2 > 0$, so no divisibility can hold.
 \end{proof}
 
 % -------------------------------------------------------

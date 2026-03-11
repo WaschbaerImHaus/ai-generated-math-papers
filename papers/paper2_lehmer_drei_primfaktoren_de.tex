@@ -147,7 +147,7 @@ Direkt: $(r-1) \mid (2qr - 1) = 2q \cdot r - 1$.
 Da $r \equiv 1 \pmod{r-1}$, gilt $2qr \equiv 2q \pmod{r-1}$, also
 $(r-1) \mid (2q - 1)$. Sei $2q - 1 = b(r-1)$ mit $b \ge 1$.
 
-\noindent\textbf{Fall $b = 1$:} $r = 2q - 1 + 1 - 1 = 2q$. Da $r$ prim und gerade,
+\noindent\textbf{Fall $b = 1$:} aus $r - 1 = 2q - 1$ folgt $r = 2q$. Da $r$ prim und gerade,
 gilt $r = 2$, aber $r > q > 2$ — Widerspruch.
 
 \noindent\textbf{Fall $b \ge 2$:} $2q - 1 = b(r-1) \ge 2(r-1) = 2r - 2$,
@@ -260,17 +260,33 @@ eingeschränkt. Eine direkte Analyse ergibt:
 
 \begin{lemma}
 \label{lem:grenze_q}
-Unter den gegebenen Bedingungen gilt $q \le \dfrac{3(p-1)}{p-2}$ (für $p \ge 5$).
+Unter den gegebenen Bedingungen gilt $q \le \dfrac{3(p-1)}{p-2}$.
 \end{lemma}
 
-\begin{proof}[Beweisskizze]
-Aus $(r-1) \mid (pq-1)$ und $r \ge q + 2$ folgt $r - 1 \ge q + 1$, also
-$k = \tfrac{pq-1}{r-1} \le \tfrac{pq-1}{q+1} < p$. Mit $k \le p-1$
-und der zweiten Bedingung $(q-1) \mid (pr-1)$ mit $r \le \tfrac{pq-1}{1} + 1 = pq$:
-$(q-1) \mid (p \cdot pq - 1)$, d.\,h. $(q-1) \mid (p^2 q - 1)$.
-Da $p^2 q \equiv p^2 \pmod{q-1}$ (wegen $q \equiv 1$), gilt $(q-1) \mid (p^2 - 1) = (p-1)(p+1)$.
-Für $p \ge 5$: $q - 1 \le (p-1)(p+1)$, aber kombiniert mit $q > p$: Es folgt
-eine Schranke auf $q$.
+\begin{proof}
+Sei $a = \tfrac{p-1}{2}$, $b = \tfrac{q-1}{2}$, $c = \tfrac{r-1}{2}$.
+Es gilt die Schlüsselidentität:
+\[
+  pqr - 1 = 8abc + 4(ab + bc + ca) + 2(a + b + c).
+\]
+Da $(p-1)(q-1)(r-1) = 8abc \mid (pqr - 1)$ vorausgesetzt wird, impliziert dies insbesondere
+$(r-1) \mid (pq - 1)$. Sei $k = \tfrac{pq-1}{r-1}$.
+
+Da $r > q$ und beide ungerade prim sind, gilt $r \ge q + 2$, also $r - 1 \ge q + 1 > q$.
+Daher:
+\[
+  k = \frac{pq - 1}{r - 1} < \frac{pq}{q} = p, \quad\text{also}\quad k \le p - 1.
+\]
+
+Die Bedingung $(p-1)(q-1)(r-1) \mid (pqr-1)$ impliziert nach der Reduktion aus Schritt~2
+auch $(p-1)(q-1) \mid (p + q - 1) + k$. Mit $k \le p - 1$:
+\[
+  (p-1)(q-1) \le (p + q - 1) + (p - 1) = 2p + q - 2.
+\]
+Umformen: $pq - p - q + 1 \le 2p + q - 2$, also $q(p-2) \le 3(p-1)$, d.\,h.:
+\[
+  q \le \frac{3(p-1)}{p-2}. \qedhere
+\]
 \end{proof}
 
 Für $p = 3$: $q \le \tfrac{6}{1} = 6$, also $q \in \{5\}$ (einzige Primzahl mit $3 < q \le 6$, die außerdem $(2) \mid (q-1)$ erfüllt, also $q = 5$).
