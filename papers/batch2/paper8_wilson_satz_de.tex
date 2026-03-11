@@ -170,12 +170,20 @@ Elemente.
 \end{theorem}
 
 \begin{proof}
-  Ist $n$ zusammengesetzt und $n \neq 4$, so besitzt $n$ eine Zerlegung $n = ab$
-  mit $1 < a < b < n$.  Beide Faktoren $a$ und $b$ kommen in $(n-1)!$ vor,
-  also gilt $ab = n \mid (n-1)!$.
+  Sei $n \geq 6$ zusammengesetzt.  Wir unterscheiden zwei Fälle.
 
-  Der Ausnahmefall $n = 4$ liefert $(4-1)! = 6 \equiv 2 \pmod{4}$,
-  aber $n = 4 < 6$ ist von der Voraussetzung $n \geq 6$ ausgeschlossen.
+  \textbf{Fall 1: $n$ ist kein Quadrat.}
+  Dann besitzt $n$ eine Zerlegung $n = ab$ mit $1 < a < b < n$.
+  Beide Faktoren $a$ und $b$ erscheinen als verschiedene Faktoren in $(n-1)!$,
+  also gilt $n = ab \mid (n-1)!$, d.\,h.\ $(n-1)! \equiv 0 \pmod{n}$.
+
+  \textbf{Fall 2: $n = a^2$ ist eine Quadratzahl.}
+  Da $n \geq 6$ und $n = a^2$, gilt $a \geq 3$
+  (der Fall $a = 2$, $n = 4$ ist ausgeschlossen).
+  Dann sind $a$ und $2a$ beide in $\{1, \ldots, n-1\}$
+  (da $2a < a^2 = n$ für $a \geq 3$) und $a \neq 2a$.
+  Ihr Produkt $a \cdot 2a = 2a^2 = 2n$ erscheint in $(n-1)!$,
+  also gilt $n \mid (n-1)!$, d.\,h.\ $(n-1)! \equiv 0 \pmod{n}$.
 \end{proof}
 
 \begin{korollar}
@@ -188,24 +196,54 @@ Elemente.
 % ================================================================
 
 \begin{theorem}[Wilson für $p^k$]\label{satz:wilson_primzahlpotenz}
-  Sei $p$ eine ungerade Primzahl und $k \geq 2$.  Dann gilt
+  Sei $p$ eine ungerade Primzahl und $k \geq 1$.  Dann gilt
   \[
     \prod_{\substack{j=1 \\ \ggT(j,p^k)=1}}^{p^k} j
     \;\equiv\; -1 \pmod{p^k}.
   \]
-  Für $p = 2$: Das analoge Produkt modulo $2^k$ ($k \geq 3$) ist ebenfalls $\equiv -1$.
+  Für $p = 2$: Das Produkt aller ungeraden Reste modulo $2^k$ ist
+  $-1 \pmod{2}$ (trivial, $k=1$) und $-1 \pmod{4}$ ($k=2$, Produkt $=3$),
+  aber $+1 \pmod{2^k}$ für alle $k \geq 3$.
 \end{theorem}
 
-\begin{proof}[Beweissskizze]
-  Die Gruppe $(\Z/p^k\Z)^*$ hat Ordnung $\varphi(p^k) = p^{k-1}(p-1)$.
-  Für ungerades $p$ ist diese Gruppe zyklisch (erzeugt durch eine Primitivwurzel
-  $g$ modulo $p^k$).
+\begin{proof}
+  \textbf{Ungerades $p$, beliebiges $k \geq 1$.}
+  Die Gruppe $G = (\Z/p^k\Z)^*$ ist zyklisch von Ordnung $\varphi(p^k) = p^{k-1}(p-1)$
+  (da für ungerade Primzahlen $p$ Primitivwurzeln modulo $p^k$ existieren;
+  vgl.\ \cite{Ireland1990}, Kap.~4).
 
-  Das Produkt aller Elemente einer zyklischen Gruppe gerader Ordnung ist gleich
-  dem eindeutigen Element der Ordnung~$2$.
-  In $(\Z/p^k\Z)^*$ ist das eindeutige Element der Ordnung~$2$ gleich
-  $-1 \equiv p^k - 1 \pmod{p^k}$.
-  Also ist das Produkt aller Einheiten modulo $p^k$ gleich $-1$.
+  \begin{lemma}[Produkt aller Elemente einer zyklischen Gruppe]\label{lem:zyklisch_produkt}
+    Sei $G = \langle g \rangle$ zyklisch von Ordnung $m$.  Dann gilt
+    \[
+      \prod_{a \in G} a =
+      \begin{cases}
+        \text{(eindeutiges Element der Ordnung }2), & m \text{ gerade},\\
+        e, & m \text{ ungerade}.
+      \end{cases}
+    \]
+  \end{lemma}
+  \begin{proof}[Beweis des Lemmas]
+    Schreibe $G = \{g^0, g^1, \ldots, g^{m-1}\}$.
+    Jedes $g^i$ paart sich mit seinem Inversen $g^{m-i}$; jedes Paar liefert $e$.
+    Selbst-inverse Elemente erfüllen $g^{2i} = e$, also $m \mid 2i$.
+    Für ungerades $m$ gilt nur $i = 0$; für gerades $m$ zusätzlich $i = m/2$.
+    Das Produkt ist $e$ (ungerade $m$) bzw.\ $g^{m/2}$ (das eindeutige
+    Element der Ordnung~$2$, bei geradem $m$).
+  \end{proof}
+
+  Da $G$ zyklisch von gerader Ordnung $p^{k-1}(p-1)$ ist (gerade wegen $p \geq 3$),
+  ist das Produkt aller Elemente das eindeutige Element der Ordnung~$2$.
+  Für ungerades $p$ und beliebiges $k \geq 1$ ist die einzige Lösung von
+  $x^2 \equiv 1 \pmod{p^k}$ mit $x \not\equiv 1$ gleich $x \equiv -1$
+  (aus $p^k \mid (x-1)(x+1)$ folgt mit $\ggT(x-1,x+1) \leq 2$ und ungeradem $p$).
+  Also ist $-1$ das eindeutige Element der Ordnung~$2$, und das Produkt ist $\equiv -1$.
+
+  \textbf{$p = 2$, $k \geq 3$.}
+  Hier gilt $(\Z/2^k\Z)^* \cong \Z/2 \times \Z/2^{k-2}$ (nicht zyklisch für $k \geq 3$).
+  Diese Gruppe hat \emph{drei} Elemente der Ordnung~$2$: $-1$, $2^{k-1}+1$ und $2^{k-1}-1$.
+  Nach dem Allgemeinen Wilson-Satz (Abschnitt~\ref{satz:allgemein_wilson}) ist das
+  Produkt aller Elemente gleich $e = 1$, wenn mehr als ein Element der Ordnung~$2$
+  vorhanden ist.  Also ist das Produkt $+1$ für $k \geq 3$.
 \end{proof}
 
 % ================================================================
@@ -247,7 +285,7 @@ Elemente.
 \end{bemerkung}
 
 % ================================================================
-\section{Allgemeiner Wilson-Satz für endliche abelsche Gruppen}
+\section{Allgemeiner Wilson-Satz für endliche abelsche Gruppen}\label{satz:allgemein_wilson}
 % ================================================================
 
 \begin{theorem}[Allgemeiner Wilson-Satz]\label{satz:allgemein_wilson}
