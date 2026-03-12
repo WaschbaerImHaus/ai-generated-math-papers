@@ -291,3 +291,68 @@ _(keine bekannten offenen Features mehr)_
 - [x] papers/batch2/paper12_wilson_applications.tex (EN): 4 Anwendungen inkl. QR, Fermat, Wolstenholme
 - [x] papers/batch2/paper12_wilson_anwendungen_de.tex (DE): Deutsche Version
 - [x] tests/test_wilson_theorems.py: 78 Tests, alle grün (Wilson-Themen)
+
+### Offene Vermutungen — Gruppe A (Build 125)
+
+#### Giuga 4-Prim-Fall (src/giuga_4prim.py)
+- [x] `berechne_giuga_bedingung(n)` — schwache + starke Giuga-Bedingung, erkennt Giuga-Zahl vs. Pseudoprime
+- [x] `numerische_suche_4prim(grenze)` — Suche über 4-Prim-Produkte bis Grenze; bis 10^6: kein Pseudoprime
+- [x] `Giuga4PrimBeweis.fall1_p_gleich_2_analyse()` — Schrankenanalyse für p=2 (n=2·q·r·s)
+- [x] `Giuga4PrimBeweis.fall2_p_gleich_3_analyse()` — Schrankenanalyse für p=3
+- [x] `Giuga4PrimBeweis.fall3_p_ungerade_analyse()` — allgemeiner ungerade Fall
+- [x] `Giuga4PrimBeweis.schranken_analyse()` — untere Schranken für alle Primteiler
+- [x] `Giuga4PrimBeweis.korollar_kein_4prim_pseudoprime()` — Status: numerisch bis 10^6, kein elem. Beweis
+- [x] 50 pytest-Tests (tests/test_giuga_4prim.py)
+- **Befund**: 3-Prim-Widerspruch nicht auf k=4 übertragbar; 4. Faktor absorbiert Widerspruch; Literatur schließt k=4 implizit aus (Borwein 1996: min. 13635 Primteiler)
+
+#### Erdős-Straus Erweiterung (src/erdos_straus_ext.py)
+- [x] `ErdosStrausExt.loese_unit_fraction(n)` — 3-stufiger Algorithmus (Formel → Teiler → Brute-Force)
+- [x] `beweis_klasse_mod4_3(p)` — **Formaler Beweis**: 4/p = 1/((p+1)/4) + 1/((p+1)/4·p) für p≡3(mod 4) ✓
+- [x] `beweis_klasse_mod4_1(p)` — Konstruktive Lösung für p≡1(mod 4)
+- [x] `beweis_klasse_mod3`, `beweis_klasse_mod_12` — kombinierte Restklassenbeweise
+- [x] `vollstaendige_analyse`, `suche_ausnahmen`, `parametrische_loesungen`
+- [x] 89 pytest-Tests (tests/test_erdos_brocard.py)
+- **Befund**: Für p≡3(mod 4) vollständig konstruktiv bewiesen (2-Term-Zerlegung, exakt algebraisch)
+
+#### Brocard-Ramanujan Numerische Erweiterung (src/brocard_extension.py)
+- [x] `BrocardExtension.numerische_suche(n_max)` — exakte Quadratwurzelprüfung via `math.isqrt`; n≤1000 in 11ms; nur n=4,5,7 gefunden
+- [x] `modular_ausschluss`, `finde_ausschlusskandidaten`, `analysiere_restklassen`
+- [x] `schranken_analyse` — Stirling-Schranken für m(n)
+- [x] `p_adische_analyse` — Legendre-Formel, v_p(n!+1)-Analyse
+
+#### Kurepa-Vermutung Erweiterung (src/kurepa_ext.py)
+- [x] `KurepaExt.numerische_verifikation(p_max)` — bis p=50000 (5133 Primzahlen) verifiziert, ~7s
+- [x] `p_adische_bewertung_analyse`, `restklassen_struktur`, `wilsons_verbindung`
+- [x] Rekursion !p ≡ !(p-1) - 1 (mod p) formal dokumentiert
+- [x] 93 pytest-Tests (tests/test_kurepa_tau_bruns.py)
+
+#### Lehmer τ(n) ≠ 0 Analyse (src/lehmer_tau.py)
+- [x] `LehmerTauAnalyse.berechne_tau(n)` — exakte Koeffizientenextraktion aus Δ(q) = q·∏(1-qⁿ)²⁴
+- [x] `verifiziere_lehmer(n_max)` — τ(n) ≠ 0 für n ≤ 1000 bestätigt
+- [x] `kongruenz_analyse` — Kongruenzen mod 2,3,5,7,11,13,23,691
+- [x] `deligne_schranke` — |τ(p)| ≤ 2p^{11/2} geprüft (Deligne 1974)
+- [x] `ausschluss_durch_kongruenzen` — systematische Ausschlussanalyse
+
+#### Bruns Konstante (src/bruns_constant.py)
+- [x] `BrunsKonstante.bruns_summe(grenze)` — partielle Summe B₂(x); B₂(10^6) ≈ 1.7108
+- [x] `hochpraezise_berechnung` — mpmath-basierte Hochpräzision
+- [x] `hardylittlewood_vorhersage` — C₂ = ∏_{p>2} p(p-2)/(p-1)² ≈ 0.6601618 berechnet
+- [x] Asymptotische Extrapolation liefert ≈ 1.9022 (bekannt: 1.9021605831...)
+
+#### Schur-Zahlen S(6) (src/schur_numbers.py)
+- [x] `SchurZahlen.partition_s5()` — explizite Partition {1,...,160} in 5 sum-freie Klassen
+- [x] `untere_schranke_s6()` — konstruktive Partition bis N=536 verifiziert
+- [x] `schranken_analyse()` — 536 ≤ S(6) ≤ 1836 dokumentiert
+- [x] Greedy + Monte-Carlo-Suche nach verbesserten unteren Schranken
+- [x] SAT-Encoding-Beschreibung implementiert
+- [x] 115 pytest-Tests (tests/test_schur_debruijn.py)
+
+#### de Bruijn-Newman-Konstante (src/debruijn_newman.py)
+- [x] `DeBruijnNewman.H_t(x, t)` — numerische Berechnung von H_t via mpmath
+- [x] `suche_nullstellen_H_t` — Bisektion-basierte Nullstellensuche
+- [x] `newman_vermutung_status()` — Λ ≥ 0 bewiesen (Rodgers-Tao 2018) dokumentiert
+- [x] Schranke 0 ≤ Λ ≤ 0.2 (Platt-Trudgian 2021) implementiert
+- [x] Verbindung H_0 ↔ ½ξ(½+ix) formal dokumentiert
+- [x] Historische Schranken-Tabelle: Λ-Bounds von 1990 bis 2021
+
+#### Gesamt neue Tests (Build 125): 347 Tests (50 + 89 + 93 + 115)

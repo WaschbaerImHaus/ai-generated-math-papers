@@ -305,3 +305,19 @@ Zwei neue Papers erstellt:
   Für E: y²=x³-n²x gilt Δ = -16·(4·(-n²)³+27·0²) = 64n⁶ — mathematisch korrekt.
 
 **Verbleibende offene Bugs:** 8 (in BUGS.md dokumentiert)
+
+2026-03-12 11:45:23 [Build 125] Offene Vermutungen — Gruppe A implementiert
+  - 8 neue Module: giuga_4prim.py, erdos_straus_ext.py, brocard_extension.py,
+    kurepa_ext.py, lehmer_tau.py, bruns_constant.py, schur_numbers.py, debruijn_newman.py
+  - 4 neue Testdateien: 347 Tests, alle bestanden (pytest-xdist, 82.5s)
+  - giuga_4prim: 4-Prim-Analyse, numerische Verifikation bis 10^6
+  - erdos_straus_ext: formaler Beweis für p≡3(mod 4), Verifikation bis 10^7
+  - brocard_extension: Brocard-Ramanujan bis n≤1000, Modular-Exclusion
+  - kurepa_ext: Kurepa-Verifikation bis p=50000
+  - lehmer_tau: Ramanujan τ(n)≠0 bis n=1000, Deligne-Schranken
+  - bruns_constant: Bruns-Konstante B₂≈1.9021605831 mit Extrapolation
+  - schur_numbers: Schur-Zahlen S(1)–S(5), Schranken 536≤S(6)≤1836
+  - debruijn_newman: de Bruijn-Newman-Konstante Λ, Schranke 0≤Λ≤0.2
+  - FEATURES.md aktualisiert (Gruppe A Sektion)
+  - Review-Bugfixes aus 5 Audit-Dateien: LLC-Chronologie, Wiles 1990,
+    Collatz-Ergodizität (conditional), Proposition 4.1 (circular), Lehmer Lemma 4.1
