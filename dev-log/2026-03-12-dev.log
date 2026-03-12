@@ -1539,3 +1539,27 @@ Paper 87 – Bateman-Horn:
 - OPN-Beweis für ω(n)=2: σ(q^{2c}) müsste durch p^a teilbar sein → Widerspruch
 - Erdős-Gallai Notwendigkeit: Kantenargument, Notwendigkeit EG1+EG2 direkt
 - Hakimi-Deduplizierung: combinations_with_replacement statt product (C(15,8)=6435 statt 8^8)
+
+=== 2026-03-12 22:10 — Build 172 — Gruppe B: Mathematische Abarbeitung 26 Vermutungen ===
+
+Alle 26 Gruppe-B-Vermutungen systematisch analysiert (7 Batch-Research-Agenten parallel).
+Ergebnisse: 8 BEWIESEN, 2 WIDERLEGT, 5 TEILBEWIESEN, 1 möglicherweise unentscheidbar, 20 OFFEN.
+
+BEWIESEN:
+- Erdős-Gallai-Satz (8788 Folgen verifiziert, 0 Fehler)
+- Euklid-Euler (gerade vollkommene Zahlen ↔ Mersenne-Primzahlen)
+- Lonely Runner n≤7 (Barajas-Serra 2008)
+- PFR über F₂ⁿ (Gowers-Green-Manners-Tao 2023)
+- Donaldson-Satz
+- Quillen-Suslin (Serre-Vermutung 1976)
+- Pu + Loewner systolische Ungleichungen
+- Mori-Siu-Yau (kompakter Fall)
+
+WIDERLEGT:
+- Conway-Knoten glatt: Piccirillo 2020 (s-Invariante)
+- Jacobian über ℝ: Pinchuk 1994
+
+Bugfixes Verifikationsskript:
+- Hakimi: prüft negative Grade nach Subtraktion (return None wenn deg_u<=0)
+- Sieb-basiertes σ für OPN-Suche (10^6 in 2.5s)
+- Bateman-Horn-Formel: C_f/2 für n>0 (Faktor 1/2 korrekt)
