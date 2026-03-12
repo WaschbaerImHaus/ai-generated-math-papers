@@ -606,3 +606,49 @@ BUG-8 [MITTEL] paper62_automorphe_formen_de.tex:
 
 ### Build-Nummer
 - src/build.txt: 143 → 144
+
+=== 2026-03-12 — Build 146 — Batch 17 Audit (Papers 64–67 EN+DE) ===
+
+2026-03-12 [Build 146]: Vollständiges mathematisches und formales Audit aller 8 LaTeX-Papers in Batch 17
+
+### Auditierte Papers
+- paper64_combinatorics_ramsey_en.tex / paper64_kombinatorik_ramsey_de.tex
+- paper65_graph_theory_en.tex / paper65_graphentheorie_de.tex
+- paper66_information_theory_en.tex / paper66_informationstheorie_de.tex
+- paper67_van_der_waerden_schur_en.tex / paper67_van_der_waerden_schur_de.tex
+
+### Behobene Bugs
+
+**Bug 1 (MITTEL) — paper64 DE: Tippfehler Beweissk\"otte → Beweisskizze (2 Stellen)**
+- paper64_kombinatorik_ramsey_de.tex, Zeilen 301 und 470 korrigiert
+
+**Bug 2 (HOCH) — paper65 EN+DE: documentclass [reqno,12pt] → [12pt,a4paper]**
+- paper65_graph_theory_en.tex und paper65_graphentheorie_de.tex korrigiert
+
+**Bug 3 (HOCH) — paper66 EN+DE: documentclass ohne Optionen → [12pt,a4paper]**
+- paper66_information_theory_en.tex und paper66_informationstheorie_de.tex korrigiert
+
+**Bug 4 (HOCH) — paper66 EN: algorithm*-Umgebung ohne Paket → definition**
+- paper66_information_theory_en.tex: \begin{algorithm*} → \begin{definition}
+- Kein algorithm-Paket geladen; Compilerfehler beseitigt
+
+**Bug 5 (MITTEL) — paper66 EN+DE: Fehlendes \tableofcontents nach \maketitle**
+- Beide paper66-Dateien: \tableofcontents nach \maketitle eingefügt
+
+**Bug 6 (HOCH) — paper67 EN+DE: documentclass [12pt] → [12pt,a4paper]**
+- paper67_van_der_waerden_schur_en.tex und paper67_van_der_waerden_schur_de.tex korrigiert
+
+**Bug 7 (MITTEL) — paper67 DE: Tippfehler sumfrei → summenfrei (6 Stellen)**
+- paper67_van_der_waerden_schur_de.tex: alle 6 Vorkommen korrigiert
+
+### Mathematische Prüfung
+- Alle Theoreme korrekt als bewiesen deklariert
+- Alle offenen Probleme korrekt als Conjecture/Vermutung/Open Question deklariert:
+  R(5,5), χ(ℝ²) exakt, Chaitin-Ω, S(6), Erdős-Turán (Kehrwert-Version)
+- Alle Theorem-Werte verifiziert (R(3,3)=6, R(4,4)=18, S(5)=160 usw.)
+
+### Neue Review-Datei
+- reviews/review_batch17_2026_03_12.md
+
+### Build-Nummer
+- src/build.txt: 145 → 146

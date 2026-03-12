@@ -6,7 +6,7 @@
 %% Projekt: Specialist Mathematics Project, Build 145
 %% Datum: 2026-03-12
 
-\documentclass[12pt]{amsart}
+\documentclass[12pt,a4paper]{amsart}
 
 \usepackage{amsmath, amssymb, amsthm}
 \usepackage{mathtools}
@@ -414,8 +414,8 @@ $a, b, c \in A$ (nicht notwendig verschieden) mit $a + b = c$ gibt.
 
 \begin{definition}[Summenfreie Partition]
 Eine Partition $\N = A_1 \sqcup A_2 \sqcup \cdots \sqcup A_r$ (eingeschränkt auf
-$\{1, \ldots, n\}$) heißt \emph{sumfrei} (oder \emph{Schur-Partition}), wenn
-jede Klasse $A_i$ sumfrei ist.
+$\{1, \ldots, n\}$) heißt \emph{summenfrei} (oder \emph{Schur-Partition}), wenn
+jede Klasse $A_i$ summenfrei ist.
 \end{definition}
 
 \begin{theorem}[Schur, 1916 \cite{Schur1916}]\label{satz:schur}
@@ -480,16 +480,16 @@ $6$ & $?$   & Offen; $536 \leq S(6) \leq 1836$ \\
 \subsection{Explizite Partitionen}
 
 \begin{example}[$S(1) = 1$]
-Die einzige Klasse $\{1\}$ ist sumfrei: $1 + 1 = 2 \notin \{1\}$.
+Die einzige Klasse $\{1\}$ ist summenfrei: $1 + 1 = 2 \notin \{1\}$.
 Die Menge $\{1, 2\}$ kann nicht abgedeckt werden: $1 + 1 = 2$ erzwingt eine
 monochromatische Lösung.
 \end{example}
 
 \begin{example}[$S(2) = 4$]
-Die Partition $\{1,4\} \sqcup \{2,3\}$ ist sumfrei:
+Die Partition $\{1,4\} \sqcup \{2,3\}$ ist summenfrei:
 $1+1=2\notin\{1,4\}$, $1+4=5\notin\{1,4\}$, $4+4=8\notin\{1,4\}$;
 $2+2=4\notin\{2,3\}$, $2+3=5\notin\{2,3\}$, $3+3=6\notin\{2,3\}$.
-Keine $2$-Partition von $\{1,2,3,4,5\}$ ist sumfrei (durch Erschöpfungssuche
+Keine $2$-Partition von $\{1,2,3,4,5\}$ ist summenfrei (durch Erschöpfungssuche
 verifiziert).
 \end{example}
 
@@ -498,8 +498,8 @@ Eine optimale $3$-Partition von $\{1,\ldots,13\}$ lautet:
 \[
   K_1 = \{1,4,7,10,13\}, \quad K_2 = \{2,3,11,12\}, \quad K_3 = \{5,6,8,9\}.
 \]
-Jede Klasse ist sumfrei (Summen $a+b$ für $a,b \in K_i$ fallen stets außerhalb von
-$K_i$ oder überschreiten $13$). Keine $3$-Partition von $\{1,\ldots,14\}$ ist sumfrei.
+Jede Klasse ist summenfrei (Summen $a+b$ für $a,b \in K_i$ fallen stets außerhalb von
+$K_i$ oder überschreiten $13$). Keine $3$-Partition von $\{1,\ldots,14\}$ ist summenfrei.
 \end{example}
 
 \begin{example}[$S(4) = 44$, Baumert 1965]
@@ -572,7 +572,7 @@ und skaliere die ursprüngliche Partition: $A_i' = \{x + 2n + 1 : x \in A_i\}$ f
 $i = 1, \ldots, r-1$. Die kombinierte Partition $(A_1', \ldots, A_{r-1}', A_r)$
 liefert eine $r$-summenfreie Partition von $\{1, \ldots, 3n+1\}$:
 \begin{itemize}
-\item $A_r$ ist sumfrei: Für $a, b \in A_r$ gilt $a + b \geq 2(n+1) > 2n+1$,
+\item $A_r$ ist summenfrei: Für $a, b \in A_r$ gilt $a + b \geq 2(n+1) > 2n+1$,
   also $a+b \notin A_r$.
 \item Jedes $A_i'$ erbt die Summenfreiheit von $A_i$ durch die Linearität der Verschiebung.
 \end{itemize}

@@ -4,7 +4,7 @@
 %% Project: Specialist Mathematics Project, Build 145
 %% Date: 2026-03-12
 
-\documentclass{amsart}
+\documentclass[12pt,a4paper]{amsart}
 
 %% ---- Packages ----
 \usepackage{amsmath, amssymb, amsthm}
@@ -66,6 +66,8 @@ theorems versus open conjectures.
 \end{abstract}
 
 \maketitle
+
+\tableofcontents
 
 %% ============================================================
 \section{Introduction}
@@ -278,7 +280,7 @@ satisfied). The expected length satisfies
 
 \subsection{Huffman Codes}
 
-\begin{algorithm*}[Huffman's Algorithm (1952)]
+\begin{definition}[Huffman's Algorithm (1952)]
 Given symbols with probabilities $p_1 \geq p_2 \geq \cdots \geq p_n$:
 \begin{enumerate}
   \item Treat each symbol as a leaf node weighted by its probability.
@@ -286,7 +288,7 @@ Given symbols with probabilities $p_1 \geq p_2 \geq \cdots \geq p_n$:
         (weight = sum), labelling the two children 0 and 1.
   \item The resulting binary tree defines a prefix-free code.
 \end{enumerate}
-\end{algorithm*}
+\end{definition}
 
 \begin{theorem}[Huffman Optimality]\label{thm:huffman}
 Among all prefix-free codes, the Huffman code minimises the expected codeword
