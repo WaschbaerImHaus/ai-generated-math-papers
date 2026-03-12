@@ -1,0 +1,37 @@
+============================================================
+Brocard-Ramanujan Heavy Computation — 2026-03-12 13:21:11
+============================================================
+
+Phase 1: Exakte Prüfung n ≤ 100,000 (gmpy2 BigInt)...
+  Bekannte Lösung bestätigt: n=4
+  Bekannte Lösung bestätigt: n=5
+  Bekannte Lösung bestätigt: n=7
+  n=5,000/100,000 geprüft | 0s
+  n=10,000/100,000 geprüft | 1s
+  n=15,000/100,000 geprüft | 4s
+  n=20,000/100,000 geprüft | 17s
+  n=25,000/100,000 geprüft | 51s
+  n=30,000/100,000 geprüft | 94s
+  n=35,000/100,000 geprüft | 144s
+  n=40,000/100,000 geprüft | 209s
+  n=45,000/100,000 geprüft | 274s
+  n=50,000/100,000 geprüft | 348s
+  n=55,000/100,000 geprüft | 467s
+  n=60,000/100,000 geprüft | 586s
+  n=65,000/100,000 geprüft | 729s
+  n=70,000/100,000 geprüft | 886s
+  n=75,000/100,000 geprüft | 1051s
+  n=80,000/100,000 geprüft | 1229s
+  n=85,000/100,000 geprüft | 1427s
+  n=90,000/100,000 geprüft | 1603s
+  n=95,000/100,000 geprüft | 1837s
+  n=100,000/100,000 geprüft | 2052s
+  Phase 1 fertig: 2051.7s
+  Neue Lösungen: 0
+
+============================================================
+GESAMT: 2051.7s (0.57h)
+Bekannte Lösungen bestätigt: n ∈ {4, 5, 7}
+Neue Lösungen (exakt): 0
+BESTÄTIGT: n!+1 ≠ m² für alle n ∈ [8, 100,000]
+Ergebnis: /home/claude-code/project/specialist-maths/research/brocard_result.json

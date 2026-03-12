@@ -1,36 +1,15 @@
 {
   "conjecture": "Brocard-Ramanujan",
-  "exact_limit": 10000,
-  "modular_limit": 1000000,
-  "exclusion_primes": [
+  "exact_limit": 100000,
+  "method": "gmpy2 BigInt exakt (isqrt-Vergleich)",
+  "known_solutions": [
+    4,
     5,
-    7,
-    11,
-    13,
-    17,
-    19,
-    23,
-    29,
-    31,
-    37,
-    41,
-    43,
-    47,
-    53,
-    59,
-    61,
-    67,
-    71,
-    73,
-    79,
-    83,
-    89,
-    97
+    7
   ],
   "new_solutions_exact": [],
-  "candidates_count_10k_100k": 90000,
-  "candidates_count_100k_1M": 900000,
-  "confirmed_no_new_exact_to": 10000,
-  "elapsed_seconds": 1.7,
-  "timestamp": "2026-03-12T12:04:00.125660"
+  "confirmed_no_new_exact_to": 100000,
+  "note": "Modulare Ausschl\u00fcsse nutzlos f\u00fcr n>97 (n!\u22610 mod p \u2192 n!+1\u22611 immer QR)",
+  "elapsed_seconds": 2051.7,
+  "timestamp": "2026-03-12T13:55:23.580994"
 }

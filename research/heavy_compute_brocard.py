@@ -84,6 +84,7 @@ def check_exact_small(n_max=10000):
     found_new = []
 
     factorial = gmpy2.mpz(1)
+    t_start = time.time()
     for n in range(1, n_max + 1):
         factorial *= n
         val = factorial + 1
@@ -96,8 +97,8 @@ def check_exact_small(n_max=10000):
             else:
                 print(f"  Bekannte Lösung bestätigt: n={n}", flush=True)
 
-        if n % 1000 == 0:
-            print(f"  n={n:,} geprüft (exakt)", flush=True)
+        if n % 5000 == 0:
+            print(f"  n={n:,}/{n_max:,} geprüft | {time.time()-t_start:.0f}s", flush=True)
 
     return found_new
 
@@ -120,65 +121,35 @@ def main():
     print(f"Brocard-Ramanujan Heavy Computation — {datetime.now():%Y-%m-%d %H:%M:%S}")
     print(f"{'='*60}\n")
 
-    # Phase 1: Exakte Prüfung bis n=10000 (mit gmpy2)
-    print("Phase 1: Exakte Prüfung n ≤ 10,000...")
+    # Phase 1: Exakte Prüfung bis n=100_000 (mit gmpy2 BigInt)
+    # Berndt & Galway (2000) verifizierten bis n=10^9 — wir prüfen exakt bis 100K
+    # Laufzeit-Schätzung: ~30-60 Min (O(n²·log n) wegen wachsender BigInts)
+    print("Phase 1: Exakte Prüfung n ≤ 100,000 (gmpy2 BigInt)...")
     t0 = time.time()
-    new_solutions_exact = check_exact_small(10000)
+    new_solutions_exact = check_exact_small(100_000)
     print(f"  Phase 1 fertig: {time.time()-t0:.1f}s")
     print(f"  Neue Lösungen: {len(new_solutions_exact)}\n")
 
-    # Phase 2: Modulare Ausschlüsse bis n = 100,000
-    print("Phase 2: Modulare Ausschlüsse n ≤ 100,000...")
-    t1 = time.time()
-    fac_dict = precompute_factorials_mod(1000, EXCLUSION_PRIMES)
-
-    candidates_100k = []
-    for n in range(10001, 100001):
-        if check_n_modular(n, fac_dict):
-            candidates_100k.append(n)
-
-    print(f"  Nicht-ausgeschlossene Kandidaten (10001–100000): {len(candidates_100k):,}")
-    print(f"  Ausschlussrate: {(90000-len(candidates_100k))/90000:.1%}")
-    print(f"  Phase 2 fertig: {time.time()-t1:.1f}s\n")
-
-    # Phase 3: Modular bis n = 1,000,000
-    print("Phase 3: Modulare Ausschlüsse n ≤ 1,000,000...")
-    t2 = time.time()
-
-    N_WORKERS = min(20, multiprocessing.cpu_count())
-    CHUNK = 50000
-    tasks = [(n, min(n + CHUNK - 1, 1_000_000), fac_dict)
-             for n in range(100001, 1_000_001, CHUNK)]
-
-    with multiprocessing.Pool(N_WORKERS) as pool:
-        results = pool.map(check_range_modular, tasks)
-
-    candidates_1M = []
-    for r in results:
-        candidates_1M.extend(r)
-
-    print(f"  Kandidaten (100001–1000000): {len(candidates_1M):,}")
-    print(f"  Ausschlussrate: {(900000-len(candidates_1M))/900000:.1%}")
-    elapsed = time.time() - t2
-    print(f"  Phase 3 fertig: {elapsed:.1f}s\n")
+    # Hinweis: Modulare Ausschlüsse (Phase 2/3) sind für n > max(EXCLUSION_PRIMES)=97
+    # nutzlos, da n! ≡ 0 (mod p) für alle p ≤ n → n!+1 ≡ 1 (mod p) ist immer QR.
+    # Daher: nur exakte Prüfung ist informativ.
 
     total_elapsed = time.time() - t0
     print(f"{'='*60}")
     print(f"GESAMT: {total_elapsed:.1f}s ({total_elapsed/3600:.2f}h)")
     print(f"Bekannte Lösungen bestätigt: n ∈ {{4, 5, 7}}")
     print(f"Neue Lösungen (exakt): {len(new_solutions_exact)}")
-    print(f"Verbleibende Kandidaten bis 10^6 (nicht ausgeschlossen): "
-          f"{len(candidates_100k) + len(candidates_1M):,}")
+    if not new_solutions_exact:
+        print(f"BESTÄTIGT: n!+1 ≠ m² für alle n ∈ [8, 100,000]")
 
     result = {
         "conjecture": "Brocard-Ramanujan",
-        "exact_limit": 10000,
-        "modular_limit": 1_000_000,
-        "exclusion_primes": EXCLUSION_PRIMES,
+        "exact_limit": 100_000,
+        "method": "gmpy2 BigInt exakt (isqrt-Vergleich)",
+        "known_solutions": [4, 5, 7],
         "new_solutions_exact": new_solutions_exact,
-        "candidates_count_10k_100k": len(candidates_100k),
-        "candidates_count_100k_1M": len(candidates_1M),
-        "confirmed_no_new_exact_to": 10000,
+        "confirmed_no_new_exact_to": 100_000,
+        "note": "Modulare Ausschlüsse nutzlos für n>97 (n!≡0 mod p → n!+1≡1 immer QR)",
         "elapsed_seconds": round(total_elapsed, 1),
         "timestamp": datetime.now().isoformat(),
     }

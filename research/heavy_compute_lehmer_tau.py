@@ -27,12 +27,14 @@ from datetime import datetime
 
 OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "lehmer_tau_result.json")
 
-# Bekannte τ-Werte zur Verifikation
+# Bekannte τ-Werte zur Verifikation (via Multiplikativität verifiziert)
+# τ(100) = τ(4)*τ(25) = (-1472)*(-25499225) = 37534859200
+# τ(1000) = τ(8)*τ(125) = 84480*(-359001100500) = -30328412970240000
 KNOWN_TAU = {
     1: 1, 2: -24, 3: 252, 4: -1472, 5: 4830,
     6: -6048, 7: -16744, 8: 84480, 9: -113643,
     10: -115920, 11: 534612, 12: -370944,
-    100: 184619776800, 1000: 3916984359240
+    100: 37534859200, 1000: -30328412970240000
 }
 
 
@@ -85,7 +87,7 @@ def compute_tau_bigint(n_max):
 
 
 def main():
-    N_MAX = 5_000  # Mit BigInt und Faltungsansatz realistisch in ~30 Min
+    N_MAX = 50_000  # ~85 min (O(N²) skaliert: 5000→50000 = 100× länger)
 
     print(f"{'='*60}")
     print(f"Lehmer τ Heavy Computation — {datetime.now():%Y-%m-%d %H:%M:%S}")
