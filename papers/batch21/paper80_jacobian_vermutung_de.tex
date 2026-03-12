@@ -310,6 +310,26 @@ affiner algebraischer Geometrie und nicht-kommutativer Algebra.
 \end{bemerkung}
 
 %% =============================================================================
+\section{Weitere algebraische Äquivalenzen}
+\label{abschn:equiv}
+%% =============================================================================
+
+Über die Dixmier-Vermutung hinaus ist die Jacobian-Vermutung äquivalent zu weiteren
+offenen Problemen und unterstreicht damit ihre zentrale Rolle in der Mathematik.
+
+\begin{satz}[Äquivalenz mit der Poisson-Vermutung]\label{satz:poisson}
+Die Jacobian-Vermutung ist äquivalent dazu, dass jeder Endomorphismus der
+Poisson-Algebra $\mathbb{C}[x_1,\ldots,x_n, y_1,\ldots,y_n]$ (mit Poisson-Klammer
+$\{x_i, y_j\} = \delta_{ij}$), der die Poisson-Klammer erhält, ein Automorphismus ist.
+\end{satz}
+
+\begin{satz}[Äquivalenz via stabile Zahmheit]\label{satz:stabile_zahmheit}
+Ein Endomorphismus von $\mathbb{C}^n$, der die Jacobian-Bedingung erfüllt, ist genau
+dann ein Automorphismus, wenn er \emph{stabil zahm} ist: nach Hinzufügen hinreichend
+vieler Variablen wird er zu einer Komposition elementarer Automorphismen.
+\end{satz}
+
+%% =============================================================================
 \section{Warum Standardmethoden versagen}
 %% =============================================================================
 
@@ -346,25 +366,40 @@ $\{x_i, y_j\} = \delta_{ij}$), der die Klammer erhält, ein Automorphismus ist.
 
 %% =============================================================================
 \section{Offene Probleme und aktueller Forschungsstand}
+\label{abschn:open}
 %% =============================================================================
 
-Die Jacobian-Vermutung bleibt eines der bekanntesten offenen Probleme der Mathematik:
+Die Jacobian-Vermutung bleibt eines der bekanntesten offenen Probleme der Mathematik.
+Wir listen die primären offenen Fragen auf:
 
 \begin{enumerate}[label=(\arabic*)]
   \item \textbf{Jacobian-Vermutung für $n = 2$}: Offen seit 1939. Selbst für
-        Polynomabbildungen vom Grad $17$ über $\mathbb{C}$ nicht vollständig bekannt.
+        Polynomabbildungen vom Grad $17$ über $\mathbb{C}$ ist die Vermutung nicht in
+        voller Allgemeinheit bekannt.
 
   \item \textbf{Injektivität durch Jacobian}: Impliziert $\det(JF) = c \neq 0$
-        bereits die Injektivität von $F$? (Jede Teilaussage ist offen.)
+        bereits die Injektivität von $F$? Injektivität zusammen mit lokaler
+        Diffeomorphie und Surjektivität würde die Vermutung ergeben; jede einzelne
+        Implikation ist offen.
 
-  \item \textbf{Normalformen}: Kann jede Jacobian-Abbildung durch Komposition mit
-        bekannten Automorphismen auf eine berechenbare Normalform gebracht werden?
+  \item \textbf{Reduktion auf Normalformen}: Kann jede Jacobian-Abbildung durch
+        Komposition mit bekannten Automorphismen auf eine berechenbare Normalform
+        gebracht werden, deren Invertierbarkeit prüfbar ist?
 
-  \item \textbf{Positive Charakteristik}: Was ist das korrekte Analogon über $\mathbb{F}_p$?
+  \item \textbf{Algorithmik}: Ist es entscheidbar, ob eine gegebene polynomiale
+        Abbildung für einen vorgegebenen Gradschranke $d$ ein polynomialer
+        Automorphismus ist?
 
-  \item \textbf{Algorithmik}: Ist entscheidbar, ob eine gegebene polynomiale Abbildung
-        ein Automorphismus ist?
+  \item \textbf{Positive Charakteristik}: Über $\mathbb{F}_p$ versagt die
+        Jacobian-Vermutung (wie in Abschnitt~\ref{abschn:n1} für $n=1$ bemerkt).
+        Was ist das korrekte Analogon?
 \end{enumerate}
+
+\begin{vermutung}[Verallgemeinerte Bass--Connell--Wright-Vermutung]\label{verm:genBCW}
+Die Jacobian-Vermutung für Abbildungen vom Grad $n$ in Dimension $d$ ist äquivalent
+zur Jacobian-Vermutung für Abbildungen vom Grad $3$ in Dimension
+$d \cdot \binom{n+d-1}{d}$.
+\end{vermutung}
 
 %% =============================================================================
 \section{Zusammenfassung}

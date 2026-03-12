@@ -131,25 +131,20 @@ All known solutions to $A^x + B^y = C^z$ with $x, y, z \geq 3$ have $\gcd(A,B,C)
 consistent with Beal's conjecture.
 
 \begin{example}[Standard parametric family]\label{ex:param}
-For any $m, n, t \geq 1$:
-\[
-  (2^m)^3 + (2^n)^3 = (2^{m-1} + 2^{n-1})^3?
-\]
-Wait, this needs checking. The canonical family is: if $d = \gcd(A,B,C) > 1$,
-write $A = da$, $B = db$, $C = dc$, then $(da)^x + (db)^y = (dc)^z$ becomes
-$d^x a^x + d^y b^y = d^z c^z$. Choosing $d$ large enough (e.g., $d^x = d^y = d^z$
-requires $x = y = z$, or one adjusts $a,b,c$ accordingly).
-
-The simplest nontrivial examples:
+All known solutions to $A^x + B^y = C^z$ with $x, y, z \geq 3$ have
+$\gcd(A,B,C) > 1$. The simplest verified examples with common factor:
 \begin{enumerate}[label=(\alph*)]
-  \item $3^3 + 6^3 = 3^5$: check: $27 + 216 = 243 = 3^5$. Yes! Here
-        $\gcd(3,6,3) = 3$.
-  \item $2^6 + 2^6 = 2^7$: i.e., $64 + 64 = 128$. Write as $(2^2)^3 + (2^2)^3 = 2^7$.
-        Here $\gcd = 4 > 1$.
-  \item $(3^n)^3 + (3^n \cdot 2)^3 = ?$: $(3^n)^3(1 + 8) = 9 \cdot 3^{3n}$,
-        not a perfect power in general.
-  \item $1^m + 2^3 = 3^2$: but exponents must be $\geq 3$; $3^2$ uses exponent $2$.
+  \item $3^3 + 6^3 = 3^5$: indeed $27 + 216 = 243 = 3^5$, and $\gcd(3,6,3) = 3 > 1$.
+  \item $2^6 + 2^6 = 2^7$: i.e., $64 + 64 = 128$, which can be written
+        $(2^2)^3 + (2^2)^3 = 2^7$, with $\gcd(4,4,2) = 2 > 1$.
+  \item For any $k \geq 1$: $(2^k)^3 + (2^k)^3 = 2 \cdot 2^{3k} = 2^{3k+1}$,
+        which is a perfect $r$-th power only for specific $k$; the family above
+        uses $k = 2$ giving $2^7$.
 \end{enumerate}
+The general construction: if $\gcd(A,B,C) = d > 1$, write $A = da$, $B = db$,
+$C = dc$; then $(da)^x + (db)^y = (dc)^z$ requires $d^x a^x + d^y b^y = d^z c^z$.
+Choosing $x = y = z$ and $a^x + b^x = c^x \cdot d^{x-x} = c^x$ recovers FLT,
+but non-trivial solutions with $d > 1$ exist for unequal exponents.
 \end{example}
 
 \begin{theorem}[Parametric solutions with common factor]\label{thm:param}
@@ -191,13 +186,11 @@ applied to a branched cover of the projective line). Faltings' theorem then
 asserts that $\mathcal{C}$ has only finitely many rational points, and the
 primitive integer solutions correspond to a finite set.
 
-The genus formula: for $x^p + y^q = z^r$, a smooth projective model has genus
-\[
-  g = 1 + \frac{pqr}{2}\left(\frac{1}{p} + \frac{1}{q} + \frac{1}{r} - 1\right)
-      \cdot \frac{n-1}{n}
-\]
-for suitable $n$. When $1/p + 1/q + 1/r < 1$, the expression inside is negative,
-giving $g \geq 2$.
+In the hyperbolic case ($1/p + 1/q + 1/r < 1$), the Fermat curve
+$x^p + y^q = z^r$ has genus $g \geq 2$ by the Riemann--Hurwitz formula applied
+to a branched cover of the projective line. Faltings' theorem (1983) then
+asserts that any smooth projective curve of genus $\geq 2$ over $\mathbb{Q}$ has
+only finitely many rational points, so the set of primitive solutions is finite.
 \end{proof}
 
 \begin{corollary}
@@ -234,7 +227,6 @@ violate Beal's conjecture.
 $A$ & $x$ & $B$ & $y$ & $C$ & $z$ & $\gcd(A,B,C)$ \\
 \midrule
 $2$ & $3$ & $1$ & $2$ & $3$ & $2$ & $1$ \\
-$6$ & $3$ & $10$ & $3$ & $14$ & $2$?? & $2$ \\
 $27$ & $5$ & $84$ & $5$ & $2805$ & $2$ & $3$ \\
 \bottomrule
 \end{tabular}
@@ -300,7 +292,7 @@ $a + b = c$ and the bound is polynomial, only finitely many solutions remain.
 %% =============================================================================
 
 \begin{theorem}[Poonen--Schaefer--Stoll, 2005]\label{thm:PSS}
-The equation $x^2 + y^3 = z^7$ has exactly 27 primitive solutions (up to signs).
+The equation $x^2 + y^3 = z^7$ has exactly 16 primitive solutions (up to signs).
 All solutions satisfy $\gcd(x,y,z) = 1$, consistent with this being a case where
 two exponents are $< 3$.
 \end{theorem}
