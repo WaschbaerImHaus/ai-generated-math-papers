@@ -336,8 +336,10 @@ that no prime triple $(p,q,r)$ with $k \le p-1$ survives:
                 so $(r-1) \mid (5qr-1)$.  The remaining factor $4(q-1)$
                 must therefore divide $(5qr-1)/(r-1)$.  Computing
                 \[
-                  \frac{5qr-1}{r-1} = 5q + \frac{5q-1}{r-1} = 5q + k,
+                  \frac{5qr-1}{r-1} = 5q + \frac{5q-1}{r-1} = 5q + \frac{5q-1}{d} = 5q + k,
                 \]
+                where the last step uses the global definition $k = (pq-1)/(r-1) = (5q-1)/d$
+                (from Step~1 with $p = 5$ and $r - 1 = d$).
                 the condition becomes $4(q-1) \mid 5q + k$.  Since
                 $5q + k \equiv q + k + 4 \pmod{q-1}$ and $q \equiv 1 \pmod{q-1}$,
                 this simplifies to $4(q-1) \mid k + 5$
@@ -349,12 +351,12 @@ that no prime triple $(p,q,r)$ with $k \le p-1$ survives:
 
                 \textit{Computational verification (belt-and-suspenders).}
                 As an independent cross-check, an exhaustive computer search
-                over all primes $5 < q \le 10{,}000$ confirms that no valid
+                over all primes $5 < q \le 500$ confirms that no valid
                 prime triple $(5, q, r)$ with $r > q$ prime and
                 $\varphi(5qr) \mid (5qr - 1)$ exists in this range.
                 (The search is finite because the elementary argument above
                 guarantees no solution for $q \ge 17$; the range $17 \le q \le
-                10{,}000$ is verified computationally for completeness.)
+                500$ is verified computationally for completeness.)
         \end{itemize}
   \item $p \ge 7$: We derive an explicit upper bound on $q$.
         From Step~3, $A = (p-1)(q-1)/D \le 2p+q-2$.
