@@ -1293,3 +1293,29 @@ ausgewiesen. Keine unbewiesen Vermutung als Theorem deklariert.
 - Echte bibliographische Referenzen mit vollständigen Angaben
 - Mathematisch rigoros (Beweisideen, nicht nur Behauptungen)
 - ~12 Sektionen pro Paper
+
+=== 2026-03-12 — Build 164 — Batch 22: Papers 84–87 (EN + DE) ===
+
+2026-03-12 [Build 164]: 8 neue LaTeX-Papers in papers/batch22/ erstellt
+
+### Neue Dateien
+- papers/batch22/paper84_fontaine_mazur_en.tex  (EN, ~12 Sections, p-adische Galois-Darstellungen)
+- papers/batch22/paper84_fontaine_mazur_de.tex  (DE, Übersetzung)
+- papers/batch22/paper85_lehmer_mahler_measure_en.tex  (EN, ~12 Sections, Mahler-Maß)
+- papers/batch22/paper85_lehmer_mahler_mass_de.tex  (DE, Übersetzung)
+- papers/batch22/paper86_elliptic_curve_rank_en.tex  (EN, ~12 Sections, Rang ell. Kurven)
+- papers/batch22/paper86_elliptische_kurven_rang_de.tex  (DE, Übersetzung)
+- papers/batch22/paper87_bateman_horn_en.tex  (EN, ~12 Sections, Bateman-Horn-Vermutung)
+- papers/batch22/paper87_bateman_horn_de.tex  (DE, Übersetzung)
+
+### Themen
+- Paper 84: Fontaine-Mazur-Vermutung (p-adische Galois-Darstellungen, BdR/Bcris/Bst,
+  Kisin 2009, Emerton completed cohomology, Taylor potential modularity)
+- Paper 85: Lehmers Problem und Mahler-Maß (Kronecker, Dobrowolski-Schranke,
+  Salem-Zahlen, Boyd-Recherchen, Lind-Schmidt-Ward Entropie, Deninger-Formeln)
+- Paper 86: Rang elliptischer Kurven (Mordell-Weil, BSD, Selmer, Sha,
+  Bhargava-Shankar avg rank ≤0.885, Elkies rank≥29, Goldfeld, Poonen-Rains)
+- Paper 87: Bateman-Horn-Vermutung (singuläre Reihe, Bunyakovsky, Primzahlzwillinge,
+  Dickson, Schinzel, Hardy-Littlewood, Green-Tao, Maynard-Tao)
+
+### Wichtig: Alle unbewiesenen Aussagen als conjecture/vermutung deklariert

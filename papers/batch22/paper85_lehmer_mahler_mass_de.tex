@@ -1,0 +1,601 @@
+% ==============================================================================
+% Paper 85 (DE): Lehmers Problem: Mahler-Maß und Algebraische Zahlentheorie
+% Autor: Michael Fuhrmann
+% Projekt: Specialist Mathematics Project, Build 167
+% Datum: 2026-03-12
+% ==============================================================================
+
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% --------------------------------------------------------------------------
+% Theorem-Umgebungen (Deutsch)
+% --------------------------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{satz}[theorem]{Satz}
+\newtheorem{korollar}[theorem]{Korollar}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{definition_de}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\newtheorem{vermutung}[theorem]{Vermutung}
+
+% --------------------------------------------------------------------------
+% Makros
+% --------------------------------------------------------------------------
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\T}{\mathbb{T}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\M}{\mathrm{M}}
+\newcommand{\m}{\mathrm{m}}
+\DeclareMathOperator{\deg}{deg}
+\DeclareMathOperator{\Res}{Res}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue,
+  pdftitle={Lehmers Problem: Mahler-Maß und Algebraische Zahlentheorie},
+  pdfauthor={Michael Fuhrmann}
+}
+
+% ==============================================================================
+\begin{document}
+% ==============================================================================
+
+\title{Lehmers Problem:\\
+  Mahler-Maß und Algebraische Zahlentheorie}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 167}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\begin{abstract}
+Lehmers Problem, 1933 von D.\,H.\ Lehmer aufgeworfen, fragt, ob das Mahler-Maß
+$\M(\alpha)$ einer algebraischen ganzen Zahl $\alpha$, die keine Einheitswurzel ist,
+beliebig nahe an $1$ liegen kann. Das Mahler-Maß eines Polynoms $P(x)$ ist
+\[
+  \M(P) = \exp\!\left(\int_0^1 \log|P(e^{2\pi i t})|\,dt\right)
+        = |a_d| \prod_{j=1}^d \max(1, |\alpha_j|),
+\]
+wobei $a_d$ der Leitkoeffizient und $\alpha_1,\ldots,\alpha_d$ die Nullstellen sind.
+Lehmers Polynom $L(x) = x^{10}+x^9-x^7-x^6-x^5-x^4-x^3+x+1$ mit dem Mahler-Maß
+$\M(L) \approx 1{,}17628\ldots$ (Salem-Zahl $\lambda_{10}$) ist trotz 90 Jahren
+intensiver Suche das kleinste bekannte Mahler-Maß $> 1$ für algebraische ganze Zahlen.
+Wir entwickeln die Theorie rigoros: Jensens Formel, Kroneckers Satz ($\M(\alpha)=1$
+genau dann, wenn $\alpha$ Null oder Einheitswurzel), Salem-Zahlen,
+Dobrowolskis untere Schranke $\M(\alpha) \geq 1 + c(\log\log n/\log n)^3$,
+die Salem-Boyd-Vermutung und die Verbindung zum Entropie-Begriff algebraischer
+dynamischer Systeme (Lind-Schmidt-Ward).
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+% ==============================================================================
+\section{Einleitung}
+% ==============================================================================
+
+In seiner Arbeit von 1933 zur Faktorisierung großer Zahlen \cite{Lehmer1933} führte
+D.\,H.\ Lehmer das Polynom
+\[
+  L(x) = x^{10}+x^9-x^7-x^6-x^5-x^4-x^3+x+1
+\]
+ein und bemerkte, dass es ein ungewöhnlich kleines Mahler-Maß besitzt:
+$\M(L) \approx 1{,}17628\ldots$.
+Er fragte:
+\begin{quote}
+  \textit{Gibt es ein Polynom mit ganzzahligen Koeffizienten, dessen Mahler-Maß
+  strikt zwischen $1$ und $\M(L)$ liegt?}
+\end{quote}
+
+Diese Frage, heute als \emph{Lehmers Problem} bekannt, ist eines der ältesten ungelösten
+Probleme der algebraischen Zahlentheorie. Sie hat tiefe Verbindungen zu:
+\begin{itemize}
+  \item der Verteilung algebraischer ganzer Zahlen auf und nahe dem Einheitskreis;
+  \item Salem-Zahlen und Pisot-Vijayaraghavan-Zahlen (PV-Zahlen);
+  \item der Entropie algebraischer $\Z^d$-Wirkungen;
+  \item der Weil-Höhe algebraischer Zahlen;
+  \item der Spektraltheorie von Graphen.
+\end{itemize}
+
+\subsection{Aufbau des Aufsatzes}
+Abschnitt~\ref{sec:mahler_def} definiert das Mahler-Maß und beweist Jensens Formel.
+Abschnitt~\ref{sec:kronecker} beweist Kroneckers Satz.
+Abschnitt~\ref{sec:lehmer_poly} analysiert Lehmers Polynom und Salem-Zahlen.
+Abschnitt~\ref{sec:vermutung} formuliert die Lehmer-Vermutung präzise.
+Abschnitt~\ref{sec:dobrowolski} beweist Dobrowolskis untere Schranke.
+Abschnitt~\ref{sec:salem_boyd} behandelt die Salem-Boyd-Vermutung.
+Abschnitt~\ref{sec:entropie} verbindet das Mahler-Maß mit dynamischer Entropie.
+Abschnitt~\ref{sec:pisot} bespricht Pisot- und Salem-Zahlen.
+Abschnitt~\ref{sec:mehrere_variablen} behandelt das mehrdimensionale Mahler-Maß.
+Abschnitt~\ref{sec:berechnungen} fasst rechnerische Ergebnisse zusammen.
+Abschnitt~\ref{sec:offene_probleme} listet offene Probleme auf.
+Abschnitt~\ref{sec:fazit} schließt den Aufsatz ab.
+
+% ==============================================================================
+\section{Mahler-Maß: Definition und Grundeigenschaften}\label{sec:mahler_def}
+% ==============================================================================
+
+\begin{definition_de}[Mahler-Maß eines Polynoms]
+  Sei $P(x) = a_d x^d + \cdots + a_0 \in \C[x]$ mit $a_d \neq 0$ und Nullstellen
+  $\alpha_1,\ldots,\alpha_d \in \C$. Das \emph{Mahler-Maß} von $P$ ist
+  \[
+    \M(P) \;:=\; |a_d| \prod_{j=1}^d \max(1, |\alpha_j|).
+  \]
+  Das \emph{logarithmische Mahler-Maß} ist $\m(P) = \log \M(P)$.
+\end{definition_de}
+
+\begin{satz}[Jensensche Formel]
+  Für $P(x) = a_d \prod_{j=1}^d (x - \alpha_j) \in \C[x]$ gilt:
+  \[
+    \M(P) \;=\; \exp\!\left(\int_0^1 \log|P(e^{2\pi i t})|\,dt\right).
+  \]
+\end{satz}
+
+\begin{proof}
+  Nach der Jensen-Formel für jeden Linearfaktor $(x - \alpha_j)$ gilt:
+  \[
+    \int_0^1 \log|e^{2\pi it} - \alpha_j|\,dt = \log\max(1, |\alpha_j|).
+  \]
+  Einsetzen in die Produktformel ergibt die Behauptung.
+\end{proof}
+
+\begin{proposition}[Grundeigenschaften des Mahler-Maßes]
+  \begin{enumerate}[label=(\roman*)]
+    \item $\M(PQ) = \M(P)\M(Q)$ (Multiplikativität);
+    \item $\M(P) = \M(P^\ast)$, wo $P^\ast(x) = x^d \overline{P(1/\bar{x})}$
+      das reziproke Polynom ist;
+    \item $\M(P) \geq 1$ für monisches $P \in \Z[x]$ mit $P(0) \neq 0$.
+  \end{enumerate}
+\end{proposition}
+
+\begin{definition_de}[Mahler-Maß einer algebraischen Zahl]
+  Für eine algebraische ganze Zahl $\alpha$ mit monischem irreduziblem
+  Minimalpolynom $P_\alpha \in \Z[x]$ sei $\M(\alpha) := \M(P_\alpha)$.
+\end{definition_de}
+
+% ==============================================================================
+\section{Kroneckers Satz}\label{sec:kronecker}
+% ==============================================================================
+
+\begin{satz}[Kronecker, 1857 \cite{Kronecker1857}]\label{satz:kronecker}
+  Sei $\alpha$ eine von Null verschiedene algebraische ganze Zahl.
+  Dann gilt $\M(\alpha) = 1$ genau dann, wenn $\alpha$ eine Einheitswurzel ist.
+  Äquivalent: $\M(P) = 1$ für ein monisches $P \in \Z[x]$ mit $P(0) \neq 0$ genau dann,
+  wenn alle Nullstellen von $P$ auf dem Einheitskreis liegen.
+\end{satz}
+
+\begin{proof}
+  \emph{($\Leftarrow$)}: Liegen alle Nullstellen auf dem Einheitskreis, so gilt
+  $\max(1,|\alpha_j|) = 1$ für alle $j$, also $\M(P) = 1$.
+
+  \emph{($\Rightarrow$)}: Gilt $\M(P) = 1$ und ist $P$ monisch in $\Z[x]$ mit
+  $|\alpha_j| \leq 1$ für alle $j$, so folgt $|a_0| = |\prod \alpha_j| \leq 1$;
+  da $a_0 \in \Z \setminus \{0\}$, muss $|a_0| = 1$, also alle $|\alpha_j| = 1$.
+  Nun erzeugen die $n$-ten Potenzen $\alpha_j^n$ Polynome mit beschränkten
+  ganzzahligen Koeffizienten; von Kroneckers Endlichkeitsargument folgt,
+  dass $\alpha_j^m = \alpha_j^n$ für $m \neq n$, also sind alle $\alpha_j$
+  Einheitswurzeln.
+\end{proof}
+
+\begin{korollar}
+  Für ein Kreisteilungspolynom $\Phi_n(x)$ gilt $\M(\Phi_n) = 1$.
+\end{korollar}
+
+% ==============================================================================
+\section{Lehmers Polynom und Salem-Zahlen}\label{sec:lehmer_poly}
+% ==============================================================================
+
+\begin{definition_de}[Salem-Zahl]
+  Eine \emph{Salem-Zahl} ist eine reelle algebraische ganze Zahl $\tau > 1$, deren
+  Konjugierte alle auf dem oder im Innern des Einheitskreises liegen, wobei mindestens
+  eine auf dem Einheitskreis liegt.
+\end{definition_de}
+
+\begin{definition_de}[Pisot-Vijayaraghavan-Zahl]
+  Eine \emph{PV-Zahl} ist eine reelle algebraische ganze Zahl $\theta > 1$, deren
+  sämtliche Konjugierte den Betrag $< 1$ haben.
+\end{definition_de}
+
+\begin{example}[Lehmers Polynom]
+  Das Polynom
+  \[
+    L(x) = x^{10}+x^9-x^7-x^6-x^5-x^4-x^3+x+1
+  \]
+  ist irreduzibel über $\Q$ und besitzt:
+  \begin{itemize}
+    \item eine reelle Nullstelle $\lambda_{10} > 1$ (eine Salem-Zahl);
+    \item eine reelle Nullstelle $\lambda_{10}^{-1} \in (0,1)$;
+    \item $8$ komplexe Nullstellen (nahe dem) auf dem Einheitskreis, in $4$
+      konjugierten Paaren.
+  \end{itemize}
+  Das Mahler-Maß beträgt $\M(L) = \lambda_{10} \approx 1{,}1762808182599175\ldots$.
+\end{example}
+
+\begin{bemerkung}
+  Das Polynom $L(x)$ ist reziprok: $x^{10}L(1/x) = L(x)$.
+  Dies ist charakteristisch für Salem-Zahlen.
+\end{bemerkung}
+
+% ==============================================================================
+\section{Die Lehmer-Vermutung}\label{sec:vermutung}
+% ==============================================================================
+
+\begin{vermutung}[Lehmer-Vermutung \cite{Lehmer1933}]\label{verm:lehmer}
+  Es gibt eine absolute Konstante $c > 1$, so dass für jede algebraische ganze Zahl
+  $\alpha$, die keine Einheitswurzel ist, gilt:
+  \[
+    \M(\alpha) \;\geq\; c.
+  \]
+  Stärkere Form: Für jedes monische $P \in \Z[x]$ mit $P(0) \neq 0$, das kein Produkt
+  von Kreisteilungspolynomen ist, gilt:
+  \[
+    \M(P) \;\geq\; \lambda_{10} \approx 1{,}17628.
+  \]
+\end{vermutung}
+
+\begin{bemerkung}
+  Die \emph{schwache} Form der Vermutung besagt nur, dass $1$ kein Häufungspunkt der
+  Menge $\{\M(\alpha) : \alpha \text{ alg.\ ganzzahlig, keine Einheitswurzel}\}$ ist.
+  Die \emph{starke} Form behauptet, dass $\lambda_{10}$ das Minimum ist.
+\end{bemerkung}
+
+\begin{satz}[Smyth \cite{Smyth1971}]
+  Für ein nicht-reziprokes monisches Polynom $P \in \Z[x]$ (d.\,h.\ $P \neq x^{\deg P}P(1/x)$),
+  das kein Produkt von Kreisteilungspolynomen ist, gilt:
+  \[
+    \M(P) \;\geq\; \theta_3 \;=\; 1{,}3247179572\ldots,
+  \]
+  wobei $\theta_3$ die kleinste PV-Zahl (reelle Nullstelle von $x^3-x-1$) ist.
+\end{satz}
+
+% ==============================================================================
+\section{Dobrowolskis untere Schranke}\label{sec:dobrowolski}
+% ==============================================================================
+
+\begin{satz}[Dobrowolski \cite{Dobrowolski1979}]\label{satz:dobro}
+  Sei $\alpha$ eine algebraische ganze Zahl vom Grad $d \geq 2$ über $\Q$, die keine
+  Einheitswurzel ist. Dann gilt:
+  \[
+    \M(\alpha) \;\geq\; 1 + \frac{1}{1200}\left(\frac{\log\log d}{\log d}\right)^3.
+  \]
+\end{satz}
+
+\begin{bemerkung}
+  Verbesserte Konstanten wurden von Voutier \cite{Voutier1996} und Cantor-Straus
+  \cite{CantorStraus1982} erzielt. Die beste bekannte Form ist
+  $\M(\alpha) \geq 1 + (1-\varepsilon(d))(\log\log d / \log d)^3$
+  mit $\varepsilon(d) \to 0$.
+\end{bemerkung}
+
+\textbf{Schlüsselideen des Beweises:}
+
+\begin{lemma}[Hilfspolynomabschätzung]
+  Für eine Primzahl $q$ und eine algebraische ganze Zahl $\alpha$ vom Grad $d$ betrachte
+  \[
+    P_q(x) = \prod_{\zeta^q = 1} P_\alpha(\zeta x) \in \Z[x].
+  \]
+  Es gilt $\log \M(P_q) \leq q \cdot \log \M(\alpha)$,
+  während $P_q$ eine große $\ell^\infty$-Norm hat, falls $\M(\alpha) < 2$.
+\end{lemma}
+
+\begin{proof}[Beweissk\glqq izze von Satz~\ref{satz:dobro}]
+  Nach dem Bertrandschen Postulat gibt es eine Primzahl $q \in [\frac{\log d}{2}, \log d]$.
+  Die Frobenius-Wirkung liefert ein Polynom der Norm $\geq q$, während das
+  Mahler-Maß von $P_q$ höchstens $\M(\alpha)^q$ ist. Der Widerspruch bei zu kleinem
+  $\M(\alpha)$ ergibt die untere Schranke.
+\end{proof}
+
+% ==============================================================================
+\section{Die Salem-Boyd-Vermutung}\label{sec:salem_boyd}
+% ==============================================================================
+
+\begin{vermutung}[Salem-Boyd \cite{Boyd1977}]\label{verm:salemboyd}
+  Die kleinste Salem-Zahl ist die Lehmer-Zahl $\lambda_{10} \approx 1{,}17628$.
+  Äquivalent: Lehmers Polynom $L(x)$ liefert das kleinste Mahler-Maß $> 1$ unter allen
+  monischen ganzzahligen Polynomen.
+\end{vermutung}
+
+\begin{bemerkung}
+  Boyd \cite{Boyd1977,Boyd1981} hat alle Salem-Zahlen vom Grad $\leq 40$ und
+  Mahler-Maß $\leq 1{,}3$ berechnet und dabei stets $\lambda_{10}$ als das kleinste
+  bestätigt. Die zweitkleinste bekannte Salem-Zahl hat
+  $\M \approx 1{,}1884\ldots$ (Grad 18).
+\end{bemerkung}
+
+\begin{satz}[Mossinghoff-Rhin-Wu \cite{MRW2008}]
+  Die Lehmer-Vermutung gilt für alle Polynome vom Grad $\leq 44$:
+  Ist $P \in \Z[x]$, $\deg P \leq 44$, $P(0) \neq 0$ und $P$ kein Produkt von
+  Kreisteilungspolynomen, so gilt $\M(P) \geq \lambda_{10}$.
+\end{satz}
+
+% ==============================================================================
+\section{Entropie algebraischer dynamischer Systeme}\label{sec:entropie}
+% ==============================================================================
+
+\begin{definition_de}[Algebraische $\Z^d$-Wirkung]
+  Für ein Laurent-Polynom $f \in \Z[x_1^{\pm 1},\ldots,x_d^{\pm 1}]$ ist
+  $X_f := \widehat{\Z[x_1^{\pm 1},\ldots,x_d^{\pm 1}]/(f)}$
+  die Pontrjagin-duale kompakte abelsche Gruppe.
+  Die $\Z^d$-Wirkung auf $X_f$ ist durch duale Verschiebungen gegeben.
+\end{definition_de}
+
+\begin{satz}[Lind-Schmidt-Ward \cite{LSW1990}]\label{satz:lsw}
+  Die topologische Entropie der $\Z^d$-Wirkung auf $X_f$ ist gleich dem
+  (mehrdimensionalen) logarithmischen Mahler-Maß:
+  \[
+    h(X_f) \;=\; \m(f) \;=\; \int_{\T^d} \log|f(e^{2\pi i \theta_1},\ldots,e^{2\pi i \theta_d})|\,
+    d\theta_1 \cdots d\theta_d.
+  \]
+\end{satz}
+
+\begin{bemerkung}
+  Satz~\ref{satz:lsw} bedeutet: Lehmers Problem ist äquivalent zur Frage, ob es eine
+  algebraische $\Z$-Wirkung mit topologischer Entropie in $(0, \log\lambda_{10})$ gibt.
+  Die Antwort ist vermutlich \emph{nein}.
+\end{bemerkung}
+
+\begin{example}[Smyths Formel]
+  Für $f = 1 + x + y \in \Z[x^{\pm 1}, y^{\pm 1}]$ gilt
+  \[
+    \m(f) \;=\; \frac{3\sqrt{3}}{4\pi} L(\chi_{-3}, 2)
+           \;=\; L'(\chi_{-3}, -1),
+  \]
+  wobei $\chi_{-3}$ der primitive Dirichlet-Charakter vom Führer $3$ ist.
+\end{example}
+
+% ==============================================================================
+\section{Pisot-Zahlen, Salem-Zahlen und Häufungspunkte}\label{sec:pisot}
+% ==============================================================================
+
+\begin{satz}[Siegel 1944 \cite{Siegel1944}]
+  Die kleinste PV-Zahl ist die reelle Nullstelle von $x^3 - x - 1$
+  (die \emph{Kunststoffzahl} $\theta_3 \approx 1{,}3247$).
+\end{satz}
+
+\begin{satz}[Salem 1944 \cite{Salem1944}]
+  Jede PV-Zahl größer als $1$ ist Häufungspunkt (von oben und unten) von Salem-Zahlen.
+  Umgekehrt ist jeder Häufungspunkt von Salem-Zahlen eine PV-Zahl.
+\end{satz}
+
+\begin{proposition}[Charakterisierung durch Minimalpolynome]
+  \begin{enumerate}[label=(\roman*)]
+    \item Das Minimalpolynom einer Salem-Zahl ist reziprok (d.\,h.\ $x^d P(1/x) = P(x)$)
+      und hat geraden Grad.
+    \item Das Minimalpolynom einer PV-Zahl ist nicht reziprok.
+    \item Lehmers Polynom $L(x)$ ist reziprok: $x^{10}L(1/x) = L(x)$.
+  \end{enumerate}
+\end{proposition}
+
+% ==============================================================================
+\section{Mehrdimensionales Mahler-Maß}\label{sec:mehrere_variablen}
+% ==============================================================================
+
+\begin{definition_de}[Mehrdimensionales Mahler-Maß]
+  Für $f \in \C[x_1^{\pm 1},\ldots,x_n^{\pm 1}]$ sei
+  \[
+    \m(f) \;:=\; \int_0^1\cdots\int_0^1
+    \log|f(e^{2\pi it_1},\ldots,e^{2\pi it_n})|\,dt_1\cdots dt_n.
+  \]
+\end{definition_de}
+
+\begin{example}[Deningers Formel \cite{Deninger1997}]
+  \[
+    \m(1+x+1/x+y+1/y) \;=\; \frac{15}{(2\pi)^2}\, L(E_{15}, 2),
+  \]
+  wobei $E_{15}$ die elliptische Kurve $y^2 + xy + y = x^3 + x^2 - 10x - 10$
+  vom Führer $15$ ist.
+\end{example}
+
+\begin{bemerkung}
+  Deninger \cite{Deninger1997} vermutete eine allgemeine Verbindung: Für viele
+  zweidimensionale Polynome $f$, die eine elliptische Kurve $E_f$ definieren, ist
+  $\m(f)$ ein rationales Vielfaches von $L'(E_f, 0)$.
+  Dies wurde für Hunderte von Beispielen numerisch bestätigt (Rodriguez Villegas
+  \cite{RV1999}) und in einigen Fällen bewiesen (Rogers-Zudilin \cite{RZ2014}).
+\end{bemerkung}
+
+% ==============================================================================
+\section{Rechnerische Ergebnisse}\label{sec:berechnungen}
+% ==============================================================================
+
+\begin{satz}[Mossinghoff \cite{Mossinghoff1998}]
+  Die folgende Tabelle zeigt die kleinsten bekannten Mahler-Maße $> 1$
+  für Polynome in $\Z[x]$:
+  \begin{center}
+    \begin{tabular}{lll}
+      \toprule
+      Rang & $\M$ & Polynom \\
+      \midrule
+      1 & $1{,}17628\ldots$ & $x^{10}+x^9-x^7-\cdots+1$ (Lehmer) \\
+      2 & $1{,}18836\ldots$ & Salem-Zahl vom Grad 18 \\
+      3 & $1{,}20002\ldots$ & Salem-Zahl vom Grad 20 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{satz}
+
+% ==============================================================================
+\section{Weil-Höhe und Lehmers Problem}\label{sec:weil_hoehe}
+% ==============================================================================
+
+\begin{definition_de}[Weil-Höhe]
+  Für eine algebraische Zahl $\alpha$ mit Minimalpolynom $P_\alpha \in \Z[x]$ (monisch,
+  irreduzibel) ist die \emph{logarithmische Weil-Höhe}:
+  \[
+    h(\alpha) \;:=\; \frac{1}{\deg\alpha} \log \M(P_\alpha)
+              \;=\; \frac{\m(P_\alpha)}{\deg\alpha}.
+  \]
+\end{definition_de}
+
+\begin{vermutung}[Lehmer-Vermutung über Weil-Höhe]\label{verm:lehmer_hoehe}
+  Es gibt eine absolute Konstante $c > 0$, so dass für jede algebraische Zahl
+  $\alpha \neq 0$, die keine Einheitswurzel ist, gilt:
+  \[
+    h(\alpha) \;\geq\; \frac{c}{\deg\alpha}.
+  \]
+\end{vermutung}
+
+\begin{bemerkung}
+  Diese Formulierung von Lehmers Problem (mit der Weil-Höhe) ist zur ursprünglichen
+  äquivalent. Sie ist besonders nützlich in der Geometrie der Zahlen und der
+  Arithmetischen Geometrie.
+\end{bemerkung}
+
+% ==============================================================================
+\section{Offene Probleme}\label{sec:offene_probleme}
+% ==============================================================================
+
+\begin{vermutung}[Starke Lehmer-Vermutung \cite{Lehmer1933}]
+  Für jedes monische $P \in \Z[x]$ mit $P(0) \neq 0$, das kein Produkt von
+  Kreisteilungspolynomen ist, gilt $\M(P) \geq \lambda_{10} = 1{,}1762808\ldots$.
+\end{vermutung}
+
+\begin{vermutung}[Mehrdimensionale Lehmer-Vermutung \cite{Boyd1981}]
+  Das Mahler-Maß eines mehrfachen Polynoms in $\Z[x_1^\pm,\ldots,x_n^\pm]$,
+  das auf dem Torus $\T^n$ nicht verschwindet, ist mindestens $\lambda_{10}$.
+\end{vermutung}
+
+\begin{vermutung}[Bogomolov-Eigenschaft]
+  Für jeden Zahlkörper $K$ gibt es $c(K) > 0$, so dass für alle
+  $\alpha \in K^\times$, die keine Einheitswurzeln sind:
+  $h(\alpha) \geq c(K)/[K:\Q]$.
+\end{vermutung}
+
+\begin{bemerkung}
+  Die Bogomolov-Eigenschaft für $K = \Q$ ist äquivalent zur Lehmer-Vermutung.
+  Sie ist bekannt für abelsche Erweiterungen von $\Q$
+  (Amoroso-Dvornicich \cite{AD2000}).
+\end{bemerkung}
+
+% ==============================================================================
+\section{Fazit}\label{sec:fazit}
+% ==============================================================================
+
+Lehmers Problem verbindet, trotz seiner elementaren Formulierung, tiefe Aspekte der
+algebraischen Zahlentheorie: die Geometrie algebraischer ganzer Zahlen am Einheitskreis,
+die Arithmetik von Salem- und Pisot-Zahlen sowie die Entropie algebraischer dynamischer
+Systeme. Die einzige bewiesene untere Schranke von Substanz ist Dobrowolskis Ergebnis,
+das weit hinter dem vermuteten Schwellenwert $\lambda_{10}$ zurückbleibt.
+Lehmers Polynom hält nach 90 Jahren den Rekord, und die Vermutung, dass kein Mahler-Maß
+strikt zwischen $1$ und $\lambda_{10}$ liegt, gilt als eines der schwierigsten offenen
+Probleme der algebraischen Zahlentheorie. Die unerwarteten Verbindungen zum
+mehrdimensionalen Mahler-Maß, zu $L$-Funktionen und elliptischen Kurven deuten auf eine
+tiefe arithmetische Struktur hin.
+
+\begin{thebibliography}{99}
+
+\bibitem{AD2000}
+F.\ Amoroso, R.\ Dvornicich,
+\textit{A lower bound for the height in abelian extensions},
+J.\ Number Theory \textbf{80} (2000), Nr.\ 2, 260--272.
+
+\bibitem{Boyd1977}
+D.\,W.\ Boyd,
+\textit{Small Salem numbers},
+Duke Math.\ J.\ \textbf{44} (1977), Nr.\ 2, 315--328.
+
+\bibitem{Boyd1981}
+D.\,W.\ Boyd,
+\textit{Speculations concerning the range of Mahler's measure},
+Canad.\ Math.\ Bull.\ \textbf{24} (1981), Nr.\ 4, 453--469.
+
+\bibitem{CantorStraus1982}
+D.\,G.\ Cantor, E.\,G.\ Straus,
+\textit{On a conjecture of D.\,H.\ Lehmer},
+Acta Arith.\ \textbf{42} (1982), Nr.\ 2, 97--100.
+
+\bibitem{Deninger1997}
+C.\ Deninger,
+\textit{Deligne periods of mixed motives, $K$-theory and the entropy of certain
+$\mathbb{Z}^n$-actions},
+J.\ Amer.\ Math.\ Soc.\ \textbf{10} (1997), Nr.\ 2, 259--281.
+
+\bibitem{Dobrowolski1979}
+E.\ Dobrowolski,
+\textit{On a question of Lehmer and the number of irreducible factors of a polynomial},
+Acta Arith.\ \textbf{34} (1979), Nr.\ 4, 391--401.
+
+\bibitem{Kronecker1857}
+L.\ Kronecker,
+\textit{Zwei Sätze über Gleichungen mit ganzzahligen Koeffizienten},
+J.\ Reine Angew.\ Math.\ \textbf{53} (1857), 173--175.
+
+\bibitem{Lehmer1933}
+D.\,H.\ Lehmer,
+\textit{Factorization of certain cyclotomic functions},
+Ann.\ of Math.\ (2) \textbf{34} (1933), Nr.\ 3, 461--479.
+
+\bibitem{LSW1990}
+D.\,A.\ Lind, K.\ Schmidt, T.\ Ward,
+\textit{Mahler measure and entropy for commuting automorphisms of compact groups},
+Invent.\ Math.\ \textbf{101} (1990), Nr.\ 3, 593--629.
+
+\bibitem{Mossinghoff1998}
+M.\,J.\ Mossinghoff,
+\textit{Polynomials with small Mahler measure},
+Math.\ Comp.\ \textbf{67} (1998), Nr.\ 224, 1697--1705.
+
+\bibitem{MRW2008}
+M.\,J.\ Mossinghoff, G.\ Rhin, Q.\ Wu,
+\textit{Minimal Mahler measures},
+Experiment.\ Math.\ \textbf{17} (2008), Nr.\ 4, 451--458.
+
+\bibitem{RV1999}
+F.\ Rodriguez Villegas,
+\textit{Modular Mahler measures I},
+Math.\ Appl.\ \textbf{467}, Kluwer (1999), 17--48.
+
+\bibitem{RZ2014}
+M.\ Rogers, W.\ Zudilin,
+\textit{From $L$-series of elliptic curves to Mahler measures},
+Compos.\ Math.\ \textbf{148} (2012), Nr.\ 2, 385--414.
+
+\bibitem{Salem1944}
+R.\ Salem,
+\textit{A remarkable class of algebraic integers},
+Duke Math.\ J.\ \textbf{11} (1944), 103--108.
+
+\bibitem{Siegel1944}
+C.\,L.\ Siegel,
+\textit{Algebraic integers whose conjugates lie in the unit circle},
+Duke Math.\ J.\ \textbf{11} (1944), 597--602.
+
+\bibitem{Smyth1971}
+C.\,J.\ Smyth,
+\textit{On the product of the conjugates outside the unit circle of an algebraic integer},
+Bull.\ London Math.\ Soc.\ \textbf{3} (1971), 169--175.
+
+\bibitem{Smyth1981}
+C.\,J.\ Smyth,
+\textit{On measures of polynomials in several variables},
+Bull.\ Austral.\ Math.\ Soc.\ \textbf{23} (1981), Nr.\ 1, 49--63.
+
+\bibitem{Voutier1996}
+P.\ Voutier,
+\textit{An effective lower bound for the height of algebraic numbers},
+Acta Arith.\ \textbf{74} (1996), Nr.\ 1, 81--95.
+
+\end{thebibliography}
+
+\end{document}

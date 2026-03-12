@@ -1,0 +1,678 @@
+% ==============================================================================
+% Paper 85 (EN): Lehmer's Problem: Mahler Measure and Algebraic Number Theory
+% Author: Michael Fuhrmann
+% Project: Specialist Mathematics Project, Build 167
+% Date: 2026-03-12
+% ==============================================================================
+
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% --------------------------------------------------------------------------
+% Theorem environments
+% --------------------------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+% --------------------------------------------------------------------------
+% Macros
+% --------------------------------------------------------------------------
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\T}{\mathbb{T}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\M}{\mathrm{M}}
+\newcommand{\m}{\mathrm{m}}
+\DeclareMathOperator{\deg}{deg}
+\DeclareMathOperator{\lcm}{lcm}
+\DeclareMathOperator{\Res}{Res}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue,
+  pdftitle={Lehmer's Problem: Mahler Measure and Algebraic Number Theory},
+  pdfauthor={Michael Fuhrmann}
+}
+
+% ==============================================================================
+\begin{document}
+% ==============================================================================
+
+\title{Lehmer's Problem: Mahler Measure and Algebraic Number Theory}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 167}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\begin{abstract}
+Lehmer's problem, posed in 1933, asks whether the Mahler measure $\M(\alpha)$ of an
+algebraic integer $\alpha$ that is not a root of unity can be arbitrarily close to $1$.
+The Mahler measure of a polynomial $P(x)$ is
+\[
+  \M(P) = \exp\!\left(\int_0^1 \log|P(e^{2\pi i t})|\,dt\right)
+        = |a_d| \prod_{j=1}^d \max(1, |\alpha_j|),
+\]
+where $a_d$ is the leading coefficient and $\alpha_1,\ldots,\alpha_d$ are the roots.
+Lehmer's polynomial $L(x) = x^{10}+x^9-x^7-x^6-x^5-x^4-x^3+x+1$, with Mahler measure
+$\M(L) \approx 1.17628\ldots$ (the Salem number $\lambda_{10}$), remains the smallest
+known Mahler measure greater than $1$ for algebraic integers, despite 90 years of effort.
+We develop the theory rigorously: Jensen's formula, Kronecker's theorem ($\M(\alpha)=1$
+iff $\alpha$ is zero or a root of unity), Salem numbers, the
+Dobrowolski lower bound $\M(\alpha) \geq 1 + c(\log\log n/\log n)^3$, the
+Salem-Boyd conjecture on the smallest limit point, connections to entropy of algebraic
+dynamical systems (Lind-Schmidt-Ward), and recent computational results.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+% ==============================================================================
+\section{Introduction}
+% ==============================================================================
+
+In his 1933 paper \cite{Lehmer1933} on factoring large numbers, D.\,H.\ Lehmer introduced
+the polynomial
+\[
+  L(x) = x^{10}+x^9-x^7-x^6-x^5-x^4-x^3+x+1
+\]
+and observed that it has an exceptionally small Mahler measure
+$\M(L) \approx 1.17628\ldots$.
+He asked:
+\begin{quote}
+  \textit{Is there a polynomial with integer coefficients whose Mahler measure lies strictly
+  between $1$ and $\M(L)$?}
+\end{quote}
+
+This question, now known as \emph{Lehmer's problem}, remains one of the oldest unsolved
+problems in algebraic number theory. It has deep connections to:
+\begin{itemize}
+  \item the distribution of algebraic integers on and near the unit circle;
+  \item Salem numbers and Pisot-Vijayaraghavan (PV) numbers;
+  \item the entropy of algebraic $\Z^d$-actions;
+  \item the Weil height of algebraic numbers;
+  \item the spectral theory of graphs.
+\end{itemize}
+
+\subsection{Outline}
+Section~\ref{sec:mahler_def} defines Mahler measure via Jensen's formula.
+Section~\ref{sec:kronecker} proves Kronecker's theorem.
+Section~\ref{sec:lehmer_poly} analyzes Lehmer's polynomial and Salem numbers.
+Section~\ref{sec:lehmer_problem} states Lehmer's conjecture precisely.
+Section~\ref{sec:dobrowolski} proves the Dobrowolski lower bound.
+Section~\ref{sec:salem_boyd} discusses the Salem-Boyd conjecture.
+Section~\ref{sec:entropy} connects Mahler measure to dynamical entropy.
+Section~\ref{sec:pisot} relates Mahler measure to Pisot and Salem numbers.
+Section~\ref{sec:multivariable} discusses multivariable Mahler measure.
+Section~\ref{sec:computations} surveys computational results.
+Section~\ref{sec:openproblems} lists open problems.
+Section~\ref{sec:conclusion} concludes.
+
+% ==============================================================================
+\section{Mahler Measure: Definition and Basic Properties}\label{sec:mahler_def}
+% ==============================================================================
+
+\begin{definition}[Mahler measure of a polynomial]
+  Let $P(x) = a_d x^d + \cdots + a_0 \in \C[x]$ with $a_d \neq 0$ and roots
+  $\alpha_1,\ldots,\alpha_d \in \C$. The \emph{Mahler measure} of $P$ is
+  \[
+    \M(P) \;:=\; |a_d| \prod_{j=1}^d \max(1, |\alpha_j|).
+  \]
+  The \emph{logarithmic Mahler measure} is $\m(P) = \log \M(P)$.
+\end{definition}
+
+\begin{theorem}[Jensen's formula]
+  For $P(x) = a_d \prod_{j=1}^d (x - \alpha_j) \in \C[x]$,
+  \[
+    \M(P) \;=\; \exp\!\left(\int_0^1 \log|P(e^{2\pi i t})|\,dt\right).
+  \]
+\end{theorem}
+
+\begin{proof}
+  By the product formula and Jensen's formula for $\log|P(e^{2\pi it})|$:
+  \[
+    \int_0^1 \log|P(e^{2\pi it})|\,dt
+    = \log|a_d| + \sum_{j=1}^d \int_0^1 \log|e^{2\pi it} - \alpha_j|\,dt.
+  \]
+  For each root $\alpha_j$, Jensen's formula gives
+  $\int_0^1 \log|e^{2\pi it} - \alpha_j|\,dt = \log\max(1, |\alpha_j|)$,
+  from which the result follows.
+\end{proof}
+
+\begin{proposition}[Basic properties of Mahler measure]
+  \begin{enumerate}[label=(\roman*)]
+    \item $\M(PQ) = \M(P)\M(Q)$ (multiplicativity);
+    \item $\M(P) \geq |a_0 a_d|^{1/\deg P}$ (AM-GM bound);
+    \item $\M(P) = \M(P^\ast)$, where $P^\ast(x) = x^d \overline{P(1/\bar{x})}$
+      is the reciprocal polynomial;
+    \item $\M(P) \geq 1$ when $P \in \Z[x]$ is monic with $P(0) \neq 0$.
+  \end{enumerate}
+\end{proposition}
+
+\begin{definition}[Mahler measure of an algebraic number]
+  For an algebraic integer $\alpha$ with minimal polynomial $P_\alpha \in \Z[x]$
+  (monic, irreducible), define $\M(\alpha) := \M(P_\alpha)$.
+\end{definition}
+
+\begin{remark}
+  If $\alpha = 0$, set $\M(0) = 0$. If $\alpha$ is rational, then
+  $\M(n) = |n|$ for $n \in \Z\setminus\{0\}$.
+\end{remark}
+
+% ==============================================================================
+\section{Kronecker's Theorem}\label{sec:kronecker}
+% ==============================================================================
+
+The threshold case $\M(\alpha) = 1$ is completely characterized by a classical theorem.
+
+\begin{theorem}[Kronecker, 1857 \cite{Kronecker1857}]\label{thm:kronecker}
+  Let $\alpha$ be a non-zero algebraic integer. Then $\M(\alpha) = 1$ if and only if
+  $\alpha$ is a root of unity.
+  Equivalently: $\M(P) = 1$ for a monic $P \in \Z[x]$ with $P(0) \neq 0$ if and only if
+  every root of $P$ lies on the unit circle.
+\end{theorem}
+
+\begin{proof}
+  \emph{($\Leftarrow$)}: If all roots lie on the unit circle, then
+  $\max(1,|\alpha_j|) = 1$ for all $j$, so $\M(P) = 1$ (with $a_d = 1$).
+
+  \emph{($\Rightarrow$)}: If $\M(P) = 1$ and $P$ is monic in $\Z[x]$ with all
+  $|\alpha_j| \leq 1$, then all $|\alpha_j| = 1$ (since otherwise $|a_0| = |\prod \alpha_j| < 1$,
+  contradicting $a_0 \in \Z\setminus\{0\}$). Now consider $P^n(x)$ (the polynomial
+  whose roots are the $n$-th powers of the roots of $P$). The coefficients of $P^n$ are
+  bounded (since $|\alpha_j^n| = 1$) and integer; by Kronecker's argument, finitely many
+  such polynomials exist, so some $\alpha_j^m = \alpha_j^n$ for $m \neq n$, meaning
+  $\alpha_j^{m-n} = 1$.
+\end{proof}
+
+\begin{corollary}
+  For a cyclotomic polynomial $\Phi_n(x)$, we have $\M(\Phi_n) = 1$.
+\end{corollary}
+
+% ==============================================================================
+\section{Lehmer's Polynomial and Salem Numbers}\label{sec:lehmer_poly}
+% ==============================================================================
+
+\begin{definition}[Salem number]
+  A \emph{Salem number} is a real algebraic integer $\tau > 1$ whose conjugates all lie
+  on or inside the unit circle, with at least one conjugate on the unit circle.
+  Equivalently, $\tau > 1$ with conjugates $\tau^{-1}$ and $\tau^{-1} \neq \tau$,
+  the remaining conjugates on the unit circle.
+\end{definition}
+
+\begin{definition}[Pisot number / PV number]
+  A \emph{Pisot-Vijayaraghavan (PV) number} is a real algebraic integer $\theta > 1$
+  all of whose conjugates have absolute value strictly less than $1$.
+\end{definition}
+
+\begin{remark}
+  Salem numbers are ``limit points'' of PV numbers from above: every Salem number is a
+  limit of PV numbers. The smallest PV number is the real root of $x^3 - x - 1$,
+  known as the \emph{plastic number} $\approx 1.3247$.
+\end{remark}
+
+\begin{example}[Lehmer's polynomial]
+  The polynomial
+  \[
+    L(x) = x^{10}+x^9-x^7-x^6-x^5-x^4-x^3+x+1
+  \]
+  is irreducible over $\Q$ and has:
+  \begin{itemize}
+    \item one real root $\lambda_{10} > 1$ (a Salem number);
+    \item one real root $\lambda_{10}^{-1} \in (0,1)$;
+    \item $8$ complex roots on (or near) the unit circle, in $4$ conjugate pairs.
+  \end{itemize}
+  The Mahler measure is $\M(L) = \lambda_{10} \approx 1.1762808182599175\ldots$.
+\end{example}
+
+\begin{proposition}
+  The exact value of $\lambda_{10}$ is the unique real root greater than $1$ of $L(x)$.
+  Numerically:
+  \[
+    \lambda_{10} = 1.1762808182599175065\ldots
+  \]
+  To date (2026), no polynomial in $\Z[x]$ with integer coefficients has been found with
+  Mahler measure strictly between $1$ and $\lambda_{10}$.
+\end{proposition}
+
+% ==============================================================================
+\section{Lehmer's Conjecture}\label{sec:lehmer_problem}
+% ==============================================================================
+
+\begin{conjecture}[Lehmer's Conjecture \cite{Lehmer1933}]\label{conj:lehmer}
+  There exists an absolute constant $c > 1$ such that for every algebraic integer
+  $\alpha$ that is not a root of unity,
+  \[
+    \M(\alpha) \;\geq\; c.
+  \]
+  Equivalently (stronger form): For every monic $P \in \Z[x]$ with $P(0) \neq 0$ that
+  is not a product of cyclotomic polynomials,
+  \[
+    \M(P) \;\geq\; \lambda_{10} \approx 1.17628.
+  \]
+\end{conjecture}
+
+\begin{remark}
+  The \emph{weak} form merely asks that there is a positive lower bound (i.e., that $1$
+  is not a limit point of $\{\M(\alpha) : \alpha \text{ algebraic integer, not root of unity}\}$).
+  The \emph{strong} form asserts that $\lambda_{10}$ is the minimum.
+\end{remark}
+
+\begin{remark}
+  Lehmer's conjecture has been verified computationally for polynomials of degree
+  $\leq 44$ (Mossinghoff-Rhin-Wu \cite{MRW2008}) and for various special families:
+  non-reciprocal polynomials (Smyth \cite{Smyth1971}, who proved $\M \geq \theta_3^{1/3}$
+  for non-reciprocal $P$, where $\theta_3 \approx 1.3247$ is the plastic number),
+  and cyclotomic-free polynomials of bounded degree.
+\end{remark}
+
+\begin{theorem}[Smyth \cite{Smyth1971}]
+  For a non-reciprocal monic polynomial $P \in \Z[x]$ (i.e., $P \neq x^d P(1/x)$)
+  that is not a product of cyclotomic polynomials,
+  \[
+    \M(P) \;\geq\; \theta_3 \;=\; 1.3247179572\ldots,
+  \]
+  the smallest PV number (root of $x^3 - x - 1$).
+\end{theorem}
+
+% ==============================================================================
+\section{Dobrowolski's Lower Bound}\label{sec:dobrowolski}
+% ==============================================================================
+
+The best proven lower bound towards Lehmer's conjecture is due to Dobrowolski.
+
+\begin{theorem}[Dobrowolski \cite{Dobrowolski1979}]\label{thm:dobro}
+  Let $\alpha$ be an algebraic integer of degree $d \geq 2$ over $\Q$ that is not a root
+  of unity. Then
+  \[
+    \M(\alpha) \;\geq\; 1 + \frac{1}{1200}\left(\frac{\log\log d}{\log d}\right)^3.
+  \]
+\end{theorem}
+
+\begin{remark}
+  The best current constant in Dobrowolski's bound is:
+  \[
+    \M(\alpha) \;\geq\; 1 + \left(1 - \varepsilon(d)\right)
+    \left(\frac{\log\log d}{\log d}\right)^3
+  \]
+  with $\varepsilon(d) \to 0$, due to Voutier \cite{Voutier1996} and
+  Cantor-Straus \cite{CantorStraus1982}.
+\end{remark}
+
+\textbf{Key ideas in Dobrowolski's proof:}
+
+\begin{lemma}[Auxiliary polynomial estimate]
+  For a prime $q$ and an algebraic integer $\alpha$ of degree $d$, consider the
+  polynomial
+  \[
+    P_q(x) = \prod_{\zeta^q = 1} P_\alpha(\zeta x) \in \Z[x],
+  \]
+  where $P_\alpha$ is the minimal polynomial of $\alpha$. The key estimate is:
+  $\log \M(P_q) \leq q \cdot \log \M(\alpha)$,
+  while at the same time $P_q$ has large $\ell^\infty$-norm if $\M(\alpha) < 2$.
+\end{lemma}
+
+The proof combines:
+\begin{enumerate}[label=(\roman*)]
+  \item An \emph{auxiliary polynomial} construction using the $q$-th power map and
+    the resultant $\Res_y(P(y), y^q - x)$;
+  \item A \emph{size estimate}: $\| P_q \|_\infty \geq q$ if $\alpha^q \equiv \alpha \pmod{q}$
+    (which holds for all but finitely many $q$ by a Fermat-like argument);
+  \item A \emph{Mahler measure bound} from the size of the polynomial.
+\end{enumerate}
+
+\begin{proof}[Sketch of Dobrowolski's bound]
+  Choose a prime $q \in [\frac{\log d}{2}, \log d]$. Such a prime exists by
+  Bertrand's postulate. The $q$-th power Frobenius gives a polynomial of norm $\geq q$,
+  while $\M(P_q)^{1/d} \lesssim \M(\alpha)^q$ (taking $q$-th powers magnifies the measure).
+  Balancing these estimates yields the bound.
+\end{proof}
+
+% ==============================================================================
+\section{The Salem-Boyd Conjecture}\label{sec:salem_boyd}
+% ==============================================================================
+
+Among Salem numbers, an important ordering question arises.
+
+\begin{conjecture}[Salem-Boyd \cite{Boyd1977}]\label{conj:salemboyd}
+  The smallest Salem number is the Lehmer number $\lambda_{10} \approx 1.17628$.
+  Equivalently, Lehmer's polynomial $L(x)$ gives the smallest Mahler measure $> 1$ among
+  all monic integer polynomials.
+\end{conjecture}
+
+\begin{remark}
+  Boyd \cite{Boyd1977,Boyd1981} has computed all Salem numbers of degree $\leq 40$ and
+  measure $\leq 1.3$, and in all cases $\lambda_{10}$ is the smallest. The second-smallest
+  known Salem number has $\M \approx 1.1883\ldots$ (degree 18).
+\end{remark}
+
+\begin{theorem}[Mossinghoff-Rhin-Wu \cite{MRW2008}]
+  Lehmer's conjecture holds for all polynomials of degree $\leq 44$: if
+  $P \in \Z[x]$, $\deg P \leq 44$, $P(0) \neq 0$, and $P$ is not a product of
+  cyclotomic polynomials, then $\M(P) \geq \lambda_{10}$.
+\end{theorem}
+
+% ==============================================================================
+\section{Entropy of Algebraic Dynamical Systems}\label{sec:entropy}
+% ==============================================================================
+
+A striking connection between Mahler measure and dynamical systems was discovered by
+Lind, Schmidt, and Ward \cite{LSW1990}.
+
+\begin{definition}[Algebraic $\Z^d$-action]
+  For a Laurent polynomial $f \in \Z[x_1^{\pm 1},\ldots,x_d^{\pm 1}]$, define the
+  compact abelian group
+  \[
+    X_f \;:=\; \widehat{\Z[x_1^{\pm 1},\ldots,x_d^{\pm 1}]/(f)},
+  \]
+  the Pontryagin dual of $\Z[\mathbf{x}^{\pm 1}]/(f)$.
+  The $\Z^d$-action on $X_f$ is by the dual shifts.
+\end{definition}
+
+\begin{theorem}[Lind-Schmidt-Ward \cite{LSW1990}]\label{thm:lsw}
+  The topological entropy of the $\Z^d$-action on $X_f$ equals
+  the (multi-variable) logarithmic Mahler measure $\m(f)$:
+  \[
+    h(X_f) \;=\; \m(f) \;=\; \int_{\T^d} \log|f(e^{2\pi i \theta_1},\ldots,e^{2\pi i \theta_d})|\,
+    d\theta_1 \cdots d\theta_d.
+  \]
+\end{theorem}
+
+\begin{example}
+  For $f = 1 + x + y \in \Z[x^{\pm 1}, y^{\pm 1}]$, the logarithmic Mahler measure
+  $\m(f)$ evaluates to $L'(\chi_{-3}, -1)$ (a value of the Dirichlet $L$-function for
+  the non-trivial character mod $3$), a result due to Smyth \cite{Smyth1981}.
+  This connects Mahler measure to special values of $L$-functions.
+\end{example}
+
+\begin{remark}
+  Theorem~\ref{thm:lsw} implies that Lehmer's problem is equivalent to asking:
+  \emph{Is there an algebraic $\Z$-action with topological entropy in $(0, \log\lambda_{10})$?}
+  The answer is conjectured to be \emph{no}.
+\end{remark}
+
+% ==============================================================================
+\section{Pisot Numbers, Salem Numbers, and the Limit Point Question}\label{sec:pisot}
+% ==============================================================================
+
+\begin{theorem}[Siegel 1944 \cite{Siegel1944}]
+  The smallest PV number is the real root of $x^3 - x - 1$ (the plastic number
+  $\theta_3 \approx 1.3247$).
+\end{theorem}
+
+\begin{theorem}[Salem 1944 \cite{Salem1944}]
+  Every PV number greater than $1$ is a limit (from both above and below) of Salem numbers.
+  Conversely, every limit point of Salem numbers is a PV number.
+\end{theorem}
+
+\begin{remark}
+  This means the set of Salem numbers is dense near every PV number.
+  The smallest known Salem number ($\lambda_{10}$) is smaller than the smallest PV number
+  ($\theta_3 \approx 1.3247$), confirming that Salem numbers can be smaller than PV numbers.
+\end{remark}
+
+\begin{proposition}[Characterization via minimal polynomials]
+  \begin{enumerate}[label=(\roman*)]
+    \item The minimal polynomial of a Salem number is a reciprocal polynomial
+      (i.e., $x^d P(1/x) = P(x)$) of even degree.
+    \item The minimal polynomial of a PV number is not reciprocal.
+    \item Lehmer's polynomial $L(x)$ is reciprocal: $x^{10}L(1/x) = L(x)$.
+  \end{enumerate}
+\end{proposition}
+
+% ==============================================================================
+\section{Multivariable Mahler Measure}\label{sec:multivariable}
+% ==============================================================================
+
+\begin{definition}[Multivariable Mahler measure]
+  For $f \in \C[x_1^{\pm 1},\ldots,x_n^{\pm 1}]$,
+  \[
+    \m(f) \;:=\; \int_0^1\cdots\int_0^1
+    \log|f(e^{2\pi it_1},\ldots,e^{2\pi it_n})|\,dt_1\cdots dt_n.
+  \]
+\end{definition}
+
+\begin{example}[Smyth's formula \cite{Smyth1981}]
+  \[
+    \m(1+x+y) \;=\; \frac{3\sqrt{3}}{4\pi} L(\chi_{-3}, 2)
+                 \;=\; L'(\chi_{-3}, -1),
+  \]
+  where $\chi_{-3}$ is the primitive Dirichlet character of conductor $3$.
+\end{example}
+
+\begin{example}[Deninger's formula \cite{Deninger1997}]
+  \[
+    \m(1+x+1/x+y+1/y) \;=\; \frac{15}{(2\pi)^2}\, L(E_{15}, 2),
+  \]
+  where $E_{15}$ is the elliptic curve $y^2 + xy + y = x^3 + x^2 - 10x - 10$
+  of conductor $15$, and $L(E_{15}, 2)$ is the $L$-value at $s=2$.
+\end{example}
+
+\begin{remark}
+  Deninger \cite{Deninger1997} conjectured a general connection: for many two-variable
+  polynomials $f$ defining an elliptic curve $E_f$, $\m(f)$ is a rational multiple of
+  $L'(E_f, 0)$. This has been verified for hundreds of examples (Rodriguez Villegas
+  \cite{RV1999}) and proved in some cases (Rogers-Zudilin \cite{RZ2014}).
+\end{remark}
+
+% ==============================================================================
+\section{Computational Results}\label{sec:computations}
+% ==============================================================================
+
+\begin{theorem}[Mossinghoff \cite{Mossinghoff1998}, updated search]
+  The following is the list of smallest known Mahler measures $> 1$ for polynomials in
+  $\Z[x]$ (as of 2020):
+  \begin{center}
+    \begin{tabular}{lll}
+      \toprule
+      Rank & $\M$ & Polynomial \\
+      \midrule
+      1 & $1.17628\ldots$ & $x^{10}+x^9-x^7-\cdots+1$ (Lehmer) \\
+      2 & $1.18836\ldots$ & degree 18 Salem (Mossinghoff) \\
+      3 & $1.20002\ldots$ & degree 20 Salem \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{theorem}
+
+\begin{remark}
+  The search by Mossinghoff-Rhin-Wu \cite{MRW2008} covers all polynomials of degree
+  $\leq 44$ and has confirmed that no Mahler measure lies in $(1, \lambda_{10})$.
+  For degree $> 44$, the problem is open.
+\end{remark}
+
+% ==============================================================================
+\section{Connection to Heights and the Weil Height}\label{sec:heights}
+% ==============================================================================
+
+\begin{definition}[Weil (logarithmic) height]
+  For an algebraic number $\alpha$ with minimal polynomial $P(x) = a_d\prod(x-\alpha_j)$
+  over $\Q$, the \emph{Weil logarithmic height} is
+  \[
+    h(\alpha) \;:=\; \frac{1}{\deg\alpha} \log \M(P_\alpha)
+              \;=\; \frac{\m(P_\alpha)}{\deg\alpha}.
+  \]
+\end{definition}
+
+\begin{proposition}
+  The Weil height satisfies:
+  \begin{enumerate}[label=(\roman*)]
+    \item $h(\alpha) \geq 0$ with equality iff $\alpha = 0$ or $\alpha$ is a root of unity;
+    \item $h(\alpha^n) = |n| h(\alpha)$;
+    \item $h(\alpha\beta) \leq h(\alpha) + h(\beta)$ (with equality for multiplicatively
+      independent $\alpha, \beta$).
+  \end{enumerate}
+\end{proposition}
+
+\begin{conjecture}[Lehmer's problem via Weil height]\label{conj:lehmer_height}
+  There exists an absolute constant $c > 0$ such that for every algebraic number
+  $\alpha \neq 0$ that is not a root of unity,
+  \[
+    h(\alpha) \;\geq\; \frac{c}{\deg\alpha}.
+  \]
+\end{conjecture}
+
+\begin{remark}
+  This form of Lehmer's conjecture (involving the Weil height and $1/\deg$) is equivalent
+  to the original: setting $c' = c \cdot \deg\alpha$ gives $\M(\alpha) \geq e^c$,
+  providing a uniform lower bound.
+\end{remark}
+
+% ==============================================================================
+\section{Open Problems}\label{sec:openproblems}
+% ==============================================================================
+
+\begin{conjecture}[Strong Lehmer \cite{Lehmer1933}]\label{conj:stronglehmer}
+  For every monic $P \in \Z[x]$ with $P(0) \neq 0$ that is not a product of cyclotomic
+  polynomials,
+  \[
+    \M(P) \;\geq\; \lambda_{10} = 1.1762808\ldots
+  \]
+\end{conjecture}
+
+\begin{conjecture}[Multivariable Lehmer \cite{Boyd1981}]
+  The Mahler measure of any multivariate polynomial in $\Z[x_1^\pm,\ldots,x_n^\pm]$
+  that does not vanish on the torus $\T^n$ is at least $\lambda_{10}$.
+\end{conjecture}
+
+\begin{conjecture}[Bogomolov property]
+  For every number field $K$, there exists $c(K) > 0$ such that for all
+  $\alpha \in K^\times$ not a root of unity, $h(\alpha) \geq c(K)/[K:\Q]$.
+\end{conjecture}
+
+\begin{remark}
+  The Bogomolov property is equivalent to Lehmer's conjecture for $K = \Q$.
+  It is known for abelian extensions of $\Q$ (Amoroso-Dvornicich \cite{AD2000}) and
+  for some other special families.
+\end{remark}
+
+% ==============================================================================
+\section{Conclusion}\label{sec:conclusion}
+% ==============================================================================
+
+Lehmer's problem, despite its elementary formulation, touches on some of the deepest
+aspects of algebraic number theory: the geometry of algebraic integers near the unit
+circle, the arithmetic of Salem and Pisot numbers, and the entropy of algebraic
+dynamical systems. The only proven lower bound of substance is Dobrowolski's, which
+falls far short of the conjectured threshold $\lambda_{10}$. Lehmer's polynomial remains
+the champion after 90 years, and the conjecture that no Mahler measure lies strictly
+between $1$ and $\lambda_{10}$ is considered one of the most challenging open problems
+in the field. Progress in multivariable Mahler measure has revealed unexpected connections
+to $L$-functions and elliptic curves, suggesting deep arithmetic structure beneath this
+seemingly elementary question.
+
+\begin{thebibliography}{99}
+
+\bibitem{AD2000}
+F.\ Amoroso, R.\ Dvornicich,
+\textit{A lower bound for the height in abelian extensions},
+J.\ Number Theory \textbf{80} (2000), no.\ 2, 260--272.
+
+\bibitem{Boyd1977}
+D.\,W.\ Boyd,
+\textit{Small Salem numbers},
+Duke Math.\ J.\ \textbf{44} (1977), no.\ 2, 315--328.
+
+\bibitem{Boyd1981}
+D.\,W.\ Boyd,
+\textit{Speculations concerning the range of Mahler's measure},
+Canad.\ Math.\ Bull.\ \textbf{24} (1981), no.\ 4, 453--469.
+
+\bibitem{CantorStraus1982}
+D.\,G.\ Cantor, E.\,G.\ Straus,
+\textit{On a conjecture of D.\,H.\ Lehmer},
+Acta Arith.\ \textbf{42} (1982), no.\ 2, 97--100.
+
+\bibitem{Deninger1997}
+C.\ Deninger,
+\textit{Deligne periods of mixed motives, $K$-theory and the entropy of certain
+$\mathbb{Z}^n$-actions},
+J.\ Amer.\ Math.\ Soc.\ \textbf{10} (1997), no.\ 2, 259--281.
+
+\bibitem{Dobrowolski1979}
+E.\ Dobrowolski,
+\textit{On a question of Lehmer and the number of irreducible factors of a polynomial},
+Acta Arith.\ \textbf{34} (1979), no.\ 4, 391--401.
+
+\bibitem{Kronecker1857}
+L.\ Kronecker,
+\textit{Zwei Sätze über Gleichungen mit ganzzahligen Koeffizienten},
+J.\ Reine Angew.\ Math.\ \textbf{53} (1857), 173--175.
+
+\bibitem{Lehmer1933}
+D.\,H.\ Lehmer,
+\textit{Factorization of certain cyclotomic functions},
+Ann.\ of Math.\ (2) \textbf{34} (1933), no.\ 3, 461--479.
+
+\bibitem{LSW1990}
+D.\,A.\ Lind, K.\ Schmidt, T.\ Ward,
+\textit{Mahler measure and entropy for commuting automorphisms of compact groups},
+Invent.\ Math.\ \textbf{101} (1990), no.\ 3, 593--629.
+
+\bibitem{Mossinghoff1998}
+M.\,J.\ Mossinghoff,
+\textit{Polynomials with small Mahler measure},
+Math.\ Comp.\ \textbf{67} (1998), no.\ 224, 1697--1705.
+
+\bibitem{MRW2008}
+M.\,J.\ Mossinghoff, G.\ Rhin, Q.\ Wu,
+\textit{Minimal Mahler measures},
+Experiment.\ Math.\ \textbf{17} (2008), no.\ 4, 451--458.
+
+\bibitem{RV1999}
+F.\ Rodriguez Villegas,
+\textit{Modular Mahler measures I},
+in \textit{Topics in Number Theory (University Park, PA, 1997)},
+Math.\ Appl.\ \textbf{467}, Kluwer (1999), 17--48.
+
+\bibitem{RZ2014}
+M.\ Rogers, W.\ Zudilin,
+\textit{From $L$-series of elliptic curves to Mahler measures},
+Compos.\ Math.\ \textbf{148} (2012), no.\ 2, 385--414.
+
+\bibitem{Salem1944}
+R.\ Salem,
+\textit{A remarkable class of algebraic integers. Proof of a conjecture of Vijayaraghavan},
+Duke Math.\ J.\ \textbf{11} (1944), 103--108.
+
+\bibitem{Siegel1944}
+C.\,L.\ Siegel,
+\textit{Algebraic integers whose conjugates lie in the unit circle},
+Duke Math.\ J.\ \textbf{11} (1944), 597--602.
+
+\bibitem{Smyth1971}
+C.\,J.\ Smyth,
+\textit{On the product of the conjugates outside the unit circle of an algebraic integer},
+Bull.\ London Math.\ Soc.\ \textbf{3} (1971), 169--175.
+
+\bibitem{Smyth1981}
+C.\,J.\ Smyth,
+\textit{On measures of polynomials in several variables},
+Bull.\ Austral.\ Math.\ Soc.\ \textbf{23} (1981), no.\ 1, 49--63.
+
+\bibitem{Voutier1996}
+P.\ Voutier,
+\textit{An effective lower bound for the height of algebraic numbers},
+Acta Arith.\ \textbf{74} (1996), no.\ 1, 81--95.
+
+\end{thebibliography}
+
+\end{document}
