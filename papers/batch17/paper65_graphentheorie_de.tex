@@ -1,0 +1,1072 @@
+%% paper65_graphentheorie_de.tex
+%% Graphentheorie: Grundlagen, Färbung, Planarität und das Hadwiger-Nelson-Problem
+%% Autor: Michael Fuhrmann
+%% Projekt: Specialist Mathematics Project, Build 145
+%% Datum: 2026-03-12
+
+\documentclass[reqno,12pt]{amsart}
+
+%% ---------------------------------------------------------------
+%% Pakete
+%% ---------------------------------------------------------------
+\usepackage[ngerman]{babel}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{microtype}
+
+\geometry{margin=2.5cm}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  citecolor=green!50!black,
+  urlcolor=blue!70!black
+}
+
+%% ---------------------------------------------------------------
+%% Theorem-Umgebungen (Deutsch)
+%% ---------------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+
+%% ---------------------------------------------------------------
+%% Eigene Befehle
+%% ---------------------------------------------------------------
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\chr}{\chi}
+\newcommand{\grad}{\mathrm{grad}}
+
+%% ---------------------------------------------------------------
+%% Dokument
+%% ---------------------------------------------------------------
+
+\title{Graphentheorie: Grundlagen, Färbung, Planarität\\
+       und das Hadwiger-Nelson-Problem}
+
+\author{Michael Fuhrmann}
+
+\address{Specialist Mathematics Project, Build 145}
+
+\email{specialist-maths@localhost}
+
+\date{2026-03-12}
+
+\keywords{Graphentheorie, Graphenfärbung, planare Graphen, Spannbäume,
+          spektrale Graphentheorie, Hadwiger-Nelson-Problem, Vierfarbensatz,
+          chromatische Zahl, Euler-Formel, Menger-Satz}
+
+\subjclass[2020]{05C15, 05C10, 05C40, 05C50, 05C45, 05D10}
+
+\begin{abstract}
+Die Graphentheorie, entstanden aus Eulers Lösung des Königsberger Brückenproblems
+im Jahr 1736, hat sich zu einem der vielseitigsten Gebiete der diskreten
+Mathematik entwickelt, mit Anwendungen in Informatik, Physik, Chemie und
+Kombinatorik. Diese Arbeit präsentiert eine in sich geschlossene Entwicklung
+der zentralen Ergebnisse der Graphentheorie: das Handschlag-Lemma,
+Charakterisierungen von Bäumen (einschließlich der Cayley-Formel
+$\kappa(K_n) = n^{n-2}$), der Menger-Satz und der Max-Flow-Min-Cut-Satz,
+Graphenfärbetheorie mit dem berühmten Vierfarbensatz (Appel-Haken 1976;
+Robertson et al.\ 1997), Planarität und Kuratowskis Charakterisierung durch
+$K_5$ und $K_{3,3}$, die Euler-Formel $V - E + F = 2$, der Fünffarbensatz,
+spektrale Graphentheorie mit der Cheeger-Ungleichung, die Theorie Eulerscher
+und Hamiltonischer Graphen sowie die NP-Vollständigkeit des
+Hamiltonischen-Pfad-Problems, und extremale Graphentheorie mit dem Turán-Satz
+und dem Szemerédi-Regularitätslemma. Ein zentrales Thema ist das
+\emph{Hadwiger-Nelson-Problem}: Wie viele Farben werden benötigt, um die Ebene
+so zu färben, dass keine zwei Punkte im Abstand 1 dieselbe Farbe erhalten?
+Wir präsentieren die klassischen Schranken $4 \le \chr(\R^2) \le 7$, den
+Moser-Spindle und den Golomb-Graphen, die $\chr(\R^2) \ge 4$ beweisen, und
+das wegweisende Ergebnis von de Grey aus dem Jahr 2018, das $\chr(\R^2) \ge 5$
+etabliert. Der genaue Wert von $\chr(\R^2)$ ist ein offenes Problem. Alle
+Beweise werden vollständig präsentiert; Vermutungen werden klar von bewiesenen
+Sätzen unterschieden.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% =============================================================
+\section{Einleitung}
+%% =============================================================
+
+Die Ursprünge der Graphentheorie liegen in einem berühmten Rätsel über die
+Stadt Königsberg (heute Kaliningrad). Der Fluss Pregel teilte die Stadt in vier
+Regionen auf, die durch sieben Brücken verbunden waren. Die Frage war, ob es
+möglich sei, alle sieben Brücken genau einmal zu überqueren und zum Ausgangs\-punkt
+zurückzukehren. Im Jahr 1736 bewies Leonhard Euler, dass kein solcher Weg
+existiert, und begründete damit die Graphentheorie als eigenständige Disziplin
+\cite{euler1736}.
+
+Eulers Einsicht bestand darin, die Geographie vollständig zu abstrahieren:
+die vier Landmassen werden durch \emph{Knoten} ersetzt und die sieben Brücken
+durch \emph{Kanten}. Die Frage wird dadurch rein kombinatorischer Natur.
+Euler beobachtete, dass ein geschlossener Weg, der jede Kante genau einmal
+durchläuft (heute \emph{Eulerscher Kreis} genannt), genau dann existiert,
+wenn jeder Knoten geraden Grad hat. Da Königsberg vier Knoten mit ungeradem
+Grad hat, existiert kein solcher Kreis.
+
+Von diesen bescheidenen Anfängen hat sich die Graphentheorie enorm ausgeweitet.
+Heute umfasst sie:
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Strukturtheorie}: Bäume, Zusammenhang, Planarität, Minoren;
+  \item \textbf{Färbetheorie}: Korrekte Färbungen, chromatische Polynome,
+        Vierfarbensatz;
+  \item \textbf{Spektraltheorie}: Eigenwerte von Adjazenz- und
+        Laplace-Matrizen;
+  \item \textbf{Extremale Theorie}: Turán-artige Probleme, Ramsey-Theorie;
+  \item \textbf{Algorithmische Aspekte}: Matching, Netzwerkfluss, NP-Vollständigkeit;
+  \item \textbf{Geometrische Graphentheorie}: Einheitsdistanzgraphen, das
+        Hadwiger-Nelson-Problem.
+\end{itemize}
+
+Diese Arbeit ist wie folgt gegliedert. Abschnitt~\ref{sec:grundbegriffe}
+führt die grundlegenden Definitionen und das Handschlag-Lemma ein.
+Abschnitt~\ref{sec:baeume} behandelt Bäume und Spannbäume, einschließlich
+der Cayley-Formel. Abschnitt~\ref{sec:zusammenhang} deckt Zusammenhang,
+Menger-Satz und Max-Flow-Min-Cut ab. Abschnitt~\ref{sec:faerbung} entwickelt
+die Graphenfärbetheorie und den Vierfarbensatz. Abschnitt~\ref{sec:planar}
+untersucht planare Graphen, die Euler-Formel und den Kuratowski-Satz.
+Abschnitt~\ref{sec:hadwiger} ist dem Hadwiger-Nelson-Problem gewidmet.
+Abschnitt~\ref{sec:spektral} führt die spektrale Graphentheorie ein.
+Abschnitt~\ref{sec:euler_hamilton} behandelt Eulersche und Hamiltonische
+Graphen. Abschnitt~\ref{sec:extremal} deckt extremale Graphentheorie ab.
+Abschnitt~\ref{sec:literatur} enthält die Literaturangaben.
+
+\subsection*{Konventionen}
+
+In dieser Arbeit bezeichnet $G = (V, E)$ einen einfachen ungerichteten Graphen
+mit Knotenmenge $V$ und Kantenmenge $E \subseteq \binom{V}{2}$. Wir schreiben
+$n = |V|$ und $m = |E|$. Ein \emph{einfacher} Graph hat keine Schleifen und
+keine Mehrfachkanten. Wir bezeichnen den vollständigen Graphen auf $n$ Knoten
+mit $K_n$, den vollständig bipartiten Graphen mit $K_{p,q}$, den Weg auf $n$
+Knoten mit $P_n$ und den Kreis auf $n$ Knoten mit $C_n$.
+
+%% =============================================================
+\section{Grundbegriffe}
+\label{sec:grundbegriffe}
+%% =============================================================
+
+\begin{definition}[Graph]
+Ein \emph{einfacher ungerichteter Graph} ist ein Paar $G = (V, E)$, wobei
+$V$ eine endliche nichtleere Menge von \emph{Knoten} ist und $E \subseteq
+\binom{V}{2}$ eine Menge von \emph{Kanten}, von denen jede eine zweielementige
+Teilmenge von $V$ ist. Ein \emph{gerichteter Graph} (Digraph) $\vec{G} = (V, A)$
+hat eine Menge $A \subseteq V \times V$ von \emph{Bögen} (gerichteten Kanten),
+wobei im Allgemeinen $(u, v) \ne (v, u)$ gilt.
+\end{definition}
+
+\begin{definition}[Grad]
+Der \emph{Grad} $\grad(v)$ eines Knotens $v \in V$ ist die Anzahl der zu $v$
+inzidenten Kanten:
+\[
+  \grad(v) = |\{u \in V : \{u,v\} \in E\}|.
+\]
+Der \emph{Minimalgrad} ist $\delta(G) = \min_{v \in V} \grad(v)$ und der
+\emph{Maximalgrad} ist $\Delta(G) = \max_{v \in V} \grad(v)$.
+\end{definition}
+
+\begin{definition}[Adjazenzmatrix]
+Die \emph{Adjazenzmatrix} von $G$ ist die $n \times n$-Matrix $A = (a_{ij})$,
+wobei $a_{ij} = 1$ wenn $\{i,j\} \in E$ und $a_{ij} = 0$ sonst. Für einfache
+Graphen ist $A$ symmetrisch mit Nulldiagonale.
+\end{definition}
+
+\begin{theorem}[Handschlag-Lemma]
+\label{satz:handschlag}
+Für jeden Graphen $G = (V, E)$ gilt:
+\[
+  \sum_{v \in V} \grad(v) = 2|E|.
+\]
+Insbesondere ist die Anzahl der Knoten mit ungeradem Grad stets gerade.
+\end{theorem}
+
+\begin{proof}
+Jede Kante $\{u, v\} \in E$ trägt genau $1$ zu $\grad(u)$ und genau $1$ zu
+$\grad(v)$ bei. Sie trägt daher genau $2$ zur Summe $\sum_{v \in V} \grad(v)$
+bei. Summieren über alle $|E|$ Kanten ergibt $\sum_{v \in V} \grad(v) = 2|E|$.
+
+Da $2|E|$ gerade ist und $\sum_{v \in V} \grad(v)$ eine Summe von ganzen Zahlen
+gleich einer geraden Zahl ist, muss die Anzahl der ungeraden Summanden gerade
+sein.
+\end{proof}
+
+\begin{definition}[Teilgraph, Isomorphismus]
+Ein Graph $H = (W, F)$ ist ein \emph{Teilgraph} von $G = (V, E)$, wenn
+$W \subseteq V$ und $F \subseteq E$. Er ist ein \emph{induzierter Teilgraph}
+auf $S \subseteq V$, wenn $F = E \cap \binom{S}{2}$. Zwei Graphen $G$ und $H$
+sind \emph{isomorph}, wenn es eine Bijektion $\phi: V(G) \to V(H)$ gibt,
+sodass $\{u,v\} \in E(G)$ genau dann wenn $\{\phi(u), \phi(v)\} \in E(H)$.
+\end{definition}
+
+\begin{example}
+Der vollständige Graph $K_n$ hat $n$ Knoten, $\binom{n}{2}$ Kanten und
+jeder Knoten hat Grad $n-1$. Das Handschlag-Lemma ergibt
+$n(n-1) = 2\binom{n}{2}$, was sich bestätigt.
+\end{example}
+
+\begin{definition}[Weg, Pfad, Kreis]
+Ein \emph{Weg} in $G$ ist eine Folge $v_0, e_1, v_1, e_2, \ldots, e_k, v_k$,
+wobei jedes $e_i = \{v_{i-1}, v_i\} \in E$. Ein \emph{Pfad} ist ein Weg ohne
+wiederholte Knoten. Ein \emph{Kreis} ist ein geschlossener Weg ($v_0 = v_k$)
+ohne weitere wiederholte Knoten, der Länge $k \ge 3$.
+\end{definition}
+
+%% =============================================================
+\section{Bäume und Spannbäume}
+\label{sec:baeume}
+%% =============================================================
+
+\begin{definition}[Baum, Wald, Spannbaum]
+Ein \emph{Wald} ist ein kreisfreier Graph. Ein \emph{Baum} ist ein
+zusammenhängender kreisfreier Graph. Ein \emph{Spannbaum} eines zusammen\-hängenden
+Graphen $G$ ist ein Teilgraph $T \subseteq G$, der ein Baum ist und alle
+Knoten von $G$ enthält.
+\end{definition}
+
+\begin{theorem}[Charakterisierung von Bäumen]
+\label{satz:baum-char}
+Für einen Graphen $G = (V, E)$ mit $|V| = n \ge 1$ sind folgende Aussagen
+äquivalent:
+\begin{enumerate}[label=\upshape(\roman*)]
+  \item $G$ ist ein Baum (zusammenhängend und kreisfrei);
+  \item $G$ ist zusammenhängend und $|E| = n - 1$;
+  \item $G$ ist kreisfrei und $|E| = n - 1$;
+  \item Je zwei verschiedene Knoten von $G$ sind durch genau einen Pfad
+        verbunden;
+  \item $G$ ist zusammenhängend, aber das Entfernen jeder Kante macht ihn
+        nicht mehr zusammenhängend.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Wir beweisen (i) $\Rightarrow$ (ii) $\Rightarrow$ (iii) $\Rightarrow$ (i)
+und skizzieren die Äquivalenz mit (iv) und (v).
+
+\medskip
+\noindent\textbf{(i) $\Rightarrow$ (ii).}
+Durch Induktion über $n$. Für $n = 1$: der einzige Baum auf einem Knoten
+hat $0 = 1-1$ Kanten. Für $n \ge 2$: jeder Baum hat ein Blatt (einen Knoten
+vom Grad 1). Sei $v$ ein Blatt von $T$. Dann ist $T - v$ ein zusammen\-hängender
+kreisfreier Graph auf $n - 1$ Knoten, also nach Induktion
+$|E(T-v)| = n - 2$. Da $T$ eine Kante mehr als $T - v$ hat (die zu $v$
+inzidente Kante), erhalten wir $|E(T)| = n - 1$.
+
+\medskip
+\noindent\textbf{(ii) $\Rightarrow$ (iii).}
+Angenommen, $G$ ist zusammenhängend mit $n - 1$ Kanten. Wir zeigen, dass $G$
+kreisfrei ist. Ein zusammenhängender Graph mit $k$ Knoten hat mindestens $k - 1$
+Kanten (nur bei Bäumen Gleichheit). Enthielte $G$ einen Kreis $C$, so würde
+das Entfernen einer Kante von $C$ den Graphen $G$ zusammenhängend lassen und
+zu einem zusammenhängenden Graphen auf $n$ Knoten mit $n-2$ Kanten führen.
+Aber ein zusammenhängender Graph auf $n$ Knoten braucht mindestens $n-1$
+Kanten --- Widerspruch.
+
+\medskip
+\noindent\textbf{(iii) $\Rightarrow$ (i).}
+Angenommen, $G$ ist kreisfrei mit $n - 1$ Kanten. Ein Wald auf $n$ Knoten
+mit $k$ zusammenhängenden Komponenten hat genau $n - k$ Kanten. Da $|E| = n - 1$,
+erhalten wir $k = 1$, also ist $G$ zusammenhängend, mithin ein Baum.
+
+\medskip
+\noindent Die Äquivalenzen mit (iv) und (v) folgen, da eindeutige Pfade
+kreisfreie zusammenhängende Graphen charakterisieren, und die Minimalität
+des Zusammenhangs Bäume kennzeichnet.
+\end{proof}
+
+\begin{theorem}[Cayley-Formel]
+\label{satz:cayley}
+Die Anzahl der verschiedenen markierten Spannbäume von $K_n$ beträgt $n^{n-2}$.
+\end{theorem}
+
+\begin{proof}[Beweis (Prüfer-Folgen)]
+Wir etablieren eine Bijektion zwischen markierten Spannbäumen auf
+$[n] = \{1, \ldots, n\}$ und Folgen $(a_1, \ldots, a_{n-2}) \in [n]^{n-2}$.
+
+\textbf{Kodierung.} Gegeben ein Baum $T$: wir entfernen iterativ das Blatt
+mit dem kleinsten Label. In Schritt $i$ sei $\ell_i$ das Blatt mit kleinstem
+Label, setze $a_i$ gleich dem eindeutigen Nachbarn von $\ell_i$ und entferne
+$\ell_i$. Nach $n - 2$ Schritten verbleiben zwei Knoten; wir erhalten die
+Folge $(a_1, \ldots, a_{n-2})$.
+
+\textbf{Dekodierung.} Gegeben eine Folge $(a_1, \ldots, a_{n-2})$: in Schritt
+$i$ ist das aktuelle Blatt das kleinste Element von $[n]$, das nicht in
+$\{a_i, a_{i+1}, \ldots, a_{n-2}\}$ und noch nicht entfernt wurde; füge eine
+Kante von diesem Blatt zu $a_i$ hinzu.
+
+Man verifiziert, dass Kodierung und Dekodierung inverse Bijektionen zwischen
+der Menge der markierten Spannbäume von $K_n$ und $[n]^{n-2}$ sind. Da
+$|[n]^{n-2}| = n^{n-2}$, folgt die Formel.
+\end{proof}
+
+\begin{remark}
+Für $n = 4$: $4^2 = 16$ markierte Spannbäume von $K_4$. Für $n = 2$: $2^0 = 1$
+(die einzelne Kante). Diese stimmen mit direkter Aufzählung überein.
+\end{remark}
+
+%% =============================================================
+\section{Zusammenhang}
+\label{sec:zusammenhang}
+%% =============================================================
+
+\begin{definition}[Zusammenhang, Schnitt]
+Ein Graph $G$ ist \emph{$k$-zusammenhängend} ($k$-knotenzusammenhängend),
+wenn $|V| > k$ und das Entfernen beliebiger $k-1$ Knoten $G$ zusammenhängend
+lässt. Der \emph{Knotenzusammenhang} $\kappa(G)$ ist das maximale solche $k$.
+Ein \emph{$s$-$t$-Knotenschnitt} ist eine Menge $S \subset V \setminus \{s,t\}$,
+deren Entfernung $s$ von $t$ trennt.
+\end{definition}
+
+\begin{theorem}[Menger-Satz]
+\label{satz:menger}
+Sei $G$ ein Graph und $s, t \in V$ mit $\{s,t\} \notin E$. Die maximale Anzahl
+paarweise intern knotendisjunkter $s$-$t$-Pfade ist gleich der minimalen Größe
+eines $s$-$t$-Knotenschnitts.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Sei $f^*$ die maximale Anzahl knotendisjunkter $s$-$t$-Pfade und $c^*$ die
+minimale Knotenschnittgröße. Offensichtlich $f^* \le c^*$ (jeder Schnitt
+muss jeden Pfad ``blockieren''). Für die andere Richtung verwenden wir ein
+Flussargument.
+
+Konstruiere ein gerichtetes Netzwerk $N$ aus $G$: ersetze jeden Knoten
+$v \ne s, t$ durch zwei Knoten $v^{\text{ein}}$ und $v^{\text{aus}}$, die
+durch einen Bogen der Kapazität $1$ verbunden sind; ersetze jede Kante
+$\{u,v\}$ durch Bögen $(u^{\text{aus}}, v^{\text{ein}})$ und
+$(v^{\text{aus}}, u^{\text{ein}})$, jeweils mit Kapazität $\infty$. Ein
+maximaler ganzzahliger $s$-$t$-Fluss in $N$ entspricht knotendisjunkten
+Pfaden in $G$, und ein minimaler $s$-$t$-Schnitt in $N$ entspricht einem
+minimalen Knotenschnitt in $G$. Nach dem Max-Flow-Min-Cut-Satz
+(Satz~\ref{satz:maxflow}) sind diese Werte gleich.
+\end{proof}
+
+\begin{theorem}[Max-Flow-Min-Cut-Satz, Ford-Fulkerson]
+\label{satz:maxflow}
+In einem gerichteten Netzwerk $N = (V, A, c)$ mit Quelle $s$ und Senke $t$
+und nichtnegativen ganzzahligen Kapazitäten $c: A \to \Z_{\ge 0}$ ist der
+Wert eines maximalen $s$-$t$-Flusses gleich der Kapazität eines minimalen
+$s$-$t$-Schnitts.
+\end{theorem}
+
+\begin{proof}
+Sei $f$ ein beliebiger $s$-$t$-Fluss und $(S, T)$ ein beliebiger $s$-$t$-Schnitt
+(mit $s \in S$, $t \in T$, $S \cup T = V$, $S \cap T = \emptyset$). Nach der
+Flusserhaltung gilt:
+$|f| = \sum_{(u,v): u \in S, v \in T} f(u,v) - \sum_{(u,v): u \in T, v \in S} f(u,v)
+\le \sum_{(u,v): u \in S, v \in T} c(u,v) = c(S,T)$.
+Also $\max |f| \le \min c(S,T)$.
+
+Für die Gleichheit führen wir den Ford-Fulkerson-Algorithmus aus: suche
+wiederholt einen \emph{augmentierenden Pfad} von $s$ nach $t$ im Residualgraphen
+und erhöhe den Fluss entlang ihm. Dies terminiert für ganzzahlige Kapazitäten.
+Wenn kein augmentierender Pfad mehr existiert, definiere $S$ als die Menge
+der von $s$ im Residualgraphen erreichbaren Knoten. Dann ist $(S, V \setminus S)$
+ein Schnitt der Kapazität $|f|$. Also $\max |f| = \min c(S,T)$.
+\end{proof}
+
+%% =============================================================
+\section{Graphenfärbung}
+\label{sec:faerbung}
+%% =============================================================
+
+\begin{definition}[Korrekte Färbung, Chromatische Zahl]
+Eine \emph{korrekte $k$-Färbung} von $G$ ist eine Funktion $c: V \to \{1, \ldots, k\}$,
+sodass $c(u) \ne c(v)$ wann immer $\{u,v\} \in E$. Die \emph{chromatische Zahl}
+$\chr(G)$ ist das kleinste $k$, für das eine korrekte $k$-Färbung existiert.
+\end{definition}
+
+\begin{example}
+$\chr(K_n) = n$, $\chr(C_{2k}) = 2$, $\chr(C_{2k+1}) = 3$, $\chr(P_n) = 2$
+für $n \ge 2$.
+\end{example}
+
+\begin{proposition}[Greedy-Schranke]
+\label{prop:greedy}
+Für jeden Graphen $G$ gilt $\chr(G) \le \Delta(G) + 1$.
+\end{proposition}
+
+\begin{proof}
+Ordne die Knoten beliebig als $v_1, \ldots, v_n$. Weise jedem Knoten $v_i$
+die kleinste Farbe aus $\{1, 2, \ldots\}$ zu, die von keinem seiner bereits
+gefärbten Nachbarn verwendet wird. Da $v_i$ höchstens $\Delta(G)$ Nachbarn
+hat, sind höchstens $\Delta(G)$ Farben ausgeschlossen, sodass stets eine
+Farbe aus $\{1, \ldots, \Delta(G)+1\}$ verfügbar ist.
+\end{proof}
+
+\begin{theorem}[Brook-Satz]
+\label{satz:brook}
+Ist $G$ ein zusammenhängender Graph, der weder ein vollständiger Graph noch
+ein ungerader Kreis ist, so gilt $\chr(G) \le \Delta(G)$.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Wir führen Induktion über $|V|$ durch. Für $\Delta(G) = 2$ muss $G$ ein Pfad
+oder ein gerader Kreis sein (ungerade Kreise und Dreiecke sind ausgeschlossen),
+beide 2-färbbar.
+
+Für $\Delta(G) \ge 3$: Ist $G$ nicht $\Delta$-regulär, entfernen wir einen
+Knoten $v$ mit $\grad(v) < \Delta(G)$. Der verbleibende Graph $G - v$ kann
+nach Induktion $\Delta$-gefärbt werden, und da $v$ weniger als $\Delta$ Nachbarn
+hat, ist für $v$ noch eine Farbe frei.
+
+Ist $G$ $\Delta$-regulär mit einem Trennknoten, zerlegen wir den Graphen
+und wenden Induktion an. Ist $G$ $\Delta$-regulär und 2-zusammenhängend,
+ermöglicht eine sorgfältige Knotenumordnung (mittels eines Pfades und
+Rückweges) dem Greedy-Algorithmus, mit $\Delta$ Farben auszukommen.
+\end{proof}
+
+\begin{theorem}[Vierfarbensatz]
+\label{satz:vierfarbensatz}
+Jeder planare Graph ist $4$-färbbar: $\chr(G) \le 4$ für alle planaren
+Graphen $G$.
+\end{theorem}
+
+\begin{proof}[Historische Anmerkung und Beweisskizze]
+Der Vierfarbensatz hat eine reiche Geschichte. Francis Guthrie vermutete
+ihn 1852. Alfred Kempe veröffentlichte 1879 einen vermeintlichen Beweis,
+den Percy Heawood 1890 widerlegte (er fand eine Lücke); Kempes Argument
+lieferte jedoch noch immer den Fünffarbensatz
+(Satz~\ref{satz:fuenffarbensatz}).
+
+Der Satz wurde schließlich \textbf{von Appel und Haken 1976 bewiesen}
+\cite{appelhaken1977}, mithilfe einer unvermeidbaren Menge von 1936
+reduzierbaren Konfigurationen, die durch Computer verifiziert wurden. Dies
+war das erste bedeutende Theorem, dessen Beweis wesentlich auf
+computergestützte Hilfe angewiesen war.
+
+Ein zweiter, saubererer Beweis wurde \textbf{1997 von Robertson, Sanders,
+Seymour und Thomas} \cite{robertson1997} gegeben, der die unvermeidbare
+Menge auf 633 Konfigurationen reduziert und die Computerverifikation
+transparenter gestaltet.
+
+\textbf{Beweissstrategie.} Das Argument verläuft in zwei Schritten:
+\begin{enumerate}
+  \item \textbf{Unvermeidbarkeit:} Zeige, dass jeder planare Graph mindestens
+        eine Konfiguration aus einer endlichen Liste enthält (z.\,B.\
+        Konfigurationen von Patches mit kleinen Flächen um einen Knoten).
+  \item \textbf{Reduzierbarkeit:} Zeige, dass, wenn eine solche Konfiguration
+        in einem minimalen Gegenbeispiel erscheint, ein kleinerer planarer
+        Graph, der nicht 4-färbbar ist, abgeleitet werden kann ---
+        im Widerspruch zur Minimalität.
+\end{enumerate}
+Die Kombination von Unvermeidbarkeit und Reduzierbarkeit zeigt, dass kein
+minimales Gegenbeispiel existieren kann, also auch kein Gegenbeispiel
+überhaupt.
+\end{proof}
+
+\begin{remark}
+Kein elementarer Beweis (ohne Computerunterstützung) des Vierfarbensatzes
+ist bekannt. Beide bekannten Beweise sind computergestützt.
+\end{remark}
+
+%% =============================================================
+\section{Planare Graphen}
+\label{sec:planar}
+%% =============================================================
+
+\begin{definition}[Planarer Graph, Einbettung, Fläche]
+Ein Graph $G$ ist \emph{planar}, wenn er in der Ebene $\R^2$ so gezeichnet
+werden kann, dass sich keine zwei Kanten außer an gemeinsamen Endpunkten
+kreuzen. Eine solche Zeichnung ist eine \emph{planare Einbettung}. Eine
+planare Einbettung teilt die Ebene in zusammenhängende Regionen, sogenannte
+\emph{Flächen}, einschließlich genau einer unbeschränkten Fläche.
+\end{definition}
+
+\begin{theorem}[Euler-Formel]
+\label{satz:eulerformel}
+Sei $G$ ein zusammenhängender planarer Graph mit $V$ Knoten, $E$ Kanten und
+$F$ Flächen in einer planaren Einbettung. Dann gilt:
+\[
+  V - E + F = 2.
+\]
+\end{theorem}
+
+\begin{proof}
+Per Induktion über die Anzahl der Kanten. Ist $G$ ein Baum, dann $E = V - 1$,
+$F = 1$ (nur die unbeschränkte Fläche), und $V - (V-1) + 1 = 2$. ✓
+
+Angenommen, $G$ hat einen Kreis, also existiert eine Kante $e$ auf einem
+Kreis. Das Entfernen von $e$ vereinigt zwei Flächen zu einer, also
+$F' = F - 1$, $E' = E - 1$, $V' = V$. Nach Induktion gilt $V' - E' + F' = 2$,
+d.\,h.\ $V - (E-1) + (F-1) = 2$, was $V - E + F = 2$ ergibt. ✓
+
+Ist $G$ zusammenhängend, hat aber eine Brücke $e$ (die auf keinem Kreis liegt),
+so trennt das Entfernen von $e$ den Graphen: $V' = V$, $E' = E - 1$. Die zwei
+resultierenden Komponenten $G_1, G_2$ erfüllen $V_1 - E_1 + F_1 = 2$ und
+$V_2 - E_2 + F_2 = 2$. Die ursprüngliche Einbettung hat die geteilte Fläche
+einmal gezählt, also $F = F_1 + F_2 - 1$, $V = V_1 + V_2$, $E = E_1 + E_2 + 1$.
+Addition der beiden Gleichungen und Anpassung ergibt $V - E + F = 2$.
+\end{proof}
+
+\begin{corollary}[Kantenschranke für planare Graphen]
+\label{kor:planare-kanten}
+Ist $G$ ein einfacher planarer Graph mit $n \ge 3$ Knoten und $m$ Kanten, so
+gilt $m \le 3n - 6$. Ist $G$ zusätzlich dreiecksfrei, so gilt $m \le 2n - 4$.
+\end{corollary}
+
+\begin{proof}
+Jede Fläche ist von mindestens 3 Kanten begrenzt. Da jede Kante genau
+2 Flächen begrenzt, gilt $3F \le 2E$, also $F \le 2E/3$. Einsetzen in
+die Euler-Formel: $2 = V - E + F \le n - E + 2E/3 = n - E/3$, was
+$E \le 3n - 6$ ergibt. Für dreiecksfreie Graphen ist jede Fläche von
+mindestens 4 Kanten begrenzt, was $4F \le 2E$ und damit $E \le 2n - 4$ liefert.
+\end{proof}
+
+\begin{corollary}
+$K_5$ und $K_{3,3}$ sind nicht planar.
+\end{corollary}
+
+\begin{proof}
+Für $K_5$: $n = 5$, $m = 10 > 3 \cdot 5 - 6 = 9$. Verstößt gegen
+Korollar~\ref{kor:planare-kanten}.
+Für $K_{3,3}$: $n = 6$, $m = 9$. Es ist bipartit, also dreiecksfrei.
+Aber $9 > 2 \cdot 6 - 4 = 8$. Verstößt gegen die dreiecksfreie Schranke.
+\end{proof}
+
+\begin{theorem}[Kuratowski-Satz]
+\label{satz:kuratowski}
+Ein Graph $G$ ist planar genau dann, wenn er keine Unterteilung von $K_5$ oder
+$K_{3,3}$ als Teilgraph enthält.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Die Notwendigkeit (planar $\Rightarrow$ keine $K_5$- oder $K_{3,3}$-Unterteilung)
+folgt aus Korollar~\ref{kor:planare-kanten}, angewandt auf Unterteilungen.
+
+Für die Hinlänglichkeit geht man durch Widerspruch vor: Man nehme an, $G$ sei
+ein minimaler nicht-planarer Graph. Mithilfe der Eigenschaften minimaler
+nicht-planarer Graphen (sie sind 3-zusammenhängend; jede Kante liegt auf einem
+Kreis) zeigt man, dass $G$ eine $K_5$- oder $K_{3,3}$-Unterteilung enthalten
+muss. Der vollständige Beweis findet sich in \cite{diestel2017}.
+\end{proof}
+
+\begin{theorem}[Fünffarbensatz]
+\label{satz:fuenffarbensatz}
+Jeder planare Graph ist $5$-färbbar.
+\end{theorem}
+
+\begin{proof}
+Durch Induktion über $n = |V|$. Die Basisfälle sind trivial. Für den
+Induktionsschritt sei $G$ ein planarer Graph mit $n$ Knoten. Nach
+Korollar~\ref{kor:planare-kanten} hat $G$ einen Knoten $v$ mit $\grad(v) \le 5$.
+
+\textbf{Fall 1: $\grad(v) \le 4$.} Entferne $v$, wende Induktion an, um eine
+5-Färbung von $G - v$ zu erhalten. Da $v$ höchstens 4 Nachbarn hat, ist
+mindestens eine der 5 Farben für $v$ frei.
+
+\textbf{Fall 2: $\grad(v) = 5$.} Seien die Nachbarn $v_1, \ldots, v_5$ in
+zyklischer Reihenfolge um $v$ in der Einbettung. Haben zwei nicht-adjazente
+Nachbarn in der $(G-v)$-Färbung dieselbe Farbe, wird $v$ mit der freigewordenen
+Farbe gefärbt.
+
+Andernfalls verwenden $v_1, \ldots, v_5$ alle 5 verschiedenen Farben. Betrachte
+den $v_1$-$v_3$-Teilgraphen, der durch die Farben 1 und 3 induziert wird.
+Liegen $v_1$ und $v_3$ in verschiedenen Zusammenhangskomponenten dieses
+2-gefärbten Teilgraphen, tausche die Farben in $v_1$s Komponente. Jetzt hat
+$v_1$ die Farbe 3, was Farbe 1 für $v$ freigibt.
+
+Liegen $v_1$ und $v_3$ in derselben Komponente, gibt es einen Pfad $P$ von
+$v_1$ nach $v_3$, der nur die Farben 1 und 3 verwendet. Zusammen mit den
+Kanten $vv_1$ und $vv_3$ trennt $P$ den Knoten $v_2$ von $v_4, v_5$. Dann
+liegen $v_2$ und $v_4$ in verschiedenen Komponenten des 2-gefärbten Teilgraphen
+mit den Farben 2 und 4, sodass wir tauschen können, um Farbe 2 für $v$
+freizugeben.
+\end{proof}
+
+%% =============================================================
+\section{Das Hadwiger-Nelson-Problem}
+\label{sec:hadwiger}
+%% =============================================================
+
+\begin{definition}[Einheitsdistanzgraph, Chromatische Zahl der Ebene]
+Der \emph{Einheitsdistanzgraph der Ebene} $G_{\R^2, 1}$ hat die Knotenmenge
+$\R^2$ und eine Kante zwischen je zwei Punkten mit euklidischem Abstand $1$.
+Die \emph{chromatische Zahl der Ebene} ist:
+\[
+  \chr(\R^2) = \chr(G_{\R^2, 1})
+  = \min\bigl\{k : \exists\; k\text{-Färbung von } \R^2 \text{ ohne zwei
+    Einheitsdistanz-Punkte gleicher Farbe}\bigr\}.
+\]
+\end{definition}
+
+Das \emph{Hadwiger-Nelson-Problem}, unabhängig von Hugo Hadwiger, Edward Nelson
+und John Isbell um 1950 gestellt, fragt nach dem genauen Wert von $\chr(\R^2)$.
+
+\begin{theorem}[Klassische Schranken]
+\label{satz:hn-klassisch}
+$4 \le \chr(\R^2) \le 7.$
+\end{theorem}
+
+\begin{proof}
+\textbf{Obere Schranke $\chr(\R^2) \le 7$.}
+Kachele die Ebene mit regulären Sechsecken der Seitenlänge $s = 0{,}48 <
+1/\sqrt{3} \approx 0{,}577$. Färbe die Sechsecke mit 7 Farben, indem man das
+periodische Muster $(i,j) \mapsto (i + 2j) \bmod 7$ in den hexagonalen
+Gitterkoordinaten verwendet.
+
+Zwei Punkte im selben Sechseck haben Abstand höchstens $2s = 0{,}96 < 1$.
+Zwei Punkte in gleichfarbigen Sechsecken haben Mittelpunktabstand mindestens
+$\sqrt{7} \cdot s\sqrt{3} = \sqrt{21} \cdot 0{,}48 \approx 2{,}20 > 1$.
+Also haben gleichfarbige Punkte stets Abstand $\ne 1$, was $\chr(\R^2) \le 7$
+beweist.
+
+\textbf{Untere Schranke $\chr(\R^2) \ge 4$.}
+Der \emph{Moser-Spindle} (Moser \& Moser, 1961) ist ein Einheitsdistanzgraph
+mit 7 Knoten und 11 Kanten. Sei er mit Knoten $A, B, C, D, E, F, G$ in $\R^2$
+eingebettet, wobei alle Kanten die Länge 1 haben. Der Graph hat die Eigenschaft,
+dass $A$ und $G$ durch einen Pfad $A - B - C - D$ und einen weiteren Pfad
+$A - E - F - G$ verbunden sind, wobei $D$ und $G$ durch eine Kante verbunden
+sind. Eine Fallunterscheidung zeigt, dass jede 3-Färbung $A$ und $G$ zur
+gleichen Farbe zwingt, obwohl $\{A, G\} \in E$ --- Widerspruch. Also
+$\chr(\text{Moser-Spindle}) = 4 \le \chr(\R^2)$.
+\end{proof}
+
+\subsection{Der Moser-Spindle}
+
+Der Moser-Spindle wird wie folgt konstruiert. Sei:
+\begin{align*}
+  A &= (0, 0), \quad B = (1, 0), \quad C = (1/2,\, \sqrt{3}/2),\\
+  D &= (3/2,\, \sqrt{3}/2), \quad E = (\cos\theta,\, \sin\theta)
+      \text{ mit } \cos\theta = 5/6,\\
+  F &= \bigl((5-\sqrt{33})/12,\, (\sqrt{11}+5\sqrt{3})/12\bigr),\\
+  G &= \bigl((15-\sqrt{33})/12,\, (3\sqrt{11}+5\sqrt{3})/12\bigr).
+\end{align*}
+Die Kanten sind: $AB, AC, BC$ (Dreieck $ABC$), $BD, CD$ ($D$ adjazent zu
+$B$ und $C$), $AE, AF, EF$ (Dreieck $AEF$), $EG, FG$ ($G$ adjazent zu
+$E$ und $F$) und $DG$.
+
+Man verifiziert numerisch, dass alle 11 Kanten die Länge genau 1 haben.
+
+\begin{lemma}[Chromatische Zahl des Moser-Spindle]
+$\chr(\text{Moser-Spindle}) = 4$.
+\end{lemma}
+
+\begin{proof}
+Der Graph ist nicht 3-färbbar. Angenommen, es existiere eine gültige
+3-Färbung mit Farben $\{1, 2, 3\}$. Da $ABC$ ein Dreieck ist, erhalten
+$A$, $B$, $C$ drei verschiedene Farben; sei $c(A) = 1$, $c(B) = 2$,
+$c(C) = 3$. Da $BD$ und $CD$ Kanten sind, gilt $c(D) \ne 2$ und
+$c(D) \ne 3$, also $c(D) = 1 = c(A)$. Da $AEF$ ein Dreieck ist, gilt
+$c(E), c(F) \in \{2, 3\}$ mit $c(E) \ne c(F)$. Da $EG$ und $FG$ Kanten
+sind, gilt $c(G) \ne c(E)$ und $c(G) \ne c(F)$, also muss $c(G)$ von
+beiden Farben in $\{2,3\}$ verschieden sein, was $c(G) = 1$ erzwingt.
+Aber $DG$ ist eine Kante und $c(D) = c(G) = 1$: Widerspruch. Damit gilt
+$\chr(\text{Moser-Spindle}) \ge 4$. Der Graph ist 4-färbbar (z.\,B.\ weise
+die Farben $1,2,3,1,2,3,4$ den Knoten $A,\ldots,G$ zu, die Kanten
+respektierend), also $\chr = 4$.
+\end{proof}
+
+\subsection{De Greys Ergebnis von 2018}
+
+\begin{theorem}[De Grey, 2018]
+\label{satz:degrey}
+$\chr(\R^2) \ge 5$.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Aubrey de Grey konstruierte einen endlichen Einheitsdistanzgraphen $H$ mit
+$\chr(H) = 5$ \cite{degrey2018}. Die Konstruktion begann mit dem Moser-Spindle
+und wendete eine Folge von Operationen (Rotation, Vereinigung, Teilgraphenbildung)
+an, um Graphen zu erhalten, die immer mehr Farben erfordern. Nach umfangreicher
+Computersuche fand de Grey einen Graphen mit $\mathbf{1581}$ Knoten und
+$\mathbf{12.066}$ Kanten, der nicht 4-färbbar ist. Dieser wurde von mehreren
+unabhängigen Teams verifiziert und 2019 in \emph{Geombinatorics}
+peer-reviewed publiziert.
+
+Da $H$ ein Einheitsdistanzgraph in $\R^2$ ist, induziert jede Färbung von
+$\R^2$ eine Färbung von $H$. Wäre $\chr(\R^2) \le 4$, so wäre $H$
+4-färbbar --- Widerspruch. Also $\chr(\R^2) \ge 5$.
+\end{proof}
+
+\begin{conjecture}[Genauer Wert von $\chr(\R^2)$]
+\label{verm:hn-genau}
+Die chromatische Zahl der Ebene erfüllt $\chr(\R^2) \in \{5, 6, 7\}$.
+Der genaue Wert ist unbekannt. De Greys Ergebnis schließt $\chr(\R^2) \le 4$
+aus, und das hexagonale Färbungsschema zeigt $\chr(\R^2) \le 7$, aber ob
+$\chr(\R^2) = 5$, $6$ oder $7$ ist, bleibt ein offenes Problem.
+\end{conjecture}
+
+\begin{remark}
+Das Problem ist bemerkenswert, da die Antwort nicht vom Auswahlaxiom abhängt:
+jede Färbung, die $\chr(\R^2) = k$ bezeugt, kann messbar gewählt werden, und
+das Problem macht Sinn in einem rein kombinatorischen Rahmen. Das
+Polymath-Projekt (2018) reduzierte anschließend die Knotenzahl eines
+5-chromatischen Einheitsdistanzgraphen auf 553 Knoten.
+\end{remark}
+
+%% =============================================================
+\section{Spektrale Graphentheorie}
+\label{sec:spektral}
+%% =============================================================
+
+\begin{definition}[Laplace-Matrix]
+Die \emph{Gradmatrix} von $G$ ist $D = \mathrm{diag}(\grad(v_1), \ldots,
+\grad(v_n))$. Die \emph{Laplace-Matrix} ist
+\[
+  L = D - A,
+\]
+wobei $A$ die Adjazenzmatrix ist. Explizit: $L_{ij} = -1$ wenn
+$\{i,j\} \in E$, $L_{ii} = \grad(v_i)$ und $L_{ij} = 0$ sonst.
+\end{definition}
+
+\begin{proposition}[Eigenschaften der Laplace-Matrix]
+\label{prop:laplace}
+Sei $G$ ein Graph mit $n$ Knoten und Laplace-Matrix $L$. Dann gilt:
+\begin{enumerate}[label=\upshape(\roman*)]
+  \item $L$ ist symmetrisch und positiv semidefinit;
+  \item $L \mathbf{1} = \mathbf{0}$, also ist $0$ stets ein Eigenwert mit
+        Eigenvektor $\mathbf{1} = (1,\ldots,1)^\top$;
+  \item Die Anzahl der Null-Eigenwerte von $L$ ist gleich der Anzahl der
+        Zusammenhangskomponenten von $G$;
+  \item Für jeden Vektor $x \in \R^n$:
+        $x^\top L x = \sum_{\{i,j\} \in E} (x_i - x_j)^2 \ge 0$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(iv) ist eine direkte Berechnung:
+$x^\top L x = x^\top D x - x^\top A x = \sum_i \grad(v_i) x_i^2
+- 2\sum_{\{i,j\} \in E} x_i x_j = \sum_{\{i,j\} \in E}(x_i^2 - 2x_ix_j + x_j^2)
+= \sum_{\{i,j\} \in E}(x_i - x_j)^2 \ge 0$.
+Dies beweist (i). (ii) folgt aus $\sum_j L_{ij} = \grad(v_i) - \sum_{j: \{i,j\} \in E} 1 = 0$.
+(iii) folgt, da der Kern von $L$ den lokal konstanten Funktionen auf $G$
+entspricht, also den Funktionen, die auf jeder Zusammenhangskomponente
+konstant sind.
+\end{proof}
+
+\begin{definition}[Algebraische Konnektivität, Fiedler-Wert]
+Die Eigenwerte von $L$ seien $0 = \lambda_1 \le \lambda_2 \le \cdots \le \lambda_n$.
+Für einen zusammenhängenden Graphen gilt $\lambda_2 > 0$; dieser Wert heißt
+die \emph{algebraische Konnektivität} oder der \emph{Fiedler-Wert} von $G$,
+bezeichnet mit $a(G)$. Der zugehörige Eigenvektor ist der \emph{Fiedler-Vektor}.
+\end{definition}
+
+\begin{definition}[Kantenexpansion, Cheeger-Konstante]
+Die \emph{Kantenexpansion} oder \emph{Cheeger-Konstante} von $G$ ist
+\[
+  h(G) = \min_{\emptyset \ne S \subsetneq V,\, |S| \le n/2}
+         \frac{|E(S, V \setminus S)|}{|S|},
+\]
+wobei $E(S, V\setminus S)$ die Menge der Kanten mit einem Endpunkt in $S$
+und dem anderen in $V \setminus S$ ist.
+\end{definition}
+
+\begin{theorem}[Cheeger-Ungleichung]
+\label{satz:cheeger}
+Für jeden $d$-regulären Graphen $G$ gilt:
+\[
+  \frac{h(G)^2}{2d} \le \lambda_2(L) \le 2h(G).
+\]
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Die obere Schranke $\lambda_2(L) \le 2h(G)$ folgt aus der Rayleigh-Quotienten-Charakterisierung
+von $\lambda_2$: für jeden zu $\mathbf{1}$ orthogonalen Vektor $x$ gilt
+$\lambda_2 \le x^\top L x / x^\top x$. Wähle $x$ als die charakteristische
+Funktion der optimalen Menge $S$, bei 0 zentriert; die resultierende Schranke
+ergibt $\lambda_2 \le 2h(G)$.
+
+Die untere Schranke $h(G) \le \sqrt{2d \lambda_2(L)}$ verwendet die
+Co-Area-Formel (diskretes Federer-Fleming-Theorem), um die Kantenbegrenzung
+von Niveaumengen des Fiedler-Vektors mit der algebraischen Konnektivität
+in Beziehung zu setzen.
+\end{proof}
+
+\begin{remark}
+Die Cheeger-Ungleichung ist das diskrete Analogon der isoperimetrischen
+Ungleichung in der Riemannschen Geometrie. Sie verbindet kombinatorische
+Expansion (nützlich für schnelles Mischen von Zufallsläufen) mit dem
+Spektralgap.
+\end{remark}
+
+%% =============================================================
+\section{Eulersche und Hamiltonische Graphen}
+\label{sec:euler_hamilton}
+%% =============================================================
+
+\begin{definition}[Eulerscher Kreis, Hamiltonischer Kreis]
+Ein \emph{Eulerscher Weg} ist ein Weg, der jede Kante genau einmal durchläuft.
+Ein \emph{Eulerscher Kreis} ist ein geschlossener Eulerscher Weg. Ein Graph,
+der einen Eulerschen Kreis enthält, heißt \emph{Eulersch}. Ein
+\emph{Hamiltonischer Kreis} ist ein Kreis, der jeden Knoten genau einmal
+besucht. Ein Graph, der einen Hamiltonischen Kreis enthält, heißt
+\emph{Hamiltonisch}.
+\end{definition}
+
+\begin{theorem}[Eulers Charakterisierung Eulerscher Graphen]
+\label{satz:eulersch}
+Ein zusammenhängender Graph $G$ ist Eulersch genau dann, wenn jeder Knoten
+geraden Grad hat.
+\end{theorem}
+
+\begin{proof}
+\textbf{Notwendigkeit.} Bei einem Eulerschen Kreis wird jedes Mal, wenn der
+Weg einen Knoten $v$ besucht, eine Kante für die Ankunft und eine für die
+Abfahrt verwendet, was $2$ zu $\grad(v)$ beiträgt. Damit ist $\grad(v)$ gerade
+für alle $v$.
+
+\textbf{Hinlänglichkeit.} Sei $G$ zusammenhängend mit allen Graden gerade.
+Beginne einen Weg bei einem beliebigen Knoten $v_0$. Der Weg kann stets
+fortgesetzt werden (da gerade Grade sicherstellen, dass eine Ankunft bei einem
+Knoten die Existenz einer unbenutzten Abfahrtskante impliziert), bis er sich
+bei $v_0$ schließt. Benutzt dieser geschlossene Weg nicht alle Kanten, gibt
+es eine unbenutzte Kante $e = \{u, w\}$, die zu einem Knoten $u$ auf dem Weg
+inzident ist (da $G$ zusammenhängend ist). Beginne bei $u$ einen neuen
+geschlossenen Weg, der nur unbenutzte Kanten verwendet; füge diesen in den
+ursprünglichen Weg bei $u$ ein. Wiederhole, bis alle Kanten benutzt sind.
+\end{proof}
+
+\begin{remark}
+Für das Königsberger Brückenproblem: Die vier Landmassen haben ungerade Grade
+(3, 3, 3, 5), also existiert kein Eulerscher Kreis. Dies bestätigt Eulers
+Ergebnis von 1736.
+\end{remark}
+
+\begin{theorem}[Satz von Dirac]
+\label{satz:dirac}
+Ist $G$ ein einfacher Graph auf $n \ge 3$ Knoten mit $\delta(G) \ge n/2$,
+so ist $G$ Hamiltonisch.
+\end{theorem}
+
+\begin{proof}
+Sei $P = v_1, v_2, \ldots, v_k$ ein längster Pfad in $G$. Wir behaupten,
+$k = n$ und der Pfad kann zu einem Hamiltonischen Kreis geschlossen werden.
+
+Ist $k < n$, so hat $v_1$ mindestens $n/2$ Nachbarn, alle auf $P$ (da $P$
+maximal ist). Ebenso für $v_k$. Durch ein Zählargument gibt es Indizes $i$,
+sodass $v_k v_i \in E$ und $v_1 v_{i+1} \in E$. Damit kann man einen Kreis
+$C = v_1 \cdots v_i v_k v_{k-1} \cdots v_{i+1} v_1$ bilden. Da $G$
+zusammenhängend ist und $k < n$, ist ein Knoten $w \notin V(C)$ zu einem
+Knoten in $C$ adjazent, was eine Verlängerung von $P$ ermöglicht --- im
+Widerspruch zur Maximalität. Also $k = n$ und $G$ ist Hamiltonisch.
+\end{proof}
+
+\begin{theorem}[NP-Vollständigkeit des Hamiltonischen-Pfad-Problems]
+\label{satz:ham-np}
+Das Problem, zu entscheiden, ob ein gegebener Graph $G$ einen Hamiltonischen
+Pfad (oder Kreis) enthält, ist NP-vollständig.
+\end{theorem}
+
+\begin{proof}
+Das Problem liegt in NP: Ein Hamiltonischer Pfad kann, wenn er gegeben ist,
+in polynomieller Zeit verifiziert werden (prüfe, dass jeder Knoten genau
+einmal vorkommt und alle Kanten in $E$ liegen).
+
+NP-Schwerheit wird durch Reduktion von 3-SAT gezeigt. Gegeben eine
+3-KNF-Formel $\phi$ auf $n$ Variablen und $m$ Klauseln, konstruiere einen
+Graphen $G_\phi$, sodass $G_\phi$ einen Hamiltonischen Kreis hat genau dann,
+wenn $\phi$ erfüllbar ist. Die Standard-Reduktion (Karp, 1972 \cite{karp1972})
+verwendet ein ``Variablen-Gadget'' für jede Variable (ein Paar von Pfaden
+für wahr/falsch) und ein ``Klauseln-Gadget'' für jede Klausel (ein einzelner
+Knoten, der mit den Variablen-Pfaden verbunden ist). Der resultierende Graph
+hat $O(nm)$ Knoten und Kanten, konstruierbar in polynomieller Zeit. Die
+Korrektheit der Reduktion sichert die Äquivalenz.
+\end{proof}
+
+\begin{remark}
+Das \emph{Travelling-Salesman-Problem} (TSP) fragt nach dem
+minimalen gewichteten Hamiltonischen Kreis in einem gewichteten vollständigen
+Graphen. TSP ist NP-schwer und ein zentrales Problem der kombinatorischen
+Optimierung. Für das euklidische TSP (Punkte in der Ebene, euklidische
+Abstände) existiert eine $(1+\varepsilon)$-Approximation in polynomieller
+Zeit für jedes $\varepsilon > 0$ (PTAS, Arora 1998), aber exakte Lösung
+bleibt NP-schwer.
+\end{remark}
+
+%% =============================================================
+\section{Extremale Graphentheorie}
+\label{sec:extremal}
+%% =============================================================
+
+Die extremale Graphentheorie fragt: Wie viele Kanten kann ein Graph auf $n$
+Knoten haben, wenn ein bestimmter Teilgraph verboten ist?
+
+\begin{definition}[Turán-Graph]
+Der \emph{Turán-Graph} $T(n, r)$ ist der vollständige $r$-partite Graph auf
+$n$ Knoten, dessen Teile so gleich wie möglich sind (Größen
+$\lfloor n/r \rfloor$ oder $\lceil n/r \rceil$). Seine Kantenzahl ist
+\[
+  t(n, r) = \left(1 - \frac{1}{r}\right)\frac{n^2}{2} + O(n).
+\]
+\end{definition}
+
+\begin{theorem}[Turán-Satz]
+\label{satz:turan}
+Hat ein einfacher Graph $G$ auf $n$ Knoten mehr als $t(n, r)$ Kanten, so
+enthält $G$ den vollständigen Graphen $K_{r+1}$ als Teilgraph. Umgekehrt ist
+$T(n,r)$ der eindeutig dichteste $K_{r+1}$-freie Graph auf $n$ Knoten.
+\end{theorem}
+
+\begin{proof}
+Wir präsentieren den eleganten \textbf{Zykov-Symmetrisierungs}-Beweis.
+
+Nenne einen Graphen \emph{extremal}, wenn er $K_{r+1}$-frei ist und maximale
+Kantenzahl hat. Wir behaupten, jeder extremale Graph ist $T(n,r)$.
+
+\textbf{Schritt 1: Extremale Graphen sind vollständig multipartit.}
+Sei $G$ extremal. Haben zwei nicht-adjazente Knoten $u, v$ den Grad
+$\grad(u) < \grad(v)$, ersetze $u$ durch eine Kopie von $v$ (gleiche Nachbarschaft
+wie $v$). Dies erzeugt kein $K_{r+1}$ (da $v$s Nachbarschaft $K_{r+1}$-frei
+ist) und kann die Kantenzahl nicht verringern. Also können wir annehmen: für
+alle nicht-adjazenten $u,v$ gilt $\grad(u) = \grad(v)$.
+
+Nicht-Adjazenz ist eine Äquivalenzrelation (sind $u \not\sim v$ und
+$u \not\sim w$, müssen sie gleichen Grad haben, also gilt $v \not\sim w$
+ebenfalls nach Maximalität). Damit ist $G$ vollständig multipartit.
+
+\textbf{Schritt 2: Teile müssen ausgewogen sein.}
+Ist $G = K_{n_1, \ldots, n_r}$ mit $n_i > n_j + 1$ für ein $i \ne j$,
+verschiebe einen Knoten von Teil $i$ nach Teil $j$. Dies erhöht die Kantenzahl
+(die Veränderung ist $n_j - n_i + 1 > 0$ nach sorgfältiger Berechnung),
+was der Extremalität widerspricht. Also haben alle Teile Größe
+$\lfloor n/r\rfloor$ oder $\lceil n/r\rceil$, d.\,h.\ $G = T(n,r)$.
+\end{proof}
+
+\begin{theorem}[Zarankiewicz-Problem, Kővári-Sós-Turán]
+\label{satz:zarankiewicz}
+Ist $G$ ein bipartiter Graph auf Teilen der Größe $m$ und $n$ (mit $m \le n$),
+der kein $K_{s,t}$ als Teilgraph enthält (mit $s \le t$), so gilt:
+\[
+  |E(G)| \le \tfrac{1}{2}\bigl((t-1)^{1/s} n m^{1-1/s} + (s-1)m\bigr).
+\]
+Insbesondere gilt ex$(n, K_{2,2}) = O(n^{3/2})$.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Zähle Paare $(u, \{v_1, v_2, \ldots, v_s\})$, wobei $u$ auf der $m$-Seite
+liegt und die $v_i$ auf der $n$-Seite mit allen $v_i$ adjazent zu $u$. Einerseits
+ist diese Zahl $\sum_{u} \binom{\grad(u)}{s} \ge m \cdot \binom{|E|/m}{s}$
+nach Konvexität. Andererseits gibt es für jede $s$-Menge $\{v_1, \ldots, v_s\}$
+auf der $n$-Seite höchstens $t-1$ gemeinsame Nachbarn auf der $m$-Seite
+(sonst existiert $K_{s,t}$). Also ist die Zahl höchstens $(t-1)\binom{n}{s}$.
+Kombination und Auflösung nach $|E|$ ergibt das Ergebnis.
+\end{proof}
+
+\begin{theorem}[Szemerédi-Regularitätslemma]
+\label{satz:szemeredi}
+Für jedes $\varepsilon > 0$ und jede ganze Zahl $k_0 \ge 1$ existiert ein
+$M = M(\varepsilon, k_0)$, sodass die Knotenmenge jedes Graphen $G$ mit
+$n \ge M$ Knoten in $k$ Klassen $V_1, \ldots, V_k$ mit $k_0 \le k \le M$
+und $|V_1| \le \cdots \le |V_k| \le |V_1| + 1$ partitioniert werden kann,
+sodass alle bis auf höchstens $\varepsilon k^2$ der Paare $(V_i, V_j)$
+$\varepsilon$-regulär sind.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Das \textbf{Energie-Inkrement-Argument}: Definiere die \emph{mittlere quadratische
+Dichte} (Energie) $q(P) = \sum_{i<j} \frac{|V_i||V_j|}{n^2} d(V_i, V_j)^2$
+für eine Partition $P$, wobei $d(V_i, V_j) = e(V_i, V_j)/(|V_i||V_j|)$ die
+Kantendichte ist. Es gilt $0 \le q(P) \le 1$.
+
+Hat die aktuelle Partition zu viele irregulä re Paare, verfeinere sie, indem
+jede Klasse mithilfe des ``Zeugen'' der Irregularität aufgeteilt wird. Jeder
+Verfeinerungsschritt erhöht die Energie um mindestens $\varepsilon^5$. Da
+die Energie durch 1 begrenzt ist, terminiert der Prozess nach höchstens
+$\varepsilon^{-5}$ Verfeinerungen mit einer regulären Partition.
+\end{proof}
+
+\begin{remark}
+Das Szemerédi-Regularitätslemma ist ein Eckpfeiler der modernen Kombinatorik.
+Es ermöglicht das \emph{Zähl-Lemma} und das \emph{Entfernungs-Lemma} und
+war zentral für den Beweis von Szmerédis Satz über arithmetische Progressionen.
+Die Schranke $M(\varepsilon)$ wächst wie ein Exponentialturm der Höhe
+$O(1/\varepsilon^5)$, was bekanntermaßen im Wesentlichen optimal ist
+(Gowers, 1997).
+\end{remark}
+
+%% =============================================================
+\section{Literatur}
+\label{sec:literatur}
+%% =============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{euler1736}
+L.~Euler,
+\emph{Solutio problematis ad geometriam situs pertinentis},
+Commentarii Academiae Scientiarum Imperialis Petropolitanae \textbf{8} (1736),
+128--140.
+
+\bibitem{cayley1889}
+A.~Cayley,
+\emph{A theorem on trees},
+Quart.\ J.\ Math.\ \textbf{23} (1889), 376--378.
+
+\bibitem{appelhaken1977}
+K.~Appel und W.~Haken,
+\emph{Every planar map is four colorable. Part~I: Discharging},
+Illinois J.\ Math.\ \textbf{21} (1977), 429--490.
+K.~Appel, W.~Haken und J.~Koch,
+\emph{Every planar map is four colorable. Part~II: Reducibility},
+Illinois J.\ Math.\ \textbf{21} (1977), 491--567.
+
+\bibitem{robertson1997}
+N.~Robertson, D.~P.~Sanders, P.~D.~Seymour und R.~Thomas,
+\emph{The four-colour theorem},
+J.\ Combin.\ Theory Ser.\ B \textbf{70} (1997), 2--44.
+
+\bibitem{degrey2018}
+A.~D.~N.~J.\ de~Grey,
+\emph{The chromatic number of the plane is at least 5},
+Geombinatorics \textbf{28} (2018/2019), 18--31.
+arXiv:1804.02385.
+
+\bibitem{diestel2017}
+R.~Diestel,
+\emph{Graphentheorie},
+5.~Aufl., Springer, Berlin, 2017.
+
+\bibitem{bollobas1998}
+B.~Bollob\'{a}s,
+\emph{Modern Graph Theory},
+Springer, New York, 1998.
+
+\bibitem{karp1972}
+R.~M.~Karp,
+\emph{Reducibility among combinatorial problems},
+in: R.~E.~Miller und J.~W.~Thatcher (Hrsg.),
+\emph{Complexity of Computer Computations},
+Plenum Press, New York, 1972, S.~85--103.
+
+\bibitem{turan1941}
+P.~Tur\'{a}n,
+\emph{On an extremal problem in graph theory} (auf Ungarisch),
+Mat.\ Fiz.\ Lapok \textbf{48} (1941), 436--452.
+
+\bibitem{szemeredi1978}
+E.~Szemer\'{e}di,
+\emph{Regular partitions of graphs},
+Probl\`{e}mes Combinatoires et Th\'{e}orie des Graphes,
+Colloques Internationaux du CNRS \textbf{260}, Paris, 1978, S.~399--401.
+
+\bibitem{mosermoser1961}
+L.~Moser und W.~Moser,
+\emph{Solution to problem 10},
+Canad.\ Math.\ Bull.\ \textbf{4} (1961), 187--189.
+
+\bibitem{kuratowski1930}
+K.~Kuratowski,
+\emph{Sur le probl\`{e}me des courbes gauches en topologie},
+Fund.\ Math.\ \textbf{15} (1930), 271--283.
+
+\end{thebibliography}
+
+\end{document}
