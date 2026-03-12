@@ -1,0 +1,732 @@
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 140}
+
+\title{Zeta Values at Odd Integers:\\
+Irrationality Results, Apéry's Theorem, and Open Problems}
+
+\begin{abstract}
+The Riemann zeta function $\zeta(s) = \sum_{n=1}^{\infty} n^{-s}$ evaluated at
+positive integers has fascinated mathematicians since Euler's time. While the
+values $\zeta(2n)$ at positive even integers are completely understood---they
+equal rational multiples of powers of $\pi$---the arithmetic nature of the odd
+values $\zeta(2n+1)$ remains largely mysterious. The sole exception is $\zeta(3)$,
+proved irrational by Roger Apéry in 1979 in a result that stunned the mathematical
+community. We present a comprehensive treatment of zeta values at odd integers,
+including Apéry's proof of the irrationality of $\zeta(3)$, the Ball--Rivoal theorem
+(2001) guaranteeing infinitely many irrational values among $\{\zeta(2k+1)\}$,
+and Zudilin's refinement (2004) that at least one of $\zeta(5), \zeta(7), \zeta(9),
+\zeta(11)$ is irrational. We discuss Bernoulli numbers, multiple zeta values,
+$p$-adic zeta functions, and connections to modular forms. The irrationality of
+$\zeta(5)$ and the transcendence of $\zeta(3)$ remain open conjectures.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+% ============================================================
+\section{Introduction}
+% ============================================================
+
+The Riemann zeta function is arguably the most important special function in
+analytic number theory. Defined for $\operatorname{Re}(s) > 1$ by the absolutely
+convergent Dirichlet series
+\[
+  \zeta(s) = \sum_{n=1}^{\infty} \frac{1}{n^s},
+\]
+it extends meromorphically to all of $\mathbb{C}$ with a single simple pole at
+$s = 1$ (residue~$1$). Euler's product formula
+\[
+  \zeta(s) = \prod_{p \text{ prime}} \frac{1}{1 - p^{-s}}, \quad
+  \operatorname{Re}(s) > 1,
+\]
+links the zeta function to the distribution of prime numbers, culminating in the
+Riemann Hypothesis, which asserts that all non-trivial zeros lie on the critical
+line $\operatorname{Re}(s) = \tfrac{1}{2}$.
+
+Beyond its role in prime number theory, the values $\zeta(n)$ at positive integers
+have been studied intensively. Euler showed in~1740 that
+\[
+  \zeta(2n) = (-1)^{n+1} \frac{(2\pi)^{2n} B_{2n}}{2\,(2n)!}, \quad n \geq 1,
+\]
+where $B_{2n}$ are the Bernoulli numbers. In particular, $\zeta(2) = \pi^2/6$,
+$\zeta(4) = \pi^4/90$, and so on---all transcendental numbers, explicitly expressed
+in terms of $\pi$.
+
+The situation for \emph{odd} positive integers is strikingly different. No
+analogous closed form is known. The question of whether $\zeta(3), \zeta(5),
+\zeta(7), \ldots$ are irrational, transcendental, or even algebraically independent
+over $\mathbb{Q}(\pi)$ is one of the deepest open problems in number theory.
+
+\subsection*{Historical overview}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Euler (1740)}: Proved $\zeta(2n) \in \mathbb{Q} \cdot \pi^{2n}$.
+        The odd case remained open.
+  \item \textbf{Apéry (1978/79)}: Proved $\zeta(3) \notin \mathbb{Q}$---a
+        \emph{mathematical sensation}, presented at the Journées Arithmétiques in
+        Luminy (1978).
+  \item \textbf{Beukers (1979)}: Gave an elegant reformulation of Apéry's proof
+        using Legendre polynomials and double integrals.
+  \item \textbf{Rivoal (2000) and Ball--Rivoal (2001)}: Proved that infinitely many
+        odd zeta values are irrational.
+  \item \textbf{Zudilin (2004)}: Proved that at least one of $\zeta(5), \zeta(7),
+        \zeta(9), \zeta(11)$ is irrational.
+\end{itemize}
+
+This paper is organised as follows. Section~2 reviews the fully understood even
+case. Section~3 presents Apéry's theorem on $\zeta(3)$ in detail.
+Section~4 discusses the constant $\zeta(3)$ and its numerical and historical
+significance. Section~5 covers the Ball--Rivoal and Zudilin results.
+Section~6 introduces multiple zeta values. Section~7 reviews Bernoulli numbers.
+Section~8 covers $p$-adic zeta functions. Section~9 connects the theory to
+modular forms. Section~10 summarises open problems. Section~11 gives references.
+
+% ============================================================
+\section{Even Values: The Euler Formula}
+% ============================================================
+
+\subsection{Statement and proof sketch}
+
+\begin{theorem}[Euler, 1740]
+  For every positive integer $n \geq 1$,
+  \[
+    \zeta(2n) = (-1)^{n+1} \frac{(2\pi)^{2n} B_{2n}}{2\,(2n)!},
+  \]
+  where $B_{2n}$ denotes the $2n$-th Bernoulli number.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+  The classical proof uses the product expansion of $\sin(\pi z)$:
+  \[
+    \frac{\sin(\pi z)}{\pi z} = \prod_{n=1}^{\infty} \left(1 - \frac{z^2}{n^2}\right).
+  \]
+  Taking logarithms and differentiating, or expanding both sides as power series
+  in $z^2$ and comparing coefficients, yields
+  \[
+    \sum_{n=1}^{\infty} \frac{1}{n^{2k}} = (-1)^{k+1} \frac{(2\pi)^{2k}
+    B_{2k}}{2\,(2k)!}.
+  \]
+  An alternative route uses the generating function of Bernoulli numbers and the
+  Fourier expansion $\sum_{n \neq 0} e^{2\pi i n x}/n^{2k}$.
+\end{proof}
+
+\subsection{Table of even zeta values}
+
+\begin{table}[h]
+  \centering
+  \caption{Even zeta values $\zeta(2n)$ via Euler's formula.}
+  \vspace{4pt}
+  \begin{tabular}{@{}cclr@{}}
+    \toprule
+    $n$ & $\zeta(2n)$ (closed form) & Decimal approximation & $B_{2n}$ \\
+    \midrule
+    1 & $\dfrac{\pi^2}{6}$           & $1.6449340668\ldots$ & $\tfrac{1}{6}$     \\[6pt]
+    2 & $\dfrac{\pi^4}{90}$          & $1.0823232337\ldots$ & $-\tfrac{1}{30}$   \\[6pt]
+    3 & $\dfrac{\pi^6}{945}$         & $1.0173430620\ldots$ & $\tfrac{1}{42}$    \\[6pt]
+    4 & $\dfrac{\pi^8}{9450}$        & $1.0040773562\ldots$ & $-\tfrac{1}{30}$   \\[6pt]
+    5 & $\dfrac{\pi^{10}}{93555}$    & $1.0009945751\ldots$ & $\tfrac{5}{66}$    \\[6pt]
+    6 & $\dfrac{691\pi^{12}}{638512875}$ & $1.0002460866\ldots$ & $-\tfrac{691}{2730}$ \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:even-zeta}
+\end{table}
+
+\subsection{Consequences}
+
+Since every $B_{2n} \in \mathbb{Q}$, Euler's theorem immediately implies that
+$\zeta(2n) \in \mathbb{Q} \cdot \pi^{2n}$ for all $n \geq 1$. Since $\pi$ is
+transcendental (Lindemann 1882), each $\zeta(2n)$ is transcendental. Moreover,
+the irrationality (and transcendence) of $\pi^{2n}$ was established well before
+any result on odd zeta values.
+
+The \emph{odd} case reveals the full depth of the problem: there is no known
+analogue of the sine product expansion that would link $\zeta(2n+1)$ to $\pi$.
+
+% ============================================================
+\section{The Irrationality of $\zeta(3)$: Apéry's Theorem}
+% ============================================================
+
+\subsection{Statement}
+
+\begin{theorem}[Apéry, 1979]
+  The number $\zeta(3) = \sum_{n=1}^{\infty} n^{-3}$ is irrational.
+\end{theorem}
+
+This theorem was announced at the Journées Arithmétiques in Luminy in June~1978
+and published in~1979. The result was initially met with scepticism---several
+experts doubted the proof---but was verified within weeks by Henri Cohen and
+others. Apéry received standing ovations at the announcement.
+
+\subsection{The Apéry sequences}
+
+The central idea of Apéry's proof is to construct two sequences of positive
+integers $\{a_n\}$ and $\{b_n\}$ satisfying the same three-term linear recurrence,
+converging to a rational approximation of $\zeta(3)$ so well that $\zeta(3)$
+cannot be rational.
+
+Define the Apéry numbers by
+\[
+  b_n = \sum_{k=0}^{n} \binom{n}{k}^2 \binom{n+k}{k}^2, \quad n \geq 0.
+\]
+The first few values are $b_0 = 1$, $b_1 = 5$, $b_2 = 73$, $b_3 = 1445$.
+
+The numerator sequence $a_n$ is defined via
+\[
+  a_n = \sum_{k=0}^{n} \binom{n}{k}^2 \binom{n+k}{k}^2
+        \sum_{j=1}^{k} \frac{(-1)^{j-1}}{j^3 \binom{j+n}{j}\binom{n}{j}},
+\]
+adjusted so that $a_n \in \mathbb{Z}$ after multiplication by a suitable
+least common multiple.
+
+\subsection{The key recurrence}
+
+Both sequences satisfy the \emph{Apéry recurrence}:
+\begin{equation}
+  (n+1)^3 u_{n+1} - (34n^3 + 51n^2 + 27n + 5)\, u_n + n^3 u_{n-1} = 0.
+  \label{eq:apery-recurrence}
+\end{equation}
+With initial conditions $(b_0, b_1) = (1, 5)$ this produces the $b_n$; with
+$(a_0, a_1) = (0, 6)$ it produces the numerator sequence.
+
+\subsection{Proof of irrationality}
+
+The key estimates are:
+\begin{enumerate}[label=(\roman*)]
+  \item $b_n \zeta(3) - a_n \to 0$ as $n \to \infty$ (the ratio converges to $\zeta(3)$).
+  \item The convergence rate is
+        \[
+          |b_n \zeta(3) - a_n| \sim C \cdot (\sqrt{2} - 1)^{4n}, \quad C > 0,
+        \]
+        so the convergence is super-exponentially fast.
+  \item The denominator $b_n$ grows only polynomially (in fact $b_n \sim A \cdot
+        (1 + \sqrt{2})^{4n} / n^3$ for some constant $A$).
+\end{enumerate}
+
+To prove irrationality: suppose $\zeta(3) = p/q$ for integers $p, q > 0$.
+Then $|b_n \zeta(3) - a_n| = |b_n p/q - a_n| \geq 1/q$ for large $n$ (as a
+non-zero integer divided by $q$), but the right-hand side tends to zero faster
+than any polynomial, a contradiction.
+
+\subsection{Beukers' integral formulation}
+
+Beukers (1979) gave an elegant reformulation: define
+\begin{align*}
+  I_n &= \int_0^1 \!\int_0^1 \frac{-\log(xy)}{1 - xy}\, P_n(x)\, P_n(y)\,
+         \mathrm{d}x\, \mathrm{d}y, \\
+  J_n &= \int_0^1 \!\int_0^1 \!\int_0^1
+         \frac{x^n(1-x)^n\, y^n(1-y)^n\, z^n(1-z)^n}
+              {(1 - (1-z)xy)^{n+1}}\,
+         \mathrm{d}x\, \mathrm{d}y\, \mathrm{d}z,
+\end{align*}
+where $P_n$ is the $n$-th Legendre polynomial. These integrals yield
+$J_n = b_n \zeta(3) - a_n$ and provide the positivity and rate estimates needed.
+
+\subsection{Irrationality measure}
+
+The best known upper bound on the irrationality measure of $\zeta(3)$ is due to
+Rhin and Viola (2001):
+\[
+  \mu(\zeta(3)) \leq 5.5138905...,
+\]
+meaning $|\zeta(3) - p/q| < q^{-5.5138905-\varepsilon}$ has only finitely many
+solutions for any $\varepsilon > 0$.
+
+% ============================================================
+\section{Apéry's Constant $\zeta(3)$}
+% ============================================================
+
+\subsection{Numerical value and continued fraction}
+
+The constant $\zeta(3)$ is now known as \emph{Apéry's constant}:
+\[
+  \zeta(3) = 1.2020569031595942854523691932819321312725\ldots
+\]
+Its continued fraction expansion begins
+\[
+  \zeta(3) = [1; 4, 1, 18, 1, 1, 1, 4, 1, 9, 9, 2, 1, 1, 1, 2, \ldots],
+\]
+exhibiting no obvious pattern. This is consistent with its conjectured (but
+unproved) transcendence.
+
+\subsection{Alternative series representations}
+
+Several faster-converging series are known:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Euler's formula:}
+    \[
+      \zeta(3) = \frac{5}{2} \sum_{n=1}^{\infty} \frac{(-1)^{n+1}}{n^3 \binom{2n}{n}}.
+    \]
+  \item \textbf{Alternating Dirichlet series:}
+    \[
+      \zeta(3) = \frac{4}{3} \sum_{n=1}^{\infty} \frac{(-1)^{n+1}}{n^3}.
+    \]
+  \item \textbf{Borwein--Crandall--Fee formula:}
+    \[
+      \zeta(3) = \frac{\pi^2}{7} \left( 1 - 4 \sum_{k=1}^{\infty}
+      \frac{\zeta(2k)}{(2k+1)(2k+2)\, 4^k} \right).
+    \]
+\end{itemize}
+
+\subsection{"Apéry's miracle"}
+
+The term \emph{Apéry's miracle} refers to the mysterious fact that the
+coefficients $b_n$ in Apéry's proof are integers---a priori by no means obvious
+from the combinatorial sums. The integrality follows from the divisibility
+properties of binomial coefficients, but there is no simple conceptual explanation.
+Alfred van der Poorten's account ``A proof that Euler missed'' (1979) made Apéry's
+argument accessible to a wide audience.
+
+\subsection{Open status}
+
+\begin{conjecture}
+  $\zeta(3)$ is transcendental (i.e., not algebraic over $\mathbb{Q}$).
+\end{conjecture}
+
+This remains completely open (as of~2026). Proving irrationality was difficult
+enough; transcendence requires entirely new methods.
+
+% ============================================================
+\section{Irrationality Among $\zeta(5), \zeta(7), \ldots$}
+% ============================================================
+
+\subsection{The Ball--Rivoal theorem}
+
+\begin{theorem}[Ball--Rivoal, 2001]
+  The $\mathbb{Q}$-vector space dimension of
+  \[
+    \operatorname{span}_{\mathbb{Q}}\{1,\, \zeta(3),\, \zeta(5),\, \ldots,\, \zeta(2n+1)\}
+  \]
+  is at least
+  \[
+    \frac{(1 + o(1))\,\ln n}{1 + \ln 2}
+    \quad \text{as } n \to \infty.
+  \]
+  In particular, infinitely many of the values $\zeta(2k+1)$ are irrational.
+\end{theorem}
+
+\begin{proof}[Proof strategy]
+  The proof constructs, for each large $r$, a linear form
+  \[
+    L_r = c_0^{(r)} + c_3^{(r)}\,\zeta(3) + c_5^{(r)}\,\zeta(5) + \cdots
+          + c_{2r-1}^{(r)}\,\zeta(2r-1)
+  \]
+  with integer coefficients $c_j^{(r)}$, where $L_r \neq 0$ but $|L_r| \to 0$.
+  The coefficients are obtained from a hypergeometric integral, and their
+  smallness relative to the denominators forces the conclusion that the
+  corresponding set $\{1, \zeta(3), \ldots, \zeta(2r-1)\}$ must contain at least
+  $\sim \ln(r)/(1 + \ln 2)$ linearly independent elements over $\mathbb{Q}$.
+\end{proof}
+
+\subsection{The growth rate}
+
+More precisely, the dimension satisfies
+\[
+  \dim_{\mathbb{Q}} \operatorname{span}_{\mathbb{Q}}\{1, \zeta(3), \zeta(5),
+  \ldots, \zeta(2n+1)\} \geq \frac{\ln n}{1 + \ln 2} \approx \frac{\ln n}{1.6931}
+\]
+for large $n$. The lower bound grows logarithmically, confirming infinitely many
+irrationals but leaving open the possibility (unlikely but not disproved) that
+only a sparse subset is irrational.
+
+\subsection{Zudilin's theorem}
+
+\begin{theorem}[Zudilin, 2004]
+  At least one of the four values
+  \[
+    \zeta(5),\quad \zeta(7),\quad \zeta(9),\quad \zeta(11)
+  \]
+  is irrational.
+\end{theorem}
+
+\begin{proof}[Proof strategy]
+  Zudilin constructed a linear form
+  \[
+    L = a_0 + a_5 \zeta(5) + a_7 \zeta(7) + a_9 \zeta(9) + a_{11} \zeta(11),
+    \quad a_i \in \mathbb{Z},
+  \]
+  with $L \neq 0$ but $|L| < 1$. If all four values were rational with a common
+  denominator $D$, then $D \cdot L$ would be a non-zero integer strictly between
+  $-1$ and $1$---a contradiction.
+
+  The construction uses hypergeometric functions ${}_{7}F_6$ and the Siegel lemma
+  to find suitable integer coefficients with controlled size.
+\end{proof}
+
+\begin{remark}
+  Zudilin's theorem does \emph{not} identify which of the four values is irrational.
+  The irrationality of $\zeta(5)$ individually remains an open conjecture.
+\end{remark}
+
+\subsection{Table of odd zeta values}
+
+\begin{table}[h]
+  \centering
+  \caption{Odd zeta values and their arithmetic status.}
+  \vspace{4pt}
+  \begin{tabular}{@{}clll@{}}
+    \toprule
+    $n$ & $\zeta(n)$ (approximation) & Irrationality & Reference \\
+    \midrule
+    3  & $1.20205690315959\ldots$ & \textbf{Proved irrational} & Apéry (1979) \\
+    5  & $1.03692775514337\ldots$ & Open conjecture           & --- \\
+    7  & $1.00834927738192\ldots$ & Open conjecture           & --- \\
+    9  & $1.00200839292608\ldots$ & Open conjecture           & --- \\
+    11 & $1.00049418860409\ldots$ & Open conjecture           & --- \\
+    13 & $1.00012271334757\ldots$ & Open conjecture           & --- \\
+    15 & $1.00003058823630\ldots$ & Open conjecture           & --- \\
+    \midrule
+    \multicolumn{4}{l}{At least one of $\zeta(5), \zeta(7), \zeta(9), \zeta(11)$
+    is irrational: \textbf{Proved} (Zudilin 2004)} \\
+    \multicolumn{4}{l}{Infinitely many $\zeta(2k+1)$ are irrational: \textbf{Proved}
+    (Ball--Rivoal 2001)} \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:odd-zeta}
+\end{table}
+
+% ============================================================
+\section{Multiple Zeta Values}
+% ============================================================
+
+\subsection{Definition}
+
+Multiple zeta values (MZVs) generalise the Riemann zeta function to multi-index
+arguments. For integers $s_1 \geq 2$ and $s_2, \ldots, s_k \geq 1$, define
+\[
+  \zeta(s_1, s_2, \ldots, s_k) = \sum_{n_1 > n_2 > \cdots > n_k \geq 1}
+  \frac{1}{n_1^{s_1} n_2^{s_2} \cdots n_k^{s_k}}.
+\]
+The integer $k$ is the \emph{depth} and $|s| = s_1 + \cdots + s_k$ is the
+\emph{weight}.
+
+\subsection{Examples and first values}
+
+\begin{align*}
+  \zeta(2) &= \frac{\pi^2}{6}, \\
+  \zeta(3) &= 1.20205690\ldots \quad \text{(Apéry's constant)}, \\
+  \zeta(2, 1) &= \zeta(3), \quad \text{(Euler's result)}, \\
+  \zeta(1, 2) &= \zeta(3) \quad \text{(duality)}, \\
+  \zeta(2, 3) &= 9\,\zeta(5)/2 - 2\,\zeta(2)\zeta(3).
+\end{align*}
+
+\subsection{The algebra of MZVs}
+
+MZVs satisfy two families of algebraic relations:
+
+\textbf{Shuffle product.} Integration-by-parts yields
+\[
+  \zeta(\mathbf{s}) \cdot \zeta(\mathbf{t}) = \sum_{\sigma \in \mathrm{Sh}(\mathbf{s}, \mathbf{t})}
+  \zeta(\sigma),
+\]
+where the sum is over all shuffle permutations.
+
+\textbf{Stuffle product (quasi-shuffle).} The Dirichlet series multiplication gives
+a different identity:
+\[
+  \zeta(s_1) \cdot \zeta(s_2) = \zeta(s_1, s_2) + \zeta(s_2, s_1) + \zeta(s_1 + s_2).
+\]
+
+These two product structures impose strong linear relations among MZVs. The
+\emph{double shuffle relations} (the two together) generate all known algebraic
+relations, and it is conjectured (but not proved) that they generate \emph{all}
+relations.
+
+\subsection{Weight and period}
+
+MZVs of weight $w$ conjecturally span a $\mathbb{Q}$-vector space of dimension
+$d_w$ satisfying $d_w = d_{w-2} + d_{w-3}$ (Zagier's conjecture). The first
+few values are:
+\[
+  d_1 = 0,\quad d_2 = 1,\quad d_3 = 1,\quad d_4 = 1,\quad d_5 = 2,
+  \quad d_6 = 2, \quad d_7 = 3.
+\]
+
+% ============================================================
+\section{Bernoulli Numbers and Euler--Maclaurin}
+% ============================================================
+
+\subsection{Definition and recurrence}
+
+The Bernoulli numbers $B_n$ are defined by the generating function
+\[
+  \frac{t}{e^t - 1} = \sum_{n=0}^{\infty} B_n \frac{t^n}{n!}, \quad |t| < 2\pi.
+\]
+They satisfy the recurrence
+\[
+  \sum_{k=0}^{n} \binom{n+1}{k} B_k = 0, \quad n \geq 1,
+\]
+with $B_0 = 1$. One finds $B_1 = -1/2$, $B_{2k+1} = 0$ for $k \geq 1$, and
+
+\begin{table}[h]
+  \centering
+  \caption{Bernoulli numbers $B_{2k}$.}
+  \vspace{4pt}
+  \begin{tabular}{@{}crr@{}}
+    \toprule
+    $k$ & $B_{2k}$ & Decimal \\
+    \midrule
+    1 & $1/6$               & $0.16\overline{6}$ \\
+    2 & $-1/30$             & $-0.0\overline{3}$ \\
+    3 & $1/42$              & $0.0238\ldots$ \\
+    4 & $-1/30$             & $-0.0\overline{3}$ \\
+    5 & $5/66$              & $0.07575\ldots$ \\
+    6 & $-691/2730$         & $-0.25311\ldots$ \\
+    7 & $7/6$               & $1.1\overline{6}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Euler--Maclaurin summation formula}
+
+\begin{theorem}[Euler--Maclaurin]
+  For a smooth function $f$ on $[1, N]$,
+  \[
+    \sum_{n=1}^{N} f(n) = \int_1^N f(x)\,\mathrm{d}x
+    + \frac{f(1) + f(N)}{2}
+    + \sum_{k=1}^{p} \frac{B_{2k}}{(2k)!}\bigl(f^{(2k-1)}(N) - f^{(2k-1)}(1)\bigr)
+    + R_p,
+  \]
+  where $R_p$ is a remainder involving $f^{(2p+1)}$.
+\end{theorem}
+
+Applied to $f(x) = x^{-s}$, the Euler--Maclaurin formula yields the analytic
+continuation of $\zeta(s)$ and, for negative integers, the special values
+$\zeta(-n) = -B_{n+1}/(n+1)$.
+
+\subsection{Kummer's congruences}
+
+For a prime $p$ and $p \nmid k$, Kummer's congruences state
+\[
+  \frac{B_k}{k} \equiv \frac{B_{k'}}{k'} \pmod{p}
+\]
+whenever $k \equiv k' \pmod{(p-1)}$ and $p \nmid k$.
+These are the cornerstone of $p$-adic interpolation of zeta values.
+
+% ============================================================
+\section{$p$-adic Zeta Functions}
+% ============================================================
+
+\subsection{Motivation}
+
+The rational values $\zeta(1-n) = -B_n/n$ for positive integers $n$ (odd $n$,
+with appropriate sign conventions) satisfy Kummer's congruences, which suggests
+that $n \mapsto \zeta(1-n)$ can be continuously extended to $p$-adic integers.
+
+\subsection{Kubota--Leopoldt $p$-adic $L$-functions}
+
+\begin{theorem}[Kubota--Leopoldt, 1964]
+  For every prime $p$ and Dirichlet character $\chi$ with $\chi(-1) = (-1)^k$,
+  there exists a unique continuous $p$-adic function
+  \[
+    L_p(s, \chi): \mathbb{Z}_p \to \mathbb{C}_p
+  \]
+  such that, for all positive integers $k$ with $k \equiv 0 \pmod{p-1}$ (or
+  $k$ even in the case $\chi = \mathbf{1}$),
+  \[
+    L_p(1-k, \chi) = -\frac{B_{k,\chi}}{k} \cdot \left(1 - \chi(p) p^{k-1}\right),
+  \]
+  where $B_{k,\chi}$ is the generalised Bernoulli number.
+\end{theorem}
+
+\subsection{$p$-adic interpolation and Iwasawa theory}
+
+The Kubota--Leopoldt function is the central object of Iwasawa theory. In the
+cyclotomic $\mathbb{Z}_p$-extension $\mathbb{Q}_\infty$ of $\mathbb{Q}$, the
+projective limit of class groups yields a finitely generated $\Lambda$-module
+(where $\Lambda = \mathbb{Z}_p[[T]]$ is the Iwasawa algebra), whose characteristic
+polynomial is closely related to $L_p(s, \chi)$.
+
+The \emph{Main Conjecture of Iwasawa Theory} (proved by Mazur--Wiles in~1984 for
+$\mathbb{Q}$, using modular curves) asserts that the characteristic ideal of this
+module equals the ideal generated by the $p$-adic $L$-function.
+
+\subsection{Connection to odd zeta values}
+
+The $p$-adic zeta function interpolates the values $\zeta(1-k)$ for even positive
+$k$, not the odd values directly. The lack of a $p$-adic interpolation for odd
+positive integers is itself a manifestation of the arithmetic mystery surrounding
+$\zeta(2k+1)$.
+
+% ============================================================
+\section{Connections to Modular Forms}
+% ============================================================
+
+\subsection{Eisenstein series and $\zeta(2k)$}
+
+The Eisenstein series of weight $2k$ for $\mathrm{SL}_2(\mathbb{Z})$ is
+\[
+  G_{2k}(\tau) = \sum_{\substack{(m,n) \in \mathbb{Z}^2 \\ (m,n) \neq (0,0)}}
+  \frac{1}{(m\tau + n)^{2k}}, \quad k \geq 2, \quad \tau \in \mathbb{H}.
+\]
+Its Fourier expansion is
+\[
+  G_{2k}(\tau) = 2\zeta(2k) + \frac{2(2\pi i)^{2k}}{(2k-1)!}
+  \sum_{n=1}^{\infty} \sigma_{2k-1}(n)\, q^n, \quad q = e^{2\pi i \tau},
+\]
+where $\sigma_r(n) = \sum_{d|n} d^r$. This directly expresses $\zeta(2k)$ as the
+constant term of an Eisenstein series, explaining the appearance of $\pi^{2k}$.
+
+\subsection{Why odd values are different}
+
+There is no Eisenstein series of odd weight for $\mathrm{SL}_2(\mathbb{Z})$
+(since $\mathrm{SL}_2(\mathbb{Z})$ contains $-I$, which forces modular forms
+of odd weight to vanish). This is a deep structural reason why $\zeta(2k+1)$
+does not have a simple expression in terms of $\pi$.
+
+\subsection{The Ramanujan--Berndt formula for $\zeta(2k+1)$}
+
+Ramanujan (and later Berndt) proved the formula
+\[
+  \zeta(2k+1) = \frac{2^{2k} \pi^{2k+1}}{(2k+1)!}
+  \left[
+    - B_{2k+1} + 2 \sum_{n=1}^{\infty} \frac{\sigma_{2k+1}^*(n)}{e^{2\pi n} - 1}
+  \right]
+\]
+where $\sigma_r^*$ involves divisor sums and $B_{2k+1}$ are generalised Bernoulli
+numbers, but this formula requires the ``correction'' from Eisenstein-like series.
+It does \emph{not} reduce $\zeta(2k+1)$ to a rational multiple of $\pi^{2k+1}$,
+confirming the arithmetic difference.
+
+\subsection{Period integrals}
+
+In the language of motives, even zeta values $\zeta(2n)$ are \emph{periods of
+mixed Tate motives} that split over $\mathbb{Q}$, whereas odd zeta values are
+related to the \emph{motivic cohomology} of $\mathrm{Spec}(\mathbb{Z})$. This
+motivic perspective, developed by Beilinson, Deligne, and Goncharov, provides
+the deepest framework for understanding the arithmetic of zeta values.
+
+% ============================================================
+\section{Open Problems}
+% ============================================================
+
+\begin{conjecture}[Transcendence of $\zeta(3)$]
+  The constant $\zeta(3) = 1.2020569\ldots$ is transcendental.
+\end{conjecture}
+
+\begin{conjecture}[Irrationality of $\zeta(5)$]
+  The value $\zeta(5) = 1.0369277\ldots$ is irrational.
+\end{conjecture}
+
+\begin{conjecture}[Irrationality of all odd zeta values]
+  For every $k \geq 1$, the value $\zeta(2k+1)$ is irrational.
+\end{conjecture}
+
+\begin{conjecture}[$\zeta(2n+1)/\pi^{2n+1}$ irrational]
+  For every $k \geq 1$, the ratio $\zeta(2k+1)/\pi^{2k+1}$ is irrational (and
+  in fact not algebraic).
+\end{conjecture}
+
+\begin{conjecture}[Algebraic independence]
+  The numbers $\pi, \zeta(3), \zeta(5), \zeta(7), \ldots$ are algebraically
+  independent over $\mathbb{Q}$.
+\end{conjecture}
+
+\subsection*{Status summary}
+
+\begin{table}[h]
+  \centering
+  \caption{Open problems concerning odd zeta values (as of 2026).}
+  \vspace{4pt}
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    Claim & Status & Reference \\
+    \midrule
+    $\zeta(3)$ irrational & \textbf{PROVED} & Apéry (1979) \\
+    $\zeta(2k+1)$ irrational ($\infty$ many) & \textbf{PROVED} & Ball--Rivoal (2001) \\
+    At least one of $\zeta(5),\ldots,\zeta(11)$ irrational & \textbf{PROVED} & Zudilin (2004) \\
+    $\zeta(3)$ transcendental & OPEN conjecture & --- \\
+    $\zeta(5)$ irrational & OPEN conjecture & --- \\
+    All $\zeta(2k+1)$ irrational & OPEN conjecture & --- \\
+    $\zeta(2k+1)/\pi^{2k+1}$ irrational & OPEN conjecture & --- \\
+    Algebraic independence of $\pi, \zeta(3), \zeta(5), \ldots$ & OPEN conjecture & --- \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection*{Approaches and outlook}
+
+Substantial progress would likely require one or more of the following:
+\begin{enumerate}[leftmargin=2em]
+  \item A better understanding of the \emph{motivic Galois group} and its action
+        on periods.
+  \item New hypergeometric identities yielding smaller linear forms in $\zeta(5)$.
+  \item A $p$-adic interpolation of odd zeta values (which would require new
+        structures beyond Kubota--Leopoldt).
+  \item Effective versions of the Lindemann--Weierstrass theorem for polylogarithms.
+\end{enumerate}
+
+% ============================================================
+\section{References}
+% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Apery1979}
+R.~Apéry,
+\textit{Irrationalité de $\zeta(2)$ et $\zeta(3)$},
+Astérisque \textbf{61} (1979), 11--13.
+
+\bibitem{BallRivoal2001}
+R.~Ball and T.~Rivoal,
+\textit{Irrationalité d'une infinité de valeurs de la fonction zeta aux entiers impairs},
+Inventiones Mathematicae \textbf{146} (2001), 193--207.
+
+\bibitem{Beukers1979}
+F.~Beukers,
+\textit{A note on the irrationality of $\zeta(2)$ and $\zeta(3)$},
+Bulletin of the London Mathematical Society \textbf{11} (1979), 268--272.
+
+\bibitem{Euler1740}
+L.~Euler,
+\textit{De summis serierum reciprocarum},
+Commentarii Academiae Scientiarum Petropolitanae \textbf{7} (1740), 123--134.
+
+\bibitem{RhinViola2001}
+G.~Rhin and C.~Viola,
+\textit{The group structure for $\zeta(3)$},
+Acta Arithmetica \textbf{97} (2001), 269--293.
+
+\bibitem{Rivoal2000}
+T.~Rivoal,
+\textit{La fonction zêta de Riemann prend une infinité de valeurs irrationnelles
+aux entiers impairs},
+Comptes Rendus de l'Académie des Sciences (Paris), Série I \textbf{331} (2000),
+267--270.
+
+\bibitem{Zudilin2004}
+W.~Zudilin,
+\textit{Arithmetic of linear forms involving odd zeta values},
+Journal de Théorie des Nombres de Bordeaux \textbf{16} (2004), 251--291.
+
+\bibitem{vanderPoorten1979}
+A.~van der Poorten,
+\textit{A proof that Euler missed \ldots\ Apéry's proof of the irrationality of
+$\zeta(3)$},
+The Mathematical Intelligencer \textbf{1} (1979), 195--203.
+
+\bibitem{Zagier1994}
+D.~Zagier,
+\textit{Values of zeta functions and their applications},
+in: \textit{First European Congress of Mathematics}, Vol.~II,
+Birkhäuser, Basel, 1994, pp.~497--512.
+
+\bibitem{KubotaLeopoldt1964}
+T.~Kubota and H.~Leopoldt,
+\textit{Eine $p$-adische Theorie der Zetawerte I},
+Journal für die reine und angewandte Mathematik \textbf{214/215} (1964), 328--339.
+
+\end{thebibliography}
+
+\end{document}
