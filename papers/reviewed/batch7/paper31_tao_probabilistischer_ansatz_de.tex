@@ -257,6 +257,12 @@ mit $\nu$-Erwartungswert
 \[
   \int g\, d\nu = \log_2 3 - \mathbb{E}_\nu[E].
 \]
+\textbf{Unbewiesene Annahme:} Die Existenz eines $S$-invarianten ergodischen Maßes $\nu$
+auf $\mathbb{Z}_2^{\text{ungerade}}$ mit der Eigenschaft, dass $E(x) = \nu_2(3x+1)$ einer
+geometrischen Verteilung mit Parameter $1/2$ folgt, ist eine \emph{unbewiesene Annahme}
+des i.i.d.-Näherungsmodells. Ihre rigorose Konstruktion aus ersten Prinzipien ist ein
+offenes Problem; der Verweis auf \cite{Kontorovich2010} liefert eine heuristische
+Motivation, keinen Existenzbeweis mit der angegebenen Verteilungseigenschaft.
 Wird $\nu$ so gewählt, dass $E$ eine geometrische Verteilung mit Parameter $1/2$ besitzt
 (was im i.i.d.-Näherungsmodell gilt), so ist $\mathbb{E}_\nu[E] = 2$ und
 \[
@@ -265,7 +271,18 @@ Wird $\nu$ so gewählt, dass $E$ eine geometrische Verteilung mit Parameter $1/2
 für $\nu$-fast alle $x$ nach dem Birkhoff-Ergodensatz.
 \end{definition}
 
-\begin{theorem}[Ergodische Konvergenz von Syrakus-Bahnen]\label{thm:ergod_konv}
+\begin{remark}[Existenz von $\nu$ ist eine unbewiesene Annahme]\label{rem:nu_annahme}
+Wir betonen ausdrücklich, dass die Existenz eines $S$-invarianten ergodischen Maßes $\nu$
+auf $\mathbb{Z}_2^{\text{ungerade}}$ mit den angegebenen Eigenschaften --- insbesondere,
+dass $E(x)=\nu_2(3x+1)$ eine geometrische Verteilung mit Parameter $1/2$ besitzt ---
+eine \textbf{unbewiesene Annahme} des i.i.d.-Näherungsmodells ist. Ihre rigorose
+Konstruktion bleibt ein offenes Problem. Satz~\ref{thm:ergod_konv} unten gilt daher
+nur \emph{bedingt} unter dieser Annahme und stellt kein unbedingtes Ergebnis über die
+Collatz-Abbildung dar.
+\end{remark}
+
+\begin{theorem}[Ergodische Konvergenz von Syrakus-Bahnen (bedingt)]\label{thm:ergod_konv}
+\textbf{(Bedingt auf die Existenz von $\nu$, siehe Bemerkung~\ref{rem:nu_annahme}.)}
 Sei $\nu$ ein $S$-invariantes ergodisches Maß auf $\mathbb{Z}_2^{\text{ungerade}}$, unter
 dem $E(x) = \nu_2(3x+1)$ den Erwartungswert 2 besitzt (wie im i.i.d.-geometrisch$(1/2)$-Modell).
 Dann gilt für $\nu$-fast alle $x$:

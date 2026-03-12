@@ -1041,3 +1041,35 @@ aus der Literatur stammt (ohne eigene Quelle als Theorem-Aussage).
 
 **Behobene Datei:**
 - papers/batch11/paper42_kurepa_conjecture_en.tex: Corollary 2.1 → Remark
+
+## 2026-03-12 — Build 162: Mathematische Fehler in Paper 31 + Paper 33 behoben
+
+### Fehler 1: Paper 31 EN+DE — S-invariantes Maß ν nicht als unbewiesen deklariert
+**2026-03-12** — Behobene Dateien:
+- papers/reviewed/batch7/paper31_tao_probabilistic_collatz_en.tex
+- papers/reviewed/batch7/paper31_tao_probabilistischer_ansatz_de.tex
+
+**Problem:** Definition 5.1 suggerierte mit "If ν is chosen so that E has a geometric
+distribution with parameter 1/2" implizit, dass ein solches S-invariantes ergodisches
+Maß ν auf ℤ₂ existiert. Diese Existenz ist jedoch UNBEWIESEN.
+
+**Fix:** 
+1. In der Definition (EN+DE): Expliziter Hinweis eingefügt ("Unproven assumption" / 
+   "Unbewiesene Annahme"), dass die Existenz eines solchen ν eine offene Frage ist.
+2. Vor Theorem 5.2 (EN+DE): Neuer \begin{remark} eingefügt, der das Theorem ausdrücklich
+   als bedingt ("conditional") deklariert — gilt nur unter der unbewiesenen Annahme.
+3. Theorem-Titel ergänzt um "(conditional)" / "(bedingt)".
+
+### Fehler 2: Paper 33 EN — Selberg 1942 fälschlich als "first" bezeichnet
+**2026-03-12** — Behobene Datei:
+- papers/reviewed/batch8/paper33_riemann_hypothesis_analytic_en.tex
+
+**Problem:** "Selberg (1942) first showed that a positive proportion of zeros lie on the
+critical line" ist historisch falsch — Hardy (1914) hatte bereits bewiesen, dass unendlich
+viele Nullstellen auf der kritischen Linie liegen.
+
+**Fix:** Passage ersetzt durch korrekte chronologische Darstellung:
+- Hardy (1914): bewies UNENDLICH VIELE Nullstellen
+- Selberg (1942): verbesserte das auf eine positive PROPORTION aller Nullstellen
+- Levinson (1974): verbesserte auf mehr als 1/3
+(DE-Version paper33 war bereits korrekt formuliert — keine Änderung nötig.)

@@ -250,6 +250,12 @@ function with $\nu$-expectation
 \[
   \int g\, d\nu = \log_2 3 - \mathbb{E}_\nu[E].
 \]
+\textbf{Unproven assumption:} The existence of an $S$-invariant ergodic measure $\nu$
+on $\mathbb{Z}_2^{\text{odd}}$ with the property that $E(x) = \nu_2(3x+1)$ follows a
+geometric distribution with parameter $1/2$ is an \emph{unproven assumption} of the
+i.i.d.\ approximation model. Its rigorous construction from first principles remains an
+open problem; the reference to \cite{Kontorovich2010} provides a heuristic motivation,
+not a proof of existence with the stated distributional property.
 If $\nu$ is chosen so that $E$ has a geometric distribution with parameter $1/2$
 (which holds in the i.i.d.\ approximation), then $\mathbb{E}_\nu[E] = 2$ and
 \[
@@ -258,7 +264,17 @@ If $\nu$ is chosen so that $E$ has a geometric distribution with parameter $1/2$
 for $\nu$-almost every $x$ by the Birkhoff ergodic theorem.
 \end{definition}
 
-\begin{theorem}[Ergodic convergence of Syracuse orbits]\label{thm:ergodic_conv}
+\begin{remark}[Existence of $\nu$ is an unproven assumption]\label{rem:nu_assumption}
+We emphasise that the existence of an $S$-invariant ergodic measure $\nu$ on
+$\mathbb{Z}_2^{\text{odd}}$ with the stated properties --- in particular, that $E(x)=\nu_2(3x+1)$
+has a geometric distribution with parameter $1/2$ --- is an \textbf{unproven assumption}
+of the i.i.d.\ approximation model. Its rigorous construction remains open.
+Theorem~\ref{thm:ergodic_conv} below therefore holds \emph{conditionally} under this
+assumption and does not constitute an unconditional result about the Collatz map.
+\end{remark}
+
+\begin{theorem}[Ergodic convergence of Syracuse orbits (conditional)]\label{thm:ergodic_conv}
+\textbf{(Conditional on the existence of $\nu$, see Remark~\ref{rem:nu_assumption}.)}
 Let $\nu$ be an $S$-invariant ergodic measure on $\mathbb{Z}_2^{\text{odd}}$ under which
 $E(x) = \nu_2(3x+1)$ has expectation $2$ (as in the i.i.d.\ geometric$(1/2)$ model).
 Then for $\nu$-almost every $x$:
