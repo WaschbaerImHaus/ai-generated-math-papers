@@ -1433,3 +1433,21 @@ Paper 87 – Bateman-Horn:
 - avg Rang-Heuristik: 0.2305 (unter Goldfeld 0.5, da naive Methode)
 - Bateman-Horn-Eulerprodukt über 500 Primzahlen: 𝔖(x²+1) ≈ 1.3704
 
+
+2026-03-12 [Build 172] Batch 20 Gruppe B – Tiefenanalyse Papers 76–79
+  - Erstellt: src/py/gruppe_b_batch20_verification.py
+    * Jones-Polynom für 19 Primknoten bis 9 Kreuzungen (alle V≠1 verifiziert)
+    * Kauffman-Klammer für 3_1, 4_1, 5_1
+    * Amphichiralität 4_1 numerisch bestätigt
+    * Mandelbrot: externe Strahlen und Feigenbaum-Kaskade analysiert
+    * Conway-Knoten: alle Concordance-Invarianten tabellarisch
+    * Piccirillo-Beweis (2020) implementiert/kommentiert
+    * Whitehead D(2)-Problem: bekannte gelöste Fälle dokumentiert
+    * Volumen-Vermutung: numerische Evidenz für 4_1
+  - Erstellt: reviews/research_batch20_gruppe_b_2026_03_12.md
+    * MLC: OFFEN (Feigenbaum-Punkt als Haupthindernis)
+    * Conway GLATT: WIDERLEGT (Piccirillo)
+    * Conway TOPOL: OFFEN
+    * Whitehead: OFFEN (seit 1941, äquiv. zu D(2))
+    * Jones-Unknoten: OFFEN (kein Gegenbeispiel ≤9x)
+    * Volumen-Vermutung: OFFEN
