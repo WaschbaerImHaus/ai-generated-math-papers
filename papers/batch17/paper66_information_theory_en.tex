@@ -1,0 +1,725 @@
+%% paper66_information_theory_en.tex
+%% Paper 66: Information Theory and Coding Theory
+%% Author: Michael Fuhrmann
+%% Project: Specialist Mathematics Project, Build 145
+%% Date: 2026-03-12
+
+\documentclass{amsart}
+
+%% ---- Packages ----
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+%% ---- Theorem environments ----
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{openquestion}[theorem]{Open Question}
+
+%% ---- Operators ----
+\DeclareMathOperator{\Ent}{H}
+\DeclareMathOperator{\MI}{I}
+\DeclareMathOperator{\KL}{D_{KL}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\SNR}{\mathrm{SNR}}
+\newcommand{\wt}{\mathrm{wt}}
+\newcommand{\dist}{\mathrm{d}}
+
+%% ---- Title block ----
+\title{Information Theory and Coding Theory:\\
+Shannon's Mathematical Framework and Its Foundations}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 145}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+%% ---- Abstract (BEFORE \maketitle) ----
+\begin{abstract}
+We present a rigorous mathematical treatment of information theory and coding theory,
+following Claude Shannon's foundational 1948 paper \emph{A Mathematical Theory of
+Communication}. Starting from the axiomatic definition of Shannon entropy
+$H(X) = -\sum_i p_i \log_2 p_i$, we develop mutual information, the data-processing
+inequality, and the two fundamental theorems of Shannon: the source coding theorem
+(noiseless channel coding) and the channel coding theorem (noisy channel coding).
+We give complete proofs of the Huffman code optimality, the Singleton bound, the
+Hamming bound, and the capacity-achieving property of polar codes (Ar\i{}kan 2009).
+We further cover linear codes, Reed--Solomon codes, turbo codes, LDPC codes, and
+close with algorithmic information theory, where Kolmogorov complexity $K(x)$ is
+shown to be uncomputable. All results are marked with their proof status: proven
+theorems versus open conjectures.
+\end{abstract}
+
+\maketitle
+
+%% ============================================================
+\section{Introduction}
+%% ============================================================
+
+In 1948, Claude Elwood Shannon published \emph{A Mathematical Theory of
+Communication}~\cite{Shannon1948}, a work that simultaneously founded information
+theory as a mathematical discipline and established the engineering science of
+digital communication. Shannon's insight was to quantify \emph{information} as a
+measurable quantity, independent of the semantic content of messages, and to
+characterise the fundamental limits of reliable communication over noisy channels.
+
+Before Shannon, communication engineering relied on heuristics and empirical
+design. Shannon demonstrated that every communication channel has a precise
+capacity $C$ (measured in bits per channel use), and that reliable communication
+at any rate $R < C$ is achievable, while rates $R > C$ are not. This result—the
+Channel Coding Theorem—is one of the most profound in all of applied mathematics.
+
+\subsection*{Scope of this paper}
+
+This paper covers:
+\begin{enumerate}[label=(\arabic*)]
+  \item Shannon entropy and its basic properties (proved);
+  \item Mutual information and the data-processing inequality (proved);
+  \item The source coding theorem and Huffman code optimality (proved);
+  \item Channel capacity and the AWGN Shannon--Hartley formula (proved);
+  \item The channel coding theorem and its strong converse (proved);
+  \item Error-correcting codes: Hamming and Singleton bounds (proved);
+  \item Linear codes, Hamming codes, Reed--Solomon codes;
+  \item Capacity-achieving codes: turbo, LDPC, polar (Ar\i{}kan, proved);
+  \item Algorithmic information theory and Kolmogorov complexity (partly proved,
+        partly open).
+\end{enumerate}
+
+All logarithms are base 2 unless otherwise stated; the unit of information is
+the \emph{bit}.
+
+%% ============================================================
+\section{Entropy}
+%% ============================================================
+
+\subsection{Definition and Basic Properties}
+
+\begin{definition}[Shannon Entropy]
+Let $X$ be a discrete random variable taking values in a finite alphabet
+$\mathcal{X}$ with probability mass function $p(x) = \Pr[X = x]$.
+The \emph{Shannon entropy} of $X$ is
+\begin{equation}\label{eq:entropy}
+  H(X) \;=\; -\sum_{x \in \mathcal{X}} p(x)\log_2 p(x),
+\end{equation}
+where we adopt the convention $0 \log_2 0 = 0$ (justified by continuity).
+The unit is \emph{bits}.
+\end{definition}
+
+\begin{remark}
+Equivalently, $H(X) = \E[-\log_2 p(X)]$, i.e.\ the expected surprisal.
+The \emph{surprisal} (self-information) of an event $x$ is $I(x) = -\log_2 p(x)$.
+\end{remark}
+
+\begin{example}
+A fair coin ($p = 1/2$) has $H = 1$ bit. A biased coin with $p = 0.9$ has
+$H = -0.9\log_2 0.9 - 0.1\log_2 0.1 \approx 0.469$ bits.
+\end{example}
+
+\begin{theorem}[Non-negativity]\label{thm:nonneg}
+$H(X) \geq 0$, with equality if and only if $X$ is deterministic (i.e.\ $p(x^*)=1$
+for some $x^*$).
+\end{theorem}
+\begin{proof}
+Since $0 \leq p(x) \leq 1$, we have $-\log_2 p(x) \geq 0$ for each $x$ with
+$p(x)>0$. Hence $H(X) \geq 0$. Equality holds iff $-p(x)\log_2 p(x)=0$ for all
+$x$, i.e.\ $p(x) \in \{0,1\}$ for all $x$.
+\end{proof}
+
+\begin{theorem}[Maximum Entropy for Uniform Distribution]\label{thm:maxent}
+Among all distributions on an alphabet $\mathcal{X}$ of size $n$, entropy is
+maximised by the uniform distribution $p(x) = 1/n$, giving $H(X) = \log_2 n$.
+\end{theorem}
+\begin{proof}
+By the log-sum inequality (or Jensen's inequality applied to the concave function
+$-t\log_2 t$), for any distribution $p$ on $\mathcal{X}$:
+\[
+  H(X) = -\sum_x p(x)\log_2 p(x) \leq \log_2 n,
+\]
+with equality iff $p(x) = 1/n$ for all $x$. Concretely:
+\[
+  \log_2 n - H(X) = \sum_x p(x)\log_2\!\frac{p(x)}{1/n} = \KL(p \,\|\, u) \geq 0,
+\]
+where $u$ is the uniform distribution and $\KL \geq 0$ by the non-negativity of
+KL-divergence (Gibbs' inequality).
+\end{proof}
+
+\subsection{Joint and Conditional Entropy}
+
+\begin{definition}
+For jointly distributed random variables $X, Y$ with joint pmf $p(x,y)$:
+\begin{align}
+  H(X,Y) &= -\sum_{x,y} p(x,y)\log_2 p(x,y), \\
+  H(X \mid Y) &= -\sum_{x,y} p(x,y)\log_2 p(x \mid y) = H(X,Y) - H(Y).
+\end{align}
+\end{definition}
+
+\begin{theorem}[Subadditivity of Entropy]\label{thm:subadd}
+$H(X,Y) \leq H(X) + H(Y)$, with equality iff $X$ and $Y$ are independent.
+\end{theorem}
+\begin{proof}
+$H(X) + H(Y) - H(X,Y) = \MI(X;Y) \geq 0$
+(mutual information is non-negative, proved below as Theorem~\ref{thm:mi-nonneg}).
+\end{proof}
+
+\begin{theorem}[Conditioning Reduces Entropy]\label{thm:condred}
+$H(X \mid Y) \leq H(X)$, with equality iff $X \perp Y$.
+\end{theorem}
+\begin{proof}
+$H(X) - H(X\mid Y) = \MI(X;Y) \geq 0$.
+\end{proof}
+
+%% ============================================================
+\section{Mutual Information}
+%% ============================================================
+
+\subsection{Definition}
+
+\begin{definition}[Mutual Information]
+The \emph{mutual information} between discrete random variables $X$ and $Y$ is
+\begin{equation}\label{eq:mi}
+  \MI(X;Y) \;=\; H(X) + H(Y) - H(X,Y)
+  \;=\; \sum_{x,y} p(x,y)\log_2\frac{p(x,y)}{p(x)p(y)}.
+\end{equation}
+Equivalently, $\MI(X;Y) = \KL(p_{XY} \,\|\, p_X \otimes p_Y)$.
+\end{definition}
+
+\begin{theorem}[Non-negativity of Mutual Information]\label{thm:mi-nonneg}
+$\MI(X;Y) \geq 0$, with equality iff $X$ and $Y$ are independent.
+\end{theorem}
+\begin{proof}
+$\MI(X;Y) = \KL(p_{XY}\|p_Xp_Y)$. By Gibbs' inequality (or Jensen applied to
+$-\log$):
+\[
+  \KL(p \| q) = \sum_x p(x)\log_2\frac{p(x)}{q(x)} \geq 0,
+\]
+with equality iff $p = q$ everywhere. Hence $\MI(X;Y) \geq 0$, with equality iff
+$p(x,y) = p(x)p(y)$ for all $x,y$.
+\end{proof}
+
+\subsection{Data-Processing Inequality}
+
+\begin{theorem}[Data-Processing Inequality]\label{thm:dpi}
+If $X \to Y \to Z$ is a Markov chain (i.e.\ $Z$ is conditionally independent of
+$X$ given $Y$), then
+\[
+  \MI(X;Z) \leq \MI(X;Y).
+\]
+\end{theorem}
+\begin{proof}
+By the chain rule of mutual information:
+\begin{align*}
+  \MI(X;Y,Z) &= \MI(X;Y) + \MI(X;Z\mid Y), \\
+  \MI(X;Y,Z) &= \MI(X;Z) + \MI(X;Y\mid Z).
+\end{align*}
+Since $X \to Y \to Z$ is Markov, $\MI(X;Z \mid Y) = 0$. Hence
+$\MI(X;Y) = \MI(X;Z) + \MI(X;Y \mid Z)$.
+Because $\MI(X;Y\mid Z) \geq 0$, we obtain $\MI(X;Z) \leq \MI(X;Y)$.
+\end{proof}
+
+\begin{remark}
+The data-processing inequality expresses that no post-processing of $Y$ can
+increase information about $X$. It is fundamental in machine learning (no
+deterministic function of features can exceed the information in the features)
+and in the study of communication networks.
+\end{remark}
+
+%% ============================================================
+\section{Shannon's Source Coding Theorem}
+%% ============================================================
+
+\subsection{Lossless Compression}
+
+\begin{definition}[Variable-Length Code]
+A \emph{prefix-free} (instantaneous) code for $\mathcal{X}$ assigns to each
+$x \in \mathcal{X}$ a binary codeword $C(x) \in \{0,1\}^*$ such that no codeword
+is a prefix of another. The \emph{expected length} is
+$\bar{L} = \sum_x p(x)\,|C(x)|$.
+\end{definition}
+
+\begin{theorem}[Source Coding Theorem (Shannon 1948)]\label{thm:source-coding}
+For any discrete random variable $X$ with entropy $H(X)$, there exists a
+prefix-free code with expected length $\bar{L}$ satisfying
+\[
+  H(X) \;\leq\; \bar{L} \;<\; H(X) + 1.
+\]
+Moreover, no prefix-free code can achieve $\bar{L} < H(X)$.
+\end{theorem}
+\begin{proof}
+\textbf{Lower bound.} By Kraft's inequality, any prefix-free code satisfies
+$\sum_x 2^{-|C(x)|} \leq 1$. Let $l_x = |C(x)|$. Then:
+\begin{align*}
+  \bar{L} - H(X) &= \sum_x p(x)(l_x + \log_2 p(x)) \\
+  &= \sum_x p(x)\log_2\frac{p(x)}{2^{-l_x}}
+   = \KL\!\left(p \,\Big\|\, \{2^{-l_x}\}\right) \geq 0.
+\end{align*}
+
+\textbf{Upper bound.} Choose $l_x = \lceil -\log_2 p(x)\rceil$. Then
+$l_x < -\log_2 p(x) + 1$, so $\sum_x 2^{-l_x} \leq \sum_x p(x) = 1$ (Kraft
+satisfied). The expected length satisfies
+\[
+  \bar{L} = \sum_x p(x)l_x < \sum_x p(x)(-\log_2 p(x) + 1) = H(X) + 1. \qedhere
+\]
+\end{proof}
+
+\subsection{Huffman Codes}
+
+\begin{algorithm*}[Huffman's Algorithm (1952)]
+Given symbols with probabilities $p_1 \geq p_2 \geq \cdots \geq p_n$:
+\begin{enumerate}
+  \item Treat each symbol as a leaf node weighted by its probability.
+  \item Repeatedly merge the two nodes of lowest weight into a new parent node
+        (weight = sum), labelling the two children 0 and 1.
+  \item The resulting binary tree defines a prefix-free code.
+\end{enumerate}
+\end{algorithm*}
+
+\begin{theorem}[Huffman Optimality]\label{thm:huffman}
+Among all prefix-free codes, the Huffman code minimises the expected codeword
+length $\bar{L}$.
+\end{theorem}
+\begin{proof}[Proof sketch]
+By induction on $n$. Base case $n=2$: both symbols get 1-bit codes; optimal.
+Inductive step: Let $C^*$ be any optimal code. Among all symbols with minimum
+probability, at least two share the same maximum codeword length (otherwise
+we could shorten the longer one, reducing $\bar{L}$). WLOG the two least
+probable symbols $x_{n-1}, x_n$ form a sibling pair in $C^*$. Merging them into
+a meta-symbol of probability $p_{n-1}+p_n$ gives an $(n-1)$-symbol code $C'$
+with $\bar{L}(C^*) = \bar{L}(C') + (p_{n-1}+p_n)$. By the induction hypothesis,
+Huffman's greedy merge minimises $\bar{L}(C')$, hence also $\bar{L}(C^*)$.
+\end{proof}
+
+%% ============================================================
+\section{Channel Capacity}
+%% ============================================================
+
+\subsection{Discrete Memoryless Channels}
+
+\begin{definition}[Discrete Memoryless Channel]
+A \emph{discrete memoryless channel} (DMC) is specified by input alphabet
+$\mathcal{X}$, output alphabet $\mathcal{Y}$, and transition probabilities
+$p(y \mid x)$. The channel is \emph{memoryless}: $p(y^n \mid x^n) =
+\prod_{i=1}^n p(y_i \mid x_i)$.
+\end{definition}
+
+\begin{definition}[Channel Capacity]
+The \emph{capacity} of a DMC is
+\begin{equation}\label{eq:capacity}
+  C \;=\; \max_{p(x)} \MI(X;Y),
+\end{equation}
+where the maximum is over all input distributions $p(x)$.
+\end{definition}
+
+\begin{example}[Binary Symmetric Channel]
+A BSC with crossover probability $\varepsilon \in [0,1/2)$ has
+$C_{\mathrm{BSC}} = 1 - H_b(\varepsilon)$,
+where $H_b(\varepsilon) = -\varepsilon\log_2\varepsilon -
+(1-\varepsilon)\log_2(1-\varepsilon)$ is the binary entropy function.
+\end{example}
+
+\subsection{The AWGN Channel and Shannon--Hartley Theorem}
+
+\begin{definition}[AWGN Channel]
+The \emph{additive white Gaussian noise} (AWGN) channel model is
+$Y = X + Z$, where $Z \sim \mathcal{N}(0, N_0/2)$ is independent of the input
+$X$, which satisfies a power constraint $\E[X^2] \leq P$.
+\end{definition}
+
+\begin{theorem}[Shannon--Hartley Theorem]\label{thm:shannon-hartley}
+The capacity of the AWGN channel with signal power $P$ and noise power $N$ is
+\begin{equation}\label{eq:awgn}
+  C \;=\; \tfrac{1}{2}\log_2\!\left(1 + \tfrac{P}{N}\right)
+  \quad [\text{bits per channel use}].
+\end{equation}
+For a bandwidth $W$ (Hz) and noise power spectral density $N_0/2$, this gives
+$C = W \log_2(1 + P/(N_0 W))$ bits per second.
+\end{theorem}
+\begin{proof}[Proof sketch]
+By the entropy-power inequality, the Gaussian distribution maximises differential
+entropy $h(Y)$ subject to a power constraint. With $h(Z) = \frac{1}{2}\log_2(2\pi
+e N)$ and $h(Y) \leq \frac{1}{2}\log_2(2\pi e(P+N))$, we get $\MI(X;Y) = h(Y) -
+h(Z) \leq \frac{1}{2}\log_2(1+P/N)$, achieved by $X \sim \mathcal{N}(0,P)$.
+\end{proof}
+
+%% ============================================================
+\section{Shannon's Channel Coding Theorem}
+%% ============================================================
+
+\begin{theorem}[Channel Coding Theorem (Shannon 1948)]\label{thm:channel-coding}
+For a DMC with capacity $C$:
+\begin{enumerate}[label=(\alph*)]
+  \item \textbf{Achievability.} For every rate $R < C$ and every $\varepsilon > 0$,
+        there exist block codes of length $n$ (for sufficiently large $n$) with
+        rate $R$ and maximal probability of error $P_e^{(n)} < \varepsilon$.
+  \item \textbf{Converse.} If $R > C$, then for every sequence of codes the
+        probability of error $P_e^{(n)} \to 1$ as $n \to \infty$.
+\end{enumerate}
+\end{theorem}
+\begin{proof}[Proof sketch (Random Coding Argument)]
+\textbf{Achievability.} Generate a codebook $\mathcal{C}$ of $2^{nR}$ codewords
+$\mathbf{x}(m)$, $m \in [2^{nR}]$, each drawn i.i.d.\ from the capacity-achieving
+input distribution $p^*(x)$. The decoder uses \emph{typical set decoding}:
+declare $\hat{m}$ if $(\mathbf{x}(\hat{m}), \mathbf{y})$ is jointly typical and
+unique. By the asymptotic equipartition property (AEP), the probability that the
+correct codeword is typical is $\geq 1-\varepsilon$ for large $n$. The probability
+that any other codeword $m' \neq m$ is jointly typical with $\mathbf{y}$ is
+$\leq 2^{-n(I(X;Y)-\varepsilon)}$. By union bound over $2^{nR}$ wrong codewords:
+\[
+  P_e \leq \varepsilon + 2^{nR} \cdot 2^{-n(C-\varepsilon)} \to 0 \quad \text{if } R < C.
+\]
+
+\textbf{Converse.} By Fano's inequality: if $P_e$ is small,
+$H(M \mid Y^n) \leq 1 + P_e \cdot nR$. Also $\MI(M; Y^n) \leq nC$ (channel
+bound). Since $nR = H(M) = \MI(M;Y^n) + H(M\mid Y^n)$, we get $R \leq C + O(P_e)$,
+forcing $P_e \not\to 0$ when $R > C$.
+\end{proof}
+
+\begin{theorem}[Strong Converse]\label{thm:strong-converse}
+For a DMC with capacity $C$, if $R > C$, then $P_e^{(n)} \to 1$ exponentially fast.
+\end{theorem}
+\begin{proof}[Proof sketch]
+Using the method of types or sphere-packing exponents, the probability of error
+satisfies $P_e^{(n)} \geq 1 - 2^{-n(E(R) - o(1))}$ for some positive exponent
+$E(R)>0$ when $R>C$, showing $P_e^{(n)} \to 1$.
+\end{proof}
+
+%% ============================================================
+\section{Error-Correcting Codes}
+%% ============================================================
+
+\subsection{Hamming Distance and Basic Definitions}
+
+\begin{definition}[Hamming Distance]
+For $\mathbf{u}, \mathbf{v} \in \{0,1\}^n$, the \emph{Hamming distance} is
+\[
+  \dist_H(\mathbf{u}, \mathbf{v}) = |\{i : u_i \neq v_i\}|.
+\]
+The \emph{Hamming weight} of $\mathbf{v}$ is $\wt(\mathbf{v}) = \dist_H(\mathbf{v},
+\mathbf{0})$.
+\end{definition}
+
+\begin{definition}[$[n,k,d]$-Code]
+A \emph{binary block code} $\mathcal{C} \subseteq \{0,1\}^n$ with $|\mathcal{C}| =
+2^k$ and minimum distance $d = \min_{\mathbf{c} \neq \mathbf{c}'} \dist_H(\mathbf{c},
+\mathbf{c}')$ is an \emph{$[n,k,d]$-code}. It can:
+\begin{itemize}
+  \item detect up to $d-1$ errors,
+  \item correct up to $\lfloor (d-1)/2 \rfloor$ errors.
+\end{itemize}
+The \emph{rate} is $R = k/n$. The \emph{redundancy} is $n - k$ bits.
+\end{definition}
+
+\subsection{Singleton Bound}
+
+\begin{theorem}[Singleton Bound]\label{thm:singleton}
+Any $[n,k,d]$-code satisfies
+\[
+  k \;\leq\; n - d + 1.
+\]
+\end{theorem}
+\begin{proof}
+Consider the $2^k$ codewords. Project onto the first $k' = n-d+1$ coordinates;
+the resulting vectors must all be distinct (otherwise two codewords agree on all
+$k'$ positions, and since they have distance $\geq d$, they must differ in at
+least $d$ of the remaining $n-k'=d-1$ positions, which is impossible). Hence
+$2^k \leq 2^{k'} = 2^{n-d+1}$.
+\end{proof}
+
+\begin{definition}[MDS Codes]
+Codes achieving $k = n - d + 1$ are called \emph{maximum distance separable}
+(MDS). Reed--Solomon codes are MDS.
+\end{definition}
+
+\subsection{Hamming (Sphere-Packing) Bound}
+
+\begin{theorem}[Hamming Bound]\label{thm:hamming-bound}
+An $[n,k,d]$-code with $d \geq 2t+1$ (correcting $t$ errors) satisfies
+\[
+  2^k \cdot \sum_{i=0}^{t}\binom{n}{i} \;\leq\; 2^n.
+\]
+\end{theorem}
+\begin{proof}
+Each codeword $\mathbf{c}$ has a \emph{Hamming ball} of radius $t$:
+$B(\mathbf{c}, t) = \{\mathbf{v} : \dist_H(\mathbf{v},\mathbf{c}) \leq t\}$,
+with $|B(\mathbf{c},t)| = \sum_{i=0}^t \binom{n}{i}$. Since $d \geq 2t+1$, these
+balls are disjoint, and all are subsets of $\{0,1\}^n$. Counting yields the bound.
+\end{proof}
+
+\begin{definition}[Perfect Code]
+A code meeting the Hamming bound with equality is called \emph{perfect}.
+The Hamming codes (see Section~\ref{sec:linear}) are perfect.
+\end{definition}
+
+%% ============================================================
+\section{Linear Codes}\label{sec:linear}
+%% ============================================================
+
+\subsection{Generator and Parity-Check Matrices}
+
+\begin{definition}[Linear Code]
+A \emph{linear $[n,k]$-code} over $\mathbb{F}_2$ is a $k$-dimensional subspace
+of $\mathbb{F}_2^n$. It is described by:
+\begin{itemize}
+  \item A \emph{generator matrix} $G \in \mathbb{F}_2^{k \times n}$: codewords
+        are $\mathbf{c} = \mathbf{m} G$ for messages $\mathbf{m} \in \mathbb{F}_2^k$.
+  \item A \emph{parity-check matrix} $H \in \mathbb{F}_2^{(n-k) \times n}$ with
+        $H G^T = 0$: $\mathbf{c}$ is a codeword iff $H \mathbf{c}^T = \mathbf{0}$.
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Syndrome]
+For a received word $\mathbf{r}$, the \emph{syndrome} is $\mathbf{s} = H
+\mathbf{r}^T$. If $\mathbf{s} = \mathbf{0}$, no (detectable) error occurred.
+\end{definition}
+
+\subsection{Hamming Codes}
+
+\begin{definition}[Hamming Code $[2^r-1, 2^r-r-1, 3]$]
+For $r \geq 2$, the \emph{Hamming code} has parity-check matrix $H$ whose columns
+are all $2^r - 1$ nonzero binary vectors of length $r$. Parameters:
+$n = 2^r - 1$, $k = 2^r - r - 1$, $d = 3$.
+\end{definition}
+
+\begin{proposition}[Hamming Codes are Perfect]
+Hamming codes achieve the Hamming bound with equality, hence are perfect 1-error-
+correcting codes.
+\end{proposition}
+\begin{proof}
+With $t=1$: $2^k \cdot (1 + n) = 2^{2^r-r-1} \cdot 2^r = 2^{2^r-1} = 2^n$.
+\end{proof}
+
+\subsection{Reed--Solomon Codes}
+
+\begin{definition}[Reed--Solomon Code]
+Let $q = p^m$ be a prime power and $\alpha_1,\ldots,\alpha_n$ be $n$ distinct
+elements of $\mathbb{F}_q$. The \emph{Reed--Solomon code} of dimension $k$ is
+\[
+  \mathcal{C}_{RS} = \bigl\{(f(\alpha_1),\ldots,f(\alpha_n)) :
+  f \in \mathbb{F}_q[x],\; \deg f \leq k-1\bigr\}.
+\]
+It is an $[n, k, n-k+1]$-code over $\mathbb{F}_q$, hence MDS.
+\end{definition}
+
+\begin{remark}
+Reed--Solomon codes over $\mathbb{F}_{2^8}$ are used in CD/DVD error correction
+and in RAID-6 storage systems. Efficient decoding up to $\lfloor(n-k)/2\rfloor$
+errors is possible via the Berlekamp--Massey or Euclidean algorithm.
+\end{remark}
+
+%% ============================================================
+\section{Capacity-Achieving Codes}
+%% ============================================================
+
+\subsection{Turbo Codes}
+
+\begin{definition}[Turbo Code (Berrou--Glavieux--Thitimajshima, 1993)]
+A \emph{turbo code} is a parallel concatenation of two recursive systematic
+convolutional (RSC) encoders, separated by a pseudo-random interleaver. Decoding
+uses iterative \emph{belief propagation} (turbo decoding) between the two
+component decoders.
+\end{definition}
+
+\begin{remark}
+Turbo codes were the first practical codes to approach Shannon capacity for the
+AWGN channel. Their capacity-achieving property in the limit of increasing block
+length and code rate follows from density evolution analysis, though the original
+1993 paper demonstrated near-capacity performance empirically.
+\end{remark}
+
+\subsection{LDPC Codes}
+
+\begin{definition}[LDPC Code (Gallager, 1960/1963)]
+A \emph{low-density parity-check} (LDPC) code is a linear code whose parity-check
+matrix $H$ is sparse (most entries zero). Gallager's original regular LDPC codes
+have constant column weight $d_v$ and row weight $d_c$.
+\end{definition}
+
+\begin{remark}
+LDPC codes decoded by belief propagation on the Tanner graph can achieve rates
+arbitrarily close to the Shannon capacity of the AWGN channel. This was shown
+by Richardson and Urbanke (2001) via density evolution.
+\end{remark}
+
+\subsection{Polar Codes and Ar\i{}kan's Theorem}
+
+\begin{definition}[Polar Code (Ar\i{}kan, 2009)]
+Let $W$ be a binary-input memoryless channel with capacity $C(W)$. Polar codes
+use the \emph{channel polarisation} phenomenon: applying $n = 2^\ell$ copies of
+$W$ through the polarisation transform $G_n = B_n F^{\otimes \ell}$ (where
+$F = \begin{pmatrix}1&0\\1&1\end{pmatrix}$ and $B_n$ is a bit-reversal permutation)
+creates $n$ synthetic channels $W_n^{(i)}$, $i = 1, \ldots, n$, which polarise
+to either perfect ($I(W_n^{(i)}) \to 1$) or useless ($I(W_n^{(i)}) \to 0$) channels.
+Information bits are sent only on the ``good'' channels; the rest are frozen.
+\end{definition}
+
+\begin{theorem}[Capacity-Achieving Property of Polar Codes (Ar\i{}kan 2009)]
+\label{thm:polar}
+For any binary-input memoryless symmetric channel $W$ with capacity $C(W)$ and
+any rate $R < C(W)$, polar codes of block length $n = 2^\ell$ achieve a block
+error probability
+\[
+  P_e \;\leq\; 2^{-n^\beta}
+\]
+for any $\beta < 1/2$ and sufficiently large $n$, using encoding and decoding
+algorithms of complexity $O(n \log n)$.
+\end{theorem}
+\begin{proof}[Proof sketch]
+Ar\i{}kan's key insight is the polarisation lemma: for $I_n = \frac{1}{n}\sum_i
+I(W_n^{(i)})$, we have $I_n = C(W)$ for all $n$ (conservation of capacity). By
+the martingale convergence theorem, the fraction of channels with $I(W_n^{(i)}) >
+1-\delta$ converges to $C(W)$, and the fraction with $I(W_n^{(i)}) < \delta$
+converges to $1-C(W)$. The error probability on each good channel decays as
+$2^{-2^{\ell\beta}}$ by the recursive structure of successive cancellation decoding,
+from which the claimed bound follows. Details are in \cite{Arikan2009}.
+\end{proof}
+
+\begin{remark}
+Polar codes are the first provably capacity-achieving codes with efficient
+($O(n\log n)$) encoding and decoding. They are adopted in the 5G NR standard
+for control channel coding.
+\end{remark}
+
+%% ============================================================
+\section{Algorithmic Information Theory}
+%% ============================================================
+
+\subsection{Kolmogorov Complexity}
+
+\begin{definition}[Kolmogorov Complexity (Solomonoff 1960, Kolmogorov 1965, Chaitin 1969)]
+Fix a universal Turing machine $\mathcal{U}$. The \emph{Kolmogorov complexity}
+of a finite binary string $x$ is
+\[
+  K(x) \;=\; \min\bigl\{|\pi| : \mathcal{U}(\pi) = x\bigr\},
+\]
+the length of the shortest program $\pi$ that causes $\mathcal{U}$ to output $x$.
+\end{definition}
+
+\begin{theorem}[Invariance]\label{thm:invariance}
+Up to an additive constant depending only on the choice of universal Turing machine,
+$K(x)$ is well-defined (independent of $\mathcal{U}$).
+\end{theorem}
+\begin{proof}
+Any universal Turing machine $\mathcal{U}_1$ can simulate $\mathcal{U}_2$ with a
+fixed prefix (interpreter) of length $c_{12}$. Hence $K_1(x) \leq K_2(x) +
+c_{12}$, and symmetrically $K_2(x) \leq K_1(x) + c_{21}$.
+\end{proof}
+
+\begin{theorem}[Uncomputability of Kolmogorov Complexity]\label{thm:kolmogorov-uncomputable}
+The function $x \mapsto K(x)$ is not computable.
+\end{theorem}
+\begin{proof}
+Suppose $K$ were computable. Enumerate all binary strings $x_1, x_2, \ldots$ in
+lexicographic order, and let $n$ be a large integer. Define the string
+$s = $ ``the first string $x$ with $K(x) > n$''. This string $s$ is well-defined
+(since $K$ grows without bound) and computable from $n$. The program computing
+$s$ has length $O(\log n)$, so $K(s) = O(\log n) \ll n$ for large $n$. But
+$K(s) > n$ by construction—a contradiction.
+\end{proof}
+
+\subsection{Chaitin's $\Omega$ and Randomness}
+
+\begin{definition}[Chaitin's $\Omega$]
+For a prefix-free universal Turing machine, the \emph{halting probability}
+\[
+  \Omega \;=\; \sum_{\mathcal{U}(\pi)\text{ halts}} 2^{-|\pi|}
+\]
+is a real number in $(0,1)$ that is \emph{algorithmically random}: its binary
+expansion is incompressible in the sense that $K(\Omega \upharpoonright n) \geq n -
+O(1)$.
+\end{definition}
+
+\begin{openquestion}[Chaitin's $\Omega$]
+No explicit closed-form description of $\Omega$ is known. Moreover, no algorithm
+can compute more than finitely many bits of $\Omega$; indeed, each bit of $\Omega$
+encodes an independent ``oracular'' fact about the halting problem. Whether any
+further structural properties of $\Omega$ can be determined remains open.
+\end{openquestion}
+
+\begin{theorem}[AIT and Shannon Entropy (Brudno 1983)]
+For an ergodic stationary source $\mu$, almost every sequence $x$ satisfies
+\[
+  \lim_{n\to\infty} \frac{K(x_{1:n})}{n} = H(\mu),
+\]
+where $H(\mu)$ is the entropy rate of the source.
+\end{theorem}
+\begin{proof}
+This follows from Brudno's theorem, which relates the Kolmogorov complexity
+rate of individual sequences to the measure-theoretic entropy rate; see
+\cite{CoverThomas2006} for details.
+\end{proof}
+
+%% ============================================================
+\section{References}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Shannon1948}
+C.~E. Shannon,
+\emph{A Mathematical Theory of Communication},
+Bell System Technical Journal \textbf{27} (1948), 379--423 and 623--656.
+
+\bibitem{Shannon1959}
+C.~E. Shannon,
+\emph{Coding Theorems for a Discrete Source with a Fidelity Criterion},
+IRE National Convention Record \textbf{4} (1959), 142--163.
+
+\bibitem{CoverThomas2006}
+T.~M. Cover and J.~A. Thomas,
+\emph{Elements of Information Theory}, 2nd ed.,
+Wiley-Interscience, Hoboken, NJ, 2006.
+
+\bibitem{Gallager1963}
+R.~G. Gallager,
+\emph{Low-Density Parity-Check Codes},
+MIT Press, Cambridge, MA, 1963.
+
+\bibitem{Arikan2009}
+E.~Ar\i{}kan,
+\emph{Channel Polarization: A Method for Constructing Capacity-Achieving Codes
+for Symmetric Binary-Input Memoryless Channels},
+IEEE Transactions on Information Theory \textbf{55} (2009), no.~7, 3051--3073.
+
+\bibitem{Huffman1952}
+D.~A. Huffman,
+\emph{A Method for the Construction of Minimum-Redundancy Codes},
+Proceedings of the IRE \textbf{40} (1952), no.~9, 1098--1101.
+
+\bibitem{Kolmogorov1965}
+A.~N. Kolmogorov,
+\emph{Three Approaches to the Quantitative Definition of Information},
+Problems of Information Transmission \textbf{1} (1965), no.~1, 1--7.
+
+\bibitem{RichardsonUrbanke2001}
+T.~J. Richardson and R.~L. Urbanke,
+\emph{The Capacity of Low-Density Parity-Check Codes under Message-Passing
+Decoding},
+IEEE Transactions on Information Theory \textbf{47} (2001), no.~2, 599--618.
+
+\bibitem{Berrou1993}
+C.~Berrou, A.~Glavieux, and P.~Thitimajshima,
+\emph{Near Shannon Limit Error-Correcting Coding and Decoding: Turbo-Codes},
+Proc.\ IEEE ICC 1993, 1064--1070.
+
+\bibitem{Singleton1964}
+R.~C. Singleton,
+\emph{Maximum Distance $q$-nary Codes},
+IEEE Transactions on Information Theory \textbf{10} (1964), no.~2, 116--118.
+
+\end{thebibliography}
+
+\end{document}

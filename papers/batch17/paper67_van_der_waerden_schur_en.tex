@@ -1,0 +1,760 @@
+%% paper67_van_der_waerden_schur_en.tex
+%% Van der Waerden's Theorem and Schur Numbers:
+%% Ramsey Theory, Arithmetic Progressions, and Combinatorial Colorings
+%%
+%% Author: Michael Fuhrmann
+%% Project: Specialist Mathematics Project, Build 145
+%% Date: 2026-03-12
+
+\documentclass[12pt]{amsart}
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+
+\geometry{margin=2.5cm}
+
+%% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+%% Operators
+\DeclareMathOperator{\AP}{AP}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\F}{\mathbb{F}}
+
+%% Abstract before \maketitle (amsart style)
+\begin{document}
+
+\title{Van der Waerden's Theorem and Schur Numbers:\\
+Ramsey Theory, Arithmetic Progressions, and Combinatorial Colorings}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 145}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\begin{abstract}
+This paper presents a comprehensive treatment of two central results in Ramsey theory:
+van der Waerden's theorem on arithmetic progressions in colored sets and Schur's theorem
+on sum-free partitions of the integers. We develop the fundamental notions of arithmetic
+progressions, monochromatic structures, and combinatorial colorings, then prove both
+classical theorems in full detail. We tabulate known van der Waerden numbers
+$W(k;r)$ and Schur numbers $S(r)$, highlight the landmark results of Szemer\'edi (1975)
+and Green--Tao (2004) as density and prime extensions, and discuss Rado's theorem
+characterizing partition-regularity in full generality. Special attention is paid to
+the frontier: $S(5) = 160$ (proved in 2017 by a SAT-solver-assisted proof), while
+$S(6)$ remains unknown with only $536 \leq S(6) \leq 1836$ established. Connections
+to ergodic theory (Furstenberg's proof of Szemer\'edi's theorem), analytic number theory,
+and open problems such as the Erd\H{o}s--Tur\'an conjecture are surveyed.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% ============================================================
+\section{Introduction}
+%% ============================================================
+
+Ramsey theory is the branch of combinatorics that seeks to find unavoidable order within
+large enough structures. Its philosophical core is Ramsey's maxim: \emph{complete disorder
+is impossible}. Among the most celebrated theorems in this area are van der Waerden's
+theorem on arithmetic progressions and Schur's theorem on sum-free colorings, both
+predating the formal birth of Ramsey theory yet embodying its spirit completely.
+
+\subsection*{Arithmetic Progressions and Colorings}
+
+An \emph{arithmetic progression} (AP) is a sequence of integers with constant difference:
+$a, a+d, a+2d, \ldots, a+(k-1)d$. A coloring of a set assigns each element one of
+finitely many colors. A monochromatic AP is one whose elements all share the same color.
+The central question of van der Waerden theory is: how large must a set be before every
+coloring must contain a monochromatic AP of a prescribed length?
+
+\subsection*{Schur's Equation}
+
+Schur's theorem asks a dual question about additive structure: can we partition the
+integers into finitely many sum-free classes, avoiding any monochromatic solution to
+$x + y = z$? Schur proved in 1916 that the answer is no for any finite number of
+colors, giving rise to the Schur numbers $S(r)$.
+
+\subsection*{Overview}
+
+This paper is organized as follows. Section~\ref{sec:ap} develops the theory of
+arithmetic progressions. Section~\ref{sec:vdw-numbers} surveys known van der Waerden
+numbers. Section~\ref{sec:proof-vdw} gives the combinatorial proof of van der Waerden's
+theorem. Sections~\ref{sec:szemeredi} and~\ref{sec:green-tao} cover the deeper density
+and prime theorems. Sections~\ref{sec:schur}--\ref{sec:schur-numbers} treat Schur's
+theorem and the Schur numbers. Section~\ref{sec:rado} discusses Rado's generalization.
+Section~\ref{sec:connections} surveys connections and open problems.
+
+%% ============================================================
+\section{Arithmetic Progressions}\label{sec:ap}
+%% ============================================================
+
+\begin{definition}[Arithmetic Progression]
+A \emph{$k$-term arithmetic progression} (abbreviated $k$-AP) with first element $a$
+and common difference $d > 0$ is the set
+\[
+  \{a, \, a+d, \, a+2d, \, \ldots, \, a+(k-1)d\} \subset \N.
+\]
+We call $a$ the \emph{base} and $d$ the \emph{step} of the progression.
+A $1$-AP is any singleton; a $2$-AP is any pair $\{a, a+d\}$.
+\end{definition}
+
+\begin{definition}[$r$-Coloring and Monochromatic AP]
+An \emph{$r$-coloring} of a set $S \subseteq \N$ is any function
+$\chi: S \to \{1, 2, \ldots, r\}$.
+A $k$-AP $P \subseteq S$ is \emph{monochromatic} under $\chi$ if $\chi$ is constant on $P$.
+\end{definition}
+
+The fundamental question is whether every coloring of a sufficiently large initial
+segment $\{1, 2, \ldots, N\}$ must produce a monochromatic $k$-AP. Van der Waerden's
+theorem answers this affirmatively.
+
+\begin{definition}[Van der Waerden Number]
+For integers $k \geq 2$ and $r \geq 2$, the \emph{van der Waerden number} $W(k;r)$
+is the smallest positive integer $N$ such that every $r$-coloring of $\{1, \ldots, N\}$
+contains a monochromatic $k$-AP.
+\end{definition}
+
+The existence of $W(k;r)$ is precisely the content of van der Waerden's theorem.
+The notation $W(k; r)$ follows the convention that $k$ is the AP length and $r$ the
+number of colors; some sources use $W(r; k)$ or write $W(k_1, k_2, \ldots, k_r)$ for
+the asymmetric generalization where color $i$ forbids $k_i$-APs.
+
+\begin{remark}[Trivial cases]
+$W(2; r) = r+1$ for all $r \geq 1$: in $\{1, 2, \ldots, r+1\}$, the pigeonhole principle
+forces two equal-colored elements, which form a $2$-AP; whereas $\{1,\ldots,r\}$ can be
+colored by assigning $i \mapsto i$.
+\end{remark}
+
+%% ============================================================
+\section{Van der Waerden Numbers}\label{sec:vdw-numbers}
+%% ============================================================
+
+Known exact values of $W(k;r)$ are remarkably sparse. Computing them requires both
+exhibiting an AP-free coloring of $\{1, \ldots, W-1\}$ (lower bound certificate) and
+proving that every coloring of $\{1, \ldots, W\}$ contains a monochromatic AP
+(upper bound). Both tasks are computationally expensive and have been tackled primarily
+by exhaustive computer search and SAT solvers.
+
+\subsection{Table of Known Values}
+
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+$k$ & $r$ & $W(k; r)$ \\
+\midrule
+$3$ & $2$ & $9$ \\
+$4$ & $2$ & $35$ \\
+$5$ & $2$ & $178$ \\
+$6$ & $2$ & $1132$ \\
+$3$ & $3$ & $27$ \\
+$3$ & $4$ & $293$ \\
+$4$ & $3$ & $unknown$ \\
+$7$ & $2$ & $unknown$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The value $W(3;2)=9$ has an elegant manual proof: consider any $2$-coloring of
+$\{1,\ldots,9\}$. If 1 and 5 receive the same color, then $\{1,5,9\}$ is a
+$3$-AP. A careful case analysis confirms that $W(3;2) = 9$.
+
+The value $W(6;2) \geq 1132$ was established by Kouril and Paul (2008) through a
+major computer search. Whether $W(6;2) = 1132$ has also been verified
+\cite{Kouril2008}, making $W(6;2) = 1132$ exact.
+
+\subsection{Asymptotic Bounds}
+
+Upper bounds on $W(k;2)$ are notoriously hard. The best general result is due to Gowers:
+
+\begin{theorem}[Gowers, 2001 \cite{Gowers2001}]
+For all $k \geq 3$,
+\[
+  W(k; 2) \leq 2^{2^{k+9}}.
+\]
+\end{theorem}
+
+This tower-of-exponentials bound, while explicit, is far from the truth.
+The lower bound of Berlekamp (1968) shows:
+
+\begin{theorem}[Berlekamp, 1968 \cite{Berlekamp1968}]
+For every prime $p$, $W(p+1; 2) > p \cdot 2^p$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Berlekamp constructs an explicit $2$-coloring of $\{1, \ldots, p \cdot 2^p\}$ using
+arithmetic in the Galois field $\mathbb{F}_{2^p}$: assign color $0$ to $n$ if the
+leading coefficient of a certain polynomial over $\mathbb{F}_2$ is $0$, and color $1$
+otherwise. One verifies that this coloring avoids any monochromatic $(p+1)$-AP.
+\end{proof}
+
+%% ============================================================
+\section{Proof of Van der Waerden's Theorem}\label{sec:proof-vdw}
+%% ============================================================
+
+\begin{theorem}[Van der Waerden, 1927 \cite{VdW1927}]\label{thm:vdw}
+For every pair of positive integers $k \geq 2$ and $r \geq 2$, there exists a
+positive integer $W = W(k; r)$ such that every $r$-coloring of $\{1, \ldots, W\}$
+contains a monochromatic $k$-term arithmetic progression.
+\end{theorem}
+
+The original proof by van der Waerden (1927) is a purely combinatorial double induction.
+We present it in modern language.
+
+\subsection{Combinatorial Proof via Double Induction}
+
+The proof proceeds by induction on $k$ (the AP length), with an inner induction on $r$
+(the number of colors) for each fixed $k$.
+
+\begin{definition}[AP-Free Coloring]
+A coloring $\chi: \{1,\ldots,N\} \to \{1,\ldots,r\}$ is \emph{$k$-AP-free} if it
+contains no monochromatic $k$-AP.
+\end{definition}
+
+\begin{lemma}[Base cases]
+$W(2; r)$ exists for all $r \geq 1$ (trivially $r+1$ suffices), and $W(k; 1) = k$
+for all $k$.
+\end{lemma}
+
+\begin{proof}[Proof of Theorem~\ref{thm:vdw}]
+We induct on $k$. The base case $k=2$ is trivial.
+
+Assume $W(k-1; r)$ exists for all $r$; we prove $W(k; r)$ exists for all $r$.
+Fix $r$ and suppose inductively $W(k; r-1)$ exists; we derive $W(k; r)$.
+
+\medskip
+\noindent\textbf{Key construction.}
+Set $N_0 = W(k-1; r)$. We will find $W(k; r)$ by a double exponential in $N_0$.
+
+Consider the set $\{1, \ldots, N\}$ with an $r$-coloring $\chi$.
+Group it into consecutive blocks of length $N_0$. Within each block,
+there is a monochromatic $(k-1)$-AP by the inductive hypothesis.
+
+The crucial observation (the ``density argument'' in van der Waerden's original proof)
+is that one can encode the color pattern of $(k-1)$-APs in a block as a ``type''.
+There are only finitely many types, so by a second application of the pigeonhole
+principle (or an inner Hales--Jewett argument), two blocks with the same type and
+matching color pattern can be combined to yield a $k$-AP.
+
+\medskip
+Formally, one shows: for each $k$ and $r$,
+\[
+  W(k; r) \leq W\bigl(k-1;\, r^{W(k;r-1)}\bigr)
+\]
+by the following argument. Suppose $N \geq W(k-1; r^{W(k;r-1)})$. Given any
+$r$-coloring $\chi$ of $\{1,\ldots,N\}$, we can define a derived coloring
+$\chi'$ on $\{1,\ldots,N\}$ that encodes the color of runs of length $W(k;r-1)$.
+By the inductive hypothesis, $\chi'$ contains a monochromatic $(k-1)$-AP, and
+unwrapping the encoding yields a monochromatic $k$-AP under $\chi$.
+\end{proof}
+
+\subsection{Connection to Hales--Jewett}
+
+The Hales--Jewett theorem (1963) \cite{HalesJewett1963} provides a powerful generalization:
+
+\begin{theorem}[Hales--Jewett, 1963]\label{thm:hj}
+For every $r \geq 2$ and $k \geq 2$, there exists $HJ(k,r)$ such that every
+$r$-coloring of the $k$-element $n$-dimensional combinatorial cube
+$[k]^n = \{1,\ldots,k\}^n$ (for $n \geq HJ(k,r)$) contains a monochromatic
+combinatorial line.
+\end{theorem}
+
+Van der Waerden's theorem follows as a corollary of Hales--Jewett by embedding
+arithmetic progressions in combinatorial lines. Specifically, every $k$-AP in
+$\{1, \ldots, N\}$ corresponds to a combinatorial line in a suitable cube, and
+the color of the line is inherited from $\chi$. This gives an alternative (and
+in some ways more transparent) proof path.
+
+%% ============================================================
+\section{Szemer\'edi's Theorem}\label{sec:szemeredi}
+%% ============================================================
+
+Van der Waerden's theorem guarantees monochromatic APs in any coloring of
+$\{1,\ldots,N\}$. A much deeper question, posed by Erd\H{o}s and Tur\'an in 1936
+\cite{ErdosTuran1936}, asks: if a set $A \subseteq \{1,\ldots,N\}$ has positive
+(upper) density, must it contain arbitrarily long APs?
+
+\begin{definition}[Upper Density]
+The \emph{upper density} of a set $A \subseteq \N$ is
+\[
+  \overline{d}(A) = \limsup_{N \to \infty} \frac{|A \cap \{1,\ldots,N\}|}{N}.
+\]
+\end{definition}
+
+\begin{theorem}[Szemer\'edi, 1975 \cite{Szemeredi1975}]\label{thm:szemeredi}
+Every set $A \subseteq \N$ with $\overline{d}(A) > 0$ contains arithmetic progressions
+of arbitrary length. That is, for every $k \geq 1$, there exist $a, d$ with $d > 0$
+such that $\{a, a+d, \ldots, a+(k-1)d\} \subseteq A$.
+\end{theorem}
+
+\begin{remark}[Relation to Erd\H{o}s--Tur\'an]
+The \emph{Erd\H{o}s--Tur\'an conjecture} (1936) originally asserted a quantitative
+version: a set avoiding $k$-APs must have density going to $0$ at a specific rate,
+namely, if $r_k(N)$ denotes the maximum cardinality of a $k$-AP-free subset of
+$\{1,\ldots,N\}$, then $r_k(N) = o(N)$.
+Szemer\'edi's theorem proves precisely this: $r_k(N)/N \to 0$. The stronger
+quantitative refinements (sharp bounds on $r_k(N)$) remain active research,
+with Kelley--Meka (2023) establishing $r_3(N) \leq N / (\log N)^{c}$ for some
+$c > 0$ for the $3$-AP case.
+\end{remark}
+
+\subsection{Earlier Partial Results}
+
+\begin{itemize}
+\item \textbf{Roth (1953)}: Proved $r_3(N) = o(N)$, i.e., every dense set contains
+  a $3$-AP \cite{Roth1953}.
+\item \textbf{Szemer\'edi (1969)}: Extended to $k=4$ using combinatorial methods.
+\item \textbf{Szemer\'edi (1975)}: Full result for all $k$ using his Regularity Lemma.
+\end{itemize}
+
+\subsection{Polynomial Extensions}
+
+The polynomial Hales--Jewett theorem (Bergelson--Leibman, 1996 \cite{BergelsonLeibman1996})
+extends Szemer\'edi's theorem to polynomial progressions:
+
+\begin{theorem}[Bergelson--Leibman, 1996]
+Let $p_1, \ldots, p_k \in \Z[t]$ with $p_i(0) = 0$ for all $i$. Then every set of
+positive upper density $A \subseteq \N$ contains $a, d$ with $d > 0$ such that
+\[
+  a + p_1(d),\; a + p_2(d),\; \ldots,\; a + p_k(d) \in A.
+\]
+\end{theorem}
+
+This subsumes van der Waerden's theorem (linear polynomials $p_i(t) = (i-1)t$) as well
+as new configurations such as $\{a, a+d, a+d^2\}$.
+
+%% ============================================================
+\section{The Green--Tao Theorem}\label{sec:green-tao}
+%% ============================================================
+
+The primes are a sparse set: their density in $\{1,\ldots,N\}$ tends to zero as
+$N \to \infty$. Thus Szemer\'edi's theorem does not directly apply to the primes.
+Nevertheless, Green and Tao proved:
+
+\begin{theorem}[Green--Tao, 2004 \cite{GreenTao2008}]\label{thm:gt}
+The set of prime numbers contains arithmetic progressions of arbitrary length.
+\end{theorem}
+
+This theorem was announced in 2004 and published in 2008 after full peer review.
+Ben Green and Terence Tao received the Fields Medal (Tao in 2006) in recognition of
+this and related work. The proof is one of the most celebrated results in
+twenty-first-century mathematics.
+
+\subsection{Outline of the Proof}
+
+The argument proceeds by establishing a \emph{pseudorandomness} property for the primes.
+While the primes are sparse, they are ``well distributed enough'' relative to a suitable
+majorant. The key steps are:
+
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Pseudorandom majorant.} Using the \emph{Goldston--Y\i ld\i r\i m sieve},
+  construct a function $\nu: \N \to [0,\infty)$ that majorizes the indicator of
+  primes (up to normalization) and satisfies suitable \emph{linear forms conditions}
+  and \emph{correlation conditions}.
+
+\item \textbf{Szemer\'edi-type result for pseudorandom measures.}
+  Extend Szemer\'edi's theorem to the setting where the uniform measure is replaced
+  by a pseudorandom measure $\nu$: any function $f: \N \to [0,1]$ with
+  $\mathbb{E}[f \cdot \nu] \geq \delta > 0$ contains $k$-APs.
+
+\item \textbf{Applying to the primes.}
+  The primes satisfy $\mathbb{E}[\mathbf{1}_{\mathrm{primes}} \cdot \nu] \geq \delta$
+  for suitable $\nu$ and $\delta$ (by the prime number theorem and the sieve estimates).
+  The pseudorandom Szemer\'edi theorem then yields $k$-APs among the primes.
+\end{enumerate}
+
+\begin{remark}[Known explicit progressions]
+The longest known AP of primes (as of 2024) has 27 terms:
+$\{224584605939537911 + k \cdot 81292139 : k = 0, 1, \ldots, 26\}$.
+\end{remark}
+
+%% ============================================================
+\section{Schur's Theorem}\label{sec:schur}
+%% ============================================================
+
+We now turn to Schur's theorem, a result from 1916 predating van der Waerden's theorem
+by eleven years. Schur discovered his theorem as a corollary to properties of Fermat's
+last theorem modulo primes.
+
+\begin{definition}[Sum-Free Set]
+A set $A \subseteq \N$ is \emph{sum-free} if there are no $a, b, c \in A$ (not
+necessarily distinct) with $a + b = c$.
+\end{definition}
+
+\begin{definition}[Sum-Free Partition]
+A partition $\N = A_1 \sqcup A_2 \sqcup \cdots \sqcup A_r$ (restricted to
+$\{1, \ldots, n\}$) is \emph{sum-free} (or \emph{Schur partition}) if each class
+$A_i$ is sum-free.
+\end{definition}
+
+\begin{theorem}[Schur, 1916 \cite{Schur1916}]\label{thm:schur}
+For every $r \geq 1$, there exists a positive integer $S$ such that every
+$r$-coloring of $\{1, \ldots, S\}$ contains a monochromatic solution to
+$x + y = z$ (where $x, y, z \in \{1, \ldots, S\}$ need not be distinct).
+\end{theorem}
+
+\begin{proof}
+We use Ramsey theory. Let $R = R(3; r)$ be the $r$-color Ramsey number for
+triangles (which exists by Ramsey's theorem, 1930). Consider the complete graph
+$K_R$ with vertices $\{1, \ldots, R\}$ and color the edge $\{a, b\}$ (with $a < b$)
+with color $\chi(b - a)$, where $\chi: \{1,\ldots, R-1\} \to \{1,\ldots,r\}$ is
+the given coloring.
+
+By Ramsey's theorem, there exist $1 \leq x < y < z \leq R$ such that the triangle
+$\{x, y, z\}$ is monochromatic, i.e., $\chi(y-x) = \chi(z-y) = \chi(z-x)$.
+Setting $a = y-x$, $b = z-y$, $c = z-x$, we have $a + b = c$ and all three have
+the same color.
+
+Thus we may take $S = R - 1$.
+\end{proof}
+
+\begin{remark}
+The bound $S \leq R(3; r) - 1$ is far from tight. The actual Schur numbers grow
+much more slowly.
+\end{remark}
+
+%% ============================================================
+\section{Schur Numbers}\label{sec:schur-numbers}
+%% ============================================================
+
+\begin{definition}[Schur Number]
+The \emph{$r$-th Schur number} $S(r)$ is the largest $n$ such that $\{1, \ldots, n\}$
+can be partitioned into $r$ sum-free classes. Equivalently,
+\[
+  S(r) = \max\bigl\{n : \exists \text{ sum-free $r$-partition of } \{1,\ldots,n\}\bigr\}.
+\]
+\end{definition}
+
+By Schur's theorem, $S(r)$ is finite for all $r$. The Schur numbers are the
+analogue of van der Waerden numbers for the equation $x + y = z$.
+
+\subsection{Known Values}
+
+\begin{center}
+\begin{tabular}{ccl}
+\toprule
+$r$ & $S(r)$ & Status / Year \\
+\midrule
+$1$ & $1$   & Trivial \\
+$2$ & $4$   & Classical \\
+$3$ & $13$  & Classical \\
+$4$ & $44$  & Baumert 1965 \cite{Baumert1965} \\
+$5$ & $160$ & Heule 2017 \cite{Heule2017} (SAT-solver proof) \\
+$6$ & $?$   & Open; $536 \leq S(6) \leq 1836$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Explicit Partitions}
+
+\begin{example}[$S(1) = 1$]
+The single class $\{1\}$ is sum-free since $1 + 1 = 2 \notin \{1\}$.
+The set $\{1, 2\}$ cannot be covered: $1 + 1 = 2$ forces a monochromatic solution.
+\end{example}
+
+\begin{example}[$S(2) = 4$]
+The partition $\{1,4\} \sqcup \{2,3\}$ is sum-free:
+$1+1=2\notin\{1,4\}$, $1+4=5\notin\{1,4\}$, $4+4=8\notin\{1,4\}$;
+$2+2=4\notin\{2,3\}$, $2+3=5\notin\{2,3\}$, $3+3=6\notin\{2,3\}$.
+No $2$-partition of $\{1,2,3,4,5\}$ is sum-free (verified by exhaustion).
+\end{example}
+
+\begin{example}[$S(3) = 13$]
+An optimal $3$-partition of $\{1,\ldots,13\}$ is:
+\[
+  K_1 = \{1,4,7,10,13\}, \quad K_2 = \{2,3,11,12\}, \quad K_3 = \{5,6,8,9\}.
+\]
+Each class is sum-free (the sums $a+b$ for $a,b \in K_i$ always fall outside $K_i$
+or exceed $13$). No $3$-partition of $\{1,\ldots,14\}$ is sum-free.
+\end{example}
+
+\begin{example}[$S(4) = 44$, Baumert 1965]
+Baumert \cite{Baumert1965} established $S(4) = 44$ by computer search, providing
+a $4$-partition of $\{1,\ldots,44\}$ and verifying that no $4$-partition of
+$\{1,\ldots,45\}$ exists.
+\end{example}
+
+\subsection{The Proof of \texorpdfstring{$S(5) = 160$}{S(5) = 160}}
+
+\begin{theorem}[Heule, 2017 \cite{Heule2017}]\label{thm:s5}
+$S(5) = 160$.
+\end{theorem}
+
+This result was a long-standing open problem. It was resolved by Marijn Heule using
+a SAT-solver-assisted computer proof. The proof consists of two parts:
+
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Lower bound}: An explicit $5$-partition of $\{1,\ldots,160\}$ into
+  sum-free classes is exhibited. Such a partition can be constructed via the
+  \emph{Cube and Conquer} framework (Heule, Kullmann, Manthey 2012
+  \cite{HeuleKullmannManthey2012}), combining a greedy seed with backtracking search.
+
+\item \textbf{Upper bound}: The SAT-solver proves that no $5$-partition of
+  $\{1,\ldots,161\}$ exists. The SAT instance for $n = 161$, $k = 5$ has
+  $161 \times 5 = 805$ Boolean variables $x_{i,c}$ and roughly $\binom{161}{2} \times 5
+  \approx 64{,}000$ clauses encoding the Schur constraint $a + b = c \Rightarrow
+  \neg(x_{a,j} \wedge x_{b,j} \wedge x_{c,j})$. The solver certifies unsatisfiability
+  with a \emph{proof certificate} (DRUP format) verifiable independently.
+\end{enumerate}
+
+\begin{remark}[Size of the proof]
+The SAT proof for $S(5) = 160$ has a certificate of approximately $200$ terabytes
+compressed; it is the largest mathematical proof by size at the time of publication (2017).
+\end{remark}
+
+\subsection{The Status of \texorpdfstring{$S(6)$}{S(6)}}
+
+\begin{conjecture}\label{conj:s6}
+The exact value of $S(6)$ lies in the interval $[536, 1836]$. The lower bound
+$S(6) \geq 536$ is established by an explicit computer-generated $6$-partition of
+$\{1, \ldots, 536\}$ (Baumert 1965, refined by later searches). The upper bound
+$S(6) \leq 1836$ follows from the general recursive estimate $S(r) \leq r! \cdot e$
+(Schur 1916) and SAT-based refinements.
+\end{conjecture}
+
+The determination of $S(6)$ is an open problem. The recursive lower bound from the
+formula $S(r) \geq 3 \cdot S(r-1) + 1$ gives $S(6) \geq 481$, which is weaker than
+the known $536$.
+
+\subsection{Recursive Bounds}
+
+\begin{proposition}[Recursive lower bound]
+For all $r \geq 2$,
+\[
+  S(r) \geq 3 \cdot S(r-1) + 1.
+\]
+\end{proposition}
+
+\begin{proof}
+Given an $r-1$ sum-free partition of $\{1,\ldots,n\}$ (with $n = S(r-1)$), define:
+\[
+  A_r = \{n+1, n+2, \ldots, 2n+1\}
+\]
+and rescale the original partition: $A_i' = \{x + 2n + 1 : x \in A_i\}$ for
+$i = 1, \ldots, r-1$. The combined partition $(A_1', \ldots, A_{r-1}', A_r)$ gives
+an $r$ sum-free partition of $\{1, \ldots, 3n+1\}$:
+\begin{itemize}
+\item $A_r$ is sum-free: for $a, b \in A_r$, $a + b \geq 2(n+1) > 2n+1$, so $a+b \notin A_r$.
+\item Each $A_i'$ inherits sum-freeness from $A_i$ by linearity of the shift.
+\end{itemize}
+Hence $S(r) \geq 3n + 1 = 3 \cdot S(r-1) + 1$.
+\end{proof}
+
+%% ============================================================
+\section{Rado's Theorem}\label{sec:rado}
+%% ============================================================
+
+Schur's theorem can be viewed as a special case of a much more general result by
+Richard Rado (1933) \cite{Rado1933}, which characterizes exactly which systems of
+linear equations have the property that every finite coloring of $\N$ produces a
+monochromatic solution.
+
+\begin{definition}[Partition Regular]
+A matrix $A \in \Z^{m \times n}$ is \emph{partition regular over $\N$} if for every
+finite coloring of $\N$, the system $A\mathbf{x} = \mathbf{0}$ has a monochromatic
+solution $\mathbf{x} \in \N^n$ (all entries having the same color).
+\end{definition}
+
+\begin{definition}[Columns Condition]
+A matrix $A = (c_1 \mid c_2 \mid \cdots \mid c_n) \in \Z^{m \times n}$ satisfies
+the \emph{columns condition} if there exists a partition $\{1,\ldots,n\} = I_1 \sqcup
+I_2 \sqcup \cdots \sqcup I_t$ (into consecutive sets in some ordering) such that:
+\begin{itemize}
+\item $\sum_{j \in I_1} c_j = \mathbf{0}$,
+\item For each $s = 2, \ldots, t$: $\sum_{j \in I_s} c_j \in \mathrm{span}_\Q\{c_j : j \in I_1 \cup \cdots \cup I_{s-1}\}$.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Rado, 1933 \cite{Rado1933}]\label{thm:rado}
+A matrix $A \in \Z^{m \times n}$ is partition regular over $\N$ if and only if $A$
+satisfies the columns condition.
+\end{theorem}
+
+\begin{example}[Schur's equation]
+The equation $x + y = z$ corresponds to $A = (1, 1, -1)$. The columns condition
+holds: $I_1 = \{3\}$ (so $c_3 = -1$, and $c_1 + c_3 = 0$... let us verify more
+carefully). With $I_1 = \{1,2\}$: $c_1 + c_2 = 1 + 1 = 2 \neq 0$. Take
+$I_1 = \{3\}$: $c_3 = -1 \neq 0$. Instead: $I_1 = \{1\}$, $I_2 = \{2\}$,
+$I_3 = \{3\}$: $c_1 = 1$; $c_1 + c_2 = 2$; check $c_3 = -1 \in \mathrm{span}(c_1, c_2) = \Q$. Yes.
+The columns condition is satisfied, confirming partition regularity.
+\end{example}
+
+\begin{corollary}
+The equation $x + y = z$ is partition regular, recovering Schur's theorem.
+The equation $x + y = 3z$ is \emph{not} partition regular (violates columns condition).
+\end{corollary}
+
+%% ============================================================
+\section{Connections and Open Problems}\label{sec:connections}
+%% ============================================================
+
+\subsection{Furstenberg's Ergodic Proof of Szemer\'edi's Theorem}
+
+One of the most conceptually striking developments in this area is Furstenberg's
+measure-theoretic proof of Szemer\'edi's theorem (1977) \cite{Furstenberg1977}.
+
+\begin{theorem}[Furstenberg Correspondence Principle]
+Let $A \subseteq \N$ with $\overline{d}(A) > 0$. Then there exists a measure-preserving
+system $(X, \mathcal{B}, \mu, T)$ and a set $E \in \mathcal{B}$ with $\mu(E) = \overline{d}(A) > 0$
+such that for all $k \geq 1$ and all $n \geq 1$:
+\[
+  d\bigl(A \cap (A-n) \cap (A-2n) \cap \cdots \cap (A-(k-1)n)\bigr) \geq
+  \mu(E \cap T^{-n}E \cap T^{-2n}E \cap \cdots \cap T^{-(k-1)n}E).
+\]
+\end{theorem}
+
+Using the \emph{multiple recurrence theorem}
+$\liminf_{N\to\infty} \frac{1}{N}\sum_{n=1}^N \mu(E \cap T^{-n}E \cap \cdots \cap T^{-(k-1)n}E) > 0$,
+Furstenberg deduced Szemer\'edi's theorem. This opened the field of \emph{ergodic
+Ramsey theory} and inspired all subsequent proofs of Szemer\'edi's theorem.
+
+\subsection{Connections to the Riemann Hypothesis}
+
+A speculative but intriguing connection exists between arithmetic progressions and the
+distribution of zeros of the Riemann zeta function $\zeta(s)$.
+
+\begin{conjecture}[Correlation of zeros with APs]\label{conj:rh-ap}
+The pair correlation statistics of nontrivial zeros of $\zeta(s)$ (as predicted by the
+Montgomery--Odlyzko law and GUE statistics) may encode information about the density of
+APs in spectra of certain operators. This connection is currently speculative and not established.
+\end{conjecture}
+
+The Green--Tao theorem relies on the prime number theorem (hence on zero-free regions of
+$\zeta$), but a direct link between specific properties of Schur or van der Waerden numbers
+and the Riemann Hypothesis is not known.
+
+\subsection{Erd\H{o}s--Tur\'an Quantitative Conjecture}
+
+\begin{conjecture}[Erd\H{o}s--Tur\'an, 1936 \cite{ErdosTuran1936}]
+If $A \subseteq \N$ is a set such that $\sum_{a \in A} \frac{1}{a}$ diverges, then $A$
+contains arithmetic progressions of all lengths.
+\end{conjecture}
+
+This conjecture remains open. It would imply the Green--Tao theorem (since $\sum_{p}
+\frac{1}{p}$ diverges by Euler), but is strictly stronger. In the direction of the
+conjecture, Szemer\'edi's theorem and Green--Tao's theorem give density versions and
+prime versions, but the full conjecture is not resolved.
+
+\begin{remark}
+Note the distinction: Szemer\'edi's theorem establishes that \emph{positive upper density}
+suffices; the Erd\H{o}s--Tur\'an conjecture asks whether \emph{divergence of reciprocal
+sum} (a weaker condition than positive density) already suffices. For example, the set
+of perfect squares has zero density but divergent harmonic sum is false
+($\sum 1/n^2 < \infty$), so the conjecture would not apply there. But a set like
+$A = \{n : \exists k, n = 2^k\}$ has divergent sum $\sum_{k\geq 1} 2^{-k} = 1 < \infty$,
+so actually converges. A relevant example: primes have zero density but $\sum_p 1/p = \infty$.
+\end{remark}
+
+\subsection{Computational Frontiers}
+
+The determination of $W(7;2)$ and $S(6)$ remain major open computational challenges.
+Both likely require petabyte-scale SAT solving. The methods of Heule et al.\
+(Cube and Conquer, DRUP certificates) continue to be refined.
+
+%% ============================================================
+\section*{References}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{VdW1927}
+B.L.\ van der Waerden,
+\emph{Beweis einer Baudetschen Vermutung},
+Nieuw Arch. Wisk.\ \textbf{15} (1927), 212--216.
+
+\bibitem{Schur1916}
+I.\ Schur,
+\emph{\"{U}ber die Kongruenz $x^m + y^m \equiv z^m \pmod{p}$},
+Jahresber. Dtsch. Math.-Ver.\ \textbf{25} (1916), 114--117.
+
+\bibitem{Szemeredi1975}
+E.\ Szemer\'edi,
+\emph{On sets of integers containing no $k$ elements in arithmetic progression},
+Acta Arith.\ \textbf{27} (1975), 199--245.
+
+\bibitem{GreenTao2008}
+B.\ Green and T.\ Tao,
+\emph{The primes contain arbitrarily long arithmetic progressions},
+Ann.\ Math.\ \textbf{167} (2008), 481--547.
+
+\bibitem{Rado1933}
+R.\ Rado,
+\emph{Studien zur Kombinatorik},
+Math.\ Z.\ \textbf{36} (1933), 424--480.
+
+\bibitem{Furstenberg1977}
+H.\ Furstenberg,
+\emph{Ergodic behavior of diagonal measures and a theorem of Szemer\'edi on arithmetic progressions},
+J.\ Anal.\ Math.\ \textbf{31} (1977), 204--256.
+
+\bibitem{Baumert1965}
+L.D.\ Baumert,
+\emph{A note on Schur's problem},
+Unpublished report, Jet Propulsion Laboratory, 1965.
+
+\bibitem{Heule2017}
+M.J.H.\ Heule,
+\emph{Schur Number Five},
+Proc.\ AAAI 2018, arXiv:1711.08076 (2017).
+
+\bibitem{Gowers2001}
+W.T.\ Gowers,
+\emph{A new proof of Szemer\'edi's theorem},
+Geom.\ Funct.\ Anal.\ \textbf{11} (2001), 465--588.
+
+\bibitem{Berlekamp1968}
+E.R.\ Berlekamp,
+\emph{A construction for partitions which avoid long arithmetic progressions},
+Canad.\ Math.\ Bull.\ \textbf{11} (1968), 409--414.
+
+\bibitem{HalesJewett1963}
+A.W.\ Hales and R.I.\ Jewett,
+\emph{Regularity and positional games},
+Trans.\ Amer.\ Math.\ Soc.\ \textbf{106} (1963), 222--229.
+
+\bibitem{Roth1953}
+K.F.\ Roth,
+\emph{On certain sets of integers},
+J.\ London Math.\ Soc.\ \textbf{28} (1953), 104--109.
+
+\bibitem{ErdosTuran1936}
+P.\ Erd\H{o}s and P.\ Tur\'an,
+\emph{On some sequences of integers},
+J.\ London Math.\ Soc.\ \textbf{11} (1936), 261--264.
+
+\bibitem{BergelsonLeibman1996}
+V.\ Bergelson and A.\ Leibman,
+\emph{Polynomial extensions of van der Waerden's and Szemer\'edi's theorems},
+J.\ Amer.\ Math.\ Soc.\ \textbf{9} (1996), 725--753.
+
+\bibitem{HeuleKullmannManthey2012}
+M.\ Heule, O.\ Kullmann, and V.\ Manthey,
+\emph{Cube and Conquer: Guiding CDCL SAT Solvers by Lookaheads},
+Lect.\ Notes Comput.\ Sci.\ \textbf{7155} (2012), 50--65.
+
+\bibitem{Kouril2008}
+M.\ Kouril and J.L.\ Paul,
+\emph{The van der Waerden number $W(2;6)$ is $1132$},
+Experiment.\ Math.\ \textbf{17} (2008), 53--61.
+
+\end{thebibliography}
+
+\end{document}

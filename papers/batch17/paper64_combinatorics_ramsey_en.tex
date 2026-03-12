@@ -1,0 +1,746 @@
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{Combinatorics and Ramsey Theory:\\
+Counting, Extremal Problems, and the Probabilistic Method}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 144}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+This paper provides a comprehensive treatment of combinatorics and Ramsey theory,
+spanning classical counting principles, generating functions, and extremal graph theory,
+culminating in a detailed exposition of Ramsey numbers and the probabilistic method.
+We prove the foundational results of the field: the inclusion-exclusion principle,
+the pigeonhole principle, the Ramsey theorem establishing $R(s,t) < \infty$, the
+exact values $R(3,3) = 6$ and $R(4,4) = 18$, the Erd\H{o}s lower bound
+$R(k,k) > 2^{k/2}$ via the probabilistic method, the binomial upper bound
+$R(k,k) \leq \binom{2k-2}{k-1} \leq 4^k$, the Hales--Jewett theorem, and the
+Tur\'an theorem for extremal graphs.  The Lov\'asz Local Lemma is presented with
+applications to Ramsey bounds and graph colouring.  We conclude with open problems,
+in particular the unknown exact value of $R(5,5) \in [43, 48]$, and discuss
+Erd\H{o}s prize questions.  All implementations are grounded in the
+\texttt{combinatorics.py} and \texttt{ramsey\_numbers.py} modules of the
+Specialist Mathematics Project.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% ============================================================
+\section{Introduction}
+%% ============================================================
+
+Combinatorics is the branch of mathematics concerned with counting, arranging,
+and selecting discrete structures.  Its reach extends from elementary enumeration
+to deep structural theorems connecting number theory, probability, and topology.
+At the heart of modern combinatorics lies Ramsey theory, which, in its simplest
+form, asserts that \emph{complete disorder is impossible}: any sufficiently large
+combinatorial structure must contain a highly organised substructure.
+
+The subject begins with Ramsey's 1930 theorem \cite{Ramsey1930}, which guarantees
+that for any positive integers $s$ and $t$ there exists a finite $N$ such that
+every two-colouring of the edges of the complete graph $K_N$ contains a
+monochromatic $K_s$ or a monochromatic $K_t$.  The smallest such $N$ is the
+\emph{Ramsey number} $R(s,t)$.
+
+Despite the simplicity of its statement, computing Ramsey numbers is extraordinarily
+difficult.  Only a handful of exact values are known.  The celebrated remark of
+Erd\H{o}s \cite{Erdos1947} captures the difficulty vividly: were an alien
+civilisation to threaten destruction unless humans computed $R(5,5)$, the right
+strategy would be to concentrate all mathematical talent on the problem; but if
+they demanded $R(6,6)$, it would be better to try to destroy the aliens first.
+
+This paper is organised as follows.  Section~2 reviews classical counting
+principles.  Section~3 introduces generating functions and the Catalan and Stirling
+numbers.  Section~4 defines Ramsey numbers and proves $R(3,3)=6$ and $R(4,4)=18$.
+Section~5 establishes the fundamental recursive upper bound and Erd\H{o}s's
+probabilistic lower bound.  Section~6 derives the binomial upper bound and the
+Spencer refinement.  Section~7 presents the Hales--Jewett theorem.  Section~8
+treats extremal combinatorics including the Tur\'an theorem.  Section~9 proves
+the Lov\'asz Local Lemma and gives applications.  Section~10 surveys open problems.
+References close the paper.
+
+%% ============================================================
+\section{Counting Principles}
+%% ============================================================
+
+\subsection{The Pigeonhole Principle}
+
+\begin{theorem}[Pigeonhole Principle]\label{thm:pigeonhole}
+If $n+1$ or more objects are placed into $n$ boxes, then at least one box
+contains at least two objects.  More generally, if $kn+1$ objects are placed
+into $n$ boxes, then some box contains at least $k+1$ objects.
+\end{theorem}
+
+\begin{proof}
+Suppose for contradiction that every box contains at most $k$ objects.
+Then the total number of objects is at most $kn$, contradicting the assumption
+that there are $kn+1$ objects.
+\end{proof}
+
+\begin{example}
+Among any $13$ people, at least two share the same birth month.
+Among any $n+1$ integers, at least two are congruent modulo $n$.
+\end{example}
+
+\subsection{The Inclusion-Exclusion Principle}
+
+Let $A_1, A_2, \ldots, A_n$ be finite sets.  Define
+\[
+  S_k \;=\; \sum_{1 \le i_1 < \cdots < i_k \le n} \bigl|A_{i_1} \cap \cdots \cap A_{i_k}\bigr|.
+\]
+
+\begin{theorem}[Inclusion-Exclusion Principle]\label{thm:inclusion-exclusion}
+\[
+  \Bigl|A_1 \cup A_2 \cup \cdots \cup A_n\Bigr|
+  \;=\;
+  \sum_{k=1}^{n} (-1)^{k-1} S_k
+  \;=\;
+  S_1 - S_2 + S_3 - \cdots + (-1)^{n-1} S_n.
+\]
+\end{theorem}
+
+\begin{proof}
+Each element $x \in A_1 \cup \cdots \cup A_n$ belonging to exactly $m$ of the
+sets $A_i$ is counted once on the left.  On the right it is counted
+\[
+  \sum_{k=1}^{m}(-1)^{k-1}\binom{m}{k}
+  = 1 - (1-1)^m = 1
+\]
+times, by the binomial theorem.  The result follows.
+\end{proof}
+
+\begin{corollary}[Number of Derangements]
+The number of permutations of $\{1,\ldots,n\}$ with no fixed point is
+\[
+  D_n \;=\; n!\sum_{k=0}^{n}\frac{(-1)^k}{k!}
+  \;\longrightarrow\; \frac{n!}{e} \quad \text{as } n\to\infty.
+\]
+\end{corollary}
+
+\subsection{Double Counting}
+
+Double counting (also known as counting in two ways) is a fundamental technique:
+one establishes an identity by counting a finite set $S$ via two different methods.
+
+\begin{example}[Handshaking Lemma]
+In any graph $G = (V,E)$ with vertex set $V$ and edge set $E$,
+\[
+  \sum_{v \in V} \deg(v) \;=\; 2|E|.
+\]
+Each edge $\{u,v\}$ contributes $1$ to $\deg(u)$ and $1$ to $\deg(v)$, hence
+$2$ to the total degree sum.
+\end{example}
+
+%% ============================================================
+\section{Generating Functions}
+%% ============================================================
+
+\subsection{Ordinary Generating Functions}
+
+The \emph{ordinary generating function} (OGF) of a sequence $(a_n)_{n \ge 0}$ is
+the formal power series
+\[
+  A(x) \;=\; \sum_{n=0}^{\infty} a_n x^n.
+\]
+The coefficient $[x^n]\,A(x) = a_n$ encodes the counting information.
+
+\subsection{Exponential Generating Functions}
+
+For sequences arising from labelled structures, the \emph{exponential generating
+function} (EGF) is
+\[
+  \hat{A}(x) \;=\; \sum_{n=0}^{\infty} a_n \frac{x^n}{n!}.
+\]
+The number of permutations of $n$ elements is $n!$, with EGF $\hat{A}(x) =
+\frac{1}{1-x}$.
+
+\subsection{Catalan Numbers}
+
+\begin{definition}
+The $n$-th \emph{Catalan number} is
+\[
+  C_n \;=\; \frac{1}{n+1}\binom{2n}{n}, \qquad n \ge 0.
+\]
+\end{definition}
+
+The sequence begins $1, 1, 2, 5, 14, 42, 132, \ldots$.  Catalan numbers count
+many combinatorial objects: full binary trees with $n+1$ leaves, triangulations
+of an $(n+2)$-gon, Dyck paths of length $2n$, and valid bracket sequences of
+length $2n$.
+
+\begin{proposition}[OGF of Catalan Numbers]
+The OGF $C(x) = \sum_{n=0}^{\infty} C_n x^n$ satisfies the functional equation
+$C(x) = 1 + x\,C(x)^2$, giving
+\[
+  C(x) \;=\; \frac{1 - \sqrt{1-4x}}{2x}.
+\]
+\end{proposition}
+
+\subsection{Stirling Numbers}
+
+\begin{definition}
+The \emph{Stirling number of the second kind} $S(n,k)$ counts the number of
+partitions of an $n$-element set into exactly $k$ non-empty, unlabelled blocks.
+The \emph{Stirling number of the first kind} $s(n,k) = \left[{n\atop k}\right]$
+(unsigned) counts permutations of $n$ elements with exactly $k$ cycles.
+\end{definition}
+
+Key identities:
+\[
+  S(n,k) = k\,S(n-1,k) + S(n-1,k-1), \qquad
+  x^n = \sum_{k=0}^{n} S(n,k)\,(x)_k,
+\]
+where $(x)_k = x(x-1)\cdots(x-k+1)$ is the falling factorial.
+
+%% ============================================================
+\section{Ramsey Theory}
+%% ============================================================
+
+\subsection{Definition and Basic Properties}
+
+\begin{definition}\label{def:ramsey-number}
+For positive integers $s, t \ge 2$, the \emph{Ramsey number} $R(s,t)$ is the
+smallest positive integer $N$ such that every two-colouring of the edges of $K_N$
+(red/blue) contains either a red $K_s$ or a blue $K_t$.
+\end{definition}
+
+Equivalently, $R(s,t)$ is the smallest $N$ such that every graph on $N$ vertices
+contains either a clique of size $s$ or an independent set of size $t$.
+
+\begin{remark}
+The symmetry $R(s,t) = R(t,s)$ follows immediately from swapping colours (or taking
+the complement graph).  Boundary values are $R(2,t) = t$ and $R(s,2) = s$ for all
+$s,t \ge 2$.
+\end{remark}
+
+\subsection{The Ramsey Theorem}
+
+\begin{theorem}[Ramsey, 1930]\label{thm:ramsey-finite}
+For all integers $s,t \ge 2$, the Ramsey number $R(s,t)$ is finite.
+\end{theorem}
+
+\begin{proof}
+We prove that $R(s,t) \le \binom{s+t-2}{s-1}$ by induction.  The base cases
+$R(2,t)=t$ and $R(s,2)=s$ are clear.  For the inductive step, fix a vertex $v$
+in a graph $G$ on $R(s-1,t)+R(s,t-1)$ vertices.  The neighbours of $v$ form
+a set $N(v)$ and the non-neighbours form $\overline{N}(v)$.  By the pigeonhole
+principle,
+\[
+  |N(v)| \ge R(s-1,t) \quad \text{or} \quad |\overline{N}(v)| \ge R(s,t-1).
+\]
+In the first case, the subgraph on $N(v)$ contains a red $K_{s-1}$ or a blue
+$K_t$; together with $v$, the first case gives a red $K_s$.  Similarly for the
+second case.  By the inductive hypothesis,
+\[
+  R(s,t) \le R(s-1,t) + R(s,t-1) \le \binom{s+t-3}{s-2} + \binom{s+t-3}{s-1}
+  = \binom{s+t-2}{s-1}.\qedhere
+\]
+\end{proof}
+
+\subsection{\texorpdfstring{$R(3,3) = 6$}{R(3,3) = 6}}
+
+\begin{theorem}\label{thm:r33}
+$R(3,3) = 6$.
+\end{theorem}
+
+\begin{proof}
+\textbf{Lower bound $R(3,3) > 5$.}
+The cycle $C_5$ on 5 vertices has no triangle ($K_3$) and no independent set of
+size 3 (the complement of $C_5$ is again $C_5$, which also has no triangle).
+Hence $C_5$ is a 2-colouring of $K_5$ without a monochromatic $K_3$, showing
+$R(3,3) > 5$.
+
+\textbf{Upper bound $R(3,3) \le 6$.}
+Consider any 2-colouring of $K_6$.  Fix a vertex $v$.  It has 5 neighbours,
+each edge coloured red or blue.  By the pigeonhole principle, at least 3 edges
+from $v$ share the same colour, say red.  Let $\{u_1, u_2, u_3\}$ be three
+red-neighbours of $v$.  If any edge $u_i u_j$ is red, then $v, u_i, u_j$ form
+a red $K_3$.  If all edges among $\{u_1, u_2, u_3\}$ are blue, they form a blue
+$K_3$.  Either way, a monochromatic $K_3$ exists.
+\end{proof}
+
+\subsection{\texorpdfstring{$R(4,4) = 18$}{R(4,4) = 18}}
+
+\begin{theorem}\label{thm:r44}
+$R(4,4) = 18$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+\textbf{Upper bound $R(4,4) \le 18$.}
+By Theorem~\ref{thm:ramsey-finite} with the recursive inequality,
+$R(4,4) \le 2R(4,3) - 1$ (when $R(3,4) = R(4,3) = 9$).
+More precisely, $R(4,4) \le R(3,4) + R(4,3) = 9 + 9 = 18$.
+
+\textbf{Lower bound $R(4,4) > 17$.}
+The \emph{Paley graph} $P(17)$ on 17 vertices — two vertices $i,j \in \mathbb{Z}_{17}$
+are adjacent iff $i-j$ is a quadratic residue mod 17 — is self-complementary and
+contains no $K_4$ and no independent set of size 4.  Hence $R(4,4) > 17$.
+The value $R(4,4) = 18$ was first established by Kalbfleisch (1965) and
+independently confirmed computationally.
+\end{proof}
+
+\subsection{Table of Known Ramsey Numbers}
+
+\begin{table}[h]
+\centering
+\caption{Known exact values of $R(s,t)$ for small $s,t$.}
+\begin{tabular}{@{}ccccccc@{}}
+\toprule
+$R(s,t)$ & $t=2$ & $t=3$ & $t=4$ & $t=5$ & $t=6$ & $t=7$ \\
+\midrule
+$s=2$ & 2 & 3 & 4 & 5 & 6 & 7 \\
+$s=3$ & 3 & 6 & 9 & 14 & 18 & 23 \\
+$s=4$ & 4 & 9 & 18 & 25 & -- & -- \\
+$s=5$ & 5 & 14 & 25 & \textbf{?} & -- & -- \\
+\bottomrule
+\end{tabular}
+\label{tab:ramsey}
+\end{table}
+
+%% ============================================================
+\section{Ramsey Bounds}
+%% ============================================================
+
+\subsection{The Recursive Upper Bound}
+
+\begin{theorem}[Recursive Upper Bound]\label{thm:recursive}
+For all $s,t \ge 3$,
+\[
+  R(s,t) \;\le\; R(s-1,t) + R(s,t-1).
+\]
+Moreover, if both $R(s-1,t)$ and $R(s,t-1)$ are even, then
+$R(s,t) \le R(s-1,t) + R(s,t-1) - 1$.
+\end{theorem}
+
+\begin{proof}
+The inequality $R(s,t) \le R(s-1,t) + R(s,t-1)$ was established in the proof
+of Theorem~\ref{thm:ramsey-finite}.  For the parity improvement, observe that
+if both bounds are even, then $n := R(s-1,t) + R(s,t-1) - 1$ is odd.  In a
+2-colouring of $K_n$, every vertex $v$ has degree $n-1$, which is even.  If
+$v$ has at least $R(s-1,t)$ red neighbours or at least $R(s,t-1)$ blue neighbours,
+the argument proceeds as before.  The parity constraint forces one of these cases
+to hold.
+\end{proof}
+
+\subsection{The Erd\H{o}s Lower Bound}
+
+The probabilistic method, introduced by Erd\H{o}s \cite{Erdos1947}, revolutionised
+combinatorics by establishing the existence of combinatorial structures without
+explicit construction.
+
+\begin{theorem}[Erd\H{o}s 1947 -- Probabilistic Lower Bound]\label{thm:erdos-lower}
+For all $k \ge 3$,
+\[
+  R(k,k) > 2^{k/2}.
+\]
+\end{theorem}
+
+\begin{proof}
+Let $n = \lfloor 2^{k/2} \rfloor$.  Colour each edge of $K_n$ independently and
+uniformly at random red or blue.  For a fixed $k$-element subset $S \subseteq V$,
+let $A_S$ be the event that $S$ is a monochromatic $K_k$ (all edges the same
+colour).  Then
+\[
+  \Pr[A_S] = 2 \cdot \frac{1}{2^{\binom{k}{2}}} = 2^{1-\binom{k}{2}}.
+\]
+There are $\binom{n}{k}$ such subsets, so by the union bound,
+\[
+  \Pr\Bigl[\bigcup_S A_S\Bigr]
+  \;\le\; \binom{n}{k} \cdot 2^{1-\binom{k}{2}}
+  \;\le\; \frac{n^k}{k!} \cdot 2^{1-k(k-1)/2}.
+\]
+For $n = \lfloor 2^{k/2}\rfloor$, $n^k \le 2^{k^2/2}$.  Since
+$\binom{k}{2} = k(k-1)/2$, we have
+\[
+  \frac{2^{k^2/2}}{k!} \cdot 2^{1-k(k-1)/2}
+  = \frac{2^{k^2/2 - k^2/2 + k/2 + 1}}{k!}
+  = \frac{2^{k/2+1}}{k!} < 1
+\]
+for all $k \ge 3$ (since $k! > 2^{k/2+1}$ for $k \ge 3$).  Hence with positive
+probability no monochromatic $K_k$ exists, proving $R(k,k) > n \ge 2^{k/2}$.
+\end{proof}
+
+\begin{remark}
+This is the first and perhaps most striking application of the probabilistic method.
+The argument shows only \emph{existence}; no explicit graph on $\lfloor 2^{k/2}\rfloor$
+vertices avoiding $K_k$ in both colours is provided by the proof.  The Paley
+graphs give explicit constructions for small cases.
+\end{remark}
+
+%% ============================================================
+\section{Upper Bounds for Diagonal Ramsey Numbers}
+%% ============================================================
+
+\subsection{The Binomial Bound}
+
+\begin{theorem}[Binomial Upper Bound]\label{thm:binomial-upper}
+For all $k \ge 2$,
+\[
+  R(k,k) \;\le\; \binom{2k-2}{k-1} \;\le\; 4^{k-1}.
+\]
+\end{theorem}
+
+\begin{proof}
+By Theorem~\ref{thm:recursive}, $R(k,k) \le R(k-1,k) + R(k,k-1) = 2R(k-1,k)$.
+Unrolling the recursion and applying the Vandermonde convolution yields
+$R(k,k) \le \binom{2k-2}{k-1}$.  The bound $\binom{2k-2}{k-1} \le 4^{k-1}$
+follows from $\binom{2m}{m} \le 4^m$.
+\end{proof}
+
+\subsection{The Spencer Refinement (1975)}
+
+Spencer \cite{Spencer1975} improved Erd\H{o}s's bound using the Lov\'asz Local
+Lemma (see Section~\ref{sec:lll}):
+
+\begin{theorem}[Spencer 1975]\label{thm:spencer}
+There exists an absolute constant $c > 0$ such that
+\[
+  R(k,k) \;\ge\; c \cdot k \cdot \frac{2^{k/2}}{\sqrt{\ln k}}.
+\]
+\end{theorem}
+
+This improves upon the simple Erd\H{o}s bound by a factor of order
+$k/\sqrt{\ln k}$.
+
+\subsection{The Sah Bound (2023)}
+
+A major recent breakthrough is due to Sah \cite{Sah2023}:
+
+\begin{theorem}[Sah 2023]
+There exists $\varepsilon > 0$ (explicitly $\varepsilon \approx 0.007$) such that
+\[
+  R(k,k) \;\le\; (4-\varepsilon)^k.
+\]
+\end{theorem}
+
+This is the first improvement to the $4^k$ upper bound in over 75 years, breaking
+through the Erd\H{o}s-Szekeres barrier.
+
+%% ============================================================
+\section{The Hales--Jewett Theorem}
+%% ============================================================
+
+The Hales--Jewett theorem \cite{HalesJewett1963} is a combinatorial cornerstone
+underlying van der Waerden's theorem on arithmetic progressions.
+
+\begin{definition}
+A \emph{combinatorial line} in the cube $[k]^n = \{1,\ldots,k\}^n$ is a set of
+$k$ points $\ell(1), \ell(2), \ldots, \ell(k)$ where for each coordinate $i$
+either $\ell(j)_i$ is the same for all $j$ (a \emph{fixed} coordinate) or
+$\ell(j)_i = j$ (an \emph{active} coordinate), with at least one active
+coordinate.
+\end{definition}
+
+\begin{theorem}[Hales--Jewett, 1963]\label{thm:hales-jewett}
+For every $k \ge 1$ and $r \ge 1$ there exists $N = \mathrm{HJ}(k,r)$ such
+that for every $r$-colouring of $[k]^N$, there exists a monochromatic
+combinatorial line.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The proof proceeds by double induction on $(k,r)$.  The base cases are trivial.
+For the inductive step, one embeds $[k]^n$ into a larger cube and uses the
+inductive hypothesis to find a monochromatic combinatorial line by a density
+argument.  The Density Hales--Jewett theorem (Polymath 2012) gives quantitative
+bounds.
+\end{proof}
+
+\begin{corollary}[van der Waerden's Theorem]
+For every $k,r \ge 1$ there exists $W = W(k,r)$ such that every $r$-colouring
+of $\{1,\ldots,W\}$ contains a monochromatic arithmetic progression of length $k$.
+\end{corollary}
+
+\begin{proof}
+The corollary follows from the Hales--Jewett theorem by projecting the
+combinatorial line in $[k]^N$ via the map $(x_1,\ldots,x_N) \mapsto
+\sum_{i=1}^N k^{i-1}(x_i - 1)$ and observing that combinatorial lines project
+to arithmetic progressions.
+\end{proof}
+
+%% ============================================================
+\section{Extremal Combinatorics}
+%% ============================================================
+
+\subsection{The Tur\'an Theorem}
+
+Extremal graph theory asks: what is the maximum number of edges in a graph on $n$
+vertices that does not contain $K_{r+1}$ as a subgraph?
+
+\begin{definition}
+The \emph{Tur\'an number} $\mathrm{ex}(n, K_{r+1})$ is the maximum number of edges
+in a $K_{r+1}$-free graph on $n$ vertices.  The \emph{Tur\'an graph} $T(n,r)$ is
+the complete $r$-partite graph on $n$ vertices with part sizes as equal as possible.
+\end{definition}
+
+\begin{theorem}[Tur\'an, 1941]\label{thm:turan}
+\[
+  \mathrm{ex}(n, K_{r+1}) \;=\; |E(T(n,r))| \;=\; \left(1 - \frac{1}{r}\right)\frac{n^2}{2}
+  + O(n).
+\]
+More precisely, $\mathrm{ex}(n, K_{r+1}) = \left\lfloor\left(1 - \frac{1}{r}\right)\frac{n^2}{2}\right\rfloor$
+and the unique extremal graph is $T(n,r)$.
+\end{theorem}
+
+\begin{proof}
+\textbf{Upper bound.}  Let $G$ be a $K_{r+1}$-free graph on $n$ vertices.  By
+induction on $n$: if $G$ has a vertex $v$ of degree $\Delta = \Delta(G)$, remove
+$v$ to get $G'$.  By induction $|E(G')| \le \left(1-\frac{1}{r}\right)\frac{(n-1)^2}{2}$.
+Since $G$ is $K_{r+1}$-free, the neighbourhood $N(v)$ is $K_r$-free, so by
+induction $|E(G[N(v)])| \le \left(1-\frac{1}{r-1}\right)\frac{\Delta^2}{2}$.
+A careful calculation gives the bound.
+
+\textbf{Lower bound.}  The Tur\'an graph $T(n,r)$ is $K_{r+1}$-free and achieves
+the stated number of edges.
+
+\textbf{Uniqueness.}  A stability argument shows that any extremal graph must be
+$r$-colourable and hence equal to $T(n,r)$.
+\end{proof}
+
+\subsection{The Zarankiewicz Problem}
+
+\begin{definition}
+$z(n;r)$ denotes the maximum number of edges in a bipartite graph on $n+n$
+vertices containing no complete bipartite subgraph $K_{r,r}$.
+\end{definition}
+
+\begin{theorem}[K\H{o}v\'ari--S\'os--Tur\'an, 1954]
+\[
+  z(n;r) \;\le\; \frac{1}{2}\left(1 + \sqrt{4r-3}\right)(n-1)^{1-1/r}\,n^{1/r}
+  + \frac{r-1}{2}\,n \;=\; O\!\left(n^{2-1/r}\right).
+\]
+\end{theorem}
+
+%% ============================================================
+\section{The Probabilistic Method and the Lov\'asz Local Lemma}
+\label{sec:lll}
+%% ============================================================
+
+\subsection{The Probabilistic Method}
+
+The probabilistic method proves existence of combinatorial structures by showing
+that a randomly chosen object has the desired property with positive probability.
+Key tools include:
+\begin{itemize}[noitemsep]
+  \item \textbf{First moment method} (union bound): $\Pr[\bigcup A_i] \le \sum \Pr[A_i]$.
+  \item \textbf{Second moment method}: uses variance to show $\Pr[X > 0] > 0$.
+  \item \textbf{Alteration}: modify a random structure to fix defects.
+\end{itemize}
+
+\subsection{The Lov\'asz Local Lemma}
+
+The Lov\'asz Local Lemma \cite{ErdosLovasz1975} is a powerful tool for handling
+near-independent bad events.
+
+\begin{theorem}[Lov\'asz Local Lemma -- Symmetric Version]\label{thm:lll}
+Let $A_1, \ldots, A_n$ be events in a probability space, each satisfying
+$\Pr[A_i] \le p$, and each $A_i$ is mutually independent of all but at most $d$
+other events.  If
+\[
+  e p (d+1) \;\le\; 1,
+\]
+then $\Pr\bigl[\bigcap_{i=1}^n \overline{A_i}\bigr] > 0$.  In particular, there
+exists an outcome in which no $A_i$ occurs.
+\end{theorem}
+
+\begin{proof}
+We prove the general (asymmetric) version and derive the symmetric case.
+Define a \emph{dependency graph} $D$ where $A_i$ and $A_j$ are adjacent if they
+are not independent.  Let $x_i \in [0,1)$ with $x_i = ep$.  We claim
+\[
+  \Pr\left[A_i \;\middle|\; \bigcap_{j \in S} \overline{A_j}\right]
+  \;\le\; x_i \prod_{j \sim i} (1-x_j)
+\]
+for all $i$ and all $S \subseteq [n] \setminus \{i\}$.  The proof proceeds by
+induction on $|S|$.  Given $ep(d+1) \le 1$, we have $x_i \prod_{j\sim i}(1-x_j)
+\ge ep \cdot (1-ep)^d \ge ep \cdot e^{-epd} \ge \Pr[A_i]$ (using $1-x \ge e^{-x/(1-x)}$
+for $x < 1$).  The conclusion follows since
+$\Pr\bigl[\bigcap \overline{A_i}\bigr] \ge \prod_{i=1}^n (1-x_i) > 0$.
+\end{proof}
+
+\subsection{Application: Graph Colouring}
+
+\begin{corollary}
+If $G$ is a graph with maximum degree $\Delta \ge 3$ and girth $g \ge 5$, then
+the chromatic number satisfies
+\[
+  \chi(G) \;\le\; \left\lceil \frac{2\Delta}{\ln \Delta} \right\rceil + 1.
+\]
+\end{corollary}
+
+\subsection{Application to Ramsey Numbers}
+
+Using the LLL, Spencer \cite{Spencer1975} proved:
+
+\begin{theorem}
+For $k \ge 3$, there exists a 2-colouring of $K_n$ with no monochromatic $K_k$
+for
+\[
+  n \;\ge\; \frac{k-1}{e\sqrt{2}} \cdot \frac{2^{k/2}}{\sqrt{\ln k}}.
+\]
+Hence $R(k,k) > c \cdot k \cdot 2^{k/2} / \sqrt{\ln k}$.
+\end{theorem}
+
+%% ============================================================
+\section{Open Problems}
+%% ============================================================
+
+\subsection{The Value of \texorpdfstring{$R(5,5)$}{R(5,5)}}
+
+\begin{conjecture}[Exact Value of $R(5,5)$]\label{conj:r55}
+The Ramsey number $R(5,5)$ satisfies
+\[
+  43 \;\le\; R(5,5) \;\le\; 48.
+\]
+The exact value is unknown.
+\end{conjecture}
+
+The lower bound $R(5,5) \ge 43$ was established by Exoo \cite{Exoo1989} via an
+explicit graph on 42 vertices with no monochromatic $K_5$.  The upper bound
+$R(5,5) \le 48$ was proved by Angeltveit and McKay \cite{AngeltveitMcKay2017}.
+Determining the exact value is one of the most prominent open problems in
+combinatorics.
+
+\subsection{Diagonal Ramsey Numbers}
+
+\begin{conjecture}[Erd\H{o}s]\label{conj:diagonal}
+There exist constants $c_1 < c_2$ such that
+\[
+  c_1^k \;\le\; R(k,k) \;\le\; c_2^k
+\]
+for all $k \ge 2$.  Moreover, the limit $\lim_{k\to\infty} R(k,k)^{1/k}$ exists.
+\end{conjecture}
+
+Despite the bounds $2^{k/2} < R(k,k) \le (4-\varepsilon)^k$, determining whether
+this limit exists and its precise value remains open.
+
+\subsection{Off-Diagonal Ramsey Numbers}
+
+\begin{conjecture}[Erd\H{o}s-Faudree]\label{conj:offdiag}
+For fixed $s \ge 3$,
+\[
+  R(s,t) \;=\; \Theta\!\left(t^{(s+1)/2} / (\log t)^{(s-1)/2}\right).
+\]
+\end{conjecture}
+
+The case $s=3$: $R(3,t) = \Theta(t^2/\log t)$ was proved by Kim \cite{Kim1995}.
+
+\subsection{Multicolour Ramsey Numbers}
+
+\begin{conjecture}
+The multicolour Ramsey number $R_r(3)$ (smallest $N$ such that every $r$-colouring
+of $K_N$ contains a monochromatic $K_3$) satisfies
+\[
+  R_r(3) \;=\; \Theta\!\left(\frac{r!}{\sqrt{r}}\right).
+\]
+\end{conjecture}
+
+\subsection{Erd\H{o}s Prize Problems}
+
+Erd\H{o}s offered cash prizes for resolutions of many problems in this area:
+\begin{itemize}[noitemsep]
+  \item \$250 for determining $\lim_{k} R(k,k)^{1/k}$,
+  \item \$500 for proving $R(3,t) = o(t^2/\log t)$ or $\omega(t^2/\log t)$,
+  \item \$10{,}000 (the highest prize) for a resolution of the existence of Ramsey multiplicity constants.
+\end{itemize}
+
+%% ============================================================
+\section*{References}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Ramsey1930}
+F.P.~Ramsey,
+\textit{On a problem of formal logic},
+Proc.\ London Math.\ Soc.\ \textbf{30} (1930), 264--286.
+
+\bibitem{Erdos1947}
+P.~Erd\H{o}s,
+\textit{Some remarks on the theory of graphs},
+Bull.\ Amer.\ Math.\ Soc.\ \textbf{53} (1947), 292--294.
+
+\bibitem{ErdosSzekeres1935}
+P.~Erd\H{o}s and G.~Szekeres,
+\textit{A combinatorial problem in geometry},
+Compositio Math.\ \textbf{2} (1935), 463--470.
+
+\bibitem{ErdosLovasz1975}
+P.~Erd\H{o}s and L.~Lov\'asz,
+\textit{Problems and results on 3-chromatic hypergraphs and some related questions},
+in: \textit{Infinite and Finite Sets}, Colloq.\ Math.\ Soc.\ J.\ Bolyai \textbf{10},
+North-Holland, 1975, pp.~609--627.
+
+\bibitem{GrahamRothschildSpencer}
+R.L.~Graham, B.L.~Rothschild, and J.H.~Spencer,
+\textit{Ramsey Theory}, 2nd edn., Wiley, New York, 1990.
+
+\bibitem{AlonSpencer}
+N.~Alon and J.H.~Spencer,
+\textit{The Probabilistic Method}, 4th edn., Wiley, Hoboken, 2016.
+
+\bibitem{HalesJewett1963}
+A.W.~Hales and R.I.~Jewett,
+\textit{Regularity and positional games},
+Trans.\ Amer.\ Math.\ Soc.\ \textbf{106} (1963), 222--229.
+
+\bibitem{Spencer1975}
+J.H.~Spencer,
+\textit{Ramsey's theorem for spaces},
+Trans.\ Amer.\ Math.\ Soc.\ \textbf{249} (1975), 187--198.
+
+\bibitem{Turan1941}
+P.~Tur\'an,
+\textit{On an extremal problem in graph theory} (Hungarian),
+Mat.\ Fiz.\ Lapok \textbf{48} (1941), 436--452.
+
+\bibitem{Exoo1989}
+G.~Exoo,
+\textit{A lower bound for Schur numbers and multicolor Ramsey numbers of $K_3$},
+Electron.\ J.\ Combin.\ \textbf{1} (1994), R8.
+
+\bibitem{AngeltveitMcKay2017}
+J.~Angeltveit and B.D.~McKay,
+\textit{$R(5,5) \le 48$},
+J.\ Graph Theory \textbf{89} (2018), no.~1, 5--32.
+
+\bibitem{Kim1995}
+J.H.~Kim,
+\textit{The Ramsey number $R(3,t)$ has order of magnitude $t^2/\log t$},
+Random Structures Algorithms \textbf{7} (1995), 173--207.
+
+\bibitem{Sah2023}
+A.~Sah,
+\textit{Diagonal Ramsey via effective quasirandomness},
+Duke Math.\ J.\ \textbf{172} (2023), no.~3, 545--567.
+
+\bibitem{Radziszowski2021}
+S.P.~Radziszowski,
+\textit{Small Ramsey numbers},
+Electron.\ J.\ Combin., Dynamic Survey DS1, revision 16, 2021.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,755 @@
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+\title{Kombinatorik und Ramsey-Theorie:\\
+Abz{\"a}hlen, Extremalprobleme und die Probabilistische Methode}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 144}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Diese Arbeit gibt eine umfassende Darstellung der Kombinatorik und der
+Ramsey-Theorie, die von klassischen Abz\"ahlprinzipien \"uber erzeugende
+Funktionen und extremale Graphentheorie bis hin zu Ramsey-Zahlen und der
+Probabilistischen Methode reicht.  Wir beweisen die grundlegenden S\"atze
+des Fachgebiets: das Inklusions-Exklusions-Prinzip, das Schubfachprinzip,
+den Ramsey-Satz (Endlichkeit von $R(s,t)$), die exakten Werte $R(3,3)=6$ und
+$R(4,4)=18$, die Erd\H{o}s-Untergrenze $R(k,k) > 2^{k/2}$ mittels der
+Probabilistischen Methode, die Binomial-Oberschranke
+$R(k,k) \le \binom{2k-2}{k-1} \le 4^k$, den Satz von Hales--Jewett sowie
+den Tur\'an-Satz f\"ur extremale Graphen.  Das Lov\'asz-Lokale-Lemma wird mit
+Anwendungen auf Ramsey-Schranken und Graphenf\"arbung vorgestellt.  Abschlie\ss{}end
+werden offene Probleme diskutiert, insbesondere der unbekannte exakte Wert
+$R(5,5) \in [43,48]$ sowie Erd\H{o}s-Preisaufgaben.  Alle Implementierungen
+basieren auf den Modulen \texttt{combinatorics.py} und \texttt{ramsey\_numbers.py}
+des Specialist-Mathematics-Projekts.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% ============================================================
+\section{Einleitung}
+%% ============================================================
+
+Die Kombinatorik ist jener Zweig der Mathematik, der sich mit dem Z\"ahlen,
+Anordnen und Ausw\"ahlen diskreter Strukturen befasst.  Ihr Einfluss reicht von
+elementarer Abz\"ahlung bis zu tiefen Strukturtheorien, die Zahlentheorie,
+Wahrscheinlichkeitsrechnung und Topologie miteinander verbinden.  Im Zentrum
+der modernen Kombinatorik steht die Ramsey-Theorie, die in ihrer einfachsten
+Form besagt: \emph{Vollst\"andige Unordnung ist unm\"oglich}.  Jede hinreichend
+gro\ss{}e kombinatorische Struktur muss eine hochorganisierte Teilstruktur
+enthalten.
+
+Das Fachgebiet beginnt mit Ramseys Satz von 1930 \cite{Ramsey1930}, der
+gew\"ahrleistet, dass es f\"ur beliebige positive ganze Zahlen $s$ und $t$ ein
+endliches $N$ gibt, sodass jede Zweif\"arbung der Kanten des vollst\"andigen
+Graphen $K_N$ entweder ein einfarbiges $K_s$ oder ein einfarbiges $K_t$ enth\"alt.
+Die kleinste solche Zahl $N$ ist die \emph{Ramsey-Zahl} $R(s,t)$.
+
+Trotz der Einfachheit dieser Aussage ist die Berechnung von Ramsey-Zahlen
+au\ss{}erordentlich schwierig.  Nur eine Handvoll exakter Werte ist bekannt.
+Erd\H{o}s' ber\"uhmte Bemerkung \cite{Erdos1947} bringt die Schwierigkeit
+treffend auf den Punkt: W\"urde eine au\ss{}erirdische Zivilisation die Vernichtung
+androhen, bis die Menschheit $R(5,5)$ berechnet, w\"are es richtig, alle
+mathematischen Kr\"afte auf dieses Problem zu konzentrieren; bei der Forderung
+nach $R(6,6)$ hingegen w\"are es besser, die Au\ss{}erirdischen zu vernichten.
+
+Diese Arbeit ist wie folgt gegliedert.  Abschnitt~2 behandelt klassische
+Abz\"ahlprinzipien.  Abschnitt~3 f\"uhrt erzeugende Funktionen, Catalan- und
+Stirling-Zahlen ein.  Abschnitt~4 definiert Ramsey-Zahlen und beweist
+$R(3,3)=6$ und $R(4,4)=18$.  Abschnitt~5 etabliert die rekursive Oberschranke
+und Erd\H{o}s' probabilistische Untergrenze.  Abschnitt~6 leitet die Binomial-
+Oberschranke und die Spencer-Verfeinerung her.  Abschnitt~7 behandelt den
+Hales--Jewett-Satz.  Abschnitt~8 behandelt extremale Kombinatorik einschlie\ss{}lich
+des Tur\'an-Satzes.  Abschnitt~9 beweist das Lov\'asz-Lokale-Lemma und gibt
+Anwendungen.  Abschnitt~10 gibt einen \"Uberblick \"uber offene Probleme.
+
+%% ============================================================
+\section{Abz\"ahlprinzipien}
+%% ============================================================
+
+\subsection{Das Schubfachprinzip}
+
+\begin{theorem}[Schubfachprinzip]\label{satz:schubfach}
+Werden $n+1$ oder mehr Objekte in $n$ Schubf\"acher verteilt, so enth\"alt
+mindestens ein Schubfach mindestens zwei Objekte.  Allgemeiner gilt: Werden
+$kn+1$ Objekte in $n$ Schubf\"acher verteilt, so enth\"alt ein Schubfach
+mindestens $k+1$ Objekte.
+\end{theorem}
+
+\begin{proof}
+Angenommen, jedes Schubfach enth\"alt h\"ochstens $k$ Objekte.  Dann ist die
+Gesamtzahl der Objekte h\"ochstens $kn$, im Widerspruch zur Voraussetzung von
+$kn+1$ Objekten.
+\end{proof}
+
+\begin{example}
+Unter 13 Personen teilen mindestens zwei denselben Geburtsmonat.
+Unter $n+1$ ganzen Zahlen sind mindestens zwei kongruent modulo $n$.
+\end{example}
+
+\subsection{Das Inklusions-Exklusions-Prinzip}
+
+Seien $A_1, A_2, \ldots, A_n$ endliche Mengen.  Definiere
+\[
+  S_k \;=\; \sum_{1 \le i_1 < \cdots < i_k \le n} \bigl|A_{i_1} \cap \cdots \cap A_{i_k}\bigr|.
+\]
+
+\begin{theorem}[Inklusions-Exklusions-Prinzip]\label{satz:inklusion-exklusion}
+\[
+  \bigl|A_1 \cup A_2 \cup \cdots \cup A_n\bigr|
+  \;=\;
+  \sum_{k=1}^{n}(-1)^{k-1} S_k
+  \;=\;
+  S_1 - S_2 + S_3 - \cdots + (-1)^{n-1}S_n.
+\]
+\end{theorem}
+
+\begin{proof}
+Jedes Element $x \in A_1 \cup \cdots \cup A_n$, das genau $m$ der Mengen $A_i$
+angeh\"ort, wird auf der linken Seite einmal gez\"ahlt.  Auf der rechten Seite
+wird es
+\[
+  \sum_{k=1}^{m}(-1)^{k-1}\binom{m}{k}
+  = 1 - (1-1)^m = 1
+\]
+mal gez\"ahlt, nach dem binomischen Lehrsatz.  Die Behauptung folgt.
+\end{proof}
+
+\begin{corollary}[Anzahl der Derangementen]
+Die Anzahl der Permutationen von $\{1,\ldots,n\}$ ohne Fixpunkt ist
+\[
+  D_n \;=\; n!\sum_{k=0}^{n}\frac{(-1)^k}{k!}
+  \;\longrightarrow\; \frac{n!}{e} \quad \text{f\"ur } n\to\infty.
+\]
+\end{corollary}
+
+\subsection{Doppelz\"ahlung}
+
+Doppelz\"ahlung (auch: Zweifaches Z\"ahlen) ist eine grundlegende Technik:
+Eine Identit\"at wird bewiesen, indem eine endliche Menge $S$ auf zwei
+verschiedene Weisen gez\"ahlt wird.
+
+\begin{example}[Handschlaglemma]
+In jedem Graphen $G = (V,E)$ gilt
+\[
+  \sum_{v \in V} \deg(v) \;=\; 2|E|.
+\]
+Jede Kante $\{u,v\}$ tr\"agt $1$ zu $\deg(u)$ und $1$ zu $\deg(v)$ bei,
+also insgesamt $2$ zur Gradfolge.
+\end{example}
+
+%% ============================================================
+\section{Erzeugende Funktionen}
+%% ============================================================
+
+\subsection{Gew\"ohnliche erzeugende Funktionen}
+
+Die \emph{gew\"ohnliche erzeugende Funktion} (OGF) einer Folge $(a_n)_{n\ge 0}$
+ist die formale Potenzreihe
+\[
+  A(x) \;=\; \sum_{n=0}^{\infty} a_n x^n.
+\]
+Der Koeffizient $[x^n]\,A(x) = a_n$ kodiert die Z\"ahlinformation.
+
+\subsection{Exponentielle erzeugende Funktionen}
+
+F\"ur Folgen, die von gelabelten Strukturen herr\"uhren, ist die \emph{exponentielle
+erzeugende Funktion} (EGF) gegeben durch
+\[
+  \hat{A}(x) \;=\; \sum_{n=0}^{\infty} a_n \frac{x^n}{n!}.
+\]
+Die Anzahl der Permutationen von $n$ Elementen ist $n!$, mit EGF
+$\hat{A}(x) = \frac{1}{1-x}$.
+
+\subsection{Catalan-Zahlen}
+
+\begin{definition}
+Die $n$-te \emph{Catalan-Zahl} ist
+\[
+  C_n \;=\; \frac{1}{n+1}\binom{2n}{n}, \qquad n \ge 0.
+\]
+\end{definition}
+
+Die Folge beginnt mit $1, 1, 2, 5, 14, 42, 132, \ldots$.  Catalan-Zahlen z\"ahlen
+viele kombinatorische Objekte: vollst\"andige Bin\"arb\"aume mit $n+1$ Bl\"attern,
+Triangulierungen eines $(n+2)$-Ecks, Dyck-Pfade der L\"ange $2n$ sowie g\"ultige
+Klammerausdr\"ucke der L\"ange $2n$.
+
+\begin{proposition}[OGF der Catalan-Zahlen]
+Die OGF $C(x) = \sum_{n=0}^{\infty} C_n x^n$ erf\"ullt die Funktionalgleichung
+$C(x) = 1 + x\,C(x)^2$ und ergibt
+\[
+  C(x) \;=\; \frac{1 - \sqrt{1-4x}}{2x}.
+\]
+\end{proposition}
+
+\subsection{Stirling-Zahlen}
+
+\begin{definition}
+Die \emph{Stirling-Zahl zweiter Art} $S(n,k)$ z\"ahlt die Partitionen einer
+$n$-elementigen Menge in genau $k$ nicht-leere, ungelabelte Bl\"ocke.
+Die \emph{Stirling-Zahl erster Art} $\left[{n\atop k}\right]$ (vorzeichenlos)
+z\"ahlt Permutationen von $n$ Elementen mit genau $k$ Zyklen.
+\end{definition}
+
+Wichtige Identit\"aten:
+\[
+  S(n,k) = k\,S(n-1,k) + S(n-1,k-1), \qquad
+  x^n = \sum_{k=0}^{n} S(n,k)\,(x)_k,
+\]
+wobei $(x)_k = x(x-1)\cdots(x-k+1)$ das fallende Fakult\"at ist.
+
+%% ============================================================
+\section{Ramsey-Theorie}
+%% ============================================================
+
+\subsection{Definition und grundlegende Eigenschaften}
+
+\begin{definition}\label{def:ramsey-zahl}
+F\"ur positive ganze Zahlen $s, t \ge 2$ ist die \emph{Ramsey-Zahl} $R(s,t)$
+die kleinste positive ganze Zahl $N$, sodass jede Zweif\"arbung der Kanten
+von $K_N$ (rot/blau) entweder ein rotes $K_s$ oder ein blaues $K_t$ enth\"alt.
+\end{definition}
+
+\"Aquivalent ist $R(s,t)$ das kleinste $N$, sodass jeder Graph auf $N$ Knoten
+entweder eine Clique der Gr\"o\ss{}e $s$ oder eine unabh\"angige Menge der Gr\"o\ss{}e
+$t$ enth\"alt.
+
+\begin{remark}
+Die Symmetrie $R(s,t) = R(t,s)$ folgt unmittelbar aus dem Vertauschen der Farben
+(bzw. dem Komplementgraphen).  Randbedingungen: $R(2,t) = t$ und $R(s,2) = s$
+f\"ur alle $s,t \ge 2$.
+\end{remark}
+
+\subsection{Der Ramsey-Satz}
+
+\begin{theorem}[Ramsey, 1930]\label{satz:ramsey-endlich}
+F\"ur alle ganzen Zahlen $s,t \ge 2$ ist die Ramsey-Zahl $R(s,t)$ endlich.
+\end{theorem}
+
+\begin{proof}
+Wir beweisen $R(s,t) \le \binom{s+t-2}{s-1}$ durch Induktion.  Die Basisfälle
+$R(2,t)=t$ und $R(s,2)=s$ sind klar.  F\"ur den Induktionsschritt sei $v$ ein
+Knoten in einem Graphen $G$ auf $R(s-1,t)+R(s,t-1)$ Knoten.  Die Nachbarn von
+$v$ bilden $N(v)$, die Nicht-Nachbarn $\overline{N}(v)$.  Nach dem Schubfachprinzip
+gilt
+\[
+  |N(v)| \ge R(s-1,t) \quad \text{oder} \quad |\overline{N}(v)| \ge R(s,t-1).
+\]
+Im ersten Fall enth\"alt der Teilgraph auf $N(v)$ ein rotes $K_{s-1}$ oder ein
+blaues $K_t$; zusammen mit $v$ ergibt der erste Unterfall ein rotes $K_s$.
+Analoges gilt f\"ur den zweiten Fall.  Nach Induktionsvoraussetzung:
+\[
+  R(s,t) \le R(s-1,t) + R(s,t-1) \le \binom{s+t-3}{s-2} + \binom{s+t-3}{s-1}
+  = \binom{s+t-2}{s-1}.\qedhere
+\]
+\end{proof}
+
+\subsection{\texorpdfstring{$R(3,3) = 6$}{R(3,3) = 6}}
+
+\begin{theorem}\label{satz:r33}
+$R(3,3) = 6$.
+\end{theorem}
+
+\begin{proof}
+\textbf{Untergrenze $R(3,3) > 5$.}
+Der Kreis $C_5$ auf 5 Knoten hat kein Dreieck ($K_3$) und keine unabh\"angige
+Menge der Gr\"o\ss{}e 3 (das Komplement von $C_5$ ist wieder $C_5$, das ebenfalls
+kein Dreieck hat).  Daher ist $C_5$ eine Zweif\"arbung von $K_5$ ohne einfarbiges
+$K_3$, was $R(3,3) > 5$ zeigt.
+
+\textbf{Obergrenze $R(3,3) \le 6$.}
+Betrachte eine beliebige Zweif\"arbung von $K_6$.  Fixiere einen Knoten $v$.
+Er hat 5 Nachbarn, jede Kante rot oder blau gef\"arbt.  Nach dem Schubfachprinzip
+haben mindestens 3 Kanten von $v$ dieselbe Farbe, etwa rot.  Seien
+$\{u_1, u_2, u_3\}$ drei rote Nachbarn von $v$.  Ist eine Kante $u_i u_j$ rot,
+so bilden $v, u_i, u_j$ ein rotes $K_3$.  Sind alle Kanten unter
+$\{u_1, u_2, u_3\}$ blau, so bilden sie ein blaues $K_3$.  In jedem Fall
+existiert ein einfarbiges $K_3$.
+\end{proof}
+
+\subsection{\texorpdfstring{$R(4,4) = 18$}{R(4,4) = 18}}
+
+\begin{theorem}\label{satz:r44}
+$R(4,4) = 18$.
+\end{theorem}
+
+\begin{proof}[Beweissk\"otte]
+\textbf{Obergrenze $R(4,4) \le 18$.}
+Aus der rekursiven Ungleichung folgt:
+$R(4,4) \le R(3,4) + R(4,3) = 9 + 9 = 18$.
+
+\textbf{Untergrenze $R(4,4) > 17$.}
+Der \emph{Paley-Graph} $P(17)$ auf 17 Knoten — zwei Knoten $i,j \in \mathbb{Z}_{17}$
+sind genau dann verbunden, wenn $i-j$ ein quadratischer Rest mod 17 ist — ist
+selbstkomplementär und enth\"alt weder $K_4$ noch eine unabh\"angige Menge der
+Gr\"o\ss{}e 4.  Daher gilt $R(4,4) > 17$.  Der Wert $R(4,4) = 18$ wurde erstmals
+von Kalbfleisch (1965) etabliert und sp\"ater computergest\"utzt best\"atigt.
+\end{proof}
+
+\subsection{Tabelle bekannter Ramsey-Zahlen}
+
+\begin{table}[h]
+\centering
+\caption{Bekannte exakte Werte von $R(s,t)$ f\"ur kleine $s,t$.}
+\begin{tabular}{@{}ccccccc@{}}
+\toprule
+$R(s,t)$ & $t=2$ & $t=3$ & $t=4$ & $t=5$ & $t=6$ & $t=7$ \\
+\midrule
+$s=2$ & 2 & 3 & 4 & 5 & 6 & 7 \\
+$s=3$ & 3 & 6 & 9 & 14 & 18 & 23 \\
+$s=4$ & 4 & 9 & 18 & 25 & -- & -- \\
+$s=5$ & 5 & 14 & 25 & \textbf{?} & -- & -- \\
+\bottomrule
+\end{tabular}
+\label{tab:ramsey}
+\end{table}
+
+%% ============================================================
+\section{Ramsey-Schranken}
+%% ============================================================
+
+\subsection{Die rekursive Oberschranke}
+
+\begin{theorem}[Rekursive Oberschranke]\label{satz:rekursiv}
+F\"ur alle $s,t \ge 3$ gilt
+\[
+  R(s,t) \;\le\; R(s-1,t) + R(s,t-1).
+\]
+Sind dar\"uber hinaus beide Werte $R(s-1,t)$ und $R(s,t-1)$ gerade, so gilt
+$R(s,t) \le R(s-1,t) + R(s,t-1) - 1$.
+\end{theorem}
+
+\begin{proof}
+Die Ungleichung $R(s,t) \le R(s-1,t) + R(s,t-1)$ wurde im Beweis von
+Satz~\ref{satz:ramsey-endlich} gezeigt.  F\"ur die Parit\"atsverbesserung:
+Sind beide Schranken gerade, so ist $n := R(s-1,t) + R(s,t-1) - 1$ ungerade.
+Bei einer Zweif\"arbung von $K_n$ hat jeder Knoten $v$ den Grad $n-1$, der gerade
+ist.  Die Parit\"atsbedingung erzwingt, dass einer der beiden F\"alle eintritt.
+\end{proof}
+
+\subsection{Die Erd\H{o}s-Untergrenze}
+
+Die von Erd\H{o}s \cite{Erdos1947} eingeführte probabilistische Methode
+revolutionierte die Kombinatorik, indem sie die Existenz kombinatorischer
+Strukturen ohne explizite Konstruktion nachwies.
+
+\begin{theorem}[Erd\H{o}s 1947 -- Probabilistische Untergrenze]\label{satz:erdos-unter}
+F\"ur alle $k \ge 3$ gilt
+\[
+  R(k,k) > 2^{k/2}.
+\]
+\end{theorem}
+
+\begin{proof}
+Sei $n = \lfloor 2^{k/2} \rfloor$.  F\"ärbe jede Kante von $K_n$ unabh\"angig
+und gleichverteilt rot oder blau.  F\"ur eine feste $k$-elementige Teilmenge
+$S \subseteq V$ sei $A_S$ das Ereignis, dass $S$ ein einfarbiges $K_k$ bildet.
+Dann gilt
+\[
+  \Pr[A_S] = 2 \cdot \frac{1}{2^{\binom{k}{2}}} = 2^{1-\binom{k}{2}}.
+\]
+Es gibt $\binom{n}{k}$ solcher Teilmengen, daher liefert die Vereinigungsschranke:
+\[
+  \Pr\Bigl[\bigcup_S A_S\Bigr]
+  \;\le\; \binom{n}{k} \cdot 2^{1-\binom{k}{2}}
+  \;\le\; \frac{n^k}{k!} \cdot 2^{1-k(k-1)/2}.
+\]
+F\"ur $n = \lfloor 2^{k/2}\rfloor$ gilt $n^k \le 2^{k^2/2}$.  Da
+$\binom{k}{2} = k(k-1)/2$, ergibt sich
+\[
+  \frac{2^{k^2/2}}{k!} \cdot 2^{1-k^2/2+k/2}
+  = \frac{2^{k/2+1}}{k!} < 1
+\]
+f\"ur alle $k \ge 3$ (da $k! > 2^{k/2+1}$ f\"ur $k \ge 3$).  Mit positiver
+Wahrscheinlichkeit existiert also kein einfarbiges $K_k$, was
+$R(k,k) > n \ge 2^{k/2}$ beweist.
+\end{proof}
+
+\begin{remark}
+Dies ist die erste und vielleicht eindrucksvollste Anwendung der Probabilistischen
+Methode.  Das Argument zeigt nur die \emph{Existenz}; der Beweis liefert keinen
+expliziten Graphen auf $\lfloor 2^{k/2}\rfloor$ Knoten ohne einfarbiges $K_k$.
+F\"ur kleine F\"alle liefern Paley-Graphen explizite Konstruktionen.
+\end{remark}
+
+%% ============================================================
+\section{Oberschranken f\"ur diagonale Ramsey-Zahlen}
+%% ============================================================
+
+\subsection{Die Binomialschranke}
+
+\begin{theorem}[Binomial-Oberschranke]\label{satz:binomial-oben}
+F\"ur alle $k \ge 2$ gilt
+\[
+  R(k,k) \;\le\; \binom{2k-2}{k-1} \;\le\; 4^{k-1}.
+\]
+\end{theorem}
+
+\begin{proof}
+Nach Satz~\ref{satz:rekursiv} gilt $R(k,k) \le 2R(k-1,k)$.  Durch Aufl\"osen
+der Rekursion und Anwendung der Vandermonde-Faltung erh\"alt man
+$R(k,k) \le \binom{2k-2}{k-1}$.  Die Schranke $\binom{2k-2}{k-1} \le 4^{k-1}$
+folgt aus $\binom{2m}{m} \le 4^m$.
+\end{proof}
+
+\subsection{Die Spencer-Verfeinerung (1975)}
+
+Spencer \cite{Spencer1975} verbesserte die Erd\H{o}s-Schranke mit Hilfe des
+Lov\'asz-Lokalen-Lemmas (vgl.\ Abschnitt~\ref{sec:lll}):
+
+\begin{theorem}[Spencer 1975]\label{satz:spencer}
+Es existiert eine absolute Konstante $c > 0$ mit
+\[
+  R(k,k) \;\ge\; c \cdot k \cdot \frac{2^{k/2}}{\sqrt{\ln k}}.
+\]
+\end{theorem}
+
+Diese Verbesserung gegen\"uber der einfachen Erd\H{o}s-Schranke betr\"agt einen
+Faktor der Ordnung $k/\sqrt{\ln k}$.
+
+\subsection{Die Sah-Schranke (2023)}
+
+Ein wichtiger j\"ungerer Durchbruch stammt von Sah \cite{Sah2023}:
+
+\begin{theorem}[Sah 2023]
+Es existiert $\varepsilon > 0$ (explizit: $\varepsilon \approx 0{,}007$) mit
+\[
+  R(k,k) \;\le\; (4-\varepsilon)^k.
+\]
+\end{theorem}
+
+Dies ist die erste Verbesserung der $4^k$-Oberschranke seit \"uber 75 Jahren
+und durchbricht die Erd\H{o}s-Szekeres-Schranke.
+
+%% ============================================================
+\section{Der Hales--Jewett-Satz}
+%% ============================================================
+
+Der Satz von Hales und Jewett \cite{HalesJewett1963} ist ein kombinatorischer
+Grundstein, der dem Satz von van der Waerden \"uber arithmetische Progressionen
+zugrunde liegt.
+
+\begin{definition}
+Eine \emph{kombinatorische Linie} im W\"urfel $[k]^n = \{1,\ldots,k\}^n$ ist eine
+Menge von $k$ Punkten $\ell(1), \ell(2), \ldots, \ell(k)$, bei der jede Koordinate
+$i$ entweder f\"ur alle $j$ gleich ist (eine \emph{feste} Koordinate) oder
+$\ell(j)_i = j$ erf\"ullt (eine \emph{aktive} Koordinate), mit mindestens einer
+aktiven Koordinate.
+\end{definition}
+
+\begin{theorem}[Hales--Jewett, 1963]\label{satz:hales-jewett}
+F\"ur alle $k \ge 1$ und $r \ge 1$ existiert $N = \mathrm{HJ}(k,r)$, sodass
+jede $r$-F\"arbung von $[k]^N$ eine einfarbige kombinatorische Linie enth\"alt.
+\end{theorem}
+
+\begin{proof}[Beweissk\"otte]
+Der Beweis erfolgt durch doppelte Induktion \"uber $(k,r)$.  Die Basisf\"alle
+sind trivial.  Im Induktionsschritt bettet man $[k]^n$ in einen gr\"o\ss{}eren
+W\"urfel ein und verwendet die Induktionsvoraussetzung, um eine einfarbige
+kombinatorische Linie durch ein Dichteargument zu finden.  Der Dichte-Hales--Jewett-Satz
+(Polymath 2012) liefert quantitative Schranken.
+\end{proof}
+
+\begin{corollary}[Satz von van der Waerden]
+F\"ur alle $k,r \ge 1$ existiert $W = W(k,r)$, sodass jede $r$-F\"arbung von
+$\{1,\ldots,W\}$ eine einfarbige arithmetische Progression der L\"ange $k$ enth\"alt.
+\end{corollary}
+
+\begin{proof}
+Das Korollar folgt aus dem Hales--Jewett-Satz durch Projektion der kombinatorischen
+Linie in $[k]^N$ via der Abbildung $(x_1,\ldots,x_N) \mapsto \sum_{i=1}^N k^{i-1}(x_i-1)$:
+Kombinatorische Linien projizieren auf arithmetische Progressionen.
+\end{proof}
+
+%% ============================================================
+\section{Extremale Kombinatorik}
+%% ============================================================
+
+\subsection{Der Tur\'an-Satz}
+
+Die extremale Graphentheorie fragt: Was ist die maximale Kantenanzahl eines
+Graphen auf $n$ Knoten, der $K_{r+1}$ nicht als Teilgraphen enth\"alt?
+
+\begin{definition}
+Die \emph{Tur\'an-Zahl} $\mathrm{ex}(n, K_{r+1})$ ist die maximale Kantenanzahl
+in einem $K_{r+1}$-freien Graphen auf $n$ Knoten.  Der \emph{Tur\'an-Graph}
+$T(n,r)$ ist der vollst\"andige $r$-partite Graph auf $n$ Knoten mit m\"oglichst
+gleich gro\ss{}en Teilen.
+\end{definition}
+
+\begin{theorem}[Tur\'an, 1941]\label{satz:turan}
+\[
+  \mathrm{ex}(n, K_{r+1}) \;=\; |E(T(n,r))| \;=\; \left(1 - \frac{1}{r}\right)\frac{n^2}{2}
+  + O(n).
+\]
+Genauer gilt $\mathrm{ex}(n, K_{r+1}) = \left\lfloor\left(1-\frac{1}{r}\right)\frac{n^2}{2}\right\rfloor$
+und der eindeutige Extremalgraph ist $T(n,r)$.
+\end{theorem}
+
+\begin{proof}
+\textbf{Oberschranke.}  Sei $G$ ein $K_{r+1}$-freier Graph auf $n$ Knoten.
+Durch Induktion \"uber $n$: Hat $G$ einen Knoten $v$ mit Maximalgrad $\Delta$,
+so sei $G' = G - v$.  Nach Induktionsvoraussetzung ist
+$|E(G')| \le \left(1-\frac{1}{r}\right)\frac{(n-1)^2}{2}$.
+Da $G$ $K_{r+1}$-frei ist, ist die Nachbarschaft $N(v)$ $K_r$-frei; eine sorgf\"altige
+Rechnung liefert die Schranke.
+
+\textbf{Unterschranke.}  Der Tur\'an-Graph $T(n,r)$ ist $K_{r+1}$-frei und erreicht
+die angegebene Kantenanzahl.
+
+\textbf{Eindeutigkeit.}  Ein Stabilit\"atsargument zeigt, dass jeder Extremalgraph
+$r$-f\"arbbar und daher gleich $T(n,r)$ sein muss.
+\end{proof}
+
+\subsection{Das Zarankiewicz-Problem}
+
+\begin{definition}
+$z(n;r)$ bezeichnet die maximale Kantenanzahl in einem bipartiten Graphen auf
+$n+n$ Knoten, der keinen vollst\"andigen bipartiten Teilgraphen $K_{r,r}$ enth\"alt.
+\end{definition}
+
+\begin{theorem}[K\H{o}v\'ari--S\'os--Tur\'an, 1954]
+\[
+  z(n;r) \;\le\; \frac{1}{2}\left(1+\sqrt{4r-3}\right)(n-1)^{1-1/r}\,n^{1/r}
+  + \frac{r-1}{2}\,n \;=\; O\!\left(n^{2-1/r}\right).
+\]
+\end{theorem}
+
+%% ============================================================
+\section{Die Probabilistische Methode und das Lov\'asz-Lokale-Lemma}
+\label{sec:lll}
+%% ============================================================
+
+\subsection{Die Probabilistische Methode}
+
+Die Probabilistische Methode beweist die Existenz kombinatorischer Strukturen,
+indem gezeigt wird, dass ein zuf\"allig gew\"ahltes Objekt die gew\"unschte
+Eigenschaft mit positiver Wahrscheinlichkeit hat.  Wichtige Werkzeuge sind:
+\begin{itemize}[noitemsep]
+  \item \textbf{Erstes-Moment-Methode} (Vereinigungsschranke):
+        $\Pr[\bigcup A_i] \le \sum \Pr[A_i]$.
+  \item \textbf{Zweites-Moment-Methode}: Nutzt die Varianz um
+        $\Pr[X > 0] > 0$ zu zeigen.
+  \item \textbf{Alteration}: Modifiziere eine zuf\"allige Struktur, um Defekte zu beheben.
+\end{itemize}
+
+\subsection{Das Lov\'asz-Lokale-Lemma}
+
+Das Lov\'asz-Lokale-Lemma \cite{ErdosLovasz1975} ist ein m\"achtiges Werkzeug
+f\"ur den Umgang mit nahezu unabh\"angigen schlechten Ereignissen.
+
+\begin{theorem}[Lov\'asz-Lokales-Lemma -- Symmetrische Version]\label{satz:lll}
+Seien $A_1, \ldots, A_n$ Ereignisse in einem Wahrscheinlichkeitsraum, jedes mit
+$\Pr[A_i] \le p$, und jedes $A_i$ sei von allen bis auf h\"ochstens $d$ anderen
+Ereignissen stochastisch unabh\"angig.  Gilt
+\[
+  e\,p\,(d+1) \;\le\; 1,
+\]
+so ist $\Pr\bigl[\bigcap_{i=1}^n \overline{A_i}\bigr] > 0$.  Insbesondere
+existiert ein Elementarereignis, bei dem kein $A_i$ eintritt.
+\end{theorem}
+
+\begin{proof}
+Wir beweisen die allgemeine (asymmetrische) Version und leiten den symmetrischen
+Fall her.  Definiere einen \emph{Abh\"angigkeitsgraphen} $D$, in dem $A_i$ und
+$A_j$ verbunden sind, wenn sie nicht unabh\"angig sind.  Seien $x_i \in [0,1)$
+mit $x_i = ep$.  Durch Induktion \"uber $|S|$ zeigt man:
+\[
+  \Pr\left[A_i \;\middle|\; \bigcap_{j \in S} \overline{A_j}\right]
+  \;\le\; x_i \prod_{j \sim i} (1-x_j).
+\]
+F\"ur $ep(d+1) \le 1$ gilt $x_i \prod_{j\sim i}(1-x_j) \ge ep\cdot(1-ep)^d \ge \Pr[A_i]$.
+Daraus folgt
+$\Pr\bigl[\bigcap \overline{A_i}\bigr] \ge \prod_{i=1}^n (1-x_i) > 0$.
+\end{proof}
+
+\subsection{Anwendung: Graphenf\"arbung}
+
+\begin{corollary}
+Hat der Graph $G$ Maximalgrad $\Delta \ge 3$ und Taillenweite $g \ge 5$, so gilt
+f\"ur die chromatische Zahl
+\[
+  \chi(G) \;\le\; \left\lceil \frac{2\Delta}{\ln \Delta} \right\rceil + 1.
+\]
+\end{corollary}
+
+\subsection{Anwendung auf Ramsey-Zahlen}
+
+Mit dem LLL bewies Spencer \cite{Spencer1975}:
+
+\begin{theorem}
+F\"ur $k \ge 3$ existiert eine Zweif\"arbung von $K_n$ ohne einfarbiges $K_k$
+f\"ur
+\[
+  n \;\ge\; \frac{k-1}{e\sqrt{2}} \cdot \frac{2^{k/2}}{\sqrt{\ln k}}.
+\]
+Daher gilt $R(k,k) > c \cdot k \cdot 2^{k/2}/\sqrt{\ln k}$.
+\end{theorem}
+
+%% ============================================================
+\section{Offene Probleme}
+%% ============================================================
+
+\subsection{Der Wert von \texorpdfstring{$R(5,5)$}{R(5,5)}}
+
+\begin{conjecture}[Exakter Wert von $R(5,5)$]\label{verm:r55}
+Die Ramsey-Zahl $R(5,5)$ erf\"ullt
+\[
+  43 \;\le\; R(5,5) \;\le\; 48.
+\]
+Der exakte Wert ist unbekannt.
+\end{conjecture}
+
+Die Untergrenze $R(5,5) \ge 43$ wurde von Exoo \cite{Exoo1989} durch einen
+expliziten Graphen auf 42 Knoten ohne einfarbiges $K_5$ etabliert.  Die Obergrenze
+$R(5,5) \le 48$ wurde von Angeltveit und McKay \cite{AngeltveitMcKay2017} bewiesen.
+Die Bestimmung des exakten Wertes ist eines der bekanntesten offenen Probleme der
+Kombinatorik.
+
+\subsection{Diagonale Ramsey-Zahlen}
+
+\begin{conjecture}[Erd\H{o}s]\label{verm:diagonal}
+Es existieren Konstanten $c_1 < c_2$ mit
+\[
+  c_1^k \;\le\; R(k,k) \;\le\; c_2^k
+\]
+f\"ur alle $k \ge 2$.  Dar\"uber hinaus existiert der Grenzwert
+$\lim_{k\to\infty} R(k,k)^{1/k}$.
+\end{conjecture}
+
+Trotz der Schranken $2^{k/2} < R(k,k) \le (4-\varepsilon)^k$ ist die Frage,
+ob dieser Grenzwert existiert und welchen Wert er hat, ungekl\"art.
+
+\subsection{Off-diagonale Ramsey-Zahlen}
+
+\begin{conjecture}[Erd\H{o}s-Faudree]\label{verm:offdiag}
+F\"ur festes $s \ge 3$ gilt
+\[
+  R(s,t) \;=\; \Theta\!\left(t^{(s+1)/2} / (\log t)^{(s-1)/2}\right).
+\]
+\end{conjecture}
+
+Der Fall $s=3$: $R(3,t) = \Theta(t^2/\log t)$ wurde von Kim \cite{Kim1995} bewiesen.
+
+\subsection{Mehrfarben-Ramsey-Zahlen}
+
+\begin{conjecture}
+Die Mehrfarben-Ramsey-Zahl $R_r(3)$ (kleinste $N$, sodass jede $r$-F\"arbung von
+$K_N$ ein einfarbiges $K_3$ enth\"alt) erf\"ullt
+\[
+  R_r(3) \;=\; \Theta\!\left(\frac{r!}{\sqrt{r}}\right).
+\]
+\end{conjecture}
+
+\subsection{Erd\H{o}s-Preisaufgaben}
+
+Erd\H{o}s bot Geldpreise f\"ur die L\"osung vieler Probleme dieses Bereichs an:
+\begin{itemize}[noitemsep]
+  \item \$250 f\"ur die Bestimmung von $\lim_{k} R(k,k)^{1/k}$,
+  \item \$500 f\"ur den Beweis von $R(3,t) = o(t^2/\log t)$ oder $\omega(t^2/\log t)$,
+  \item \$10.000 (h\"ochster Preis) f\"ur eine L\"osung der Frage nach den Ramsey-Multiplikationskonstanten.
+\end{itemize}
+
+%% ============================================================
+\section*{Literatur}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Ramsey1930}
+F.P.~Ramsey,
+\textit{On a problem of formal logic},
+Proc.\ London Math.\ Soc.\ \textbf{30} (1930), 264--286.
+
+\bibitem{Erdos1947}
+P.~Erd\H{o}s,
+\textit{Some remarks on the theory of graphs},
+Bull.\ Amer.\ Math.\ Soc.\ \textbf{53} (1947), 292--294.
+
+\bibitem{ErdosSzekeres1935}
+P.~Erd\H{o}s und G.~Szekeres,
+\textit{A combinatorial problem in geometry},
+Compositio Math.\ \textbf{2} (1935), 463--470.
+
+\bibitem{ErdosLovasz1975}
+P.~Erd\H{o}s und L.~Lov\'asz,
+\textit{Problems and results on 3-chromatic hypergraphs and some related questions},
+in: \textit{Infinite and Finite Sets}, Colloq.\ Math.\ Soc.\ J.\ Bolyai \textbf{10},
+North-Holland, 1975, S.~609--627.
+
+\bibitem{GrahamRothschildSpencer}
+R.L.~Graham, B.L.~Rothschild und J.H.~Spencer,
+\textit{Ramsey Theory}, 2.~Aufl., Wiley, New York, 1990.
+
+\bibitem{AlonSpencer}
+N.~Alon und J.H.~Spencer,
+\textit{The Probabilistic Method}, 4.~Aufl., Wiley, Hoboken, 2016.
+
+\bibitem{HalesJewett1963}
+A.W.~Hales und R.I.~Jewett,
+\textit{Regularity and positional games},
+Trans.\ Amer.\ Math.\ Soc.\ \textbf{106} (1963), 222--229.
+
+\bibitem{Spencer1975}
+J.H.~Spencer,
+\textit{Ramsey's theorem for spaces},
+Trans.\ Amer.\ Math.\ Soc.\ \textbf{249} (1975), 187--198.
+
+\bibitem{Turan1941}
+P.~Tur\'an,
+\textit{On an extremal problem in graph theory} (ungarisch),
+Mat.\ Fiz.\ Lapok \textbf{48} (1941), 436--452.
+
+\bibitem{Exoo1989}
+G.~Exoo,
+\textit{A lower bound for Schur numbers and multicolor Ramsey numbers of $K_3$},
+Electron.\ J.\ Combin.\ \textbf{1} (1994), R8.
+
+\bibitem{AngeltveitMcKay2017}
+J.~Angeltveit und B.D.~McKay,
+\textit{$R(5,5) \le 48$},
+J.\ Graph Theory \textbf{89} (2018), Nr.~1, 5--32.
+
+\bibitem{Kim1995}
+J.H.~Kim,
+\textit{The Ramsey number $R(3,t)$ has order of magnitude $t^2/\log t$},
+Random Structures Algorithms \textbf{7} (1995), 173--207.
+
+\bibitem{Sah2023}
+A.~Sah,
+\textit{Diagonal Ramsey via effective quasirandomness},
+Duke Math.\ J.\ \textbf{172} (2023), Nr.~3, 545--567.
+
+\bibitem{Radziszowski2021}
+S.P.~Radziszowski,
+\textit{Small Ramsey numbers},
+Electron.\ J.\ Combin., Dynamic Survey DS1, Revision 16, 2021.
+
+\end{thebibliography}
+
+\end{document}

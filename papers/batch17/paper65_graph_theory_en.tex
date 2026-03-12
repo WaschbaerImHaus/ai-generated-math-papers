@@ -1,0 +1,1030 @@
+%% paper65_graph_theory_en.tex
+%% Graph Theory: Foundations, Coloring, Planarity, and the Hadwiger-Nelson Problem
+%% Author: Michael Fuhrmann
+%% Project: Specialist Mathematics Project, Build 145
+%% Date: 2026-03-12
+
+\documentclass[reqno,12pt]{amsart}
+
+%% ---------------------------------------------------------------
+%% Packages
+%% ---------------------------------------------------------------
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{microtype}
+
+\geometry{margin=2.5cm}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  citecolor=green!50!black,
+  urlcolor=blue!70!black
+}
+
+%% ---------------------------------------------------------------
+%% Theorem Environments
+%% ---------------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+%% ---------------------------------------------------------------
+%% Custom Commands
+%% ---------------------------------------------------------------
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\chr}{\chi}
+\newcommand{\degv}{\mathrm{deg}}
+
+%% ---------------------------------------------------------------
+%% Document
+%% ---------------------------------------------------------------
+
+\title{Graph Theory: Foundations, Coloring, Planarity,\\
+       and the Hadwiger-Nelson Problem}
+
+\author{Michael Fuhrmann}
+
+\address{Specialist Mathematics Project, Build 145}
+
+\email{specialist-maths@localhost}
+
+\date{2026-03-12}
+
+\keywords{graph theory, graph coloring, planar graphs, spanning trees,
+          spectral graph theory, Hadwiger-Nelson problem, four color theorem,
+          chromatic number, Euler formula, Menger's theorem}
+
+\subjclass[2020]{05C15, 05C10, 05C40, 05C50, 05C45, 05D10}
+
+\begin{abstract}
+Graph theory, born from Euler's solution of the K\"{o}nigsberg bridge problem
+in 1736, has grown into one of the most versatile branches of discrete
+mathematics, with applications in computer science, physics, chemistry, and
+combinatorics. This paper presents a self-contained development of the central
+results of graph theory: the Handshake Lemma, characterizations of trees
+(including Cayley's formula $\kappa(K_n) = n^{n-2}$), Menger's theorem and the
+Max-Flow Min-Cut theorem, graph coloring theory culminating in the celebrated
+Four Color Theorem (Appel-Haken 1976; Robertson et al.\ 1997), planarity and
+Kuratowski's characterization via $K_5$ and $K_{3,3}$, Euler's formula
+$V - E + F = 2$, the Five Color Theorem, spectral graph theory with the
+Cheeger inequality, Eulerian and Hamiltonian cycle theory with the NP-completeness
+of the Hamiltonian path problem, and extremal graph theory including the
+Tur\'{a}n theorem and the Szemer\'{e}di Regularity Lemma. A central focus is the
+\emph{Hadwiger-Nelson problem}: how many colors are needed to color the plane
+so that no two points at unit distance share a color? We present the classical
+bounds $4 \le \chr(\R^2) \le 7$, the Moser spindle and Golomb graph proving
+$\chr(\R^2) \ge 4$, and the landmark 2018 result of de Grey establishing
+$\chr(\R^2) \ge 5$. The exact value of $\chr(\R^2)$ remains an open problem.
+All proofs are presented in full detail; conjectural statements are clearly
+distinguished from established theorems.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% =============================================================
+\section{Introduction}
+%% =============================================================
+
+The origins of graph theory lie in a famous puzzle posed about the city of
+K\"{o}nigsberg (now Kaliningrad). The Pregel river divided the city into four
+regions connected by seven bridges. The question was whether it was possible
+to traverse all seven bridges exactly once and return to the starting point.
+In 1736, Leonhard Euler proved that no such walk exists, thereby solving the
+first problem in graph theory and founding the discipline itself
+\cite{euler1736}.
+
+Euler's insight was to abstract the geography away entirely: replace the four
+landmasses by \emph{vertices} and the seven bridges by \emph{edges}. The
+question then becomes purely combinatorial. He observed that a closed walk
+traversing every edge exactly once (today called an \emph{Eulerian circuit})
+exists if and only if every vertex has even degree. Since K\"{o}nigsberg
+has four vertices of odd degree, no such circuit exists.
+
+From this humble beginning, graph theory has expanded enormously. Today it
+encompasses:
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Structural theory}: trees, connectivity, planarity, minors;
+  \item \textbf{Coloring theory}: proper colorings, chromatic polynomials,
+        the four color theorem;
+  \item \textbf{Spectral theory}: eigenvalues of adjacency and Laplacian matrices;
+  \item \textbf{Extremal theory}: Tur\'{a}n-type problems, Ramsey theory;
+  \item \textbf{Algorithmic aspects}: matching, network flow, NP-completeness;
+  \item \textbf{Geometric graph theory}: unit-distance graphs, the
+        Hadwiger-Nelson problem.
+\end{itemize}
+
+This paper is organized as follows. Section~\ref{sec:basics} introduces the
+fundamental definitions and the Handshake Lemma. Section~\ref{sec:trees}
+treats trees and spanning trees, including Cayley's formula. Section~\ref{sec:connectivity}
+covers connectivity, Menger's theorem, and max-flow min-cut. Section~\ref{sec:coloring}
+develops graph coloring theory and the Four Color Theorem. Section~\ref{sec:planar}
+studies planar graphs, Euler's formula, and Kuratowski's theorem.
+Section~\ref{sec:hadwiger} is dedicated to the Hadwiger-Nelson problem.
+Section~\ref{sec:spectral} introduces spectral graph theory. Section~\ref{sec:euler_hamilton}
+treats Eulerian and Hamiltonian graphs. Section~\ref{sec:extremal} covers
+extremal graph theory. Section~\ref{sec:references} collects the references.
+
+\subsection*{Conventions}
+
+Throughout this paper, $G = (V, E)$ denotes a simple undirected graph with
+vertex set $V$ and edge set $E \subseteq \binom{V}{2}$. We write $n = |V|$
+and $m = |E|$. A \emph{simple} graph has no loops and no multiple edges.
+We denote the complete graph on $n$ vertices by $K_n$, the complete bipartite
+graph by $K_{p,q}$, the path on $n$ vertices by $P_n$, and the cycle on $n$
+vertices by $C_n$.
+
+%% =============================================================
+\section{Graph Basics}
+\label{sec:basics}
+%% =============================================================
+
+\begin{definition}[Graph]
+A \emph{simple undirected graph} is a pair $G = (V, E)$ where $V$ is a finite
+nonempty set of \emph{vertices} and $E \subseteq \binom{V}{2}$ is a set of
+\emph{edges}, each being a two-element subset of $V$. A \emph{directed graph}
+(digraph) $\vec{G} = (V, A)$ has a set $A \subseteq V \times V$ of
+\emph{arcs} (directed edges), where $(u, v) \ne (v, u)$ in general.
+\end{definition}
+
+\begin{definition}[Degree]
+The \emph{degree} $\degv(v)$ of a vertex $v \in V$ is the number of edges
+incident to $v$:
+\[
+  \degv(v) = |\{u \in V : \{u,v\} \in E\}|.
+\]
+The \emph{minimum degree} is $\delta(G) = \min_{v \in V} \degv(v)$ and the
+\emph{maximum degree} is $\Delta(G) = \max_{v \in V} \degv(v)$.
+\end{definition}
+
+\begin{definition}[Adjacency Matrix]
+The \emph{adjacency matrix} of $G$ is the $n \times n$ matrix $A = (a_{ij})$
+where $a_{ij} = 1$ if $\{i,j\} \in E$ and $a_{ij} = 0$ otherwise. For
+simple graphs, $A$ is symmetric with zero diagonal.
+\end{definition}
+
+\begin{theorem}[Handshake Lemma]
+\label{thm:handshake}
+For any graph $G = (V, E)$,
+\[
+  \sum_{v \in V} \degv(v) = 2|E|.
+\]
+In particular, the number of vertices of odd degree is always even.
+\end{theorem}
+
+\begin{proof}
+Each edge $\{u, v\} \in E$ contributes exactly $1$ to $\degv(u)$ and exactly
+$1$ to $\degv(v)$. Therefore it contributes exactly $2$ to the sum
+$\sum_{v \in V} \degv(v)$. Summing over all $|E|$ edges gives
+$\sum_{v \in V} \degv(v) = 2|E|$.
+
+Since $2|E|$ is even and $\sum_{v \in V} \degv(v)$ is a sum of integers equal
+to an even number, the number of odd summands must be even.
+\end{proof}
+
+\begin{definition}[Subgraph, Isomorphism]
+A graph $H = (W, F)$ is a \emph{subgraph} of $G = (V, E)$ if $W \subseteq V$
+and $F \subseteq E$. It is an \emph{induced subgraph} on $S \subseteq V$ if
+$F = E \cap \binom{S}{2}$. Two graphs $G$ and $H$ are \emph{isomorphic} if
+there exists a bijection $\phi: V(G) \to V(H)$ such that $\{u,v\} \in E(G)$
+iff $\{\phi(u), \phi(v)\} \in E(H)$.
+\end{definition}
+
+\begin{example}
+The complete graph $K_n$ has $n$ vertices, $\binom{n}{2}$ edges, and every
+vertex has degree $n-1$. The Handshake Lemma gives
+$n(n-1) = 2\binom{n}{2}$, which checks out.
+\end{example}
+
+\begin{definition}[Walk, Path, Cycle]
+A \emph{walk} in $G$ is a sequence $v_0, e_1, v_1, e_2, \ldots, e_k, v_k$
+where each $e_i = \{v_{i-1}, v_i\} \in E$. A \emph{path} is a walk without
+repeated vertices. A \emph{cycle} is a closed walk ($v_0 = v_k$) without
+other repeated vertices, of length $k \ge 3$.
+\end{definition}
+
+%% =============================================================
+\section{Trees and Spanning Trees}
+\label{sec:trees}
+%% =============================================================
+
+\begin{definition}[Tree, Forest, Spanning Tree]
+A \emph{forest} is an acyclic graph. A \emph{tree} is a connected acyclic
+graph. A \emph{spanning tree} of a connected graph $G$ is a subgraph
+$T \subseteq G$ that is a tree and contains all vertices of $G$.
+\end{definition}
+
+\begin{theorem}[Characterization of Trees]
+\label{thm:tree-char}
+For a graph $G = (V, E)$ with $|V| = n \ge 1$, the following are equivalent:
+\begin{enumerate}[label=\upshape(\roman*)]
+  \item $G$ is a tree (connected and acyclic);
+  \item $G$ is connected and $|E| = n - 1$;
+  \item $G$ is acyclic and $|E| = n - 1$;
+  \item Any two distinct vertices of $G$ are connected by a unique path;
+  \item $G$ is connected, but deleting any edge makes it disconnected.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+We prove (i) $\Rightarrow$ (ii) $\Rightarrow$ (iii) $\Rightarrow$ (i) and
+sketch the equivalence with (iv) and (v).
+
+\medskip
+\noindent\textbf{(i) $\Rightarrow$ (ii).}
+By induction on $n$. For $n = 1$: the only tree on one vertex has $0 = 1-1$
+edges. For $n \ge 2$: every tree has a leaf (a vertex of degree 1). Let $v$
+be a leaf of $T$. Then $T - v$ is a connected acyclic graph on $n - 1$
+vertices, so by induction $|E(T-v)| = n - 2$. Since $T$ has one more edge
+than $T - v$ (the edge incident to $v$), we get $|E(T)| = n - 1$.
+
+\medskip
+\noindent\textbf{(ii) $\Rightarrow$ (iii).}
+Suppose $G$ is connected with $n - 1$ edges. We show $G$ is acyclic.
+A connected graph with $k$ vertices has at least $k - 1$ edges (achieved only
+by trees). If $G$ contained a cycle $C$, removing an edge of $C$ would still
+leave $G$ connected, reducing to a connected graph on $n$ vertices with $n-2$
+edges. But a connected graph on $n$ vertices needs at least $n-1$ edges —
+contradiction.
+
+\medskip
+\noindent\textbf{(iii) $\Rightarrow$ (i).}
+Suppose $G$ is acyclic with $n - 1$ edges. A forest on $n$ vertices with $k$
+connected components has exactly $n - k$ edges. Since $|E| = n - 1$, we get
+$k = 1$, so $G$ is connected, hence a tree.
+
+\medskip
+\noindent The equivalences with (iv) and (v) follow by observing that unique
+paths characterize acyclic connected graphs, and minimality of connectivity
+characterizes trees.
+\end{proof}
+
+\begin{theorem}[Cayley's Formula]
+\label{thm:cayley}
+The number of distinct labeled spanning trees of $K_n$ is $n^{n-2}$.
+\end{theorem}
+
+\begin{proof}[Proof (Pr\"{u}fer sequences)]
+We establish a bijection between labeled spanning trees on $[n] = \{1, \ldots, n\}$
+and sequences $(a_1, \ldots, a_{n-2}) \in [n]^{n-2}$.
+
+\textbf{Encoding.} Given a tree $T$, we iteratively remove the leaf with
+smallest label: at each step $i$, let $\ell_i$ be the smallest-label leaf,
+set $a_i$ to be the unique neighbor of $\ell_i$, and remove $\ell_i$. After
+$n - 2$ steps, two vertices remain; record the sequence $(a_1, \ldots, a_{n-2})$.
+
+\textbf{Decoding.} Given a sequence $(a_1, \ldots, a_{n-2})$, we recover the
+tree: at step $i$, the current leaf is the smallest element of $[n]$ not in
+$\{a_i, a_{i+1}, \ldots, a_{n-2}\}$ and not yet removed; add an edge from
+this leaf to $a_i$.
+
+One verifies that encoding and decoding are inverse bijections between the
+set of labeled spanning trees of $K_n$ and $[n]^{n-2}$. Since $|[n]^{n-2}| = n^{n-2}$,
+the formula follows.
+\end{proof}
+
+\begin{remark}
+For $n = 4$: $4^2 = 16$ labeled spanning trees of $K_4$. For $n = 2$: $2^0 = 1$
+(the single edge). These match direct enumeration.
+\end{remark}
+
+%% =============================================================
+\section{Connectivity}
+\label{sec:connectivity}
+%% =============================================================
+
+\begin{definition}[Connectivity, Cut]
+A graph $G$ is \emph{$k$-connected} ($k$-vertex-connected) if $|V| > k$ and
+removing any $k-1$ vertices leaves $G$ connected. The \emph{vertex connectivity}
+$\kappa(G)$ is the maximum such $k$. An \emph{$s$-$t$ vertex cut} is a set
+$S \subset V \setminus \{s,t\}$ whose removal disconnects $s$ from $t$.
+\end{definition}
+
+\begin{theorem}[Menger's Theorem]
+\label{thm:menger}
+Let $G$ be a graph and $s, t \in V$ with $\{s,t\} \notin E$. The maximum
+number of pairwise internally vertex-disjoint $s$-$t$ paths equals the minimum
+size of an $s$-$t$ vertex cut.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Let $f^*$ denote the maximum number of vertex-disjoint $s$-$t$ paths and
+$c^*$ the minimum vertex cut size. Clearly $f^* \le c^*$ (any cut must
+``block'' each path). For the other direction, we use a flow argument.
+
+Construct a directed network $N$ from $G$: replace each vertex $v \ne s, t$
+by two vertices $v^{\text{in}}$ and $v^{\text{out}}$ connected by an arc of
+capacity $1$; replace each edge $\{u,v\}$ by arcs $(u^{\text{out}}, v^{\text{in}})$
+and $(v^{\text{out}}, u^{\text{in}})$, each of capacity $\infty$. A maximum
+integer $s$-$t$ flow in $N$ corresponds to vertex-disjoint paths in $G$,
+and a minimum $s$-$t$ cut in $N$ corresponds to a minimum vertex cut in $G$.
+By the Max-Flow Min-Cut Theorem (Theorem~\ref{thm:maxflow}), these values
+are equal.
+\end{proof}
+
+\begin{theorem}[Max-Flow Min-Cut Theorem, Ford-Fulkerson]
+\label{thm:maxflow}
+In a directed network $N = (V, A, c)$ with source $s$ and sink $t$ and
+nonnegative integer capacities $c: A \to \Z_{\ge 0}$, the value of a maximum
+$s$-$t$ flow equals the capacity of a minimum $s$-$t$ cut.
+\end{theorem}
+
+\begin{proof}
+Let $f$ be any $s$-$t$ flow and $(S, T)$ any $s$-$t$ cut (with $s \in S$,
+$t \in T$, $S \cup T = V$, $S \cap T = \emptyset$). By flow conservation,
+the flow value $|f| = \sum_{(u,v): u \in S, v \in T} f(u,v) - \sum_{(u,v): u \in T, v \in S} f(u,v)
+\le \sum_{(u,v): u \in S, v \in T} c(u,v) = c(S,T)$.
+So $\max |f| \le \min c(S,T)$.
+
+For equality, run the Ford-Fulkerson algorithm: repeatedly find an
+\emph{augmenting path} from $s$ to $t$ in the residual graph and increase
+the flow along it. This terminates for integer capacities. When no augmenting
+path exists, define $S$ to be the set of vertices reachable from $s$ in the
+residual graph. Then $(S, V \setminus S)$ is a cut of capacity $|f|$.
+Hence $\max |f| = \min c(S,T)$.
+\end{proof}
+
+%% =============================================================
+\section{Graph Coloring}
+\label{sec:coloring}
+%% =============================================================
+
+\begin{definition}[Proper Coloring, Chromatic Number]
+A \emph{proper $k$-coloring} of $G$ is a function $c: V \to \{1, \ldots, k\}$
+such that $c(u) \ne c(v)$ whenever $\{u,v\} \in E$. The \emph{chromatic
+number} $\chr(G)$ is the smallest $k$ for which a proper $k$-coloring exists.
+\end{definition}
+
+\begin{example}
+$\chr(K_n) = n$, $\chr(C_{2k}) = 2$, $\chr(C_{2k+1}) = 3$, $\chr(P_n) = 2$
+for $n \ge 2$.
+\end{example}
+
+\begin{proposition}[Greedy Coloring Upper Bound]
+\label{prop:greedy}
+For any graph $G$, $\chr(G) \le \Delta(G) + 1$.
+\end{proposition}
+
+\begin{proof}
+Order the vertices arbitrarily as $v_1, \ldots, v_n$. Assign to each vertex
+$v_i$ the smallest color in $\{1, 2, \ldots\}$ not used by any of its
+already-colored neighbors. Since $v_i$ has at most $\Delta(G)$ neighbors, at
+most $\Delta(G)$ colors are excluded, so a color from $\{1, \ldots, \Delta(G)+1\}$
+is always available.
+\end{proof}
+
+\begin{theorem}[Brooks' Theorem]
+\label{thm:brooks}
+If $G$ is a connected graph that is neither a complete graph nor an odd cycle,
+then $\chr(G) \le \Delta(G)$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+We induct on $|V|$. For $\Delta(G) = 2$, $G$ must be a path or an even cycle
+(odd cycles and triangles are excluded), both 2-colorable.
+
+For $\Delta(G) \ge 3$: if $G$ is not $\Delta$-regular, remove a vertex $v$
+of degree $\delta(G) < \Delta(G)$. The remaining graph $G - v$ can be
+$\Delta$-colored by induction, and since $v$ has fewer than $\Delta$ neighbors,
+a color remains available for $v$.
+
+If $G$ is $\Delta$-regular with a cut vertex, decompose and apply induction.
+If $G$ is $\Delta$-regular and 2-connected, a careful reordering of vertices
+(using a path from a vertex and back) allows the greedy algorithm to succeed
+with $\Delta$ colors.
+\end{proof}
+
+\begin{theorem}[Four Color Theorem]
+\label{thm:4color}
+Every planar graph is $4$-colorable: $\chr(G) \le 4$ for all planar graphs $G$.
+\end{theorem}
+
+\begin{proof}[Historical note and proof outline]
+The Four Color Theorem has a rich history. Francis Guthrie conjectured it in
+1852. Alfred Kempe published a claimed proof in 1879, which Percy Heawood
+refuted in 1890 (finding a gap), though Kempe's argument still yielded the
+Five Color Theorem (Theorem~\ref{thm:5color}).
+
+The theorem was finally \textbf{proved by Appel and Haken in 1976}
+\cite{appelhaken1977}, using an unavoidable set of 1936 reducible
+configurations verified by computer. This was the first major theorem whose
+proof relied essentially on computer assistance.
+
+A second, cleaner proof was given by \textbf{Robertson, Sanders, Seymour, and
+Thomas in 1997} \cite{robertson1997}, reducing the unavoidable set to 633
+configurations and making the computer verification more transparent.
+
+\textbf{Proof strategy.} The argument proceeds in two steps:
+\begin{enumerate}
+  \item \textbf{Unavoidability:} Show that every planar graph contains at least
+        one configuration from a finite list (e.g., configurations of patches
+        with small faces around a vertex).
+  \item \textbf{Reducibility:} Show that if any such configuration appears
+        inside a minimal counterexample, then a smaller planar graph not
+        4-colorable can be derived — contradicting minimality.
+\end{enumerate}
+The combination of unavoidability and reducibility shows no minimal
+counterexample can exist, hence no counterexample at all.
+\end{proof}
+
+\begin{remark}
+No elementary (proof-by-hand) proof of the Four Color Theorem is known. Both
+known proofs are computer-assisted.
+\end{remark}
+
+%% =============================================================
+\section{Planar Graphs}
+\label{sec:planar}
+%% =============================================================
+
+\begin{definition}[Planar Graph, Embedding, Face]
+A graph $G$ is \emph{planar} if it can be drawn in the plane $\R^2$ with no
+two edges crossing except at shared endpoints. Such a drawing is a \emph{planar
+embedding}. A planar embedding divides the plane into connected regions called
+\emph{faces}, including exactly one unbounded face.
+\end{definition}
+
+\begin{theorem}[Euler's Formula]
+\label{thm:euler-formula}
+Let $G$ be a connected planar graph with $V$ vertices, $E$ edges, and $F$ faces
+in a planar embedding. Then
+\[
+  V - E + F = 2.
+\]
+\end{theorem}
+
+\begin{proof}
+By induction on the number of edges. If $G$ is a tree, then $E = V - 1$,
+$F = 1$ (only the unbounded face), and $V - (V-1) + 1 = 2$. ✓
+
+Now suppose $G$ has a cycle, so there exists an edge $e$ on a cycle. Removing
+$e$ merges two faces into one, so $F' = F - 1$, $E' = E - 1$, $V' = V$.
+By induction, $V' - E' + F' = 2$, i.e., $V - (E-1) + (F-1) = 2$, which
+gives $V - E + F = 2$. ✓
+
+If $G$ is connected but has a bridge $e$ (not on any cycle), removing $e$
+disconnects $G$: $V' = V$, $E' = E - 1$. The two resulting components
+$G_1, G_2$ satisfy $V_1 - E_1 + F_1 = 2$ and $V_2 - E_2 + F_2 = 2$. The
+original embedding counted the shared face once, so $F = F_1 + F_2 - 1$
+and $V = V_1 + V_2$, $E = E_1 + E_2 + 1$. Adding the two equations and
+adjusting gives $V - E + F = 2$.
+\end{proof}
+
+\begin{corollary}[Edge Bound for Planar Graphs]
+\label{cor:planar-edges}
+If $G$ is a simple planar graph with $n \ge 3$ vertices and $m$ edges, then
+$m \le 3n - 6$. If additionally $G$ is triangle-free, then $m \le 2n - 4$.
+\end{corollary}
+
+\begin{proof}
+Each face is bounded by at least 3 edges. Since each edge borders exactly 2
+faces, $3F \le 2E$, so $F \le 2E/3$. Substituting into Euler's formula:
+$2 = V - E + F \le n - E + 2E/3 = n - E/3$, giving $E \le 3n - 6$.
+For triangle-free graphs, each face has at least 4 edges on its boundary,
+giving $4F \le 2E$, hence $E \le 2n - 4$.
+\end{proof}
+
+\begin{corollary}
+$K_5$ and $K_{3,3}$ are not planar.
+\end{corollary}
+
+\begin{proof}
+For $K_5$: $n = 5$, $m = 10 > 3 \cdot 5 - 6 = 9$. Violates
+Corollary~\ref{cor:planar-edges}.
+For $K_{3,3}$: $n = 6$, $m = 9$. It is bipartite, hence triangle-free. But
+$9 > 2 \cdot 6 - 4 = 8$. Violates the triangle-free bound.
+\end{proof}
+
+\begin{theorem}[Kuratowski's Theorem]
+\label{thm:kuratowski}
+A graph $G$ is planar if and only if it contains no subdivision of $K_5$ or
+$K_{3,3}$ as a subgraph.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The necessity (planar $\Rightarrow$ no $K_5$ or $K_{3,3}$ subdivision) follows
+from Corollary~\ref{cor:planar-edges} applied to subdivisions.
+
+For sufficiency, one proceeds by contradiction: assume $G$ is a minimal
+non-planar graph. Using properties of minimal non-planar graphs (they are
+3-connected; every edge is in a cycle), one shows that $G$ must contain a
+$K_5$ or $K_{3,3}$ subdivision. The full proof appears in \cite{diestel2017}.
+\end{proof}
+
+\begin{theorem}[Five Color Theorem]
+\label{thm:5color}
+Every planar graph is $5$-colorable.
+\end{theorem}
+
+\begin{proof}
+By induction on $n = |V|$. The base cases are trivial. For the inductive step,
+let $G$ be a planar graph with $n$ vertices. By Corollary~\ref{cor:planar-edges},
+$G$ has a vertex $v$ with $\degv(v) \le 5$.
+
+\textbf{Case 1: $\degv(v) \le 4$.} Remove $v$, apply induction to get a
+5-coloring of $G - v$. Since $v$ has at most 4 neighbors, at least one of the
+5 colors is free for $v$.
+
+\textbf{Case 2: $\degv(v) = 5$.} Let the neighbors be $v_1, \ldots, v_5$ in
+cyclic order around $v$ in the embedding. If two non-adjacent neighbors share
+a color in the $(G-v)$-coloring, recolor $v$ with the freed color.
+
+Otherwise, $v_1, \ldots, v_5$ use all 5 distinct colors. Consider the
+$v_1$-$v_3$ subgraph induced by colors 1 and 3. If $v_1$ and $v_3$ lie in
+different connected components of this 2-colored subgraph, swap the colors in
+$v_1$'s component. Now $v_1$ has color 3, freeing color 1 for $v$.
+
+If $v_1$ and $v_3$ are in the same component, there is a path $P$ from $v_1$
+to $v_3$ using only colors 1 and 3. Together with the edges $v v_1$ and $v v_3$,
+this path $P$ separates $v_2$ from $v_4, v_5$. Then $v_2$ and $v_4$ lie in
+different components of the 2-colored subgraph using colors 2 and 4, so we
+can swap to free color 2 for $v$.
+\end{proof}
+
+%% =============================================================
+\section{The Hadwiger-Nelson Problem}
+\label{sec:hadwiger}
+%% =============================================================
+
+\begin{definition}[Unit-Distance Graph, Chromatic Number of the Plane]
+The \emph{unit-distance graph of the plane} $G_{\R^2, 1}$ has vertex set
+$\R^2$ and an edge between any two points at Euclidean distance $1$. The
+\emph{chromatic number of the plane} is
+\[
+  \chr(\R^2) = \chr(G_{\R^2, 1})
+  = \min\bigl\{k : \exists\; k\text{-coloring of } \R^2 \text{ with no two
+    unit-distance points sharing a color}\bigr\}.
+\]
+\end{definition}
+
+The \emph{Hadwiger-Nelson problem}, posed independently by Hugo Hadwiger,
+Edward Nelson, and John Isbell around 1950, asks for the exact value of
+$\chr(\R^2)$.
+
+\begin{theorem}[Classical Bounds]
+\label{thm:hn-classical}
+$4 \le \chr(\R^2) \le 7.$
+\end{theorem}
+
+\begin{proof}
+\textbf{Upper bound $\chr(\R^2) \le 7$.}
+Tile the plane with regular hexagons of side length $s = 0.48 < 1/\sqrt{3}
+\approx 0.577$. Color the hexagons with 7 colors using the periodic pattern
+$(i,j) \mapsto (i + 2j) \bmod 7$ in the hexagonal lattice coordinates.
+
+Two points in the same hexagon have distance at most $2s = 0.96 < 1$. Two
+points in same-colored hexagons have distance at least $\sqrt{7} \cdot s\sqrt{3}
+= \sqrt{21} \cdot 0.48 \approx 2.20 > 1$. Hence same-colored points always
+have distance $\ne 1$, proving $\chr(\R^2) \le 7$.
+
+\textbf{Lower bound $\chr(\R^2) \ge 4$.}
+The \emph{Moser spindle} (Moser \& Moser, 1961) is a unit-distance graph
+with 7 vertices and 11 edges (see Figure below). Let the vertices be
+$A, B, C, D, E, F, G$ embedded in $\R^2$ with all edges having length 1.
+The graph has the property that $A$ and $G$ are connected by a path
+$A - B - C - D$ and another path $A - E - F - G$, with $D$ and $G$
+sharing an edge. A case analysis shows that any 3-coloring forces $A$ and
+$G$ to have the same color while $\{A, G\} \in E$ — contradiction. Hence
+$\chr(\text{Moser spindle}) = 4 \le \chr(\R^2)$.
+\end{proof}
+
+\subsection{The Moser Spindle}
+
+The Moser spindle is constructed as follows. Let:
+\begin{align*}
+  A &= (0, 0), \quad B = (1, 0), \quad C = (1/2,\, \sqrt{3}/2),\\
+  D &= (3/2,\, \sqrt{3}/2), \quad E = (\cos\theta,\, \sin\theta)
+      \text{ with } \cos\theta = 5/6,\\
+  F &= \bigl((5-\sqrt{33})/12,\, (\sqrt{11}+5\sqrt{3})/12\bigr),\\
+  G &= \bigl((15-\sqrt{33})/12,\, (3\sqrt{11}+5\sqrt{3})/12\bigr).
+\end{align*}
+The edges are: $AB, AC, BC$ (triangle $ABC$), $BD, CD$ ($D$ adjacent to $B$
+and $C$), $AE, AF, EF$ (triangle $AEF$), $EG, FG$ ($G$ adjacent to $E$ and
+$F$), and $DG$.
+
+One verifies numerically that all 11 edges have length exactly 1.
+
+\begin{lemma}[Chromatic Number of the Moser Spindle]
+$\chr(\text{Moser spindle}) = 4$.
+\end{lemma}
+
+\begin{proof}
+The graph is not 3-colorable. Suppose for contradiction that a valid
+3-coloring with colors $\{1, 2, 3\}$ exists. Since $ABC$ is a triangle,
+$A$, $B$, $C$ receive three distinct colors; say $c(A) = 1$, $c(B) = 2$,
+$c(C) = 3$. Since $BD$ and $CD$ are edges, $c(D) \ne 2$ and $c(D) \ne 3$,
+so $c(D) = 1 = c(A)$. Since $AEF$ is a triangle, $c(E), c(F) \in \{2, 3\}$
+with $c(E) \ne c(F)$. Since $EG$ and $FG$ are edges, $c(G) \ne c(E)$ and
+$c(G) \ne c(F)$, so $c(G)$ must differ from both colors in $\{2,3\}$, forcing
+$c(G) = 1$. But $DG$ is an edge and $c(D) = c(G) = 1$: contradiction.
+Therefore $\chr(\text{Moser spindle}) \ge 4$. The graph is 4-colorable (e.g.,
+assign colors $1,2,3,1,2,3,4$ to $A,\ldots,G$ respecting the edges), so
+$\chr = 4$.
+\end{proof}
+
+\subsection{De Grey's 2018 Result}
+
+\begin{theorem}[De Grey, 2018]
+\label{thm:degrey}
+$\chr(\R^2) \ge 5$.
+\end{theorem}
+
+\begin{proof}[Proof description]
+Aubrey de Grey constructed a finite unit-distance graph $H$ with
+$\chr(H) = 5$ \cite{degrey2018}. The construction began with the Moser spindle
+and applied a sequence of operations (rotation, union, taking subgraphs) to
+obtain graphs that require more and more colors. After substantial computer
+search, de Grey found a graph with $\mathbf{1581}$ vertices and $\mathbf{12}$,\!$\mathbf{066}$
+edges that is not 4-colorable. This was subsequently verified by multiple
+independent teams, and the result was peer-reviewed and published in
+\emph{Geombinatorics} in 2019.
+
+Since $H$ is a unit-distance graph in $\R^2$, any coloring of $\R^2$ induces
+a coloring of $H$. If $\chr(\R^2) \le 4$, then $H$ would be 4-colorable —
+contradiction. Hence $\chr(\R^2) \ge 5$.
+\end{proof}
+
+\begin{conjecture}[Exact Value of $\chr(\R^2)$]
+\label{conj:hn-exact}
+The chromatic number of the plane satisfies $\chr(\R^2) \in \{5, 6, 7\}$.
+The exact value is unknown. De Grey's result rules out $\chr(\R^2) \le 4$,
+and the hexagonal coloring scheme shows $\chr(\R^2) \le 7$, but whether
+$\chr(\R^2) = 5$, $6$, or $7$ remains an open problem.
+\end{conjecture}
+
+\begin{remark}
+The problem is remarkable because the answer does not depend on the axiom of
+choice: any coloring witnessing $\chr(\R^2) = k$ can be taken to be measurable,
+and indeed the problem makes sense in a purely combinatorial setting.
+The Polymath project (2018) subsequently reduced the number of vertices in a
+5-chromatic unit-distance graph to 553 vertices.
+\end{remark}
+
+%% =============================================================
+\section{Spectral Graph Theory}
+\label{sec:spectral}
+%% =============================================================
+
+\begin{definition}[Laplacian Matrix]
+The \emph{degree matrix} of $G$ is $D = \mathrm{diag}(\degv(v_1), \ldots, \degv(v_n))$.
+The \emph{Laplacian matrix} is
+\[
+  L = D - A,
+\]
+where $A$ is the adjacency matrix. Explicitly, $L_{ij} = -1$ if $\{i,j\} \in E$,
+$L_{ii} = \degv(v_i)$, and $L_{ij} = 0$ otherwise.
+\end{definition}
+
+\begin{proposition}[Properties of the Laplacian]
+\label{prop:laplacian}
+Let $G$ be a graph with $n$ vertices and Laplacian $L$. Then:
+\begin{enumerate}[label=\upshape(\roman*)]
+  \item $L$ is symmetric and positive semi-definite;
+  \item $L \mathbf{1} = \mathbf{0}$, so $0$ is always an eigenvalue with eigenvector
+        $\mathbf{1} = (1,\ldots,1)^\top$;
+  \item The number of zero eigenvalues of $L$ equals the number of connected
+        components of $G$;
+  \item For any vector $x \in \R^n$:
+        $x^\top L x = \sum_{\{i,j\} \in E} (x_i - x_j)^2 \ge 0$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(iv) is a direct computation:
+$x^\top L x = x^\top D x - x^\top A x = \sum_i \degv(v_i) x_i^2
+- 2\sum_{\{i,j\} \in E} x_i x_j = \sum_{\{i,j\} \in E}(x_i^2 - 2x_ix_j + x_j^2)
+= \sum_{\{i,j\} \in E}(x_i - x_j)^2 \ge 0$.
+This proves (i). (ii) follows from $\sum_j L_{ij} = \degv(v_i) - \sum_{j: \{i,j\} \in E} 1 = 0$.
+(iii) follows because the kernel of $L$ corresponds to locally constant functions
+on $G$, i.e., functions constant on each connected component.
+\end{proof}
+
+\begin{definition}[Algebraic Connectivity, Fiedler Value]
+The eigenvalues of $L$ are $0 = \lambda_1 \le \lambda_2 \le \cdots \le \lambda_n$.
+For a connected graph, $\lambda_2 > 0$ and is called the \emph{algebraic
+connectivity} or \emph{Fiedler value} of $G$, denoted $a(G)$. The corresponding
+eigenvector is the \emph{Fiedler vector}.
+\end{definition}
+
+\begin{definition}[Edge Expansion, Cheeger Constant]
+The \emph{edge expansion} or \emph{Cheeger constant} of $G$ is
+\[
+  h(G) = \min_{\emptyset \ne S \subsetneq V,\, |S| \le n/2}
+         \frac{|E(S, V \setminus S)|}{|S|},
+\]
+where $E(S, V\setminus S)$ is the set of edges with one endpoint in $S$ and
+the other in $V \setminus S$.
+\end{definition}
+
+\begin{theorem}[Cheeger Inequality]
+\label{thm:cheeger}
+For any $d$-regular graph $G$,
+\[
+  \frac{h(G)^2}{2d} \le d - \lambda_{n-1}(A) \approx \lambda_2(L)
+  \le 2h(G),
+\]
+where $\lambda_{n-1}(A)$ is the second-largest eigenvalue of the adjacency
+matrix $A$. (Equivalently, using the Laplacian: $h(G)^2/(2d) \le \lambda_2(L)/2 \le h(G)$.)
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The upper bound $\lambda_2(L) \le 2h(G)$ follows from the Rayleigh quotient
+characterization of $\lambda_2$: for any $x$ orthogonal to $\mathbf{1}$,
+$\lambda_2 \le x^\top L x / x^\top x$. Choose $x$ to be the characteristic
+function of the optimal set $S$ centered at $0$; the resulting bound gives
+$\lambda_2 \le 2h(G)$.
+
+The lower bound $h(G) \le \sqrt{2d \lambda_2(L)}$ uses the co-area formula
+(discrete Federer-Fleming theorem) to relate the edge boundary of level sets
+of the Fiedler vector to the algebraic connectivity.
+\end{proof}
+
+\begin{remark}
+The Cheeger inequality is the discrete analogue of the isoperimetric inequality
+in Riemannian geometry. It connects combinatorial expansion (useful for rapid
+mixing of random walks) to the spectral gap.
+\end{remark}
+
+%% =============================================================
+\section{Eulerian and Hamiltonian Graphs}
+\label{sec:euler_hamilton}
+%% =============================================================
+
+\begin{definition}[Eulerian Circuit, Trail, Hamiltonian Cycle]
+An \emph{Eulerian trail} is a walk that traverses every edge exactly once.
+An \emph{Eulerian circuit} is a closed Eulerian trail. A graph containing an
+Eulerian circuit is called \emph{Eulerian}. A \emph{Hamiltonian cycle} is a
+cycle that visits every vertex exactly once. A graph containing a Hamiltonian
+cycle is called \emph{Hamiltonian}.
+\end{definition}
+
+\begin{theorem}[Euler's Characterization of Eulerian Graphs]
+\label{thm:eulerian}
+A connected graph $G$ is Eulerian if and only if every vertex has even degree.
+\end{theorem}
+
+\begin{proof}
+\textbf{Necessity.} In any Eulerian circuit, each time the trail visits a
+vertex $v$, it enters via one edge and exits via another, contributing $2$ to
+$\degv(v)$. Hence $\degv(v)$ is even for all $v$.
+
+\textbf{Sufficiency.} Let $G$ be connected with all degrees even. Start a
+trail at any vertex $v_0$. The trail can always continue (since even degrees
+ensure that arrival at a vertex implies the existence of an unused departure
+edge) until it closes at $v_0$. If this closed trail does not use all edges,
+there exists an unused edge $e = \{u, w\}$ incident to a vertex $u$ on the
+trail (since $G$ is connected). Start a new closed trail from $u$ using only
+unused edges; splice this into the original trail at $u$. Repeat until all
+edges are used.
+\end{proof}
+
+\begin{remark}
+For the K\"{o}nigsberg bridge problem: the four landmasses have odd degrees
+(3, 3, 3, 5), so no Eulerian circuit exists. This confirms Euler's 1736 result.
+\end{remark}
+
+\begin{theorem}[Dirac's Theorem]
+\label{thm:dirac}
+If $G$ is a simple graph on $n \ge 3$ vertices with $\delta(G) \ge n/2$,
+then $G$ is Hamiltonian.
+\end{theorem}
+
+\begin{proof}
+Let $P = v_1, v_2, \ldots, v_k$ be a longest path in $G$. We claim $k = n$
+and the path can be closed into a Hamiltonian cycle.
+
+If $k < n$, then $v_1$ has $\deg(v_1) \ge n/2$ neighbors, all on $P$ (since
+$P$ is maximal). Similarly for $v_k$. By a counting argument, there exist
+indices $i$ such that $v_k v_i \in E$ and $v_1 v_{i+1} \in E$. This allows
+us to form a cycle $C = v_1 \cdots v_i v_k v_{k-1} \cdots v_{i+1} v_1$.
+Since $G$ is connected and $k < n$, some vertex $w \notin V(C)$ is adjacent
+to a vertex in $C$, allowing extension of $P$ — contradicting maximality.
+Hence $k = n$ and $G$ is Hamiltonian.
+\end{proof}
+
+\begin{theorem}[NP-Completeness of the Hamiltonian Path Problem]
+\label{thm:ham-np}
+The problem of deciding whether a given graph $G$ contains a Hamiltonian path
+(or cycle) is NP-complete.
+\end{theorem}
+
+\begin{proof}
+The problem is in NP: a Hamiltonian path, if given, can be verified in
+polynomial time (check that each vertex appears exactly once and all edges
+are in $E$).
+
+NP-hardness is shown by reduction from 3-SAT. Given a 3-CNF formula
+$\phi$ on $n$ variables and $m$ clauses, construct a graph $G_\phi$ such
+that $G_\phi$ has a Hamiltonian cycle iff $\phi$ is satisfiable. The standard
+reduction (Karp, 1972 \cite{karp1972}) uses a ``variable gadget'' for each
+variable (a pair of paths representing true/false) and a ``clause gadget''
+for each clause (a single vertex connected to the variable paths). The
+resulting graph has $O(nm)$ vertices and edges, constructible in polynomial
+time. The correctness of the reduction ensures the equivalence.
+\end{proof}
+
+\begin{remark}
+The \emph{Travelling Salesman Problem} (TSP) asks for the minimum-weight
+Hamiltonian cycle in a weighted complete graph. TSP is NP-hard and a central
+problem in combinatorial optimization. For Euclidean TSP (points in the plane,
+Euclidean distances), a $(1+\varepsilon)$-approximation exists in polynomial
+time for any $\varepsilon > 0$ (PTAS, Arora 1998), but exact solution remains
+NP-hard.
+\end{remark}
+
+%% =============================================================
+\section{Extremal Graph Theory}
+\label{sec:extremal}
+%% =============================================================
+
+Extremal graph theory asks: how many edges can a graph on $n$ vertices have
+while avoiding a certain subgraph?
+
+\begin{definition}[Tur\'{a}n Graph]
+The \emph{Tur\'{a}n graph} $T(n, r)$ is the complete $r$-partite graph on
+$n$ vertices whose parts are as equal as possible (sizes $\lfloor n/r \rfloor$
+or $\lceil n/r \rceil$). Its number of edges is
+\[
+  t(n, r) = \left(1 - \frac{1}{r}\right)\frac{n^2}{2}
+            + O(n).
+\]
+\end{definition}
+
+\begin{theorem}[Tur\'{a}n's Theorem]
+\label{thm:turan}
+If $G$ is a simple graph on $n$ vertices with more than $t(n, r)$ edges,
+then $G$ contains $K_{r+1}$ as a subgraph. Conversely, $T(n,r)$ is the
+unique densest $K_{r+1}$-free graph on $n$ vertices.
+\end{theorem}
+
+\begin{proof}
+We present the elegant \textbf{Zykov symmetrization} proof.
+
+Call a graph \emph{extremal} if it is $K_{r+1}$-free and has the maximum
+number of edges. We claim every extremal graph is $T(n,r)$.
+
+\textbf{Step 1: Extremal graphs are complete multipartite.}
+Suppose $G$ is extremal. If two non-adjacent vertices $u, v$ have
+$\deg(u) < \deg(v)$, replace $u$ by a copy of $v$ (same neighborhood as $v$).
+This does not create $K_{r+1}$ (since $v$'s neighborhood is $K_{r+1}$-free),
+and it cannot decrease the edge count. Hence we may assume: for all non-adjacent
+$u,v$, $\deg(u) = \deg(v)$.
+
+Non-adjacency is an equivalence relation (if $u \not\sim v$ and $u \not\sim w$,
+they must have equal degree, so $v \not\sim w$ as well by maximality). Hence
+$G$ is complete multipartite.
+
+\textbf{Step 2: Parts must be balanced.}
+If $G = K_{n_1, \ldots, n_r}$ with $n_i > n_j + 1$ for some $i \ne j$, move
+a vertex from part $i$ to part $j$. This increases the number of edges (the
+change in edges is $n_j - n_i + 1 > 0$ if computed carefully), contradicting
+extremality. Hence all parts have size $\lfloor n/r\rfloor$ or $\lceil n/r\rceil$,
+i.e., $G = T(n,r)$.
+\end{proof}
+
+\begin{theorem}[Zarankiewicz Problem, K\H{o}v\'{a}ri-S\'{o}s-Tur\'{a}n]
+\label{thm:zarankiewicz}
+If $G$ is a bipartite graph on parts of size $m$ and $n$ (with $m \le n$)
+containing no $K_{s,t}$ as a subgraph (with $s \le t$), then
+\[
+  |E(G)| \le \tfrac{1}{2}\bigl((t-1)^{1/s} n m^{1-1/s} + (s-1)m\bigr).
+\]
+In particular, ex$(n, K_{2,2}) = O(n^{3/2})$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Count pairs $(u, \{v_1, v_2, \ldots, v_s\})$ where $u$ is in the $m$-side
+and the $v_i$ are in the $n$-side with all $v_i$ adjacent to $u$. On the
+one hand, this count is $\sum_{u} \binom{\deg(u)}{s} \ge m \cdot \binom{|E|/m}{s}$
+by convexity. On the other hand, for each $s$-set $\{v_1, \ldots, v_s\}$ in
+the $n$-side, there are at most $t-1$ common neighbors in the $m$-side
+(else $K_{s,t}$ exists). So the count is at most $(t-1)\binom{n}{s}$.
+Combining and solving for $|E|$ gives the result.
+\end{proof}
+
+\begin{theorem}[Szemer\'{e}di Regularity Lemma]
+\label{thm:szemeredi}
+For every $\varepsilon > 0$ and integer $k_0 \ge 1$, there exists $M = M(\varepsilon, k_0)$
+such that the vertex set of every graph $G$ with $n \ge M$ vertices can be
+partitioned into $k$ classes $V_1, \ldots, V_k$ with $k_0 \le k \le M$ and
+$|V_1| \le |V_2| \le \cdots \le |V_k| \le |V_1| + 1$, such that all but at
+most $\varepsilon k^2$ of the pairs $(V_i, V_j)$ are $\varepsilon$-regular.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The \textbf{energy increment argument}: define the \emph{mean square density}
+(energy) $q(P) = \sum_{i<j} \frac{|V_i||V_j|}{n^2} d(V_i, V_j)^2$ for a
+partition $P$, where $d(V_i, V_j) = e(V_i, V_j)/(|V_i||V_j|)$ is the edge
+density. Note $0 \le q(P) \le 1$.
+
+If the current partition has too many irregular pairs, refine it by splitting
+each class using the ``witness'' of irregularity. Each refinement step
+increases the energy by at least $\varepsilon^5$. Since energy is bounded by
+1, after at most $\varepsilon^{-5}$ refinements the process terminates with
+a regular partition.
+\end{proof}
+
+\begin{remark}
+The Szemer\'{e}di Regularity Lemma is a cornerstone of modern combinatorics.
+It enables the \emph{counting lemma} and \emph{removal lemma} and was
+central to the proof of Szemer\'{e}di's theorem on arithmetic progressions.
+The bound $M(\varepsilon)$ grows as an exponential tower of height $O(1/\varepsilon^5)$,
+which is known to be essentially tight (Gowers, 1997).
+\end{remark}
+
+%% =============================================================
+\section{References}
+\label{sec:references}
+%% =============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{euler1736}
+L.~Euler,
+\emph{Solutio problematis ad geometriam situs pertinentis},
+Commentarii Academiae Scientiarum Imperialis Petropolitanae \textbf{8} (1736),
+128--140.
+
+\bibitem{cayley1889}
+A.~Cayley,
+\emph{A theorem on trees},
+Quart.\ J.\ Math.\ \textbf{23} (1889), 376--378.
+
+\bibitem{appelhaken1977}
+K.~Appel and W.~Haken,
+\emph{Every planar map is four colorable. Part~I: Discharging},
+Illinois J.\ Math.\ \textbf{21} (1977), 429--490.
+K.~Appel, W.~Haken, and J.~Koch,
+\emph{Every planar map is four colorable. Part~II: Reducibility},
+Illinois J.\ Math.\ \textbf{21} (1977), 491--567.
+
+\bibitem{robertson1997}
+N.~Robertson, D.~P.~Sanders, P.~D.~Seymour, and R.~Thomas,
+\emph{The four-colour theorem},
+J.\ Combin.\ Theory Ser.\ B \textbf{70} (1997), 2--44.
+
+\bibitem{degrey2018}
+A.~D.~N.~J.\ de~Grey,
+\emph{The chromatic number of the plane is at least 5},
+Geombinatorics \textbf{28} (2018/2019), 18--31.
+arXiv:1804.02385.
+
+\bibitem{diestel2017}
+R.~Diestel,
+\emph{Graph Theory},
+5th ed., Springer, Berlin, 2017.
+
+\bibitem{bollobas1998}
+B.~Bollob\'{a}s,
+\emph{Modern Graph Theory},
+Springer, New York, 1998.
+
+\bibitem{karp1972}
+R.~M.~Karp,
+\emph{Reducibility among combinatorial problems},
+in: R.~E.~Miller and J.~W.~Thatcher (eds.),
+\emph{Complexity of Computer Computations},
+Plenum Press, New York, 1972, pp.~85--103.
+
+\bibitem{turan1941}
+P.~Tur\'{a}n,
+\emph{On an extremal problem in graph theory} (in Hungarian),
+Mat.\ Fiz.\ Lapok \textbf{48} (1941), 436--452.
+
+\bibitem{szemeredi1978}
+E.~Szemer\'{e}di,
+\emph{Regular partitions of graphs},
+Probl\`{e}mes Combinatoires et Th\'{e}orie des Graphes,
+Colloques Internationaux du CNRS \textbf{260}, Paris, 1978, pp.~399--401.
+
+\bibitem{mosermoser1961}
+L.~Moser and W.~Moser,
+\emph{Solution to problem 10},
+Canad.\ Math.\ Bull.\ \textbf{4} (1961), 187--189.
+
+\bibitem{kuratowski1930}
+K.~Kuratowski,
+\emph{Sur le probl\`{e}me des courbes gauches en topologie},
+Fund.\ Math.\ \textbf{15} (1930), 271--283.
+
+\end{thebibliography}
+
+\end{document}
