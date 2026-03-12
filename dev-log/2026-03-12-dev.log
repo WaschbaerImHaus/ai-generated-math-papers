@@ -998,3 +998,46 @@ BEHOBEN: Ergänzung nach der Formel:
 - src/parallel_compute.py
 - src/formula_simplifier.py
 - src/plugin_system.py
+
+=== 2026-03-12 19:21 — Build 161 — Bugfixes Paper 41 + Paper 42 ===
+
+2026-03-12 19:21 [Build 161]: Zwei konkrete Fehler in Batch-11-Papers behoben.
+
+### FEHLER 1 — Paper 41 EN+DE: CRT-Restklassen-Überdeckung korrigiert
+
+**Problem:**
+Die Coverage Summary (Abschnitt 4) und die mod-4-Proposition (Abschnitt 5)
+behaupteten, die nicht abgedeckten Restklassen mod 12 seien nur {1, 9}.
+
+**Korrekte Analyse der Typen:**
+- Typ I: n ≡ 0 (mod 4) → {0, 4, 8} mod 12
+- Typ II: n ≡ 2 (mod 3) → {2, 5, 8, 11} mod 12
+- Typ III: n ≡ 3 (mod 4) → {3, 7, 11} mod 12
+- Union: {0, 2, 3, 4, 5, 7, 8, 11} mod 12
+- Nicht abgedeckt: {1, 6, 9, 10} mod 12 — 4 Klassen, nicht 2
+
+**Grund des Fehlers:**
+n ≡ 2 (mod 4) ist weder von Typ I (braucht 0 mod 4) noch Typ III (braucht 3 mod 4)
+abgedeckt. Nur wenn n ≡ 2 (mod 4) UND n ≡ 2 (mod 3), greift Typ II.
+Für n ≡ 6 (mod 12): n ≡ 2 mod 4, n ≡ 0 mod 3 → kein Typ greift.
+Für n ≡ 10 (mod 12): n ≡ 2 mod 4, n ≡ 1 mod 3 → kein Typ greift.
+
+**Behobene Dateien:**
+- papers/batch11/paper41_erdos_straus_en.tex: Coverage Summary + mod-4-Proposition
+- papers/batch11/paper41_erdos_straus_de.tex: Abdeckungsübersicht + mod-4-Proposition
+
+### FEHLER 2 — Paper 42 EN: Widerspruch 10^7 vs 10^8
+
+**Problem:**
+Corollary 2.1 (als "Computational bound" bezeichnet) behauptete:
+"No prime p ≤ 10^8 is a Kurepa prime"
+— aber unser Build 131 hat nur bis 10^7 verifiziert.
+
+**Fix:**
+Das Corollary wurde in eine Remark umgewandelt:
+"Computational Result (this paper): No prime p < 10^7 is a Kurepa prime"
+mit explizitem Hinweis auf Build 131 und der Klarstellung, dass 10^8
+aus der Literatur stammt (ohne eigene Quelle als Theorem-Aussage).
+
+**Behobene Datei:**
+- papers/batch11/paper42_kurepa_conjecture_en.tex: Corollary 2.1 → Remark

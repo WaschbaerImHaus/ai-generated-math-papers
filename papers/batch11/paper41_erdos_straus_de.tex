@@ -414,8 +414,22 @@ Die drei Konstruktionen decken ab:
   \item Typ III: alle $n \equiv 3 \pmod 4$.
 \end{itemize}
 Durch den Chinesischen Restsatz sind die nicht abgedeckten Restklassen
-modulo $12$ genau $n \equiv 1 \pmod{4}$ und $n \not\equiv 2 \pmod{3}$,
-also $n \equiv 1 \pmod{12}$ und $n \equiv 9 \pmod{12}$.
+modulo~12 diejenigen mit $n \equiv 1 \pmod{4}$ (also $n \not\equiv 0,3
+\pmod 4$, was Typ~I und Typ~III ausschließt) und gleichzeitig
+$n \not\equiv 2 \pmod{3}$ (was Typ~II ausschließt).  Das liefert:
+\[
+  n \equiv 1,\; 9 \pmod{12}
+  \quad\text{(d.\,h.\ }n \equiv 1 \pmod 4\text{ und }n \equiv 1 \pmod 3\text{)}.
+\]
+Zusätzlich decken die Typen die Fälle $n \equiv 2 \pmod 4$ mit
+$n \not\equiv 2 \pmod 3$ nicht ab; das ergibt die weiteren Klassen:
+\[
+  n \equiv 6,\; 10 \pmod{12}.
+\]
+Insgesamt sind die \textbf{vier} nicht abgedeckten Restklassen modulo~12
+\[
+  n \equiv 1,\; 6,\; 9,\; 10 \pmod{12}.
+\]
 Diese erfordern verfeinerte Methoden (vgl.\ Abschnitt~5).
 
 % =========================================================
@@ -432,8 +446,13 @@ geschlossene Konstruktion existiert.
 \begin{enumerate}[label=(\roman*)]
 \item Falls $n \equiv 0 \pmod 4$: direkte Konstruktion aus Typ I.
 \item Falls $n \equiv 2 \pmod 4$: Schreibe $n = 2m$ mit ungeradem $m$.
-      Dann $4/n = 2/m$, und da $m$ ungerade ist, folgt aus Typ III oder
-      einer direkten Zerlegung eine Lösung.
+      Dann $4/n = 2/m$.  Falls $m \equiv 2 \pmod 3$ (also $n \equiv 2$
+      oder $10 \pmod{12}$): wende Typ~II auf $m$ an.  Falls $m \equiv 0
+      \pmod 3$ (also $n \equiv 6 \pmod{12}$): schreibe $m = 3j$ und
+      $2/m = 2/(3j)$; verwende z.\,B.\ $2/(3j) = 1/(2j) + 1/(6j^2)$
+      für gerades $j$, oder analysiere die verbleibenden Fälle analog
+      zu Abschnitt~5. Allgemein benötigen $n \equiv 6$ und
+      $n \equiv 10 \pmod{12}$ Fallunterscheidungen.
 \item Falls $n \equiv 3 \pmod 4$: zweigliedrige Zerlegung aus Typ III.
 \item Falls $n \equiv 1 \pmod 4$: Restklassenanalyse modulo weiterer Primzahlen erforderlich.
 \end{enumerate}

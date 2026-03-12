@@ -225,16 +225,18 @@ Each $k! \equiv 0 \pmod{2}$ for $k \geq 2$, so $!n \equiv 1+1+0 = 2 \equiv 0
 \pmod{2}$.
 \end{proof}
 
-\begin{corollary}[Computational bound]
-No prime $p \leq 10^8$ is a Kurepa prime.
-That is, $p \nmid !p$ holds for every odd prime $p \leq 10^8$.
-\end{corollary}
-\begin{proof}
-This follows from the computational verifications listed in
-Section~\ref{sec:computation}: the conjecture has been checked for all primes
-up to $10^8$ (various authors after 2010; see the historical table in
-Section~\ref{sec:computation}), finding no counterexample.
-\end{proof}
+\begin{remark}[Computational result --- this paper]
+\label{rem:comp-result}
+No prime $p < 10^7$ is a Kurepa prime.
+That is, $p \nmid !p$ holds for every odd prime $p < 10^7$.
+This was verified computationally in the context of this paper
+(Specialist Mathematics Project, Build~131), using left-factorial computations
+modulo $p$ for all $664{,}578$ odd primes $p < 10^7$; no violation was found.
+See Section~\ref{sec:computation} for details.
+The literature additionally reports verification up to $10^8$ (various authors
+after 2010, see the historical table in Section~\ref{sec:computation}),
+but no self-contained source for this bound is reproduced here.
+\end{remark}
 
 % ---------------------------------------------------------------
 \section{The Kurepa Conjecture}
