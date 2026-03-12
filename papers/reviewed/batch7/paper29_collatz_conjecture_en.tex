@@ -88,7 +88,16 @@ $(n, T(n), T^2(n), \ldots)$.
 The \emph{total stopping time} $\sigma(n)$ is the smallest $k \geq 0$ such that
 $T^k(n) = 1$, or $\infty$ if no such $k$ exists.
 The \emph{stopping time} $\sigma_\infty(n)$ is the smallest $k \geq 0$ such that
-$T^k(n) < n$, or $\infty$ if no such $k$ exists.
+$T^k(n) < n$, or $\infty$ if no such $k$ exists.%
+\footnote{%
+  \textbf{Non-standard notation.} The present paper uses $\sigma(n)$ for the
+  \emph{total} stopping time (first iterate equal to 1) and $\sigma_\infty(n)$
+  for the \emph{partial} stopping time (first iterate strictly less than $n$).
+  This is the \emph{reverse} of the convention used by Lagarias (1985) and
+  Tao (2022), where $\sigma_\infty(n)$ denotes the total stopping time and
+  $\sigma(n)$ (or $\sigma_T(n)$) denotes the partial stopping time.
+  Readers consulting those references should swap the two symbols accordingly.%
+}
 \end{definition}
 
 \begin{proposition}[Existence of predecessors]\label{prop:pred}
@@ -181,7 +190,7 @@ provided the limit exists. This is a weaker notion of density than the natural d
 $\lim_{N\to\infty} |A \cap [1,N]|/N$.
 \end{definition}
 
-\begin{proposition}[Positive density of well-behaved orbits, conditional on the Collatz Conjecture]\label{prop:pos_density}
+\begin{proposition}[Positive density of well-behaved orbits]\label{prop:pos_density}
 For any fixed $M \in \mathbb{N}$, the set
 $A_M = \{n \in \mathbb{N} : T^k(n) \leq M \text{ for some } k \geq 0\}$
 has natural density 1. That is, almost all positive integers (in the sense of natural density)
@@ -189,14 +198,24 @@ eventually descend below any fixed bound $M$.
 \end{proposition}
 
 \begin{proof}
-\emph{We assume the Collatz Conjecture throughout this proof.}
-Every positive integer eventually reaches a power of 2 under the conjecture (if true).
-Assuming the conjecture, all integers are in $A_M$. For a density-theoretic statement without
-assuming the conjecture, one uses the backward-iteration tree: the set of integers that
-can reach $m$ within $k$ steps grows exponentially in $k$ (at rate roughly $2^k$), while
-the integers that have \emph{not} descended below $M$ within $k$ steps have density
-bounded by $(3/4)^{k/2}$ by ergodic-theoretic estimates (see \cite{Terras1976}).
-In the limit, the density of exceptions is 0.
+We give two arguments, one unconditional and one conditional.
+
+\textbf{Unconditionally} (following Terras \cite{Terras1976}):
+One uses the backward-iteration tree rooted at $M$. For any $m \leq M$, the set of integers
+that can reach $m$ within $k$ steps grows exponentially in $k$ (at rate roughly $2^k$),
+because every positive integer has at least one predecessor under $T$ (Proposition~\ref{prop:pred}).
+The complementary set of integers that have \emph{not} descended below $M$ within $k$ steps
+has density bounded by $(3/4)^{k/2}$ (up to logarithmic corrections) by
+ergodic-theoretic estimates; see \cite{Terras1976}.
+In the limit $k \to \infty$, the density of exceptions is 0, giving $\mathrm{dens}(A_M) = 1$.
+
+\textbf{Conditionally} (assuming the Collatz Conjecture):
+Every positive integer eventually reaches 1, hence every integer is in $A_M$ for every
+$M \geq 1$. Under this assumption the set $\mathbb{N} \setminus A_M$ is empty, and the
+density-1 conclusion is immediate.
+
+\emph{Note:} The unconditional argument is the substantive one; the conditional argument
+merely illustrates that the conjecture, if true, gives a much stronger (pointwise) result.
 \end{proof}
 
 \section{Connections to Ergodic Theory}

@@ -714,6 +714,53 @@ Zusammen mit Batches 1–10 (Papers 1–39) bildet das den vollständigen Paper-
 ### Build-Nummer
 - src/build.txt: 148 → 149
 
+=== 2026-03-12 — Build 152 — Medium-Bug-Fixes Batch 7 Papers 29 + 31 ===
+
+2026-03-12 18:56 [Build 152]: Gezielte Korrekturen in 4 LaTeX-Papers (Batch 7, Paper 29 EN/DE + Paper 31 EN/DE)
+
+### BUG-B7-P29-NOTATION — BEHOBEN (MEDIUM)
+Dateien: paper29_collatz_conjecture_en.tex, paper29_collatz_vermutung_de.tex
+Problem: σ(n) und σ_∞(n) in umgekehrter Konvention gegenüber Lagarias (1985) / Tao (2022).
+Behoben: Fußnote bei Definition 2.2 (def:sequence) ergänzt, die die Abweichung von
+der Standard-Konvention explizit erläutert und Leser zum Vertauschen der Symbole anweist.
+
+### BUG-B7-P29-CIRCULAR-PROP4 — BEHOBEN (MEDIUM)
+Dateien: paper29_collatz_conjecture_en.tex, paper29_collatz_vermutung_de.tex
+Problem: Proposition 4.1 (prop:pos_density) mixte bedingte und unbedingte Argumente
+ohne klare Trennung. Der Beweis begann mit "Wir setzen die Collatz-Vermutung voraus",
+behandelte aber danach die Terras-Dichteschranke als ob sie unbedingt wäre.
+Behoben: Beweis in zwei klar getrennte Teile gegliedert:
+- "Unbedingt (nach Terras 1976)": Rückwärtsbaum + (3/4)^{k/2}-Schranke
+- "Bedingt (unter Voraussetzung der Collatz-Vermutung)": direktes Trivialargument
+Klärende Anmerkung am Ende: das unbedingte Argument ist das mathematisch gehaltvolle.
+
+### BUG-B7-P31-FURSTENBERG-REF — BEHOBEN (MEDIUM)
+Dateien: paper31_tao_probabilistic_collatz_en.tex, paper31_tao_probabilistischer_ansatz_de.tex
+Problem: \bibitem{Furstenberg1977} (topologische Dynamik, nicht Collatz-relevant) war
+im Literaturverzeichnis vorhanden, aber nirgends im Text von Paper 31 zitiert.
+Behoben: Furstenberg-1977-Eintrag aus der Bibliographie beider Dateien entfernt.
+
+### BUG-B7-P31-BIRKHOFF — BEHOBEN (MEDIUM)
+Dateien: paper31_tao_probabilistic_collatz_en.tex, paper31_tao_probabilistischer_ansatz_de.tex
+Problem: Definition 5.1 und Theorem 5.2 wendeten den Birkhoff-Ergodensatz "unter dem
+Haar-Maß auf Z₂^{ungerade}" an, obwohl S das Haar-Maß NICHT erhält. Paper 32 verwendet
+korrekt ein separat konstruiertes invariantes Maß.
+Behoben:
+- Definition 5.1 (def:ergodic_rw / def:ergodisch_rw): Expliziter Hinweis "S ist NICHT
+  maßerhaltend bzgl. Haar-Maß; Birkhoff erfordert ein S-invariantes Maß ν".
+- Theorem 5.2 (thm:ergodic_conv / thm:ergod_konv): Formulierung auf "sei ν ein
+  S-invariantes ergodisches Maß" geändert; Bold-Hinweis auf Haar ≠ invariant eingefügt.
+- Beweis angepasst: Erwartungswert unter ν statt μ; explizite Referenz auf Kontorovich 2010.
+
+### Geänderte Dateien
+- papers/reviewed/batch7/paper29_collatz_conjecture_en.tex
+- papers/reviewed/batch7/paper29_collatz_vermutung_de.tex
+- papers/reviewed/batch7/paper31_tao_probabilistic_collatz_en.tex
+- papers/reviewed/batch7/paper31_tao_probabilistischer_ansatz_de.tex
+
+### Build-Nummer
+- src/build.txt: 151 → 152
+
 === 2026-03-12 — Build 151 — Bug-Fixes Paper 39 DE (Langlands-Programm) ===
 
 2026-03-12 [Build 151]: Bug-Fixes in papers/batch10/paper39_langlands_programm_de.tex

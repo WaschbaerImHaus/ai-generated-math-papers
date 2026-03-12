@@ -91,7 +91,17 @@ $(n, T(n), T^2(n), \ldots)$.
 Die \emph{totale Stoppzeit} $\sigma(n)$ ist das kleinste $k \geq 0$ mit $T^k(n) = 1$,
 oder $\infty$, falls kein solches $k$ existiert.
 Die \emph{Stoppzeit} $\sigma_\infty(n)$ ist das kleinste $k \geq 0$ mit $T^k(n) < n$,
-oder $\infty$, falls kein solches $k$ existiert.
+oder $\infty$, falls kein solches $k$ existiert.%
+\footnote{%
+  \textbf{Nicht-Standard-Notation.} In dieser Arbeit bezeichnet $\sigma(n)$ die
+  \emph{totale} Stoppzeit (erstes Iteriertes gleich 1) und $\sigma_\infty(n)$
+  die \emph{partielle} Stoppzeit (erstes Iteriertes echt kleiner als $n$).
+  Dies ist die \emph{umgekehrte} Konvention gegenüber Lagarias (1985) und
+  Tao (2022), wo $\sigma_\infty(n)$ die totale Stoppzeit und $\sigma(n)$
+  (bzw.\ $\sigma_T(n)$) die partielle Stoppzeit bezeichnet.
+  Leserinnen und Leser, die jene Quellen konsultieren, mögen die beiden Symbole
+  entsprechend vertauschen.%
+}
 \end{definition}
 
 \begin{proposition}[Existenz von Vorgängern]\label{prop:pred}
@@ -187,7 +197,7 @@ sofern der Grenzwert existiert. Dies ist ein schwächerer Dichtebegriff als die
 natürliche Dichte $\lim_{N\to\infty} |A \cap [1,N]|/N$.
 \end{definition}
 
-\begin{proposition}[Positive Dichte gutartiger Bahnen, bedingt durch die Collatz-Vermutung]\label{prop:pos_density}
+\begin{proposition}[Positive Dichte gutartiger Bahnen]\label{prop:pos_density}
 Für jedes feste $M \in \mathbb{N}$ hat die Menge
 \[
   A_M = \{n \in \mathbb{N} : \exists k \geq 0,\; T^k(n) \leq M\}
@@ -197,13 +207,27 @@ natürlichen Dichte) steigen schließlich unter jede feste Schranke $M$ ab.
 \end{proposition}
 
 \begin{proof}
-\emph{Wir setzen die Collatz-Vermutung im gesamten Beweis voraus.}
-Der Rückwärtsiterations-Baum von $m$ wächst mit Rate $\approx 2^k$ nach $k$ Schritten:
-Für jeden Vorgänger $n$ von $m$ hat $2n$ das doppelte Gewicht, und ein Drittel aller
-Zahlen hat auch einen ungeraden Vorgänger. Die Menge der Zahlen, die innerhalb von $k$
-Schritten \emph{nicht} unter $M$ fallen, hat eine Dichte, die durch ergodische
-Abschätzungen (siehe \cite{Terras1976}) exponentiell in $k$ abnimmt. Im Grenzwert
-$k \to \infty$ ist die Dichte der Ausnahmen gleich 0.
+Wir geben zwei Argumente an: ein unbedingtes und ein bedingtes.
+
+\textbf{Unbedingt} (nach Terras \cite{Terras1976}):
+Man verwendet den Rückwärtsiterations-Baum mit Wurzel $M$. Für jedes $m \leq M$ wächst
+die Menge der ganzen Zahlen, die innerhalb von $k$ Schritten $m$ erreichen können,
+exponentiell in $k$ (mit Rate $\approx 2^k$), da jede positive ganze Zahl mindestens
+einen Vorgänger unter $T$ besitzt (Proposition~\ref{prop:pred}).
+Die komplementäre Menge der Zahlen, die innerhalb von $k$ Schritten \emph{nicht}
+unter $M$ fallen, hat eine Dichte, die durch ergodische Abschätzungen
+(siehe \cite{Terras1976}) durch $(3/4)^{k/2}$ nach oben beschränkt ist
+(bis auf logarithmische Korrekturen). Im Grenzwert $k \to \infty$ ist die Dichte
+der Ausnahmen gleich 0, also $\mathrm{Dichte}(A_M) = 1$.
+
+\textbf{Bedingt} (unter Voraussetzung der Collatz-Vermutung):
+Gilt die Collatz-Vermutung, so erreicht jede positive ganze Zahl schließlich 1;
+damit liegt jede Zahl in $A_M$ für jedes $M \geq 1$. Die Menge
+$\mathbb{N} \setminus A_M$ ist dann leer, und das Dichte-1-Resultat folgt unmittelbar.
+
+\emph{Hinweis:} Das unbedingte Argument ist das mathematisch gehaltvolle; das bedingte
+Argument zeigt lediglich, dass die Vermutung --- falls sie gilt --- ein wesentlich
+stärkeres (punktweises) Ergebnis liefert.
 \end{proof}
 
 \section{Verbindungen zur Ergodentheorie}

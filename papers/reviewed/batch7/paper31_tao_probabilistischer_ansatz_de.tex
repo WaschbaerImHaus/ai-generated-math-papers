@@ -245,32 +245,49 @@ Ausgangspunkt.
 
 \begin{definition}[Syrakus-Zufallswalk als ergodischer Prozess]\label{def:ergodisch_rw}
 Die Folge der Log-Verhältnisse $(\log S^k(n) / \log n)_{k \geq 0}$ kann als Trajektorie
-eines Punktes in einem maßerhaltenden dynamischen System betrachtet werden. Konkret trägt
-$\mathbb{Z}_2^{\text{ungerade}}$ mit dem Haar-Maß $\mu$ die Syrakus-Abbildung $S$, und
-die Funktion $g(x) = \log_2 3 - E(x)$ (wobei $E(x) = \nu_2(3x+1)$) ist die
-``Schrittweiten''-Funktion. Der Ergodensatz liefert:
+eines Punktes in einem maßerhaltenden dynamischen System betrachtet werden.
+\textbf{Wichtiger Hinweis:} Die Syrakus-Abbildung $S$ ist \emph{nicht} maßerhaltend
+bezüglich des Haar-Maßes auf $\mathbb{Z}_2^{\text{ungerade}}$.
+Um den Birkhoff-Ergodensatz anwenden zu können, muss ein separat konstruiertes
+$S$-invariantes Maß $\nu$ auf $\mathbb{Z}_2^{\text{ungerade}}$ verwendet werden
+(wie in \cite{Tao2022} und \cite{Kontorovich2010} rigoros durchgeführt).
+Unter einem solchen invarianten Maß $\nu$ ist die Funktion
+$g(x) = \log_2 3 - E(x)$ (wobei $E(x) = \nu_2(3x+1)$) die ``Schrittweiten''-Funktion
+mit $\nu$-Erwartungswert
 \[
-  \frac{1}{k} \sum_{j=0}^{k-1} g(S^j(x)) \;\longrightarrow\; \int_{\mathbb{Z}_2^{\text{ungerade}}} g\, d\mu
-  = \log_2 3 - 2 = \log_2(3/4) < 0
+  \int g\, d\nu = \log_2 3 - \mathbb{E}_\nu[E].
 \]
-für $\mu$-fast alle $x$.
+Wird $\nu$ so gewählt, dass $E$ eine geometrische Verteilung mit Parameter $1/2$ besitzt
+(was im i.i.d.-Näherungsmodell gilt), so ist $\mathbb{E}_\nu[E] = 2$ und
+\[
+  \frac{1}{k} \sum_{j=0}^{k-1} g(S^j(x)) \;\longrightarrow\; \log_2 3 - 2 = \log_2(3/4) < 0
+\]
+für $\nu$-fast alle $x$ nach dem Birkhoff-Ergodensatz.
 \end{definition}
 
 \begin{theorem}[Ergodische Konvergenz von Syrakus-Bahnen]\label{thm:ergod_konv}
-Unter dem Haar-Maß auf $\mathbb{Z}_2^{\text{ungerade}}$ gilt für $\mu$-fast alle $x$:
+Sei $\nu$ ein $S$-invariantes ergodisches Maß auf $\mathbb{Z}_2^{\text{ungerade}}$, unter
+dem $E(x) = \nu_2(3x+1)$ den Erwartungswert 2 besitzt (wie im i.i.d.-geometrisch$(1/2)$-Modell).
+Dann gilt für $\nu$-fast alle $x$:
 \[
   \lim_{k \to \infty} \frac{\log S^k(x)}{k} \;=\; \log(3/4) < 0.
 \]
-Dies bedeutet, dass der Logarithmus der Bahn linear abnimmt, d.h.\ die Bahn sinkt
-\emph{geometrisch schnell} gegen 0 im 2-adischen Sinne.
+Dies bedeutet, dass der Logarithmus der Bahn linear abnimmt, d.h.\ die Bahn fällt
+\emph{geometrisch schnell} im absoluten Sinne.
+
+\textbf{Hinweis:} Das Haar-Maß auf $\mathbb{Z}_2^{\text{ungerade}}$ ist \emph{nicht}
+$S$-invariant, weshalb der Birkhoff-Ergodensatz nicht direkt mit dem Haar-Maß angewendet
+werden darf. Die obige Aussage verwendet das invariante Maß $\nu$; eine explizite
+Konstruktion findet sich in \cite{Kontorovich2010}.
 \end{theorem}
 
 \begin{proof}
-Das Integral $\int g\, d\mu = \mathbb{E}_\mu[\log_2 3 - E] = \log_2 3 - \mathbb{E}_\mu[E]$.
-Der Erwartungswert $\mathbb{E}_\mu[E] = \sum_{j \geq 1} j \cdot \Pr[E = j] = \sum_{j \geq 1} j \cdot 2^{-j} = 2$
-(aus Proposition~\ref{prop:vert_E}).
-Also ist der ergodische Mittelwert von $g$ gleich $\log_2 3 - 2 = \log_2(3/4) \approx -0{,}415 < 0$.
-Der Ergodensatz liefert dann die behauptete Konvergenz für $\mu$-fast alle $x$.
+Das Integral $\int g\, d\nu = \mathbb{E}_\nu[\log_2 3 - E] = \log_2 3 - \mathbb{E}_\nu[E]$.
+Nach Voraussetzung gilt $\mathbb{E}_\nu[E] = 2$
+(aus Proposition~\ref{prop:vert_E} im i.i.d.-Modell).
+Also ist der $\nu$-ergodische Mittelwert von $g$ gleich $\log_2 3 - 2 = \log_2(3/4) \approx -0{,}415 < 0$.
+Da $\nu$ $S$-invariant und ergodisch ist, liefert der Birkhoff-Ergodensatz die behauptete
+Konvergenz für $\nu$-fast alle $x$.
 \end{proof}
 
 \begin{lemma}[Korrespondenzprinzip im Collatz-Kontext]\label{lem:furstenberg}
@@ -352,11 +369,6 @@ J.~C. Lagarias.
 J.~C. Lagarias (Hrsg.).
 \newblock \emph{The Ultimate Challenge: The $3x+1$ Problem}.
 \newblock American Mathematical Society, Providence, RI, 2010.
-
-\bibitem{Furstenberg1977}
-H.~Furstenberg.
-\newblock Ergodic behavior of diagonal measures and a theorem of Szemer\'edi on arithmetic progressions.
-\newblock \emph{Journal d'Analyse Math\'ematique}, 31(1):204--256, 1977.
 
 \bibitem{Terras1976}
 R.~Terras.

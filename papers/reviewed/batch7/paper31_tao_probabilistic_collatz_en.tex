@@ -238,32 +238,49 @@ Collatz orbits contain arbitrarily small values relative to the starting point.
 
 \begin{definition}[Syracuse random walk as ergodic process]\label{def:ergodic_rw}
 The sequence of log-ratios $(\log S^k(n) / \log n)_{k \geq 0}$ can be viewed as the
-trajectory of a point in a measure-preserving dynamical system. Specifically, the space
-$\mathbb{Z}_2^{\text{odd}}$ with Haar measure $\mu$ carries the Syracuse map $S$,
-and the function $g(x) = \log_2 3 - E(x)$ (where $E(x) = \nu_2(3x+1)$) is the ``step size''
-function. The ergodic theorem gives:
+trajectory of a point in a measure-preserving dynamical system.
+\textbf{Important caveat:} The Syracuse map $S$ is \emph{not} measure-preserving
+with respect to the Haar measure on $\mathbb{Z}_2^{\text{odd}}$.
+To apply the Birkhoff ergodic theorem, one must work with a separately constructed
+$S$-invariant measure $\nu$ on $\mathbb{Z}_2^{\text{odd}}$ (as done rigorously in
+\cite{Tao2022} and in the companion paper on ergodic methods \cite{Kontorovich2010}).
+Under such an invariant measure $\nu$, the function
+$g(x) = \log_2 3 - E(x)$ (where $E(x) = \nu_2(3x+1)$) is the ``step size''
+function with $\nu$-expectation
 \[
-  \frac{1}{k} \sum_{j=0}^{k-1} g(S^j(x)) \;\longrightarrow\; \int_{\mathbb{Z}_2^{\text{odd}}} g\, d\mu
-  = \log_2 3 - \sum_{j=1}^\infty j \cdot 2^{-j} = \log_2 3 - 2 = \log_2(3/4) < 0
+  \int g\, d\nu = \log_2 3 - \mathbb{E}_\nu[E].
 \]
-for $\mu$-almost every $x$.
+If $\nu$ is chosen so that $E$ has a geometric distribution with parameter $1/2$
+(which holds in the i.i.d.\ approximation), then $\mathbb{E}_\nu[E] = 2$ and
+\[
+  \frac{1}{k} \sum_{j=0}^{k-1} g(S^j(x)) \;\longrightarrow\; \log_2 3 - 2 = \log_2(3/4) < 0
+\]
+for $\nu$-almost every $x$ by the Birkhoff ergodic theorem.
 \end{definition}
 
 \begin{theorem}[Ergodic convergence of Syracuse orbits]\label{thm:ergodic_conv}
-Under the Haar measure on $\mathbb{Z}_2^{\text{odd}}$, for $\mu$-almost every $x$:
+Let $\nu$ be an $S$-invariant ergodic measure on $\mathbb{Z}_2^{\text{odd}}$ under which
+$E(x) = \nu_2(3x+1)$ has expectation $2$ (as in the i.i.d.\ geometric$(1/2)$ model).
+Then for $\nu$-almost every $x$:
 \[
   \lim_{k \to \infty} \frac{\log S^k(x)}{k} \;=\; \log(3/4) < 0.
 \]
 This means that the logarithm of the orbit decreases linearly, i.e.\ the orbit decreases
-\emph{geometrically fast} to 0 in $\mathbb{Z}_2$ (in the absolute value sense).
+\emph{geometrically fast} in the absolute value sense.
+
+\textbf{Note:} The Haar measure on $\mathbb{Z}_2^{\text{odd}}$ is \emph{not} preserved
+by $S$, so the Birkhoff theorem cannot be applied directly with Haar measure.
+The statement above uses the invariant measure $\nu$; see \cite{Kontorovich2010}
+for an explicit construction.
 \end{theorem}
 
 \begin{proof}
-The integral $\int g\, d\mu = \mathbb{E}_\mu[\log_2 3 - E] = \log_2 3 - \mathbb{E}_\mu[E]$.
-The expectation $\mathbb{E}_\mu[E] = \sum_{j \geq 1} j \cdot \Pr[E = j] = \sum_{j \geq 1} j \cdot 2^{-j} = 2$
-(from Proposition~\ref{prop:dist_E}).
-Thus the ergodic mean of $g$ is $\log_2 3 - 2 = \log_2(3/4) \approx -0.415 < 0$.
-The ergodic theorem then gives the stated convergence for $\mu$-a.e.\ $x$.
+The integral $\int g\, d\nu = \mathbb{E}_\nu[\log_2 3 - E] = \log_2 3 - \mathbb{E}_\nu[E]$.
+By assumption $\mathbb{E}_\nu[E] = 2$
+(from Proposition~\ref{prop:dist_E} in the i.i.d.\ model).
+Thus the $\nu$-ergodic mean of $g$ is $\log_2 3 - 2 = \log_2(3/4) \approx -0.415 < 0$.
+Since $\nu$ is $S$-invariant and ergodic, the Birkhoff ergodic theorem gives the stated
+convergence for $\nu$-a.e.\ $x$.
 \end{proof}
 
 \begin{lemma}[Correspondence principle in the Collatz context]\label{lem:furstenberg}
@@ -345,11 +362,6 @@ J.~C. Lagarias.
 J.~C. Lagarias (ed.).
 \newblock \emph{The Ultimate Challenge: The $3x+1$ Problem}.
 \newblock American Mathematical Society, Providence, RI, 2010.
-
-\bibitem{Furstenberg1977}
-H.~Furstenberg.
-\newblock Ergodic behavior of diagonal measures and a theorem of Szemer\'edi on arithmetic progressions.
-\newblock \emph{Journal d'Analyse Math\'ematique}, 31(1):204--256, 1977.
 
 \bibitem{Terras1976}
 R.~Terras.
