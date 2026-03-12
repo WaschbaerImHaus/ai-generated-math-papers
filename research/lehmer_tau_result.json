@@ -1,0 +1,25 @@
+{
+  "conjecture": "Lehmer-tau",
+  "n_max": 5000,
+  "method": "BigInt polynomial expansion",
+  "zeros": [],
+  "deligne_violations": [],
+  "known_values_correct": false,
+  "tau_sample": {
+    "1": 1,
+    "2": -24,
+    "3": 252,
+    "4": -1472,
+    "5": 4830,
+    "6": -6048,
+    "7": -16744,
+    "8": 84480,
+    "9": -113643,
+    "10": -115920,
+    "12": -370944,
+    "100": 37534859200,
+    "1000": -30328412970240000
+  },
+  "elapsed_seconds": 51.3,
+  "timestamp": "2026-03-12T12:07:11.528668"
+}

@@ -1,0 +1,37 @@
+============================================================
+Brocard-Ramanujan Heavy Computation — 2026-03-12 12:03:58
+============================================================
+
+Phase 1: Exakte Prüfung n ≤ 10,000...
+  Bekannte Lösung bestätigt: n=4
+  Bekannte Lösung bestätigt: n=5
+  Bekannte Lösung bestätigt: n=7
+  n=1,000 geprüft (exakt)
+  n=2,000 geprüft (exakt)
+  n=3,000 geprüft (exakt)
+  n=4,000 geprüft (exakt)
+  n=5,000 geprüft (exakt)
+  n=6,000 geprüft (exakt)
+  n=7,000 geprüft (exakt)
+  n=8,000 geprüft (exakt)
+  n=9,000 geprüft (exakt)
+  n=10,000 geprüft (exakt)
+  Phase 1 fertig: 1.4s
+  Neue Lösungen: 0
+
+Phase 2: Modulare Ausschlüsse n ≤ 100,000...
+  Nicht-ausgeschlossene Kandidaten (10001–100000): 90,000
+  Ausschlussrate: 0.0%
+  Phase 2 fertig: 0.1s
+
+Phase 3: Modulare Ausschlüsse n ≤ 1,000,000...
+  Kandidaten (100001–1000000): 900,000
+  Ausschlussrate: 0.0%
+  Phase 3 fertig: 0.3s
+
+============================================================
+GESAMT: 1.7s (0.00h)
+Bekannte Lösungen bestätigt: n ∈ {4, 5, 7}
+Neue Lösungen (exakt): 0
+Verbleibende Kandidaten bis 10^6 (nicht ausgeschlossen): 990,000
+Ergebnis: /home/claude-code/project/specialist-maths/research/brocard_result.json

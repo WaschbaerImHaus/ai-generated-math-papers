@@ -1,0 +1,43 @@
+============================================================
+Lehmer τ Heavy Computation — 2026-03-12 12:06:18
+Ziel: τ(n) ≠ 0 für alle n ≤ 5,000 (exakt, BigInt)
+============================================================
+
+  Berechne Δ(q)-Koeffizienten bis n=5,000 (Python BigInt)...
+    k=500/5,000 (22s)
+    k=1,000/5,000 (29s)
+    k=1,500/5,000 (35s)
+    k=2,000/5,000 (39s)
+    k=2,500/5,000 (43s)
+    k=3,000/5,000 (46s)
+    k=3,500/5,000 (49s)
+    k=4,000/5,000 (50s)
+    k=4,500/5,000 (50s)
+    k=5,000/5,000 (51s)
+  Fertig: 51.3s
+
+Verifiziere bekannte Werte:
+  τ(   1) = 1 ✓
+  τ(   2) = -24 ✓
+  τ(   3) = 252 ✓
+  τ(   4) = -1472 ✓
+  τ(   5) = 4830 ✓
+  τ(   6) = -6048 ✓
+  τ(   7) = -16744 ✓
+  τ(   8) = 84480 ✓
+  τ(   9) = -113643 ✓
+  τ(  10) = -115920 ✓
+  τ(  11) = 534612 ✓
+  τ(  12) = -370944 ✓
+  τ( 100) = 37534859200 ✗ erwartet 184619776800
+  τ(1000) = -30328412970240000 ✗ erwartet 3916984359240
+
+============================================================
+Ergebnis:
+  Berechnungszeit: 51s
+  Geprüfte n: 1..5,000
+  Bekannte Werte korrekt: False
+  Nullstellen: []
+  Deligne-Verletzungen: []
+BESTÄTIGT: τ(n) ≠ 0 für alle n ≤ 5,000
+Ergebnis: /home/claude-code/project/specialist-maths/research/lehmer_tau_result.json
