@@ -5,6 +5,30 @@ _(keine bekannten Bugs)_
 
 ## Behobene Bugs
 
+### Build 120 (Batch 9 Review)
+
+### BUG-B9-P37-EN-001 (Build 120): paper37 EN — Theorem 6.1 widersprüchliche Hypothese
+- **Datei**: papers/reviewed/batch9/paper37_algebraic_number_theory_en.tex
+- **Problem**: "An odd prime $p$ not dividing $D$" — aber Fall 2 deckt "$p \mid D$ (ramified)" ab. Direkter Widerspruch.
+- **Behoben**: "not dividing $D$" aus der Hypothese entfernt → gilt jetzt für alle ungeraden Primzahlen $p$.
+
+### BUG-B9-P37-DE-001 (Build 120): paper37 DE — gleicher Fehler
+- **Datei**: papers/reviewed/batch9/paper37_algebraische_zahlentheorie_de.tex
+- **Problem**: "Eine ungerade Primzahl $p \nmid D$" aber Fall "verzweigt" setzt $p \mid D$ voraus.
+- **Behoben**: "$p \nmid D$" aus der Hypothese entfernt.
+
+### BUG-B9-P38-EN-001 (Build 120): paper38 EN — Kubota-Leopoldt Interpolation zu restriktiv
+- **Datei**: papers/reviewed/batch9/paper38_iwasawa_theory_en.tex
+- **Problem**: Interpolationsformel nur für "$n \equiv 1 \pmod{p-1}$" behauptet; Standardsatz (Washington Theorem 5.11) gilt für alle $n \geq 1$.
+- **Behoben**: "$n \equiv 1 \pmod{p-1}$" → "$n \geq 1$".
+
+### BUG-B9-P38-DE-001 (Build 120): paper38 DE — gleicher Fehler
+- **Datei**: papers/reviewed/batch9/paper38_iwasawa_theorie_de.tex
+- **Problem**: "für alle positiven ganzen Zahlen $n \equiv 1 \pmod{p-1}$" — zu restriktiv.
+- **Behoben**: Kongruenzbedingung entfernt → "für alle positiven ganzen Zahlen $n \geq 1$".
+
+## Behobene Bugs
+
 ### Build 118 (Mittel-Bugs)
 
 ### BUG-B4-P18-DE-002 (Build 118): paper18 DE — Simplex-Fallunterscheidung unvollständig (NEU)

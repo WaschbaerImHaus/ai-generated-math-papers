@@ -97,32 +97,40 @@ Letzte Aktualisierung: 2026-03-11 (Build 102)
 
 ---
 
-## Refactoring-Plan (Build 102)
+## Refactoring-Plan (Build 102–120)
 
 ### Erledigt (Build 102)
 - [x] **`math_helpers.py`**: Zentrale Hilfsfunktionen (is_prime, gcd, euler_phi etc.) erstellt.
-  Neue Module sollen von hier importieren. Migration bestehender Module schrittweise.
 - [x] **`langlands_program.py`**: Bereits math_helpers importiert (Vorbildcharakter).
 - [x] **Visualisierung-Bug**: `create_interactive_plot()` gibt jetzt `return fig` zurück (Build 102).
 
-### Offen (geplant)
-- [ ] **Migration bestehender Module**: algebraic_number_theory.py, galois_representations.py, l_functions.py,
-  elliptic_curves.py auf math_helpers umstellen (je ~20 Zeilen Duplikat einsparen).
-- [ ] **galois_theory.py aufteilen** (3005 Zeilen → 4 Module):
-  - `galois_theory_fields.py` — FiniteField, FieldExtension, GaloisGroup
-  - `galois_theory_polynomials.py` — discriminant, galois_group_polynomial, cyclotomic
-  - `galois_theory_constructibility.py` — is_constructible, construct_regular_polygon
-  - `galois_theory.py` → Re-export-Wrapper (rückwärtskompatibel)
-- [ ] **modular_forms.py aufteilen** (1848 Zeilen → Hecke + L-Funktionen + Theta):
-  - `modular_forms_hecke.py` — Hecke-Algebra, Eigenformen
-  - `modular_forms_l.py` — L-Funktionen, Funktionalgleichung
-  - `modular_forms.py` → Re-export-Wrapper
+### Erledigt (Build 120)
+- [x] **galois_theory.py aufgeteilt**: galois_theory_fields.py, galois_theory_polynomials.py,
+  galois_theory_constructibility.py + Re-export-Wrapper galois_theory.py (148 Zeilen).
+- [x] **modular_forms.py teilweise aufgeteilt**: modular_forms_hecke.py existiert bereits.
+- [x] **Migration bestehender Module**: algebraic_number_theory.py, galois_representations.py,
+  l_functions.py, elliptic_curves.py nutzen alle `from math_helpers import ...` via Aliase.
 
-## Prioritäten (Stand 2026-03-11)
+### Noch offen (niedrige Priorität)
+- [ ] **Weitere math_helpers-Migration**: Noch Duplikate in iwasawa_theory.py, automorphic_forms.py,
+  motive_theory.py, commutative_algebra.py, modules_algebra.py, additive_number_theory.py etc.
+  (je ~10-30 Zeilen _is_prime/_gcd-Duplikate).
+- [ ] **modular_forms.py vollständig aufteilen**: 974 Zeilen → modular_forms_l.py für L-Funktionen.
 
-1. `_safe_parse()` Logging-Fallback (Sicherheit/Debuggbarkeit)
-2. `repl.py` Eingabe-Validierung (Sicherheit)
-3. Migration math_helpers (Performance + Wartbarkeit)
-4. Christoffel-Symbole Memoization (Performance)
-5. SVG/PDF-Export (Visualisierung)
-6. Numba JIT (Performance, Numba-Installation nötig)
+## Neue Ideen (Build 120)
+
+### Mathematische Vertiefung
+- [ ] **Langlands-Korrespondenz**: Direkte Umsetzung von ρ: Gal(Q̄/Q) → GL_n(ℤ_p) als Python-Klasse
+  in `galois_representations.py` erweitern.
+- [ ] **Etale Kohomologie**: Verbindung zu algebraic_geometry.py herstellen (H^i_et → Betti-Zahlen).
+- [ ] **Automorphe Darstellungen**: Verbindung zwischen automorphic_forms.py und l_functions.py.
+
+### Performance
+- [ ] **`math_helpers` vollständige Migration**: Batch-Migration aller verbleibenden Module via Skript.
+
+## Prioritäten (Stand 2026-03-12, Build 120)
+
+1. Langlands-Korrespondenz (mathematisch + Code) — höchste wissenschaftliche Priorität
+2. Batch 10 Papers: Langlands, Shimura-Varietäten, Motivische Kohomologie
+3. Vollständige math_helpers-Migration (Wartbarkeit)
+4. modular_forms_l.py Aufteilung (Code-Struktur)

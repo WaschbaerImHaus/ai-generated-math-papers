@@ -131,3 +131,47 @@ Externen Review `reviews/review_vollständig_alle_batches_2026_03_12.md` verarbe
 - Mathematische Erkenntnisse: Weil/Deligne, Hausdorff-Dim, Syracuse, PNT-ζ^4, abc ergänzt
 
 ### Build-Nummer: 118 → 119
+
+---
+
+## 2026-03-12 Build 120
+
+### Aufgabe 1: Batch 9 Review — Papers 37+38 (EN+DE)
+
+Review-Dokument erstellt: `reviews/review_batch9_2026_03_12.md`
+4 Papers geprüft: paper37 (Alg. Zahlentheorie), paper38 (Iwasawa-Theorie), je EN+DE.
+
+#### BUG-B9-P37-EN/DE-001 — BEHOBEN (Mittel): Theorem 6.1 Hypothese widersprüchlich
+- EN+DE: "p not dividing D / $p \nmid D$" aber Fall 2 behandelt "$p \mid D$" → Widerspruch
+- Fix: Hypothesen-Restriktion entfernt → Satz gilt für alle ungeraden Primzahlen $p$
+
+#### BUG-B9-P38-EN/DE-001 — BEHOBEN (Mittel): Kubota-Leopoldt Interpolationsbedingung
+- EN+DE: Formel nur für $n \equiv 1 \pmod{p-1}$; Standard (Washington Thm 5.11): gilt für alle $n \geq 1$
+- Fix: Kongruenzbedingung entfernt
+
+#### Batch 9 Papers nach reviewed/batch9/ verschoben
+- papers/reviewed/batch9/paper37_algebraic_number_theory_en.tex
+- papers/reviewed/batch9/paper37_algebraische_zahlentheorie_de.tex
+- papers/reviewed/batch9/paper38_iwasawa_theory_en.tex
+- papers/reviewed/batch9/paper38_iwasawa_theorie_de.tex
+
+### Aufgabe 3: Lehmer 3-Prim-Fall
+- Bereits vollständig implementiert (Build 119, beweisversuche.py):
+  - satz_kein_3prim_gerade_beweis() (2·q·r-Fall) ✓
+  - satz_kein_3prim_alle_ungerade_beweis() (p·q·r-Fall, 3-stufiger Beweis) ✓
+  - Papers: reviewed/batch1/paper2_lehmer_three_primes.tex + _de.tex ✓
+- Keine neue Arbeit nötig — alle Fälle bewiesen.
+
+### Aufgabe 4: CLAUDE.md Fortschrittscheckliste
+- Alle veralteten Einträge (Algebra, Analysis als offen) auf [x] gesetzt
+- Vollständige Liste aller 93+ Module dokumentiert
+- Themengebiete 11–14 ergänzt (L-Funktionen, Modulformen, p-adisch, Alg. Zahlentheorie)
+- Review-Workflow und Theorem-vs-Conjecture-Regel hinzugefügt
+
+### Aufgabe 5: OPTIMIZE.md
+- galois_theory.py Aufteilung als erledigt dokumentiert (148 Zeilen Wrapper)
+- math_helpers-Migration für geplante Module als erledigt dokumentiert
+- Neue offene Punkte: Langlands-Korrespondenz, Etale Kohomologie, weitere Module
+- Prioritäten auf Build 120 Stand aktualisiert
+
+### Build-Nummer: 119 → 120
