@@ -1513,3 +1513,29 @@ Paper 87 – Bateman-Horn:
 - reviews/research_batch24_gruppe_b_2026_03_12.md erstellt
 - LaTeX-Bug in paper95 (EN) behoben: \end{conjecture}\end{theorem} → \end{theorem}
 - Klassifikation: 7 Theoreme BEWIESEN, 5 Aussagen OFFEN
+
+=== 2026-03-12 — Build 173 — Batch 23 Gruppe B: Papers 88–91 ===
+
+2026-03-12 [Build 173]: Batch 23 Gruppe B — vollständiges mathematisches Review + Computational Verifikation
+
+### Neue Dateien
+- src/py/gruppe_b_batch23_verification.py: Verifikationsskript Papers 88–91
+  - Erdős-Gallai: 8788 Folgen für n≤8, 0 Fehler, EG=Hakimi ✓
+  - Hakimi-Algorithmus: konstruktive Realisierung graphischer Folgen
+  - OPN-Siebmethode: keine ungeraden vollkommenen Zahlen bis 10^6
+  - Lucas-Lehmer: 14 Mersenne-Primzahlen für p≤1000, OEIS A000043 bestätigt ✓
+  - Bunyakovsky n²+1: 841 Primwerte für n≤10000, Bateman-Horn-Verhältnis=1.13 ✓
+- reviews/research_batch23_gruppe_b_2026_03_12.md: Vollständiger Review
+
+### Mathematische Klassifikation (Batch 23)
+- Paper 91 (Erdős-Gallai): BEWIESEN (1960) — beide Richtungen, Hakimi-Konstruktion
+- Paper 89 (Euklid-Euler): BEWIESEN (~300 v.Chr. / Euler 1747)
+- Paper 89 (Mersenne unendlich): OFFEN — 14 Mersenne-Primzahlen p≤1000 bestätigt
+- Paper 88 (ungerade vollkommene Zahlen): OFFEN — Euler-Struktur n=p^a·m², ω(n)≥9
+- Paper 90 (Bunyakovsky): OFFEN — Iwaniec 1978: n²+1 hat ∞ viele P₂-Werte
+
+### Wichtige mathematische Details
+- Bateman-Horn-Korrektur: C_f=1.3727 gilt für n in [-N,N]; für n>0 ist C_f/2=0.6864
+- OPN-Beweis für ω(n)=2: σ(q^{2c}) müsste durch p^a teilbar sein → Widerspruch
+- Erdős-Gallai Notwendigkeit: Kantenargument, Notwendigkeit EG1+EG2 direkt
+- Hakimi-Deduplizierung: combinations_with_replacement statt product (C(15,8)=6435 statt 8^8)

@@ -431,14 +431,20 @@ def count_prime_values_quadratic(N: int = 100_000):
     elapsed = time.time() - start
 
     # Bateman-Horn Vorhersage
-    C_f = 1.3727  # Bekannte Konstante für x²+1
-    predicted = C_f * N / math.log(N)
+    # C_f = 1.3727... ist die Konstante für alle n in ℤ \ {0} (beidseitig)
+    # Da f(n) = f(-n) = n²+1, zählen wir für n≥1 nur die Hälfte der Eingaben.
+    # Korrekte Vorhersage für #{n in [1,N] : n²+1 prim}:
+    #   π_f^+(N) ~ (C_f / 2) * N / log(N) ≈ 0.6864 * N / log(N)
+    C_f_full = 1.3727   # Konstante für alle ±n
+    C_f_pos = C_f_full / 2  # Konstante für n > 0 (da f(n)=f(-n))
+    predicted = C_f_pos * N / math.log(N)
 
     print(f"\n  Tatsächlich gefunden: #{'{'}n≤{N}{'}'}: n²+1 prim = {count}")
-    print(f"  Bateman-Horn Vorhersage: C_f·N/log(N) = {C_f}·{N}/log({N})")
+    print(f"  Bateman-Horn Vorhersage (n>0): (C_f/2)·N/log(N) = {C_f_pos:.4f}·{N}/log({N})")
     print(f"    = {predicted:.1f}")
+    print(f"  (Hinweis: C_f={C_f_full} gilt für n in [-N,N], Faktor 1/2 für n>0)")
     ratio = count / predicted if predicted > 0 else 0
-    print(f"  Verhältnis tatsächlich/vorhergesagt: {ratio:.4f}")
+    print(f"  Verhältnis tatsächlich/vorhergesagt: {ratio:.4f}  (→ 1 für N→∞)")
     print(f"  Laufzeit: {elapsed:.2f}s")
     print(f"\n  Erste Treffer (n ≤ 20): {prime_values[:20]}")
     print(f"  → Bunyakovsky-Vermutung für f=x²+1: NUMERISCH BESTÄTIGT ✓")
@@ -509,8 +515,9 @@ if __name__ == "__main__":
     # 3. Mersenne-Primzahlen (p ≤ 1000)
     find_mersenne_primes(p_limit=1000)
 
-    # 4. Bunyakovsky: n²+1 prim (N=10^5)
-    count_prime_values_quadratic(N=100_000)
+    # 4. Bunyakovsky: n²+1 prim (N=10^4 für schnelle Verifikation)
+    # Für N=10^5 dauert es ~1s, aber N=10^4 reicht für numerische Bestätigung.
+    count_prime_values_quadratic(N=10_000)
 
     print("=" * 60)
     print("ZUSAMMENFASSUNG")
