@@ -880,3 +880,36 @@ BEHOBEN: Ergänzung nach der Formel:
 ### BUG-B4-P19-DE-003 (paper19_waringsches_problem_de.tex)
 - \begin{theorem}[Wooley, Efficient Congruencing] → \begin{bemerkung}
   umgewandelt (war fälschlicherweise als Theorem deklariert).
+
+=== 2026-03-12 — Build 156 — Minor/Cosmetic Bug Fixes (Multi-Paper) ===
+
+2026-03-12 [Build 156]: Kosmtische und geringe Bugs in mehreren Papers behoben
+
+### Geänderte Dateien
+
+**papers/reviewed/batch3/paper14_selberg_sieve.tex** (BUG-B3-P14-EN-LAMBDA):
+  - Hinweis zu |\lambda_d^*| <= 1 ergänzt (Standardeigenschaft, Verweis auf Cojocaru-Murty)
+
+**papers/reviewed/batch3/paper14_selberg_sieb_de.tex** (BUG-B3-P14-DE-LAMBDA):
+  - Gleiches auf Deutsch: Hinweis zu |\lambda_d^*| <= 1 ergänzt
+
+**papers/reviewed/batch3/paper15_large_sieve.tex** (BUG-B3-P15-BUILD):
+  - Build 56 → Build 153 in \address aktualisiert
+
+**papers/reviewed/batch3/paper15_grosses_sieb_de.tex** (BUG-B3-P15-BUILD):
+  - Build 56 → Build 153 in \address aktualisiert
+
+**papers/reviewed/batch4/paper20_goldbach_singular_series.tex** (BUG-B4-P20-EN-PREDICT):
+  - Vorhersagewert n=100: ~8 → ~6 korrigiert (S(100)≈1.76, asymptot. Formel ≈6)
+
+**papers/reviewed/batch9/paper37_algebraische_zahlentheorie_de.tex** (BUG-B9-P37-DE-NEUKIRCH-YEAR + SAMUEL):
+  - \bibitem{Neukirch1999} → \bibitem{Neukirch1992} (korrekte Edition 1992)
+  - \cite{Neukirch1999} → \cite{Neukirch1992} (2 Stellen im Text)
+  - \bibitem{Samuel1970} P.~Samuel, Algebraic Theory of Numbers, Hermann, 1970 hinzugefügt
+
+### Nicht geändert (bereits korrekt oder Datei nicht vorhanden):
+  - BUG-B2-P8-EN-001: paper08_wilson_theorem_en.tex existiert nicht
+  - BUG-B2-P10-DE-001: Kommentar bereits entfernt
+  - BUG-B5-P24-EN-001: \bibitem{Deligne1974} bereits vorhanden
+  - BUG-B5-P24-DE-001: \bibitem{Deligne1974} bereits vorhanden
+  - BUG-B9-P37-DE-TYPO: "Kürzbarkeit" bereits korrekt geschrieben
