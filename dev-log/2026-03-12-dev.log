@@ -201,3 +201,29 @@ Zwei neue Papers erstellt:
 12. Geometrische Langlands 2024: Gaitsgory-Team
 
 ### Build-Nummer: 120 → 121
+
+### 2026-03-12 — Build 122: LaTeX-Bugfixes Batch4/Batch5 Papers
+
+#### BUG-B4-P19-DE-MISSING-THM — BEHOBEN (KRITISCH)
+- Datei: `papers/reviewed/batch4/paper19_waringsches_problem_de.tex`
+- Problem: `\begin{bemerkung}[Idee des effizienten Kongruenzrechnens]` enthielt Wooleys Hauptresultat, war aber als Bemerkung statt als Satz deklariert.
+- Fix: Umgewandelt zu `\begin{theorem}[Wooley, Efficient Congruencing]` / `\end{theorem}`.
+
+#### BUG-B4-P19-DE-REFS — GEPRÜFT (KEIN BUG)
+- Bibitems HardyLittlewood1920, Wooley2012, Wooley2013 waren bereits vorhanden (Zeilen 385–398). Kein Fix nötig.
+
+#### BUG-B4-P19-DE-KOROLLAR — GEPRÜFT (KEIN BUG)
+- Korollar 4.1 (Weyl-Schranke) war bereits korrekt als `\begin{korollar}` in Abschnitt 4 vorhanden.
+
+#### BUG-B5-P24-DE-MISSING-SECTION — GEPRÜFT (KEIN BUG)
+- Abschnitt "Verbindung zur Physik: Quantenchaos und darüber hinaus" war bereits in der DE-Version vorhanden (Zeilen 368–407) mit Lee-Yang, Connes und Bender.
+
+#### BUG-B5-P24-DE-001 — BEHOBEN (MITTEL)
+- Datei: `papers/reviewed/batch5/paper24_rh_approaches_de.tex`
+- Problem: DE-Abstract fehlte abschließender Satz über GRH und Dirichlet-L-Funktionen.
+- Fix: Satz "Analoge Resultate gelten für verallgemeinerte Riemann-Hypothesen (GRH) für Dirichlet-$L$-Funktionen $L(s,\chi)$." eingefügt.
+
+#### BUG-B5-P24-EN-001 + DE-001 — BEHOBEN (MITTEL)
+- Dateien: `papers/reviewed/batch5/paper24_rh_approaches_en.tex` + `_de.tex`
+- Problem: `\bibitem{Deligne1974}` fehlte in beiden Bibliographien, obwohl `\cite{Deligne1974}` im Text verwendet wird.
+- Fix: Bibitem in beide Dateien eingefügt (vor `\bibitem{Davenport2000}`).
