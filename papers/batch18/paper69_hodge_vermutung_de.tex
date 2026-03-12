@@ -1,0 +1,822 @@
+%% paper69_hodge_vermutung_de.tex
+%% Paper 69 (DE): Die Hodge-Vermutung — Ein Millennium-Problem an der Schnittstelle
+%%                von Topologie, Algebra und komplexer Geometrie
+%% Autor: Michael Fuhrmann
+%% Projekt: Specialist Mathematics, Build 147
+%% Datum: 2026-03-12
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\theoremstyle{remark}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 147}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Die Hodge-Vermutung ist eines der sieben Millennium-Preisprobleme des Clay Mathematics
+Institute (2000), für deren Lösung jeweils eine Million US-Dollar ausgesetzt ist.
+Sie behauptet, dass auf einer glatten projektiven komplexen algebraischen Varietät
+jede rationale Kohomologieklasse vom Hodge-Typ $(p,p)$ eine rationale Linearkombination
+von Klassen algebraischer Teilvarietäten (algebraischer Zyklen) ist. Diese Arbeit
+gibt eine in sich abgeschlossene Einführung in die mathematische Landschaft rund um
+die Vermutung: Kähler-Mannigfaltigkeiten und die Kähler-Form $\omega$, das
+$\partial\bar\partial$-Lemma, der Hodge-Zerlegungssatz, de-Rham- und Dolbeault-Kohomologie,
+algebraische Zyklen und ihre Fundamentalklassen sowie die formale Aussage der Vermutung.
+Wir diskutieren den Lefschetz-$(1,1)$-Satz — die einzige nicht-triviale Dimension,
+in der die Hodge-Vermutung vollständig bewiesen ist — sowie Gegenbeispiele, die zeigen,
+dass weder die ganzzahlige Version noch das Analogon für Nicht-Kähler-Mannigfaltigkeiten
+gilt. Die Rolle der Grothendieck'schen Theorie der Motive und der Standard-Vermutungen
+als konjekctureller Rahmen wird skizziert. Durchgehend werden bewiesene Sätze und
+offene Vermutungen sorgfältig unterschieden, da die Hodge-Vermutung selbst vollständig
+offen ist.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% ============================================================
+\section{Einleitung}
+\label{sec:einleitung}
+%% ============================================================
+
+Im Jahr 1950, beim Internationalen Mathematiker-Kongress in Cambridge (Massachusetts),
+stellte William Vallance Douglas Hodge ein weitreichendes Programm vor, das die
+Topologie komplexer algebraischer Varietäten mit ihrer algebraischen Geometrie
+verbindet. Im Mittelpunkt stand, was schließlich als \emph{Hodge-Vermutung} bekannt
+werden sollte:
+
+\begin{quotation}
+\itshape
+Auf einer glatten projektiven komplexen algebraischen Varietät $X$ ist jede rationale
+Kohomologieklasse vom Typ $(p,p)$ eine rationale Linearkombination von Klassen
+algebraischer Zyklen.
+\end{quotation}
+
+Ein halbes Jahrhundert später nahm das Clay Mathematics Institute sie in die Liste
+der sieben \emph{Millennium-Preisprobleme} auf \cite{clay2000}. Trotz enormer
+Fortschritte in algebraischer Geometrie, Hodge-Theorie und der Theorie der Motive
+in den seitdem vergangenen Jahrzehnten ist die Vermutung in allen Fällen jenseits
+der komplexen Dimension~1 ungelöst.
+
+\subsection*{Warum die Hodge-Vermutung wichtig ist}
+
+Die Vermutung steht an einer bemerkenswerten Schnittstelle mathematischer Disziplinen:
+
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Topologie}: Kohomologieklassen sind topologische Invarianten, ohne
+  Bezug auf algebraische oder komplexe Strukturen berechnet.
+\item \textbf{Komplexe Geometrie}: Die Hodge-Zerlegung $H^n(X,\mathbb{C}) =
+  \bigoplus_{p+q=n} H^{p,q}(X)$ hängt von der komplexen Struktur ab und ist das
+  zentrale Objekt der Hodge-Theorie.
+\item \textbf{Algebraische Geometrie}: Algebraische Zyklen — durch Polynomgleichungen
+  definierte Teilvarietäten — erzeugen Kohomologieklassen, die konstruktionsbedingt
+  vom Typ $(p,p)$ sind.
+\end{enumerate}
+
+Die Vermutung behauptet, dass diese drei Perspektiven in einem präzisen Sinn
+\emph{kompatibel} sind: Jede kohomologisch nachweisbare $(p,p)$-Klasse entsteht
+geometrisch aus einer algebraischen Teilvarietät.
+
+\subsection*{Gliederung}
+
+Abschnitt~\ref{sec:kaehler} führt Kähler-Mannigfaltigkeiten ein. Abschnitt~\ref{sec:hodge-theorie}
+entwickelt den Hodge-Satz via Laplace–Beltrami-Operator. Abschnitt~\ref{sec:kohomologie}
+vergleicht de-Rham- und Dolbeault-Kohomologie. Abschnitt~\ref{sec:zyklen} behandelt
+algebraische Zyklen. Abschnitt~\ref{sec:vermutung} formuliert die Hodge-Vermutung
+präzise. Abschnitt~\ref{sec:bekannt} gibt eine Übersicht bekannter Fälle.
+Abschnitt~\ref{sec:lefschetz} behandelt den Lefschetz-$(1,1)$-Satz ausführlich.
+Abschnitt~\ref{sec:gegenbeispiele} diskutiert Gegenbeispiele. Abschnitt~\ref{sec:motive}
+skizziert den motivischen Rahmen. Abschnitt~\ref{sec:literatur} enthält Literaturangaben.
+
+%% ============================================================
+\section{Kähler-Mannigfaltigkeiten}
+\label{sec:kaehler}
+%% ============================================================
+
+\subsection{Hermitesche Metriken und die Kähler-Form}
+
+Sei $X$ eine kompakte komplexe Mannigfaltigkeit der komplexen Dimension $n$. Das
+Tangentialbündel $TX$ trägt eine natürliche fast-komplexe Struktur $J: TX \to TX$
+mit $J^2 = -\mathrm{id}$.
+
+\begin{definition}
+Eine \emph{hermitesche Metrik} auf $X$ ist eine $J$-kompatible Riemannsche Metrik
+$g$, d.h. $g(Ju, Jv) = g(u,v)$ für alle Tangentialvektoren $u,v$. Die zugehörige
+\emph{fundamentale (Kähler-)Form} ist die reelle $(1,1)$-Form
+\[
+  \omega(u,v) := g(Ju, v).
+\]
+\end{definition}
+
+In lokalen holomorphen Koordinaten $(z^1, \ldots, z^n)$ schreibt man
+$\omega = \frac{i}{2}\sum_{j,k} h_{j\bar k}\, dz^j \wedge d\bar z^k$,
+wobei $(h_{j\bar k})$ eine positiv-definite hermitesche Matrix ist.
+
+\begin{definition}
+Eine hermitesche Mannigfaltigkeit $(X, g, \omega)$ heißt \emph{Kähler-Mannigfaltigkeit},
+wenn $d\omega = 0$, d.h. die Fundamentalform ist geschlossen.
+\end{definition}
+
+Diese eine Bedingung — die Geschlossenheit von $\omega$ — hat weitreichende Folgen.
+Sie gewährleistet die Kompatibilität von komplexer, Riemannscher und symplektischer
+Struktur.
+
+\begin{beispiel}
+\begin{enumerate}[label=(\alph*)]
+\item Der projektive Raum $\mathbb{CP}^n$ mit der Fubini–Study-Metrik ist Kähler.
+\item Jede glatte projektive Varietät $X \subset \mathbb{CP}^N$ erbt eine Kähler-Struktur
+  von der umgebenden Fubini-Study-Metrik.
+\item Komplexe Tori $\mathbb{C}^n / \Lambda$ sind Kähler.
+\item $K3$-Flächen sind Kähler (Siu, 1983, bewiesen).
+\end{enumerate}
+\end{beispiel}
+
+\subsection{Das \texorpdfstring{$\partial\bar\partial$}{deldel-quer}-Lemma}
+
+Auf einer kompakten Kähler-Mannigfaltigkeit erfüllen die Operatoren $\partial$,
+$\bar\partial$ und ihre Adjungierten $\partial^*$, $\bar\partial^*$ die entscheidende
+Identität
+\[
+  \Delta_d = 2\Delta_\partial = 2\Delta_{\bar\partial},
+\]
+wobei $\Delta_d = dd^* + d^*d$ der de-Rham-Laplacian und $\Delta_\partial =
+\partial\partial^* + \partial^*\partial$ der Dolbeault-Laplacian ist. Dies führt zu:
+
+\begin{theorem}[$\partial\bar\partial$-Lemma, bewiesen]
+\label{thm:ddbar}
+Sei $X$ eine kompakte Kähler-Mannigfaltigkeit. Wenn eine Form $\alpha$ $d$-geschlossen,
+$\partial$-exakt und $\bar\partial$-exakt ist, dann gilt $\alpha = \partial\bar\partial\beta$
+für eine Form $\beta$.
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+Dies folgt aus den Kähler-Identitäten $[\Lambda, \partial] = -i\bar\partial^*$ und
+$[\Lambda, \bar\partial] = i\partial^*$, wobei $\Lambda$ der Adjungierte des
+Lefschetz-Operators $L(\alpha) = \omega \wedge \alpha$ ist. Diese Identitäten implizieren
+$\Delta_d = 2\Delta_\partial = 2\Delta_{\bar\partial}$, woraus das Lemma durch ein
+Hodge-Theorie-Argument folgt. Siehe \cite[Kap.~6]{griffiths_harris1978}.
+\end{proof}
+
+Das $\partial\bar\partial$-Lemma ist das entscheidende analytische Werkzeug, das die
+Kähler-Geometrie so viel reicher macht als die allgemeine komplexe Geometrie.
+
+\subsection{Der harte Lefschetz-Satz}
+
+\begin{theorem}[Harter Lefschetz-Satz, bewiesen]
+\label{thm:hard-lefschetz}
+Sei $X$ eine kompakte Kähler-Mannigfaltigkeit der komplexen Dimension $n$. Die Abbildung
+\[
+  L^{n-k} : H^k(X,\mathbb{R}) \longrightarrow H^{2n-k}(X,\mathbb{R}),
+  \quad [\alpha] \mapsto [\omega^{n-k} \wedge \alpha]
+\]
+ist ein Isomorphismus für alle $0 \le k \le n$.
+\end{theorem}
+
+Dieser Satz, von Hodge mit harmonischen Formen bewiesen, hat tiefgreifende Konsequenzen
+für die Topologie projektiver Varietäten.
+
+%% ============================================================
+\section{Hodge-Theorie}
+\label{sec:hodge-theorie}
+%% ============================================================
+
+\subsection{Der Laplace–Beltrami-Operator}
+
+Sei $(X,g)$ eine kompakte orientierte Riemannsche Mannigfaltigkeit der reellen Dimension $m$.
+Bezeichne mit $\Omega^k(X)$ den Raum der glatten $k$-Formen. Das $L^2$-Skalarprodukt ist
+\[
+  \langle \alpha, \beta \rangle = \int_X \alpha \wedge *\beta,
+\]
+wobei $*: \Omega^k \to \Omega^{m-k}$ der durch $g$ bestimmte Hodge-Stern-Operator ist.
+Das formale Adjungierte von $d: \Omega^k \to \Omega^{k+1}$ ist
+$d^* = (-1)^{mk+m+1} * d\, * : \Omega^k \to \Omega^{k-1}$.
+
+\begin{definition}
+Der \emph{Laplace–Beltrami-Operator} (oder Hodge-Laplacian) ist
+\[
+  \Delta = dd^* + d^*d : \Omega^k(X) \longrightarrow \Omega^k(X).
+\]
+Eine Form $\alpha$ heißt \emph{harmonisch}, wenn $\Delta\alpha = 0$, oder äquivalent
+(für kompaktes $X$): $d\alpha = 0$ und $d^*\alpha = 0$.
+\end{definition}
+
+\subsection{Der Hodge-Zerlegungssatz}
+
+\begin{theorem}[Hodge-Satz, bewiesen]
+\label{thm:hodge-main}
+Sei $X$ eine kompakte orientierte Riemannsche Mannigfaltigkeit. Es gibt eine orthogonale
+direkte Summenzerlegung
+\[
+  \Omega^k(X) = \mathcal{H}^k(X) \oplus \mathrm{im}(d) \oplus \mathrm{im}(d^*),
+\]
+wobei $\mathcal{H}^k(X) = \ker(\Delta) \cap \Omega^k(X)$ der endlich-dimensionale Raum
+der harmonischen $k$-Formen ist. Ferner ist die natürliche Abbildung
+\[
+  \mathcal{H}^k(X) \xrightarrow{\;\sim\;} H^k_{\mathrm{dR}}(X, \mathbb{R})
+\]
+ein Isomorphismus.
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+Die elliptische Regularitätstheorie zeigt, dass $\Delta$ ein selbstadjungierter
+elliptischer Operator ist, also kompakte Resolvente hat. Das Fredholm-Prinzip liefert
+die orthogonale Zerlegung, und die endliche Dimension von $\mathcal{H}^k$ folgt aus
+der Kompaktheit. Der Isomorphismus mit der de-Rham-Kohomologie ist unmittelbar, da
+$\ker d = \mathcal{H}^k \oplus \mathrm{im}(d)$.
+Siehe \cite[Kap.~0]{griffiths_harris1978} oder \cite[Kap.~4]{warner1983}.
+\end{proof}
+
+\subsection{Hodge-Zerlegung für Kähler-Mannigfaltigkeiten}
+
+Auf einer kompakten Kähler-Mannigfaltigkeit liefert die komplexe Struktur eine feinere
+Zerlegung.
+
+\begin{theorem}[Hodge-Zerlegung für Kähler-Mannigfaltigkeiten, bewiesen]
+\label{thm:hodge-kahler}
+Sei $X$ eine kompakte Kähler-Mannigfaltigkeit der komplexen Dimension $n$. Es gibt eine
+direkte Summenzerlegung
+\[
+  H^k(X, \mathbb{C}) = \bigoplus_{p+q=k} H^{p,q}(X),
+\]
+wobei $H^{p,q}(X)$ den Raum der durch $\bar\partial$-geschlossene $(p,q)$-Formen
+darstellbaren Kohomologieklassen (Dolbeault-Kohomologie) bezeichnet. Ferner gilt:
+\begin{enumerate}[label=(\roman*)]
+\item $\overline{H^{p,q}(X)} = H^{q,p}(X)$, also $h^{p,q} = h^{q,p}$;
+\item $h^{p,q} = h^{n-p,n-q}$ nach Serre-Dualität;
+\item jedes $H^{p,q}(X)$ wird durch harmonische Formen vom Typ $(p,q)$ repräsentiert.
+\end{enumerate}
+\end{theorem}
+
+Die ganzen Zahlen $h^{p,q} = \dim_{\mathbb{C}} H^{p,q}(X)$ heißen \emph{Hodge-Zahlen}
+und sind topologische Invarianten der Kähler-Mannigfaltigkeit (sie hängen von der
+komplexen Struktur ab; biholomerphe Mannigfaltigkeiten haben dieselben Hodge-Zahlen).
+
+\begin{definition}
+Das \emph{Hodge-Diamant} einer kompakten Kähler-Mannigfaltigkeit $X$ der komplexen
+Dimension $n$ ist die Anordnung $(h^{p,q})_{0 \le p,q \le n}$ in Diamantform:
+\[
+\begin{array}{ccccc}
+  & & h^{n,n} & & \\
+  & h^{n,n-1} & & h^{n-1,n} & \\
+  & \cdots & & \cdots & \\
+  h^{0,0} & & & & \\
+\end{array}
+\]
+\end{definition}
+
+\begin{beispiel}[Hodge-Diamant von $\mathbb{CP}^2$]
+Für die komplexe projektive Ebene $X = \mathbb{CP}^2$ (komplexe Dimension $n=2$)
+ist der Hodge-Diamant
+\[
+\begin{array}{ccccc}
+ & & 1 & & \\
+ & 0 & & 0 & \\
+ 1 & & 1 & & 1 \\
+ & 0 & & 0 & \\
+ & & 1 & &
+\end{array}
+\]
+mit $h^{0,0}=h^{1,1}=h^{2,2}=1$ und allen anderen $h^{p,q}=0$.
+\end{beispiel}
+
+%% ============================================================
+\section{de-Rham- versus Dolbeault-Kohomologie}
+\label{sec:kohomologie}
+%% ============================================================
+
+\subsection{de-Rham-Kohomologie}
+
+Die de-Rham-Kohomologiegruppen
+\[
+  H^k_{\mathrm{dR}}(X, \mathbb{R}) = \frac{\ker(d: \Omega^k \to \Omega^{k+1})}{\mathrm{im}(d: \Omega^{k-1} \to \Omega^k)}
+\]
+sind rein topologische Invarianten: Durch den de-Rham-Satz (bewiesen) sind sie
+isomorph zur singulären Kohomologie $H^k(X, \mathbb{R})$.
+
+\subsection{Dolbeault-Kohomologie}
+
+Auf einer komplexen Mannigfaltigkeit zerfällt das äußere Differential als $d = \partial + \bar\partial$,
+wobei $\partial: \mathcal{A}^{p,q} \to \mathcal{A}^{p+1,q}$ und
+$\bar\partial: \mathcal{A}^{p,q} \to \mathcal{A}^{p,q+1}$. Die \emph{Dolbeault-Kohomologiegruppen}
+sind
+\[
+  H^{p,q}(X) = H^{p,q}_{\bar\partial}(X) = \frac{\ker(\bar\partial: \mathcal{A}^{p,q} \to \mathcal{A}^{p,q+1})}{\mathrm{im}(\bar\partial: \mathcal{A}^{p,q-1} \to \mathcal{A}^{p,q})}.
+\]
+Durch den Dolbeault-Satz (bewiesen) gilt $H^{p,q}(X) \cong H^q(X, \Omega^p_X)$,
+wobei $\Omega^p_X$ die Garbe der holomorphen $p$-Formen bezeichnet.
+
+\subsection{Die Hodge-zu-de-Rham-Spektralsequenz}
+
+Es gibt eine Spektralsequenz (die Hodge-zu-de-Rham- oder Frölicher-Spektralsequenz)
+mit $E_1^{p,q} = H^q(X, \Omega^p_X)$, die gegen $H^{p+q}(X, \mathbb{C})$ konvergiert.
+Für Kähler-Mannigfaltigkeiten degeneriert diese Spektralsequenz bei $E_1$ (bewiesen),
+was äquivalent zum Hodge-Zerlegungssatz ist. Für allgemeine komplexe Mannigfaltigkeiten
+muss das nicht gelten.
+
+\subsection{Die Hodge-Filtrierung}
+
+Die Hodge-Zerlegung definiert eine absteigende Filtrierung
+\[
+  F^p H^k(X, \mathbb{C}) = \bigoplus_{a \ge p} H^{a,k-a}(X),
+\]
+die \emph{Hodge-Filtrierung}. Sie ist funktoriell und zentral in der abstrakten
+Theorie der Hodge-Strukturen.
+
+\begin{definition}
+Eine \emph{reine Hodge-Struktur vom Gewicht $k$} ist ein endlich-dimensionaler reeller
+Vektorraum $H_\mathbb{R}$ zusammen mit einer Bgraduierung
+$H_\mathbb{C} = \bigoplus_{p+q=k} H^{p,q}$, die $\overline{H^{p,q}} = H^{q,p}$ erfüllt.
+\end{definition}
+
+%% ============================================================
+\section{Algebraische Zyklen}
+\label{sec:zyklen}
+%% ============================================================
+
+\subsection{Algebraische Teilvarietäten und ihre Klassen}
+
+Sei $X$ eine glatte projektive komplexe algebraische Varietät der komplexen Dimension $n$.
+
+\begin{definition}
+Ein \emph{algebraischer Zyklus der Kodimension $k$} auf $X$ ist eine formale
+ganzzahlige Linearkombination
+\[
+  Z = \sum_{i} n_i Z_i, \quad n_i \in \mathbb{Z},
+\]
+wobei jedes $Z_i \subset X$ eine irreduzible abgeschlossene Teilvarietät der Kodimension $k$ ist.
+\end{definition}
+
+\begin{definition}
+Die \emph{Chow-Gruppe} $\mathrm{CH}^k(X)$ ist die Gruppe der algebraischen Zyklen
+der Kodimension $k$ modulo rationaler Äquivalenz.
+\end{definition}
+
+\subsection{Die Zyklenabbildung und Fundamentalklassen}
+
+Jede irreduzible Teilvarietät $Z \subset X$ der komplexen Kodimension $k$ (also
+reellen Kodimension $2k$) trägt eine Fundamentalklasse $[Z] \in H_{2n-2k}(X, \mathbb{Z})$.
+Durch Poincaré-Dualität entspricht dies einer Kohomologieklasse
+\[
+  [Z]^* \in H^{2k}(X, \mathbb{Z}).
+\]
+
+\begin{theorem}[Typ von Zyklenklassen, bewiesen]
+\label{thm:zyklus-typ}
+Die Kohomologieklasse $[Z]^* \in H^{2k}(X, \mathbb{Z}) \subset H^{2k}(X, \mathbb{C})$
+liegt unter der Hodge-Zerlegung in $H^{k,k}(X)$.
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+Dies folgt daraus, dass $Z$ lokal durch holomorphe Gleichungen definiert ist: Der
+Poincaré-duale Strom $[Z]$ ist vom Typ $(k,k)$, weil er auf einer komplexen
+Untermannigfaltigkeit getragen wird (glatter Fall), oder durch Auflösung von
+Singularitäten (allgemeiner Fall).
+\end{proof}
+
+\begin{definition}
+Das Bild der \emph{Zyklenklassenabbildung}
+\[
+  \mathrm{kl}: \mathrm{CH}^k(X) \longrightarrow H^{2k}(X, \mathbb{Z})
+\]
+besteht aus \emph{algebraischen Kohomologieklassen}. Eine Klasse
+$\alpha \in H^{2k}(X,\mathbb{Z})$, die in $H^{k,k}(X)$ liegt, heißt
+\emph{ganzzahlige Hodge-Klasse}, und eine Klasse in
+$H^{2k}(X, \mathbb{Q}) \cap H^{k,k}(X)$ heißt \emph{rationale Hodge-Klasse}.
+\end{definition}
+
+%% ============================================================
+\section{Die Hodge-Vermutung}
+\label{sec:vermutung}
+%% ============================================================
+
+\subsection{Formale Aussage}
+
+Wir sind nun in der Lage, die Hodge-Vermutung präzise zu formulieren.
+
+\begin{vermutung}[Hodge-Vermutung, offen]
+\label{verm:hodge}
+Sei $X$ eine glatte projektive komplexe algebraische Varietät. Für jedes $k \ge 0$
+induziert die Zyklenklassenabbildung eine Surjektion
+\[
+  \mathrm{kl}_\mathbb{Q}: \mathrm{CH}^k(X) \otimes_\mathbb{Z} \mathbb{Q}
+  \longrightarrow
+  H^{2k}(X, \mathbb{Q}) \cap H^{k,k}(X).
+\]
+Äquivalent: Jede rationale Kohomologieklasse vom Typ $(k,k)$ ist eine rationale
+Linearkombination von Klassen algebraischer Teilvarietäten.
+\end{vermutung}
+
+\begin{bemerkung}
+\label{bem:millennium}
+Die Hodge-Vermutung ist eines der sieben Millennium-Preisprobleme des Clay Mathematics
+Institute \cite{clay2000}. Sie ist seit Hodges ursprünglicher Formulierung im Jahr
+1950 offen \cite{hodge1950}. Stand 2026 ist sie für alle $k \ge 2$ auf Varietäten
+der Dimension $n \ge 3$ unbewiesen.
+\end{bemerkung}
+
+\subsection{Äquivalente Umformulierungen}
+
+\begin{proposition}[Äquivalente Form, bewiesen]
+Die folgenden Aussagen sind für eine glatte projektive Varietät $X$ äquivalent:
+\begin{enumerate}[label=(\roman*)]
+\item Jede rationale $(k,k)$-Hodge-Klasse auf $X$ ist algebraisch.
+\item Die Zyklenabbildung $\mathrm{CH}^k(X)_\mathbb{Q} \to H^{k,k}(X) \cap H^{2k}(X,\mathbb{Q})$
+  ist surjektiv.
+\item Das natürliche Bild von $\mathrm{Hdg}^k(X)$ in
+  $H^{2k}(X, \mathbb{Q}) / N^{k+1} H^{2k}(X,\mathbb{Q})$ wird von algebraischen
+  Klassen erzeugt.
+\end{enumerate}
+\end{proposition}
+
+\subsection{Warum rationale Koeffizienten?}
+
+Hodges ursprüngliche Formulierung von 1950 verwendete \emph{ganzzahlige} Koeffizienten.
+Wie wir in Abschnitt~\ref{sec:gegenbeispiele} diskutieren, ist die ganzzahlige Version
+\emph{falsch} — es gibt ganzzahlige Hodge-Klassen, die keine ganzzahligen Linearkombinationen
+von Zyklenklassen sind. Die korrekte Version erfordert rationale Koeffizienten.
+
+\subsection{Funktorialität}
+
+\begin{proposition}[Funktorialität, bewiesen]
+Wenn $f: X \to Y$ ein Morphismus glatter projektiver Varietäten ist, dann bildet
+$f^*$ Hodge-Klassen auf $Y$ auf Hodge-Klassen auf $X$ ab, und $f_*$ (wo definiert)
+bildet algebraische Klassen auf algebraische Klassen ab.
+\end{proposition}
+
+%% ============================================================
+\section{Bekannte Fälle}
+\label{sec:bekannt}
+%% ============================================================
+
+Trotz ihrer scheinbaren Einfachheit ist die Hodge-Vermutung in bemerkenswert wenigen
+Fällen bekannt.
+
+\subsection{Triviale Fälle}
+
+\begin{itemize}
+\item $k = 0$: $H^0(X,\mathbb{Q}) \cap H^{0,0}(X) = \mathbb{Q}$, erzeugt durch
+  die Fundamentalklasse $[X]$. Trivialerweise wahr.
+\item $k = n$: Durch Serre-Dualität äquivalent zum Fall $k = 0$ auf der dualen
+  Varietät, also trivialerweise wahr.
+\item $n = 1$ (Kurven): $X$ ist eine Riemann-Fläche; nur $H^{0,0}$ und $H^{1,1}$
+  kommen vor, beide trivial.
+\end{itemize}
+
+\subsection{Der Lefschetz-Fall $k=1$}
+
+Der erste nicht-triviale Fall ist $k = 1$, der durch den Lefschetz-$(1,1)$-Satz
+behandelt wird (Abschnitt~\ref{sec:lefschetz}, bewiesen von Lefschetz 1924 und
+vervollständigt durch Kodaira).
+
+\subsection{Abelsche Varietäten}
+
+Für abelsche Varietäten $A$ der Dimension $n$ gilt für die Hodge-Vermutung:
+\begin{itemize}
+\item Bewiesen für $k = 1$ (Lefschetz-Satz).
+\item Bewiesen für $k = n-1$ (durch Dualität mit $k = 1$).
+\item Bekannt für gewisse spezielle abelsche Varietäten: Weil-4-Faltigkeiten
+  (partiell), Potenzen elliptischer Kurven (Tate, Murasaki), einfache abelsche
+  Varietäten primer Dimension (für $k=1$ via Albert-Klassifikation).
+\item Offen für $k = 2$ auf allgemeinen abelschen 4-Faltigkeiten.
+\end{itemize}
+
+\subsection{Unirulierte und rational zusammenhängende Varietäten}
+
+Für rational zusammenhängende glatte projektive Varietäten $X$ ist die
+Hodge-Vermutung in Kodimension 1 bekannt (Lefschetz), bleibt aber in höherer
+Kodimension offen. Die Hodge-Zahlen rational zusammenhängender Varietäten
+erfüllen $h^{p,0} = 0$ für $p > 0$ (bewiesen).
+
+\subsection{Die Tate-Vermutung}
+
+Über endlichen Körpern gibt es ein Analogon: Die \emph{Tate-Vermutung} besagt,
+dass Zyklenklassen die (kristalline oder $\ell$-adische) Kohomologie in Grad $2k$
+erzeugen. Tate-Vermutung und Hodge-Vermutung sind eng verwandt, ohne dass eine
+die andere impliziert.
+
+%% ============================================================
+\section{Der Lefschetz-\texorpdfstring{$(1,1)$}{(1,1)}-Satz}
+\label{sec:lefschetz}
+%% ============================================================
+
+Der Lefschetz-$(1,1)$-Satz ist das Prunkstück der bewiesenen Fälle der Hodge-Vermutung.
+Er charakterisiert algebraische Kohomologieklassen in Grad 2 vollständig.
+
+\subsection{Aussage und Beweis}
+
+\begin{theorem}[Lefschetz-$(1,1)$-Satz, bewiesen]
+\label{thm:lefschetz11}
+Sei $X$ eine kompakte Kähler-Mannigfaltigkeit. Eine Klasse $\alpha \in H^2(X, \mathbb{Z})$
+liegt in $H^{1,1}(X)$ genau dann, wenn $\alpha$ die erste Chern-Klasse $c_1(L)$
+eines holomorphen Geradenbündels $L$ auf $X$ ist.
+\end{theorem}
+
+\begin{proof}
+Betrachte die exponentielle Garbensequenz auf $X$:
+\[
+  0 \longrightarrow \mathbb{Z} \xrightarrow{\;\cdot 2\pi i\;}
+  \mathcal{O}_X \xrightarrow{\;\exp\;} \mathcal{O}_X^* \longrightarrow 0.
+\]
+Die zugehörige lange exakte Kohomologiesequenz enthält
+\[
+  H^1(X, \mathcal{O}_X^*) \xrightarrow{\;c_1\;} H^2(X, \mathbb{Z})
+  \xrightarrow{\;\delta\;} H^2(X, \mathcal{O}_X).
+\]
+Dabei klassifiziert $H^1(X, \mathcal{O}_X^*)$ holomorphe Geradenbündel (die Picard-Gruppe
+$\mathrm{Pic}(X)$). Eine Klasse $\alpha \in H^2(X,\mathbb{Z})$ liegt im Bild von $c_1$
+genau dann, wenn ihr Bild in $H^2(X, \mathcal{O}_X) = H^{0,2}(X)$ verschwindet.
+Nach der Hodge-Zerlegung gilt $H^2(X,\mathbb{C}) = H^{2,0}(X) \oplus H^{1,1}(X) \oplus H^{0,2}(X)$,
+und $\alpha \in H^2(X,\mathbb{Z}) \subset H^2(X,\mathbb{C})$ ist reell, also sind seine
+$(2,0)$- und $(0,2)$-Komponenten komplex konjugiert. Mithin liegt $\alpha$ in $H^{1,1}(X)$
+genau dann, wenn seine $H^{0,2}$-Komponente verschwindet, d.h. genau dann, wenn
+$\alpha = c_1(L)$ für ein $L \in \mathrm{Pic}(X)$.
+\end{proof}
+
+\begin{korollar}[Hodge-Vermutung in Kodimension 1, bewiesen]
+\label{kor:hv1}
+Die Hodge-Vermutung gilt für $k = 1$ auf jeder glatten projektiven komplexen Varietät:
+Jede rationale $(1,1)$-Hodge-Klasse ist eine rationale Linearkombination von Divisorklassen.
+\end{korollar}
+
+\begin{proof}
+Nach dem Lefschetz-Satz ist jede ganzzahlige $(1,1)$-Klasse gleich $c_1(L)$ für ein
+Geradenbündel $L$. Auf einer projektiven Varietät ist $L^{\otimes m}$ für großes $m$
+sehr ampel, entspricht also einem Hyperebenschnitt und damit einer algebraischen Hyperfläche.
+Rationale Linearkombinationen liefern das Ergebnis.
+\end{proof}
+
+\subsection{Deligne's Beitrag}
+
+Aufbauend auf Grothendieck's Rahmen und seiner eigenen Arbeit zu den Weil-Vermutungen
+bewies Deligne in \emph{Hodge III} \cite{deligne1974}, dass die Hodge-de-Rham-Spektralsequenz
+für glatte projektive Varietäten auch in gemischten Charakteristiken bei $E_1$ degeneriert.
+Dies beweist zwar nicht die Hodge-Vermutung direkt, etabliert aber die Algebraizität von
+Hodge-Klassen in gewissen funktoriellen Situationen.
+
+\subsection{Der Hodge-Index-Satz}
+
+\begin{theorem}[Hodge-Index-Satz, bewiesen]
+\label{thm:hodge-index}
+Sei $X$ eine glatte projektive Fläche, und $H$ eine ample Divisorklasse. Wenn
+$D \in \mathrm{NS}(X)$ die Bedingung $D \cdot H = 0$ erfüllt, dann gilt $D^2 \le 0$,
+mit Gleichheit genau dann, wenn $D$ numerisch trivial ist.
+\end{theorem}
+
+Dieser Satz, bewiesen mit der Hodge-Zerlegung, ist grundlegend für das Studium der
+Néron–Severi-Gruppe und von Flächen.
+
+%% ============================================================
+\section{Gegenbeispiele und Nicht-Kähler-Mannigfaltigkeiten}
+\label{sec:gegenbeispiele}
+%% ============================================================
+
+\subsection{Die ganzzahlige Hodge-Vermutung ist falsch}
+
+\begin{theorem}[Atiyah–Hirzebruch, bewiesen]
+\label{thm:ah-gegenbeispiel}
+Die ganzzahlige Version der Hodge-Vermutung ist falsch: Es gibt glatte projektive
+komplexe Varietäten $X$ und ganzzahlige Hodge-Klassen
+$\alpha \in H^{2k}(X, \mathbb{Z}) \cap H^{k,k}(X)$, die keine ganzzahligen
+Linearkombinationen von Klassen algebraischer Zyklen sind.
+\end{theorem}
+
+\begin{proof}[Historischer Kontext]
+Atiyah und Hirzebruch \cite{atiyah_hirzebruch1961} konstruierten das erste Gegenbeispiel
+unter Verwendung von Torsionsklassen in der Kohomologie gewisser Varietäten. Ihre Methode
+nutzt die Atiyah–Hirzebruch-Spektralsequenz und zeigt, dass Torsions-Hodge-Klassen nicht
+von algebraischen Zyklen stammen müssen.
+\end{proof}
+
+\subsection{Voisins stärkeres Gegenbeispiel}
+
+\begin{theorem}[Voisin 2002, bewiesen]
+\label{thm:voisin}
+Es gibt glatte projektive komplexe Varietäten $X$ und rationale Hodge-Klassen
+$\alpha \in H^{2k}(X, \mathbb{Q}) \cap H^{k,k}(X)$, so dass $\alpha$ auch nach
+Übergang zu einem birationalen Modell nicht die Klasse eines algebraischen Zyklus ist.
+\end{theorem}
+
+\begin{bemerkung}
+Voisins Ergebnis \cite{voisin2002} ist stärker als Atiyah–Hirzebruch: Es zeigt, dass
+sogar bis auf birationale Äquivalenz die ganzzahlige Hodge-Vermutung versagt.
+Allerdings liefert es kein Gegenbeispiel zur \emph{rationalen} Hodge-Vermutung
+(Vermutung~\ref{verm:hodge}), die offen bleibt.
+\end{bemerkung}
+
+\subsection{Nicht-Kähler-Mannigfaltigkeiten}
+
+Die Hodge-Vermutung ist für projektive (also Kähler-) Varietäten formuliert.
+Für allgemeine komplexe Mannigfaltigkeiten kann die Hodge-Zerlegung selbst versagen:
+
+\begin{theorem}[bewiesen]
+Es gibt kompakte komplexe Mannigfaltigkeiten, die nicht Kähler sind (z.B. Hopf-Flächen
+$(\mathbb{C}^2 \setminus \{0\})/\langle z \mapsto 2z \rangle$), für die der
+Hodge-Zerlegungssatz nicht gilt und für die jedes Analogon der Hodge-Vermutung
+leicht scheitert.
+\end{theorem}
+
+\begin{bemerkung}
+Die Kähler-(bzw. projektiv-)Voraussetzung in der Hodge-Vermutung ist also wesentlich
+und kann nicht fallen gelassen werden.
+\end{bemerkung}
+
+\subsection{Hodge-Vermutung für singuläre Varietäten}
+
+Die Hodge-Vermutung in der angegebenen Form erfordert, dass $X$ glatt ist. Für
+singuläre Varietäten verwendet man Schnitt-Kohomologie (Goresky–MacPherson) oder
+gemischte Hodge-Strukturen (Deligne), aber die entsprechenden Vermutungen sind
+subtiler und in der Literatur nicht vollständig ausformuliert.
+
+%% ============================================================
+\section{Motive und Standard-Vermutungen}
+\label{sec:motive}
+%% ============================================================
+
+\subsection{Grothendieck's Theorie der Motive}
+
+In den 1960er Jahren schlug Grothendieck eine universelle Kohomologietheorie vor —
+die Theorie der \emph{Motive} — die de-Rham-, Betti-, $\ell$-adische und kristalline
+Kohomologien als spezielle Realisierungen umfassen sollte \cite{grothendieck1969}.
+
+\begin{definition}
+Die \emph{Kategorie der reinen Motive} $\mathbf{Mot}(k)_\mathbb{Q}$ über einem
+Körper $k$ (mit rationalen Koeffizienten) hat:
+\begin{itemize}
+\item Objekte: Tripel $(X, p, n)$, wobei $X$ eine glatte projektive Varietät,
+  $p \in \mathrm{CH}^{\dim X}(X \times X)_\mathbb{Q}$ ein idempotenter Korrespondenz
+  und $n \in \mathbb{Z}$ eine Tate-Verdrehung ist.
+\item Morphismen: Korrespondenzen modulo rationaler Äquivalenz.
+\end{itemize}
+\end{definition}
+
+Die Hodge-Vermutung ist äquivalent zur Behauptung, dass jede Hodge-Klasse
+\emph{motiviert} ist, d.h. im Bild der motivischen Zyklenklassenabbildung liegt.
+
+\subsection{Die Standard-Vermutungen}
+
+Grothendieck formulierte vier \emph{Standard-Vermutungen} (A, B, C, D), die, wenn
+bewiesen, die Kategorie der Motive als halbeinfache abelsche Kategorie etablieren
+und die Weil-Vermutungen (von Deligne ohne sie bewiesen) implizieren würden:
+
+\begin{vermutung}[Lefschetz-Standard-Vermutung B, offen]
+\label{verm:std-b}
+Für eine glatte projektive Varietät $X$ über einem algebraisch abgeschlossenen Körper
+und eine ample Klasse $L$ sind die Lefschetz-Operatoren $\Lambda^k$ (Inverse zu $L^k$
+auf primitiver Kohomologie) algebraisch, d.h. durch algebraische Korrespondenzen gegeben.
+\end{vermutung}
+
+\begin{vermutung}[Künneth-Standard-Vermutung C, offen]
+\label{verm:std-c}
+Die Künneth-Projektoren $\pi_k: H^*(X) \to H^k(X)$ sind algebraisch.
+\end{vermutung}
+
+\begin{vermutung}[Hodge-Standard-Vermutung D, offen]
+\label{verm:std-d}
+Numerische und homologische Äquivalenz algebraischer Zyklen fallen zusammen.
+\end{vermutung}
+
+\begin{bemerkung}
+Die Standard-Vermutungen sind über allen Körpern, einschließlich $\mathbb{C}$, offen.
+Vermutung~\ref{verm:std-b} über $\mathbb{C}$ würde aus der Hodge-Vermutung folgen,
+ist aber anderweitig unbekannt. Vermutung~\ref{verm:std-d} ist für abelsche Varietäten
+bewiesen (Lieberman 1968).
+\end{bemerkung}
+
+\subsection{Verbindung zu L-Funktionen}
+
+Motive tragen natürliche L-Funktionen. Für eine glatte projektive Varietät $X/\mathbb{Q}$
+ist die \emph{motivische L-Funktion}
+\[
+  L(H^k(X), s) = \prod_p \det\bigl(1 - p^{-s} \mathrm{Frob}_p \,|\, H^k(\bar X)^{I_p}\bigr)^{-1}
+\]
+für eine Funktionalgleichung und analytische Fortsetzung erwartet. Die
+Tate-Vermutung sagt voraus, dass die Ordnung des Pols bei $s = k/2 + 1$ den Rang von
+$\mathrm{CH}^{k/2}(X)$ gleicht. Die BSD-Vermutung ist der Fall $k = 1$ für elliptische Kurven.
+
+\subsection{Grothendieck's Vision}
+
+Grothendieck glaubte, die Hodge-Vermutung würde aus den Standard-Vermutungen via
+der Existenz einer motivischen Galois-Gruppe folgen:
+
+\begin{vermutung}[Motivische Galois-Gruppe, offen]
+\label{verm:motivische-galois}
+Die Tannaka-Kategorie der reinen Motive über $\mathbb{C}$ ist äquivalent zur
+Kategorie der Darstellungen einer pro-reduktiven algebraischen Gruppe $G_{\mathrm{mot}}$,
+der \emph{motivischen Galois-Gruppe}. Die Hodge-Vermutung würde aus der Algebraizität
+der Hodge-Gruppe $\mathrm{MT}(H) \subset G_{\mathrm{mot}}$ folgen.
+\end{vermutung}
+
+%% ============================================================
+\section*{Schluss}
+\label{sec:schluss}
+%% ============================================================
+
+Die Hodge-Vermutung bleibt eines der tiefsten ungelösten Probleme der Mathematik.
+Wir haben gesehen:
+
+\begin{enumerate}[label=(\roman*)]
+\item Der \textbf{Hodge-Zerlegungssatz} (bewiesen) und das $\partial\bar\partial$-Lemma
+  (bewiesen) sind Eckpfeiler der Kähler-Geometrie.
+\item Klassen algebraischer Zyklen sind stets vom Hodge-Typ $(k,k)$ (bewiesen);
+  die Hodge-Vermutung fragt nach der Umkehrung.
+\item Der \textbf{Lefschetz-$(1,1)$-Satz} (bewiesen) klärt den Fall $k=1$:
+  Ganzzahlige $(1,1)$-Klassen sind genau Chern-Klassen von Geradenbündeln.
+\item Die \textbf{ganzzahlige Hodge-Vermutung ist falsch} (Atiyah–Hirzebruch,
+  bewiesen; Voisin 2002, bewiesen), was die rationale Version als die korrekte
+  Formulierung auszeichnet.
+\item Die rationale Hodge-Vermutung ist für alle $k \ge 2$ auf Varietäten der
+  Dimension $\ge 3$ offen.
+\item Grothendieck's Theorie der Motive liefert einen konjekcturellen Rahmen
+  (Standard-Vermutungen, alle offen), der die Hodge-Vermutung implizieren würde.
+\end{enumerate}
+
+Jeder Fortschritt bei der Hodge-Vermutung würde einen Durchbruch darstellen, der
+die drei großen Säulen der Geometrie verbindet: Topologie, komplexe Analysis und
+algebraische Geometrie.
+
+%% ============================================================
+\section{Literatur}
+\label{sec:literatur}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{hodge1950}
+W.~V.~D. Hodge,
+\textit{The topological invariants of algebraic varieties},
+Proc. Int. Congr. Math. (Cambridge, MA, 1950), Bd.~1, 182--192.
+
+\bibitem{lefschetz1924}
+S.~Lefschetz,
+\textit{L'analysis situs et la g\'eom\'etrie alg\'ebrique},
+Gauthier-Villars, Paris, 1924.
+
+\bibitem{griffiths_harris1978}
+P.~Griffiths und J.~Harris,
+\textit{Principles of Algebraic Geometry},
+Wiley-Interscience, New York, 1978.
+
+\bibitem{deligne1974}
+P.~Deligne,
+\textit{Th\'eorie de Hodge: III},
+Publ. Math. IHES \textbf{44} (1974), 5--77.
+
+\bibitem{voisin2002}
+C.~Voisin,
+\textit{A counterexample to the Hodge conjecture extended to K\"ahler varieties},
+Int. Math. Res. Not. \textbf{2002}, Nr.~20, 1057--1075.
+
+\bibitem{grothendieck1969}
+A.~Grothendieck,
+\textit{Standard conjectures on algebraic cycles},
+Algebraic Geometry (Bombay Colloquium 1968), Oxford Univ. Press, 1969, 193--199.
+
+\bibitem{atiyah_hirzebruch1961}
+M.~F. Atiyah und F.~Hirzebruch,
+\textit{Analytic cycles on complex manifolds},
+Topology \textbf{1} (1962), 25--45.
+
+\bibitem{weil1949}
+A.~Weil,
+\textit{Numbers of solutions of equations in finite fields},
+Bull. Amer. Math. Soc. \textbf{55} (1949), 497--508.
+
+\bibitem{voisin2007}
+C.~Voisin,
+\textit{Hodge Theory and Complex Algebraic Geometry}, Bde.~I--II,
+Cambridge Univ. Press, 2002--2003.
+
+\bibitem{clay2000}
+A.~Jaffe und A.~Wiles (Hrsg.),
+\textit{The Millennium Prize Problems},
+Clay Mathematics Institute, Cambridge, MA, 2006.
+
+\bibitem{warner1983}
+F.~W. Warner,
+\textit{Foundations of Differentiable Manifolds and Lie Groups},
+Springer, New York, 1983.
+
+\end{thebibliography}
+
+\end{document}

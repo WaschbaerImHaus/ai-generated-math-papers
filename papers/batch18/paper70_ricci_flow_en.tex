@@ -1,0 +1,794 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Ric}{\mathrm{Ric}}
+\newcommand{\Rm}{\mathrm{Rm}}
+\newcommand{\vol}{\mathrm{vol}}
+\newcommand{\diam}{\mathrm{diam}}
+\newcommand{\inj}{\mathrm{inj}}
+\newcommand{\Sec}{\mathrm{Sec}}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\divop}{div}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Ricci Flow and the Poincar\'{e} Conjecture:\\
+       Hamilton's Programme, Perelman's Proof,\\
+       and the Geometrization Theorem}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 147}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+The Ricci flow, introduced by Richard Hamilton in 1982, is a geometric
+evolution equation
+\[
+  \frac{\partial g}{\partial t} = -2\,\Ric(g)
+\]
+that deforms a Riemannian metric in the direction of its Ricci curvature.
+Hamilton used it to prove that every compact three-manifold with positive
+Ricci curvature is diffeomorphic to a spherical space form, and launched a
+programme to prove Thurston's Geometrization Conjecture.  In 2002--2003
+Grigori Perelman completed this programme by introducing the $\mathcal{F}$-
+and $\mathcal{W}$-entropy functionals, the reduced volume, and the technique
+of Ricci flow with surgery.  As a corollary, he obtained the Poincar\'{e}
+Conjecture: every simply connected, closed, orientable three-manifold is
+homeomorphic to $S^3$.  Both results are now fully proved theorems.  We
+survey the main definitions, key estimates, the surgery procedure, and the
+logical structure of Perelman's argument, and contrast the three-dimensional
+situation with the four-dimensional case, where the smooth Poincar\'{e}
+Conjecture remains open.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Introduction}
+% ================================================================
+
+The Poincar\'{e} Conjecture, formulated by Henri Poincar\'{e} in 1904, asks
+whether every simply connected closed $3$-manifold is homeomorphic to the
+three-sphere $S^3$.  For nearly a century it resisted all attempts at proof
+and became the most famous open problem in topology.
+
+Richard Hamilton~\cite{Hamilton1982} proposed in 1982 a strategy based on
+\emph{geometric analysis}: deform an arbitrary Riemannian metric by the
+\emph{Ricci flow} until it converges to a round metric.  Over the next two
+decades he developed deep estimates, classified singularities, and proved
+several foundational theorems.  However, the problem of singularities in
+dimensions three and above seemed to block a complete proof.
+
+In October 2002 Grigori Perelman posted the first of three preprints on the
+arXiv~\cite{Perelman2002,Perelman2003a,Perelman2003b} that completed
+Hamilton's programme.  Perelman introduced entirely new monotone quantities
+($\mathcal{F}$-entropy, $\mathcal{W}$-entropy, reduced volume), proved the
+$\kappa$-non-collapsing theorem, and constructed a canonical Ricci flow with
+surgery that continues through all finite-time singularities.  From this he
+deduced both the \emph{Geometrization Conjecture} (Thurston 1982) and, as a
+special case, the Poincar\'{e} Conjecture.
+
+Perelman was awarded the Fields Medal in 2006 for this work; he declined to
+accept it.  Complete, peer-reviewed accounts were subsequently provided by
+Morgan--Tian~\cite{MorganTian2007} and Cao--Zhu~\cite{CaoZhu2006}, among
+others.
+
+\subsection*{Organisation of this paper}
+Section~\ref{sec:riem} reviews the Riemannian geometry background.
+Section~\ref{sec:rf} defines the Ricci flow and the normalised Ricci flow.
+Section~\ref{sec:hamilton} presents Hamilton's key results.
+Section~\ref{sec:surgery} introduces Ricci flow with surgery.
+Section~\ref{sec:perelman} describes Perelman's entropy functionals and
+monotonicity results.
+Section~\ref{sec:poincare} states and proves (by reference) the Poincar\'{e}
+theorem.
+Section~\ref{sec:geom} treats the Geometrization theorem.
+Section~\ref{sec:4d} discusses the four-dimensional situation.
+Section~\ref{sec:applications} mentions further applications.
+
+
+% ================================================================
+\section{Riemannian Geometry Background}
+\label{sec:riem}
+% ================================================================
+
+Let $(M,g)$ be a smooth Riemannian manifold of dimension $n$.
+
+\begin{definition}[Riemann curvature tensor]
+The \emph{Riemann curvature tensor} $\Rm$ is the $(1,3)$-tensor defined by
+\[
+  \Rm(X,Y)Z = \nabla_X\nabla_Y Z - \nabla_Y\nabla_X Z - \nabla_{[X,Y]}Z,
+\]
+where $\nabla$ is the Levi-Civita connection.  In local coordinates,
+$R^l{}_{ijk}$ denotes its components.
+\end{definition}
+
+\begin{definition}[Ricci tensor]
+The \emph{Ricci tensor} is the contraction
+\[
+  R_{ij} = R^k{}_{ikj} = g^{kl}R_{kilj}.
+\]
+It is a symmetric $(0,2)$-tensor measuring, roughly, how much the volume of a
+small geodesic ball differs from the Euclidean volume.
+\end{definition}
+
+\begin{definition}[Scalar curvature]
+The \emph{scalar curvature} is the full trace
+\[
+  R = g^{ij}R_{ij} = \tr_g \Ric.
+\]
+\end{definition}
+
+\begin{definition}[Sectional curvature]
+For a two-plane $\sigma = \mathrm{span}\{X,Y\}$ in $T_pM$,
+\[
+  K(\sigma) = \frac{g(\Rm(X,Y)Y,X)}{g(X,X)g(Y,Y)-g(X,Y)^2}.
+\]
+\end{definition}
+
+\begin{definition}[Einstein manifold]
+$(M,g)$ is called \emph{Einstein} if $\Ric = \lambda g$ for some constant
+$\lambda \in \R$.  On a compact Einstein three-manifold one has $\lambda > 0$,
+$= 0$, or $< 0$ corresponding to positive, zero, or negative scalar curvature.
+\end{definition}
+
+\begin{remark}
+In dimension three, the full Riemann curvature tensor is completely determined
+by the Ricci tensor via
+\[
+  R_{ijkl} = g_{ik}R_{jl} - g_{il}R_{jk} - g_{jk}R_{il} + g_{jl}R_{ik}
+             - \tfrac{1}{2}R(g_{ik}g_{jl} - g_{il}g_{jk}).
+\]
+This algebraic fact plays a key role in Hamilton's analysis.
+\end{remark}
+
+\begin{definition}[Gradient, Laplacian, Divergence]
+For a function $f$ and a $(0,2)$-tensor $T$:
+\begin{align*}
+  (\nabla f)^i &= g^{ij}\partial_j f, \\
+  \Delta f &= g^{ij}\nabla_i\nabla_j f, \\
+  (\divop T)_j &= g^{ik}\nabla_i T_{kj}.
+\end{align*}
+\end{definition}
+
+
+% ================================================================
+\section{The Ricci Flow}
+\label{sec:rf}
+% ================================================================
+
+\begin{definition}[Ricci flow]
+Let $M$ be a compact smooth manifold and $g_0$ a Riemannian metric on $M$.
+The \emph{Ricci flow} is the one-parameter family of metrics $g(t)$ satisfying
+\begin{equation}
+  \label{eq:rf}
+  \frac{\partial}{\partial t} g(t) = -2\,\Ric(g(t)), \qquad g(0) = g_0.
+\end{equation}
+\end{definition}
+
+The factor $2$ is conventional; it ensures that the flow coincides with the
+heat equation on flat space.
+
+\begin{remark}[Heuristic]
+The Ricci flow is a kind of non-linear heat equation for the metric.  Where
+curvature is positive (the manifold is ``too curved''), the metric contracts;
+where curvature is negative, it expands.  In this way, the flow tends to
+homogenise the curvature.
+\end{remark}
+
+\begin{theorem}[Short-time existence and uniqueness; DeTurck 1983]
+\label{thm:ste}
+For every smooth compact Riemannian manifold $(M,g_0)$, there exists
+$T > 0$ and a unique smooth solution $g(t)$ of~\eqref{eq:rf} on $[0,T)$.
+\end{theorem}
+
+\begin{proof}[Sketch of proof]
+The Ricci flow equation is not strictly parabolic due to diffeomorphism
+invariance.  DeTurck's trick consists of coupling~\eqref{eq:rf} with a
+time-dependent family of diffeomorphisms $\varphi_t$ chosen so that the
+pulled-back flow $\tilde g(t) = \varphi_t^* g(t)$ satisfies a strictly
+parabolic equation.  Standard parabolic PDE theory then gives short-time
+existence and uniqueness of $\tilde g(t)$, from which one recovers $g(t)$.
+\end{proof}
+
+\subsection{Evolution equations}
+
+Under the Ricci flow, the geometric quantities evolve as follows:
+\begin{align}
+  \frac{\partial}{\partial t} R_{ij} &= \Delta R_{ij} + 2 R_{kijl}R^{kl}
+     - 2 R_{ik}R^k{}_j + \nabla_i\nabla_j R, \label{eq:ric-ev} \\
+  \frac{\partial}{\partial t} R &= \Delta R + 2|\Ric|^2. \label{eq:scal-ev}
+\end{align}
+Equation~\eqref{eq:scal-ev} implies, via the maximum principle, that the
+scalar curvature satisfies $R(x,t) \geq R_{\min}(0)$ for all $t \geq 0$, so
+the infimum of $R$ is non-decreasing.
+
+\subsection{Normalised Ricci flow}
+
+To study convergence on manifolds with non-zero Euler characteristic it is
+convenient to rescale the metric to keep the volume fixed.  Let
+$r(t) = \frac{\int_M R\,d\mu}{\vol(M,g(t))}$ be the average scalar curvature.
+The \emph{normalised Ricci flow} is
+\begin{equation}
+  \label{eq:nrf}
+  \frac{\partial}{\partial t} g = -2\Ric + \frac{2}{n} r\, g.
+\end{equation}
+In dimension $3$ the normalised flow is equivalent to the unnormalised flow up
+to a time reparametrisation and a homothetic rescaling of the metric.
+
+\subsection{Ricci solitons}
+
+\begin{definition}[Ricci soliton]
+A Riemannian metric $g$ is a \emph{Ricci soliton} if
+\[
+  \Ric + \nabla^2 f = \lambda g
+\]
+for some smooth function $f$ (the \emph{potential}) and constant
+$\lambda \in \R$.  The soliton is \emph{shrinking} ($\lambda > 0$),
+\emph{steady} ($\lambda = 0$), or \emph{expanding} ($\lambda < 0$).
+\end{definition}
+
+A Ricci soliton is a fixed point of the normalised Ricci flow modulo
+diffeomorphisms and scaling.  The round sphere $S^n$ with its standard metric
+is a shrinking Ricci soliton with $f = \mathrm{const}$ (a Ricci--Einstein
+metric).  The Gaussian soliton on $\R^n$ is a steady soliton with
+$f(x) = |x|^2/4$.
+
+
+% ================================================================
+\section{Hamilton's Results}
+\label{sec:hamilton}
+% ================================================================
+
+\begin{theorem}[Hamilton 1982]
+\label{thm:hamilton82}
+Let $(M^3, g_0)$ be a compact three-manifold with positive Ricci curvature,
+$\Ric(g_0) > 0$.  Then the normalised Ricci flow exists for all time, and the
+metric $g(t)$ converges in $C^\infty$ to a metric of constant positive
+sectional curvature as $t\to\infty$.  In particular, $M$ is diffeomorphic to a
+spherical space form $S^3/\Gamma$.
+\end{theorem}
+
+\begin{proof}[Strategy]
+Hamilton analysed the evolution of the curvature tensor using the maximum
+principle.  The key steps are:
+\begin{enumerate}[label=(\roman*)]
+  \item Show that $\Ric > 0$ is preserved under the flow (pinching lemma).
+  \item Establish the \emph{pinching estimate}: if $\Ric \geq \delta R\, g$ at
+    $t = 0$, then this lower bound improves over time.
+  \item Use the Harnack inequality for the curvature to control spatial
+    variations.
+  \item Deduce exponential convergence to a constant-curvature metric via
+    the normalised flow.
+\end{enumerate}
+The positive Ricci curvature assumption is essential; it prevents the
+formation of the long thin ``necks'' ($S^2 \times \R$) that would otherwise
+obstruct convergence.
+\end{proof}
+
+\begin{corollary}
+Every compact three-manifold with positive Ricci curvature has finite
+fundamental group.
+\end{corollary}
+
+\subsection{Hamilton's entropy}
+
+Hamilton introduced the \emph{entropy functional}
+\[
+  \mathcal{E}(g) = \int_M R \log R\, d\mu
+\]
+and showed it is monotone non-decreasing along the normalised Ricci flow on
+surfaces, playing a role analogous to Perelman's $\mathcal{W}$-entropy
+(Section~\ref{sec:perelman}).
+
+\subsection{Singularity analysis}
+
+In dimensions $\geq 3$, the Ricci flow may develop finite-time singularities.
+Hamilton classified them into:
+\begin{itemize}
+  \item \textbf{Type~I}: $|\Rm|(x,t) \leq \frac{C}{T-t}$ as $t \nearrow T$.
+    These include round sphere shrinkage.
+  \item \textbf{Type~II}: $|\Rm|$ grows faster than $(T-t)^{-1}$.
+    These include the cigar soliton.
+  \item \textbf{Type~III}: singularities at $t \to +\infty$ on immortal
+    solutions.
+\end{itemize}
+For three-manifolds with positive Ricci curvature, only Type~I singularities
+(corresponding to round collapse) occur, and these are resolved by the
+convergence theorem~\ref{thm:hamilton82}.  In the general case without
+positivity of Ricci curvature, neck-pinch singularities of Type~I can form;
+these require surgery.
+
+
+% ================================================================
+\section{Ricci Flow with Surgery}
+\label{sec:surgery}
+% ================================================================
+
+\subsection{Neck-pinch singularities}
+
+The most important finite-time singularity in dimension three is the
+\emph{neck-pinch}: a region diffeomorphic to $S^2 \times (-1,1)$ develops
+unbounded curvature as the $S^2$-factor collapses to a point.
+
+\begin{definition}[$\varepsilon$-neck]
+An \emph{$\varepsilon$-neck} in $(M,g)$ centred at $x$ is a region
+$U \subset M$ with a diffeomorphism $\psi: S^2 \times (-\varepsilon^{-1},
+\varepsilon^{-1}) \to U$ such that
+\[
+  \bigl\|\, r^{-2}\,\psi^*g - g_{S^2} \oplus ds^2 \,\bigr\|_{C^{[\varepsilon^{-1}]}} < \varepsilon,
+\]
+where $r$ is the radius of the $S^2$ factor.
+\end{definition}
+
+\subsection{Canonical neighbourhood theorem}
+
+Perelman's \emph{canonical neighbourhood theorem} states that any
+$(x,t)$ with sufficiently large curvature $|{\Rm}|(x,t) \geq r^{-2}$
+has a neighbourhood (after rescaling by $|{\Rm}|(x,t)$) that is
+$\varepsilon$-close to a standard model:
+\begin{itemize}
+  \item a strong $\varepsilon$-neck,
+  \item an $\varepsilon$-cap (topology of a half-space or projective plane
+    cap), or
+  \item a compact $\varepsilon$-round manifold.
+\end{itemize}
+
+\subsection{Surgery procedure}
+
+At a singularity time $T$, one performs surgery on all necks:
+\begin{enumerate}
+  \item Cut $M$ along the neck $S^2$.
+  \item Cap off each resulting boundary $S^2$ with a standard round
+    hemisphere (\emph{standard cap}).
+  \item Restart the flow with the modified metric $g^+(T)$.
+\end{enumerate}
+
+\begin{theorem}[Perelman 2003; existence of surgical solution]
+\label{thm:surgery}
+There exist constants $r, \delta, \kappa > 0$ depending only on the initial
+metric such that the Ricci flow with $(r,\delta)$-cutoff exists for all time
+$t \in [0,\infty)$, with only finitely many surgeries on any finite time
+interval.
+\end{theorem}
+
+A key point is that surgeries are performed at a carefully chosen scale $h$
+comparable to the curvature scale $r$, so that the geometric quality of the
+metric after surgery is controlled.
+
+
+% ================================================================
+\section{Perelman's Proof: Entropy, Non-Collapsing, and Reduced Volume}
+\label{sec:perelman}
+% ================================================================
+
+\subsection{The $\mathcal{F}$-entropy}
+
+\begin{definition}[Perelman's $\mathcal{F}$-functional]
+Let $f: M \to \R$ be a smooth function with $\int_M e^{-f}\,d\mu = 1$.
+Define
+\begin{equation}
+  \mathcal{F}(g,f) = \int_M \bigl(R + |\nabla f|^2\bigr) e^{-f}\,d\mu.
+\end{equation}
+\end{definition}
+
+\begin{theorem}[Monotonicity of $\mathcal{F}$; Perelman 2002]
+\label{thm:F-mono}
+Under the \emph{modified Ricci flow}
+\[
+  \partial_t g_{ij} = -2 R_{ij}, \qquad
+  \partial_t f = -\Delta f - R + |\nabla f|^2,
+\]
+the $\mathcal{F}$-functional is non-decreasing:
+\begin{equation}
+  \frac{d}{dt}\mathcal{F}(g(t),f(t))
+  = 2\int_M \bigl|R_{ij} + \nabla_i\nabla_j f\bigr|^2 e^{-f}\,d\mu \geq 0.
+\end{equation}
+Equality holds if and only if $(g,f)$ is a gradient steady Ricci soliton.
+\end{theorem}
+
+\begin{proof}[Sketch]
+Direct computation using the evolution equations for $g$, $d\mu$, $R$, and
+$|\nabla f|^2$.  Integration by parts converts boundary terms to zero on a
+compact manifold.
+\end{proof}
+
+\subsection{The $\mathcal{W}$-entropy}
+
+\begin{definition}[Perelman's $\mathcal{W}$-functional]
+For $\tau > 0$ and $(g, f)$ with $\int_M (4\pi\tau)^{-n/2}e^{-f}\,d\mu = 1$:
+\begin{equation}
+  \mathcal{W}(g,f,\tau)
+  = \int_M \bigl[\tau(R + |\nabla f|^2) + f - n\bigr]
+    (4\pi\tau)^{-n/2}e^{-f}\,d\mu.
+\end{equation}
+\end{definition}
+
+\begin{definition}[Perelman entropy $\mu$-functional]
+\[
+  \mu(g,\tau) = \inf \bigl\{\mathcal{W}(g,f,\tau) :
+    \int_M (4\pi\tau)^{-n/2}e^{-f}\,d\mu = 1 \bigr\}.
+\]
+\end{definition}
+
+\begin{theorem}[Monotonicity of $\mathcal{W}$; Perelman 2002]
+\label{thm:W-mono}
+Under the Ricci flow coupled with
+\[
+  \partial_t f = -\Delta f - R + \frac{n}{2\tau}, \qquad
+  \frac{d\tau}{dt} = -1,
+\]
+the $\mathcal{W}$-functional is non-decreasing.  In particular,
+$t \mapsto \mu(g(t), T-t)$ is non-decreasing for $t < T$.
+\end{theorem}
+
+\subsection{$\kappa$-non-collapsing}
+
+\begin{theorem}[$\kappa$-non-collapsing; Perelman 2002]
+\label{thm:kappa}
+Let $(M,g(t))$ be a Ricci flow on $[0,T]$.  For every $\rho > 0$ there
+exists $\kappa > 0$ (depending on $\rho$, $T$, and $g(0)$) such that the
+following holds: if $|\Rm|(x,t) \leq \rho^{-2}$ on the ball $B(x,t,\rho)$,
+then
+\[
+  \vol_t B(x,t,\rho) \geq \kappa \rho^n.
+\]
+\end{theorem}
+
+\begin{proof}[Strategy]
+The $\mathcal{W}$-entropy lower bound provides a lower bound on
+$\mu(g(t),\rho^2)$.  A collapsing ball would force $\mathcal{W}$ to be very
+negative, contradicting the monotonicity theorem~\ref{thm:W-mono}.
+\end{proof}
+
+The $\kappa$-non-collapsing theorem is the central tool: it prevents the
+development of the cigar-type singularities that had previously obstructed
+Hamilton's programme, and ensures that high-curvature regions have the
+canonical neighbourhood structure needed for surgery.
+
+\subsection{Reduced volume and reduced length}
+
+Perelman defined the \emph{$\mathcal{L}$-geodesic} and \emph{reduced length}:
+\begin{equation}
+  l(q,\tau) = \frac{1}{2\sqrt{\tau}}
+    \inf_\gamma \int_0^\tau \sqrt{s}\bigl(R(\gamma(s)) + |\dot\gamma(s)|^2\bigr)ds,
+\end{equation}
+where the infimum is over all curves $\gamma$ from $(p,0)$ to $(q,\tau)$
+traversed backwards in time.  The \emph{reduced volume} is
+\begin{equation}
+  \tilde V(\tau) = \int_M (4\pi\tau)^{-n/2} e^{-l(q,\tau)}\,d\vol_{g(\tau)}.
+\end{equation}
+
+\begin{theorem}[Monotonicity of reduced volume; Perelman 2002]
+Under the Ricci flow, $\tilde V(\tau)$ is non-increasing in $\tau$, and
+$\tilde V(\tau) \leq 1$.  If $\tilde V(\tau_0) = 1$ for some $\tau_0 > 0$,
+then $(M,g)$ is isometric to Euclidean space.
+\end{theorem}
+
+
+% ================================================================
+\section{The Poincar\'{e} Conjecture}
+\label{sec:poincare}
+% ================================================================
+
+\begin{theorem}[Poincar\'{e} Conjecture; Perelman 2003]
+\label{thm:poincare}
+Every simply connected, closed (compact, without boundary), orientable
+three-manifold is homeomorphic to the three-sphere $S^3$.
+\end{theorem}
+
+\begin{proof}[Proof via Ricci flow with surgery]
+Let $M$ be a simply connected closed three-manifold.  Equip $M$ with an
+arbitrary smooth metric $g_0$ and run the Ricci flow with surgery
+(Theorem~\ref{thm:surgery}).
+
+\medskip
+\textbf{Step 1: The flow becomes extinct in finite time.}
+Since $\pi_1(M) = 0$, in particular $\pi_2(M) = 0$ (by Hurewicz) and the
+$3$-manifold is prime.  Perelman~\cite{Perelman2003b} (and independently
+Colding--Minicozzi) proved that for simply connected closed $3$-manifolds
+the Ricci flow with surgery becomes extinct in finite time $T < \infty$:
+the manifold is completely decomposed after finitely many surgeries, each
+piece becoming round before collapsing.
+
+\medskip
+\textbf{Step 2: No non-trivial topology survives.}
+Just before extinction, the metric is $\varepsilon$-close to a round metric
+on $S^3$ or on a spherical space form $S^3/\Gamma$.  Since $\pi_1(M) = 0$,
+no non-trivial $\Gamma$ can arise, so the only possibility is $S^3$.
+
+\medskip
+\textbf{Step 3: Conclusion.}
+All surgeries replace $M$ by a topologically equivalent manifold (by the
+canonical neighbourhood structure, surgeries are performed along $S^2$-necks
+and attach standard caps that are topological balls).  Therefore the original
+manifold $M$ is homeomorphic to $S^3$.
+\end{proof}
+
+\begin{remark}
+The complete verification of Perelman's argument was carried out by
+Morgan--Tian~\cite{MorganTian2007} and Cao--Zhu~\cite{CaoZhu2006}.  Both
+independently confirmed all details of the proof.  There is now complete
+consensus in the mathematical community that Theorem~\ref{thm:poincare} is
+established.
+\end{remark}
+
+\begin{remark}[Historical context]
+The Poincar\'{e} Conjecture was one of the seven Millennium Prize Problems
+of the Clay Mathematics Institute (CMI), each carrying a prize of
+\$1{,}000{,}000.  Perelman was awarded the prize in 2010 but declined to
+accept it, just as he had declined the Fields Medal in 2006.
+\end{remark}
+
+
+% ================================================================
+\section{The Geometrization Conjecture}
+\label{sec:geom}
+% ================================================================
+
+\begin{definition}[Thurston's eight geometries]
+\label{def:geom}
+A three-dimensional geometry $(X,G)$ consists of a simply connected
+three-manifold $X$ together with a transitive isometry group $G$ such that
+the stabiliser of a point is compact.  There are exactly eight such maximal
+geometries:
+\[
+  S^3,\quad \R^3,\quad H^3,\quad S^2\times\R,\quad H^2\times\R,\quad
+  \widetilde{\mathrm{SL}_2(\R)},\quad \mathrm{Nil},\quad \mathrm{Sol}.
+\]
+\end{definition}
+
+\begin{definition}[Geometric decomposition]
+A closed, orientable three-manifold $M$ is \emph{geometric} if it is modelled
+on one of the eight geometries.  The \emph{JSJ decomposition} cuts $M$ along
+incompressible tori into atoroidal pieces; together with the prime
+decomposition along $S^2$, one obtains the \emph{geometrisation}.
+\end{definition}
+
+\begin{theorem}[Geometrization Theorem; Thurston 1982, Perelman 2003]
+\label{thm:geom}
+Every closed, orientable three-manifold can be cut along finitely many
+disjoint, incompressible tori and spheres into pieces, each of which
+admits a complete, locally homogeneous Riemannian metric modelled on one of
+the eight Thurston geometries.
+\end{theorem}
+
+\begin{proof}[Proof via Ricci flow with surgery]
+Perelman's Ricci flow with surgery provides a canonical decomposition of $M$
+into prime pieces.  For the atoroidal (hyperbolic) pieces, Perelman established
+the \emph{thick-thin decomposition}: after rescaling, the thick part converges
+to a hyperbolic manifold (using Hamilton's compactness theorem and the
+$\kappa$-non-collapsing estimates), while the thin part is a graph manifold
+(and hence carries one of the Seifert-fibred geometries).  The graph manifold
+case was handled separately using results of Shioya--Yamaguchi.  Together
+these give the full Geometrization Theorem.
+\end{proof}
+
+\begin{corollary}
+The Poincar\'{e} Conjecture (Theorem~\ref{thm:poincare}) follows from the
+Geometrization Theorem: the only geometry compatible with a simply connected
+closed three-manifold is the spherical geometry $S^3$, so $M \cong S^3$.
+\end{corollary}
+
+\begin{remark}
+The Geometrization Theorem was first conjectured by William Thurston~\cite{Thurston1982}
+in 1982, based on his deep work on hyperbolic three-manifolds (for which he
+received the Fields Medal in 1982).  Thurston proved the conjecture for
+Haken manifolds; the general case required Perelman's Ricci flow methods.
+\end{remark}
+
+
+% ================================================================
+\section{The Four-Dimensional Case}
+\label{sec:4d}
+% ================================================================
+
+The situation in dimension four differs fundamentally from dimension three.
+
+\subsection{Topological Poincar\'{e} conjecture in dimension 4}
+
+\begin{theorem}[Freedman 1982]
+\label{thm:freedman}
+Every simply connected closed topological four-manifold with the homotopy
+type of $S^4$ is homeomorphic to $S^4$.
+\end{theorem}
+
+Freedman's proof~\cite{Freedman1982} uses the technique of
+\emph{Casson handles} and is specific to dimension four.  It builds on the
+Whitney trick, which works topologically in dimension four but not smoothly.
+Freedman was awarded the Fields Medal in 1986 for this work.
+
+\subsection{Smooth Poincar\'{e} conjecture in dimension 4 --- open problem}
+
+\begin{conjecture}[Smooth four-dimensional Poincar\'{e} conjecture]
+\label{conj:s4d}
+Every smooth manifold homeomorphic to $S^4$ is diffeomorphic to $S^4$.
+\end{conjecture}
+
+This remains one of the most important open problems in geometric topology.
+In contrast to the topological statement (Theorem~\ref{thm:freedman}), the
+smooth problem is completely open.
+
+\begin{remark}
+In all other dimensions $n \neq 4$, the smooth Poincar\'{e} conjecture is
+decided:
+\begin{itemize}
+  \item $n \leq 2$: classical (and trivial for $n=1$).
+  \item $n = 3$: Perelman's theorem (Theorem~\ref{thm:poincare}).
+  \item $n \geq 5$: Smale (1961) proved that every simply connected, closed
+    $n$-manifold homotopy equivalent to $S^n$ is diffeomorphic to $S^n$
+    for $n \geq 5$ (the $h$-cobordism theorem).
+\end{itemize}
+Dimension four is exceptional because the Whitney trick works topologically
+but not smoothly.  Donaldson gauge theory and Seiberg--Witten theory have
+produced obstructions showing that exotic smooth structures exist on $\R^4$
+(but not on $\R^n$ for $n \neq 4$), and many simply connected $4$-manifolds
+admit infinitely many distinct smooth structures.  For $S^4$ itself, no exotic
+smooth structure has been found, but none has been ruled out.
+\end{remark}
+
+\subsection{Ricci flow in dimension 4}
+
+The Ricci flow in dimension four faces new challenges:
+\begin{itemize}
+  \item The Weyl curvature tensor does not vanish in dimension four, so the
+    Riemann tensor is not determined by $\Ric$ alone.
+  \item New types of singularities (e.g., orbifold singularities) appear.
+  \item Hamilton's classification of singularities is less complete.
+\end{itemize}
+Progress includes work of Chen--Zhu and of Brendle on four-manifolds with
+pointwise $\frac{1}{4}$-pinched sectional curvature.
+
+
+% ================================================================
+\section{Applications and Generalisations}
+\label{sec:applications}
+% ================================================================
+
+\subsection{Mean curvature flow}
+
+The \emph{mean curvature flow} (MCF) moves a hypersurface $\Sigma_t \subset \R^{n+1}$
+in the direction of its mean curvature vector:
+\[
+  \frac{d}{dt}\mathbf{x} = H\,\mathbf{n},
+\]
+where $H$ is the mean curvature and $\mathbf{n}$ the inward unit normal.
+By analogy with Ricci flow, the MCF develops singularities (neck-pinches) that
+can be resolved by surgery.  Andrews, Brendle, Huisken, and Ilmanen have
+developed a MCF with surgery analogous to Perelman's construction.
+
+\subsection{K\"{a}hler--Ricci flow}
+
+On a K\"{a}hler manifold $(M, J, g)$ the Ricci form $\rho = -\frac{i}{2\pi}\partial\bar\partial\log\det(g_{i\bar j})$
+represents the first Chern class.  The \emph{K\"{a}hler--Ricci flow} is
+\[
+  \frac{\partial \omega}{\partial t} = -\Ric(\omega) + \lambda\omega, \qquad \lambda \in \{-1, 0, 1\},
+\]
+and is used in the study of canonical K\"{a}hler metrics (Calabi--Yau,
+K\"{a}hler--Einstein).  The Yau--Tian--Donaldson conjecture (proved by Chen,
+Donaldson, and Sun in 2015) states that K-stability is equivalent to the
+existence of a K\"{a}hler--Einstein metric, and the K\"{a}hler--Ricci flow
+plays a central role.
+
+\subsection{Harmonic map flow and Yang--Mills flow}
+
+The techniques developed for Ricci flow have analogues in:
+\begin{itemize}
+  \item \textbf{Harmonic map flow}: $\partial_t u = \tau(u)$, where $\tau$ is
+    the tension field.  Eells--Sampson (1964) proved long-time existence when
+    the target has non-positive curvature.
+  \item \textbf{Yang--Mills flow}: gradient flow of the Yang--Mills energy
+    functional.  Donaldson used it to prove the Donaldson--Uhlenbeck--Yau
+    theorem on stable bundles.
+\end{itemize}
+
+\subsection{Thurston's program and low-dimensional topology}
+
+The Geometrization Theorem resolves the \emph{virtual Haken conjecture} (proved by
+Agol 2012) and the \emph{virtual fibering conjecture}, both now theorems.
+The classification of three-manifolds is now, in principle, complete: every
+closed orientable three-manifold can be understood in terms of the eight
+model geometries.
+
+
+% ================================================================
+\section*{Acknowledgements}
+% ================================================================
+
+This paper is part of the \emph{Specialist Mathematics Project}, a systematic
+study of advanced mathematics from algebra and analysis to the Millennium
+Problems.  The exposition follows the treatments in Morgan--Tian~\cite{MorganTian2007},
+Cao--Zhu~\cite{CaoZhu2006}, and Kleiner--Lott~\cite{KleinerLott2008}.
+
+
+% ================================================================
+\begin{thebibliography}{99}
+% ================================================================
+
+\bibitem{Hamilton1982}
+R.~S.~Hamilton,
+\textit{Three-manifolds with positive Ricci curvature},
+J.\ Differential Geom.\ \textbf{17} (1982), no.~2, 255--306.
+
+\bibitem{Perelman2002}
+G.~Perelman,
+\textit{The entropy formula for the Ricci flow and its geometric applications},
+arXiv:math/0211159 (2002).
+
+\bibitem{Perelman2003a}
+G.~Perelman,
+\textit{Ricci flow with surgery on three-manifolds},
+arXiv:math/0303109 (2003).
+
+\bibitem{Perelman2003b}
+G.~Perelman,
+\textit{Finite extinction time for the solutions to the Ricci flow on certain three-manifolds},
+arXiv:math/0307245 (2003).
+
+\bibitem{MorganTian2007}
+J.~Morgan and G.~Tian,
+\textit{Ricci Flow and the Poincar\'{e} Conjecture},
+Clay Mathematics Monographs, vol.~3, AMS, Providence, 2007.
+
+\bibitem{CaoZhu2006}
+H.-D.~Cao and X.-P.~Zhu,
+\textit{A complete proof of the Poincar\'{e} and geometrization conjectures ---
+application of the Hamilton-Perelman theory of the Ricci flow},
+Asian J.\ Math.\ \textbf{10} (2006), no.~2, 165--492.
+
+\bibitem{KleinerLott2008}
+B.~Kleiner and J.~Lott,
+\textit{Notes on Perelman's papers},
+Geom.\ Topol.\ \textbf{12} (2008), 2587--2855.
+
+\bibitem{Thurston1982}
+W.~P.~Thurston,
+\textit{Three-dimensional manifolds, Kleinian groups and hyperbolic geometry},
+Bull.\ Amer.\ Math.\ Soc.\ \textbf{6} (1982), 357--381.
+
+\bibitem{Freedman1982}
+M.~H.~Freedman,
+\textit{The topology of four-dimensional manifolds},
+J.\ Differential Geom.\ \textbf{17} (1982), 357--453.
+
+\bibitem{Chow2004}
+B.~Chow and D.~Knopf,
+\textit{The Ricci Flow: An Introduction},
+Mathematical Surveys and Monographs, vol.~110, AMS, Providence, 2004.
+
+\end{thebibliography}
+
+\end{document}

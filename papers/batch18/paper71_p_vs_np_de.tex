@@ -1,0 +1,799 @@
+% @file paper71_p_vs_np_de.tex
+% @brief Paper 71 (DE): Das P-vs-NP-Problem — Komplexitätsklassen, Barrieren und Implikationen
+% @author Michael Fuhrmann
+% @address Specialist Mathematics Project, Build 147
+% @date 2026-03-12
+
+\documentclass[reqno,11pt]{amsart}
+
+% -----------------------------------------------------------------------
+% Pakete
+% -----------------------------------------------------------------------
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathrsfs}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage[ngerman]{babel}
+\usepackage{tikz}
+
+\geometry{margin=2.5cm}
+
+% -----------------------------------------------------------------------
+% Theorem-Environments (Deutsch)
+% -----------------------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\newtheorem{openproblem}[theorem]{Offenes Problem}
+
+% -----------------------------------------------------------------------
+% Makros
+% -----------------------------------------------------------------------
+\newcommand{\Pclass}{\mathsf{P}}
+\newcommand{\NP}{\mathsf{NP}}
+\newcommand{\coNP}{\mathsf{coNP}}
+\newcommand{\PSPACE}{\mathsf{PSPACE}}
+\newcommand{\EXPTIME}{\mathsf{EXPTIME}}
+\newcommand{\EXPSPACE}{\mathsf{EXPSPACE}}
+\newcommand{\Lclass}{\mathsf{L}}
+\newcommand{\NL}{\mathsf{NL}}
+\newcommand{\PH}{\mathsf{PH}}
+\newcommand{\BQP}{\mathsf{BQP}}
+\newcommand{\NC}{\mathsf{NC}}
+\newcommand{\SAT}{\textsc{Sat}}
+\newcommand{\TSAT}{\textsc{3-Sat}}
+\newcommand{\CLIQUE}{\textsc{Clique}}
+\newcommand{\VC}{\textsc{Vertex-Cover}}
+\newcommand{\SUBSET}{\textsc{Subset-Sum}}
+\newcommand{\HAM}{\textsc{Ham-Cycle}}
+\newcommand{\polyredu}{\leq_{\mathrm{p}}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\DeclareMathOperator{\SIZE}{SIZE}
+\DeclareMathOperator{\DTIME}{DTIME}
+\DeclareMathOperator{\NTIME}{NTIME}
+\DeclareMathOperator{\DSPACE}{DSPACE}
+\DeclareMathOperator{\NSPACE}{NSPACE}
+
+% -----------------------------------------------------------------------
+% Metadaten
+% -----------------------------------------------------------------------
+\title[Das P-vs-NP-Problem]{%
+  Das P-vs-NP-Problem:\\
+  Komplexitätsklassen, Barrieren und Implikationen}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 147}
+\email{specialist-maths@project.local}
+\date{12.\ März 2026}
+
+\keywords{P vs.\ NP, NP-Vollständigkeit, Cook-Levin-Satz, Polynomhierarchie,
+  Schaltkreiskomplexität, Natural Proofs, Relativierung, Algebrisierung, PCP-Theorem}
+
+\subjclass[2020]{68Q15, 68Q17, 03D15, 68Q25}
+
+% -----------------------------------------------------------------------
+% Abstract (VOR \maketitle)
+% -----------------------------------------------------------------------
+\begin{abstract}
+Die Frage, ob $\Pclass = \NP$ gilt, ist das bedeutendste offene Problem der
+theoretischen Informatik und eines der sieben Millennium-Probleme des Clay
+Mathematics Institute.  Informell fragt sie: Kann jedes Problem, dessen Lösung
+\emph{effizient überprüfbar} ist, auch \emph{effizient gelöst} werden?
+
+Dieser Artikel gibt eine in sich geschlossene Darstellung der zentralen
+Konzepte.  Wir führen die deterministischen und nicht-deterministischen
+Komplexitätsklassen $\Pclass$, $\NP$, $\PSPACE$ und verwandte Klassen ein
+und beweisen den \emph{Satz von Cook und Levin} (1971): \SAT{} ist
+$\NP$-vollständig.  Wir behandeln Karps 21 $\NP$-vollständige Probleme (1972),
+die Polynomhierarchie $\PH$, Schaltkreiskomplexität sowie die drei
+grundlegenden \emph{Beweisbarrieren}---Relativierung (Baker--Gill--Solovay
+1975, bewiesen), Algebrisierung (Aaronson--Wigderson 2009, bewiesen) und
+Natural Proofs (Razborov--Rudich 1994, bewiesen).  Abschließend diskutieren
+wir das PCP-Theorem und seine Konsequenzen für Inapproximierbarkeit sowie
+die dramatischen Auswirkungen eines Beweises von $\Pclass = \NP$ auf
+Kryptographie, Künstliche Intelligenz, Biologie und Mathematik.
+
+Wir unterscheiden stets sorgfältig zwischen \emph{bewiesenen Sätzen} und
+\emph{offenen Vermutungen}: Die zentrale Frage $\Pclass \neq \NP$ bleibt eine
+\textbf{Vermutung}.
+\end{abstract}
+
+\maketitle
+
+% -----------------------------------------------------------------------
+\section{Einleitung}
+% -----------------------------------------------------------------------
+
+Wenige Fragen in der gesamten Mathematik sind zugleich so leicht zu formulieren
+und so hartnäckig ungelöst.  Im Jahr 1971 fragte Stephen Cook, ob es einen
+effizienten Algorithmus zur Erfüllbarkeitsprüfung Boolescher Formeln gibt.
+Präziser fragte er, ob die Klasse $\NP$ der Probleme, deren Lösungen schnell
+\emph{überprüft} werden können, mit der Klasse $\Pclass$ der Probleme
+übereinstimmt, die schnell \emph{gelöst} werden können.
+
+\begin{openproblem}[$\Pclass$ vs.\ $\NP$, Cook 1971]
+Gilt $\Pclass = \NP$?
+\end{openproblem}
+
+Das Clay Mathematics Institute nahm dieses Problem im Jahr 2000 in die Liste
+der Millennium-Probleme auf und lobte eine Prämie von einer Million US-Dollar
+für eine Lösung in beliebiger Richtung aus~\cite{smale1998}.  Trotz jahrzehntelanger
+intensiver Arbeit der besten Logiker, Informatiker und Mathematiker der Welt
+bleibt die Frage vollständig offen.
+
+Die Bedeutung des Problems geht weit über die theoretische Informatik hinaus.
+Ein Beweis von $\Pclass = \NP$ würde implizieren, dass im Wesentlichen jedes
+Problem, für das eine Lösung in Polynomialzeit erkannt werden kann, auch in
+Polynomialzeit \emph{gefunden} werden kann.  Dies würde die Grundlagen moderner
+Public-Key-Kryptographie erschüttern, Proteinfaltung und Wirkstoffdesign
+berechenbar machen und die mathematische Beweisfindung automatisieren.
+Die überwiegende Mehrheit der Forscher \emph{vermutet} $\Pclass \neq \NP$,
+doch kein Beweis existiert.
+
+Das Papier ist wie folgt gegliedert.  Abschnitt~\ref{sec:klassen} führt die
+grundlegenden Komplexitätsklassen ein.  Abschnitt~\ref{sec:npv} behandelt
+NP-Vollständigkeit und den Satz von Cook--Levin.
+Abschnitt~\ref{sec:pvsnp} formuliert die Frage präzise.
+Abschnitt~\ref{sec:raum} behandelt Raumkomplexität.
+Abschnitt~\ref{sec:ph} stellt die Polynomhierarchie vor.
+Abschnitt~\ref{sec:schaltkreis} diskutiert Schaltkreiskomplexität.
+Abschnitt~\ref{sec:barrieren} erläutert die drei Hauptbarrieren.
+Abschnitt~\ref{sec:implikationen} untersucht Konsequenzen von $\Pclass = \NP$.
+Abschnitt~\ref{sec:pcp} präsentiert das PCP-Theorem und Inapproximierbarkeit.
+
+% -----------------------------------------------------------------------
+\section{Komplexitätsklassen}
+\label{sec:klassen}
+% -----------------------------------------------------------------------
+
+\subsection{Turingmaschinen und Zeitkomplexität}
+
+Eine \emph{deterministische Turingmaschine} (DTM) $M$ besteht aus einer
+endlichen Zustandsmenge~$Q$, einem Bandalphabet~$\Gamma$, einer
+Übergangsfunktion
+$\delta\colon Q\times\Gamma\to Q\times\Gamma\times\{L,R,N\}$,
+einem Anfangszustand~$q_0$ und einer Menge von Akzeptier- und
+Ablehnzuständen.  Bei Eingabe $x\in\{0,1\}^*$ der Länge $n=|x|$ ist die
+\emph{Zeitkomplexität} von $M$ auf~$x$ die Anzahl der Schritte bis zum Halt.
+
+\begin{definition}[Zeitkomplexitätsklasse $\DTIME$]
+Für eine Funktion $T\colon\N\to\N$:
+\[
+  \DTIME(T(n)) \;=\;
+  \bigl\{\,L\subseteq\{0,1\}^* \;\big|\;
+    \text{eine DTM entscheidet }L\text{ in höchstens }c\cdot T(n)\text{ Schritten}\,\bigr\}.
+\]
+\end{definition}
+
+\begin{definition}[Die Klasse $\Pclass$]
+\[
+  \Pclass \;=\; \bigcup_{k\geq 1} \DTIME(n^k).
+\]
+$\Pclass$ ist die Klasse der Entscheidungsprobleme, die von einer DTM in
+Polynomialzeit lösbar sind.  Sie ist robust gegenüber vernünftigen Änderungen
+des Maschinenmodells (Mehrbandmaschinen, Registermaschinen usw.)\ und wird
+weithin als die formale Klasse der \emph{effizienten Berechenbarkeit} angesehen.
+\end{definition}
+
+\subsection{Nicht-deterministische Turingmaschinen und $\NP$}
+
+Eine \emph{nicht-deterministische Turingmaschine} (NTM) hat eine
+Übergangsrelation, die in jedem Schritt mehrere Möglichkeiten zulässt.
+Eine NTM \emph{akzeptiert} $x$, wenn mindestens ein Berechnungspfad in einem
+Akzeptierzustand endet.
+
+\begin{definition}[$\NTIME$ und $\NP$]
+\[
+  \NTIME(T(n)) \;=\;
+  \bigl\{\,L \;\big|\;
+    \text{eine NTM entscheidet }L\text{ in höchstens }T(n)\text{ Schritten auf allen Pfaden}\,\bigr\}.
+\]
+\[
+  \NP \;=\; \bigcup_{k\geq 1} \NTIME(n^k).
+\]
+\end{definition}
+
+Eine äquivalente, oft intuitivere Charakterisierung verwendet
+\emph{polynomielle Zertifikate}.
+
+\begin{proposition}[Zertifikat-Charakterisierung von $\NP$]
+$L\in\NP$ genau dann, wenn es ein Polynom $p$ und einen deterministischen
+polynomialzeitigen Verifizierer $V$ gibt mit:
+\[
+  x\in L \;\iff\; \exists\,c\in\{0,1\}^{p(|x|)}: V(x,c) = 1.
+\]
+\end{proposition}
+
+\begin{example}
+  \textsc{Graph-3-Färbung}: Gegeben ein Graph $G$, existiert eine korrekte
+  3-Färbung der Knoten?  Ein Zertifikat ist die Färbung selbst; ihre
+  Überprüfung benötigt $O(|E|)$ Zeit.  Also liegt
+  \textsc{Graph-3-Färbung}$\in\NP$ vor.
+\end{example}
+
+\subsection{Die Inklusion $\Pclass\subseteq\NP$}
+
+\begin{proposition}
+$\Pclass\subseteq\NP$.
+\end{proposition}
+\begin{proof}
+Falls $L\in\Pclass$, dient die DTM, die $L$ entscheidet, als Verifizierer,
+der sein Zertifikat ignoriert; die Berechnung benötigt höchstens Polynomialzeit.
+\end{proof}
+
+Ob die umgekehrte Inklusion gilt---ob $\Pclass = \NP$---ist die zentrale offene
+Frage dieses Papiers.
+
+% -----------------------------------------------------------------------
+\section{NP-Vollständigkeit}
+\label{sec:npv}
+% -----------------------------------------------------------------------
+
+\subsection{Polynomialzeit-Reduktionen}
+
+\begin{definition}[Many-one-Reduktion]
+Eine Sprache $A$ ist \emph{polynomialzeit-many-one-reduzierbar} auf~$B$,
+geschrieben $A\polyredu B$, wenn es eine in Polynomialzeit berechenbare
+Funktion $f\colon\{0,1\}^*\to\{0,1\}^*$ gibt mit $x\in A\iff f(x)\in B$.
+\end{definition}
+
+\begin{definition}[$\NP$-Schwere und $\NP$-Vollständigkeit]
+$B$ ist \emph{$\NP$-schwer}, wenn $A\polyredu B$ für alle $A\in\NP$ gilt.
+$B$ ist \emph{$\NP$-vollständig}, wenn $B\in\NP$ und $B$ $\NP$-schwer ist.
+\end{definition}
+
+\subsection{Der Satz von Cook und Levin}
+
+Das Boolesche Erfüllbarkeitsproblem \SAT{} fragt: Gegeben eine
+Aussagenlogik-Formel $\varphi$ in KNF (konjunktive Normalform) mit Variablen
+$x_1,\ldots,x_n$, existiert eine Belegung, die alle Klauseln erfüllt?
+
+\begin{theorem}[Cook--Levin, 1971~\cite{cook1971}, BEWIESEN]
+\label{thm:cooklevin}
+\SAT{} ist $\NP$-vollständig.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+\textbf{(\SAT{}$\in\NP$).}  Eine erfüllende Belegung dient als polynomielles
+Zertifikat; die Verifikation ist linear in der Formelgröße.
+
+\textbf{(\SAT{} ist $\NP$-schwer).}  Sei $L\in\NP$ mit Verifizierer $V$,
+der in Zeit $p(n)$ läuft.  Wir kodieren die Berechnung von $V(x,c)$ als
+KNF-Formel $\varphi_x$ der Größe $O(p(n)^2)$, deren Variablen das
+\emph{Tableau} der Berechnung von~$V$ darstellen: Zustand, Kopfposition und
+Bandinhalt zu jedem Zeitschritt.  Die Tableau-Klauseln erzwingen:
+\begin{enumerate}[label=(\roman*)]
+  \item die Anfangskonfiguration von $V$ auf Eingabe $x$ und Zertifikat~$c$;
+  \item die gültigen Einzelschrittübergänge von~$V$;
+  \item dass der Endzustand ein Akzeptierzustand ist.
+\end{enumerate}
+Die Konstruktion ist polynomiell: $|\varphi_x| = O(p(|x|)^2)$ und in
+Polynomialzeit berechenbar.  Man zeigt, dass $\varphi_x$ genau dann erfüllbar
+ist, wenn $x\in L$.  Da $L\in\NP$ beliebig war, reduziert jede
+$\NP$-Sprache auf \SAT{}.
+\end{proof}
+
+\subsection{Karps 21 NP-vollständige Probleme}
+
+Im Jahr 1972 zeigte Karp~\cite{karp1972} durch Kettenreduktionen ausgehend
+von \SAT{}, dass 21 konkrete kombinatorische und graphentheoretische Probleme
+$\NP$-vollständig sind:
+
+\begin{theorem}[Karp 1972~\cite{karp1972}, BEWIESEN]
+Die folgenden Probleme sind alle $\NP$-vollständig:
+\begin{enumerate}[label=(\arabic*)]
+  \item \textsc{3-Sat} ($\varphi$ in 3-KNF)
+  \item \CLIQUE{} (enthält $G$ eine $k$-Clique?)
+  \item \VC{} (Knotenüberdeckung der Größe $\leq k$?)
+  \item \textsc{Unabhängige Menge}
+  \item \SUBSET{} (summiert eine Teilmenge ganzer Zahlen zu~$t$?)
+  \item \HAM{} (enthält $G$ einen Hamiltonkreis?)
+  \item \textsc{Partition}, \textsc{Bin-Packing}, \textsc{Graph-Färbung}, \ldots
+\end{enumerate}
+\end{theorem}
+
+Diese Ergebnisse etablierten NP-Vollständigkeit als zentrales Konzept der
+kombinatorischen Optimierung.
+
+% -----------------------------------------------------------------------
+\section{Die P-vs-NP-Frage}
+\label{sec:pvsnp}
+% -----------------------------------------------------------------------
+
+\subsection{Formale Aussage}
+
+\begin{conjecture}[$\Pclass\neq\NP$ --- die zentrale Vermutung, OFFEN]
+\label{verm:pvsnp}
+$\Pclass \neq \NP$, d.\,h.\ es existieren Probleme in $\NP$, die von keinem
+deterministischen Polynomialzeit-Algorithmus gelöst werden können.
+\end{conjecture}
+
+Dies ist eine \emph{Vermutung}, kein Satz.  Kein Beweis---in irgendeiner
+Richtung---existiert.  Die überwiegende Mehrheit der Komplexitätstheoretiker
+glaubt an $\Pclass\neq\NP$~\cite{gasarch2012}, doch dieser Glaube beruht auf
+Intuition, empirischen Belegen und dem Vorhandensein der drei Barrieren aus
+Abschnitt~\ref{sec:barrieren}.
+
+\subsection{Warum die meisten Forscher $\Pclass\neq\NP$ vermuten}
+
+\begin{enumerate}[label=(\alph*)]
+  \item \textbf{Empirische Evidenz.}  Tausende von NP-vollständigen Problemen
+    wurden über 50 Jahre lang untersucht; für keines davon wurde ein
+    Polynomialzeit-Algorithmus gefunden.
+  \item \textbf{Barrieren.}  Alle bekannten Beweistechniken sind nachweislich
+    unzureichend (Abschnitt~\ref{sec:barrieren}).
+  \item \textbf{Philosophisches Argument.}  Das \emph{Verifizieren} einer
+    Lösung erscheint fundamental leichter als das \emph{Finden} einer Lösung;
+    diese Intuition teilen die meisten Experten.
+\end{enumerate}
+
+\subsection{Konsequenzen von $\Pclass = \NP$}
+
+Falls Vermutung~\ref{verm:pvsnp} falsch wäre---also $\Pclass = \NP$ gelten
+würde---hätte dies revolutionäre Konsequenzen:
+
+\begin{itemize}
+  \item \textbf{Kryptographie.}  RSA, Diffie--Hellman, AES-Schlüsselplanung
+    und praktisch alle Public-Key-Kryptosysteme stützen sich auf die
+    angenommene Schwierigkeit von Problemen in~$\NP$.  Falls $\Pclass=\NP$,
+    würden Polynomialzeit-Algorithmen für Ganzzahlfaktorisierung, diskreten
+    Logarithmus und Graphisomorphismus folgen.  Die gesamte Infrastruktur
+    sicherer Kommunikation, Bankwesen, digitaler Signaturen und
+    Kryptowährungen (Bitcoin, Ethereum) wäre gebrochen.
+  \item \textbf{Künstliche Intelligenz.}  Maschinelles Lernen, Planung und
+    Scheduling enthalten $\NP$-schwere Teilprobleme; ihre polynomiale Lösung
+    würde KI revolutionieren.
+  \item \textbf{Mathematischer Beweis.}  Das Prüfen, ob eine mathematische
+    Aussage einen Beweis der Länge $\leq k$ hat, ist $\NP$-vollständig.
+    Falls $\Pclass=\NP$, wäre das \emph{Finden} kurzer Beweise in $\Pclass$:
+    Mathematik würde prinzipiell automatisierbar.
+  \item \textbf{Biologie.}  Proteinfaltungs-Optimierung, Sequenzalignment
+    und phylogenetische Rekonstruktion haben $\NP$-harte Kerne; polynomiale
+    Algorithmen könnten die Medizin revolutionieren.
+\end{itemize}
+
+% -----------------------------------------------------------------------
+\section{Raumkomplexität}
+\label{sec:raum}
+% -----------------------------------------------------------------------
+
+\subsection{Grundlegende Raumklassen}
+
+\begin{definition}[Raumkomplexitätsklassen]
+\begin{align*}
+  \DSPACE(S(n)) &= \{L \mid \text{eine DTM entscheidet }L\text{ mit höchstens }S(n)\text{ Bandzellen}\},\\
+  \NSPACE(S(n)) &= \{L \mid \text{eine NTM entscheidet }L\text{ mit höchstens }S(n)\text{ Bandzellen}\}.
+\end{align*}
+Die wichtigsten Raumklassen sind:
+\[
+  \Lclass = \DSPACE(\log n),\quad
+  \NL = \NSPACE(\log n),\quad
+  \PSPACE = \bigcup_{k\geq 1}\DSPACE(n^k).
+\]
+\end{definition}
+
+\subsection{Bekannte Inklusionen}
+
+\begin{theorem}[Raum-Zeit-Hierarchie, BEWIESEN]
+Die folgenden Inklusionen gelten, und alle sind bekanntermaßen echt:
+\[
+  \Lclass \;\subsetneq\; \PSPACE \;\subsetneq\; \EXPTIME \;\subsetneq\; \EXPSPACE.
+\]
+\end{theorem}
+
+Die echte Inklusion $\Pclass\subsetneq\EXPTIME$ folgt aus dem
+\emph{Zeithierarchiesatz}; $\PSPACE\subsetneq\EXPTIME$ folgt aus dem
+\emph{Raumhierarchiesatz}.
+
+\begin{theorem}[Raumhierarchiesatz, BEWIESEN]
+Für raumkonstruierbare Funktionen $s_1(n) = o(s_2(n))$:
+$\DSPACE(s_1(n)) \subsetneq \DSPACE(s_2(n))$.
+Insbesondere gilt $\Lclass \subsetneq \PSPACE$.
+\end{theorem}
+
+\subsection{Satz von Savitch}
+
+\begin{theorem}[Savitch 1970~\cite{savitch1970}, BEWIESEN]
+Für jede raumkonstruierbare Funktion $f(n)\geq\log n$:
+\[
+  \NSPACE(f(n)) \;\subseteq\; \DSPACE\!\left(f(n)^2\right).
+\]
+Insbesondere gilt $\NL\subseteq\DSPACE(\log^2 n)$ und
+$\PSPACE = \mathsf{NPSPACE}$.
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+Savitchs Algorithmus löst das Graph-Erreichbarkeitsproblem (das
+$\NSPACE(f)$-vollständig ist) deterministisch: Um zu prüfen, ob Konfiguration
+$C_1$ die Konfiguration $C_2$ in $\leq 2^k$ Schritten erreichen kann, wird ein
+Mittelpunkt $C_m$ geraten und rekursiv $C_1\to C_m$ sowie $C_m\to C_2$ in
+$\leq 2^{k-1}$ Schritten verifiziert.  Die Rekursionstiefe beträgt $O(f(n))$,
+und der Gesamtraumverbrauch ist $O(f(n)^2)$.
+\end{proof}
+
+\subsection{Die vollständige Inklusionskette}
+
+Zusammenfassend gilt:
+\[
+  \Lclass \;\subseteq\; \NL \;\subseteq\; \Pclass \;\subseteq\; \NP \;\subseteq\;
+  \PSPACE \;\subseteq\; \EXPTIME,
+\]
+wobei die erste und letzte Inklusion echt sind, der Status aller anderen
+(einschließlich $\Pclass$ vs.\ $\NP$) jedoch offen bleibt.
+
+% -----------------------------------------------------------------------
+\section{Die Polynomhierarchie}
+\label{sec:ph}
+% -----------------------------------------------------------------------
+
+Die \emph{Polynomhierarchie} (PH) verallgemeinert $\NP$ durch alternierende
+Quantoren.
+
+\begin{definition}[Polynomhierarchie~\cite{stockmeyer1976}]
+Setze $\Sigma_0^\Pclass = \Pi_0^\Pclass = \Delta_0^\Pclass = \Pclass$ und
+definiere rekursiv:
+\begin{align*}
+  \Sigma_{k+1}^\Pclass &= \NP^{\Sigma_k^\Pclass},\\
+  \Pi_{k+1}^\Pclass &= \coNP^{\Sigma_k^\Pclass},\\
+  \Delta_{k+1}^\Pclass &= \Pclass^{\Sigma_k^\Pclass}.
+\end{align*}
+Die Polynomhierarchie ist $\PH = \bigcup_{k\geq 0}\Sigma_k^\Pclass$.
+\end{definition}
+
+\begin{theorem}[PH vs.\ PSPACE, BEWIESEN]
+$\PH \;\subseteq\; \PSPACE$.
+\end{theorem}
+
+\begin{theorem}[Kollaps der Polynomhierarchie, BEWIESEN]
+Falls $\Pclass = \NP$, dann gilt $\PH = \Pclass$ (die Hierarchie kollabiert
+auf ihre erste Stufe).  Allgemeiner: falls $\Sigma_k^\Pclass = \Pi_k^\Pclass$
+für irgendein~$k$, dann gilt $\PH = \Sigma_k^\Pclass$.
+\end{theorem}
+
+\begin{proof}
+$\Sigma_1^\Pclass = \NP = \Pclass = \Pi_1^\Pclass$ gilt trivialerweise.
+Durch Induktion fügt Orakelzugang zu $\Sigma_k^\Pclass = \Pclass$ keine
+über $\Pclass$ hinausgehende Stärke hinzu.
+\end{proof}
+
+Die meisten Experten vermuten, dass PH nicht kollabiert, was ein weiteres
+indirektes Indiz für $\Pclass\neq\NP$ liefert.
+
+% -----------------------------------------------------------------------
+\section{Schaltkreiskomplexität}
+\label{sec:schaltkreis}
+% -----------------------------------------------------------------------
+
+\subsection{Boolesche Schaltkreise}
+
+Ein \emph{Boolescher Schaltkreis} $C_n$ ist ein gerichteter azyklischer Graph
+mit Eingabeknoten ($x_1,\ldots,x_n$ sowie Konstanten $0,1$), Gatterknoten
+(beschriftet mit UND, ODER, NICHT) und einem einzelnen Ausgabegatter.
+Die \emph{Größe} $|C_n|$ ist die Anzahl der Gatter; die \emph{Tiefe}
+$d(C_n)$ ist der längste Eingabe-Ausgabe-Pfad.
+
+\begin{definition}[Schaltkreiskomplexitätsklassen]
+\begin{align*}
+  \Pclass/\mathrm{poly} &= \bigcup_{k}\SIZE(n^k), \\
+  \NC^i &= \bigcup_{k}\text{Schaltkreise der Tiefe }O(\log^i n)\text{ und polynomieller Größe},\\
+  \NC &= \bigcup_{i\geq 1}\NC^i.
+\end{align*}
+\end{definition}
+
+Es ist bekannt, dass $\Pclass\subseteq\Pclass/\mathrm{poly}$ und $\NC\subseteq\Pclass$.
+
+\subsection{Satz von Barrington}
+
+\begin{theorem}[Barrington 1989~\cite{barrington1989}, BEWIESEN]
+$\NC^1$ stimmt mit der Klasse der Sprachen überein, die von polynomialgroßen
+Verzweigungsprogrammen der Breite~5 erkannt werden.  Insbesondere kann jede
+$\NC^1$-Sprache durch ein Permutations-Verzweigungsprogramm der Breite~5
+berechnet werden.
+\end{theorem}
+
+Dieses überraschende Ergebnis zeigt die Robustheit von $\NC^1$ und hat die
+Erforschung flacher Schaltkreise nachhaltig beeinflusst.
+
+\subsection{Barriere der Natural Proofs}
+
+\begin{theorem}[Razborov--Rudich 1994~\cite{razborov1994}, BEWIESEN]
+Falls eine Einwegfunktion existiert (was weithin angenommen wird), dann kann
+kein \emph{natürlicher Beweis} $\Pclass$ von $\NP$ trennen (oder auch nur
+super-polynomielle untere Schranken für Boolesche Schaltkreise gegen
+$\Pclass/\mathrm{poly}$ beweisen).
+\end{theorem}
+
+Ein \emph{natürlicher Beweis} ist ein kombinatorisches Argument, das
+(i) \emph{nützlich} (für Funktionen außerhalb einer kleinen Komplexitätsklasse
+gültig), (ii) \emph{konstruktiv} (die Eigenschaft ist effizient berechenbar)
+und (iii) \emph{groß} (für einen nicht vernachlässigbaren Anteil aller
+Funktionen gültig) ist.  Nahezu alle bekannten Techniken für untere Schranken
+sind natürlich, was erklärt, warum keine super-polynomiellen unteren Schranken
+für allgemeine Schaltkreise bewiesen wurden.
+
+% -----------------------------------------------------------------------
+\section{Beweisbarrieren}
+\label{sec:barrieren}
+% -----------------------------------------------------------------------
+
+Drei fundamentale Meta-Sätze erklären, warum bestehende Techniken die Frage
+$\Pclass$ vs.\ $\NP$ nicht auflösen können.  \emph{Alle drei Barrieren sind
+bewiesene Sätze; was offen bleibt, ist die Frage $\Pclass$ vs.\ $\NP$ selbst.}
+
+\subsection{Relativierung (Baker--Gill--Solovay 1975)}
+
+\begin{theorem}[Baker--Gill--Solovay 1975~\cite{baker1975}, BEWIESEN]
+Es existieren Orakel $A$ und $B$ mit $\Pclass^A = \NP^A$ und
+$\Pclass^B \neq \NP^B$.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Für Orakel $A$: Wähle $A$ als ein $\PSPACE$-vollständiges Problem; dann gilt
+$\Pclass^A = \NP^A = \PSPACE$.
+
+Für Orakel $B$: Konstruiere $B$ durch Diagonalisierung so, dass die unäre
+Sprache $U_B = \{1^n \mid \exists x\in B,\,|x|=n\}$ in
+$\NP^B\setminus\Pclass^B$ liegt.  In Schritt~$n$ wird $B$ so gewählt, dass
+die $n$-te $\Pclass^B$-Maschine auf Eingabe $1^n$ gestört wird, während ein
+String der Länge~$n$ in $B$ aufgenommen wird.
+\end{proof}
+
+\textbf{Konsequenz.}  Jeder Beweis von $\Pclass\neq\NP$ muss
+\emph{nicht-relativierend} sein---er darf nicht einheitlich für alle
+Orakelerweiterungen gelten.
+
+\subsection{Algebrisierung (Aaronson--Wigderson 2009)}
+
+\begin{theorem}[Aaronson--Wigderson 2009~\cite{aaronson2009}, BEWIESEN]
+Die natürliche \emph{algebraische Erweiterung} des Relativierungs-Rahmens,
+genannt \emph{Algebrisierung}, reicht ebenfalls nicht aus, um $\Pclass$ von
+$\NP$ zu trennen.  Formal existieren algebraische Orakel $\tilde{A}$ mit
+$\Pclass^{\tilde{A}} = \NP^{\tilde{A}}$ und algebraische Orakel $\tilde{B}$
+mit $\Pclass^{\tilde{B}} \neq \NP^{\tilde{B}}$.
+\end{theorem}
+
+Die Algebrisierung erfasst die Stärke der \emph{Arithmetisierungstechnik},
+die den Beweisen $\mathsf{IP}=\PSPACE$ und dem PCP-Theorem zugrunde liegt.
+Selbst diese gefeierten Beweise können also nicht direkt in einen Beweis
+von $\Pclass\neq\NP$ umgewandelt werden.
+
+\subsection{Natural Proofs}
+
+Die Razborov--Rudich-Barriere (Abschnitt~\ref{sec:schaltkreis}) zeigt, dass
+\emph{konstruktive kombinatorische} Techniken für untere Schranken
+unzureichend sind---vorausgesetzt, Einwegfunktionen existieren.
+
+\subsection{Zusammenfassung der Barrieren}
+
+\begin{remark}
+Zusammen zeigen die drei Barrieren:
+\begin{itemize}
+  \item Jeder Beweis von $\Pclass\neq\NP$ muss nicht-relativierend,
+  \item nicht-algebrisierend und
+  \item nicht-natürlich sein (es sei denn, Einwegfunktionen existieren nicht).
+\end{itemize}
+Derzeit ist keine Beweistechnik bekannt, die alle drei Anforderungen erfüllt.
+Dies erklärt, warum das Problem seit über 50 Jahren ungelöst ist.
+\end{remark}
+
+% -----------------------------------------------------------------------
+\section{Implikationen von P=NP}
+\label{sec:implikationen}
+% -----------------------------------------------------------------------
+
+\subsection{Kryptographie}
+
+Public-Key-Kryptographie beruht auf der angenommenen Schwierigkeit
+zahlentheoretischer Probleme:
+\begin{itemize}
+  \item \textbf{RSA}: Sicherheit setzt die Schwierigkeit der
+    Ganzzahlfaktorisierung voraus.  Faktorisierung liegt in $\NP$;
+    falls $\Pclass=\NP$, folgt ein Polynomialzeit-Faktorisierungsalgorithmus.
+  \item \textbf{Diffie--Hellman / Elliptische-Kurven-Kryptographie}: Basiert
+    auf dem Diskreten-Logarithmus-Problem, das ebenfalls in $\NP$ liegt.
+  \item \textbf{Hash-Funktionen}: Urbild- und Kollisionssuche liegen in $\NP$;
+    Polynomialzeit-Algorithmen würden SHA-256, SHA-3 und BLAKE brechen.
+  \item \textbf{Symmetrische Verschlüsselung}: Schlüsselrekonstruktion aus
+    Klartext-Geheimtext-Paaren für AES liegt in $\NP$.
+\end{itemize}
+
+Die gesamte Infrastruktur sicherer Kommunikation, des Bankwesens, elektronischer
+Signaturen und von Kryptowährungen (Bitcoin, Ethereum) wäre kompromittiert.
+
+\subsection{Künstliche Intelligenz und Optimierung}
+
+\begin{itemize}
+  \item \textbf{Maschinelles Lernen}: Training tiefer Netzwerke enthält
+    $\NP$-harte Teilprobleme; deren Lösbarkeit würde KI drastisch
+    beschleunigen.
+  \item \textbf{Constraint Satisfaction}: SAT-Lösung liegt der Hardware-
+    Verifikation und Planung zugrunde; polynomiales SAT würde den Chipdesign
+    revolutionieren.
+  \item \textbf{Routing und Scheduling}: Travelling Salesman, Job-Scheduling
+    und Fahrzeugrouting sind $\NP$-vollständig; exakte polynomiale Algorithmen
+    würden die globale Logistik optimieren.
+\end{itemize}
+
+\subsection{Mathematik und Beweisfindung}
+
+Das Problem, ob eine mathematische Aussage einen Beweis der Länge $\leq k$ hat,
+ist $\NP$-vollständig (für gegebenes Formalsystem).  Falls $\Pclass=\NP$, wäre
+das \emph{Finden} kurzer Beweise in $\Pclass$: Mathematik würde prinzipiell
+automatisierbar.  Gödel bemerkte dies bereits in einem Brief an von Neumann
+(1956) und erkannte, dass diese Frage im Wesentlichen äquivalent zur
+$\Pclass$-vs-$\NP$-Frage ist.
+
+\subsection{Biologie und Wirkstoffdesign}
+
+Proteinfaltungs-Optimierung, Sequenzalignment und phylogenetische Rekonstruktion
+haben $\NP$-harte Kerne.  Polynomiale Algorithmen könnten die
+Wirkstoffentdeckung und die Reaktion auf Pandemien revolutionieren.
+
+% -----------------------------------------------------------------------
+\section{Das PCP-Theorem und Inapproximierbarkeit}
+\label{sec:pcp}
+% -----------------------------------------------------------------------
+
+\subsection{Probabilistisch Überprüfbare Beweise}
+
+\begin{definition}[PCP-Verifizierer]
+Ein \emph{$(\log n, 1)$-beschränkter PCP-Verifizierer} für eine Sprache~$L$
+ist ein polynomialzeitiger randomisierter Algorithmus $V$, der bei Eingabe~$x$
+der Länge~$n$:
+\begin{enumerate}[label=(\roman*)]
+  \item $O(\log n)$ zufällige Bits verwendet,
+  \item $O(1)$ Bits einer Beweiszeichenkette $\pi$ liest,
+  \item mit Wahrscheinlichkeit 1 akzeptiert, falls $x\in L$ (Vollständigkeit),
+  \item mit Wahrscheinlichkeit $\geq 1/2$ für alle $\pi$ ablehnt, falls
+    $x\notin L$ (Korrektheit).
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[PCP-Theorem, Arora--Safra / Arora et al.\ 1998~\cite{arora1998}, BEWIESEN]
+\[
+  \NP = \mathrm{PCP}[\log n,\, 1].
+\]
+Jede $\NP$-Sprache besitzt einen probabilistisch überprüfbaren Beweis mit
+logarithmischem Zufallsaufwand und konstantem Abfragekomplexität.
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+Der Beweis verläuft über \emph{PCP-Komposition}: Ein PCP-Verifizierer für
+\SAT{} wird konstruiert, indem die erfüllende Belegung als Polynom kleinen
+Grades über einem endlichen Körper kodiert wird (Arithmetisierung), und dann
+Konsistenz mithilfe des \emph{Sumcheck}-Protokolls und
+\emph{Low-Degree-Testings} überprüft wird.  Der Verifizierer verwendet
+$O(\log n)$ zufällige Bits zur Auswahl von Körperelementen und liest $O(1)$
+Werte.
+\end{proof}
+
+\subsection{Inapproximierbarkeitsresultate}
+
+Das PCP-Theorem hat tiefgreifende Konsequenzen für Approximationsalgorithmen:
+
+\begin{theorem}[MAX-SAT-Inapproximierbarkeit, BEWIESEN]
+Falls $\Pclass\neq\NP$, kann \textsc{Max-3-Sat} in Polynomialzeit nicht
+besser als mit Faktor $\frac{7}{8}+\varepsilon$ für beliebiges $\varepsilon>0$
+approximiert werden.  (Der Goemans--Williamson-Algorithmus erreicht das
+Verhältnis $\approx 0{,}878$, was dies bis auf eine kleine Konstante trifft.)
+\end{theorem}
+
+\begin{theorem}[\CLIQUE-Inapproximierbarkeit, BEWIESEN]
+Falls $\Pclass\neq\NP$, kann $\CLIQUE$ in Polynomialzeit nicht mit konstantem
+Faktor approximiert werden~\cite{hastad1999}.
+\end{theorem}
+
+\begin{remark}
+Das PCP-Theorem liefert damit einen \emph{bedingten} Beweis, dass
+Approximierbarkeit schwierig ist: Es beweist nicht $\Pclass\neq\NP$ (das würde
+das offene Problem lösen), zeigt aber, dass falls $\Pclass\neq\NP$ gilt,
+viele Probleme nicht einmal approximiert werden können.
+\end{remark}
+
+% -----------------------------------------------------------------------
+\section*{Schlussfolgerung}
+% -----------------------------------------------------------------------
+
+Das P-vs-NP-Problem ist das tiefste und folgenreichste offene Problem der
+theoretischen Informatik.  Der Satz von Cook--Levin (bewiesen, 1971) und Karps
+Reduktionskatalog (bewiesen, 1972) haben die Landschaft der NP-Vollständigkeit
+etabliert.  Die Hierarchiesätze und der Satz von Savitch (bewiesen) gliedern
+die Struktur der Komplexitätsklassen.  Das PCP-Theorem (bewiesen) verbindet
+Approximierbarkeit mit NP-Schwere.  Doch die zentrale Frage selbst---Vermutung
+\ref{verm:pvsnp}---bleibt offen.
+
+Die drei Barrieren---Relativierung, Algebrisierung und Natural Proofs---zeigen,
+dass jede Auflösung fundamental neue mathematische Ideen erfordert.  Fortschritt
+könnte aus der algebraischen Geometrie (Mulmuley's \emph{Geometric Complexity
+Theory}), aus der Beweiskomplexität oder aus unerwarteten Richtungen kommen.
+
+Bis ein Beweis vorliegt, bleibt $\Pclass\neq\NP$ die Arbeitsannahme von
+Kryptographen, Algorithmikern und Komplexitätstheoretikern weltweit.
+
+% -----------------------------------------------------------------------
+% Literatur
+% -----------------------------------------------------------------------
+\begin{thebibliography}{99}
+
+\bibitem{cook1971}
+S.~A.\ Cook,
+\textit{The complexity of theorem-proving procedures},
+Proc.\ 3.\ ACM-Symposium on Theory of Computing (STOC), S.~151--158, 1971.
+
+\bibitem{karp1972}
+R.~M.\ Karp,
+\textit{Reducibility among combinatorial problems},
+in R.~E.\ Miller und J.~W.\ Thatcher (Hrsg.), \textit{Complexity of Computer
+Computations}, Plenum Press, S.~85--103, 1972.
+
+\bibitem{baker1975}
+T.~Baker, J.~Gill und R.~Solovay,
+\textit{Relativizations of the P=?NP question},
+SIAM Journal on Computing, 4(4):431--442, 1975.
+
+\bibitem{savitch1970}
+W.~J.\ Savitch,
+\textit{Relationships between nondeterministic and deterministic tape complexities},
+Journal of Computer and System Sciences, 4(2):177--192, 1970.
+
+\bibitem{stockmeyer1976}
+L.~J.\ Stockmeyer,
+\textit{The polynomial-time hierarchy},
+Theoretical Computer Science, 3(1):1--22, 1976.
+
+\bibitem{barrington1989}
+D.~A.\ M.\ Barrington,
+\textit{Bounded-width polynomial-size branching programs recognize exactly those
+languages in NC$^1$},
+Journal of Computer and System Sciences, 38(1):150--164, 1989.
+
+\bibitem{razborov1994}
+A.~A.\ Razborov und S.~Rudich,
+\textit{Natural proofs},
+Journal of Computer and System Sciences, 55(1):24--35, 1997.
+(Konferenzversion: STOC 1994.)
+
+\bibitem{aaronson2009}
+S.~Aaronson und A.~Wigderson,
+\textit{Algebrization: A new barrier in complexity theory},
+ACM Transactions on Computation Theory, 1(1):2:1--2:54, 2009.
+
+\bibitem{arora1998}
+S.~Arora, C.~Lund, R.~Motwani, M.~Sudan und M.~Szegedy,
+\textit{Proof verification and the hardness of approximation problems},
+Journal of the ACM, 45(3):501--555, 1998.
+
+\bibitem{hastad1999}
+J.~H{\aa}stad,
+\textit{Clique is hard to approximate within $n^{1-\varepsilon}$},
+Acta Mathematica, 182(1):105--142, 1999.
+
+\bibitem{arora-barak}
+S.~Arora und B.~Barak,
+\textit{Computational Complexity: A Modern Approach},
+Cambridge University Press, 2009.
+
+\bibitem{smale1998}
+S.~Smale,
+\textit{Mathematical problems for the next century},
+Mathematical Intelligencer, 20(2):7--15, 1998.
+
+\bibitem{gasarch2012}
+W.~I.\ Gasarch,
+\textit{The second P=?NP poll},
+SIGACT News, 43(2):53--77, 2012.
+
+\end{thebibliography}
+
+\end{document}
