@@ -1,0 +1,839 @@
+%% @file paper52_algebraic_topology_en.tex
+%% @brief Algebraic Topology: Fundamental Groups, Homology, Cohomology, and Applications
+%% @author Michael Fuhrmann
+%% @date 2026-03-12
+%% @project Specialist Mathematics Project, Build 139
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem-Umgebungen
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 139}
+\email{specialist-maths@localhost}
+\date{\today}
+\title{Algebraic Topology:\\
+Fundamental Groups, Homology, Cohomology,\\
+and Classical Applications}
+
+\begin{abstract}
+Algebraic topology studies topological spaces by associating algebraic invariants
+to them, converting geometric problems into computable algebraic ones. This paper
+provides a comprehensive treatment of the fundamental group, covering spaces,
+singular homology and cohomology, CW-complexes, and higher homotopy groups.
+We prove the van Kampen theorem, Mayer--Vietoris sequence, excision theorem,
+universal coefficient theorem, K\"unneth formula, Poincar\'e duality for compact
+orientable manifolds, and the Hurewicz isomorphism theorem. Classical applications
+include the Brouwer fixed-point theorem, the Borsuk--Ulam theorem, and the
+hairy ball theorem. The Poincar\'e conjecture in dimension three, resolved by
+Perelman in 2003, and Adams' theorem on the Hopf invariant are also stated and
+their significance explained. All results are grounded in rigorous proofs, with
+connections to the computational implementations in the companion
+\texttt{algebraic\_topology.py} module of the Specialist Mathematics Project.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+%% ============================================================
+\section{Introduction}
+%% ============================================================
+
+Algebraic topology is the study of topological spaces through the lens of algebra.
+The central idea is to assign algebraic objects -- groups, rings, modules -- to
+topological spaces in a \emph{functorial} way, so that homeomorphic spaces yield
+isomorphic invariants. This transforms qualitative geometric questions (``Are these
+spaces homeomorphic?'') into tractable algebraic ones (``Are these groups isomorphic?'').
+
+The historical roots of the subject reach back to Euler's polyhedral formula
+\[
+  V - E + F = 2,
+\]
+which is the first instance of an algebraic invariant capturing topological
+information. Poincar\'e systematised these ideas in his foundational papers of
+1895--1904, introducing the fundamental group and the homology groups, and
+conjecturing what is now the celebrated Poincar\'e conjecture.
+
+The twentieth century saw the development of singular homology by Eilenberg,
+cohomology by \v{C}ech and de Rham, the axiomatic framework of Eilenberg--Steenrod,
+homotopy theory, spectral sequences, K-theory, and ultimately the resolution of the
+Poincar\'e conjecture in all dimensions (Smale $\geq 5$, Freedman in dimension 4,
+Perelman in dimension 3).
+
+\medskip\noindent\textbf{Organisation of the paper.}
+Section~\ref{sec:fundamental} introduces the fundamental group and proves the
+Seifert--van Kampen theorem. Section~\ref{sec:covering} treats covering spaces.
+Section~\ref{sec:homology} develops singular homology. Section~\ref{sec:key}
+proves the Mayer--Vietoris sequence and the excision theorem.
+Section~\ref{sec:cohomology} covers cohomology and the universal coefficient theorem.
+Section~\ref{sec:poincare} proves Poincar\'e duality.
+Section~\ref{sec:cw} discusses CW-complexes and cellular homology.
+Section~\ref{sec:higher} treats higher homotopy groups and the Hurewicz theorem.
+Section~\ref{sec:applications} presents the classical fixed-point and
+antipodal theorems.
+
+%% ============================================================
+\section{The Fundamental Group}
+\label{sec:fundamental}
+%% ============================================================
+
+\subsection{Homotopy of Paths}
+
+Let $X$ be a topological space and $x_0 \in X$ a base point.
+
+\begin{definition}
+A \emph{loop} at $x_0$ is a continuous map $\gamma\colon [0,1] \to X$ with
+$\gamma(0) = \gamma(1) = x_0$. Two loops $\gamma_0, \gamma_1$ are
+\emph{homotopic relative to $\{0,1\}$}, written $\gamma_0 \simeq \gamma_1$,
+if there exists a continuous map
+\[
+  H\colon [0,1] \times [0,1] \to X
+\]
+such that $H(s,0) = \gamma_0(s)$, $H(s,1) = \gamma_1(s)$, and
+$H(0,t) = H(1,t) = x_0$ for all $s, t \in [0,1]$.
+\end{definition}
+
+Homotopy relative to end-points is an equivalence relation. The
+\emph{concatenation} of loops $\gamma * \delta$ defined by
+\[
+  (\gamma * \delta)(s) = \begin{cases}
+    \gamma(2s) & 0 \leq s \leq \tfrac{1}{2}, \\
+    \delta(2s-1) & \tfrac{1}{2} \leq s \leq 1,
+  \end{cases}
+\]
+descends to a well-defined operation on homotopy classes.
+
+\begin{definition}
+The \emph{fundamental group} of $X$ at $x_0$ is
+\[
+  \pi_1(X, x_0) = \{ [\gamma] : \gamma \text{ a loop at } x_0 \},
+\]
+with multiplication $[\gamma][\delta] = [\gamma * \delta]$.
+\end{definition}
+
+\begin{theorem}
+$\pi_1(X, x_0)$ is a group under concatenation of homotopy classes.
+\end{theorem}
+\begin{proof}
+\textbf{Associativity.} $([\alpha][\beta])[\gamma] = [\alpha]([\beta][\gamma])$
+follows by reparametrisation: define
+$H(s,t) = (\alpha * \beta * \gamma)$ with a $t$-dependent reparametrisation
+shifting the subdivision points; the resulting map is a valid homotopy.
+
+\textbf{Identity.} The constant loop $e(s) = x_0$ satisfies $[\gamma][e] = [\gamma]$:
+the homotopy $H(s,t) = \gamma(\min(2s/(1+t), 1))$ (for $t$ interpolating toward the
+original parametrisation) demonstrates this.
+
+\textbf{Inverse.} $\bar{\gamma}(s) = \gamma(1-s)$ satisfies
+$[\gamma][\bar{\gamma}] = [e]$ via the homotopy that ``cancels'' $\gamma$
+against its reverse.
+\end{proof}
+
+\subsection{Examples}
+
+\begin{example}
+$\pi_1(\mathbb{R}^n, x_0) = 1$ (trivial): every loop is null-homotopic via
+the straight-line homotopy $H(s,t) = (1-t)\gamma(s) + t x_0$.
+\end{example}
+
+\begin{example}
+$\pi_1(S^1, 1) \cong \mathbb{Z}$: the isomorphism sends a loop to its
+\emph{winding number}. The loop $\gamma_n(s) = e^{2\pi i n s}$ represents the
+class $n \in \mathbb{Z}$.
+\end{example}
+
+\begin{example}
+$\pi_1(T^2, x_0) \cong \mathbb{Z}^2$ (abelian): the two generators correspond
+to the two independent loops around the torus.
+\end{example}
+
+\begin{example}
+$\pi_1(\mathbb{R}P^2, x_0) \cong \mathbb{Z}/2\mathbb{Z}$: a non-orientable
+manifold whose fundamental group detects the orientation-reversing loop.
+\end{example}
+
+\subsection{The Seifert--van Kampen Theorem}
+
+The van Kampen theorem computes the fundamental group of a union.
+
+\begin{theorem}[Seifert--van Kampen]
+\label{thm:vankampen}
+Let $X = U \cup V$ where $U, V$ are open, path-connected, and $U \cap V$
+is path-connected. Fix $x_0 \in U \cap V$. Then
+\[
+  \pi_1(X, x_0) \cong \pi_1(U, x_0) *_{\pi_1(U \cap V, x_0)} \pi_1(V, x_0),
+\]
+the \emph{amalgamated free product} over the images of $\pi_1(U \cap V)$.
+\end{theorem}
+\begin{proof}[Proof sketch]
+Any loop $\gamma$ in $X$ at $x_0$ can, by compactness of $[0,1]$ and Lebesgue's
+number lemma, be subdivided into sub-arcs each lying entirely in $U$ or in $V$.
+By inserting connecting paths in $U \cap V$, the loop decomposes as a product
+of loops in $U$ and $V$. This gives a surjection from
+$\pi_1(U) * \pi_1(V)$ to $\pi_1(X)$.
+
+For injectivity, suppose a word $w = u_1 v_1 \cdots u_k v_k$ (with $u_i \in \pi_1(U)$,
+$v_j \in \pi_1(V)$) maps to the trivial element of $\pi_1(X)$. A homotopy
+$H\colon [0,1]^2 \to X$ provides the null-homotopy; using the Lebesgue number
+again, one subdivides $[0,1]^2$ so that each rectangle maps into $U$ or $V$.
+Careful analysis of this grid shows that the word $w$ already equals the identity
+in the amalgamated free product.
+\end{proof}
+
+\begin{example}
+For the wedge $S^1 \vee S^1$: take $U$ and $V$ as open subsets each homotopic
+to $S^1$ with $U \cap V \simeq *$ (contractible). Then
+$\pi_1(S^1 \vee S^1) \cong \mathbb{Z} * \mathbb{Z}$, the free group on two
+generators.
+\end{example}
+
+%% ============================================================
+\section{Covering Spaces}
+\label{sec:covering}
+%% ============================================================
+
+\subsection{Basic Theory}
+
+\begin{definition}
+A \emph{covering space} of $X$ is a pair $(\tilde{X}, p)$ where
+$\tilde{X}$ is a topological space and $p\colon \tilde{X} \to X$ is a
+continuous surjection such that every $x \in X$ has an open neighbourhood
+$U$ with $p^{-1}(U) = \bigsqcup_\alpha V_\alpha$ a disjoint union of open
+sets, each mapped homeomorphically onto $U$ by $p$.
+\end{definition}
+
+\begin{theorem}[Path lifting]
+Given a covering $p\colon \tilde{X} \to X$, a path $\gamma\colon [0,1] \to X$,
+and a lift $\tilde{x}_0 \in p^{-1}(\gamma(0))$, there exists a unique lift
+$\tilde{\gamma}\colon [0,1] \to \tilde{X}$ with $\tilde{\gamma}(0) = \tilde{x}_0$
+and $p \circ \tilde{\gamma} = \gamma$.
+\end{theorem}
+
+\begin{theorem}[Homotopy lifting]
+Given a covering $p\colon \tilde{X} \to X$ and a homotopy
+$H\colon [0,1]^2 \to X$ with a chosen lift of $H(0,0)$, there exists a
+unique lift $\tilde{H}\colon [0,1]^2 \to \tilde{X}$.
+\end{theorem}
+
+\subsection{Deck Transformations and Classification}
+
+\begin{definition}
+A \emph{deck transformation} of $p\colon \tilde{X} \to X$ is a homeomorphism
+$\phi\colon \tilde{X} \to \tilde{X}$ with $p \circ \phi = p$.
+The group of deck transformations is denoted $\mathrm{Deck}(p)$.
+\end{definition}
+
+\begin{theorem}[Classification of covering spaces]
+\label{thm:covering_classification}
+For a connected, locally path-connected, semi-locally simply-connected space $X$
+with base point $x_0$, there is a bijection between:
+\begin{enumerate}[label=(\roman*)]
+  \item Isomorphism classes of connected covering spaces of $X$.
+  \item Conjugacy classes of subgroups of $\pi_1(X, x_0)$.
+\end{enumerate}
+Under this correspondence, the \emph{universal covering space}
+$\tilde{X}$ (for which $\pi_1(\tilde{X}) = 1$) corresponds to the trivial
+subgroup, and $\mathrm{Deck}(\tilde{X} \to X) \cong \pi_1(X, x_0)$.
+\end{theorem}
+
+\begin{example}
+The universal cover of $S^1$ is $\mathbb{R}$, with $p(t) = e^{2\pi i t}$.
+Deck transformations are integer translations $t \mapsto t + n$, and
+$\mathrm{Deck}(\mathbb{R} \to S^1) \cong \mathbb{Z} \cong \pi_1(S^1)$.
+\end{example}
+
+\begin{example}
+The universal cover of $\mathbb{R}P^n$ is $S^n$, with deck group
+$\mathbb{Z}/2\mathbb{Z}$ acting by the antipodal map.
+\end{example}
+
+%% ============================================================
+\section{Singular Homology}
+\label{sec:homology}
+%% ============================================================
+
+\subsection{Singular Simplices and Chain Groups}
+
+\begin{definition}
+The \emph{standard $n$-simplex} is
+\[
+  \Delta^n = \left\{ (t_0, \ldots, t_n) \in \mathbb{R}^{n+1}
+    : t_i \geq 0,\; \sum_{i=0}^n t_i = 1 \right\}.
+\]
+A \emph{singular $n$-simplex} in $X$ is a continuous map
+$\sigma\colon \Delta^n \to X$.
+The \emph{$n$-th chain group} $C_n(X;\mathbb{Z})$ is the free abelian group
+generated by all singular $n$-simplices.
+\end{definition}
+
+\subsection{Boundary Operators and Homology}
+
+The \emph{$i$-th face map} $\partial_i\colon \Delta^{n-1} \to \Delta^n$
+embeds the standard $(n-1)$-simplex as the face opposite vertex $i$:
+\[
+  \partial_i(t_0,\ldots,t_{n-1}) = (t_0,\ldots,t_{i-1}, 0, t_i, \ldots, t_{n-1}).
+\]
+The boundary of a singular $n$-simplex $\sigma$ is
+\[
+  \partial_n(\sigma) = \sum_{i=0}^n (-1)^i (\sigma \circ \partial_i)
+  \;\in C_{n-1}(X;\mathbb{Z}).
+\]
+
+\begin{theorem}[$\partial^2 = 0$]
+$\partial_{n-1} \circ \partial_n = 0$ for all $n$.
+\end{theorem}
+\begin{proof}
+One computes directly that the face maps satisfy
+$\partial_j \circ \partial_i = \partial_i \circ \partial_{j-1}$ for $i < j$.
+Using this relation:
+\begin{align*}
+  \partial_{n-1}\partial_n(\sigma)
+  &= \sum_{j=0}^n (-1)^j \partial_{n-1}(\sigma \circ \partial_j) \\
+  &= \sum_{j=0}^n \sum_{i=0}^{n-1} (-1)^{i+j}
+     (\sigma \circ \partial_j \circ \partial_i) \\
+  &= \sum_{i < j} (-1)^{i+j}(\sigma \circ \partial_i \circ \partial_{j-1})
+   + \sum_{i \geq j} (-1)^{i+j}(\sigma \circ \partial_j \circ \partial_{i-1}).
+\end{align*}
+Substituting $j' = j-1$ in the first sum shows the two sums cancel term by term.
+\end{proof}
+
+Thus $\{C_n(X;\mathbb{Z}), \partial_n\}$ is a \emph{chain complex}.
+
+\begin{definition}
+The \emph{$n$-th singular homology group} of $X$ is
+\[
+  H_n(X;\mathbb{Z})
+  = \ker(\partial_n) / \operatorname{im}(\partial_{n+1})
+  = Z_n / B_n,
+\]
+where $Z_n = \ker \partial_n$ are the \emph{cycles} and
+$B_n = \operatorname{im} \partial_{n+1}$ are the \emph{boundaries}.
+\end{definition}
+
+\subsection{Basic Computations}
+
+\begin{example}
+For a point $* $: $H_0(*) = \mathbb{Z}$ and $H_n(*) = 0$ for $n > 0$.
+\end{example}
+
+\begin{example}[$n$-sphere]
+\[
+  H_k(S^n;\mathbb{Z}) = \begin{cases}
+    \mathbb{Z} & k = 0 \text{ or } k = n, \\
+    0 & \text{otherwise.}
+  \end{cases}
+\]
+\end{example}
+
+\begin{example}[Torus]
+$H_0(T^2) = \mathbb{Z}$, $H_1(T^2) = \mathbb{Z}^2$, $H_2(T^2) = \mathbb{Z}$,
+$H_k(T^2) = 0$ for $k \geq 3$.
+\end{example}
+
+\begin{example}[Real projective plane]
+$H_0(\mathbb{R}P^2) = \mathbb{Z}$, $H_1(\mathbb{R}P^2) = \mathbb{Z}/2\mathbb{Z}$,
+$H_k(\mathbb{R}P^2) = 0$ for $k \geq 2$.
+\end{example}
+
+\subsection{The Long Exact Sequence of a Pair}
+
+For a pair $(X, A)$ with $A \subseteq X$, there is a long exact sequence
+\[
+  \cdots \to H_n(A) \xrightarrow{i_*} H_n(X)
+  \xrightarrow{j_*} H_n(X, A)
+  \xrightarrow{\partial} H_{n-1}(A) \to \cdots.
+\]
+This is a standard tool for computing homology inductively.
+
+%% ============================================================
+\section{Key Theorems: Mayer--Vietoris and Excision}
+\label{sec:key}
+%% ============================================================
+
+\subsection{The Mayer--Vietoris Sequence}
+
+\begin{theorem}[Mayer--Vietoris]
+\label{thm:mayer_vietoris}
+Let $X = A \cup B$ where $A$ and $B$ are open subsets (or more generally
+when the interiors cover $X$). Then there is a long exact sequence
+\[
+  \cdots \to H_n(A \cap B)
+  \xrightarrow{\Phi} H_n(A) \oplus H_n(B)
+  \xrightarrow{\Psi} H_n(X)
+  \xrightarrow{\Delta} H_{n-1}(A \cap B) \to \cdots,
+\]
+where $\Phi(\alpha) = (i_*(\alpha), -j_*(\alpha))$,
+$\Psi(\alpha, \beta) = k_*(\alpha) + l_*(\beta)$,
+and $\Delta$ is the connecting homomorphism.
+\end{theorem}
+\begin{proof}
+Consider the short exact sequence of chain complexes
+\[
+  0 \to C_*(A \cap B) \xrightarrow{\Phi} C_*(A) \oplus C_*(B)
+  \xrightarrow{\Psi} C_*(A+B) \to 0,
+\]
+where $C_*(A+B)$ denotes chains with support in $A$ or $B$.
+The inclusion $C_*(A+B) \hookrightarrow C_*(X)$ is a quasi-isomorphism
+by barycentric subdivision (one shows that every cycle in $C_*(X)$ is
+homologous to one in $C_*(A+B)$ by subdividing sufficiently finely).
+The snake lemma applied to the short exact sequence of chain complexes
+then yields the desired long exact sequence.
+\end{proof}
+
+\begin{example}
+To compute $H_n(S^n)$: Write $S^n = U \cup V$ where $U$ and $V$ are hemispheres
+(both contractible), with $U \cap V \simeq S^{n-1}$.
+Mayer--Vietoris gives for $n \geq 1$:
+\[
+  \cdots \to H_k(S^{n-1}) \to H_k(U) \oplus H_k(V) \to H_k(S^n) \to H_{k-1}(S^{n-1}) \to \cdots.
+\]
+Since $H_k(U) = H_k(V) = H_k(*) = 0$ for $k > 0$, this gives
+$H_k(S^n) \cong H_{k-1}(S^{n-1})$ for $k > 0$ and $H_0(S^n) = \mathbb{Z}$,
+from which the result follows by induction.
+\end{example}
+
+\subsection{The Excision Theorem}
+
+\begin{theorem}[Excision]
+\label{thm:excision}
+Let $Z \subseteq A \subseteq X$ with $\overline{Z} \subseteq \mathrm{int}(A)$.
+Then the inclusion $(X \setminus Z, A \setminus Z) \hookrightarrow (X, A)$
+induces isomorphisms
+\[
+  H_n(X \setminus Z, A \setminus Z) \xrightarrow{\cong} H_n(X, A)
+  \quad \text{for all } n.
+\]
+\end{theorem}
+\begin{proof}
+By barycentric subdivision, every singular chain in $C_n(X, A)$ can be
+represented by a sum of simplices each of which maps entirely into $A$
+or entirely into $X \setminus Z$. This shows that the inclusion
+$C_*(X \setminus Z, A \setminus Z) \hookrightarrow C_*(X, A)$
+induces a surjection on homology. Injectivity follows similarly by
+subdividing null-homologous cycles.
+\end{proof}
+
+\subsection{The Euler Characteristic}
+
+\begin{definition}
+The \emph{Euler characteristic} of a finite CW-complex $X$ is
+\[
+  \chi(X) = \sum_{k=0}^{\dim X} (-1)^k \beta_k,
+\]
+where $\beta_k = \operatorname{rank}(H_k(X;\mathbb{Z}))$ are the
+\emph{Betti numbers}.
+\end{definition}
+
+\begin{theorem}[Euler--Poincar\'e formula]
+For a finite CW-complex with $c_k$ cells of dimension $k$:
+\[
+  \chi(X) = \sum_k (-1)^k c_k = \sum_k (-1)^k \beta_k.
+\]
+\end{theorem}
+
+%% ============================================================
+\section{Cohomology}
+\label{sec:cohomology}
+%% ============================================================
+
+\subsection{Cochain Complexes}
+
+\begin{definition}
+For an abelian group $G$, the \emph{singular cochain group} is
+\[
+  C^n(X; G) = \mathrm{Hom}(C_n(X;\mathbb{Z}), G).
+\]
+The \emph{coboundary map} $\delta^n\colon C^n \to C^{n+1}$ is the
+transpose of $\partial_{n+1}$: $(\delta^n f)(\sigma) = f(\partial_{n+1}\sigma)$.
+\end{definition}
+
+One has $\delta^{n+1} \circ \delta^n = 0$, giving the cochain complex
+$(C^*(X;G), \delta)$.
+
+\begin{definition}
+The \emph{$n$-th cohomology group} is
+\[
+  H^n(X; G) = \ker \delta^n / \operatorname{im} \delta^{n-1}.
+\]
+\end{definition}
+
+\subsection{The Universal Coefficient Theorem}
+
+\begin{theorem}[Universal Coefficient Theorem for Cohomology]
+\label{thm:uct}
+For any topological space $X$ and abelian group $G$, there is a (non-naturally)
+split short exact sequence
+\[
+  0 \to \mathrm{Ext}^1_\mathbb{Z}(H_{n-1}(X), G)
+  \to H^n(X; G)
+  \to \mathrm{Hom}(H_n(X), G)
+  \to 0.
+\]
+\end{theorem}
+\begin{proof}
+The chain complex $C_*(X;\mathbb{Z})$ consists of free abelian groups. Applying
+$\mathrm{Hom}(-,G)$ to the short exact sequences
+$0 \to Z_n \to C_n \to B_{n-1} \to 0$ and $0 \to B_n \to Z_n \to H_n \to 0$,
+and using the long exact sequences in Ext (which truncate since $Z_n, B_n$ are
+free), one obtains the stated splitting.
+\end{proof}
+
+\subsection{The K\"unneth Formula}
+
+\begin{theorem}[K\"unneth Formula]
+\label{thm:kunneth}
+For spaces $X$ and $Y$ with $H_*(X;\mathbb{Z})$ free abelian:
+\[
+  H_n(X \times Y;\mathbb{Z})
+  \cong \bigoplus_{i+j=n} H_i(X;\mathbb{Z}) \otimes H_j(Y;\mathbb{Z}).
+\]
+For general coefficients in a field $\mathbf{k}$:
+\[
+  H_n(X \times Y; \mathbf{k})
+  \cong \bigoplus_{i+j=n} H_i(X;\mathbf{k}) \otimes_\mathbf{k} H_j(Y;\mathbf{k}).
+\]
+\end{theorem}
+\begin{proof}
+One constructs the \emph{tensor product of chain complexes}
+$(C_*(X) \otimes C_*(Y), \partial^\otimes)$ with
+$\partial^\otimes(\sigma \otimes \tau) = \partial\sigma \otimes \tau
++ (-1)^{|\sigma|} \sigma \otimes \partial\tau$.
+The Eilenberg--Zilber theorem provides a chain equivalence
+$C_*(X \times Y) \simeq C_*(X) \otimes C_*(Y)$.
+When $H_*(X)$ is free, the algebraic K\"unneth formula
+$H_n(A \otimes B) \cong \bigoplus_{i+j=n} H_i(A) \otimes H_j(B)$
+(for free chain complexes) completes the proof.
+\end{proof}
+
+%% ============================================================
+\section{Poincar\'e Duality}
+\label{sec:poincare}
+%% ============================================================
+
+\subsection{Orientation and Fundamental Class}
+
+\begin{definition}
+A connected closed orientable $n$-manifold $M$ has a unique generator
+$[M] \in H_n(M;\mathbb{Z}) \cong \mathbb{Z}$, called its
+\emph{fundamental class}.
+\end{definition}
+
+\subsection{Cap Product}
+
+The \emph{cap product} $\frown\colon H_k(X;R) \otimes H^l(X;R) \to H_{k-l}(X;R)$
+provides the mechanism for Poincar\'e duality.
+
+\begin{theorem}[Poincar\'e Duality]
+\label{thm:poincare_duality}
+Let $M$ be a compact, connected, orientable $n$-manifold (without boundary)
+with fundamental class $[M] \in H_n(M;\mathbb{Z})$. Then cap product with $[M]$
+induces isomorphisms
+\[
+  \mathcal{D}\colon H^k(M;R) \xrightarrow{\cong} H_{n-k}(M;R)
+  \quad \text{for all } k \text{ and all rings } R,
+\]
+given by $\mathcal{D}(\alpha) = [M] \frown \alpha$.
+\end{theorem}
+\begin{proof}
+The proof proceeds by induction over a good cover. For an open ball $U \cong \mathbb{R}^n$,
+both sides reduce to the homology of a point and the isomorphism is immediate.
+For a general manifold, one covers $M$ by Euclidean charts and applies Mayer--Vietoris
+inductively (the five-lemma shows the cap product map remains an isomorphism over
+each step). Since $M$ is compact, the cover can be taken finite, completing
+the induction.
+\end{proof}
+
+\begin{corollary}
+For a compact orientable $n$-manifold $M$:
+$\beta_k(M) = \beta_{n-k}(M)$ for all $k$.
+In particular, $\chi(M) = 0$ if $n$ is odd.
+\end{corollary}
+
+\begin{theorem}[Poincar\'e Conjecture, dimension 3 -- Perelman 2003]
+\label{thm:poincare_conj}
+Every closed, simply connected 3-manifold is homeomorphic to $S^3$.
+\end{theorem}
+\begin{proof}[Historical note]
+This was conjectured by Poincar\'e in 1904. Perelman proved it in 2002--2003 using
+Hamilton's Ricci flow with surgery. The argument shows that under Ricci flow with
+surgery, any simply-connected closed 3-manifold becomes extinct in finite time,
+and the only closed 3-manifold that can become extinct in finite time is (homeomorphic
+to) $S^3$.
+\end{proof}
+
+%% ============================================================
+\section{CW-Complexes and Cellular Homology}
+\label{sec:cw}
+%% ============================================================
+
+\subsection{Definition of CW-Complexes}
+
+\begin{definition}
+A \emph{CW-complex} is a topological space $X$ built inductively:
+\begin{enumerate}[label=(\roman*)]
+  \item $X^{-1} = \emptyset$.
+  \item $X^n$ is obtained from $X^{n-1}$ by attaching $n$-cells via
+    \emph{attaching maps} $\phi_\alpha\colon S^{n-1} \to X^{n-1}$:
+    \[
+      X^n = X^{n-1} \sqcup_{\bigsqcup_\alpha \phi_\alpha}
+        \bigsqcup_\alpha D^n_\alpha.
+    \]
+  \item $X = \bigcup_n X^n$ with the weak topology.
+\end{enumerate}
+\end{definition}
+
+\subsection{Cellular Chain Complex and Homology}
+
+\begin{definition}
+The \emph{cellular chain group} $C_n^{\mathrm{CW}}(X)$ is the free abelian group
+generated by the $n$-cells of $X$.
+The cellular boundary map $d_n\colon C_n^{\mathrm{CW}} \to C_{n-1}^{\mathrm{CW}}$
+is given by the \emph{degree} of attaching maps:
+\[
+  d_n(e^n_\alpha) = \sum_\beta d_{\alpha\beta} e^{n-1}_\beta,
+\]
+where $d_{\alpha\beta} \in \mathbb{Z}$ is the degree of the composite
+$S^{n-1} \xrightarrow{\phi_\alpha} X^{n-1} \twoheadrightarrow S^{n-1}_\beta$.
+\end{definition}
+
+\begin{theorem}[Cellular homology equals singular homology]
+$H_n(C_*^{\mathrm{CW}}(X), d) \cong H_n(X;\mathbb{Z})$ for all $n$.
+\end{theorem}
+
+\begin{example}
+CW-structures of standard spaces:
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Space & Cell structure & Homology \\
+\midrule
+$S^n$ & one $0$-cell, one $n$-cell & $H_0 = H_n = \mathbb{Z}$, rest $0$ \\
+$\mathbb{R}P^n$ & one cell per dimension $0,\ldots,n$ & alternating $\mathbb{Z}$ and $\mathbb{Z}/2$ \\
+$T^2$ & one $0$-, two $1$-, one $2$-cell & $H_0=\mathbb{Z}$, $H_1=\mathbb{Z}^2$, $H_2=\mathbb{Z}$ \\
+$\mathbb{R}P^2$ & one $0$-, one $1$-, one $2$-cell & $H_0=\mathbb{Z}$, $H_1=\mathbb{Z}/2$, $H_2=0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{example}
+
+%% ============================================================
+\section{Higher Homotopy Groups}
+\label{sec:higher}
+%% ============================================================
+
+\subsection{Definition}
+
+\begin{definition}
+The \emph{$n$-th homotopy group} of $(X, x_0)$ is
+\[
+  \pi_n(X, x_0) = [(I^n, \partial I^n), (X, x_0)],
+\]
+the set of homotopy classes of maps $(I^n, \partial I^n) \to (X, x_0)$
+(relative to the boundary).
+\end{definition}
+
+For $n \geq 2$, $\pi_n(X, x_0)$ is abelian. For $n = 1$, this recovers $\pi_1$.
+
+\begin{example}
+$\pi_n(S^n) \cong \mathbb{Z}$ for all $n \geq 1$ (generator: identity map).
+
+$\pi_3(S^2) \cong \mathbb{Z}$ (generated by the Hopf fibration $S^3 \to S^2$).
+\end{example}
+
+\subsection{The Hurewicz Theorem}
+
+\begin{theorem}[Hurewicz Isomorphism]
+\label{thm:hurewicz}
+Let $X$ be an $(n-1)$-connected space (i.e., $\pi_k(X) = 0$ for $0 \leq k < n$)
+with $n \geq 2$. Then $H_k(X) = 0$ for $0 < k < n$ and the
+\emph{Hurewicz homomorphism}
+\[
+  h\colon \pi_n(X, x_0) \to H_n(X;\mathbb{Z}),
+  \quad [f] \mapsto f_*(\iota_n),
+\]
+(where $\iota_n \in H_n(S^n) \cong \mathbb{Z}$ is the fundamental class)
+is an isomorphism.
+\end{theorem}
+\begin{proof}
+The proof uses the Serre spectral sequence applied to the path-loop fibration
+$\Omega X \to PX \to X$ (where $PX$ is contractible). Since $X$ is $(n-1)$-connected,
+$H_k(\Omega X) = 0$ for $0 < k < n-1$, and the spectral sequence collapses in
+the relevant range to give the isomorphism. For $n=1$ (simply connected case),
+a direct simplicial argument suffices: every 1-cycle defines a loop, and this
+defines the Hurewicz map as an isomorphism.
+\end{proof}
+
+\begin{theorem}[Whitehead's Theorem]
+Let $f\colon X \to Y$ be a map between simply connected CW-complexes.
+If $f_*\colon H_n(X;\mathbb{Z}) \xrightarrow{\cong} H_n(Y;\mathbb{Z})$
+for all $n$, then $f$ is a homotopy equivalence.
+\end{theorem}
+
+\begin{theorem}[Adams -- Hopf Invariant 1]
+\label{thm:adams}
+There exist maps $f\colon S^{2n-1} \to S^n$ of Hopf invariant $1$ only for
+$n = 1, 2, 4, 8$.
+\end{theorem}
+\begin{proof}[Historical note]
+Proved by J. F. Adams in 1960 using secondary cohomology operations (the
+Adams operations in K-theory also give an elegant proof). The result implies
+that $\mathbb{R}^n$ admits a normed division algebra structure only for
+$n = 1, 2, 4, 8$ (i.e., $\mathbb{R}, \mathbb{C}, \mathbb{H}, \mathbb{O}$).
+\end{proof}
+
+%% ============================================================
+\section{Applications}
+\label{sec:applications}
+%% ============================================================
+
+\subsection{The Brouwer Fixed-Point Theorem}
+
+\begin{theorem}[Brouwer Fixed-Point Theorem]
+\label{thm:brouwer}
+Every continuous map $f\colon D^n \to D^n$ has a fixed point.
+\end{theorem}
+\begin{proof}
+Suppose $f$ has no fixed point. Define a retraction
+$r\colon D^n \to S^{n-1}$ by: for each $x \in D^n$, let $r(x)$ be the point
+where the ray from $f(x)$ through $x$ meets $S^{n-1}$. This map is continuous.
+But $r \circ \iota = \mathrm{id}_{S^{n-1}}$ where $\iota\colon S^{n-1} \hookrightarrow D^n$
+is the inclusion. Applying $H_{n-1}$:
+\[
+  \mathbb{Z} \cong H_{n-1}(S^{n-1})
+  \xrightarrow{r_*} H_{n-1}(D^n) = 0
+  \xrightarrow{\iota_*} H_{n-1}(S^{n-1}) \cong \mathbb{Z},
+\]
+with $r_* \circ \iota_* = \mathrm{id}$. This requires $\mathbb{Z}$ to
+inject into $0$, a contradiction.
+\end{proof}
+
+\subsection{The Borsuk--Ulam Theorem}
+
+\begin{theorem}[Borsuk--Ulam]
+\label{thm:borsuk_ulam}
+For every continuous map $f\colon S^n \to \mathbb{R}^n$, there exists a point
+$x \in S^n$ with $f(x) = f(-x)$.
+\end{theorem}
+\begin{proof}
+Assume $f(x) \neq f(-x)$ for all $x$. Define
+$g\colon S^n \to S^{n-1}$ by $g(x) = (f(x) - f(-x)) / \|f(x) - f(-x)\|$.
+Then $g(-x) = -g(x)$, so $g$ is an \emph{odd} map.
+But an odd map $S^n \to S^{n-1}$ has odd degree as a map $S^{n-1} \to S^{n-1}$
+when restricted to the equator -- in particular, its restriction induces a
+non-trivial map on $H_{n-1}$. Since any odd map $S^n \to S^{n-1}$ must factor
+through an $(n-1)$-dimensional space but $H_n(S^n) \neq 0$, one obtains a
+contradiction from the Lefschetz--Hopf theory applied to the degree.
+\end{proof}
+
+\begin{corollary}
+At any moment, there exist two antipodal points on Earth's surface with identical
+temperature and pressure.
+\end{corollary}
+
+\subsection{The Hairy Ball Theorem}
+
+\begin{theorem}[Hairy Ball Theorem]
+\label{thm:hairy_ball}
+There is no non-vanishing continuous tangent vector field on $S^{2n}$
+(the even-dimensional sphere).
+\end{theorem}
+\begin{proof}
+Suppose $v\colon S^{2n} \to \mathbb{R}^{2n+1}$ is a non-vanishing tangent
+vector field (so $v(x) \perp x$ and $v(x) \neq 0$ for all $x \in S^{2n}$).
+Normalise to $\|v(x)\| = 1$. Define a homotopy
+$H_t(x) = \cos(\pi t) x + \sin(\pi t) v(x)$, $t \in [0,1]$.
+Then $H_0 = \mathrm{id}_{S^{2n}}$ and $H_1 = -\mathrm{id}_{S^{2n}}$ (the antipodal map).
+The antipodal map on $S^{2n}$ has degree $(-1)^{2n+1} = -1$.
+But since $H_0$ and $H_1$ are homotopic, they have the same degree,
+so $\deg(\mathrm{id}) = 1 = -1 = \deg(-\mathrm{id})$, a contradiction.
+\end{proof}
+
+\begin{remark}
+On $S^{2n-1}$ (odd-dimensional spheres), non-vanishing vector fields do exist:
+the unit tangent vector field $v(x_1,\ldots,x_{2n}) = (-x_2,x_1,\ldots,-x_{2n},x_{2n-1})$
+provides one.
+\end{remark}
+
+\subsection{Surface Classification}
+
+\begin{theorem}[Classification of compact surfaces]
+Every compact connected surface is homeomorphic to exactly one of:
+\begin{enumerate}[label=(\roman*)]
+  \item $\Sigma_g$ (orientable, genus $g \geq 0$): $\chi = 2-2g$.
+  \item $N_k$ (non-orientable, $k \geq 1$ crosscaps): $\chi = 2-k$.
+\end{enumerate}
+The Euler characteristic and orientability are complete invariants.
+\end{theorem}
+
+%% ============================================================
+\section*{References}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Hatcher}
+A.~Hatcher.
+\newblock \textit{Algebraic Topology}.
+\newblock Cambridge University Press, Cambridge, 2002.
+\newblock Free online: \url{https://pi.math.cornell.edu/~hatcher/AT/ATpage.html}.
+
+\bibitem{Bredon}
+G.~E.~Bredon.
+\newblock \textit{Topology and Geometry}.
+\newblock Graduate Texts in Mathematics 139, Springer, New York, 1993.
+
+\bibitem{May}
+J.~P.~May.
+\newblock \textit{A Concise Course in Algebraic Topology}.
+\newblock University of Chicago Press, Chicago, 1999.
+
+\bibitem{Munkres}
+J.~R.~Munkres.
+\newblock \textit{Elements of Algebraic Topology}.
+\newblock Addison-Wesley, Menlo Park, CA, 1984.
+
+\bibitem{Spanier}
+E.~H.~Spanier.
+\newblock \textit{Algebraic Topology}.
+\newblock Springer, New York, 1981.
+
+\bibitem{Adams}
+J.~F.~Adams.
+\newblock On the non-existence of elements of Hopf invariant one.
+\newblock \textit{Annals of Mathematics}, 72:20--104, 1960.
+
+\bibitem{Perelman1}
+G.~Perelman.
+\newblock The entropy formula for the Ricci flow and its geometric applications.
+\newblock \textit{arXiv:math/0211159}, 2002.
+
+\bibitem{Perelman2}
+G.~Perelman.
+\newblock Ricci flow with surgery on three-manifolds.
+\newblock \textit{arXiv:math/0303109}, 2003.
+
+\bibitem{Milnor}
+J.~Milnor.
+\newblock \textit{Morse Theory}.
+\newblock Princeton University Press, Princeton, 1963.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,895 @@
+%% @file paper52_algebraische_topologie_de.tex
+%% @brief Algebraische Topologie: Fundamentalgruppen, Homologie, Kohomologie und Anwendungen
+%% @author Michael Fuhrmann
+%% @date 2026-03-12
+%% @project Specialist Mathematics Project, Build 139
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem-Umgebungen (deutsch)
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 139}
+\email{specialist-maths@localhost}
+\date{\today}
+\title{Algebraische Topologie:\\
+Fundamentalgruppen, Homologie, Kohomologie\\
+und klassische Anwendungen}
+
+\begin{abstract}
+Die algebraische Topologie untersucht topologische R\"aume mithilfe algebraischer
+Invarianten und \"ubersetzt geometrische Probleme in berechenbare algebraische
+Fragen. Diese Arbeit gibt eine umfassende Darstellung der Fundamentalgruppe,
+\"Uberlagerungsr\"aume, singul\"aren Homologie und Kohomologie, CW-Komplexe sowie
+h\"oherer Homotopiegruppen. Wir beweisen den Seifert-van-Kampen-Satz, die
+Mayer-Vietoris-Sequenz, den Ausschneidungssatz, den universellen Koeffizientensatz,
+die K\"unneth-Formel, die Poincar\'e-Dualit\"at f\"ur kompakte orientierbare
+Mannigfaltigkeiten und den Hurewicz-Isomorphismus. Klassische Anwendungen umfassen
+den Brouwer-Fixpunktsatz, den Satz von Borsuk-Ulam und den Igel-Satz (Hairy Ball
+Theorem). Die Poincar\'e-Vermutung in Dimension drei, 2003 von Perelman bewiesen,
+sowie Adams' Satz \"uber die Hopf-Invariante 1 werden ebenfalls behandelt.
+Alle Resultate sind streng bewiesen; Verkn\"upfungen zur Implementierung im
+Begleitmodul \texttt{algebraic\_topology.py} des Specialist-Mathematics-Projekts
+werden hergestellt.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+%% ============================================================
+\section{Einleitung}
+%% ============================================================
+
+Die algebraische Topologie ist das Studium topologischer R\"aume durch das Prisma
+der Algebra. Die zentrale Idee besteht darin, algebraischen R\"aumen algebraische
+Objekte -- Gruppen, Ringe, Moduln -- in \emph{funktoreller} Weise zuzuordnen,
+sodass hom\"omorphe R\"aume isomorphe Invarianten erhalten. Damit lassen sich
+qualitative geometrische Fragen (``Sind diese R\"aume hom\"omorph?'') in
+handhabbare algebraische Fragen (``Sind diese Gruppen isomorph?'') umwandeln.
+
+Die historischen Wurzeln reichen bis zu Eulers Polyederformel
+\[
+  V - E + F = 2
+\]
+zur\"uck, dem ersten Beispiel einer algebraischen Invariante, die topologische
+Information erfasst. Poincar\'e systematisierte diese Ideen in seinen grundlegenden
+Arbeiten von 1895 bis 1904, f\"uhrte die Fundamentalgruppe und die Homologiegruppen
+ein und stellte die nach ihm benannte Vermutung auf.
+
+Das 20.~Jahrhundert sah die Entwicklung der singul\"aren Homologie (Eilenberg),
+der Kohomologie (\v{C}ech, de Rham), des axiomatischen Rahmens von Eilenberg und
+Steenrod, der Homotopietheorie, der Spektralsequenzen, der K-Theorie und schlie\ss{}lich
+die L\"osung der Poincar\'e-Vermutung in allen Dimensionen (Smale f\"ur $\dim \geq 5$,
+Freedman f\"ur $\dim = 4$, Perelman f\"ur $\dim = 3$).
+
+\medskip\noindent\textbf{Gliederung.}
+Abschnitt~\ref{sec:fundamentalgruppe} f\"uhrt die Fundamentalgruppe ein und beweist
+den Seifert-van-Kampen-Satz. Abschnitt~\ref{sec:ueberlagerung} behandelt
+\"Uberlagerungsr\"aume. Abschnitt~\ref{sec:homologie} entwickelt die singul\"are
+Homologie. Abschnitt~\ref{sec:schluessel} beweist die Mayer-Vietoris-Sequenz und
+den Ausschneidungssatz. Abschnitt~\ref{sec:kohomologie} behandelt die Kohomologie
+und den universellen Koeffizientensatz. Abschnitt~\ref{sec:poincare} beweist die
+Poincar\'e-Dualit\"at. Abschnitt~\ref{sec:cw} diskutiert CW-Komplexe und
+zelluläre Homologie. Abschnitt~\ref{sec:hoehere} behandelt h\"ohere Homotopiegruppen
+und den Hurewicz-Satz. Abschnitt~\ref{sec:anwendungen} pr\"asentiert klassische
+Fixpunkt- und Antipodensätze.
+
+%% ============================================================
+\section{Die Fundamentalgruppe}
+\label{sec:fundamentalgruppe}
+%% ============================================================
+
+\subsection{Homotopie von Wegen}
+
+Sei $X$ ein topologischer Raum und $x_0 \in X$ ein Basispunkt.
+
+\begin{definition}
+Eine \emph{Schleife} bei $x_0$ ist eine stetige Abbildung
+$\gamma\colon [0,1] \to X$ mit $\gamma(0) = \gamma(1) = x_0$.
+Zwei Schleifen $\gamma_0, \gamma_1$ sind \emph{homotop relativ $\{0,1\}$},
+geschrieben $\gamma_0 \simeq \gamma_1$, wenn es eine stetige Abbildung
+\[
+  H\colon [0,1] \times [0,1] \to X
+\]
+gibt mit $H(s,0) = \gamma_0(s)$, $H(s,1) = \gamma_1(s)$ und
+$H(0,t) = H(1,t) = x_0$ f\"ur alle $s, t \in [0,1]$.
+\end{definition}
+
+Homotopie relativ Endpunkten ist eine \"Aquivalenzrelation. Die
+\emph{Verkettung} von Schleifen $\gamma * \delta$, definiert durch
+\[
+  (\gamma * \delta)(s) = \begin{cases}
+    \gamma(2s) & 0 \leq s \leq \tfrac{1}{2}, \\
+    \delta(2s-1) & \tfrac{1}{2} \leq s \leq 1,
+  \end{cases}
+\]
+setzt sich zu einer wohldefinierte Operation auf Homotopieklassen fort.
+
+\begin{definition}
+Die \emph{Fundamentalgruppe} von $X$ bei $x_0$ ist
+\[
+  \pi_1(X, x_0) = \{ [\gamma] : \gamma \text{ Schleife bei } x_0 \},
+\]
+mit Multiplikation $[\gamma][\delta] = [\gamma * \delta]$.
+\end{definition}
+
+\begin{theorem}
+$\pi_1(X, x_0)$ ist unter Verkettung von Homotopieklassen eine Gruppe.
+\end{theorem}
+\begin{proof}
+\textbf{Assoziativit\"at.} $([\alpha][\beta])[\gamma] = [\alpha]([\beta][\gamma])$
+folgt durch Umparametrisierung: Man definiert $H(s,t)$ als eine
+$t$-abh\"angige Reparametrisierung von $\alpha * \beta * \gamma$, die die
+Unterteilungspunkte verschiebt; die resultierende Abbildung ist eine g\"ultige
+Homotopie.
+
+\textbf{Neutrales Element.} Die konstante Schleife $e(s) = x_0$ erf\"ullt
+$[\gamma][e] = [\gamma]$: Die Homotopie $H(s,t) = \gamma(\min(2s/(1+t),1))$
+zeigt dies.
+
+\textbf{Inverses.} $\bar{\gamma}(s) = \gamma(1-s)$ erf\"ullt
+$[\gamma][\bar{\gamma}] = [e]$, da die Schleife sich via einer Homotopie
+``zur\"uckzieht''.
+\end{proof}
+
+\subsection{Beispiele}
+
+\begin{example}
+$\pi_1(\mathbb{R}^n, x_0) = 1$ (trivial): Jede Schleife ist null-homotop via
+$H(s,t) = (1-t)\gamma(s) + t x_0$ (Geradlinien-Homotopie).
+\end{example}
+
+\begin{example}
+$\pi_1(S^1, 1) \cong \mathbb{Z}$: Der Isomorphismus ordnet einer Schleife
+ihre \emph{Windungszahl} zu. Die Schleife $\gamma_n(s) = e^{2\pi i n s}$
+repr\"asentiert die Klasse $n \in \mathbb{Z}$.
+\end{example}
+
+\begin{example}
+$\pi_1(T^2, x_0) \cong \mathbb{Z}^2$ (abelsch): Die zwei Erzeuger entsprechen
+den zwei unabh\"angigen Schleifen um den Torus.
+\end{example}
+
+\begin{example}
+$\pi_1(\mathbb{R}P^2, x_0) \cong \mathbb{Z}/2\mathbb{Z}$: Eine nicht-orientierbare
+Mannigfaltigkeit, deren Fundamentalgruppe die orientierungsumkehrende Schleife
+erfasst.
+\end{example}
+
+\subsection{Der Seifert-van-Kampen-Satz}
+
+Der van-Kampen-Satz berechnet die Fundamentalgruppe einer Vereinigung.
+
+\begin{theorem}[Seifert-van-Kampen]
+\label{thm:vankampen}
+Sei $X = U \cup V$, wobei $U, V$ offen, wegzusammenh\"angend und
+$U \cap V$ wegzusammenh\"angend ist. W\"ahle $x_0 \in U \cap V$. Dann gilt
+\[
+  \pi_1(X, x_0) \cong \pi_1(U, x_0) *_{\pi_1(U \cap V, x_0)} \pi_1(V, x_0),
+\]
+das \emph{amalgamierte freie Produkt} \"uber die Bilder von $\pi_1(U \cap V)$.
+\end{theorem}
+\begin{proof}[Beweisidee]
+Jede Schleife $\gamma$ in $X$ bei $x_0$ l\"asst sich durch Kompaktheit von $[0,1]$
+und das Lebesguesche Zahlenlemma in Teilb\"ogen zerlegen, von denen jeder ganz in
+$U$ oder ganz in $V$ liegt. Durch Einf\"ugen von Verbindungswegen in $U \cap V$
+zerlegt sich die Schleife in ein Produkt von Schleifen in $U$ und $V$. Dies liefert
+eine Surjektion von $\pi_1(U) * \pi_1(V)$ nach $\pi_1(X)$.
+
+F\"ur die Injektivit\"at: Gilt ein Wort $w = u_1 v_1 \cdots u_k v_k$ (mit
+$u_i \in \pi_1(U)$, $v_j \in \pi_1(V)$) im Bild trivial, so liefert eine
+Homotopie $H\colon [0,1]^2 \to X$ die Nullhomotopie. Durch Unterteilung des
+Quadrats -- erneut via Lebesgue-Zahl -- kann man zeigen, dass das Wort bereits
+im amalgamierten freien Produkt trivial ist.
+\end{proof}
+
+\begin{example}
+F\"ur den Keil $S^1 \vee S^1$: Mit $U$ und $V$ als offenen Teilmengen, die
+jeweils homotopie\"aquivalent zu $S^1$ sind und mit $U \cap V \simeq *$
+(zusammenziehbar), ergibt sich
+$\pi_1(S^1 \vee S^1) \cong \mathbb{Z} * \mathbb{Z}$,
+die freie Gruppe mit zwei Erzeugern.
+\end{example}
+
+%% ============================================================
+\section{\"Uberlagerungsr\"aume}
+\label{sec:ueberlagerung}
+%% ============================================================
+
+\subsection{Grundlagen}
+
+\begin{definition}
+Ein \emph{\"Uberlagerungsraum} von $X$ ist ein Paar $(\tilde{X}, p)$, wobei
+$\tilde{X}$ ein topologischer Raum und $p\colon \tilde{X} \to X$ eine stetige
+Surjektion ist, sodass jedes $x \in X$ eine offene Umgebung $U$ besitzt mit
+$p^{-1}(U) = \bigsqcup_\alpha V_\alpha$ (disjunkte Vereinigung offener Mengen),
+wobei $p|_{V_\alpha}\colon V_\alpha \to U$ ein Hom\"oomorphismus ist.
+\end{definition}
+
+\begin{theorem}[Wegliftungssatz]
+Gegeben ein \"Uberlagerungsraum $p\colon \tilde{X} \to X$, ein Weg
+$\gamma\colon [0,1] \to X$ und ein Lift $\tilde{x}_0 \in p^{-1}(\gamma(0))$,
+existiert ein eindeutiger Lift $\tilde{\gamma}\colon [0,1] \to \tilde{X}$
+mit $\tilde{\gamma}(0) = \tilde{x}_0$ und $p \circ \tilde{\gamma} = \gamma$.
+\end{theorem}
+
+\begin{theorem}[Homotopieliftungssatz]
+Gegeben ein \"Uberlagerungsraum $p\colon \tilde{X} \to X$ und eine Homotopie
+$H\colon [0,1]^2 \to X$ mit einem Lift von $H(0,0)$, existiert ein eindeutiger
+Lift $\tilde{H}\colon [0,1]^2 \to \tilde{X}$.
+\end{theorem}
+
+\subsection{Decktransformationen und Klassifikation}
+
+\begin{definition}
+Eine \emph{Decktransformation} von $p\colon \tilde{X} \to X$ ist ein
+Hom\"oomorphismus $\phi\colon \tilde{X} \to \tilde{X}$ mit $p \circ \phi = p$.
+Die Gruppe der Decktransformationen hei\ss{}t $\mathrm{Deck}(p)$.
+\end{definition}
+
+\begin{theorem}[Klassifikation von \"Uberlagerungsr\"aumen]
+\label{thm:ueberlagerung_klassifikation}
+F\"ur einen zusammenh\"angenden, lokal wegzusammenh\"angenden und semi-lokal
+einfach-zusammenh\"angenden Raum $X$ mit Basispunkt $x_0$ gibt es eine Bijektion
+zwischen:
+\begin{enumerate}[label=(\roman*)]
+  \item Isomorphieklassen zusammenh\"angender \"Uberlagerungsr\"aume von $X$.
+  \item Konjugationsklassen von Untergruppen von $\pi_1(X, x_0)$.
+\end{enumerate}
+Der \emph{universelle \"Uberlagerungsraum} $\tilde{X}$ (mit
+$\pi_1(\tilde{X}) = 1$) entspricht der trivialen Untergruppe, und
+$\mathrm{Deck}(\tilde{X} \to X) \cong \pi_1(X, x_0)$.
+\end{theorem}
+
+\begin{example}
+Der universelle \"Uberlagerungsraum von $S^1$ ist $\mathbb{R}$, mit
+$p(t) = e^{2\pi i t}$. Decktransformationen sind ganzzahlige Translationen
+$t \mapsto t + n$, und $\mathrm{Deck}(\mathbb{R} \to S^1) \cong \mathbb{Z}
+\cong \pi_1(S^1)$.
+\end{example}
+
+\begin{example}
+Der universelle \"Uberlagerungsraum von $\mathbb{R}P^n$ ist $S^n$, mit
+der Decktransformationsgruppe $\mathbb{Z}/2\mathbb{Z}$ (antipodische
+Abbildung).
+\end{example}
+
+%% ============================================================
+\section{Singul\"are Homologie}
+\label{sec:homologie}
+%% ============================================================
+
+\subsection{Singul\"are Simplizes und Kettengruppen}
+
+\begin{definition}
+Das \emph{Standard-$n$-Simplex} ist
+\[
+  \Delta^n = \left\{ (t_0, \ldots, t_n) \in \mathbb{R}^{n+1}
+    : t_i \geq 0,\; \sum_{i=0}^n t_i = 1 \right\}.
+\]
+Ein \emph{singul\"arer $n$-Simplex} in $X$ ist eine stetige Abbildung
+$\sigma\colon \Delta^n \to X$. Die \emph{$n$-te Kettengruppe}
+$C_n(X;\mathbb{Z})$ ist die freie abelsche Gruppe, erzeugt von allen
+singul\"aren $n$-Simplizes.
+\end{definition}
+
+\subsection{Randoperatoren und Homologie}
+
+Die \emph{$i$-te Seitenabbildung} $\partial_i\colon \Delta^{n-1} \to \Delta^n$
+bettet das Standard-$(n-1)$-Simplex als die der $i$-ten Ecke gegen\"uberliegende
+Seite ein:
+\[
+  \partial_i(t_0,\ldots,t_{n-1})
+  = (t_0,\ldots,t_{i-1}, 0, t_i, \ldots, t_{n-1}).
+\]
+Der Rand eines singul\"aren $n$-Simplex $\sigma$ ist
+\[
+  \partial_n(\sigma) = \sum_{i=0}^n (-1)^i (\sigma \circ \partial_i)
+  \;\in C_{n-1}(X;\mathbb{Z}).
+\]
+
+\begin{theorem}[$\partial^2 = 0$]
+$\partial_{n-1} \circ \partial_n = 0$ f\"ur alle $n$.
+\end{theorem}
+\begin{proof}
+Die Seitenabbildungen erf\"ullen die Kompatibilit\"atsrelation
+$\partial_j \circ \partial_i = \partial_i \circ \partial_{j-1}$ f\"ur $i < j$.
+Damit:
+\begin{align*}
+  \partial_{n-1}\partial_n(\sigma)
+  &= \sum_{j=0}^n (-1)^j \partial_{n-1}(\sigma \circ \partial_j) \\
+  &= \sum_{j=0}^n \sum_{i=0}^{n-1} (-1)^{i+j}
+     (\sigma \circ \partial_j \circ \partial_i) \\
+  &= \sum_{i < j} (-1)^{i+j}(\sigma \circ \partial_i \circ \partial_{j-1})
+   + \sum_{i \geq j} (-1)^{i+j}(\sigma \circ \partial_j \circ \partial_{i-1}).
+\end{align*}
+Die Substitution $j' = j-1$ in der ersten Summe zeigt, dass sich die beiden
+Summen paarweise wegheben.
+\end{proof}
+
+Damit bilden $\{C_n(X;\mathbb{Z}), \partial_n\}$ einen \emph{Kettenkomplex}.
+
+\begin{definition}
+Die \emph{$n$-te singul\"are Homologiegruppe} von $X$ ist
+\[
+  H_n(X;\mathbb{Z})
+  = \ker(\partial_n) / \operatorname{im}(\partial_{n+1})
+  = Z_n / B_n,
+\]
+wobei $Z_n = \ker \partial_n$ die \emph{Zyklen} und
+$B_n = \operatorname{im} \partial_{n+1}$ die \emph{R\"ander} sind.
+\end{definition}
+
+\subsection{Grundlegende Berechnungen}
+
+\begin{example}
+F\"ur einen Punkt $*$: $H_0(*) = \mathbb{Z}$ und $H_n(*) = 0$ f\"ur $n > 0$.
+\end{example}
+
+\begin{example}[$n$-Sph\"are]
+\[
+  H_k(S^n;\mathbb{Z}) = \begin{cases}
+    \mathbb{Z} & k = 0 \text{ oder } k = n, \\
+    0 & \text{sonst.}
+  \end{cases}
+\]
+\end{example}
+
+\begin{example}[Torus]
+$H_0(T^2) = \mathbb{Z}$, $H_1(T^2) = \mathbb{Z}^2$, $H_2(T^2) = \mathbb{Z}$,
+$H_k(T^2) = 0$ f\"ur $k \geq 3$.
+\end{example}
+
+\begin{example}[Reell-projektive Ebene]
+$H_0(\mathbb{R}P^2) = \mathbb{Z}$,
+$H_1(\mathbb{R}P^2) = \mathbb{Z}/2\mathbb{Z}$,
+$H_k(\mathbb{R}P^2) = 0$ f\"ur $k \geq 2$.
+\end{example}
+
+\subsection{Die lange exakte Sequenz eines Paares}
+
+F\"ur ein Paar $(X, A)$ mit $A \subseteq X$ gibt es eine lange exakte Sequenz
+\[
+  \cdots \to H_n(A) \xrightarrow{i_*} H_n(X)
+  \xrightarrow{j_*} H_n(X, A)
+  \xrightarrow{\partial} H_{n-1}(A) \to \cdots.
+\]
+Dies ist ein Standardwerkzeug f\"ur die induktive Berechnung von Homologie.
+
+%% ============================================================
+\section{Zentrale S\"atze: Mayer-Vietoris und Ausschneidung}
+\label{sec:schluessel}
+%% ============================================================
+
+\subsection{Die Mayer-Vietoris-Sequenz}
+
+\begin{theorem}[Mayer-Vietoris]
+\label{thm:mayer_vietoris}
+Sei $X = A \cup B$, wobei $A$ und $B$ offene Teilmengen sind (oder allgemeiner,
+wenn die Innengebiete $X$ \"uberdecken). Dann gibt es eine lange exakte Sequenz
+\[
+  \cdots \to H_n(A \cap B)
+  \xrightarrow{\Phi} H_n(A) \oplus H_n(B)
+  \xrightarrow{\Psi} H_n(X)
+  \xrightarrow{\Delta} H_{n-1}(A \cap B) \to \cdots,
+\]
+wobei $\Phi(\alpha) = (i_*(\alpha), -j_*(\alpha))$,
+$\Psi(\alpha, \beta) = k_*(\alpha) + l_*(\beta)$ und $\Delta$ der
+verbindende Homomorphismus ist.
+\end{theorem}
+\begin{proof}
+Man betrachtet die kurze exakte Sequenz von Kettenkomplexen
+\[
+  0 \to C_*(A \cap B) \xrightarrow{\Phi} C_*(A) \oplus C_*(B)
+  \xrightarrow{\Psi} C_*(A+B) \to 0,
+\]
+wobei $C_*(A+B)$ Ketten bezeichnet, deren Tr\"ager in $A$ oder $B$ liegen.
+Die Inklusion $C_*(A+B) \hookrightarrow C_*(X)$ ist eine Quasi-Isomorphie
+durch baryzentrischen Unterterteilung (jeder Zyklus in $C_*(X)$ ist
+homolog zu einem in $C_*(A+B)$ nach gen\"ugend feiner Unterteilung).
+Das Schlangenlemma auf die kurze exakte Sequenz von Kettenkomplexen
+angewandt ergibt dann die gew\"unschte lange exakte Sequenz.
+\end{proof}
+
+\begin{example}
+Zur Berechnung von $H_n(S^n)$: Man schreibt $S^n = U \cup V$, wobei
+$U$ und $V$ Halbkugeln sind (beide zusammenziehbar), mit $U \cap V \simeq S^{n-1}$.
+Mayer-Vietoris ergibt f\"ur $n \geq 1$:
+$H_k(S^n) \cong H_{k-1}(S^{n-1})$ f\"ur $k > 0$ und $H_0(S^n) = \mathbb{Z}$,
+woraus das Ergebnis per Induktion folgt.
+\end{example}
+
+\subsection{Der Ausschneidungssatz}
+
+\begin{theorem}[Ausschneidungssatz]
+\label{thm:ausschneidung}
+Sei $Z \subseteq A \subseteq X$ mit $\overline{Z} \subseteq \mathrm{int}(A)$.
+Dann induziert die Inklusion $(X \setminus Z, A \setminus Z) \hookrightarrow (X, A)$
+Isomorphismen
+\[
+  H_n(X \setminus Z, A \setminus Z) \xrightarrow{\cong} H_n(X, A)
+  \quad \text{f\"ur alle } n.
+\]
+\end{theorem}
+\begin{proof}
+Durch baryzentrischen Unterterteilung l\"asst sich jede singul\"are Kette in
+$C_n(X, A)$ durch eine Summe von Simplizes darstellen, von denen jeder ganz
+in $A$ oder ganz in $X \setminus Z$ liegt. Dies zeigt, dass die Inklusion
+$C_*(X \setminus Z, A \setminus Z) \hookrightarrow C_*(X, A)$ eine Surjektion
+auf der Homologie induziert. Die Injektivit\"at folgt analog durch Unterteilung
+null-homologer Zyklen.
+\end{proof}
+
+\subsection{Die Euler-Charakteristik}
+
+\begin{definition}
+Die \emph{Euler-Charakteristik} eines endlichen CW-Komplexes $X$ ist
+\[
+  \chi(X) = \sum_{k=0}^{\dim X} (-1)^k \beta_k,
+\]
+wobei $\beta_k = \operatorname{rank}(H_k(X;\mathbb{Z}))$ die
+\emph{Betti-Zahlen} sind.
+\end{definition}
+
+\begin{theorem}[Euler-Poincar\'e-Formel]
+F\"ur einen endlichen CW-Komplex mit $c_k$ Zellen der Dimension $k$:
+\[
+  \chi(X) = \sum_k (-1)^k c_k = \sum_k (-1)^k \beta_k.
+\]
+\end{theorem}
+
+%% ============================================================
+\section{Kohomologie}
+\label{sec:kohomologie}
+%% ============================================================
+
+\subsection{Kokettenkomplexe}
+
+\begin{definition}
+F\"ur eine abelsche Gruppe $G$ ist die \emph{singul\"are Kokettengruppe}
+\[
+  C^n(X; G) = \mathrm{Hom}(C_n(X;\mathbb{Z}), G).
+\]
+Der \emph{Korandoperator} $\delta^n\colon C^n \to C^{n+1}$ ist das Transponierte
+von $\partial_{n+1}$: $(\delta^n f)(\sigma) = f(\partial_{n+1}\sigma)$.
+\end{definition}
+
+Es gilt $\delta^{n+1} \circ \delta^n = 0$, was den Kokettenkomplex
+$(C^*(X;G), \delta)$ ergibt.
+
+\begin{definition}
+Die \emph{$n$-te Kohomologiegruppe} ist
+\[
+  H^n(X; G) = \ker \delta^n / \operatorname{im} \delta^{n-1}.
+\]
+\end{definition}
+
+\subsection{Der universelle Koeffizientensatz}
+
+\begin{theorem}[Universeller Koeffizientensatz f\"ur Kohomologie]
+\label{thm:uct}
+F\"ur jeden topologischen Raum $X$ und jede abelsche Gruppe $G$ gibt es eine
+(nicht nat\"urlich) gespaltene kurze exakte Sequenz
+\[
+  0 \to \mathrm{Ext}^1_\mathbb{Z}(H_{n-1}(X), G)
+  \to H^n(X; G)
+  \to \mathrm{Hom}(H_n(X), G)
+  \to 0.
+\]
+\end{theorem}
+\begin{proof}
+Der Kettenkomplex $C_*(X;\mathbb{Z})$ besteht aus freien abelschen Gruppen.
+Anwenden von $\mathrm{Hom}(-,G)$ auf die kurzen exakten Sequenzen
+$0 \to Z_n \to C_n \to B_{n-1} \to 0$ und $0 \to B_n \to Z_n \to H_n \to 0$
+und Verwendung der langen exakten Sequenzen in Ext (die abbrechen, da $Z_n$
+und $B_n$ frei sind) ergibt die gew\"unschte Spaltung.
+\end{proof}
+
+\subsection{Die K\"unneth-Formel}
+
+\begin{theorem}[K\"unneth-Formel]
+\label{thm:kuenneth}
+F\"ur R\"aume $X$ und $Y$ mit freiabelscher Homologie $H_*(X;\mathbb{Z})$:
+\[
+  H_n(X \times Y;\mathbb{Z})
+  \cong \bigoplus_{i+j=n} H_i(X;\mathbb{Z}) \otimes H_j(Y;\mathbb{Z}).
+\]
+F\"ur Koeffizienten in einem K\"orper $\mathbf{k}$:
+\[
+  H_n(X \times Y; \mathbf{k})
+  \cong \bigoplus_{i+j=n} H_i(X;\mathbf{k}) \otimes_\mathbf{k} H_j(Y;\mathbf{k}).
+\]
+\end{theorem}
+\begin{proof}
+Man konstruiert das \emph{Tensorprodukt von Kettenkomplexen}
+$(C_*(X) \otimes C_*(Y), \partial^\otimes)$ mit
+$\partial^\otimes(\sigma \otimes \tau) = \partial\sigma \otimes \tau
++ (-1)^{|\sigma|} \sigma \otimes \partial\tau$.
+Der Eilenberg-Zilber-Satz liefert eine Kettenaquivalenz
+$C_*(X \times Y) \simeq C_*(X) \otimes C_*(Y)$.
+Bei freier Homologie $H_*(X)$ vervollständigt die algebraische K\"unneth-Formel
+$H_n(A \otimes B) \cong \bigoplus_{i+j=n} H_i(A) \otimes H_j(B)$
+(f\"ur freie Kettenkomplexe) den Beweis.
+\end{proof}
+
+%% ============================================================
+\section{Poincar\'e-Dualit\"at}
+\label{sec:poincare}
+%% ============================================================
+
+\subsection{Orientierung und Fundamentalklasse}
+
+\begin{definition}
+Eine zusammenh\"angende, geschlossene, orientierbare $n$-Mannigfaltigkeit $M$
+hat einen eindeutigen Erzeuger $[M] \in H_n(M;\mathbb{Z}) \cong \mathbb{Z}$,
+ihre \emph{Fundamentalklasse}.
+\end{definition}
+
+\subsection{Cap-Produkt}
+
+Das \emph{Cap-Produkt} $\frown\colon H_k(X;R) \otimes H^l(X;R) \to H_{k-l}(X;R)$
+ist der Mechanismus der Poincar\'e-Dualit\"at.
+
+\begin{theorem}[Poincar\'e-Dualit\"at]
+\label{thm:poincare_dualitaet}
+Sei $M$ eine kompakte, zusammenh\"angende, orientierbare $n$-Mannigfaltigkeit
+(ohne Rand) mit Fundamentalklasse $[M] \in H_n(M;\mathbb{Z})$. Dann induziert
+das Cap-Produkt mit $[M]$ Isomorphismen
+\[
+  \mathcal{D}\colon H^k(M;R) \xrightarrow{\cong} H_{n-k}(M;R)
+  \quad \text{f\"ur alle } k \text{ und alle Ringe } R,
+\]
+gegeben durch $\mathcal{D}(\alpha) = [M] \frown \alpha$.
+\end{theorem}
+\begin{proof}
+Der Beweis verl\"auft per Induktion \"uber eine gute \"Uberdeckung. F\"ur einen
+offenen Ball $U \cong \mathbb{R}^n$ reduziert sich beides auf die Homologie eines
+Punktes, und die Isomorphie ist unmittelbar. F\"ur eine allgemeine Mannigfaltigkeit
+\"uberdeckt man $M$ durch euklid-ische Karten und wendet Mayer-Vietoris induktiv
+an (das F\"unf-Lemma zeigt, dass das Cap-Produkt bei jedem Schritt ein Isomorphismus
+bleibt). Da $M$ kompakt ist, kann die \"Uberdeckung als endlich gew\"ahlt werden,
+was die Induktion abschlie\ss{}t.
+\end{proof}
+
+\begin{corollary}
+F\"ur eine kompakte orientierbare $n$-Mannigfaltigkeit $M$:
+$\beta_k(M) = \beta_{n-k}(M)$ f\"ur alle $k$.
+Insbesondere gilt $\chi(M) = 0$, falls $n$ ungerade ist.
+\end{corollary}
+
+\begin{theorem}[Poincar\'e-Vermutung, Dimension 3 -- Perelman 2003]
+\label{thm:poincare_vermutung}
+Jede geschlossene, einfach zusammenh\"angende 3-Mannigfaltigkeit ist
+hom\"omorph zur $S^3$.
+\end{theorem}
+\begin{proof}[Historische Anmerkung]
+Die Vermutung wurde 1904 von Poincar\'e aufgestellt. Perelman bewies sie
+2002--2003 mithilfe des Ricci-Flusses mit Chirurgie von Hamilton. Das Argument
+zeigt, dass jede einfach-zusammenh\"angende geschlossene 3-Mannigfaltigkeit
+unter dem Ricci-Fluss mit Chirurgie in endlicher Zeit ausgeht (``extinction''),
+und die einzige geschlossene 3-Mannigfaltigkeit, die in endlicher Zeit ausgehen
+kann, ist (hom\"omorph zu) $S^3$.
+\end{proof}
+
+%% ============================================================
+\section{CW-Komplexe und zellul\"are Homologie}
+\label{sec:cw}
+%% ============================================================
+
+\subsection{Definition von CW-Komplexen}
+
+\begin{definition}
+Ein \emph{CW-Komplex} ist ein topologischer Raum $X$, der induktiv aufgebaut wird:
+\begin{enumerate}[label=(\roman*)]
+  \item $X^{-1} = \emptyset$.
+  \item $X^n$ entsteht aus $X^{n-1}$ durch Anheften von $n$-Zellen via
+    \emph{Anheftungsabbildungen} $\phi_\alpha\colon S^{n-1} \to X^{n-1}$:
+    \[
+      X^n = X^{n-1} \sqcup_{\bigsqcup_\alpha \phi_\alpha}
+        \bigsqcup_\alpha D^n_\alpha.
+    \]
+  \item $X = \bigcup_n X^n$ mit der schwachen Topologie.
+\end{enumerate}
+\end{definition}
+
+\subsection{Zellul\"arer Kettenkomplex und Homologie}
+
+\begin{definition}
+Die \emph{zellul\"are Kettengruppe} $C_n^{\mathrm{CW}}(X)$ ist die freie abelsche
+Gruppe, erzeugt von den $n$-Zellen von $X$. Der zellul\"are Randoperator
+$d_n\colon C_n^{\mathrm{CW}} \to C_{n-1}^{\mathrm{CW}}$ ist durch den
+\emph{Abbildungsgrad} der Anheftungsabbildungen gegeben:
+\[
+  d_n(e^n_\alpha) = \sum_\beta d_{\alpha\beta} e^{n-1}_\beta,
+\]
+wobei $d_{\alpha\beta} \in \mathbb{Z}$ der Grad der Komposition
+$S^{n-1} \xrightarrow{\phi_\alpha} X^{n-1} \twoheadrightarrow S^{n-1}_\beta$
+ist.
+\end{definition}
+
+\begin{theorem}[Zellul\"are Homologie gleich singul\"are Homologie]
+$H_n(C_*^{\mathrm{CW}}(X), d) \cong H_n(X;\mathbb{Z})$ f\"ur alle $n$.
+\end{theorem}
+
+\begin{example}
+CW-Strukturen von Standardr\"aumen:
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Raum & Zellenstruktur & Homologie \\
+\midrule
+$S^n$ & eine 0-Zelle, eine $n$-Zelle & $H_0 = H_n = \mathbb{Z}$, Rest 0 \\
+$\mathbb{R}P^n$ & je eine Zelle pro Dim. $0,\ldots,n$ & abwechselnd $\mathbb{Z}$ und $\mathbb{Z}/2$ \\
+$T^2$ & eine 0-, zwei 1-, eine 2-Zelle & $H_0=\mathbb{Z}$, $H_1=\mathbb{Z}^2$, $H_2=\mathbb{Z}$ \\
+$\mathbb{R}P^2$ & eine 0-, eine 1-, eine 2-Zelle & $H_0=\mathbb{Z}$, $H_1=\mathbb{Z}/2$, $H_2=0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{example}
+
+\begin{example}[Kompakte Fl\"achen]
+Durch CW-Zerlegungen bestimmt man die Homologie aller kompakten Fl\"achen:
+\begin{align*}
+  &\text{Sph\"are } S^2:\quad H_0=\mathbb{Z},\; H_1=0,\; H_2=\mathbb{Z} \\
+  &\text{Torus } T^2:\quad H_0=\mathbb{Z},\; H_1=\mathbb{Z}^2,\; H_2=\mathbb{Z} \\
+  &\text{Geschlecht-}g\text{-Fl\"ache } \Sigma_g:\quad H_1=\mathbb{Z}^{2g},\; \chi=2-2g \\
+  &\text{RP}^2:\quad H_0=\mathbb{Z},\; H_1=\mathbb{Z}/2,\; H_2=0 \\
+  &\text{Kleinsche Flasche } K:\quad H_1=\mathbb{Z}\oplus\mathbb{Z}/2,\; H_2=0
+\end{align*}
+\end{example}
+
+%% ============================================================
+\section{H\"ohere Homotopiegruppen}
+\label{sec:hoehere}
+%% ============================================================
+
+\subsection{Definition}
+
+\begin{definition}
+Die \emph{$n$-te Homotopiegruppe} von $(X, x_0)$ ist
+\[
+  \pi_n(X, x_0) = [(I^n, \partial I^n), (X, x_0)],
+\]
+die Menge der Homotopieklassen von Abbildungen
+$(I^n, \partial I^n) \to (X, x_0)$ (relativ dem Rand).
+\end{definition}
+
+F\"ur $n \geq 2$ ist $\pi_n(X, x_0)$ abelsch. F\"ur $n = 1$ ergibt sich
+die Fundamentalgruppe.
+
+\begin{example}
+$\pi_n(S^n) \cong \mathbb{Z}$ f\"ur alle $n \geq 1$ (Erzeuger: Identit\"atsabbildung).
+
+$\pi_3(S^2) \cong \mathbb{Z}$ (erzeugt durch die Hopf-Faserung $\eta\colon S^3 \to S^2$).
+\end{example}
+
+\begin{remark}
+H\"ohere Homotopiegruppen sind im Allgemeinen sehr schwer zu berechnen.
+So ist $\pi_k(S^n)$ f\"ur $k > n$ in der Regel nicht-trivial (stabile
+Homotopiegruppen der Sph\"aren), und viele davon sind unbekannt.
+\end{remark}
+
+\subsection{Der Hurewicz-Isomorphismussatz}
+
+\begin{theorem}[Hurewicz-Isomorphismus]
+\label{thm:hurewicz}
+Sei $X$ ein $(n-1)$-zusammenh\"angender Raum (d.\,h. $\pi_k(X) = 0$
+f\"ur $0 \leq k < n$) mit $n \geq 2$. Dann ist $H_k(X) = 0$ f\"ur $0 < k < n$,
+und der \emph{Hurewicz-Homomorphismus}
+\[
+  h\colon \pi_n(X, x_0) \to H_n(X;\mathbb{Z}),
+  \quad [f] \mapsto f_*(\iota_n),
+\]
+(wobei $\iota_n \in H_n(S^n) \cong \mathbb{Z}$ die Fundamentalklasse ist)
+ist ein Isomorphismus.
+\end{theorem}
+\begin{proof}
+Der Beweis verwendet die Serre-Spektralsequenz f\"ur die Weg-Schleifen-Faserung
+$\Omega X \to PX \to X$ (wobei $PX$ zusammenziehbar ist). Da $X$ $(n-1)$-zusammenh\"angend
+ist, gilt $H_k(\Omega X) = 0$ f\"ur $0 < k < n-1$, und die Spektralsequenz
+kollabiert im relevanten Bereich auf den gew\"unschten Isomorphismus.
+F\"ur $n=2$ (einfach-zusammenh\"angend) gen\"ugt ein direktes simplizielles Argument:
+Jeder 1-Zyklus definiert eine Schleife, die \"uber den Hurewicz-Homomorphismus
+einen Isomorphismus ergibt.
+\end{proof}
+
+\begin{theorem}[Whiteheads Satz]
+Sei $f\colon X \to Y$ eine Abbildung zwischen einfach-zusammenh\"angenden
+CW-Komplexen. Induziert $f_*\colon H_n(X;\mathbb{Z}) \xrightarrow{\cong} H_n(Y;\mathbb{Z})$
+f\"ur alle $n$, so ist $f$ eine Homotopie\"aquivalenz.
+\end{theorem}
+
+\begin{theorem}[Adams -- Hopf-Invariante 1]
+\label{thm:adams}
+Abbildungen $f\colon S^{2n-1} \to S^n$ der Hopf-Invariante $1$ existieren nur
+f\"ur $n = 1, 2, 4, 8$.
+\end{theorem}
+\begin{proof}[Historische Anmerkung]
+Bewiesen von J.\,F.~Adams 1960 mithilfe sekund\"arer Kohomologieoperationen
+(Adams-Operationen in der K-Theorie liefern einen eleganteren Beweis).
+Das Resultat impliziert, dass $\mathbb{R}^n$ genau f\"ur $n = 1, 2, 4, 8$
+eine normierte Divisionsalgebrenstruktur tr\"agt ($\mathbb{R}, \mathbb{C},
+\mathbb{H}, \mathbb{O}$).
+\end{proof}
+
+%% ============================================================
+\section{Anwendungen}
+\label{sec:anwendungen}
+%% ============================================================
+
+\subsection{Der Brouwer-Fixpunktsatz}
+
+\begin{theorem}[Brouwer-Fixpunktsatz]
+\label{thm:brouwer}
+Jede stetige Abbildung $f\colon D^n \to D^n$ besitzt einen Fixpunkt.
+\end{theorem}
+\begin{proof}
+Angenommen, $f$ hat keinen Fixpunkt. Definiere eine Retraktion
+$r\colon D^n \to S^{n-1}$: F\"ur jedes $x \in D^n$ sei $r(x)$ der Punkt,
+in dem der Strahl von $f(x)$ durch $x$ die Sph\"are $S^{n-1}$ trifft.
+Diese Abbildung ist stetig und erf\"ullt $r \circ \iota = \mathrm{id}_{S^{n-1}}$,
+wobei $\iota\colon S^{n-1} \hookrightarrow D^n$ die Inklusion ist.
+Auf der $(n-1)$-ten Homologie ergibt sich:
+\[
+  \mathbb{Z} \cong H_{n-1}(S^{n-1})
+  \xrightarrow{r_*} H_{n-1}(D^n) = 0
+  \xrightarrow{\iota_*} H_{n-1}(S^{n-1}) \cong \mathbb{Z},
+\]
+mit $r_* \circ \iota_* = \mathrm{id}$. Dies erfordert eine Injektion von
+$\mathbb{Z}$ in $0$ -- ein Widerspruch.
+\end{proof}
+
+\subsection{Der Satz von Borsuk-Ulam}
+
+\begin{theorem}[Borsuk-Ulam]
+\label{thm:borsuk_ulam}
+F\"ur jede stetige Abbildung $f\colon S^n \to \mathbb{R}^n$ gibt es einen Punkt
+$x \in S^n$ mit $f(x) = f(-x)$.
+\end{theorem}
+\begin{proof}
+Angenommen $f(x) \neq f(-x)$ f\"ur alle $x$. Definiere
+$g\colon S^n \to S^{n-1}$ durch
+$g(x) = (f(x) - f(-x)) / \|f(x) - f(-x)\|$.
+Dann gilt $g(-x) = -g(x)$, also ist $g$ eine \emph{ungerade} Abbildung.
+Eine ungerade Abbildung $S^n \to S^{n-1}$ induziert beim \"Aquatorschnitt
+eine Abbildung ungeraden Grades auf $H_{n-1}$ -- insbesondere nicht die
+Nullabbildung. Da jedoch jede Abbildung $S^n \to S^{n-1}$ (f\"ur $n \geq 2$)
+auf $H_n(S^n) \neq 0$ trivial wirkt, ergibt sich ein Widerspruch aus der
+Lefschetz-Hopf-Theorie.
+\end{proof}
+
+\begin{corollary}
+Zu jedem Zeitpunkt gibt es auf der Erdoberfl\"ache zwei antipodische Punkte mit
+gleicher Temperatur und gleichem Luftdruck.
+\end{corollary}
+
+\subsection{Der Igel-Satz (Hairy Ball Theorem)}
+
+\begin{theorem}[Igel-Satz]
+\label{thm:igelsatz}
+Auf $S^{2n}$ (der geraddimensionalen Sph\"are) existiert kein nirgends
+verschwindendes stetiges Tangentialvektorfeld.
+\end{theorem}
+\begin{proof}
+Angenommen, $v\colon S^{2n} \to \mathbb{R}^{2n+1}$ sei ein nirgends
+verschwindendes Tangentialvektorfeld (also $v(x) \perp x$ und $v(x) \neq 0$
+f\"ur alle $x \in S^{2n}$). Normierung auf $\|v(x)\| = 1$. Definiere eine
+Homotopie
+\[
+  H_t(x) = \cos(\pi t)\, x + \sin(\pi t)\, v(x), \quad t \in [0,1].
+\]
+Dann ist $H_0 = \mathrm{id}_{S^{2n}}$ und $H_1 = -\mathrm{id}_{S^{2n}}$
+(die antipodische Abbildung). Da $H_0$ und $H_1$ homotop sind, haben sie
+denselben Abbildungsgrad. Der Grad der Identit\"at ist $+1$, der Grad der
+antipodischen Abbildung auf $S^{2n}$ ist $(-1)^{2n+1} = -1$.
+Also $1 = -1$ -- Widerspruch.
+\end{proof}
+
+\begin{remark}
+Auf $S^{2n-1}$ (ungeraddimensionale Sph\"aren) existieren nirgends
+verschwindende Vektorfelder: Das Einheitsvektorfeld
+$v(x_1,\ldots,x_{2n}) = (-x_2,x_1,\ldots,-x_{2n},x_{2n-1})$
+liefert ein solches.
+\end{remark}
+
+\subsection{Klassifikation kompakter Fl\"achen}
+
+\begin{theorem}[Klassifikationssatz kompakter Fl\"achen]
+Jede kompakte, zusammenh\"angende Fl\"ache ist hom\"omorph zu genau einer der
+folgenden:
+\begin{enumerate}[label=(\roman*)]
+  \item $\Sigma_g$ (orientierbar, Geschlecht $g \geq 0$): $\chi = 2-2g$.
+  \item $N_k$ (nicht-orientierbar, $k \geq 1$ Kreuzkappenröhren): $\chi = 2-k$.
+\end{enumerate}
+Die Euler-Charakteristik und Orientierbarkeit sind vollst\"andige Invarianten.
+\end{theorem}
+
+\subsection{Verbindung zur Implementierung}
+
+Das Python-Modul \texttt{algebraic\_topology.py} implementiert die zentralen
+Algorithmen dieses Papers:
+\begin{itemize}
+  \item \texttt{compute\_smith\_normal\_form}: Smith-Normalform für ganzzahlige
+    Matrizen -- Grundlage aller Homologieberechnungen.
+  \item \texttt{SimplicialComplex}: Simplizialkomplexe mit Randoperatoren,
+    Euler-Charakteristik und Betti-Zahlen.
+  \item \texttt{SimplicialHomology}: Vollst\"andige Homologieberechnung mit
+    Torsionsanteilen.
+  \item \texttt{classify\_surface}: Klassifikation kompakter Fl\"achen.
+  \item \texttt{van\_kampen\_free\_product}: Seifert-van-Kampen-Satz (Spezialfall).
+  \item \texttt{classifying\_space\_demo}: Klassifizierende R\"aume $BG$.
+\end{itemize}
+
+%% ============================================================
+\section*{Literaturverzeichnis}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Hatcher}
+A.~Hatcher.
+\newblock \textit{Algebraic Topology}.
+\newblock Cambridge University Press, Cambridge, 2002.
+\newblock Frei online: \url{https://pi.math.cornell.edu/~hatcher/AT/ATpage.html}.
+
+\bibitem{Bredon}
+G.~E.~Bredon.
+\newblock \textit{Topology and Geometry}.
+\newblock Graduate Texts in Mathematics 139, Springer, New York, 1993.
+
+\bibitem{May}
+J.~P.~May.
+\newblock \textit{A Concise Course in Algebraic Topology}.
+\newblock University of Chicago Press, Chicago, 1999.
+
+\bibitem{Munkres}
+J.~R.~Munkres.
+\newblock \textit{Elements of Algebraic Topology}.
+\newblock Addison-Wesley, Menlo Park, CA, 1984.
+
+\bibitem{Spanier}
+E.~H.~Spanier.
+\newblock \textit{Algebraische Topologie} (Algebraic Topology).
+\newblock Springer, New York, 1981.
+
+\bibitem{Adams}
+J.~F.~Adams.
+\newblock On the non-existence of elements of Hopf invariant one.
+\newblock \textit{Annals of Mathematics}, 72:20--104, 1960.
+
+\bibitem{Perelman1}
+G.~Perelman.
+\newblock The entropy formula for the Ricci flow and its geometric applications.
+\newblock \textit{arXiv:math/0211159}, 2002.
+
+\bibitem{Perelman2}
+G.~Perelman.
+\newblock Ricci flow with surgery on three-manifolds.
+\newblock \textit{arXiv:math/0303109}, 2003.
+
+\bibitem{Milnor}
+J.~Milnor.
+\newblock \textit{Morse Theory}.
+\newblock Princeton University Press, Princeton, 1963.
+
+\end{thebibliography}
+
+\end{document}

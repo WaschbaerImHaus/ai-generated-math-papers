@@ -1,0 +1,779 @@
+% =============================================================================
+% paper54_symplectic_geometry_en.tex
+% Symplectic Geometry: From Classical Mechanics to Floer Homology
+% Author: Michael Fuhrmann
+% Build: 139
+% Date: 2026-03-12
+% =============================================================================
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{Symplectic Geometry:\\
+From Classical Mechanics to Floer Homology}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 139}
+\email{specialist-maths@localhost}
+\date{\today}
+
+% =============================================================================
+% ABSTRACT  (must appear BEFORE \maketitle in amsart)
+% =============================================================================
+\begin{abstract}
+Symplectic geometry is the mathematical framework underlying classical
+Hamiltonian mechanics and has grown into one of the most active areas of
+modern mathematics, with deep connections to topology, algebra, and
+theoretical physics.  Starting from the standard symplectic vector space
+$(\mathbb{R}^{2n}, \omega_{\mathrm{std}})$, we develop the theory of
+symplectic manifolds, state and prove Darboux's theorem (every symplectic
+manifold is locally standard), and derive the Hamiltonian equations of
+motion.  We then treat Liouville's theorem on phase-space volume preservation
+and Poincar\'{e}'s recurrence theorem---both proved results.  Lagrangian
+submanifolds, the Arnold conjecture (open in general; proved for tori),
+moment maps, and the Marsden--Weinstein symplectic reduction theorem are
+discussed in detail.  The paper culminates with Gromov's celebrated
+non-squeezing theorem (1985) and an introduction to Floer homology.
+Applications range from integrable systems and KAM theory to geometric
+quantisation.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+% =============================================================================
+\section{Introduction}
+% =============================================================================
+
+Symplectic geometry originated in the nineteenth century as the geometric
+language of classical mechanics.  The word \emph{symplectic} was coined by
+Hermann Weyl in his 1939 monograph \emph{The Classical Groups} as a Greek
+translation of the Latin \emph{complex}; it describes the intertwined
+structure of positions and momenta in phase space.
+
+At its heart lies a single mathematical object: a closed, non-degenerate
+differential 2-form $\omega$ on a smooth even-dimensional manifold $M$.
+This deceptively simple axiom encodes an enormous amount of geometry and
+dynamics.  Unlike Riemannian geometry, which features a rich local structure
+(curvature), Darboux's theorem shows that symplectic geometry is \emph{locally
+flat}: every symplectic manifold looks the same near every point.  All
+interesting phenomena are therefore of a \emph{global} nature, and this is
+precisely what makes the field both challenging and beautiful.
+
+\subsection*{Historical overview}
+
+The roots of symplectic geometry lie in the work of Lagrange and Hamilton on
+analytical mechanics (1788--1835).  Jacobi recognised the invariance of the
+Poisson bracket under canonical transformations.  Poincar\'{e}'s recurrence
+theorem (1890) was the first purely topological result in the subject.  The
+modern era begins with Eliashberg and Gromov's discovery of \emph{symplectic
+rigidity}: despite the absence of local invariants, there exist surprising
+global obstructions to symplectic embeddings---most strikingly captured by
+Gromov's non-squeezing theorem (1985).
+
+\subsection*{Organisation of the paper}
+
+Section~\ref{sec:manifolds} introduces symplectic manifolds and their
+canonical examples.  Darboux's theorem is stated and proved in
+Section~\ref{sec:darboux}.  Hamiltonian mechanics occupies
+Section~\ref{sec:hamilton}.  Symplectomorphisms, Liouville, and Poincar\'{e}
+are treated in Section~\ref{sec:symplecto}.  Lagrangian submanifolds and the
+Arnold conjecture are covered in Section~\ref{sec:lagrangian}.  Moment maps
+and reduction appear in Section~\ref{sec:moment}.  Gromov's non-squeezing
+theorem is Section~\ref{sec:gromov}.  Floer homology is introduced in
+Section~\ref{sec:floer}.  Applications conclude the paper in
+Section~\ref{sec:applications}.
+
+% =============================================================================
+\section{Symplectic Manifolds}
+\label{sec:manifolds}
+% =============================================================================
+
+\begin{definition}
+A \emph{symplectic manifold} is a pair $(M, \omega)$ where $M$ is a smooth
+manifold (without boundary) and $\omega \in \Omega^{2}(M)$ is a differential
+2-form satisfying
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Non-degeneracy:}  $\omega_p(u,v) = 0$ for all $v \in T_p M$
+        implies $u = 0$.
+  \item \textbf{Closedness:}  $d\omega = 0$.
+\end{enumerate}
+\end{definition}
+
+Non-degeneracy forces $M$ to be even-dimensional, say $\dim M = 2n$.  The
+$n$-th exterior power $\omega^n := \omega \wedge \cdots \wedge \omega$
+($n$ factors) is then a nowhere-vanishing volume form, so every symplectic
+manifold is orientable.
+
+\subsection{The standard symplectic form on \texorpdfstring{$\mathbb{R}^{2n}$}{R2n}}
+
+Choose coordinates $(q_1, \ldots, q_n, p_1, \ldots, p_n)$ on $\mathbb{R}^{2n}$.
+The \emph{standard symplectic form} is
+\begin{equation}\label{eq:omega_std}
+  \omega_{\mathrm{std}} = \sum_{i=1}^{n} dq_i \wedge dp_i.
+\end{equation}
+In matrix form, for vectors $u, v \in \mathbb{R}^{2n}$:
+\begin{equation}
+  \omega_{\mathrm{std}}(u, v) = u^{\top} J\, v, \qquad
+  J = \begin{pmatrix} 0 & I_n \\ -I_n & 0 \end{pmatrix}.
+\end{equation}
+One verifies $d\omega_{\mathrm{std}} = 0$ (constant coefficients) and
+$\det J = 1 \neq 0$ (non-degenerate).
+
+\subsection{Cotangent bundles}
+
+Let $Q$ be any smooth $n$-manifold (configuration space).  The cotangent
+bundle $T^*Q$ carries a canonical 1-form $\lambda$ (\emph{Liouville form},
+also called \emph{tautological form}): if $\pi: T^*Q \to Q$ is the projection
+and $\alpha \in T^*Q$, then
+\[
+  \lambda_\alpha(v) := \alpha\bigl(d\pi_\alpha(v)\bigr), \quad v \in T_\alpha(T^*Q).
+\]
+The form $\omega := -d\lambda$ is the canonical symplectic form on $T^*Q$.
+In local coordinates $(q^i, p_i)$:
+\[
+  \lambda = \sum_i p_i \, dq^i, \qquad \omega = \sum_i dq^i \wedge dp_i.
+\]
+Cotangent bundles are the prototypical symplectic manifolds; they provide the
+phase space for any mechanical system with configuration space $Q$.
+
+\subsection{Further examples}
+
+\begin{example}[Surfaces]
+Every oriented surface $\Sigma$ with an area form $\sigma$ (nowhere-vanishing
+2-form) is a symplectic manifold $(\Sigma, \sigma)$, since $d\sigma = 0$
+automatically for dimension reasons.
+\end{example}
+
+\begin{example}[K\"{a}hler manifolds]
+A K\"{a}hler manifold $(M, g, J, \omega)$ is simultaneously Riemannian,
+complex, and symplectic.  The symplectic form $\omega(u,v) = g(Ju, v)$ is
+closed by the K\"{a}hler identity.  Complex projective space $\mathbb{CP}^n$
+with the Fubini--Study form is the primary example.
+\end{example}
+
+\begin{example}[Coadjoint orbits]
+Let $G$ be a Lie group with Lie algebra $\mathfrak{g}$ and let
+$\mu \in \mathfrak{g}^*$.  The coadjoint orbit
+$\mathcal{O}_\mu = \{\mathrm{Ad}^*_g \mu : g \in G\}$ carries the
+Kirillov--Kostant--Souriau (KKS) symplectic form:
+\[
+  \omega_\mu(\xi_M, \eta_M) = \mu([\xi, \eta]), \quad \xi, \eta \in \mathfrak{g},
+\]
+where $\xi_M$ denotes the fundamental vector field of $\xi$.
+\end{example}
+
+% =============================================================================
+\section{Darboux's Theorem}
+\label{sec:darboux}
+% =============================================================================
+
+One of the most fundamental results in symplectic geometry distinguishes it
+sharply from Riemannian geometry: there are no local invariants.
+
+\begin{theorem}[Darboux, 1882]\label{thm:darboux}
+Let $(M, \omega)$ be a $2n$-dimensional symplectic manifold and let
+$p \in M$.  Then there exists a neighbourhood $U \ni p$ and local coordinates
+$(q_1, \ldots, q_n, p_1, \ldots, p_n)$ on $U$ such that
+\[
+  \omega\big|_U = \sum_{i=1}^{n} dq_i \wedge dp_i.
+\]
+Such coordinates are called \emph{Darboux coordinates} or \emph{canonical
+coordinates}.
+\end{theorem}
+
+\begin{proof}
+We follow the Moser path method.  Choose any coordinate chart around $p$;
+after a linear change of coordinates we may assume we are working on an open
+subset $U \subset \mathbb{R}^{2n}$ with $p = 0$, and that
+$\omega_0 := \omega_p = \omega_{\mathrm{std},0}$.
+
+Define a smooth family of 2-forms
+\[
+  \omega_t = (1-t)\,\omega_{\mathrm{std}} + t\,\omega, \quad t \in [0,1].
+\]
+Since $\omega_{\mathrm{std}}$ and $\omega$ agree at the origin, $\omega_t$ is
+non-degenerate on a (possibly shrunk) neighbourhood $U$ for all $t \in [0,1]$.
+Each $\omega_t$ is also closed:
+\[
+  d\omega_t = (1-t)\,d\omega_{\mathrm{std}} + t\,d\omega = 0.
+\]
+
+We seek a time-dependent vector field $X_t$ on $U$ whose flow $\varphi_t$
+satisfies $\varphi_t^* \omega_t = \omega_{\mathrm{std}}$.  Differentiating:
+\[
+  0 = \frac{d}{dt}(\varphi_t^* \omega_t) = \varphi_t^*\!\left(
+    \mathcal{L}_{X_t}\omega_t + \dot{\omega}_t \right),
+\]
+so we need $\mathcal{L}_{X_t}\omega_t + \dot{\omega}_t = 0$, i.e.,
+\begin{equation}\label{eq:moser}
+  \iota_{X_t} \omega_t + \tau = 0, \quad \tau := \dot{\omega}_t = \omega - \omega_{\mathrm{std}}.
+\end{equation}
+The form $\tau = \omega - \omega_{\mathrm{std}}$ is closed; by the Poincar\'{e}
+lemma on a star-shaped neighbourhood, $\tau = d\sigma$ for some 1-form
+$\sigma$ that can be chosen to vanish at $0$ (since $\tau_0 = 0$).
+Equation~\eqref{eq:moser} then becomes $\iota_{X_t}\omega_t = -\sigma$,
+which has a unique solution $X_t$ because $\omega_t$ is non-degenerate.
+The flow $\varphi_1$ of $X_t$ is the desired Darboux coordinate map.
+\end{proof}
+
+\begin{remark}
+The Darboux theorem has no analogue in Riemannian geometry: not every
+Riemannian manifold is locally flat (curvature obstructs this).  In
+symplectic geometry, closedness of $\omega$ plays the role that ``curvature
+zero'' plays in the Riemannian setting.
+\end{remark}
+
+\begin{corollary}
+The only local invariant of a symplectic manifold is its dimension.
+\end{corollary}
+
+% =============================================================================
+\section{Hamiltonian Mechanics}
+\label{sec:hamilton}
+% =============================================================================
+
+\subsection{The Hamiltonian vector field}
+
+Let $(M, \omega)$ be a symplectic manifold.  Given a smooth function
+$H: M \to \mathbb{R}$ (the \emph{Hamiltonian}), the non-degeneracy of $\omega$
+guarantees the existence of a unique vector field $X_H$ satisfying
+\begin{equation}\label{eq:ham_vf}
+  \iota_{X_H}\omega = dH, \quad \text{i.e.,} \quad
+  \omega(X_H, \cdot) = dH(\cdot).
+\end{equation}
+The vector field $X_H$ is called the \emph{Hamiltonian vector field} of $H$.
+
+\subsection{Hamilton's equations}
+
+In Darboux coordinates $(q_i, p_i)$, equation~\eqref{eq:ham_vf} gives
+\begin{equation}\label{eq:hamilton}
+  \dot{q}_i = \frac{\partial H}{\partial p_i}, \qquad
+  \dot{p}_i = -\frac{\partial H}{\partial q_i}, \quad i = 1, \ldots, n.
+\end{equation}
+These are \emph{Hamilton's equations of motion}.  They describe the
+evolution of a mechanical system with $n$ degrees of freedom.
+
+\subsection{Energy conservation}
+
+\begin{proposition}
+The Hamiltonian $H$ is preserved along the flow of $X_H$.
+\end{proposition}
+\begin{proof}
+$\dot{H} = dH(X_H) = \omega(X_H, X_H) = 0$, by antisymmetry of $\omega$.
+\end{proof}
+
+\subsection{The Poisson bracket}
+
+The \emph{Poisson bracket} of two smooth functions $f, g \in C^\infty(M)$ is
+\begin{equation}\label{eq:poisson}
+  \{f, g\} := \omega(X_f, X_g) = \sum_{i=1}^{n}
+  \left(\frac{\partial f}{\partial q_i}\frac{\partial g}{\partial p_i}
+  - \frac{\partial f}{\partial p_i}\frac{\partial g}{\partial q_i}\right).
+\end{equation}
+
+\begin{proposition}
+$(C^\infty(M), \{\cdot,\cdot\})$ is a Lie algebra.  In particular:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Antisymmetry:} $\{f,g\} = -\{g,f\}$.
+  \item \textbf{Jacobi identity:} $\{f,\{g,h\}\} + \{g,\{h,f\}\} + \{h,\{f,g\}\} = 0$.
+  \item \textbf{Leibniz rule:} $\{fg, h\} = f\{g,h\} + g\{f,h\}$.
+\end{enumerate}
+\end{proposition}
+
+\subsection{Example: the harmonic oscillator}
+
+The harmonic oscillator with $n = 1$ has Hamiltonian
+\[
+  H(q, p) = \frac{p^2 + \omega^2 q^2}{2}.
+\]
+Hamilton's equations give $\dot{q} = p$ and $\dot{p} = -\omega^2 q$, yielding
+circular orbits in phase space $(q, p)$ of radius
+$r = \sqrt{2H/\omega^2}$.  The period is $T = 2\pi/\omega$ independent of
+amplitude---a direct consequence of the linearity of the equations.
+
+% =============================================================================
+\section{Symplectomorphisms}
+\label{sec:symplecto}
+% =============================================================================
+
+\begin{definition}
+A \emph{symplectomorphism} between symplectic manifolds $(M_1, \omega_1)$ and
+$(M_2, \omega_2)$ is a diffeomorphism $\varphi: M_1 \to M_2$ satisfying
+$\varphi^* \omega_2 = \omega_1$.
+\end{definition}
+
+The flow $\varphi_t$ of any Hamiltonian vector field $X_H$ consists of
+symplectomorphisms.  This follows from
+$\frac{d}{dt}\varphi_t^*\omega = \varphi_t^*(\mathcal{L}_{X_H}\omega) = 0$,
+since $\mathcal{L}_{X_H}\omega = \iota_{X_H}d\omega + d(\iota_{X_H}\omega)
+= 0 + d(dH) = 0$.
+
+\subsection{Liouville's theorem}
+
+\begin{theorem}[Liouville, 1838]\label{thm:liouville}
+Every Hamiltonian flow preserves the symplectic volume form $\omega^n$.
+Equivalently, the phase-space volume of any measurable set is preserved under
+the Hamiltonian flow.
+\end{theorem}
+
+\begin{proof}
+Since $\varphi_t^*\omega = \omega$, we have
+\[
+  \varphi_t^*(\omega^n) = (\varphi_t^*\omega)^n = \omega^n.
+\]
+The volume of a Borel set $A \subset M$ under the flow is
+$\mathrm{Vol}(\varphi_t(A)) = \int_{\varphi_t(A)} \omega^n
+= \int_A \varphi_t^*\omega^n = \int_A \omega^n = \mathrm{Vol}(A)$.
+\end{proof}
+
+\begin{remark}
+This is the celebrated Liouville theorem of statistical mechanics.  It
+implies that the density of states in phase space is conserved---the
+foundation of the microcanonical ensemble in statistical mechanics.
+\end{remark}
+
+\subsection{Poincar\'{e}'s recurrence theorem}
+
+\begin{theorem}[Poincar\'{e}, 1890]\label{thm:poincare}
+Let $\varphi: M \to M$ be a volume-preserving map on a finite-measure
+space $(M, \mu)$.  Then for every measurable set $A$ with $\mu(A) > 0$ and
+for $\mu$-almost every $x \in A$, there exists $N \geq 1$ such that
+$\varphi^N(x) \in A$.
+\end{theorem}
+
+\begin{proof}
+Define $B := \bigcup_{k=1}^{\infty} \varphi^{-k}(A^c \cap A)$.  One shows
+that $B$ has measure zero by the following counting argument: the sets
+$\varphi^{-k}(A)$ for $k \geq 0$ must overlap for almost all points, since
+otherwise their total measure would exceed $\mu(M) < \infty$.  Formally:
+the sets $A \setminus \bigcup_{k=1}^N \varphi^{-k}(A)$ have measure
+decreasing to zero as $N \to \infty$ (by volume preservation and finiteness
+of total measure), so the set of points in $A$ that never return has
+measure zero.
+\end{proof}
+
+% =============================================================================
+\section{Lagrangian Submanifolds}
+\label{sec:lagrangian}
+% =============================================================================
+
+\begin{definition}
+A submanifold $L \subset (M^{2n}, \omega)$ is called
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{isotropic} if $\omega|_L = 0$ and $\dim L \leq n$,
+  \item \emph{Lagrangian} if $\omega|_L = 0$ and $\dim L = n$.
+\end{enumerate}
+\end{definition}
+
+Lagrangian submanifolds are the maximally isotropic submanifolds; they have
+the largest possible dimension compatible with the isotropy condition.
+
+\begin{example}[Zero section]
+In $T^*Q$, the zero section $Q \subset T^*Q$ (where all momenta vanish) is
+a Lagrangian submanifold.  Indeed, $\omega|_Q = d\lambda|_Q = 0$ since
+$\lambda = p\,dq$ vanishes on the zero section.
+\end{example}
+
+\begin{example}[Graph of a closed 1-form]
+If $\alpha \in \Omega^1(Q)$ is closed, $d\alpha = 0$, then its graph
+$\Gamma_\alpha = \{(q, \alpha_q) : q \in Q\} \subset T^*Q$
+is a Lagrangian submanifold.  In particular, graphs of exact forms $\alpha = df$
+(for $f \in C^\infty(Q)$) are always Lagrangian.
+\end{example}
+
+\subsection{The Arnold conjecture}
+
+A major open problem in symplectic topology concerns the minimum number of
+fixed points of Hamiltonian diffeomorphisms.
+
+\begin{conjecture}[Arnold, 1965]\label{conj:arnold}
+Let $(M, \omega)$ be a closed symplectic manifold and let $\varphi \in
+\mathrm{Ham}(M, \omega)$ be a Hamiltonian diffeomorphism.  Then $\varphi$
+has at least as many fixed points as a smooth function on $M$ has critical
+points, i.e.,
+\[
+  \#\mathrm{Fix}(\varphi) \geq \sum_{k=0}^{2n} \beta_k(M),
+\]
+where $\beta_k = \dim H_k(M; \mathbb{Z}/2)$ are the Betti numbers of $M$.
+\end{conjecture}
+
+\begin{remark}
+This conjecture is \textbf{open in general}.  It has been proved in special
+cases:
+\begin{itemize}
+  \item \textit{Tori:} Conley and Zehnder proved the Arnold conjecture for
+    $M = \mathbb{T}^{2n}$ in 1983.  A Hamiltonian diffeomorphism of the
+    $2n$-torus has at least $2n+1$ fixed points (and at least $2^{2n}$
+    non-degenerate ones).
+  \item \textit{Surfaces:} Proved for all closed surfaces.
+  \item \textit{Floer homology approach:} Floer (1989) proved the conjecture
+    for monotone manifolds using his homology theory.
+\end{itemize}
+The general case for arbitrary closed symplectic manifolds remains open.
+\end{remark}
+
+% =============================================================================
+\section{Moment Maps}
+\label{sec:moment}
+% =============================================================================
+
+\subsection{Group actions and moment maps}
+
+Let $G$ be a Lie group acting on $(M, \omega)$ by symplectomorphisms
+(a \emph{symplectic action}).  For $\xi \in \mathfrak{g}$, let $\xi_M$
+denote the fundamental vector field: $\xi_M(x) = \frac{d}{dt}\big|_{t=0}
+\exp(t\xi) \cdot x$.
+
+\begin{definition}
+The symplectic action of $G$ on $(M, \omega)$ is called \emph{Hamiltonian}
+if there exists a map $\mu: M \to \mathfrak{g}^*$ (the \emph{moment map})
+satisfying
+\begin{enumerate}[label=(\roman*)]
+  \item $\iota_{\xi_M}\omega = d\langle \mu, \xi \rangle$ for all
+        $\xi \in \mathfrak{g}$ (i.e., $\xi_M = X_{\langle\mu,\xi\rangle}$),
+  \item $\mu$ is equivariant: $\mu(g \cdot x) = \mathrm{Ad}^*_g \mu(x)$.
+\end{enumerate}
+\end{definition}
+
+\begin{example}[$G = S^1$ acting on $\mathbb{C}^n$]
+The $S^1$-action $e^{i\theta}(z_1, \ldots, z_n) = (e^{i\theta}z_1, \ldots,
+e^{i\theta}z_n)$ on $(\mathbb{C}^n, \frac{i}{2}\sum dz_k \wedge d\bar{z}_k)$
+has moment map $\mu(z) = -\frac{1}{2}|z|^2$.
+\end{example}
+
+\subsection{Marsden--Weinstein reduction}
+
+\begin{theorem}[Marsden--Weinstein, 1974]\label{thm:mw}
+Let $G$ act on $(M, \omega)$ in a Hamiltonian fashion with moment map
+$\mu: M \to \mathfrak{g}^*$.  Let $\lambda \in \mathfrak{g}^*$ be a regular
+value of $\mu$ and assume $G_\lambda := \{\,g \in G : \mathrm{Ad}^*_g \lambda
+= \lambda\,\}$ acts freely and properly on $\mu^{-1}(\lambda)$.  Then the
+\emph{reduced space}
+\[
+  M_\lambda := \mu^{-1}(\lambda) / G_\lambda
+\]
+carries a unique symplectic form $\omega_\lambda$ characterised by
+$\pi^* \omega_\lambda = \iota^* \omega$, where $\iota: \mu^{-1}(\lambda) \hookrightarrow M$
+and $\pi: \mu^{-1}(\lambda) \twoheadrightarrow M_\lambda$.
+\end{theorem}
+
+\begin{proof}[Sketch of proof]
+The tangent space to $\mu^{-1}(\lambda)$ at $x$ is $\ker d\mu_x = (\mathfrak{g}
+\cdot x)^{\omega}$---the symplectic complement of the $G$-orbit through $x$.
+The quotient by $G_\lambda$ removes the degenerate directions, and one verifies
+that $\omega_\lambda$ is well-defined, closed, and non-degenerate.
+\end{proof}
+
+\begin{remark}
+Marsden--Weinstein reduction is the symplectic analogue of quotienting by a
+symmetry group.  It is used throughout mathematical physics: e.g., reducing a
+mechanical system by rotation symmetry yields the effective one-dimensional
+problem in the radial coordinate.
+\end{remark}
+
+\subsection{The convexity theorem}
+
+\begin{theorem}[Atiyah 1982; Guillemin--Sternberg 1982]
+If $(M, \omega)$ is compact and connected and $T$ is a torus acting on $M$
+with moment map $\mu: M \to \mathfrak{t}^*$, then the image $\mu(M)$ is a
+convex polytope (the \emph{moment polytope}).
+\end{theorem}
+
+% =============================================================================
+\section{Gromov's Non-Squeezing Theorem}
+\label{sec:gromov}
+% =============================================================================
+
+Gromov's non-squeezing theorem (1985) was a landmark discovery: it showed
+that symplectic geometry is genuinely different from volume-preserving geometry.
+
+\begin{theorem}[Gromov, 1985]\label{thm:gromov}
+Let $B^{2n}(r) = \{(q,p) \in \mathbb{R}^{2n} : |q|^2 + |p|^2 < r^2\}$
+be the $2n$-dimensional ball of radius $r$, and let
+$Z^{2n}(R) = \{(q,p) \in \mathbb{R}^{2n} : q_1^2 + p_1^2 < R^2\}$
+be the symplectic cylinder of radius $R$ (a cylinder in the first symplectic
+factor $\mathbb{R}^2$).  Then a symplectic embedding
+$\varphi: B^{2n}(r) \hookrightarrow Z^{2n}(R)$ exists if and only if
+$r \leq R$.
+\end{theorem}
+
+\begin{remark}
+By contrast, a \emph{volume-preserving} embedding $B^{2n}(r) \hookrightarrow
+Z^{2n}(R)$ exists for any $R > 0$ as long as the volume fits (by a result of
+Dacorogna--Moser).  Thus the non-squeezing theorem reveals a genuinely
+symplectic obstruction.
+\end{remark}
+
+\begin{proof}[Idea of proof]
+The key idea is the \emph{symplectic width} (or \emph{Gromov width}).  Define
+the width of a symplectic manifold $(M, \omega)$ as
+\[
+  w(M, \omega) := \sup\bigl\{\pi r^2 : B^{2n}(r) \xhookrightarrow{\text{symp}} M\bigr\}.
+\]
+One establishes:
+\begin{enumerate}[label=(\roman*)]
+  \item The width is a symplectic invariant: $\varphi^* \omega = \omega
+    \Rightarrow w(M, \omega) = w(M', \omega')$ for symplectomorphic manifolds.
+  \item $w(B^{2n}(r)) = \pi r^2$.
+  \item $w(Z^{2n}(R)) = \pi R^2$.
+\end{enumerate}
+The first item uses the theory of $J$-holomorphic curves: Gromov introduced
+pseudo-holomorphic curves into symplectic topology and used the existence of
+$J$-holomorphic discs in $B^{2n}(r)$ (bounded by a Lagrangian torus) to show
+that any symplectic image must have a non-constant $J$-holomorphic disc
+intersecting a generic $\mathbb{R}^2$-slice, whose area (by Stokes' theorem
+applied to the $J$-holomorphic equation) is at least $\pi r^2$.  Since the
+cylinder $Z^{2n}(R)$ has 2D-width $\pi R^2$, we obtain $r \leq R$.
+\end{proof}
+
+The non-squeezing theorem introduced the notion of \emph{symplectic capacity}:
+
+\begin{definition}
+A \emph{symplectic capacity} on the class of $2n$-dimensional symplectic
+manifolds is a function $c$ assigning to each $(M, \omega)$ a value in
+$[0, \infty]$ satisfying
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Monotonicity:} $(M_1, \omega_1) \xhookrightarrow{\text{symp}}
+    (M_2, \omega_2) \Rightarrow c(M_1) \leq c(M_2)$.
+  \item \textbf{Conformality:} $c(M, \lambda\omega) = \lambda\, c(M,\omega)$.
+  \item \textbf{Normalisation:} $c(B^{2n}(1)) = \pi = c(Z^{2n}(1))$.
+\end{enumerate}
+\end{definition}
+
+% =============================================================================
+\section{Floer Homology}
+\label{sec:floer}
+% =============================================================================
+
+Floer homology, introduced by Andreas Floer in 1988--1989, is an
+infinite-dimensional Morse theory on the space of loops in a symplectic
+manifold.  It was created specifically to attack the Arnold conjecture.
+
+\subsection{The action functional}
+
+Let $(M, \omega)$ be a closed symplectic manifold and $H: S^1 \times M \to
+\mathbb{R}$ a time-dependent Hamiltonian.  The \emph{symplectic action
+functional} on the space $\mathcal{L}M$ of contractible loops $x: S^1 \to M$
+is
+\begin{equation}\label{eq:action}
+  \mathcal{A}_H(x) = -\int_{D^2} \bar{x}^*\omega + \int_0^1 H(t, x(t))\,dt,
+\end{equation}
+where $\bar{x}: D^2 \to M$ is any disc bounding $x$.  The critical points
+of $\mathcal{A}_H$ are exactly the 1-periodic orbits of $X_H$.
+
+\subsection{Floer chain complex}
+
+Fix a $\omega$-compatible almost complex structure $J = J(t)$.  The
+\emph{Floer chain complex} is generated (over $\mathbb{Z}/2$) by the
+1-periodic orbits $x$ of $X_H$, with grading given by the
+\emph{Conley--Zehnder index} $\mu_{\mathrm{CZ}}(x)$.
+
+The boundary operator $\partial: CF_k \to CF_{k-1}$ counts rigid
+$J$-holomorphic cylinders (Floer trajectories) connecting orbits of adjacent
+index: maps $u: \mathbb{R} \times S^1 \to M$ satisfying the
+\emph{Floer equation}
+\begin{equation}\label{eq:floer}
+  \frac{\partial u}{\partial s} + J(t, u)\frac{\partial u}{\partial t} =
+  \nabla H(t, u),
+\end{equation}
+with $\lim_{s \to \pm\infty} u(s,\cdot) = x^\pm(\cdot)$.
+
+\begin{theorem}[Floer, 1989]\label{thm:floer}
+$\partial^2 = 0$, so $(CF_*, \partial)$ is a chain complex.  Its homology
+\[
+  HF_*(M, H) := H_*(CF_*, \partial)
+\]
+is independent of the choices of $H$ and $J$, and is isomorphic to the
+singular homology of $M$:
+\[
+  HF_*(M) \cong H_*(M; \mathbb{Z}/2).
+\]
+\end{theorem}
+
+\subsection{Partial proof of the Arnold conjecture}
+
+\begin{theorem}[Floer, 1989 — monotone case]\label{thm:arnold_floer}
+Let $(M, \omega)$ be a monotone closed symplectic manifold
+(i.e., $[\omega] = \lambda c_1(TM)$ for some $\lambda > 0$).  Then every
+non-degenerate Hamiltonian diffeomorphism $\varphi \in \mathrm{Ham}(M)$
+has at least $\sum_k \beta_k(M)$ fixed points.
+\end{theorem}
+
+\begin{proof}[Sketch]
+The non-degenerate fixed points of $\varphi$ correspond to non-degenerate
+1-periodic orbits of $H$, hence to generators of the Floer complex.  The
+Euler characteristic argument gives
+\[
+  \#\mathrm{Fix}(\varphi) \geq \mathrm{rank}\, HF_*(M) = \mathrm{rank}\, H_*(M),
+\]
+which is $\sum_k \beta_k(M)$.
+\end{proof}
+
+\begin{remark}
+The general Arnold conjecture (for all closed symplectic manifolds, not just
+monotone ones) remains \textbf{open}.  Partial results exist for many classes
+of manifolds (K\"{a}hler, Calabi--Yau, etc.), but a complete proof has not
+yet been achieved.
+\end{remark}
+
+% =============================================================================
+\section{Applications}
+\label{sec:applications}
+% =============================================================================
+
+\subsection{Integrable systems}
+
+A Hamiltonian system with $n$ degrees of freedom is called \emph{(Liouville)
+integrable} if it admits $n$ functionally independent, pairwise Poisson-
+commuting first integrals $F_1 = H, F_2, \ldots, F_n$:
+\[
+  \{F_i, F_j\} = 0, \quad i \neq j.
+\]
+The Liouville--Arnold theorem then guarantees that the common level sets
+$\{F_1 = c_1, \ldots, F_n = c_n\}$ are (when compact and connected)
+diffeomorphic to $n$-tori $\mathbb{T}^n$, and the motion on each torus is
+quasi-periodic.
+
+\begin{example}
+The Kepler problem (gravitational two-body problem) in $\mathbb{R}^3$ is
+integrable: the independent commuting integrals are $H$ (energy) and the
+angular momentum components $L_1, L_2, L_3$ (with $\{L_i, L_j\} =
+\varepsilon_{ijk}L_k$, but Casimir functions reduce to two commuting ones).
+The Runge--Lenz vector provides an additional hidden symmetry.
+\end{example}
+
+\subsection{KAM theory}
+
+The Kolmogorov--Arnold--Moser (KAM) theorem addresses the stability of
+integrable systems under small perturbations.
+
+\begin{theorem}[KAM; Kolmogorov 1954, Arnold 1963, Moser 1962]
+Let the Hamiltonian $H_\varepsilon = H_0 + \varepsilon H_1$ be a small
+perturbation of an integrable system.  Then, for sufficiently small
+$\varepsilon$, a large measure of invariant tori persist---those with
+\emph{Diophantine} frequency vectors $\omega = (\omega_1, \ldots, \omega_n)$
+satisfying
+\[
+  |k \cdot \omega| \geq \frac{c}{|k|^\tau}, \quad \forall k \in \mathbb{Z}^n
+  \setminus \{0\},
+\]
+for some $c > 0$, $\tau > n-1$.  The destroyed tori correspond to
+resonances.
+\end{theorem}
+
+\subsection{Geometric quantisation}
+
+Geometric quantisation attempts to construct a quantum theory from a
+symplectic manifold $(M, \omega)$ by:
+\begin{enumerate}[label=(\arabic*)]
+  \item \textbf{Pre-quantisation:} Construct a Hermitian line bundle $\mathcal{L}
+    \to M$ with connection $\nabla$ whose curvature is $\frac{i}{\hbar}\omega$.
+    This requires the \emph{integrality condition} $[\omega/2\pi\hbar] \in
+    H^2(M; \mathbb{Z})$.
+  \item \textbf{Polarisation:} Choose a Lagrangian distribution (polarisation)
+    to reduce the space of sections to a ``half-dimensional'' Hilbert space.
+  \item \textbf{Quantisation map:} Assign to each $f \in C^\infty(M)$ a
+    self-adjoint operator $\hat{f}$ satisfying $[\hat{f}, \hat{g}] = -i\hbar
+    \widehat{\{f,g\}}$.
+\end{enumerate}
+
+The Hilbert space of the harmonic oscillator ($n = 1$) constructed this way
+has basis $\{|0\rangle, |1\rangle, |2\rangle, \ldots\}$ with energies
+$E_k = \hbar\omega(k + \frac{1}{2})$---exactly the quantum harmonic oscillator.
+
+\subsection{Mirror symmetry}
+
+The Homological Mirror Symmetry conjecture (Kontsevich, 1994) proposes a deep
+duality between the symplectic geometry of a Calabi--Yau manifold $X$ (encoded
+in its Fukaya category, whose objects are Lagrangian submanifolds) and the
+complex geometry of a mirror $\hat{X}$ (encoded in its derived category of
+coherent sheaves).  Floer homology groups between Lagrangian submanifolds
+correspond to Ext groups of coherent sheaves.  This remains an active area
+of research at the frontier of symplectic geometry and algebraic geometry.
+
+% =============================================================================
+\section*{Conclusion}
+% =============================================================================
+
+Symplectic geometry provides the mathematical framework for Hamiltonian
+mechanics and has evolved into a deep theory with far-reaching implications.
+The key results presented here---Darboux's theorem (local triviality),
+Liouville's theorem (volume preservation), and Gromov's non-squeezing theorem
+(symplectic rigidity)---together illustrate the duality between local
+flexibility and global constraints that characterises the field.  Floer
+homology, building on earlier work in Morse theory, provides powerful algebraic
+tools for studying global properties of symplectic manifolds and partially
+establishes the Arnold conjecture---one of the central open problems in the
+area.
+
+% =============================================================================
+\begin{thebibliography}{99}
+% =============================================================================
+
+\bibitem{Arnold}
+V.~I.~Arnold.
+\newblock {\em Mathematical Methods of Classical Mechanics}.
+\newblock Springer, 2nd edition, 1989.
+
+\bibitem{CannasDS}
+A.~Cannas da Silva.
+\newblock {\em Lectures on Symplectic Geometry}.
+\newblock Springer Lecture Notes in Mathematics 1764, 2001.
+
+\bibitem{McDuffSalamon}
+D.~McDuff and D.~Salamon.
+\newblock {\em Introduction to Symplectic Topology}.
+\newblock Oxford University Press, 3rd edition, 2017.
+
+\bibitem{Gromov85}
+M.~Gromov.
+\newblock Pseudo holomorphic curves in symplectic manifolds.
+\newblock {\em Inventiones Mathematicae}, 82:307--347, 1985.
+
+\bibitem{Floer89}
+A.~Floer.
+\newblock Symplectic fixed points and holomorphic spheres.
+\newblock {\em Communications in Mathematical Physics}, 120:575--611, 1989.
+
+\bibitem{MarsdenWeinstein}
+J.~Marsden and A.~Weinstein.
+\newblock Reduction of symplectic manifolds with symmetry.
+\newblock {\em Reports on Mathematical Physics}, 5(1):121--130, 1974.
+
+\bibitem{ConleyZehnder}
+C.~Conley and E.~Zehnder.
+\newblock The Birkhoff--Lewis fixed point theorem and a conjecture of V.~I.~Arnold.
+\newblock {\em Inventiones Mathematicae}, 73:33--49, 1983.
+
+\bibitem{Darboux}
+G.~Darboux.
+\newblock Sur le probl\`{e}me de Pfaff.
+\newblock {\em Bulletin des Sciences Math\'{e}matiques}, 6:14--36, 49--68, 1882.
+
+\bibitem{MoserPath}
+J.~Moser.
+\newblock On the volume elements on a manifold.
+\newblock {\em Transactions of the American Mathematical Society}, 120:286--294, 1965.
+
+\end{thebibliography}
+
+\end{document}
