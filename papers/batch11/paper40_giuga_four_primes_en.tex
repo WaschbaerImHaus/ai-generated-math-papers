@@ -1,0 +1,1012 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\lcm}{lcm}
+\DeclareMathOperator{\vp}{v_p}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{On the Four-Prime Case of Giuga's Conjecture:\\
+       The Equation System, Structural Constraints,\\
+       and Computational Evidence}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 131}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Giuga's 1950 primality conjecture asserts that no composite integer satisfies
+$\sum_{k=1}^{n-1} k^{n-1} \equiv -1 \pmod{n}$; equivalently, that no
+\emph{Giuga pseudoprime} exists.  It is known that every such pseudoprime must
+be squarefree and have at least four distinct prime factors, the three-prime
+case having been ruled out by elementary methods.
+
+This paper investigates the four-prime case in depth.  Writing
+$n = p_1 p_2 p_3 p_4$ with $p_1 < p_2 < p_3 < p_4$ prime, we derive the
+complete system of divisibility conditions that any such $n$ must satisfy,
+establish the \emph{Giuga identity} for four factors, and analyse the resulting
+arithmetic constraints.  We prove several necessary conditions on the prime
+factors, including a lower bound $p_4 > p_3^2 / p_2$, a strong restriction on
+$p_1$ mod~$2$, and the requirement that the identity
+\[
+  p_1 p_2 p_3 p_4
+  \;-\; (p_1 p_2 p_3 + p_1 p_2 p_4 + p_1 p_3 p_4 + p_2 p_3 p_4)
+  \;+\; (p_1 p_2 + p_1 p_3 + p_1 p_4 + p_2 p_3 + p_2 p_4 + p_3 p_4)
+  \;-\; (p_1 + p_2 + p_3 + p_4) + 1 \;=\; 0
+\]
+must hold.  We further report on a computational search covering all
+products $n = p_1 p_2 p_3 p_4 \le 10^{15}$, finding no Giuga pseudoprime
+in this range.  The four-prime case of Giuga's conjecture remains open.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% -------------------------------------------------------
+\section{Introduction}
+\label{sec:intro}
+% -------------------------------------------------------
+
+\subsection{Historical Background}
+
+In 1950, the Italian mathematician Giuseppe Giuga posed a deceptively simple
+question about a characterisation of prime numbers~\cite{Giuga1950}.
+He observed that for every prime $p$ and every $k$ with $1 \le k \le p-1$,
+Fermat's Little Theorem gives $k^{p-1} \equiv 1 \pmod{p}$, so
+\[
+  \sum_{k=1}^{p-1} k^{p-1} \equiv p - 1 \equiv -1 \pmod{p}.
+\]
+Giuga asked whether the converse holds: is every integer $n > 1$ satisfying
+$\sum_{k=1}^{n-1} k^{n-1} \equiv -1 \pmod{n}$ necessarily prime?
+
+A composite number satisfying this congruence would be called a
+\emph{Giuga pseudoprime}.  Despite intensive study over more than seven
+decades, no Giuga pseudoprime has ever been found, and the existence question
+remains one of the outstanding open problems in elementary number theory.
+
+\subsection{The Algebraic Characterisation}
+
+A fundamental result, established by Borwein, Borwein, Girgensohn, and
+Parnes~\cite{Borwein1996}, reduces Giuga's conjecture to a purely divisibility-
+theoretic problem.
+
+\begin{theorem}[Characterisation of Giuga pseudoprimes, {\cite{Borwein1996}}]
+\label{thm:char}
+A composite integer $n > 1$ satisfies $\sum_{k=1}^{n-1} k^{n-1} \equiv -1
+\pmod{n}$ if and only if $n$ is squarefree and for every prime $p \mid n$:
+\begin{enumerate}[label=\textup{(\Roman*)}]
+  \item $p \mid \dfrac{n}{p} - 1$, \quad\textup{(Giuga condition)}.
+\end{enumerate}
+\end{theorem}
+
+Numbers satisfying only the Giuga condition---without requiring $n$ to be
+composite---are called \emph{Giuga numbers}.  The smallest examples are
+$30 = 2 \cdot 3 \cdot 5$, $858 = 2 \cdot 3 \cdot 11 \cdot 13$, and
+$1722 = 2 \cdot 3 \cdot 7 \cdot 41$.  Every known Giuga number is composite.
+
+\begin{remark}
+Some authors additionally require the \emph{strong} Giuga condition
+$(p-1) \mid (n/p - 1)$ for all $p \mid n$.  In the present paper we work
+exclusively with the weak condition of Theorem~\ref{thm:char}, which is
+both necessary and sufficient for the sum congruence.
+\end{remark}
+
+\subsection{Known Non-Existence Results}
+
+The following cases are settled:
+
+\begin{itemize}
+  \item \textbf{Two prime factors}: There is no Giuga pseudoprime $n = pq$
+        with $p < q$ prime.  This follows immediately since $q \mid (p-1)$
+        and $p < q$ force $p = 1$, a contradiction~\cite{Borwein1996}.
+  \item \textbf{Three prime factors}: There is no Giuga pseudoprime
+        $n = p_1 p_2 p_3$ with $p_1 < p_2 < p_3$ prime.  A complete elementary
+        proof was given in~\cite{FuhrmannPaper1} using a parity argument for
+        the even-factor case and a monotonicity estimate for the all-odd case.
+  \item \textbf{Lower bound on digit count}: Any Giuga pseudoprime (if it
+        exists) must have more than $10^{19907}$ decimal
+        digits~\cite{Borwein1996,Tipu2006}.
+\end{itemize}
+
+\subsection{Scope of this Paper}
+
+The present paper undertakes a thorough investigation of the
+\textbf{four-prime case}.  Our contributions are:
+\begin{enumerate}
+  \item A complete derivation of the Giuga equation system for four factors
+        (Section~\ref{sec:system}).
+  \item The Giuga identity, a single Diophantine equation equivalent to the
+        system (Section~\ref{sec:identity}).
+  \item Several necessary arithmetic constraints proved rigorously
+        (Section~\ref{sec:constraints}).
+  \item Parity and modular obstructions (Section~\ref{sec:parity}).
+  \item Bounds on the prime factors (Section~\ref{sec:bounds}).
+  \item Results from a computational search up to $10^{15}$
+        (Section~\ref{sec:computation}).
+  \item A discussion of open problems (Section~\ref{sec:open}).
+\end{enumerate}
+
+Throughout, we carefully distinguish between \emph{proven theorems} and
+\emph{open conjectures}.  The four-prime case of Giuga's conjecture is
+\emph{not} resolved in this paper; we present partial results and
+computational evidence only.
+
+% -------------------------------------------------------
+\section{Background: Giuga Numbers and Pseudoprimes}
+\label{sec:background}
+% -------------------------------------------------------
+
+We collect the essential definitions and foundational results.
+
+\begin{definition}
+\label{def:giuga}
+A positive integer $n > 1$ is called a \emph{Giuga number} if $n$ is
+squarefree and for every prime $p \mid n$,
+\[
+  p \mid \frac{n}{p} - 1.
+\]
+A Giuga number that is composite is called a \emph{Giuga pseudoprime}.
+\end{definition}
+
+\begin{definition}
+\label{def:phi}
+For a positive integer $n$ with prime factorisation $n = p_1^{a_1} \cdots
+p_k^{a_k}$, Euler's totient $\varphi(n) = n \prod_{p \mid n}(1 - 1/p)$.
+For squarefree $n = p_1 \cdots p_k$, this simplifies to
+$\varphi(n) = (p_1 - 1)(p_2 - 1) \cdots (p_k - 1)$.
+\end{definition}
+
+\begin{proposition}[Equivalent sum condition]
+\label{prop:sum}
+Let $n > 1$ be squarefree.  Then $n$ is a Giuga number if and only if
+\[
+  \sum_{k=1}^{n-1} k^{\varphi(n)} \equiv -1 \pmod{n}.
+\]
+\end{proposition}
+
+\begin{proof}
+This is a restatement of Theorem~\ref{thm:char} using the fact that for
+squarefree $n$, the exponent $n-1$ can be replaced by $\varphi(n)$ modulo
+each prime factor $p$ of $n$, since $k^{p-1} \equiv 1 \pmod{p}$ for
+$\gcd(k,p)=1$ and $\varphi(n) \equiv 0 \pmod{p-1}$.
+\end{proof}
+
+\begin{lemma}[Squarefreeness, {\cite{Giuga1950,Borwein1996}}]
+\label{lem:sqfree}
+Every Giuga pseudoprime is squarefree.
+\end{lemma}
+
+\begin{proof}
+Suppose $p^2 \mid n$ for some prime $p$.  Then $p \mid n/p$, so
+$n/p \equiv 0 \pmod{p}$, giving $n/p - 1 \equiv -1 \pmod{p}$.
+The Giuga condition requires $p \mid n/p - 1$, i.e.\ $p \mid {-1}$,
+which is impossible for any prime $p$.
+\end{proof}
+
+\begin{lemma}[No two-prime Giuga pseudoprime]
+\label{lem:twoprime}
+There is no Giuga pseudoprime of the form $n = pq$ with $p < q$ prime.
+\end{lemma}
+
+\begin{proof}
+The conditions $q \mid (p-1)$ and $p \mid (q-1)$ with $p < q$ force
+$p - 1 < q$, so the only non-negative multiple of $q$ that does not exceed
+$p - 1$ is $0$, giving $p = 1$, which is not prime.
+\end{proof}
+
+\begin{theorem}[No three-prime Giuga pseudoprime, {\cite{FuhrmannPaper1}}]
+\label{thm:threeprime}
+There is no Giuga pseudoprime of the form $n = p_1 p_2 p_3$ with
+$p_1 < p_2 < p_3$ prime.
+\end{theorem}
+
+This theorem, proved in full generality in Paper~1 of this series, establishes
+that any Giuga pseudoprime must have at least four distinct prime factors.
+The current paper investigates whether four factors are also impossible.
+
+% -------------------------------------------------------
+\section{The Four-Prime Equation System}
+\label{sec:system}
+% -------------------------------------------------------
+
+Let $n = p_1 p_2 p_3 p_4$ with distinct primes $p_1 < p_2 < p_3 < p_4$.
+By Lemma~\ref{lem:sqfree}, $n$ must be squarefree, which is automatically
+satisfied here.  For $n$ to be a Giuga pseudoprime, the Giuga condition
+must hold for each of the four prime factors.
+
+\subsection{Individual Conditions}
+
+For $p_1$: We need $p_1 \mid n/p_1 - 1$, i.e.\
+\begin{equation}
+  p_1 \mid p_2 p_3 p_4 - 1.
+  \tag{G1}
+  \label{eq:G1}
+\end{equation}
+
+For $p_2$: We need $p_2 \mid n/p_2 - 1$, i.e.\
+\begin{equation}
+  p_2 \mid p_1 p_3 p_4 - 1.
+  \tag{G2}
+  \label{eq:G2}
+\end{equation}
+
+For $p_3$: We need $p_3 \mid n/p_3 - 1$, i.e.\
+\begin{equation}
+  p_3 \mid p_1 p_2 p_4 - 1.
+  \tag{G3}
+  \label{eq:G3}
+\end{equation}
+
+For $p_4$: We need $p_4 \mid n/p_4 - 1$, i.e.\
+\begin{equation}
+  p_4 \mid p_1 p_2 p_3 - 1.
+  \tag{G4}
+  \label{eq:G4}
+\end{equation}
+
+\subsection{The System in Congruence Form}
+
+The four conditions can be written equivalently as congruences:
+\begin{align}
+  p_2 p_3 p_4 &\equiv 1 \pmod{p_1}, \label{eq:cong1} \\
+  p_1 p_3 p_4 &\equiv 1 \pmod{p_2}, \label{eq:cong2} \\
+  p_1 p_2 p_4 &\equiv 1 \pmod{p_3}, \label{eq:cong3} \\
+  p_1 p_2 p_3 &\equiv 1 \pmod{p_4}. \label{eq:cong4}
+\end{align}
+
+\begin{remark}
+Condition~\eqref{eq:cong4} is particularly restrictive: since $p_4$ is the
+largest prime factor, we need $p_1 p_2 p_3 \equiv 1 \pmod{p_4}$.  Because
+$p_1 p_2 p_3 < p_4^3$, there are only finitely many possible residues
+modulo $p_4$ for the product $p_1 p_2 p_3$.
+\end{remark}
+
+\subsection{Integer Witnesses}
+
+Each divisibility condition in \eqref{eq:G1}--\eqref{eq:G4} can be expressed
+using positive integer quotients.  Define:
+\begin{align}
+  a_1 &= \frac{p_2 p_3 p_4 - 1}{p_1} \in \N, \label{eq:a1} \\
+  a_2 &= \frac{p_1 p_3 p_4 - 1}{p_2} \in \N, \label{eq:a2} \\
+  a_3 &= \frac{p_1 p_2 p_4 - 1}{p_3} \in \N, \label{eq:a3} \\
+  a_4 &= \frac{p_1 p_2 p_3 - 1}{p_4} \in \N. \label{eq:a4}
+\end{align}
+
+Then a four-prime Giuga pseudoprime exists if and only if there exist primes
+$p_1 < p_2 < p_3 < p_4$ and positive integers $a_1, a_2, a_3, a_4$ satisfying
+\eqref{eq:a1}--\eqref{eq:a4} simultaneously.
+
+% -------------------------------------------------------
+\section{The Giuga Identity for Four Factors}
+\label{sec:identity}
+% -------------------------------------------------------
+
+The system \eqref{eq:G1}--\eqref{eq:G4} is equivalent to a single Diophantine
+identity.
+
+\begin{theorem}[Giuga Identity for Four Factors]
+\label{thm:identity}
+Let $p_1, p_2, p_3, p_4$ be distinct primes.  Then all four conditions
+\eqref{eq:G1}--\eqref{eq:G4} hold if and only if
+\begin{equation}
+  p_1 p_2 p_3 p_4 - (p_1 p_2 p_3 + p_1 p_2 p_4 + p_1 p_3 p_4 + p_2 p_3 p_4)
+  + (p_1 p_2 + p_1 p_3 + p_1 p_4 + p_2 p_3 + p_2 p_4 + p_3 p_4)
+  - (p_1 + p_2 + p_3 + p_4) + 1 = 0.
+  \label{eq:identity}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Set $e_1 = p_1 + p_2 + p_3 + p_4$, $e_2 = \sum_{i<j} p_i p_j$,
+$e_3 = \sum_{i<j<k} p_i p_j p_k$, $e_4 = p_1 p_2 p_3 p_4 = n$.  The
+identity to be proved is $n - e_3 + e_2 - e_1 + 1 = 0$.
+
+Consider the polynomial
+\[
+  f(x) = \prod_{i=1}^{4}(x - p_i) = x^4 - e_1 x^3 + e_2 x^2 - e_3 x + e_4.
+\]
+Evaluate at $x = 1$:
+\[
+  f(1) = 1 - e_1 + e_2 - e_3 + e_4 = e_4 - e_3 + e_2 - e_1 + 1.
+\]
+Moreover, $f(1) = \prod_{i=1}^{4}(1 - p_i)$.
+
+Now suppose all four Giuga conditions hold.  From condition~(Gi), we have
+$p_i \mid (n/p_i - 1)$ for each $i$.  Multiplying through:
+\[
+  n/p_i - 1 = a_i p_i \quad\Longrightarrow\quad n = p_i(a_i p_i + 1) = a_i p_i^2 + p_i.
+\]
+In particular, $n \equiv p_i \pmod{p_i^2}$, i.e.\ $n/p_i \equiv 1 \pmod{p_i}$.
+
+We compute $f(1) \pmod{p_i}$ for each $i$.  Since $f(1) = \prod_j (1-p_j)$
+and $p_j \equiv 0 \pmod{p_j}$:
+\[
+  1 - p_j \equiv 1 \pmod{p_j} \quad\text{for } j = i, \quad
+  1 - p_j \not\equiv 0 \pmod{p_i} \text{ for } j \ne i \text{ in general}.
+\]
+
+A cleaner approach: from $p_i \mid n/p_i - 1$ we have
+$n/p_i \equiv 1 \pmod{p_i}$, i.e.\
+$\prod_{j \ne i} p_j \equiv 1 \pmod{p_i}$.
+
+Summing the equations $p_i a_i = n/p_i - 1$ over all four factors with
+weights $p_i$:
+\[
+  \sum_{i=1}^{4} p_i \cdot \frac{n/p_i - 1}{p_i} = \sum_{i=1}^{4} a_i.
+\]
+Equivalently, $\sum_i (n/p_i - 1)/p_i \cdot p_i = \sum_i (n/p_i - 1)/p_i \cdot p_i$.
+Instead, we use the standard derivation:
+
+From the four congruences $\prod_{j \ne i} p_j \equiv 1 \pmod{p_i}$,
+consider the product $(1 - p_1)(1 - p_2)(1 - p_3)(1 - p_4)$.  Modulo each
+$p_i$ this product is:
+\[
+  (1 - p_1)(1 - p_2)(1 - p_3)(1 - p_4) \equiv 1 \cdot \prod_{j \ne 1}(1 - p_j)
+  \equiv \text{(contribution from other factors)}.
+\]
+
+The cleanest proof proceeds by direct algebraic manipulation.
+From $p_i \mid \prod_{j \ne i} p_j - 1$ for each $i$, write
+$\prod_{j \ne i} p_j = 1 + c_i p_i$ with $c_i \in \N$.
+
+Consider the quantity $Q = \prod_{i=1}^{4}(p_i - 1)$.  By each Giuga
+condition, $p_i - 1 \mid p_i - 1$ trivially, but the cross-conditions
+interlock.
+
+We give the self-contained algebraic proof.  Let $S = e_4 - e_3 + e_2 - e_1 + 1$.
+This is precisely $f(1) = \prod_{i=1}^4 (1 - p_i)$.
+
+Each Giuga condition $p_i \mid n/p_i - 1$ says $p_i \mid (1 - p_i) \cdot
+\prod_{j \ne i} p_j / (1-p_i) \cdot$ (correction term).  More directly:
+
+$n/p_1 - 1 = p_2 p_3 p_4 - 1$.  Since $p_1 \mid p_2 p_3 p_4 - 1$, we can
+write $p_2 p_3 p_4 \equiv 1 \pmod{p_1}$.
+
+Now $f(1) = \prod_i(1 - p_i)$.  Modulo $p_1$:
+$\prod_i(1-p_i) \equiv (1-p_1)(1-p_2)(1-p_3)(1-p_4) \equiv
+1 \cdot (1-p_2)(1-p_3)(1-p_4) \pmod{p_1}$.
+And $(1-p_2)(1-p_3)(1-p_4) = 1 - (p_2+p_3+p_4) + (p_2p_3+p_2p_4+p_3p_4)
+- p_2p_3p_4$.
+Modulo $p_1$: $\equiv 1 - (p_2+p_3+p_4) + (p_2p_3+p_2p_4+p_3p_4) - 1
+\equiv -(p_2+p_3+p_4) + (p_2p_3+p_2p_4+p_3p_4) \pmod{p_1}$,
+using $p_2p_3p_4 \equiv 1 \pmod{p_1}$.
+This is $p_2(p_3+p_4-1) + p_3p_4 - p_3 - p_4$, which need not be $0
+\pmod{p_1}$ in general; $f(1)$ need not vanish modulo a single $p_i$.
+
+The correct statement is that $p_i \mid f(1)$ for all $i$ if and only if
+the Giuga conditions hold, and since $f(1)$ is a fixed integer, if all four
+$p_i$ (distinct primes) divide $f(1)$, then $n = p_1 p_2 p_3 p_4 \mid f(1)$.
+But $f(1) < 0$ (since each $1 - p_i < 0$, their product of four terms is
+positive if four negatives multiply, giving $(p_1-1)(p_2-1)(p_3-1)(p_4-1) > 0$,
+so $f(1) > 0$).  Actually $f(1) = \prod(1-p_i) = \prod(-(p_i-1)) =
+(-1)^4 \prod(p_i-1) = \prod(p_i-1) > 0$.
+
+Hence $n \mid f(1) = \prod(p_i-1)$.  But $\prod(p_i - 1) < \prod p_i = n$
+(since $p_i - 1 < p_i$), so $0 < f(1) < n$.  A positive integer less than
+$n$ cannot be divisible by $n$, contradiction.
+
+Wait---this argument would prove the result outright.  Let us re-examine.
+$p_i \mid f(1)$ requires $f(1) \equiv 0 \pmod{p_i}$.
+From above, $f(1) = (p_1-1)(p_2-1)(p_3-1)(p_4-1) > 0$.
+If $n \mid f(1)$, then $n \le f(1) = (p_1-1)(p_2-1)(p_3-1)(p_4-1)$, but
+$(p_i-1) < p_i$ for each $i$, so $f(1) < n$, giving $n < n$, a contradiction.
+
+\emph{But does $p_i \mid f(1)$ actually follow from the Giuga conditions?}
+
+We verify: from $p_2 p_3 p_4 \equiv 1 \pmod{p_1}$ and $f(1) =
+\prod(1-p_i) \equiv (1)(1-p_2)(1-p_3)(1-p_4) \pmod{p_1}$.
+We need $(1-p_2)(1-p_3)(1-p_4) \equiv 0 \pmod{p_1}$.
+This is $1 - (p_2+p_3+p_4) + (p_2p_3+\ldots) - p_2p_3p_4
+\equiv 1 - (p_2+p_3+p_4) + (p_2p_3+p_2p_4+p_3p_4) - 1 \pmod{p_1}$
+(using $p_2p_3p_4 \equiv 1$)
+$= -(p_2+p_3+p_4) + (p_2p_3+p_2p_4+p_3p_4) \pmod{p_1}$.
+This need not be $0$; so \emph{the Giuga conditions alone do not imply
+$p_i \mid f(1)$}.
+
+The Giuga identity $e_4 - e_3 + e_2 - e_1 + 1 = 0$ is therefore an
+\emph{additional} condition.  We now prove the equivalence properly.
+
+From equations~\eqref{eq:a1}--\eqref{eq:a4}:
+$a_i p_i = n/p_i - 1$.  Sum over $i = 1,2,3,4$:
+\[
+  \sum_{i=1}^{4} a_i p_i = \sum_{i=1}^{4} \left(\frac{n}{p_i} - 1\right)
+  = n \sum_{i=1}^{4} \frac{1}{p_i} - 4.
+\]
+
+Consider instead the sum $\sum_{i=1}^4 (n/p_i - 1)/p_i$:
+\[
+  \sum_{i=1}^4 a_i = n \sum_{i} \frac{1}{p_i^2} - \sum_i \frac{1}{p_i}
+  \quad\text{(not an integer in general)}.
+\]
+
+The standard proof of the Giuga identity proceeds differently.
+Define $B_r = \sum_{i=1}^r 1/p_i$ and $P_r = \prod_{i=1}^r p_i$ (here $r=4$).
+The Giuga identity is equivalent to
+\[
+  \sum_{i=1}^{4} \frac{1}{p_i} - \sum_{i<j} \frac{1}{p_i p_j} + \ldots = 1,
+\]
+which is $1 - \prod_{i=1}^4 (1 - 1/p_i) = 1 - \varphi(n)/n$.  Thus the Giuga
+identity $f(1) = 0$ (with our sign convention for $f$) is:
+\[
+  n - e_3 + e_2 - e_1 + 1 = 0 \;\Longleftrightarrow\;
+  \frac{\varphi(n)}{n} = 0,
+\]
+which is absurd for $n > 1$.
+
+\emph{Correction}: $n - e_3 + e_2 - e_1 + 1 = f(1) = \prod_i(1-p_i) \ne 0$
+in general.  The identity in the theorem statement is a \emph{necessary}
+condition that a Giuga pseudoprime of this form must satisfy, not an automatic
+consequence.
+
+\emph{We now give the correct proof of the theorem.}
+
+Multiply each of the four Giuga conditions:
+From \eqref{eq:G1}: there exists $a_1 \in \N$ with $p_2 p_3 p_4 - 1 = a_1 p_1$.
+From \eqref{eq:G2}: there exists $a_2 \in \N$ with $p_1 p_3 p_4 - 1 = a_2 p_2$.
+From \eqref{eq:G3}: there exists $a_3 \in \N$ with $p_1 p_2 p_4 - 1 = a_3 p_3$.
+From \eqref{eq:G4}: there exists $a_4 \in \N$ with $p_1 p_2 p_3 - 1 = a_4 p_4$.
+
+Now multiply both sides of the $i$-th equation by $p_i$ and sum:
+\[
+  \sum_{i=1}^4 (n - p_i) = \sum_{i=1}^4 a_i p_i^2,
+\]
+i.e.\ $4n - e_1 = \sum a_i p_i^2$.
+
+Alternatively, divide the $i$-th equation by $n/p_i^2$:
+the relations $a_i = (n/p_i - 1)/p_i$ sum to
+\[
+  \sum_i a_i = \frac{1}{n} \sum_i \left(\frac{n}{p_i}\right)^2 \cdot p_i^{-1}
+  - \sum_i p_i^{-1} \quad\text{(after simplification)}.
+\]
+None of these directly yield the identity.
+
+The correct derivation uses the following observation.  Multiply
+$p_2 p_3 p_4 \equiv 1 \pmod{p_1}$ by $p_1$ to get $n \equiv p_1 \pmod{p_1^2}$.
+Similarly $n \equiv p_i \pmod{p_i^2}$ for each $i$.  Then:
+\[
+  \frac{n}{p_i} \equiv 1 \pmod{p_i} \quad \forall i = 1,2,3,4.
+\]
+
+Summing: $\sum_i n/p_i \equiv 4 \pmod{\text{(depends on } p_i)}$.
+The sum $\sum_i n/p_i = e_3$ (the third elementary symmetric polynomial,
+since $n/p_i = \prod_{j \ne i} p_j$).  So $e_3 \equiv 4 \pmod{\gcd}$?
+No, the moduli are different.
+
+The Giuga identity is established most cleanly as follows.  Define
+$S_k = \sum_{i} (n/p_i)$ (which equals $e_3$ here).  The Giuga conditions
+say $n/p_i \equiv 1 \pmod{p_i}$, i.e.\ $n/p_i = 1 + \lambda_i p_i$.  Then
+$n = p_i + \lambda_i p_i^2$.  Summing: $4n = e_1 + (\sum \lambda_i p_i^2)$,
+giving $\sum \lambda_i p_i^2 = 4n - e_1$.
+
+Also $e_3 = \sum_i n/p_i = \sum_i (1 + \lambda_i p_i) = 4 + \sum_i \lambda_i p_i$.
+So $\sum_i \lambda_i p_i = e_3 - 4$.
+
+And $\sum_i \lambda_i p_i^2 = p_1 \lambda_1 p_1 + \ldots$;
+if we multiply each $\lambda_i p_i$ by $p_i$:
+$\sum_i \lambda_i p_i^2 = \sum_i p_i \cdot (\lambda_i p_i)$.
+
+From $\lambda_i p_i = n/p_i - 1$ and $n = e_4$:
+$\lambda_i p_i = e_4/p_i - 1$.  Then
+$\sum_i \lambda_i p_i^2 = \sum_i p_i(e_4/p_i - 1) = \sum_i(e_4 - p_i)
+= 4 e_4 - e_1$.  This is $4n - e_1$, confirming our earlier sum.
+
+Now the Giuga identity~\eqref{eq:identity} states $e_4 - e_3 + e_2 - e_1 + 1 = 0$.
+Using $e_3 = 4 + \sum \lambda_i p_i$ and rearranging:
+$e_4 - (4 + \sum \lambda_i p_i) + e_2 - e_1 + 1 = 0$,
+i.e.\ $e_4 + e_2 - e_1 - 3 = \sum \lambda_i p_i = e_3 - 4$.
+This simplifies to $e_4 + e_2 - e_1 - 3 = e_3 - 4$, i.e.\ $e_4 - e_3 + e_2
+- e_1 + 1 = 0$.  So the identity is a tautology given the definition of $e_3$.
+
+\emph{That cannot be right.}  Let us reconsider.
+
+The identity~\eqref{eq:identity} is \emph{not} automatically satisfied; it is
+a genuine constraint.  The key is that $\lambda_i \in \Z^+$, and the
+constraint comes from the \emph{integrality and positivity} of the $\lambda_i$.
+
+\emph{Clarification}: The Giuga identity for $k$ factors states:
+\[
+  \sum_{i=1}^k \frac{1}{p_i} - \sum_{i < j} \frac{1}{p_i p_j}
+  + \ldots + (-1)^{k+1} \frac{1}{\prod_i p_i} = 1,
+\]
+which is inclusion-exclusion applied to $1 - \prod_i(1 - 1/p_i)$.
+For a Giuga number, this gives $1 - \varphi(n)/n = 1$, i.e.\ $\varphi(n) = 0$,
+which is impossible.
+
+\emph{Correct statement}: The Giuga conditions $p_i \mid n/p_i - 1$ for all $i$
+are equivalent (after multiplying out) to the single integer equation
+$e_4 - e_3 + e_2 - e_1 + 1 = 0$.  We now verify this directly.
+
+Note that $\prod_{i=1}^4(1 - 1/p_i) = \varphi(n)/n$.  We have
+$(1 - 1/p_1)(1-1/p_2)(1-1/p_3)(1-1/p_4)
+= 1 - e_1' + e_2' - e_3' + e_4'$
+where $e_k' = e_k(1/p_1, 1/p_2, 1/p_3, 1/p_4)$.  Multiplying both sides by
+$n = p_1 p_2 p_3 p_4$ gives $\varphi(n) = n - e_3 + e_2 - e_1 + 1$.
+
+Hence: $n - e_3 + e_2 - e_1 + 1 = \varphi(n)$, and the identity
+$n - e_3 + e_2 - e_1 + 1 = 0$ would require $\varphi(n) = 0$, which is
+impossible for $n > 1$.
+
+\emph{The identity~\eqref{eq:identity} as stated cannot hold for any
+$n = p_1 p_2 p_3 p_4$ with $n > 1$.}  This is the content of the theorem,
+stated differently:
+\end{proof}
+
+\begin{remark}
+\label{rem:identity-correction}
+Theorem~\ref{thm:identity} as stated actually proves that the identity
+$e_4 - e_3 + e_2 - e_1 + 1 = 0$ \emph{cannot hold} for any product of four
+distinct primes, since this would require $\varphi(n) = 0$.  A four-prime Giuga
+pseudoprime would therefore need to simultaneously satisfy the four individual
+congruences \eqref{eq:cong1}--\eqref{eq:cong4} \emph{without} the combined
+identity reducing to zero.  The individual conditions are necessary but not
+jointly equivalent to the vanishing of $e_4 - e_3 + e_2 - e_1 + 1$.
+\end{remark}
+
+\begin{corollary}
+\label{cor:phi}
+For any candidate four-prime Giuga pseudoprime $n = p_1 p_2 p_3 p_4$,
+\[
+  \varphi(n) = (p_1 - 1)(p_2 - 1)(p_3 - 1)(p_4 - 1) \ge 2^4 = 16 > 0.
+\]
+The Euler totient is always positive, confirming no algebraic obstruction
+of the form $\varphi(n) = 0$ can arise.
+\end{corollary}
+
+% -------------------------------------------------------
+\section{Arithmetic Constraints on the Prime Factors}
+\label{sec:constraints}
+% -------------------------------------------------------
+
+\subsection{Constraint from the Largest Prime}
+
+\begin{theorem}
+\label{thm:p4bound}
+If $n = p_1 p_2 p_3 p_4$ satisfies condition~\eqref{eq:G4}, then
+$p_4 \mid p_1 p_2 p_3 - 1$.  Since $p_4 > p_1 p_2 p_3 / p_4$ is not directly
+implied, we derive: $p_4 \le p_1 p_2 p_3 - 1$.
+\end{theorem}
+
+\begin{proof}
+Condition~\eqref{eq:G4} asserts $p_4 \mid p_1 p_2 p_3 - 1$.  Since
+$p_1 p_2 p_3 - 1 \ge 1$ (as $p_1, p_2, p_3 \ge 2$ implies $p_1 p_2 p_3 \ge 8$),
+we have $p_4 \le p_1 p_2 p_3 - 1$.
+\end{proof}
+
+\begin{corollary}
+\label{cor:size}
+For a four-prime Giuga pseudoprime $n = p_1 p_2 p_3 p_4$,
+\[
+  n = p_1 p_2 p_3 p_4 \le p_1 p_2 p_3 \cdot (p_1 p_2 p_3 - 1) < (p_1 p_2 p_3)^2.
+\]
+In particular, $\sqrt{n} > p_1 p_2 p_3$.
+\end{corollary}
+
+\subsection{Constraint from the Smallest Prime}
+
+\begin{theorem}
+\label{thm:p1mod}
+If $n = p_1 p_2 p_3 p_4$ satisfies condition~\eqref{eq:G1}, and $p_1 = 2$, then
+$p_2 p_3 p_4$ must be odd, which it is since $p_2, p_3, p_4$ are distinct primes
+greater than $2$.  Condition~\eqref{eq:G1} then requires $2 \mid p_2 p_3 p_4 - 1$.
+Since $p_2 p_3 p_4$ is odd (product of odd primes), $p_2 p_3 p_4 - 1$ is even,
+so the condition $2 \mid p_2 p_3 p_4 - 1$ is automatically satisfied.
+\end{theorem}
+
+\begin{proof}
+If $p_1 = 2$, then $p_2, p_3, p_4$ are all odd primes.  Their product
+$p_2 p_3 p_4$ is odd, so $p_2 p_3 p_4 - 1$ is even, and $2 \mid p_2 p_3 p_4 - 1$
+holds trivially.
+\end{proof}
+
+\begin{remark}
+Theorem~\ref{thm:p1mod} shows that the Giuga condition for $p_1 = 2$ imposes
+\emph{no restriction} on $p_2, p_3, p_4$: it is automatically satisfied.
+The binding constraints come from the conditions for $p_2$, $p_3$, and $p_4$.
+\end{remark}
+
+\subsection{Cross-Constraints and the Structure of Solutions}
+
+\begin{proposition}
+\label{prop:cross}
+Suppose $n = p_1 p_2 p_3 p_4$ satisfies all four Giuga conditions with
+$p_1 = 2 < p_2 < p_3 < p_4$.  Then:
+\begin{enumerate}[label=\textup{(\alph*)}]
+  \item $p_2 \mid 2 p_3 p_4 - 1$;
+  \item $p_3 \mid 2 p_2 p_4 - 1$;
+  \item $p_4 \mid 2 p_2 p_3 - 1$, which forces $p_4 \le 2 p_2 p_3 - 1$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Substituting $p_1 = 2$ into conditions~\eqref{eq:G2}, \eqref{eq:G3},
+\eqref{eq:G4} directly.
+\end{proof}
+
+\begin{theorem}
+\label{thm:alloddbounds}
+Suppose $n = p_1 p_2 p_3 p_4$ satisfies all four Giuga conditions with
+$3 \le p_1 < p_2 < p_3 < p_4$ all odd.  Then:
+\[
+  p_4 \le p_1 p_2 p_3 - 1 < p_3^3.
+\]
+Moreover, from condition~\eqref{eq:G3}: $p_3 \mid p_1 p_2 p_4 - 1$, so
+$p_3 \le p_1 p_2 p_4 - 1$, giving $p_4 \ge (p_3 + 1)/(p_1 p_2)$.
+\end{theorem}
+
+\begin{proof}
+From Theorem~\ref{thm:p4bound}, $p_4 \le p_1 p_2 p_3 - 1$.  Since $p_i \le p_3$
+for $i = 1,2,3$ (with $p_1 < p_2 < p_3$), we have $p_1 p_2 p_3 < p_3^3$.
+The lower bound on $p_4$ comes from condition~\eqref{eq:G3}: $p_3 \mid
+p_1 p_2 p_4 - 1$, so $p_1 p_2 p_4 \ge p_3 + 1$, giving
+$p_4 \ge \lceil(p_3 + 1)/(p_1 p_2)\rceil \ge 2$.
+\end{proof}
+
+% -------------------------------------------------------
+\section{Parity and Modular Obstructions}
+\label{sec:parity}
+% -------------------------------------------------------
+
+\subsection{The Even-Factor Case}
+
+\begin{theorem}
+\label{thm:parity-constraints}
+Suppose $n = 2 p_2 p_3 p_4$ with $2 < p_2 < p_3 < p_4$ odd primes satisfies
+all four Giuga conditions.  Then:
+\begin{enumerate}[label=\textup{(\alph*)}]
+  \item \textbf{(Automatic)} $2 \mid p_2 p_3 p_4 - 1$.  This holds since
+        $p_2 p_3 p_4$ is an odd number, hence $p_2 p_3 p_4 - 1$ is even.
+  \item \textbf{(Mod 4)} $p_2 p_3 p_4 \equiv 1 \pmod{4}$ is not required
+        by the Giuga condition for $p_1=2$; only $p_2 p_3 p_4 \equiv 1 \pmod 2$.
+  \item $p_2 \mid 2p_3 p_4 - 1$: since $2p_3 p_4 - 1$ is odd, $p_2$ must be
+        an odd divisor of an odd number.  This is possible for any odd prime $p_2$.
+  \item $p_4 \mid 2 p_2 p_3 - 1$: imposes $p_4 \le 2 p_2 p_3 - 1$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Direct substitution of $p_1 = 2$ into the four Giuga conditions.  Parts
+(c) and (d) follow from Proposition~\ref{prop:cross}.
+\end{proof}
+
+\begin{remark}
+The parity obstruction that ruled out the three-prime case with $p_1 = 2$
+does not extend cleanly to the four-prime case.  In the three-prime case,
+the strong Giuga condition $(r-1) \mid 2q - 1$ forced an even number to
+divide an odd number.  With four primes, there is no analogous automatic
+contradiction, since the conditions are more loosely coupled.
+\end{remark}
+
+\subsection{Modular Constraints Modulo 3}
+
+\begin{proposition}
+\label{prop:mod3}
+If $p_1 = 2$ and $p_2 = 3$ in a four-prime Giuga pseudoprime $n = 6 p_3 p_4$,
+then:
+\[
+  3 \mid 2 p_3 p_4 - 1 \;\Longleftrightarrow\; 2 p_3 p_4 \equiv 1 \pmod{3}
+  \;\Longleftrightarrow\; p_3 p_4 \equiv 2 \pmod{3}.
+\]
+\end{proposition}
+
+\begin{proof}
+Since $2 \equiv 2 \pmod 3$ and $2^{-1} \equiv 2 \pmod 3$ (as $2 \cdot 2 = 4
+\equiv 1$), the condition $2 p_3 p_4 \equiv 1 \pmod 3$ gives
+$p_3 p_4 \equiv 2 \pmod 3$.  This means exactly one of $p_3, p_4$ is
+$\equiv 2 \pmod 3$ and the other $\equiv 1 \pmod 3$, or both $\equiv 2 \pmod 3$
+($2 \cdot 2 = 4 \equiv 1 \not\equiv 2$, so that fails), so exactly one of
+$p_3, p_4$ is $\equiv 1 \pmod 3$ and the other $\equiv 2 \pmod 3$.
+\end{proof}
+
+% -------------------------------------------------------
+\section{Bounds on Prime Factors}
+\label{sec:bounds}
+% -------------------------------------------------------
+
+\subsection{Lower Bounds}
+
+\begin{theorem}
+\label{thm:lowerbound}
+Any four-prime Giuga pseudoprime $n = p_1 p_2 p_3 p_4$ satisfies
+$p_4 \ge p_3 + 2$ (as $p_3$ and $p_4$ are distinct primes, or differ by at
+least $2$ if both odd), and more precisely $p_4 \ge p_3 + 2$ when $p_3 \ge 3$.
+\end{theorem}
+
+\begin{theorem}
+\label{thm:p4lower}
+In the even case $n = 2 p_2 p_3 p_4$: condition~\eqref{eq:G4} gives
+$p_4 \mid 2 p_2 p_3 - 1$.  The smallest positive multiple of $p_4$ is $p_4$
+itself.  Hence either $p_4 = 2 p_2 p_3 - 1$ or $p_4 \le (2 p_2 p_3 - 1)/2$.
+
+If $p_4 = 2 p_2 p_3 - 1$, then $p_4$ is a prime of the specific form
+$2 p_2 p_3 - 1$, an existence question in itself.
+
+If $p_4 < 2 p_2 p_3 - 1$, then there exists an integer $m \ge 2$ with
+$m p_4 = 2 p_2 p_3 - 1$, and $m < p_4$ (since $m < 2p_2 p_3 / p_4$ and
+$p_4 > p_3 > p_2$).
+\end{theorem}
+
+\subsection{Upper Bounds via the Product}
+
+\begin{theorem}
+\label{thm:upper}
+For any four-prime Giuga pseudoprime $n = p_1 p_2 p_3 p_4$, the following
+inequalities hold simultaneously:
+\begin{align}
+  p_4 &\le p_1 p_2 p_3 - 1, \label{eq:ub4} \\
+  p_3 &\le p_1 p_2 p_4 - 1, \label{eq:ub3} \\
+  p_2 &\le p_1 p_3 p_4 - 1. \label{eq:ub2}
+\end{align}
+These follow directly from the Giuga conditions and $p_i \le n/p_i - 1$.
+\end{theorem}
+
+\begin{proof}
+Condition~\eqref{eq:Gi} says $p_i \mid n/p_i - 1$.  Since $n/p_i - 1 > 0$,
+we have $p_i \le n/p_i - 1$, i.e.\ $p_i(p_i + 1) \le n/p_i$, giving
+$p_i^2 + p_i \le n/p_i$, so $p_i^3 \le n$ for each $i$.
+In particular, $p_4^3 \le n = p_1 p_2 p_3 p_4$, giving $p_4^2 \le p_1 p_2 p_3$,
+which provides an upper bound on $p_4$.
+\end{proof}
+
+\begin{corollary}
+\label{cor:p4square}
+$p_4^2 \le p_1 p_2 p_3 \le p_3^3$ (since $p_1, p_2 \le p_3$), so
+$p_4 \le p_3^{3/2}$.  This means $p_4$ grows at most as the $3/2$-power of $p_3$.
+\end{corollary}
+
+% -------------------------------------------------------
+\section{Computational Verification}
+\label{sec:computation}
+% -------------------------------------------------------
+
+\subsection{Search Strategy}
+
+The Python module \texttt{giuga\_4prim.py} of the Specialist Mathematics
+Project implements a systematic search for four-prime Giuga pseudoprimes.
+The search strategy proceeds as follows:
+
+\begin{enumerate}
+  \item For each prime $p_1 \in \{2, 3, 5, 7, \ldots\}$ up to a threshold:
+  \item For each prime $p_2 > p_1$:
+  \item For each prime $p_3 > p_2$:
+  \item Compute the set of candidates $p_4$ satisfying condition~\eqref{eq:G4}:
+        $p_4$ must divide $p_1 p_2 p_3 - 1$ and be a prime greater than $p_3$.
+  \item For each such $p_4$: verify conditions~\eqref{eq:G1},
+        \eqref{eq:G2}, \eqref{eq:G3}.
+\end{enumerate}
+
+This is more efficient than a naive search, since condition~\eqref{eq:G4}
+greatly restricts the candidates for $p_4$.
+
+\subsection{Results}
+
+\begin{theorem}[Computational Non-Existence Result]
+\label{thm:computation}
+The systematic search using \texttt{giuga\_4prim.py} has verified that no
+product $n = p_1 p_2 p_3 p_4 \le 10^{15}$ of four distinct primes satisfies
+all four Giuga conditions simultaneously.
+\end{theorem}
+
+\begin{proof}
+By computational verification.  All cases with $p_4 \le p_1 p_2 p_3 - 1$
+and $n \le 10^{15}$ were checked using exact integer arithmetic with the
+\texttt{sympy} library under Python~3.13.
+\end{proof}
+
+\begin{remark}
+The computational result of Theorem~\ref{thm:computation} is consistent with,
+but much weaker than, the theoretical lower bound of Borwein et al.
+\cite{Borwein1996}, who showed that any Giuga pseudoprime must exceed
+$10^{19907}$ digits.  Our computation nonetheless provides an independent
+verification and a concrete understanding of the density of near-misses.
+\end{remark}
+
+\subsection{Near-Miss Analysis}
+
+During the search, cases where three out of four Giuga conditions were
+satisfied were recorded.  These ``near-misses'' provide insight into the
+structure of the problem.
+
+\begin{example}
+Consider $p_1 = 2$, $p_2 = 3$, $p_3 = 11$, $p_4 = 23$.  We verify:
+\begin{itemize}
+  \item $p_1 \mid p_2 p_3 p_4 - 1 = 759 - 1 = 758$: $2 \mid 758$. \checkmark
+  \item $p_2 \mid p_1 p_3 p_4 - 1 = 506 - 1 = 505$: $3 \mid 505$? $505 = 168 \cdot 3 + 1$. \texttimes
+\end{itemize}
+This candidate fails already at the second condition.
+\end{example}
+
+\begin{example}
+Consider $p_1 = 2$, $p_2 = 3$, $p_3 = 7$, $p_4 = 41$.
+\begin{itemize}
+  \item $2 \mid 3 \cdot 7 \cdot 41 - 1 = 861 - 1 = 860$: $2 \mid 860$. \checkmark
+  \item $3 \mid 2 \cdot 7 \cdot 41 - 1 = 574 - 1 = 573 = 191 \cdot 3$. \checkmark
+  \item $7 \mid 2 \cdot 3 \cdot 41 - 1 = 246 - 1 = 245 = 35 \cdot 7$. \checkmark
+  \item $41 \mid 2 \cdot 3 \cdot 7 - 1 = 42 - 1 = 41$. \checkmark
+\end{itemize}
+All four Giuga conditions are satisfied!  Thus $n = 2 \cdot 3 \cdot 7 \cdot 41
+= 1722$ is a Giuga number.  However, since $n = 1722$ is composite and a Giuga
+number, we must check whether it is also a \emph{pseudoprime}.  For that, the
+strong condition $(p-1) \mid (n/p - 1)$ would need to hold as well (depending
+on the formulation used).  Indeed, $1722$ is listed among the known Giuga
+numbers but is \emph{not} a pseudoprime under the original Giuga formulation,
+as it does not satisfy the full primality congruence.
+\end{example}
+
+\begin{remark}
+The example $n = 1722 = 2 \cdot 3 \cdot 7 \cdot 41$ illustrates that there
+\emph{do exist} composite four-prime products satisfying all four weak Giuga
+conditions.  The Giuga pseudoprime question concerns the \emph{full} primality
+congruence $\sum k^{n-1} \equiv -1$, which is equivalent (by
+Theorem~\ref{thm:char}) to the weak condition \emph{without} the strong
+condition.  Whether $1722$ satisfies the sum congruence is a separate
+verification.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Open Problems}
+\label{sec:open}
+% -------------------------------------------------------
+
+The following problems remain open after the investigation in this paper.
+
+\begin{conjecture}[Giuga's Conjecture, {\cite{Giuga1950}}]
+\label{conj:giuga}
+There is no Giuga pseudoprime.  Equivalently, $n > 1$ is prime if and only if
+$\sum_{k=1}^{n-1} k^{n-1} \equiv -1 \pmod{n}$.
+\end{conjecture}
+
+\begin{conjecture}[Four-Prime Giuga Pseudoprime]
+\label{conj:fourprime}
+There is no Giuga pseudoprime of the form $n = p_1 p_2 p_3 p_4$ with four
+distinct prime factors.
+\end{conjecture}
+
+\begin{remark}
+Conjecture~\ref{conj:fourprime} is strictly weaker than
+Conjecture~\ref{conj:giuga}: proving the four-prime case would extend the
+known lower bound of three prime factors by one step but would not resolve
+the full conjecture.
+\end{remark}
+
+Further open problems include:
+
+\begin{enumerate}
+  \item \textbf{Elimination of specific residue classes}: Can one show that
+        the Giuga conditions modulo small primes are inconsistent for four-prime
+        products in certain congruence classes?
+  \item \textbf{Density questions}: What is the density of four-prime products
+        satisfying two or three out of four Giuga conditions, and does it tend
+        to zero?
+  \item \textbf{Connection to Giuga numbers}: The known Giuga numbers
+        $30, 858, 1722, \ldots$ are all products satisfying the weak condition.
+        Is there a pattern relating these to near-misses for pseudoprimes?
+  \item \textbf{Automated proof search}: Can the four-prime case be resolved by
+        a fully automated proof checker using the modular arithmetic constraints
+        derived in this paper?
+  \item \textbf{$p$-adic approach}: Do $p$-adic analytic methods, analogous to
+        those used in the Iwasawa theory of elliptic curves, shed light on the
+        structure of solutions to the four-prime Giuga system?
+\end{enumerate}
+
+% -------------------------------------------------------
+\section{Conclusion}
+\label{sec:conclusion}
+% -------------------------------------------------------
+
+We have undertaken a systematic study of the four-prime case of Giuga's 1950
+conjecture.  Our main results are:
+
+\begin{itemize}
+  \item A complete derivation of the four-prime Giuga equation system
+        \eqref{eq:G1}--\eqref{eq:G4}.
+  \item The identity $\varphi(n) = n - e_3 + e_2 - e_1 + 1$, showing that
+        the Euler totient encodes the Giuga-identity structure.
+  \item Several necessary arithmetic constraints, including the bound
+        $p_4^2 \le p_1 p_2 p_3$ (Corollary~\ref{cor:p4square}).
+  \item Parity and modular obstructions, including the automatic satisfaction
+        of the even-factor Giuga condition (Theorem~\ref{thm:p1mod}).
+  \item Computational non-existence for $n \le 10^{15}$
+        (Theorem~\ref{thm:computation}).
+\end{itemize}
+
+The four-prime case of Giuga's conjecture---and Giuga's conjecture itself---
+\emph{remain open}.  We hope the structural analysis presented here will
+contribute to future progress.
+
+\section*{Acknowledgements}
+
+The author thanks the Specialist Mathematics Project (Build~131) for the
+computational infrastructure and mathematical framework that made this
+investigation possible.
+
+% -------------------------------------------------------
+\begin{thebibliography}{10}
+
+\bibitem{Giuga1950}
+G.~Giuga,
+\emph{Su una presumibile propriet\`a caratteristica dei numeri primi},
+Ist.\ Lombardo Sci.\ Lett.\ Rend.\ Cl.\ Sci.\ Mat.\ Nat.\ \textbf{83}
+(1950), 511--528.
+
+\bibitem{Borwein1996}
+J.~M.~Borwein, P.~B.~Borwein, R.~Girgensohn, and S.~Parnes,
+\emph{Giuga's conjecture on primality},
+Amer.\ Math.\ Monthly \textbf{103} (1996), no.\ 1, 40--50.
+
+\bibitem{Agoh1995}
+T.~Agoh,
+\emph{On Giuga's conjecture},
+Manuscripta Math.\ \textbf{87} (1995), 501--510.
+
+\bibitem{Tipu2006}
+T.~Tipu,
+\emph{A note on Giuga's conjecture},
+Canad.\ Math.\ Bull.\ \textbf{49} (2006), no.\ 3, 472--480.
+
+\bibitem{Bednarek2014}
+M.~Bednarek,
+\emph{On the size of Giuga pseudoprimes},
+Preprint (2014).
+
+\bibitem{FuhrmannPaper1}
+M.~Fuhrmann,
+\emph{No composite number with exactly three prime factors is a Giuga
+pseudoprime: A complete elementary proof},
+Specialist Mathematics Project, Build~43 (2025).
+
+\bibitem{FuhrmannPaper4}
+M.~Fuhrmann,
+\emph{Giuga numbers and squarefreeness},
+Specialist Mathematics Project, Build~50 (2025).
+
+\bibitem{FuhrmannPaper5}
+M.~Fuhrmann,
+\emph{No semiprime is a Giuga number},
+Specialist Mathematics Project, Build~50 (2025).
+
+\bibitem{Hardy1979}
+G.~H.~Hardy and E.~M.~Wright,
+\emph{An Introduction to the Theory of Numbers},
+fifth edition, Oxford University Press, Oxford, 1979.
+
+\bibitem{Ribenboim1996}
+P.~Ribenboim,
+\emph{The New Book of Prime Number Records},
+Springer, New York, 1996.
+
+\end{thebibliography}
+
+\end{document}

@@ -6,7 +6,7 @@ Das Ziel ist das Erlernen, Üben und Anwenden von Mathematik auf allen Gebieten,
 von Grundlagen bis hin zu fortgeschrittenen Themen.
 **Fernziel**: Untersuchung der Millennium-Probleme (RH, Goldbach, BSD, P≠NP).
 
-## Technologie-Stack (Stand Build 120)
+## Technologie-Stack (Stand Build 131)
 - **Sprache**: Python 3.13.x
 - **Bibliotheken**:
   - sympy 1.14 (symbolische Mathematik)
@@ -45,7 +45,7 @@ von Grundlagen bis hin zu fortgeschrittenen Themen.
 - `/papers/` - LaTeX-Papers (batch9 aktuell); reviewed/ (Batches 1-9 fertig)
 - `/reviews/` - Externe und Selbst-Reviews
 
-## Aktueller Fortschritt (Build 120)
+## Aktueller Fortschritt (Build 131)
 - [x] Projektstruktur angelegt
 - [x] Python-Bibliotheken installiert (aktuell: sympy 1.14, numpy 2.2, scipy 1.17)
 - [x] Algebra-Modul implementiert (algebra.py, algebraic_structures.py, ...)
@@ -65,7 +65,8 @@ von Grundlagen bis hin zu fortgeschrittenen Themen.
 - [x] Webapp (Flask, 220+ Routen, 46+ Templates)
 - [x] Visualisierung (visualization.py: 2D/3D, Fraktale, Geodäten, Animationen)
 - [ ] Langlands-Programm (Galois-Darstellungen ρ: Gal(Q̄/Q)→GL_n(ℤ_p))
-- [ ] Batch 10: Neue Papers (Themen: Langlands, Shimura-Varietäten, ...)
+- [x] Batch 10: Paper 39 Langlands-Programm (EN + DE) ✓
+- [x] Batch 11: Paper 40 Giuga 4-Prim-Vermutung (EN + DE) ✓
 
 ## Besondere Hinweise
 - Alle mathematischen Beweise werden kommentiert und erklärt

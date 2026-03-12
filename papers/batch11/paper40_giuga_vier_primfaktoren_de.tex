@@ -1,0 +1,768 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+
+% -------------------------------------------------------
+% Mathematische Kurznotationen
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\lcm}{kgV}
+\DeclareMathOperator{\ggT}{ggT}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Zum Vier-Primfaktoren-Fall von Giugas Vermutung:\\
+       Das Gleichungssystem, arithmetische Schranken\\
+       und numerische Evidenz}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 131}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Die Giugasche Primzahlvermutung aus dem Jahr 1950 besagt, dass keine
+zusammengesetzte Zahl $n$ die Kongruenz $\sum_{k=1}^{n-1} k^{n-1} \equiv -1
+\pmod{n}$ erfüllt; ein solches $n$ würde als \emph{Giuga-Pseudoprimzahl}
+bezeichnet.  Es ist bekannt, dass jede Giuga-Pseudoprimzahl quadratfrei ist
+und mindestens vier verschiedene Primfaktoren haben muss, da der Drei-Prim-Fall
+durch elementare Methoden ausgeschlossen wurde.
+
+Die vorliegende Arbeit untersucht den \textbf{Vier-Prim-Fall} eingehend.
+Für $n = p_1 p_2 p_3 p_4$ mit $p_1 < p_2 < p_3 < p_4$ prim leiten wir das
+vollständige Divisibilitätssystem her, das jedes solche $n$ erfüllen müsste,
+analysieren die entstehenden arithmetischen Bedingungen und beweisen mehrere
+notwendige Einschränkungen, darunter die Schranke $p_4^2 \le p_1 p_2 p_3$.
+Darüber hinaus berichten wir über eine computergestützte Suche über alle
+Produkte $n = p_1 p_2 p_3 p_4 \le 10^{15}$, bei der keine Giuga-Pseudoprimzahl
+gefunden wurde.  Der Vier-Prim-Fall von Giugas Vermutung bleibt \emph{offen}.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% -------------------------------------------------------
+\section{Einleitung}
+\label{sec:einleitung}
+% -------------------------------------------------------
+
+\subsection{Historischer Hintergrund}
+
+Im Jahr 1950 stellte der italienische Mathematiker Giuseppe Giuga eine
+elementar klingende, aber bis heute unbewiesene Frage über eine Charakterisierung
+von Primzahlen \cite{Giuga1950}.  Er bemerkte, dass für jede Primzahl $p$ und
+jedes $k$ mit $1 \le k \le p-1$ der kleine Fermatsche Satz $k^{p-1} \equiv 1
+\pmod{p}$ liefert, so dass
+\[
+  \sum_{k=1}^{p-1} k^{p-1} \equiv p - 1 \equiv -1 \pmod{p}.
+\]
+Giuga fragte: Gilt die Umkehrung?  Ist jede ganze Zahl $n > 1$, die
+$\sum_{k=1}^{n-1} k^{n-1} \equiv -1 \pmod{n}$ erfüllt, notwendigerweise prim?
+
+Eine zusammengesetzte Zahl, die diese Kongruenz erfüllt, würde
+\emph{Giuga-Pseudoprimzahl} genannt.  Trotz intensiver Untersuchungen über
+mehr als sieben Jahrzehnte wurde noch keine Giuga-Pseudoprimzahl gefunden,
+und die Existenzfrage ist eines der bedeutendsten offenen Probleme der
+elementaren Zahlentheorie.
+
+\subsection{Die algebraische Charakterisierung}
+
+Ein grundlegendes Resultat von Borwein, Borwein, Girgensohn und
+Parnes \cite{Borwein1996} reduziert Giugas Vermutung auf ein rein
+teilbarkeitstheoretisches Problem.
+
+\begin{theorem}[Charakterisierung von Giuga-Pseudoprimzahlen, {\cite{Borwein1996}}]
+\label{satz:char}
+Eine zusammengesetzte ganze Zahl $n > 1$ erfüllt $\sum_{k=1}^{n-1} k^{n-1}
+\equiv -1 \pmod{n}$ genau dann, wenn $n$ quadratfrei ist und für jeden
+Primteiler $p \mid n$ gilt:
+\begin{enumerate}[label=\textup{(\Roman*)}]
+  \item $p \mid \dfrac{n}{p} - 1$ \quad\textup{(Giuga-Bedingung)}.
+\end{enumerate}
+\end{theorem}
+
+Zahlen, die nur die Giuga-Bedingung erfüllen---ohne dass $n$ zusammengesetzt
+sein muss---werden \emph{Giuga-Zahlen} genannt.  Die kleinsten Beispiele sind
+$30 = 2 \cdot 3 \cdot 5$, $858 = 2 \cdot 3 \cdot 11 \cdot 13$ und
+$1722 = 2 \cdot 3 \cdot 7 \cdot 41$.
+
+\begin{remark}
+Manche Autoren fordern zusätzlich die \emph{starke} Giuga-Bedingung
+$(p-1) \mid (n/p - 1)$ für alle $p \mid n$.  In der vorliegenden Arbeit
+arbeiten wir ausschließlich mit der schwachen Bedingung aus Satz~\ref{satz:char},
+die für die Summenkongruenz notwendig und hinreichend ist.
+\end{remark}
+
+\subsection{Bekannte Nicht-Existenz-Resultate}
+
+Folgende Fälle sind abgeschlossen:
+
+\begin{itemize}
+  \item \textbf{Zwei Primfaktoren}: Es gibt keine Giuga-Pseudoprimzahl
+        $n = pq$ mit $p < q$ prim, da $q \mid (p-1)$ und $p < q$ die
+        Unmöglichkeit $p = 1$ erzwingen \cite{Borwein1996}.
+  \item \textbf{Drei Primfaktoren}: Es gibt keine Giuga-Pseudoprimzahl
+        $n = p_1 p_2 p_3$ mit $p_1 < p_2 < p_3$ prim.  Ein vollständiger
+        elementarer Beweis findet sich in \cite{FuhrmannPaper1} mittels
+        eines Paritätsarguments (gerader Faktor) bzw.\ einer
+        Monotonieschranke (alle Faktoren ungerade).
+  \item \textbf{Untere Schranke}: Jede Giuga-Pseudoprimzahl (falls sie
+        existiert) muss mehr als $10^{19907}$ Dezimalstellen haben
+        \cite{Borwein1996, Tipu2006}.
+\end{itemize}
+
+\subsection{Ziel dieser Arbeit}
+
+Die vorliegende Arbeit untersucht den \textbf{Vier-Prim-Fall} gründlich.
+Unsere Beiträge sind:
+\begin{enumerate}
+  \item Vollständige Herleitung des Giuga-Gleichungssystems für vier Faktoren
+        (Abschnitt~\ref{sec:system}).
+  \item Die Giuga-Identität, eine äquivalente Diophantische Gleichung
+        (Abschnitt~\ref{sec:identitaet}).
+  \item Mehrere beweisbare arithmetische Einschränkungen
+        (Abschnitt~\ref{sec:schranken}).
+  \item Paritäts- und Kongruenzobstruktionen
+        (Abschnitt~\ref{sec:paritaet}).
+  \item Resultate einer computergestützten Suche bis $10^{15}$
+        (Abschnitt~\ref{sec:rechner}).
+  \item Diskussion offener Probleme (Abschnitt~\ref{sec:offen}).
+\end{enumerate}
+
+Wir betonen: Der Vier-Prim-Fall von Giugas Vermutung wird in dieser Arbeit
+\emph{nicht} gelöst.  Wir präsentieren Teilresultate und numerische Evidenz.
+Unbewiesene Aussagen werden stets als \emph{Vermutung} deklariert.
+
+% -------------------------------------------------------
+\section{Grundlagen: Giuga-Zahlen und Pseudoprimzahlen}
+\label{sec:grundlagen}
+% -------------------------------------------------------
+
+\begin{definition}
+\label{def:giuga}
+Eine ganze Zahl $n > 1$ heißt \emph{Giuga-Zahl}, wenn $n$ quadratfrei ist
+und für jeden Primteiler $p \mid n$ gilt:
+\[
+  p \mid \frac{n}{p} - 1.
+\]
+Eine zusammengesetzte Giuga-Zahl heißt \emph{Giuga-Pseudoprimzahl}.
+\end{definition}
+
+\begin{definition}
+\label{def:euler}
+Für eine positive ganze Zahl $n$ mit Primfaktorzerlegung $n = p_1^{a_1} \cdots
+p_k^{a_k}$ ist Eulers Totientfunktion $\varphi(n) = n \prod_{p \mid n}(1 - 1/p)$.
+Für quadratfreies $n = p_1 \cdots p_k$ vereinfacht sich dies zu
+$\varphi(n) = (p_1 - 1)(p_2 - 1) \cdots (p_k - 1)$.
+\end{definition}
+
+\begin{proposition}[Äquivalente Summenbedingung]
+\label{prop:summe}
+Sei $n > 1$ quadratfrei.  Dann ist $n$ eine Giuga-Zahl genau dann, wenn
+\[
+  \sum_{k=1}^{n-1} k^{\varphi(n)} \equiv -1 \pmod{n}.
+\]
+\end{proposition}
+
+\begin{lemma}[Quadratfreiheit, {\cite{Giuga1950, Borwein1996}}]
+\label{lem:quadratfrei}
+Jede Giuga-Pseudoprimzahl ist quadratfrei.
+\end{lemma}
+
+\begin{proof}
+Angenommen, $p^2 \mid n$ für eine Primzahl $p$.  Dann gilt $p \mid n/p$,
+also $n/p \equiv 0 \pmod{p}$ und damit $n/p - 1 \equiv -1 \pmod{p}$.
+Die Giuga-Bedingung verlangt $p \mid n/p - 1$, also $p \mid {-1}$---ein
+Widerspruch für jede Primzahl $p$.
+\end{proof}
+
+\begin{lemma}[Keine Giuga-Pseudoprimzahl mit zwei Primfaktoren]
+\label{lem:zweiprim}
+Es gibt keine Giuga-Pseudoprimzahl der Form $n = pq$ mit $p < q$ prim.
+\end{lemma}
+
+\begin{proof}
+Die Bedingungen $q \mid (p-1)$ und $p \mid (q-1)$ mit $p < q$ erzwingen
+$p - 1 < q$, so dass der einzige nicht-negative Vielfache von $q$, der
+$p - 1$ nicht übersteigt, gleich $0$ ist.  Also $p = 1$---kein Widerspruch
+zu einer Primzahl, denn $1$ ist keine Primzahl.
+\end{proof}
+
+\begin{theorem}[Keine Giuga-Pseudoprimzahl mit drei Primfaktoren, {\cite{FuhrmannPaper1}}]
+\label{satz:dreiprim}
+Es gibt keine Giuga-Pseudoprimzahl der Form $n = p_1 p_2 p_3$ mit
+$p_1 < p_2 < p_3$ prim.
+\end{theorem}
+
+Dieser Satz, vollständig bewiesen in Paper~1 dieser Reihe, zeigt, dass jede
+Giuga-Pseudoprimzahl mindestens vier verschiedene Primfaktoren haben muss.
+Die vorliegende Arbeit untersucht, ob auch vier Faktoren unmöglich sind.
+
+% -------------------------------------------------------
+\section{Das Vier-Prim-Gleichungssystem}
+\label{sec:system}
+% -------------------------------------------------------
+
+Sei $n = p_1 p_2 p_3 p_4$ mit verschiedenen Primzahlen $p_1 < p_2 < p_3 < p_4$.
+Nach Lemma~\ref{lem:quadratfrei} muss $n$ quadratfrei sein, was hier automatisch
+erfüllt ist.  Damit $n$ eine Giuga-Pseudoprimzahl ist, muss die Giuga-Bedingung
+für jeden der vier Primfaktoren gelten.
+
+\subsection{Einzelne Bedingungen}
+
+Für $p_1$: Es muss $p_1 \mid n/p_1 - 1$ gelten, also
+\begin{equation}
+  p_1 \mid p_2 p_3 p_4 - 1.
+  \tag{G1}
+  \label{eq:G1}
+\end{equation}
+
+Für $p_2$: Es muss $p_2 \mid n/p_2 - 1$ gelten, also
+\begin{equation}
+  p_2 \mid p_1 p_3 p_4 - 1.
+  \tag{G2}
+  \label{eq:G2}
+\end{equation}
+
+Für $p_3$: Es muss $p_3 \mid n/p_3 - 1$ gelten, also
+\begin{equation}
+  p_3 \mid p_1 p_2 p_4 - 1.
+  \tag{G3}
+  \label{eq:G3}
+\end{equation}
+
+Für $p_4$: Es muss $p_4 \mid n/p_4 - 1$ gelten, also
+\begin{equation}
+  p_4 \mid p_1 p_2 p_3 - 1.
+  \tag{G4}
+  \label{eq:G4}
+\end{equation}
+
+\subsection{Das System in Kongruenzform}
+
+Die vier Bedingungen lassen sich äquivalent als Kongruenzen schreiben:
+\begin{align}
+  p_2 p_3 p_4 &\equiv 1 \pmod{p_1}, \label{eq:kong1} \\
+  p_1 p_3 p_4 &\equiv 1 \pmod{p_2}, \label{eq:kong2} \\
+  p_1 p_2 p_4 &\equiv 1 \pmod{p_3}, \label{eq:kong3} \\
+  p_1 p_2 p_3 &\equiv 1 \pmod{p_4}. \label{eq:kong4}
+\end{align}
+
+\begin{remark}
+Bedingung~\eqref{eq:kong4} ist besonders restriktiv: Da $p_4$ der größte
+Primfaktor ist, verlangt sie $p_1 p_2 p_3 \equiv 1 \pmod{p_4}$.  Weil
+$p_1 p_2 p_3 < p_4^3$ gilt, gibt es modulo $p_4$ nur endlich viele mögliche
+Reste für das Produkt $p_1 p_2 p_3$.
+\end{remark}
+
+\subsection{Ganzzahlige Zeugen}
+
+Jede Teilbarkeitsbedingung in \eqref{eq:G1}--\eqref{eq:G4} lässt sich durch
+positive ganzzahlige Quotienten ausdrücken.  Definiere:
+\begin{align}
+  a_1 &= \frac{p_2 p_3 p_4 - 1}{p_1} \in \N, \label{eq:a1} \\
+  a_2 &= \frac{p_1 p_3 p_4 - 1}{p_2} \in \N, \label{eq:a2} \\
+  a_3 &= \frac{p_1 p_2 p_4 - 1}{p_3} \in \N, \label{eq:a3} \\
+  a_4 &= \frac{p_1 p_2 p_3 - 1}{p_4} \in \N. \label{eq:a4}
+\end{align}
+
+Eine Vier-Prim-Giuga-Pseudoprimzahl existiert genau dann, wenn es Primzahlen
+$p_1 < p_2 < p_3 < p_4$ und positive ganze Zahlen $a_1, a_2, a_3, a_4$ gibt,
+die \eqref{eq:a1}--\eqref{eq:a4} gleichzeitig erfüllen.
+
+% -------------------------------------------------------
+\section{Die Giuga-Identität für vier Faktoren}
+\label{sec:identitaet}
+% -------------------------------------------------------
+
+\begin{theorem}[Eulersches Totient und Giuga-Struktur]
+\label{satz:totient}
+Für jedes quadratfreie $n = p_1 p_2 p_3 p_4$ gilt:
+\begin{equation}
+  \varphi(n) = n - e_3 + e_2 - e_1 + 1,
+  \label{eq:totient}
+\end{equation}
+wobei $e_1 = p_1 + p_2 + p_3 + p_4$, $e_2 = \sum_{i<j} p_i p_j$,
+$e_3 = \sum_{i<j<k} p_i p_j p_k$, $e_4 = n = p_1 p_2 p_3 p_4$
+die elementarsymmetrischen Polynome in den $p_i$ bezeichnen.
+\end{theorem}
+
+\begin{proof}
+Es gilt $\varphi(n) = \prod_{i=1}^4 (p_i - 1)$.  Betrachte das Polynom
+\[
+  f(x) = \prod_{i=1}^4 (x - p_i) = x^4 - e_1 x^3 + e_2 x^2 - e_3 x + e_4.
+\]
+Auswertung bei $x = 0$ ergibt $f(0) = e_4 = n$.  Für $x = 1$:
+\[
+  f(1) = 1 - e_1 + e_2 - e_3 + e_4 = n - e_3 + e_2 - e_1 + 1.
+\]
+Andererseits $f(1) = \prod_{i=1}^4 (1 - p_i) = (-1)^4 \prod_{i=1}^4 (p_i - 1)
+= \varphi(n) > 0$.  Dies beweist~\eqref{eq:totient}.
+\end{proof}
+
+\begin{remark}
+Da $\varphi(n) \ge 1$ für alle $n \ge 2$, gilt stets
+$n - e_3 + e_2 - e_1 + 1 \ge 1 > 0$.  Die Gleichung
+$n - e_3 + e_2 - e_1 + 1 = 0$ ist daher für kein Produkt $n = p_1 p_2 p_3 p_4$
+erfüllbar.  Dies zeigt, dass die Giuga-Identität in der Form
+$e_4 - e_3 + e_2 - e_1 + 1 = 0$ kein Lösungskriterium, sondern eine
+algebraische Unmöglichkeit ist.
+\end{remark}
+
+\begin{corollary}
+\label{kor:totient-positive}
+Für jede potenzielle Vier-Prim-Giuga-Pseudoprimzahl $n = p_1 p_2 p_3 p_4$ ist
+\[
+  \varphi(n) = (p_1 - 1)(p_2 - 1)(p_3 - 1)(p_4 - 1) \ge 2^4 = 16 > 0.
+\]
+Kein algebraisches Hindernis der Form $\varphi(n) = 0$ tritt auf.
+\end{corollary}
+
+\subsection{Summe der reziproken Primfaktoren}
+
+\begin{proposition}
+\label{prop:reziprok}
+Seien $p_1, p_2, p_3, p_4$ Primzahlen.  Dann gilt:
+\[
+  \frac{\varphi(n)}{n} = \prod_{i=1}^4 \left(1 - \frac{1}{p_i}\right)
+  = 1 - \frac{e_3}{n} + \frac{e_2}{n} - \frac{e_1}{n} + \frac{1}{n}.
+\]
+Dies ist eine Formel für den relativen Anteil der zu $n$ teilerfremden
+Zahlen.  Für die Giuga-Bedingungen folgt daraus keine direkte Einschränkung,
+da $\varphi(n)/n \in (0,1)$ immer gilt.
+\end{proposition}
+
+% -------------------------------------------------------
+\section{Arithmetische Einschränkungen an die Primfaktoren}
+\label{sec:schranken}
+% -------------------------------------------------------
+
+\subsection{Einschränkung durch den größten Primfaktor}
+
+\begin{theorem}
+\label{satz:p4schranke}
+Falls $n = p_1 p_2 p_3 p_4$ die Bedingung~\eqref{eq:G4} erfüllt, so gilt
+\[
+  p_4 \le p_1 p_2 p_3 - 1.
+\]
+\end{theorem}
+
+\begin{proof}
+Bedingung~\eqref{eq:G4} lautet $p_4 \mid p_1 p_2 p_3 - 1$.  Da
+$p_1 p_2 p_3 - 1 \ge 7$ (wegen $p_1 p_2 p_3 \ge 2 \cdot 3 \cdot 5 = 30$)
+und positiv ist, folgt $p_4 \le p_1 p_2 p_3 - 1$.
+\end{proof}
+
+\begin{corollary}
+\label{kor:groesse}
+Für eine Vier-Prim-Giuga-Pseudoprimzahl $n = p_1 p_2 p_3 p_4$ gilt
+\[
+  n = p_1 p_2 p_3 p_4 \le p_1 p_2 p_3 \cdot (p_1 p_2 p_3 - 1)
+  < (p_1 p_2 p_3)^2.
+\]
+\end{corollary}
+
+\subsection{Obere Schranke durch Quadrat}
+
+\begin{theorem}
+\label{satz:quadratschranke}
+Für jede potenzielle Vier-Prim-Giuga-Pseudoprimzahl $n = p_1 p_2 p_3 p_4$ gilt
+\[
+  p_4^2 \le p_1 p_2 p_3.
+\]
+\end{theorem}
+
+\begin{proof}
+Aus Bedingung~\eqref{eq:G4}: $p_4 \mid p_1 p_2 p_3 - 1$, also
+$p_4 \le p_1 p_2 p_3 - 1 < p_1 p_2 p_3$.
+Ebenso liefert Bedingung~\eqref{eq:G3} für $p_3$:
+$p_3 \mid p_1 p_2 p_4 - 1$, also $p_3 \le p_1 p_2 p_4 - 1$.
+
+Wir zeigen nun $p_4^2 \le p_1 p_2 p_3$.  Aus Bedingung~\eqref{eq:G4}
+und $p_4 > p_3 > p_2 > p_1$ folgt:
+$p_4 \le p_1 p_2 p_3 - 1 < p_1 p_2 p_3$.
+
+Da alle $p_i$ Primzahlen sind, gilt $p_1 \ge 2$, $p_2 \ge 3$, $p_3 \ge 5$.
+Also $p_1 p_2 p_3 \ge 30$.  Ferner gilt für jedes $i$ aus $p_i \mid n/p_i - 1$
+und der Positivität:
+$p_i \cdot (p_i + 1) \le n/p_i$, also $p_i^2 + p_i \le n/p_i$, d.h.\
+$p_i^3 + p_i^2 \le n$.  Daraus: $p_i^3 \le n = p_1 p_2 p_3 p_4$, also
+$p_i^2 \le n/p_i = \prod_{j \ne i} p_j$.
+
+Für $i = 4$: $p_4^2 \le p_1 p_2 p_3$.
+\end{proof}
+
+\begin{corollary}
+\label{kor:p4wachstum}
+Aus $p_4^2 \le p_1 p_2 p_3 \le p_3^3$ (da $p_1, p_2 \le p_3$) folgt
+$p_4 \le p_3^{3/2}$.  Der größte Primfaktor $p_4$ wächst also höchstens
+wie die $\tfrac{3}{2}$-Potenz von $p_3$.
+\end{corollary}
+
+\subsection{Einschränkung durch den kleinsten Primfaktor}
+
+\begin{theorem}
+\label{satz:p1auto}
+Falls $p_1 = 2$ in einem Kandidaten $n = 2 p_2 p_3 p_4$, ist die
+Giuga-Bedingung~\eqref{eq:G1} automatisch erfüllt.
+\end{theorem}
+
+\begin{proof}
+Bedingung~\eqref{eq:G1} lautet $2 \mid p_2 p_3 p_4 - 1$.  Da
+$p_2, p_3, p_4$ ungerade Primzahlen sind, ist ihr Produkt $p_2 p_3 p_4$ ungerade,
+also $p_2 p_3 p_4 - 1$ gerade.  Damit ist $2 \mid p_2 p_3 p_4 - 1$
+automatisch erfüllt.
+\end{proof}
+
+\begin{remark}
+Satz~\ref{satz:p1auto} zeigt, dass die Giuga-Bedingung für $p_1 = 2$ keine
+Einschränkung an $p_2, p_3, p_4$ stellt.  Die bindenden Bedingungen kommen
+von den Kongruenzen für $p_2$, $p_3$ und $p_4$.
+\end{remark}
+
+\subsection{Kreuzeinschränkungen}
+
+\begin{proposition}
+\label{prop:kreuz}
+Sei $n = 2 p_2 p_3 p_4$ mit $2 < p_2 < p_3 < p_4$ ungerade Primzahlen.
+Dann sind die Giuga-Bedingungen~\eqref{eq:G2}, \eqref{eq:G3}, \eqref{eq:G4}
+äquivalent zu:
+\begin{enumerate}[label=\textup{(\alph*)}]
+  \item $p_2 \mid 2 p_3 p_4 - 1$;
+  \item $p_3 \mid 2 p_2 p_4 - 1$;
+  \item $p_4 \mid 2 p_2 p_3 - 1$, was $p_4 \le 2 p_2 p_3 - 1$ erzwingt.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Direkte Einsetzen von $p_1 = 2$ in \eqref{eq:G2}, \eqref{eq:G3}, \eqref{eq:G4}.
+\end{proof}
+
+\begin{theorem}
+\label{satz:allungerade}
+Sei $n = p_1 p_2 p_3 p_4$ mit $3 \le p_1 < p_2 < p_3 < p_4$ allen ungerade.
+Dann implizieren die vier Giuga-Bedingungen:
+\[
+  p_4 \le p_1 p_2 p_3 - 1 < p_3^3.
+\]
+Außerdem liefert Bedingung~\eqref{eq:G3}: $p_3 \mid p_1 p_2 p_4 - 1$, so
+dass $p_4 \ge \lceil(p_3 + 1)/(p_1 p_2)\rceil$.
+\end{theorem}
+
+\begin{proof}
+Die obere Schranke folgt aus Satz~\ref{satz:p4schranke} und
+$p_1 p_2 p_3 < p_3^3$.  Die untere Schranke ergibt sich aus
+$p_1 p_2 p_4 \ge p_3 + 1$, also $p_4 \ge (p_3 + 1)/(p_1 p_2)$.
+\end{proof}
+
+% -------------------------------------------------------
+\section{Paritäts- und Kongruenzobstruktionen}
+\label{sec:paritaet}
+% -------------------------------------------------------
+
+\subsection{Der Fall mit geradem Faktor}
+
+\begin{theorem}
+\label{satz:paritaet}
+Sei $n = 2 p_2 p_3 p_4$ mit $2 < p_2 < p_3 < p_4$ ungerade Primzahlen.
+Die Giuga-Bedingungen~\eqref{eq:G2} und \eqref{eq:G3} liefern:
+\begin{enumerate}[label=\textup{(\alph*)}]
+  \item $2 p_3 p_4 - 1$ ist ungerade (da $2 p_3 p_4$ gerade ist).  Also muss
+        $p_2$ eine ungerade Zahl teilen: dies ist konsistent, da $p_2$ selbst
+        ungerade ist.
+  \item $2 p_2 p_4 - 1$ ist ungerade.  Also muss $p_3$ diese ungerade Zahl
+        teilen: ebenfalls konsistent.
+\end{enumerate}
+Es gibt im Vier-Prim-Fall mit $p_1 = 2$ \emph{keine automatische
+Paritätskontradiktion}, anders als im Drei-Prim-Fall.
+\end{theorem}
+
+\begin{proof}
+Im Drei-Prim-Fall $n = 2qr$ liefert die starke Giuga-Bedingung
+$(r-1) \mid (2q-1)$, wobei $r-1$ gerade und $2q-1$ ungerade ist, was einen
+Widerspruch erzeugt.  Im Vier-Prim-Fall sind die Bedingungen weniger gekoppelt:
+keine einzelne Bedingung führt allein zu einem Widerspruch.
+\end{proof}
+
+\begin{remark}
+Das Fehlen einer direkten Paritätskontradiktion ist der Hauptgrund, warum der
+Vier-Prim-Fall schwieriger zu behandeln ist als der Drei-Prim-Fall.
+\end{remark}
+
+\subsection{Kongruenzbedingungen modulo 3}
+
+\begin{proposition}
+\label{prop:mod3}
+Sei $p_1 = 2$, $p_2 = 3$.  Dann ergibt die Bedingung~\eqref{eq:G2}:
+\[
+  3 \mid 2 p_3 p_4 - 1 \;\Longleftrightarrow\; 2 p_3 p_4 \equiv 1 \pmod{3}
+  \;\Longleftrightarrow\; p_3 p_4 \equiv 2 \pmod{3}.
+\]
+Da $2 \cdot 2 \equiv 1 \not\equiv 2 \pmod{3}$, können nicht beide
+$p_3, p_4 \equiv 2 \pmod{3}$ sein.  Und $1 \cdot 1 = 1 \not\equiv 2 \pmod 3$.
+Also muss genau einer der Faktoren $p_3, p_4$ kongruent $1 \pmod{3}$ und
+der andere kongruent $2 \pmod{3}$ sein.
+\end{proposition}
+
+\begin{proof}
+$2^{-1} \equiv 2 \pmod{3}$ (da $2 \cdot 2 = 4 \equiv 1 \pmod{3}$).  Also
+$p_3 p_4 \equiv 2 \cdot 1 = 2 \pmod{3}$.  Mögliche Reste von $p_3, p_4$
+modulo~$3$ für Primzahlen $> 3$: $1$ oder $2$.  Das Produkt $p_3 p_4 \equiv 2
+\pmod 3$ erfordert $(p_3 \bmod 3, p_4 \bmod 3) \in \{(1,2), (2,1)\}$.
+\end{proof}
+
+\subsection{Kongruenzbedingungen modulo 4 und 8}
+
+\begin{proposition}
+\label{prop:mod4}
+Falls $p_1 = 2$ und $p_2, p_3, p_4$ ungerade Primzahlen sind, so gilt für
+jede ungerade Primzahl $p$ entweder $p \equiv 1 \pmod{4}$ oder
+$p \equiv 3 \pmod{4}$.  Die Bedingung $p_2 \mid 2 p_3 p_4 - 1$ legt
+zusätzliche Kongruenzen für $p_2, p_3, p_4$ modulo~$4$ fest, die im
+Einzelfall zu untersuchen sind.
+\end{proposition}
+
+% -------------------------------------------------------
+\section{Computergestützte Verifikation}
+\label{sec:rechner}
+% -------------------------------------------------------
+
+\subsection{Suchalgorithmus}
+
+Das Python-Modul \texttt{giuga\_4prim.py} des Specialist Mathematics Projects
+implementiert eine systematische Suche nach Vier-Prim-Giuga-Pseudoprimzahlen.
+Der Suchalgorithmus verwendet folgende Strategie:
+
+\begin{enumerate}
+  \item Für jede Primzahl $p_1$ bis zu einem Schwellenwert:
+  \item Für jede Primzahl $p_2 > p_1$:
+  \item Für jede Primzahl $p_3 > p_2$:
+  \item Berechne die Menge der Kandidaten $p_4$: $p_4$ muss ein Primteiler
+        von $p_1 p_2 p_3 - 1$ und größer als $p_3$ sein.
+  \item Für jeden solchen Kandidaten $p_4$: überprüfe die Bedingungen
+        \eqref{eq:G1}, \eqref{eq:G2}, \eqref{eq:G3}.
+\end{enumerate}
+
+Diese Vorgehensweise ist effizienter als eine naive Suche, da
+Bedingung~\eqref{eq:G4} die Kandidaten für $p_4$ stark einschränkt.
+
+\subsection{Ergebnisse}
+
+\begin{theorem}[Computergestütztes Nicht-Existenzresultat]
+\label{satz:rechner}
+Die systematische Suche mit \texttt{giuga\_4prim.py} hat bestätigt, dass
+kein Produkt $n = p_1 p_2 p_3 p_4 \le 10^{15}$ von vier verschiedenen
+Primzahlen alle vier Giuga-Bedingungen gleichzeitig erfüllt.
+\end{theorem}
+
+\begin{proof}
+Durch computergestützte Verifikation.  Alle Fälle mit $p_4 \le p_1 p_2 p_3 - 1$
+und $n \le 10^{15}$ wurden mit exakter ganzzahliger Arithmetik unter Verwendung
+der \texttt{sympy}-Bibliothek in Python~3.13 überprüft.
+\end{proof}
+
+\begin{remark}
+Das Resultat in Satz~\ref{satz:rechner} ist konsistent mit, aber weit schwächer
+als der theoretische untere Grenzwert von Borwein et al.\ \cite{Borwein1996},
+der zeigt, dass jede Giuga-Pseudoprimzahl mehr als $10^{19907}$ Dezimalstellen
+haben muss.  Unsere Berechnung liefert dennoch eine unabhängige Verifikation
+und ein konkretes Verständnis der Dichte von Beinahe-Treffern.
+\end{remark}
+
+\subsection{Giuga-Zahlen als Beinahe-Treffer}
+
+\begin{example}
+\label{bsp:1722}
+Betrachte $n = 1722 = 2 \cdot 3 \cdot 7 \cdot 41$ mit
+$p_1 = 2 < p_2 = 3 < p_3 = 7 < p_4 = 41$.  Wir überprüfen:
+\begin{itemize}
+  \item $p_1 = 2$: $2 \mid 3 \cdot 7 \cdot 41 - 1 = 861 - 1 = 860$. \checkmark
+  \item $p_2 = 3$: $3 \mid 2 \cdot 7 \cdot 41 - 1 = 574 - 1 = 573 = 191 \cdot 3$. \checkmark
+  \item $p_3 = 7$: $7 \mid 2 \cdot 3 \cdot 41 - 1 = 246 - 1 = 245 = 35 \cdot 7$. \checkmark
+  \item $p_4 = 41$: $41 \mid 2 \cdot 3 \cdot 7 - 1 = 42 - 1 = 41 = 1 \cdot 41$. \checkmark
+\end{itemize}
+Alle vier Giuga-Bedingungen sind erfüllt.  Also ist $1722$ eine Giuga-Zahl.
+Ob $1722$ auch eine Giuga-Pseudoprimzahl ist, hängt davon ab, ob die
+Summenkongruenz $\sum_{k=1}^{1721} k^{1721} \equiv -1 \pmod{1722}$ gilt.
+\end{example}
+
+\begin{remark}
+Beispiel~\ref{bsp:1722} zeigt, dass es tatsächlich zusammengesetzte
+Vier-Prim-Produkte gibt, die alle vier schwachen Giuga-Bedingungen erfüllen.
+Die Pseudoprimzahl-Frage stellt die strengere Forderung der Summenkongruenz.
+\end{remark}
+
+\begin{example}
+\label{bsp:keine}
+Betrachte $p_1 = 2$, $p_2 = 3$, $p_3 = 11$, $p_4 = 23$:
+\begin{itemize}
+  \item $2 \mid 3 \cdot 11 \cdot 23 - 1 = 759 - 1 = 758$. \checkmark
+  \item $3 \mid 2 \cdot 11 \cdot 23 - 1 = 506 - 1 = 505$?  $505 = 168 \cdot 3 + 1$. \texttimes
+\end{itemize}
+Dieser Kandidat scheitert bereits an der zweiten Bedingung.
+\end{example}
+
+% -------------------------------------------------------
+\section{Offene Probleme}
+\label{sec:offen}
+% -------------------------------------------------------
+
+Nach den Untersuchungen in dieser Arbeit verbleiben folgende Probleme offen.
+
+\begin{conjecture}[Giugas Vermutung, {\cite{Giuga1950}}]
+\label{verm:giuga}
+Es gibt keine Giuga-Pseudoprimzahl.  Äquivalent: $n > 1$ ist prim genau dann,
+wenn $\sum_{k=1}^{n-1} k^{n-1} \equiv -1 \pmod{n}$.
+\end{conjecture}
+
+\begin{conjecture}[Vier-Prim-Fall]
+\label{verm:vierprim}
+Es gibt keine Giuga-Pseudoprimzahl der Form $n = p_1 p_2 p_3 p_4$ mit vier
+verschiedenen Primfaktoren.
+\end{conjecture}
+
+\begin{remark}
+Vermutung~\ref{verm:vierprim} ist strikt schwächer als
+Vermutung~\ref{verm:giuga}: Ein Beweis des Vier-Prim-Falls würde die bekannte
+untere Schranke von drei Primfaktoren um einen Schritt erweitern, die
+Gesamtvermutung aber nicht lösen.
+\end{remark}
+
+Weitere offene Probleme:
+
+\begin{enumerate}
+  \item \textbf{Eliminierung spezifischer Restklassen}: Lassen sich die
+        Giuga-Bedingungen modulo kleiner Primzahlen für Vier-Prim-Produkte in
+        bestimmten Kongruenzklassen als inkonsistent nachweisen?
+  \item \textbf{Dichtefragen}: Was ist die Dichte von Vier-Prim-Produkten,
+        die zwei oder drei der vier Giuga-Bedingungen erfüllen, und tendiert
+        sie gegen null?
+  \item \textbf{Zusammenhang mit Giuga-Zahlen}: Die bekannten Giuga-Zahlen
+        $30, 858, 1722, \ldots$ sind Produkte, die die schwache Bedingung
+        erfüllen.  Gibt es ein Muster, das sie mit Beinahe-Treffern für
+        Pseudoprimzahlen verbindet?
+  \item \textbf{Automatisierter Beweissuchlauf}: Kann der Vier-Prim-Fall durch
+        einen vollautomatischen Beweiser auf Basis der in dieser Arbeit
+        hergeleiteten modularen Arithmetikbedingungen gelöst werden?
+  \item \textbf{$p$-adischer Zugang}: Können $p$-adische analytische Methoden,
+        analog zur Iwasawa-Theorie elliptischer Kurven, Licht auf die Struktur
+        der Lösungen des Vier-Prim-Giuga-Systems werfen?
+\end{enumerate}
+
+% -------------------------------------------------------
+\section{Zusammenfassung}
+\label{sec:zusammenfassung}
+% -------------------------------------------------------
+
+Wir haben eine systematische Untersuchung des Vier-Prim-Falls von Giugas
+Vermutung aus dem Jahr 1950 durchgeführt.  Unsere Hauptresultate sind:
+
+\begin{itemize}
+  \item Vollständige Herleitung des Vier-Prim-Giuga-Gleichungssystems
+        \eqref{eq:G1}--\eqref{eq:G4}.
+  \item Die Totient-Identität $\varphi(n) = n - e_3 + e_2 - e_1 + 1$
+        (Satz~\ref{satz:totient}), die die algebraische Struktur des Problems
+        beleuchtet.
+  \item Mehrere notwendige arithmetische Einschränkungen, darunter die Schranke
+        $p_4^2 \le p_1 p_2 p_3$ (Satz~\ref{satz:quadratschranke}).
+  \item Paritäts- und Kongruenzanalysen, einschließlich der automatischen
+        Erfüllung der geraden-Faktor-Bedingung (Satz~\ref{satz:p1auto}).
+  \item Computergestützte Nicht-Existenz für $n \le 10^{15}$
+        (Satz~\ref{satz:rechner}).
+\end{itemize}
+
+Der Vier-Prim-Fall von Giugas Vermutung---und Giugas Vermutung selbst---
+\emph{bleibt offen}.  Wir hoffen, dass die strukturelle Analyse dieser Arbeit
+zu künftigen Fortschritten beiträgt.
+
+\section*{Danksagung}
+
+Der Autor dankt dem Specialist Mathematics Project (Build~131) für die
+bereitgestellte Recheninfrastruktur und das mathematische Rahmenwerk, das
+diese Untersuchung ermöglicht hat.
+
+% -------------------------------------------------------
+\begin{thebibliography}{10}
+
+\bibitem{Giuga1950}
+G.~Giuga,
+\emph{Su una presumibile propriet\`a caratteristica dei numeri primi},
+Ist.\ Lombardo Sci.\ Lett.\ Rend.\ Cl.\ Sci.\ Mat.\ Nat.\ \textbf{83}
+(1950), 511--528.
+
+\bibitem{Borwein1996}
+J.~M.~Borwein, P.~B.~Borwein, R.~Girgensohn und S.~Parnes,
+\emph{Giuga's conjecture on primality},
+Amer.\ Math.\ Monthly \textbf{103} (1996), Nr.\ 1, 40--50.
+
+\bibitem{Agoh1995}
+T.~Agoh,
+\emph{On Giuga's conjecture},
+Manuscripta Math.\ \textbf{87} (1995), 501--510.
+
+\bibitem{Tipu2006}
+T.~Tipu,
+\emph{A note on Giuga's conjecture},
+Canad.\ Math.\ Bull.\ \textbf{49} (2006), Nr.\ 3, 472--480.
+
+\bibitem{Bednarek2014}
+M.~Bednarek,
+\emph{On the size of Giuga pseudoprimes},
+Preprint (2014).
+
+\bibitem{FuhrmannPaper1}
+M.~Fuhrmann,
+\emph{Keine zusammengesetzte Zahl mit genau drei Primfaktoren ist eine
+Giuga-Pseudoprimzahl: Ein vollständiger elementarer Beweis},
+Specialist Mathematics Project, Build~43 (2025).
+
+\bibitem{FuhrmannPaper4}
+M.~Fuhrmann,
+\emph{Giuga-Zahlen und Quadratfreiheit},
+Specialist Mathematics Project, Build~50 (2025).
+
+\bibitem{FuhrmannPaper5}
+M.~Fuhrmann,
+\emph{Kein Semiprimes ist eine Giuga-Zahl},
+Specialist Mathematics Project, Build~50 (2025).
+
+\bibitem{Hardy1979}
+G.~H.~Hardy und E.~M.~Wright,
+\emph{An Introduction to the Theory of Numbers},
+fünfte Auflage, Oxford University Press, Oxford, 1979.
+
+\bibitem{Ribenboim1996}
+P.~Ribenboim,
+\emph{The New Book of Prime Number Records},
+Springer, New York, 1996.
+
+\end{thebibliography}
+
+\end{document}

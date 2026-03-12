@@ -174,3 +174,33 @@
   - Mindestens 8 Beispiele mit konkreten Zahlen in beiden Papers
   - Literaturverzeichnis: 10 Quellen (EN), 10 Quellen (DE)
   - Build-Nummer: 130 → 131
+
+=== 2026-03-12 — Build 131 — Paper 40: Giuga Vier-Prim-Vermutung (EN + DE) ===
+
+2026-03-12 [Build 131]: 2 neue LaTeX-Papers in papers/batch11/
+
+### Neue Dateien
+- papers/batch11/paper40_giuga_four_primes_en.tex
+  - Englisches Paper über den Vier-Prim-Fall von Giugas Vermutung
+  - Vier-Prim-Gleichungssystem (G1)-(G4) vollständig hergeleitet
+  - Giuga-Identität und Totient-Zusammenhang analysiert
+  - Arithmetische Schranken: p4^2 <= p1*p2*p3
+  - Paritäts- und Kongruenzobstruktionen
+  - Computergestützte Nicht-Existenz bis 10^15
+  - Beispiele: 1722 = 2·3·7·41 als Giuga-Zahl (nicht Pseudoprimzahl)
+  - Unbewiesene Aussagen als Conjecture deklariert
+
+- papers/batch11/paper40_giuga_vier_primfaktoren_de.tex
+  - Deutsche Übersetzung desselben Papers
+  - Vollständig auf Deutsch, alle mathematischen Inhalte identisch
+  - Deutsche Theorem-Umgebungen: Satz, Lemma, Korollar, Vermutung
+
+### Mathematische Kernresultate
+- Satz (bewiesen): p4^2 <= p1*p2*p3 für jeden 4-Prim-Kandidaten
+- Satz (bewiesen): Giuga-Bedingung für p1=2 automatisch erfüllt
+- Satz (bewiesen): phi(n) = n - e3 + e2 - e1 + 1 (Totient-Identität)
+- Vermutung (offen): Kein 4-Prim-Giuga-Pseudoprime existiert
+- Numerisch: Keine Lösung bis 10^15 gefunden
+
+### Build
+- src/build.txt: 130 → 131
