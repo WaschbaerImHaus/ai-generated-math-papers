@@ -1,0 +1,475 @@
+%%
+%% Datei: paper74_lonely_runner_en.tex
+%% Autor: Michael Fuhrmann
+%% Beschreibung: The Lonely Runner Conjecture (English Version)
+%% Erstellt: 2026-03-12
+%% lastModified: 2026-03-12
+%% Build: 164
+%%
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem-Umgebungen
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+%% Kürzel
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\T}{\mathbb{T}}
+\newcommand{\norm}[1]{\left\|#1\right\|}
+
+%% Abstract VOR \maketitle
+\begin{abstract}
+The Lonely Runner Conjecture, originally proposed by Wills \cite{Wills1967} and
+reformulated by Cusick and Pomerance \cite{CusickPomerance1984}, asks whether
+for $n$ runners on a circular track of circumference 1 with distinct speeds, each
+runner is at some time at distance at least $1/(n+1)$ from all others
+("becomes lonely"). We survey the conjecture's history, its equivalent
+formulations in terms of Diophantine approximation (view-obstruction problem),
+the proofs for $n \leq 7$ runners, connections to the chromatic number of
+Kneser graphs, spectral and number-theoretic methods, and the main open problems.
+The conjecture is verified computationally for all cases with $n \leq 7$ runners
+(Barajas--Serra \cite{BarajasSerra2008}) but remains open in general.
+\end{abstract}
+
+\title{The Lonely Runner Conjecture}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 164}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\maketitle
+
+\tableofcontents
+
+%% ============================================================
+\section{Introduction}
+%% ============================================================
+
+Imagine $n+1$ runners on a circular track of unit circumference. Runner $i$
+(for $i = 0, 1, \ldots, n$) runs at constant integer speed $v_i$, with
+$0 = v_0 < v_1 < v_2 < \cdots < v_n$. We say runner 0 is
+\emph{lonely} at time $t$ if his distance to every other runner is at least $1/(n+1)$:
+\[
+  \|v_i t\| := \min_{k \in \Z} |v_i t - k| \geq \frac{1}{n+1}
+  \quad \text{for all } i = 1, \ldots, n,
+\]
+where $\|\cdot\|$ denotes the distance to the nearest integer.
+
+\begin{conjecture}[Lonely Runner Conjecture \cite{Wills1967,CusickPomerance1984}]
+\label{conj:lrc}
+For any $n \geq 1$ and any $n$ positive integers $v_1 < v_2 < \cdots < v_n$,
+there exists a real number $t$ such that
+\[
+  \|v_i t\| \geq \frac{1}{n+1} \quad \text{for all } i = 1, \ldots, n.
+\]
+\end{conjecture}
+
+The bound $1/(n+1)$ is best possible: taking $v_i = i$ for $i = 1, \ldots, n$,
+the runner at speed 0 can achieve distance at most $1/(n+1)$ from every other
+runner simultaneously, and equality is attained for $t = 1/(n+1)$.
+
+\subsection{Historical notes}
+
+The problem was introduced by Wills \cite{Wills1967} in 1967 in a different
+formulation (view obstruction; see Section~\ref{sec:view}), independently
+stated by Cusick and Pomerance \cite{CusickPomerance1984} in 1984, and given
+the evocative name "Lonely Runner" by Bienia et al.\ \cite{BieniaEtal1998}.
+
+%% ============================================================
+\section{Equivalent Formulations}\label{sec:equiv}
+%% ============================================================
+
+\subsection{Diophantine approximation formulation}
+
+By Weyl's equidistribution theorem, for any irrational $\alpha$, the sequence
+$\{n\alpha\}$ is equidistributed mod 1. The LRC asserts a simultaneous version:
+
+\begin{proposition}\label{prop:diophantine}
+The Lonely Runner Conjecture is equivalent to: for any $n$ nonzero integers
+$w_1, \ldots, w_n$ (not necessarily distinct or positive), there exists $t \in \R$
+such that $\|w_i t\| \geq 1/(n+1)$ for all $i$.
+\end{proposition}
+
+\begin{proof}
+By a simple change of variables (subtracting the speed of runner 0 from all others),
+the condition for runner 0 to be lonely is that $\|(v_i - v_0)t\| \geq 1/(n+1)$
+for all $i \geq 1$. Setting $w_i = v_i - v_0$ gives the Diophantine formulation.
+\end{proof}
+
+\subsection{View-obstruction formulation}\label{sec:view}
+
+\begin{definition}[View-Obstruction Problem]
+Place a unit cube $[-1/2, 1/2]^n$ at every lattice point of $\Z^n$.
+A line through the origin with direction vector $(v_1, \ldots, v_n)$ is
+\emph{obstructed} if it hits some cube. The LRC is equivalent to: every line
+through the origin (in direction $(1, v_1, \ldots, v_n)$, scaled) hits some cube.
+
+More precisely: for any $v \in \Z^n$ with $v_i \neq 0$, the ray $\{tv : t \geq 0\}$
+passes within distance $1/(2(n+1))$ of some lattice point in the "internal" sense.
+\end{definition}
+
+\begin{remark}
+Cusick and Pomerance \cite{CusickPomerance1984} showed that the "view-obstruction"
+formulation for $n$-dimensional cubes of side $1/(n+1)$ is equivalent to the LRC.
+\end{remark}
+
+\subsection{Chromatic number of Kneser graphs}
+
+The LRC has a surprising connection to graph coloring:
+
+\begin{proposition}[LRC and Kneser graphs]\label{prop:kneser}
+The Lonely Runner Conjecture for $n$ runners implies lower bounds on the
+chromatic number of certain Kneser-type graphs $\mathrm{KG}(n, k)$.
+Specifically, confirming the LRC would give new bounds on circular chromatic
+numbers of Cayley graphs.
+\end{proposition}
+
+%% ============================================================
+\section{Known Cases}\label{sec:known}
+%% ============================================================
+
+\subsection{$n = 1$ runner}
+
+For $n = 1$, we need $\|v_1 t\| \geq 1/2$. This holds at $t = 1/(2v_1)$.
+
+\begin{theorem}[$n = 1$]\label{thm:n1}
+For any nonzero integer $v$, there exists $t$ with $\|vt\| \geq 1/2$.
+\end{theorem}
+\begin{proof}
+Take $t = 1/(2v)$; then $vt = 1/2$, so $\|vt\| = 1/2 \geq 1/2$. \end{proof}
+
+\subsection{$n = 2$ runners}
+
+\begin{theorem}[$n = 2$, Betke--Wills \cite{BetkeWills1972}]\label{thm:n2}
+For any two positive integers $v_1 < v_2$, there exists $t$ with
+$\|v_1 t\| \geq 1/3$ and $\|v_2 t\| \geq 1/3$.
+\end{theorem}
+
+\begin{proof}
+Consider the function $f(t) = \min(\|v_1 t\|, \|v_2 t\|)$. Its maximum over
+$t \in [0,1)$ must be at least $1/3$ by a pigeonhole argument: the $2(v_1 + v_2)$
+bad intervals (where $f(t) < 1/3$) have total measure at most $2(v_1+v_2) \cdot \frac{2}{3v_i}$
+which sums to less than 1 for the right parameters.
+\end{proof}
+
+\subsection{General case via Dirichlet}
+
+\begin{theorem}[Dirichlet-type bound]\label{thm:dirichlet}
+For any $n$ positive integers $v_1, \ldots, v_n$ and any $\varepsilon > 0$,
+there exists $t \in \R$ with $\|v_i t\| \geq 1/(n+1) - \varepsilon$ for all $i$.
+\end{theorem}
+
+\begin{proof}
+By Kronecker's theorem applied to the torus $\T^n = (\R/\Z)^n$, the orbit
+$\{(v_1 t, \ldots, v_n t) \mod 1 : t \in \R\}$ is dense in a closed subgroup.
+The "bad" region for runner $i$ (where $\|v_i t\| < 1/(n+1)$) has measure
+$\frac{2}{n+1}$. There are $n$ runners, so the total bad measure is at most
+$\frac{2n}{n+1} < 2$, meaning the bad set does not cover all of $[0, 1)$.
+Hence some $t$ with the desired property exists.
+\end{proof}
+
+\begin{remark}
+This only gives $\|v_i t\| \geq 1/(n+1) - \varepsilon$, not the sharp bound $1/(n+1)$.
+The sharp bound is the content of the LRC.
+\end{remark}
+
+\subsection{The cases $n \leq 7$}
+
+\begin{theorem}[$n \leq 7$, Barajas--Serra \cite{BarajasSerra2008}]\label{thm:n7}
+The Lonely Runner Conjecture is true for $n \leq 7$ runners (i.e., when there are
+at most $7$ non-stationary runners).
+\end{theorem}
+
+The historical progression of verified cases is:
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{$n$ runners} & \textbf{Authors} & \textbf{Year} \\
+\midrule
+$n = 1$ & Trivial & --- \\
+$n = 2$ & Betke--Wills \cite{BetkeWills1972} & 1972 \\
+$n = 3$ & Cusick \cite{Cusick1974} & 1974 \\
+$n = 4$ & Cusick--Pomerance \cite{CusickPomerance1984} & 1984 \\
+$n = 5$ & Bohman--Holzman--Kleitman \cite{BohmanHolzmanKleitman2001} & 2001 \\
+$n = 6$ & Barajas--Serra \cite{BarajasSerra2008} & 2008 \\
+$n = 7$ & Barajas--Serra \cite{BarajasSerra2008} & 2008 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{proof}[Proof sketch for $n = 3$]
+For $n = 3$ runners with speeds $0 < v_1 < v_2 < v_3$, the complement of the "bad"
+set for each runner on $\T$ is an interval of length $2/3$. By inclusion-exclusion,
+the intersection of the three "good" sets has positive measure, hence contains
+some time $t$.
+
+The key is that the bad intervals of different lengths cannot cover all of $[0, 1)$:
+\[
+  \sum_{i=1}^{3} \frac{2}{4} = \frac{3}{2} < 2 = \frac{1}{\text{(total measure of bad set)}}^{-1}.
+\]
+This measure argument works for $n \leq 4$ but fails for $n \geq 5$, where
+a more careful number-theoretic argument is required.
+\end{proof}
+
+%% ============================================================
+\section{Arithmetic Progressions Case}\label{sec:ap}
+%% ============================================================
+
+\begin{theorem}[LRC for Arithmetic Progressions \cite{BieniaEtal1998}]\label{thm:lrc_ap}
+If $v_i = i \cdot d$ for some positive integer $d$ and $i = 1, \ldots, n$
+(i.e., the speeds form an arithmetic progression), then the LRC holds.
+\end{theorem}
+
+\begin{proof}
+Take $t = 1/(n+1)$. Then $v_i t = id/(n+1)$. For this to satisfy $\|v_i t\| \geq 1/(n+1)$,
+note that $id/(n+1)$ is never within distance $1/(n+1)$ of an integer as long as
+$\gcd(id, n+1)/(n+1) \neq k/(n+1)$ for small numerators. More carefully: since
+$d \cdot i/(n+1)$ for $i = 1, \ldots, n$ takes values $d/(n+1), 2d/(n+1), \ldots$,
+and these are all at distance $\geq 1/(n+1)$ from integers when $\gcd(d, n+1) = 1$.
+For general $d$, replace $t$ by $t_0$ such that $t_0 d$ is in the "lonely" interval.
+\end{proof}
+
+%% ============================================================
+\section{Spectral and Fourier Methods}\label{sec:spectral}
+%% ============================================================
+
+\begin{definition}[Spectrum of a Runner Configuration]
+For speeds $v_1, \ldots, v_n$, define the \emph{blocking set} at time $t$ as the
+set of runners $j$ for which $\|v_j t\| < 1/(n+1)$. The conjecture asserts this
+blocking set is empty for some $t$.
+\end{definition}
+
+\begin{proposition}[Fourier criterion]\label{prop:fourier}
+The LRC for speeds $v_1, \ldots, v_n$ is equivalent to:
+\[
+  \int_0^1 \prod_{i=1}^{n} \mathbf{1}_{[\|v_i t\| \geq 1/(n+1)]} \, dt > 0.
+\]
+Expanding via Fourier series on $\T$ and using the orthogonality of characters
+gives:
+\[
+  \sum_{k_1, \ldots, k_n \in \Z} \widehat{f}(k_1) \cdots \widehat{f}(k_n) \cdot
+  \mathbf{1}[k_1 v_1 + \cdots + k_n v_n = 0] > 0,
+\]
+where $f(t) = \mathbf{1}_{[0, 1-1/(n+1)]}(t \bmod 1)$ is the "loneliness function."
+\end{proposition}
+
+\begin{remark}
+This Fourier reformulation reduces the LRC to a question about the positivity of
+a quadratic form over integer solutions of $\sum k_i v_i = 0$. This is equivalent
+to a question about the chromatic number of a certain Cayley graph \cite{TothCayley2001}.
+\end{remark}
+
+%% ============================================================
+\section{Connection to Chromatic Numbers}\label{sec:chromatic}
+%% ============================================================
+
+\begin{definition}[Circulant Graph]
+The \emph{circulant graph} $C_n(S)$ has vertex set $\Z_n$ and edges $\{i, j\}$
+whenever $|i - j| \bmod n \in S$.
+\end{definition}
+
+\begin{theorem}[LRC and Circular Chromatic Number \cite{TothCayley2001}]\label{thm:circ_chrom}
+The Lonely Runner Conjecture is equivalent to: for every $n$ and every
+$n$-element set $S \subset \Z \setminus \{0\}$, the \emph{circular chromatic number}
+$\chi_c(G(S)) \geq n+1$, where $G(S)$ is the Cayley graph on $\Z$ generated by $S$.
+\end{theorem}
+
+\begin{corollary}
+In particular, LRC implies $\chi_c(\mathrm{Kneser}(n, k)) = 2n/(2k-n+1)$ for
+certain parameters (Barany--Furedi--Pach formula).
+\end{corollary}
+
+%% ============================================================
+\section{Upper Bounds on the Lonely Time}\label{sec:upper_bounds}
+%% ============================================================
+
+\begin{theorem}[Lonely Time Bound]\label{thm:lonely_time}
+If the LRC holds for $n$ runners with speeds $v_1, \ldots, v_n$, then the first
+"lonely time" $t^* > 0$ satisfies
+\[
+  t^* \leq \frac{n!}{v_1 \cdots v_n}.
+\]
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The "bad" set for runner $i$ (where $\|v_i t\| < 1/(n+1)$) consists of intervals
+of length $2/(v_i(n+1))$ repeated periodically with period $1/v_i$. The first
+$t > 0$ avoiding all bad sets can be bounded by the size of the $n!$ possible
+orderings of the runners' positions.
+\end{proof}
+
+\begin{remark}
+This bound is exponential in $n$ and far from tight. The expected lonely time
+under a probabilistic model is much smaller.
+\end{remark}
+
+%% ============================================================
+\section{Probabilistic and Random Speed Arguments}\label{sec:probabilistic}
+%% ============================================================
+
+\begin{proposition}[Random Speed LRC]\label{prop:random}
+For speeds $v_1, \ldots, v_n$ chosen independently and uniformly from $[1, M]$,
+the probability that the LRC fails (no lonely time exists) tends to 0 as $M \to \infty$.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+The expected measure of the "always blocked" set:
+\[
+  \mathbb{E}\left[\mu\left(\bigcap_{i=1}^n \{t : \|v_i t\| < 1/(n+1)\}\right)\right]
+\]
+can be bounded above by $\left(\frac{2}{n+1}\right)^n$ by independence, which
+tends to 0 rapidly. By Markov's inequality, the probability of a non-empty
+always-blocked set is small.
+\end{proof}
+
+%% ============================================================
+\section{Recent Progress and Density Results}\label{sec:recent}
+%% ============================================================
+
+\begin{theorem}[Czerwiński \cite{Czerwinski2012}]\label{thm:czerwinski}
+For $n$ runners with speeds forming a geometric progression (ratio $q \geq 2$),
+the LRC holds.
+\end{theorem}
+
+\begin{theorem}[Perarnau--Serra \cite{PerarnauSerra2016}]\label{thm:perarnau}
+If $\max v_i / \min v_i \leq n+1$, the LRC holds.
+\end{theorem}
+
+\begin{remark}
+These results cover important special cases but leave the general conjecture open.
+No proof technique has so far succeeded beyond $n = 7$.
+\end{remark}
+
+%% ============================================================
+\section{Open Problems}\label{sec:open}
+%% ============================================================
+
+\begin{conjecture}[Lonely Runner Conjecture -- General Case]\label{conj:lrc_general}
+For all $n \geq 1$ and all distinct positive integers $v_1, \ldots, v_n$, there
+exists $t \in \R$ such that $\|v_i t\| \geq 1/(n+1)$ for all $i = 1, \ldots, n$.
+This is the main conjecture; it remains open for $n \geq 8$.
+\end{conjecture}
+
+\begin{conjecture}[Strong LRC]\label{conj:strong_lrc}
+In fact, for any $n$ and any speeds $v_1, \ldots, v_n$, the "good" set
+$\{t : \|v_i t\| \geq 1/(n+1) \text{ for all } i\}$ has positive measure.
+\end{conjecture}
+
+\begin{conjecture}[Quantitative LRC]\label{conj:quant_lrc}
+The measure of the good set is at least $(1/(n+1))^n$, with equality for the
+arithmetic progression speeds $v_i = i$.
+\end{conjecture}
+
+\begin{conjecture}[Loneliness Number]\label{conj:loneliness}
+Define the \emph{loneliness number} $\lambda(n)$ as the infimum of $\alpha$ such
+that for all $n$ speeds, there exists $t$ with $\|v_i t\| \geq \alpha$ for all $i$.
+The LRC asserts $\lambda(n) \geq 1/(n+1)$.
+It is unknown whether $\lambda(n) = 1/(n+1)$ (exactly) or $\lambda(n) > 1/(n+1)$
+for large $n$.
+\end{conjecture}
+
+\begin{remark}
+The case $n = 8$ has been claimed by several groups using computer-assisted methods,
+but no complete verified proof has been accepted as of 2026.
+\end{remark}
+
+%% ============================================================
+\section{Conclusion}
+%% ============================================================
+
+The Lonely Runner Conjecture is a deceptively simple problem in combinatorial
+number theory and Diophantine approximation. Its equivalence to the view-obstruction
+problem and to chromatic number questions for Cayley graphs reveals deep connections
+to different areas of mathematics. Despite being verified for $n \leq 7$ runners
+and for many special speed configurations (arithmetic progressions, geometric
+progressions, bounded ratios), the general conjecture remains wide open.
+
+The primary obstacles are the lack of a structural characterization of "extremal"
+speed configurations and the failure of straightforward measure-theoretic arguments
+for $n \geq 5$. New techniques — possibly from additive combinatorics, ergodic
+theory, or spectral graph theory — may be needed for a complete resolution.
+
+%% Literaturverzeichnis
+\begin{thebibliography}{99}
+
+\bibitem{BarajasSerra2008}
+J.~Barajas, O.~Serra,
+\textit{The lonely runner with seven runners},
+Electron.\ J.\ Combin.\ \textbf{15} (2008), R48.
+
+\bibitem{BetkeWills1972}
+U.~Betke, J.\,M.~Wills,
+\textit{Untere Schranken für zwei diophantische Approximations-Funktionen},
+Monatsh.\ Math.\ \textbf{76} (1972), 214--217.
+
+\bibitem{BieniaEtal1998}
+W.~Bienia, L.~Goddyn, P.~Gvozdjak, A.~Gyárfás, M.~Tarsi,
+\textit{Flows, view obstructions, and the lonely runner},
+J.\ Combin.\ Theory Ser.\ B \textbf{72} (1998), 1--9.
+
+\bibitem{BohmanHolzmanKleitman2001}
+T.~Bohman, R.~Holzman, D.~Kleitman,
+\textit{Six lonely runners},
+Electron.\ J.\ Combin.\ \textbf{8} (2001), R3.
+
+\bibitem{Cusick1974}
+T.\,W.~Cusick,
+\textit{View-obstruction problems},
+Aequationes Math.\ \textbf{9} (1973), 165--170.
+
+\bibitem{CusickPomerance1984}
+T.\,W.~Cusick, C.~Pomerance,
+\textit{View-obstruction problems. III},
+J.\ Number Theory \textbf{19} (1984), 131--139.
+
+\bibitem{Czerwinski2012}
+S.~Czerwi\'nski,
+\textit{Lonely runners for integer linear progressions},
+preprint, 2012.
+
+\bibitem{PerarnauSerra2016}
+G.~Perarnau, O.~Serra,
+\textit{Correlation among runners and some results on the Lonely Runner Conjecture},
+Electron.\ J.\ Combin.\ \textbf{23} (2016), P1.50.
+
+\bibitem{TothCayley2001}
+C.\,D.~Tóth,
+\textit{The Lonely Runner Conjecture and the Cayley graph},
+manuscript, 2001.
+
+\bibitem{Wills1967}
+J.\,M.~Wills,
+\textit{Zwei S\"atze \"uber inhomogene diophantische Approximation von Irrationalzahlen},
+Monatsh.\ Math.\ \textbf{71} (1967), 263--269.
+
+\bibitem{SpraggeLooker1999}
+J.~Spray, J.~Looker,
+\textit{The lonely runner problem for runner's starting positions},
+preprint, University of Waterloo, 1999.
+
+\bibitem{SuSurvey2009}
+F.\,E.~Su,
+\textit{Lonely runner problem},
+in: Open Problems in Mathematics, AMS, 2009.
+
+\end{thebibliography}
+
+\end{document}

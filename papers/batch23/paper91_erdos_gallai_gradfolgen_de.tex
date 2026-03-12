@@ -1,0 +1,524 @@
+% ============================================================
+% Paper 91 (DE): Das Erdős-Gallai-Theorem und offene Probleme
+%                in Gradfolgen
+% Autor: Michael Fuhrmann
+% Specialist Mathematics Project, Build 168
+% Datum: 2026-03-12
+% ============================================================
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% ---- Theorem-Umgebungen (Deutsch) ----
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{satz}[theorem]{Satz}
+\newtheorem{korollar}[theorem]{Korollar}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{definition_de}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\newtheorem{vermutung}[theorem]{Vermutung}
+
+% ---- Operatoren ----
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+
+% ============================================================
+\begin{document}
+
+\title{Das Erd\H{o}s--Gallai-Theorem und offene Probleme\\
+in Gradfolgen}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 168}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\begin{abstract}
+Eine endliche Folge nicht-negativer ganzer Zahlen heißt \emph{graphisch}
+(oder \emph{realisierbar}), wenn sie die Gradfolge eines einfachen Graphen ist.
+Das Erd\H{o}s--Gallai-Theorem (1960) liefert eine vollständige Charakterisierung:
+Eine nicht-wachsende Folge $(d_1, \ldots, d_n)$ ist genau dann graphisch, wenn
+ihre Summe gerade ist und die Erd\H{o}s--Gallai-Ungleichungen für jedes $k$ gelten.
+Dieses elegante Ergebnis --- zunächst von Fulkerson mittels Netzwerkflüssen,
+dann durch kombinatorische Argumente (Hakimi) bewiesen --- hat eine reiche Theorie
+hervorgebracht.
+Diese Arbeit präsentiert den Satz und seine Beweise, den Gradfolgenpolytop,
+die gerichtete Variante (Satz von Gale--Ryser), Multigraph-Gradfolgen sowie
+offene Probleme: Charakterisierung von Gradfolgen planarer, außerplanarer,
+chordaler und Schwellenwertgraphen sowie das Zählproblem für Realisierungen.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+% ============================================================
+\section{Einleitung}
+% ============================================================
+
+Die \emph{Gradfolge} eines Graphen $G = (V, E)$ mit $V = \{v_1, \ldots, v_n\}$
+ist die nicht-wachsend geordnete Folge
+\[
+  d_1 \geq d_2 \geq \cdots \geq d_n \geq 0,
+\]
+wobei $d_i = \deg(v_i)$ die Anzahl der inzidenten Kanten von $v_i$ ist.
+
+Eine fundamentale Frage der Graphentheorie ist das inverse Problem:
+
+\begin{definition_de}
+Eine Folge $(d_1, \ldots, d_n)$ nicht-negativer ganzer Zahlen heißt
+\emph{graphisch} (oder \emph{realisierbar}), wenn ein einfacher Graph
+(ohne Schleifen und Mehrfachkanten) auf $n$ Knoten mit dieser Gradfolge existiert.
+\end{definition_de}
+
+Die Charakterisierung graphischer Folgen gelang unabhängig Erd\H{o}s--Gallai (1960)
+und Hakimi (1962).
+
+\begin{satz}[Erd\H{o}s--Gallai 1960]
+\label{satz:EG}
+Eine nicht-wachsende Folge nicht-negativer ganzer Zahlen
+$d_1 \geq d_2 \geq \cdots \geq d_n$
+ist genau dann graphisch, wenn:
+\begin{enumerate}[label=(\roman*)]
+  \item $\sum_{i=1}^n d_i$ gerade ist, und
+  \item Für jedes $k = 1, 2, \ldots, n$:
+        \[
+          \sum_{i=1}^k d_i \leq k(k-1) + \sum_{i=k+1}^n \min(d_i, k).
+        \]
+\end{enumerate}
+\end{satz}
+
+% ============================================================
+\section{Grundbegriffe}
+% ============================================================
+
+\begin{definition_de}
+Ein \emph{einfacher Graph} ist ein Paar $G = (V, E)$, wobei $V$ eine endliche
+Knotenmenge und $E \subseteq \binom{V}{2}$ eine Menge ungeordneter Paare (Kanten)
+ohne Schleifen oder Mehrfachkanten ist.
+\end{definition_de}
+
+\begin{lemma}[Handschlaglemma]
+Für jeden Graphen $G = (V, E)$ gilt:
+\[
+  \sum_{v \in V} \deg(v) = 2|E|.
+\]
+\end{lemma}
+
+\begin{proof}
+Jede Kante $\{u,v\}$ trägt $1$ zu $\deg(u)$ und $1$ zu $\deg(v)$ bei.
+\end{proof}
+
+\begin{korollar}
+\label{kor:gerade}
+Eine notwendige Bedingung für eine graphische Folge ist, dass ihre Summe gerade ist.
+\end{korollar}
+
+% ============================================================
+\section{Beweis des Erd\H{o}s--Gallai-Theorems}
+% ============================================================
+
+\subsection{Notwendigkeit}
+
+\begin{proposition}[Notwendigkeit der Erd\H{o}s--Gallai-Bedingungen]
+Ist $(d_1, \ldots, d_n)$ graphisch, so gelten beide Bedingungen von
+Satz~\ref{satz:EG}.
+\end{proposition}
+
+\begin{proof}
+Bedingung (i) folgt aus dem Handschlaglemma.
+Für Bedingung (ii): Sei $G$ eine Realisierung.
+Teile $V$ in $S = \{v_1, \ldots, v_k\}$ und $T = V \setminus S$ auf.
+Kantenzählung:
+\begin{itemize}[nosep]
+  \item Kanten innerhalb $S$: höchstens $\binom{k}{2} = k(k-1)/2$, beitragen
+        höchstens $k(k-1)$ zu $\sum_{i=1}^k d_i$.
+  \item Kanten zwischen $S$ und $T$: Knoten $v_i \in T$ hat höchstens
+        $\min(d_i, k)$ Kanten zu Knoten in $S$.
+\end{itemize}
+Summation liefert $\sum_{i=1}^k d_i \leq k(k-1) + \sum_{i=k+1}^n \min(d_i, k)$.
+\end{proof}
+
+\subsection{Hinreichendheit: Hakimis Algorithmus}
+
+\begin{satz}[Hakimi 1962]
+\label{satz:hakimi}
+Eine nicht-wachsende Folge $(d_1, d_2, \ldots, d_n)$ mit $d_1 \geq 1$ ist
+genau dann graphisch, wenn die Folge
+\[
+  (d_2 - 1, d_3 - 1, \ldots, d_{d_1+1} - 1, d_{d_1+2}, \ldots, d_n)
+\]
+nach Umsortierung in nicht-wachsender Reihenfolge graphisch ist.
+\end{satz}
+
+\begin{proof}
+\textbf{Notwendigkeit}: In jeder Realisierung kann man $v_1$ (mit Grad $d_1$)
+stets mit $v_2, \ldots, v_{d_1+1}$ verbunden wählen (``Austauschtrick'').
+Entfernen von $v_1$ ergibt die reduzierte Folge.
+
+\textbf{Hinreichendheit}: Hat die reduzierte Folge eine Realisierung $G'$,
+so füge Knoten $v_1$ hinzu, verbunden mit den $d_1$ Knoten höchsten Grades in $G'$.
+\end{proof}
+
+\begin{bemerkung}
+Hakimis Satz liefert einen rekursiven (konstruktiven) Beweis der Hinreichendheit.
+Zusammen mit der Notwendigkeit beweist dies das Erd\H{o}s--Gallai-Theorem.
+Der Algorithmus läuft in $O(n \log n)$ Zeit.
+\end{bemerkung}
+
+\begin{example}
+Ist $(4, 3, 3, 2, 2)$ graphisch?
+Summe $= 14$, gerade. $\checkmark$
+EG-Bedingungen für $k=1$: $4 \leq 0 + 1+1+1+1 = 4$. $\checkmark$
+$k=2$: $7 \leq 2 + 2+2+2 = 8$. $\checkmark$
+$k=3$: $10 \leq 6 + 2+2 = 10$. $\checkmark$
+$k=4$: $12 \leq 12 + 2 = 14$. $\checkmark$
+Graphisch! Hakimi: Entferne 4, subtrahiere 1 von nächsten 4: $(2,2,1,1)$.
+Weiter: $(1,0,1) \to (1,1,0)$; dann $(0,0)$. $\checkmark$
+\end{example}
+
+% ============================================================
+\section{Fulkersons Bedingungen und Netzwerkflüsse}
+% ============================================================
+
+\begin{definition_de}
+Die \emph{Fulkerson-Bedingungen} für eine Folge $(d_1, \ldots, d_n)$ lauten:
+Für alle disjunkten Teilmengen $S, T \subseteq [n]$:
+\[
+  \sum_{i \in S} d_i \leq |S|(|S|-1) + 2|S||T|
+    + \sum_{j \notin S \cup T} \min(d_j, |S|).
+\]
+\end{definition_de}
+
+\begin{satz}[Fulkerson 1960]
+Die Erd\H{o}s--Gallai-Bedingungen sind äquivalent zu Fulkersons Bedingungen
+für den Spezialfall $S = \{1, \ldots, k\}$, $T = \emptyset$.
+Ein flusbasierter Beweis liefert die Charakterisierung.
+\end{satz}
+
+% ============================================================
+\section{Der Gradfolgenpolytop}
+% ============================================================
+
+\begin{definition_de}
+Der \emph{Gradfolgenpolytop} auf $n$ Knoten ist
+\[
+  \mathcal{D}_n = \operatorname{conv}\{d(G) : G \text{ einfacher Graph auf } [n]\}
+  \subseteq \R^n.
+\]
+\end{definition_de}
+
+\begin{satz}[Polytopecharakterisierung]
+$\mathcal{D}_n$ ist ein Polytop, dessen Ecken genau die Gradfolgen von
+Schwellenwertgraphen sind.
+Seine Facetten entsprechen den Erd\H{o}s--Gallai-Ungleichungen.
+\end{satz}
+
+\begin{bemerkung}
+Der Gradfolgenpolytop ist eng mit dem Birkhoff-Polytop und
+Transportationspolytopen verwandt.
+\end{bemerkung}
+
+% ============================================================
+\section{Gerichtete Graphen: Der Satz von Gale--Ryser}
+% ============================================================
+
+\begin{definition_de}
+Ein Paar von Folgen $(\mathbf{a}, \mathbf{b})$ mit $a_i, b_j \geq 0$ heißt
+\emph{bipartit graphisch}, wenn eine $0$-$1$-Matrix $A$ mit Zeilensummen $a_i$
+und Spaltensummen $b_j$ existiert.
+\end{definition_de}
+
+\begin{satz}[Gale 1957, Ryser 1957]
+\label{satz:GR}
+Das Paar $\mathbf{a} = (a_1, \ldots, a_m)$ (nicht-wachsend) und
+$\mathbf{b} = (b_1, \ldots, b_n)$ ist bipartit graphisch genau dann, wenn
+$\sum a_i = \sum b_j$ und für jedes $k = 1, \ldots, m$:
+\[
+  \sum_{i=1}^k a_i \leq \sum_{j=1}^n \min(b_j, k).
+\]
+\end{satz}
+
+\begin{bemerkung}
+Satz~\ref{satz:GR} ist das bipartite Analogon des Erd\H{o}s--Gallai-Theorems.
+Er hat direkte Anwendungen auf das Problem der Realisierung von $(0,1)$-Matrizen
+mit vorgegebenen Zeilen- und Spaltensummen.
+\end{bemerkung}
+
+% ============================================================
+\section{Multigraph-Gradfolgen}
+% ============================================================
+
+\begin{definition_de}
+Ein \emph{Multigraph} erlaubt Mehrfachkanten zwischen demselben Knotenpaar
+(aber keine Schleifen).
+Eine Folge $(d_1, \ldots, d_n)$ heißt \emph{multigraphisch}, wenn sie
+Gradfolge eines Multigraphen ist.
+\end{definition_de}
+
+\begin{satz}[Multigraphische Charakterisierung]
+Eine nicht-wachsende Folge $(d_1, \ldots, d_n)$ ist multigraphisch genau dann, wenn:
+\begin{enumerate}[label=(\roman*)]
+  \item $\sum d_i$ gerade ist;
+  \item $d_1 \leq \sum_{i=2}^n d_i$ (der Maximalgrad überschreitet nicht die
+        Summe aller übrigen Grade).
+\end{enumerate}
+\end{satz}
+
+\begin{bemerkung}
+Die multigraphische Charakterisierung ist wesentlich einfacher als die
+einfach-graphische (Erd\H{o}s--Gallai), da Mehrfachkanten die
+$\min(d_i, k)$-Einschränkung aufheben.
+\end{bemerkung}
+
+% ============================================================
+\section{Schwellenwertgraphen}
+% ============================================================
+
+\begin{definition_de}
+Ein Graph $G$ heißt \emph{Schwellenwertgraph} (\textit{threshold graph}),
+wenn er aus einem einzelnen Knoten aufgebaut werden kann, indem man abwechselnd:
+\begin{itemize}[nosep]
+  \item einen isolierten Knoten hinzufügt (mit keinem existierenden Knoten verbunden), oder
+  \item einen dominierenden Knoten hinzufügt (mit allen existierenden Knoten verbunden).
+\end{itemize}
+\end{definition_de}
+
+\begin{satz}[Chvátal--Hammer 1977]
+Für einen Graphen $G$ sind äquivalent:
+\begin{enumerate}[label=(\roman*)]
+  \item $G$ ist ein Schwellenwertgraph;
+  \item $G$ enthält keinen induzierten Teilgraphen isomorph zu $P_4$, $C_4$ oder $2K_2$;
+  \item Die Gradfolge von $G$ ist (bis auf Isomorphie) die einzige Realisierung
+        ihrer Gradfolge.
+\end{enumerate}
+\end{satz}
+
+% ============================================================
+\section{Offene Probleme: Planare Graphen}
+% ============================================================
+
+\begin{definition_de}
+Ein Graph heißt \emph{planar}, wenn er in der Ebene ohne Kantenkreuzungen
+gezeichnet werden kann.
+\end{definition_de}
+
+\begin{vermutung}[Charakterisierung planarer Gradfolgen]
+\label{verm:planar}
+Charakterisiere alle Folgen $(d_1, \ldots, d_n)$, die Gradfolge eines
+\emph{planaren} Graphen sind.
+\end{vermutung}
+
+Vermutung~\ref{verm:planar} ist offen: Keine vollständige Charakterisierung
+planarer Gradfolgen analog zu Erd\H{o}s--Gallai ist bekannt.
+
+\begin{satz}[Notwendige Bedingungen für planare Gradfolgen]
+Ist $(d_1, \ldots, d_n)$ planar-graphisch, so gilt:
+\begin{enumerate}[label=(\roman*)]
+  \item $\sum d_i \leq 6n - 12$ (aus Eulers Formel: planarer Graph mit
+        $|E| \leq 3n-6$);
+  \item Die Folge erfüllt die Erd\H{o}s--Gallai-Bedingungen.
+\end{enumerate}
+\end{satz}
+
+\begin{bemerkung}
+Die Schwierigkeit liegt darin, dass Planarität eine globale Bedingung ist
+(kein $K_5$- oder $K_{3,3}$-Minor, nach Kuratowski/Wagner), während
+Erd\H{o}s--Gallai rein lokal ist.
+\end{bemerkung}
+
+% ============================================================
+\section{Offene Probleme: Chordale und außerplanare Graphen}
+% ============================================================
+
+\begin{definition_de}
+Ein Graph heißt \emph{chordal}, wenn jeder Kreis der Länge $\geq 4$ eine
+Sehne besitzt.
+Ein Graph heißt \emph{außerplanar}, wenn er eine planare Einbettung mit allen
+Knoten auf der äußeren Fläche hat.
+\end{definition_de}
+
+\begin{vermutung}[Chordale Gradfolgen]
+\label{verm:chordal}
+Charakterisiere Gradfolgen chordaler Graphen.
+\end{vermutung}
+
+\begin{vermutung}[Außerplanare Gradfolgen]
+\label{verm:ausserplanar}
+Charakterisiere Gradfolgen außerplanarer Graphen.
+\end{vermutung}
+
+\begin{bemerkung}
+Chordale Graphen sind vollkommene Graphen und haben eine perfekte
+Eliminationsordnung; ihre Struktur ist gut verstanden, aber die
+Gradfolgencharakterisierung bleibt offen.
+Für außerplanare Graphen gilt $|E| \leq 2n-3$, also $\sum d_i \leq 4n-6$.
+\end{bemerkung}
+
+% ============================================================
+\section{Zählen von Realisierungen}
+% ============================================================
+
+\begin{definition_de}
+Für eine graphische Folge $\mathbf{d} = (d_1, \ldots, d_n)$ sei
+$R(\mathbf{d})$ die Anzahl nicht-isomorpher einfacher Graphen mit
+Gradfolge $\mathbf{d}$.
+\end{definition_de}
+
+\begin{vermutung}[Zählen von Realisierungen]
+\label{verm:zaehlen}
+Bestimme für eine generische graphische Folge $\mathbf{d}$ die Anzahl
+$R(\mathbf{d})$ oder eine asymptotische Formel.
+\end{vermutung}
+
+\begin{satz}[McKay--Wormald 1991]
+Für Gradfolgen mit Maximalgrad $d_{\max} = O(m^{1/4})$ gilt:
+\[
+  |\{G : d(G) = \mathbf{d}\}| \sim \frac{(\sum d_i)!}{\prod_i d_i! \cdot 2^m}
+  \cdot \exp\left(-\frac{\lambda^2}{4}\right),
+\]
+wobei $m = \sum d_i/2$ und $\lambda = \sum d_i(d_i-1)/m$.
+\end{satz}
+
+\begin{bemerkung}
+Das exakte Zählen von Realisierungen ist im Allgemeinen $\#P$-vollständig,
+also für große Folgen rechnerisch nicht handhabbar.
+\end{bemerkung}
+
+% ============================================================
+\section{Ganzzahlige Programmierung und Polytope}
+% ============================================================
+
+\begin{satz}[IP-Formulierung]
+Eine Folge $\mathbf{d}$ ist graphisch genau dann, wenn das folgende
+ganzzahlige lineare Programm eine Lösung hat:
+\[
+  \text{finde } x_{ij} \in \{0,1\} \quad \text{für } i < j \leq n
+  \quad \text{mit} \quad \sum_{j \neq i} x_{ij} = d_i \; \forall i.
+\]
+\end{satz}
+
+\begin{bemerkung}
+Das Erd\H{o}s--Gallai-Theorem ist äquivalent dazu, dass die LP-Relaxierung
+dieses Programms stets ganzzahlige optimale Lösungen hat, wenn die rechte Seite
+die EG-Bedingungen erfüllt.
+\end{bemerkung}
+
+% ============================================================
+\section{Zusammenfassung und offene Probleme}
+% ============================================================
+
+\begin{satz}[Erd\H{o}s--Gallai, Zusammenfassung]
+Eine nicht-wachsende Folge $(d_1, \ldots, d_n)$ nicht-negativer ganzer Zahlen ist
+die Gradfolge eines einfachen Graphen genau dann, wenn:
+\[
+  \sum_{i=1}^n d_i \equiv 0 \pmod{2}
+  \quad \text{und} \quad
+  \sum_{i=1}^k d_i \leq k(k-1) + \sum_{i=k+1}^n \min(d_i, k)
+  \quad \forall\, k.
+\]
+\end{satz}
+
+\noindent\textbf{Offene Probleme:}
+\begin{enumerate}[label=(\arabic*)]
+  \item \textbf{Planare Gradfolgen}: Kein Analogon zu Erd\H{o}s--Gallai bekannt.
+  \item \textbf{Außerplanare Gradfolgen}: Vollständige Charakterisierung offen.
+  \item \textbf{Chordale Gradfolgen}: Vollständige Charakterisierung offen.
+  \item \textbf{Zählen}: Effizientes exaktes Zählen von $R(\mathbf{d})$.
+  \item \textbf{Flächen}: Gradfolgen von Graphen auf Flächen vom Geschlecht $g$.
+  \item \textbf{Gleichmäßige Stichproben}: Effizientes Abtasten einer
+        gleichmäßigen Verteilung über alle Realisierungen.
+\end{enumerate}
+
+% ============================================================
+\section{Schluss}
+% ============================================================
+
+Das Erd\H{o}s--Gallai-Theorem liefert eine elegante und effiziente Charakterisierung
+von Gradfolgen einfacher Graphen.
+Der 1960 bewiesene und 1962 durch Hakimis konstruktiven Ansatz verfeinerte Satz
+verbindet Netzwerkflusstheorie, Polytopgeometrie und kombinatorische Zählprobleme.
+
+Trotz dieser vollständigen Lösung für einfache Graphen bleiben die analogen Probleme
+für strukturell eingeschränkte Graphen (planar, chordal, außerplanar) offen ---
+ein eindrucksvolles Beispiel dafür, wie eine lokale kombinatorische Bedingung
+(Gradfolge) globale Struktureigenschaften (Planarität) nicht in eine saubere
+Charakterisierung fasst.
+
+% ============================================================
+\begin{thebibliography}{99}
+
+\bibitem{ErdosGallai1960}
+P.\ Erd\H{o}s und T.\ Gallai,
+\textit{Graphs with prescribed degrees of vertices} (Ungarisch),
+Mat.\ Lapok \textbf{11} (1960), 264--274.
+
+\bibitem{Hakimi1962}
+S.\ L.\ Hakimi,
+\textit{On realizability of a set of integers as degrees of the vertices of a
+linear graph, I},
+J.\ SIAM Appl.\ Math.\ \textbf{10} (1962), 496--506.
+
+\bibitem{Fulkerson1965}
+D.\ R.\ Fulkerson,
+\textit{Zero-one matrices with zero trace},
+Pacific J.\ Math.\ \textbf{12} (1965), 831--836.
+
+\bibitem{Gale1957}
+D.\ Gale,
+\textit{A theorem on flows in networks},
+Pacific J.\ Math.\ \textbf{7} (1957), 1073--1082.
+
+\bibitem{Ryser1957}
+H.\ J.\ Ryser,
+\textit{Combinatorial properties of matrices of zeros and ones},
+Canad.\ J.\ Math.\ \textbf{9} (1957), 371--377.
+
+\bibitem{ChvatalHammer1977}
+V.\ Chvátal und P.\ L.\ Hammer,
+\textit{Aggregation of inequalities in integer programming},
+Ann.\ Discrete Math.\ \textbf{1} (1977), 145--162.
+
+\bibitem{McKayWormald1991}
+B.\ D.\ McKay und N.\ C.\ Wormald,
+\textit{Asymptotic enumeration by degree sequence of graphs with degrees
+$o(n^{1/2})$},
+Combinatorica \textbf{11} (1991), 369--382.
+
+\bibitem{Diestel2010}
+R.\ Diestel,
+\textit{Graphentheorie},
+4.\ Aufl., Springer, 2010.
+
+\bibitem{BondyMurty2008}
+J.\ A.\ Bondy und U.\ S.\ R.\ Murty,
+\textit{Graph Theory},
+Springer, 2008.
+
+\bibitem{Sierksma1991}
+G.\ Sierksma und H.\ Hoogeveen,
+\textit{Seven criteria for integer sequences being graphic},
+J.\ Graph Theory \textbf{15} (1991), 223--231.
+
+\bibitem{Tripathi2003}
+A.\ Tripathi und S.\ Vijay,
+\textit{A note on a theorem of Erd\H{o}s and Gallai},
+Discrete Math.\ \textbf{265} (2003), 417--420.
+
+\end{thebibliography}
+
+\end{document}

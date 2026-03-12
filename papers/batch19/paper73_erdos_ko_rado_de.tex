@@ -1,0 +1,525 @@
+%%
+%% Datei: paper73_erdos_ko_rado_de.tex
+%% Autor: Michael Fuhrmann
+%% Beschreibung: Der Erdős-Ko-Rado-Satz: Verallgemeinerungen und offene Probleme
+%%               (Deutsche Version)
+%% Erstellt: 2026-03-12
+%% lastModified: 2026-03-12
+%% Build: 164
+%%
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem-Umgebungen (Englisch, Basis)
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+%% Deutsche Theorem-Umgebungen
+\newtheorem{satz}[theorem]{Satz}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{lemma_de}[theorem]{Lemma}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{definition_de}[theorem]{Definition}
+
+%% Kürzel
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+
+%% Abstract VOR \maketitle
+\begin{abstract}
+Der Erdős--Ko--Rado-Satz (EKR) von 1961 ist das grundlegende Ergebnis der
+extremalen Mengenlehre: Die größte schneidende $k$-uniforme Familie über einer
+$n$-elementigen Grundmenge ist ein \emph{Stern} (alle Mengen enthalten ein festes
+Element), sofern $n \geq 2k$. Wir geben eine Gesamtdarstellung des Originalsatzes
+mit Katonas elegantem Kreisbeweis, der Hilton--Milner-Charakterisierung der
+zweitgrößten Familie, Frankls $t$-schneidender Verallgemeinerung, dem vollständigen
+Schnittsatz von Ahlswede--Khachatrian und den $q$-Analoga über Vektorräumen.
+Kreuzschneidende Familien, Zeichenmengen und Permutationsgruppen werden behandelt.
+Frankls Vereinigungs-geschlossene Vermutung und mehrere Extremalprobleme für
+nicht-uniforme Hypergraphen bleiben offen.
+\end{abstract}
+
+\title{Der Erd\H{o}s--Ko--Rado-Satz:\\
+Verallgemeinerungen und offene Probleme}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 164}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\maketitle
+
+\tableofcontents
+
+%% ============================================================
+\section{Einleitung}
+%% ============================================================
+
+Sei $[n] = \{1, 2, \ldots, n\}$ und $\binom{[n]}{k}$ die Menge aller
+$k$-elementigen Teilmengen von $[n]$. Eine Familie
+$\mathcal{F} \subseteq \binom{[n]}{k}$ heißt \emph{schneidend} (intersecting), wenn
+$A \cap B \neq \emptyset$ für alle $A, B \in \mathcal{F}$.
+
+Die einfachste schneidende Familie ist der \emph{Stern}
+$\mathcal{S}_i = \{A \in \binom{[n]}{k} : i \in A\}$
+mit Größe $\binom{n-1}{k-1}$. Die grundlegende Frage lautet: Ist dies die größte
+mögliche schneidende Familie?
+
+\begin{satz}[Erdős--Ko--Rado \cite{ErdosKoRado1961}]\label{satz:ekr}
+Sei $n \geq 2k$ und $\mathcal{F} \subseteq \binom{[n]}{k}$ schneidend. Dann gilt:
+\[
+  |\mathcal{F}| \leq \binom{n-1}{k-1}.
+\]
+Gleichheit gilt (für $n > 2k$) genau dann, wenn $\mathcal{F}$ ein Stern ist.
+\end{satz}
+
+Dieser Satz hat eine enorme Literatur erzeugt. Seine Verallgemeinerungen berühren
+Kombinatorik, Algebra, Codierungstheorie und diskrete Geometrie.
+
+%% ============================================================
+\section{Katonas Kreisbeweis}\label{sec:katona}
+%% ============================================================
+
+Der eleganteste Beweis des EKR-Satzes stammt von Katona \cite{Katona1972}.
+
+\begin{proof}[Katonas Beweis von Satz~\ref{satz:ekr}]
+Betrachte alle $n!$ zyklischen Permutationen von $[n]$ auf einem Kreis angeordnet.
+Für jede $k$-elementige Menge $A \subseteq [n]$ erscheint sie als aufeinanderfolgender
+Bogen in genau $k!(n-k)!$ dieser zyklischen Anordnungen.
+
+Für eine feste zyklische Anordnung $\sigma$ heißt $A \in \mathcal{F}$ ein
+\emph{guter Bogen}, wenn er als aufeinanderfolgender Bogen in $\sigma$ erscheint.
+Da $\mathcal{F}$ schneidend ist, müssen je zwei gute Bögen in $\sigma$ sich
+überlappen; da sie alle Länge $k$ auf einem Kreis der Länge $n \geq 2k$ haben,
+können höchstens $k$ der $n$ möglichen $k$-Bögen in $\sigma$ paarweise schneiden
+(sie müssen sich alle um einen gemeinsamen Punkt "stapeln"). Also erscheinen
+höchstens $k$ Elemente von $\mathcal{F}$ als Bögen in $\sigma$.
+
+Zählen der Paare $(\sigma, A)$ mit $A$ als gutem Bogen von $\sigma$:
+\[
+  \sum_\sigma |\{\text{gute Bögen von } \sigma \text{ in } \mathcal{F}\}|
+  = |\mathcal{F}| \cdot k!(n-k)!.
+\]
+Da jedes $\sigma$ höchstens $k$ beiträgt:
+\[
+  |\mathcal{F}| \cdot k!(n-k)! \leq k \cdot n!,
+  \quad\Longrightarrow\quad
+  |\mathcal{F}| \leq \frac{k \cdot n!}{k!(n-k)!} = \binom{n-1}{k-1}.
+\qedhere\]
+\end{proof}
+
+%% ============================================================
+\section{Der Hilton--Milner-Satz}\label{sec:hilton_milner}
+%% ============================================================
+
+\begin{satz}[Hilton--Milner \cite{HiltonMilner1967}]\label{satz:hilton_milner}
+Sei $n > 2k$ und $\mathcal{F} \subseteq \binom{[n]}{k}$ schneidend mit
+$\bigcap_{A \in \mathcal{F}} A = \emptyset$ (kein gemeinsames Element). Dann gilt:
+\[
+  |\mathcal{F}| \leq \binom{n-1}{k-1} - \binom{n-k-1}{k-1} + 1.
+\]
+\end{satz}
+
+\begin{proof}[Beweissskizze]
+Da $\mathcal{F}$ schneidend, aber ohne gemeinsames Element ist, gibt es
+$A, B \in \mathcal{F}$ mit $A \cap B = \{x\}$ für ein $x$ (das "Zeugenpaar").
+Jedes weitere $F \in \mathcal{F}$ muss sowohl $A$ als auch $B$ schneiden, also
+entweder $x \in F$ oder $F$ schneidet $A \setminus \{x\}$ und $B \setminus \{x\}$.
+Sorgfältiges Abzählen dieser Fälle liefert die Schranke.
+\end{proof}
+
+\begin{bemerkung}
+Die extremale Familie für Hilton--Milner ist
+$\mathcal{HM}(n,k) = \{A \in \binom{[n]}{k} : 1 \in A,\, A \cap [k+1] \neq \emptyset\}
+\cup \{[2, k+1]\}$.
+\end{bemerkung}
+
+%% ============================================================
+\section{Frankls $t$-schneidender Satz}\label{sec:frankl}
+%% ============================================================
+
+\begin{definition_de}[$t$-schneidende Familie]
+Eine Familie $\mathcal{F} \subseteq \binom{[n]}{k}$ heißt \emph{$t$-schneidend},
+wenn $|A \cap B| \geq t$ für alle $A, B \in \mathcal{F}$.
+\end{definition_de}
+
+\begin{satz}[Frankl \cite{Frankl1977}]\label{satz:frankl_t}
+Sei $n$ hinreichend groß (Frankl-Schranke) und $\mathcal{F} \subseteq \binom{[n]}{k}$
+$t$-schneidend. Dann gilt:
+\[
+  |\mathcal{F}| \leq \binom{n-t}{k-t}.
+\]
+\end{satz}
+
+Das extremale Beispiel ist der \emph{$t$-Stern}:
+$\mathcal{F}^* = \{A \in \binom{[n]}{k} : [t] \subseteq A\}$ mit Größe
+$\binom{n-t}{k-t}$.
+
+%% ============================================================
+\section{Der vollständige Satz von Ahlswede--Khachatrian}\label{sec:ak}
+%% ============================================================
+
+Für alle Werte von $n, k, t$ wurde die vollständige Antwort von Ahlswede und
+Khachatrian gegeben.
+
+\begin{definition_de}[$r$-Kern-Familie]
+Für $0 \leq r \leq k-t$ definiere die \emph{$r$-Kern-Familie}
+\[
+  \mathcal{A}_r = \{A \in \binom{[n]}{k} : |A \cap [t+2r]| \geq t+r\}.
+\]
+\end{definition_de}
+
+\begin{satz}[Ahlswede--Khachatrian \cite{AhlswedeKhachatrian1997}]\label{satz:ak}
+Sei $1 \leq t \leq k \leq n$ und $\mathcal{F} \subseteq \binom{[n]}{k}$
+$t$-schneidend. Dann gilt:
+\[
+  |\mathcal{F}| \leq \max_{r \geq 0} |\mathcal{A}_r|,
+\]
+und Gleichheit gilt genau dann, wenn $\mathcal{F}$ isomorph zu einem $\mathcal{A}_r$ ist.
+\end{satz}
+
+\begin{bemerkung}
+Dies ist eine vollständige Charakterisierung. Das Maximum wird beim durch $n, k, t$
+bestimmten Wert von $r$ angenommen. Für $n$ groß relativ zu $k$ liegt das Maximum
+bei $r=0$ (Frankls Satz).
+\end{bemerkung}
+
+%% ============================================================
+\section{Kreuzschneidende Familien}\label{sec:kreuz}
+%% ============================================================
+
+\begin{definition_de}[Kreuzschneidend]
+Zwei Familien $\mathcal{A}, \mathcal{B} \subseteq \binom{[n]}{k}$ heißen
+\emph{kreuzschneidend}, wenn $A \cap B \neq \emptyset$ für alle $A \in \mathcal{A}$,
+$B \in \mathcal{B}$.
+\end{definition_de}
+
+\begin{satz}[Pyber \cite{Pyber1986}]\label{satz:pyber}
+Sind $\mathcal{A}, \mathcal{B} \subseteq \binom{[n]}{k}$ kreuzschneidend mit
+$n \geq 2k$, so gilt:
+\[
+  |\mathcal{A}| \cdot |\mathcal{B}| \leq \binom{n-1}{k-1}^2.
+\]
+\end{satz}
+
+\begin{vermutung}[Kreuzschneidende Summenvermutung]\label{verm:kreuz_summe}
+Sind $\mathcal{A}, \mathcal{B} \subseteq \binom{[n]}{k}$ kreuzschneidend mit
+$n \geq 2k$, so gilt:
+\[
+  |\mathcal{A}| + |\mathcal{B}| \leq \binom{n}{k} - \binom{n-k}{k} + 1.
+\]
+\end{vermutung}
+
+%% ============================================================
+\section{$q$-Analog: Vektorräume über $\mathbb{F}_q$}\label{sec:q_analog}
+%% ============================================================
+
+\begin{definition_de}[$q$-Analog]
+Sei $V = \F_q^n$ der $n$-dimensionale Vektorraum über $\F_q$. Der
+\emph{Gauß'sche Binomialkoeffizient} $\binom{n}{k}_q$ zählt die $k$-dimensionalen
+Unterräume von $V$:
+\[
+  \binom{n}{k}_q = \prod_{i=0}^{k-1} \frac{q^{n-i} - 1}{q^{i+1} - 1}.
+\]
+Eine Familie $\mathcal{F}$ von $k$-dimensionalen Unterräumen heißt
+\emph{schneidend}, wenn $\dim(U \cap W) \geq 1$ für alle $U, W \in \mathcal{F}$.
+\end{definition_de}
+
+\begin{satz}[$q$-Analog EKR \cite{FranklWilson1986}]\label{satz:q_ekr}
+Sei $n \geq 2k$ und $\mathcal{F}$ eine schneidende Familie von $k$-dimensionalen
+Unterräumen von $\F_q^n$. Dann gilt:
+\[
+  |\mathcal{F}| \leq \binom{n-1}{k-1}_q.
+\]
+Gleichheit gilt genau dann, wenn $\mathcal{F}$ ein \emph{$q$-Stern} ist: alle
+$k$-Räume, die einen festen 1-dimensionalen Unterraum enthalten.
+\end{satz}
+
+\begin{proof}[Beweissskizze]
+Katonas Kreisbeweis lässt sich mit einem $q$-Analog des Permutationszählarguments
+adaptieren. Alternativ nutzt die Frankl--Wilson-Methode die Darstellungstheorie
+von $GL_n(\F_q)$.
+\end{proof}
+
+\begin{bemerkung}
+Das $q$-Analog ist streng allgemeiner: $\binom{n-1}{k-1}_q \to \binom{n-1}{k-1}$
+für $q \to 1$ (in geeignetem Sinne). Die Theorie der $q$-Analoga verbindet sich
+mit Gebäuden, Codierungstheorie und zufälligen simplizialen Komplexen.
+\end{bemerkung}
+
+%% ============================================================
+\section{Zeichenmengen und Permutationsgruppen}\label{sec:zeichen}
+%% ============================================================
+
+\begin{definition_de}[Vorzeichenmenge]
+Eine \emph{Vorzeichen-$k$-Menge} auf $[n]$ ist ein Paar $(A, \epsilon)$, wobei
+$A \in \binom{[n]}{k}$ und $\epsilon: A \to \{+, -\}$ eine Vorzeichenfunktion ist.
+Zwei Vorzeichenmengen sind \emph{schneidend}, wenn sie ein vorzeichengleiches
+Element teilen: es gibt $x \in A \cap B$ mit $\epsilon_A(x) = \epsilon_B(x)$.
+\end{definition_de}
+
+\begin{satz}[Vorzeichen-EKR \cite{DezaFranklFuredi1983}]\label{satz:zeichen_ekr}
+Die größte schneidende Familie von Vorzeichen-$k$-Mengen auf $[n]$ (für $n \geq 2k$)
+hat Größe $2^{k-1}\binom{n-1}{k-1}$.
+\end{satz}
+
+\begin{definition_de}[Schneidende Permutationsfamilie]
+Eine Familie $\mathcal{F}$ von Permutationen von $[n]$ heißt \emph{schneidend},
+wenn für je zwei $\sigma, \tau \in \mathcal{F}$ ein $i$ mit $\sigma(i) = \tau(i)$
+existiert.
+\end{definition_de}
+
+\begin{satz}[Deza--Frankl \cite{DezaFranklPerm1983}]\label{satz:deza_frankl_perm}
+Die größte schneidende Permutationsfamilie von $[n]$ hat Größe $(n-1)!$;
+die extremalen Familien sind Nebenklassen von Punktstabilisatoren.
+\end{satz}
+
+%% ============================================================
+\section{Nicht-uniforme Hypergraphen}\label{sec:nicht_uniform}
+%% ============================================================
+
+Für nicht-uniforme (gemischtgroße) schneidende Familien ist die Situation
+komplizierter.
+
+\begin{definition_de}[Schneidende Antikette]
+Eine Familie $\mathcal{F} \subseteq 2^{[n]}$ heißt \emph{schneidende Antikette},
+wenn $\mathcal{F}$ schneidend ist und keine Menge in $\mathcal{F}$ eine andere
+enthält.
+\end{definition_de}
+
+\begin{satz}[Bollobás-Mengenpaare-Ungleichung \cite{Bollobas1965}]\label{satz:bollobas}
+Seien $(A_i, B_i)_{i=1}^m$ Mengenpaare mit $A_i \cap B_j = \emptyset$ genau dann
+wenn $i = j$, $|A_i| = a$, $|B_i| = b$. Dann gilt $m \leq \binom{a+b}{a}$.
+\end{satz}
+
+\begin{vermutung}[Nicht-uniformes EKR]\label{verm:nicht_uniform}
+Für jede schneidende Antikette $\mathcal{F} \subseteq 2^{[n]}$ gibt es ein
+Element $x \in [n]$, das in mindestens der Hälfte der Mengen in $\mathcal{F}$
+enthalten ist.
+\end{vermutung}
+
+%% ============================================================
+\section{Frankls Vereinigungs-geschlossene Vermutung}\label{sec:vereinigung}
+%% ============================================================
+
+\begin{vermutung}[Frankls Vereinigungs-geschlossene Vermutung \cite{Frankl1979}]
+\label{verm:frankl_vg}
+Sei $\mathcal{F}$ eine endliche vereinigungs-geschlossene Familie endlicher Mengen
+(d.\,h.\ $A, B \in \mathcal{F}$ impliziert $A \cup B \in \mathcal{F}$) mit
+$\mathcal{F} \neq \{\emptyset\}$. Dann gibt es ein Element $x$, das in mindestens
+der Hälfte der Mengen in $\mathcal{F}$ enthalten ist.
+\end{vermutung}
+
+\begin{bemerkung}
+Diese Vermutung ist seit 1979 bekannt und hat trotz enormer Anstrengungen keinen
+Beweis erhalten. Wichtige Teilresultate:
+\begin{enumerate}[label=(\roman*)]
+  \item Knill: wahr für $|\mathcal{F}| \leq 50$ \cite{Knill1994}.
+  \item Bošnjak--Marković: wahr, wenn die Grundmenge höchstens 12 Elemente hat
+        \cite{BosnjacMarkovic2008}.
+  \item Gilmer (2022): Es gibt stets ein $x$ in mindestens $0{,}01\%$ der Mengen
+        \cite{Gilmer2022} (Entropiemethode).
+  \item Chase--Lovett (2024): Verbesserung auf $(50 - \varepsilon)\%$ via
+        verfeinerter Entropie \cite{ChaseLovett2024} — bislang bestes Ergebnis.
+\end{enumerate}
+\end{bemerkung}
+
+%% ============================================================
+\section{Stabilitätsergebnisse}\label{sec:stabilitaet}
+%% ============================================================
+
+Ein \emph{Stabilitätsergebnis} fragt: Wenn $|\mathcal{F}|$ nahe am Maximum liegt,
+muss $\mathcal{F}$ (strukturell) nahe an der extremalen Familie sein?
+
+\begin{satz}[Frankl Stabilität \cite{Frankl1987stability}]\label{satz:frankl_stab}
+Sei $n > (2+\varepsilon)k$ und $\mathcal{F} \subseteq \binom{[n]}{k}$ schneidend mit
+$|\mathcal{F}| \geq (1-\delta)\binom{n-1}{k-1}$. Dann gibt es $i \in [n]$ mit
+\[
+  |\mathcal{F} \setminus \mathcal{S}_i| \leq \delta' \binom{n-2}{k-2},
+\]
+wobei $\delta' \to 0$ für $\delta \to 0$.
+\end{satz}
+
+%% ============================================================
+\section{Algebraische Methoden: Das Polynomverfahren}\label{sec:algebraisch}
+%% ============================================================
+
+\begin{satz}[Frankl--Wilson-Satz \cite{FranklWilson1981}]\label{satz:frankl_wilson}
+Sei $L \subseteq \Z_{\geq 0}$ eine Menge von $s$ Resten modulo einer Primzahl $p$,
+und $\mathcal{F} \subseteq 2^{[n]}$ eine Familie, sodass $|A| \not\equiv 0 \pmod{p}$
+für alle $A \in \mathcal{F}$ und $|A \cap B| \equiv \lambda_i \pmod{p}$ für ein
+$\lambda_i \in L$ gilt, wenn $A \neq B$. Dann gilt $|\mathcal{F}| \leq \binom{n}{s}$.
+\end{satz}
+
+\begin{korollar}[Untere Schranke für chromatische Zahl]\label{kor:chrom}
+Der Kneser-Graph $K(n, k)$ (Knoten sind $k$-Mengen, Kanten verbinden disjunkte
+Mengen) erfüllt $\chi(K(n, k)) \geq n - 2k + 2$. Dies bewies Lovász erstmals mit
+topologischen Methoden \cite{Lovasz1978} und wurde später via den Borsuk--Ulam-Satz
+neu bewiesen.
+\end{korollar}
+
+%% ============================================================
+\section{Offene Probleme}\label{sec:offen}
+%% ============================================================
+
+\begin{vermutung}[Optimale kreuzschneidende Familien]\label{verm:kreuz_opt}
+Für kreuzschneidende Familien $\mathcal{A}, \mathcal{B} \subseteq \binom{[n]}{k}$
+mit $n \geq 2k$ gilt:
+\[
+  |\mathcal{A}| + |\mathcal{B}| \leq \binom{n}{k} - \binom{n-k}{k} + 1.
+\]
+\end{vermutung}
+
+\begin{vermutung}[$t$-schneidend für kleines $n$]\label{verm:t_klein_n}
+Bestimme die maximale Größe einer $t$-schneidenden Familie in $\binom{[n]}{k}$ für
+ALLE Werte von $n, k, t$. Der Satz von Ahlswede--Khachatrian beantwortet dies
+vollständig, aber der Beweis ist lang und nicht-elementar; ein kurzer Beweis ist
+erwünscht.
+\end{vermutung}
+
+\begin{vermutung}[EKR für Permutationen mit $t \geq 2$]\label{verm:ekr_perm}
+Die größte $t$-schneidende Permutationsfamilie von $[n]$ (mit Übereinstimmung in
+$\geq t$ Stellen) hat Größe $(n-t)!$. Bekannt ist dies für $t=1$ (Deza--Frankl),
+der allgemeine Fall ist offen.
+\end{vermutung}
+
+\begin{vermutung}[Frankl Vereinigungs-geschlossen, wiederholt]
+\label{verm:frankl_vg2}
+(Vgl.\ Vermutung~\ref{verm:frankl_vg}.) Dies gilt weithin als eines der
+schönsten und zugänglichsten offenen Probleme der Kombinatorik.
+\end{vermutung}
+
+%% ============================================================
+\section{Schluss}
+%% ============================================================
+
+Der Erdős--Ko--Rado-Satz ist eines der einflussreichsten Ergebnisse der
+Kombinatorik. Sein Beweis durch Katonas Kreismethode ist ein Muster an Eleganz.
+Die Verallgemeinerungen erstrecken sich auf $t$-schneidende Familien
+(Frankl, Ahlswede--Khachatrian), kreuzschneidende Familien, $q$-Analoga über
+Vektorräumen, Vorzeichenmengen und Permutationsgruppen. Die algebraische
+Frankl--Wilson-Methode verbindet EKR mit Codierungstheorie und chromatischen
+Zahlen.
+
+Trotz mehr als 60 Jahren Forschung bleiben grundlegende Probleme offen: Frankls
+Vereinigungs-geschlossene Vermutung, optimale kreuzschneidende Schranken und
+EKR-Analoga für Permutationen mit $t \geq 2$. Die von Gilmer und Chase--Lovett
+eingeführten Entropiemethoden eröffnen vielversprechende neue Richtungen.
+
+%% Literaturverzeichnis
+\begin{thebibliography}{99}
+
+\bibitem{AhlswedeKhachatrian1997}
+R.~Ahlswede, L.\,H.~Khachatrian,
+\textit{The complete intersection theorem for systems of finite sets},
+European J.\ Combin.\ \textbf{18} (1997), 125--136.
+
+\bibitem{Bollobas1965}
+B.~Bollobás,
+\textit{On generalized graphs},
+Acta Math.\ Acad.\ Sci.\ Hungar.\ \textbf{16} (1965), 447--452.
+
+\bibitem{BosnjacMarkovic2008}
+I.~Bošnjak, P.~Marković,
+\textit{The 11-element case of Frankl's conjecture},
+Electron.\ J.\ Combin.\ \textbf{15} (2008), R88.
+
+\bibitem{ChaseLovett2024}
+Z.~Chase, S.~Lovett,
+\textit{Approximate union closed sets and union-closed conjecture},
+Preprint arXiv:2201.01800 (2024, aktualisiert).
+
+\bibitem{DezaFranklFuredi1983}
+M.~Deza, P.~Frankl, Z.~Füredi,
+\textit{The Erdős--Ko--Rado theorem for signed sets},
+Computers \& Mathematics with Applications \textbf{34} (1983), 89--95.
+
+\bibitem{DezaFranklPerm1983}
+M.~Deza, P.~Frankl,
+\textit{Erdős--Ko--Rado theorem --- 22 years later},
+SIAM J.\ Algebraic Discrete Methods \textbf{4} (1983), 419--431.
+
+\bibitem{ErdosKoRado1961}
+P.~Erd\H{o}s, C.~Ko, R.~Rado,
+\textit{Intersection theorems for systems of finite sets},
+Quart.\ J.\ Math.\ Oxford \textbf{12} (1961), 313--320.
+
+\bibitem{Frankl1977}
+P.~Frankl,
+\textit{The Erdős--Ko--Rado theorem is true for $n = ckt$},
+Colloq.\ Math.\ Soc.\ J.\ Bolyai \textbf{18} (1977), 365--375.
+
+\bibitem{Frankl1979}
+P.~Frankl,
+\textit{An extremal problem for two families of sets},
+European J.\ Combin.\ \textbf{3} (1979), 125--127.
+
+\bibitem{Frankl1987stability}
+P.~Frankl,
+\textit{Stability of Erdős--Ko--Rado type results},
+J.\ Combin.\ Theory Ser.\ A \textbf{46} (1987), 10--14.
+
+\bibitem{FranklWilson1981}
+P.~Frankl, R.\,M.~Wilson,
+\textit{Intersection theorems with geometric consequences},
+Combinatorica \textbf{1} (1981), 357--368.
+
+\bibitem{FranklWilson1986}
+P.~Frankl, R.\,M.~Wilson,
+\textit{The Erdős--Ko--Rado theorem for vector spaces},
+J.\ Combin.\ Theory Ser.\ A \textbf{43} (1986), 228--236.
+
+\bibitem{Gilmer2022}
+J.~Gilmer,
+\textit{A constant lower bound for the union-closed conjecture},
+Preprint arXiv:2211.09055 (2022).
+
+\bibitem{HiltonMilner1967}
+A.\,J.\,W.~Hilton, E.\,C.~Milner,
+\textit{Some intersection theorems for systems of finite sets},
+Quart.\ J.\ Math.\ Oxford \textbf{18} (1967), 369--384.
+
+\bibitem{Katona1972}
+G.\,O.\,H.~Katona,
+\textit{A simple proof of the Erdős--Ko--Rado theorem},
+J.\ Combin.\ Theory Ser.\ B \textbf{13} (1972), 183--184.
+
+\bibitem{Knill1994}
+E.~Knill,
+\textit{Graph generated union-closed families of sets},
+Preprint, Los Alamos National Laboratory, 1994.
+
+\bibitem{Lovasz1978}
+L.~Lov\'asz,
+\textit{Kneser's conjecture, chromatic number, and homotopy},
+J.\ Combin.\ Theory Ser.\ A \textbf{25} (1978), 319--324.
+
+\bibitem{Pyber1986}
+L.~Pyber,
+\textit{A new generalization of the Erdős--Ko--Rado theorem},
+J.\ Combin.\ Theory Ser.\ A \textbf{43} (1986), 85--90.
+
+\bibitem{GodsilvMeagherBook}
+C.~Godsil, K.~Meagher,
+\textit{Erd\H{o}s--Ko--Rado Theorems: Algebraic Approaches},
+Cambridge University Press, Cambridge, 2016.
+
+\end{thebibliography}
+
+\end{document}

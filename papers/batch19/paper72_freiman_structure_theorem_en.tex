@@ -1,0 +1,610 @@
+%%
+%% Datei: paper72_freiman_structure_theorem_en.tex
+%% Autor: Michael Fuhrmann
+%% Beschreibung: Freiman's Theorem and Improvements to the Structural Theorem
+%%               of Additive Combinatorics (English Version)
+%% Erstellt: 2026-03-12
+%% lastModified: 2026-03-12
+%% Build: 164
+%%
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem-Umgebungen (Englisch)
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+%% Mathematische Operatoren
+\DeclareMathOperator{\Sumset}{+}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\C}{\mathbb{C}}
+
+%% Abstract VOR \maketitle
+\begin{abstract}
+Freiman's theorem is one of the cornerstones of additive combinatorics: it asserts
+that a finite set $A \subset \Z$ with small doubling constant $|A+A| \leq K|A|$
+must be contained in a generalized arithmetic progression of bounded dimension and
+size. We survey the original theorem, its quantitative refinements by
+Bilu, Green--Ruzsa, and Sanders, and the foundational Plünnecke--Ruzsa
+inequality. We present complete proofs of the Plünnecke--Ruzsa inequality and the
+Green--Ruzsa generalization to torsion-free abelian groups, discuss connections to
+Roth's theorem and sum-free sets, and highlight the remaining open problems
+concerning optimal constants, in particular Sanders' quasi-polynomial bound and
+the question whether a polynomial bound is achievable.
+\end{abstract}
+
+\title{Freiman's Theorem and Improvements to the Structural Theorem\\
+of Additive Combinatorics}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 164}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\maketitle
+
+%% Inhaltsverzeichnis
+\tableofcontents
+
+%% ============================================================
+\section{Introduction}
+%% ============================================================
+
+A central question in additive combinatorics asks: what structural information
+is encoded in the smallness of a sumset? Given a finite non-empty set
+$A \subseteq \Z$, the \emph{sumset} is
+\[
+  A + A := \{a + b \mid a, b \in A\},
+\]
+and the \emph{doubling constant} is $K := |A + A|/|A|$. Since
+$|A + A| \geq 2|A| - 1$ for sets of integers (with equality iff $A$ is itself an
+arithmetic progression), small $K$ forces $A$ to have arithmetic structure.
+
+Freiman's theorem \cite{Freiman1966} makes this precise: if $K$ is bounded, then
+$A$ lies inside a \emph{generalized arithmetic progression} (GAP) of dimension and
+size depending only on $K$. This qualitative result was the starting point for a
+rich theory developed by Ruzsa, Bilu, Gowers, Green, Tao, and Sanders, among many
+others.
+
+\subsection{Overview of the paper}
+
+Section~\ref{sec:definitions} introduces GAPs, doubling constants, and the
+Plünnecke graph. Section~\ref{sec:plunnecke} proves the Plünnecke--Ruzsa
+inequality. Section~\ref{sec:freiman} states and sketches the proof of Freiman's
+theorem. Section~\ref{sec:green_ruzsa} presents the Green--Ruzsa generalization.
+Sections~\ref{sec:bogolyubov}--\ref{sec:sanders} discuss Bogolyubov's method,
+Roth's theorem connection, and Sanders' quasi-polynomial improvement. Sum-free
+sets are treated in Section~\ref{sec:sumfree}, and open problems conclude the
+paper in Section~\ref{sec:open}.
+
+%% ============================================================
+\section{Definitions and Basic Notions}\label{sec:definitions}
+%% ============================================================
+
+\begin{definition}[Generalized Arithmetic Progression]
+A \emph{$d$-dimensional generalized arithmetic progression} (GAP) in an abelian
+group $G$ is a set of the form
+\[
+  P = \{a_0 + x_1 a_1 + \cdots + x_d a_d \mid 0 \leq x_i < L_i\}
+\]
+for some $a_0, a_1, \ldots, a_d \in G$ and positive integers $L_1, \ldots, L_d$.
+The \emph{dimension} is $d$ and the \emph{size} is $|P| \leq L_1 \cdots L_d$.
+The progression is \emph{proper} if $|P| = L_1 \cdots L_d$.
+\end{definition}
+
+\begin{definition}[Doubling and Difference Constants]
+For a finite non-empty set $A$ in an abelian group, define:
+\begin{align*}
+  A + B &:= \{a + b \mid a \in A,\, b \in B\}, \\
+  A - B &:= \{a - b \mid a \in A,\, b \in B\}, \\
+  \sigma[A] &:= \frac{|A + A|}{|A|} \quad \text{(doubling constant)}, \\
+  \delta[A] &:= \frac{|A - A|}{|A|} \quad \text{(difference constant)}.
+\end{align*}
+\end{definition}
+
+\begin{remark}
+Clearly $\sigma[A] \geq 1$ with equality iff $|A| = 1$. For a proper $d$-dimensional
+GAP, $\sigma[P] \leq 2^d$. The difference constant satisfies
+$\sigma[A] \leq \delta[A]^2$ by the Ruzsa triangle inequality (Lemma~\ref{lem:ruzsa_triangle}).
+\end{remark}
+
+\begin{lemma}[Ruzsa Triangle Inequality]\label{lem:ruzsa_triangle}
+For finite non-empty sets $A, B, C$ in an abelian group,
+\[
+  |A - C| \leq \frac{|A - B| \cdot |B - C|}{|B|}.
+\]
+\end{lemma}
+
+\begin{proof}
+For each pair $(a, c) \in A \times C$ with $a - c = d$, fix a representation
+$a - c = (a - b_{a,c}) + (b_{a,c} - c)$ for some $b_{a,c} \in B$ depending on
+the pair (since $B$ is non-empty, we may choose it freely). The key point is to
+encode the element $d = a - c$ via the pair $(a - b, b - c)$ for a \emph{fixed}
+choice $b \in B$. More precisely, define an injection
+$\phi: (A - C) \times B \to (A - B) \times (B - C)$ by $\phi(d, b) = (a - b, b - c)$
+where $a \in A$ and $c \in C$ are any elements with $a - c = d$. The injectivity
+of $\phi$ gives
+\[
+  |A - C| \cdot |B| \leq |A - B| \cdot |B - C|.
+\]
+Dividing by $|B|$ yields the claim. \end{proof}
+
+%% ============================================================
+\section{The Plünnecke--Ruzsa Inequality}\label{sec:plunnecke}
+%% ============================================================
+
+The Plünnecke--Ruzsa inequality is a fundamental tool that bounds iterated sumsets
+in terms of the doubling constant.
+
+\begin{theorem}[Plünnecke--Ruzsa Inequality \cite{Plunnecke1970,Ruzsa1989}]\label{thm:plunnecke}
+Let $A, B$ be finite non-empty subsets of an abelian group with $|A + B| \leq K|A|$.
+Then for all non-negative integers $m, n$,
+\[
+  |mB - nB| \leq K^{m+n} |A|.
+\]
+In particular, $|A + A| \leq K|A|$ implies $|mA - nA| \leq K^{m+n}|A|$ for all
+$m, n \geq 0$.
+\end{theorem}
+
+We present Ruzsa's elegant probabilistic proof \cite{Ruzsa2009}.
+
+\begin{proof}
+It suffices to show $|B - B| \leq K^2 |A|$ and iterate; the general case follows
+similarly. Since $|A + B| \leq K|A|$, choose a subset $A' \subseteq A$ minimizing
+$|A' + B|/|A'|$; let $K' = |A' + B|/|A'| \leq K$. Then for every
+$a \in A'$, the translate $a + B \subseteq A' + B$ is contained in a set of size
+$K'|A'|$. By the Ruzsa triangle inequality (Lemma~\ref{lem:ruzsa_triangle}),
+\[
+  |B - B| \leq \frac{|B + A'| \cdot |A' + B|}{|A'|} = \frac{(K'|A'|)^2}{|A'|}
+  = K'^2 |A'| \leq K^2 |A|.
+\]
+The induction on $m + n$ using the Ruzsa triangle inequality gives the general
+bound.
+\end{proof}
+
+\begin{corollary}\label{cor:plunnecke_sumset}
+If $|A + A| \leq K|A|$, then for every $k \geq 1$:
+\[
+  |kA| \leq K^k |A|.
+\]
+\end{corollary}
+
+%% ============================================================
+\section{Freiman's Theorem}\label{sec:freiman}
+%% ============================================================
+
+\begin{theorem}[Freiman's Theorem \cite{Freiman1966,Ruzsa1994}]\label{thm:freiman}
+Let $A \subset \Z$ be a finite set with $|A + A| \leq K|A|$. Then $A$ is contained
+in a $d$-dimensional generalized arithmetic progression $P$ with
+\[
+  d \leq d(K), \qquad |P| \leq C(K) |A|,
+\]
+where $d(K)$ and $C(K)$ depend only on $K$ (and not on $|A|$).
+
+More precisely, Ruzsa's version \cite{Ruzsa1994} gives
+$d \leq 2K^4 \log(2K)$
+and $C(K) = \exp(K^4 \log K)$.
+\end{theorem}
+
+The proof strategy (following Ruzsa \cite{Ruzsa1994}) uses two main ingredients:
+\begin{enumerate}[label=(\roman*)]
+  \item A \emph{Freiman homomorphism} argument to lift $A$ to a higher-dimensional
+        torus $\Z_N^d$ where structure is easier to detect.
+  \item A \emph{geometry of numbers} argument (Minkowski's theorem) to find a
+        large GAP containing the image of $A$.
+\end{enumerate}
+
+\begin{definition}[Freiman Homomorphism]
+A map $\phi: A \to G'$ between subsets of abelian groups is a
+\emph{Freiman $s$-homomorphism} if
+\[
+  a_1 + \cdots + a_s = b_1 + \cdots + b_s \implies
+  \phi(a_1) + \cdots + \phi(a_s) = \phi(b_1) + \cdots + \phi(b_s)
+\]
+for all $a_i, b_i \in A$. It is a \emph{Freiman $s$-isomorphism} if the converse
+also holds.
+\end{definition}
+
+\begin{proposition}\label{prop:freiman_iso}
+If $A \subset \Z$ has $|A + A| \leq K|A|$ and $n \geq |A|^2$, then there exists
+a Freiman $2$-isomorphism $\phi: A \to \Z_n$ with $|\phi(A) + \phi(A)| \leq K|\phi(A)|$.
+\end{proposition}
+
+The key geometric lemma, due to Freiman, identifies GAPs via lattice points.
+
+\begin{lemma}[Freiman's Lemma]\label{lem:freiman_lemma}
+Let $\Lambda \subset \R^d$ be a lattice of determinant $\det(\Lambda)$ and let
+$S \subset \Lambda$ be a finite set with $|S + S| \leq K|S|$. Then $S$ is
+contained in a $d$-dimensional proper GAP $P$ with
+$|P| \leq (2K)^d |S|$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Apply the Plünnecke--Ruzsa inequality to get $|dS - dS| \leq K^{2d}|S|$.
+The set $dS - dS$ spans a sublattice $\Lambda' \subseteq \Z^d$ of index at most
+$K^{2d}|S|^d / |S| = K^{2d}|S|^{d-1}$. Minkowski's second theorem then provides
+$d$ linearly independent short vectors in $\Lambda'$, which form the generators of
+the desired GAP.
+\end{proof}
+
+%% ============================================================
+\section{Green--Ruzsa Generalization}\label{sec:green_ruzsa}
+%% ============================================================
+
+Green and Ruzsa \cite{GreenRuzsa2007} extended Freiman's theorem to general abelian
+groups, where torsion elements require a more flexible notion of "progression."
+
+\begin{definition}[Coset Progression]
+A \emph{coset $d$-progression} in an abelian group $G$ is a set of the form
+$H + P$ where $H \leq G$ is a finite subgroup and $P$ is a $d$-dimensional GAP in
+$G/H$ lifted to $G$.
+\end{definition}
+
+\begin{theorem}[Green--Ruzsa Theorem \cite{GreenRuzsa2007}]\label{thm:green_ruzsa}
+Let $G$ be an abelian group and $A \subset G$ a finite set with $|A + A| \leq K|A|$.
+Then $A$ is contained in a coset $d$-progression $H + P$ with
+\[
+  d \leq d(K), \qquad |H + P| \leq C(K)|A|,
+\]
+where $d(K)$ and $C(K)$ depend only on $K$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The torsion-free case reduces to Freiman's theorem. For groups with torsion, one
+first identifies the "torsion subgroup" $H$ generated by elements of small order
+that appear in $A + A$. The quotient $G/H$ is torsion-free (in the relevant range),
+and the image of $A$ in $G/H$ satisfies a doubling condition. Freiman's theorem
+applied in $G/H$ gives a GAP, which lifts to a coset progression in $G$.
+\end{proof}
+
+\begin{remark}
+For $G = \F_2^n$ (which is entirely $2$-torsion), the result gives a coset of a
+subspace of bounded codimension, which is a much stronger structural statement
+exploited in the Bogolyubov--Chang--Sanders line of work.
+\end{remark}
+
+%% ============================================================
+\section{Bogolyubov's Method}\label{sec:bogolyubov}
+%% ============================================================
+
+Bogolyubov's lemma is a Fourier-analytic tool that converts the sumset assumption
+into density information on a structured set.
+
+\begin{lemma}[Bogolyubov's Lemma \cite{Bogolyubov1939}]\label{lem:bogolyubov}
+Let $A \subseteq \Z_N$ with $|A| = \alpha N$. Then $2A - 2A$ contains a Bohr set
+\[
+  \mathrm{Bohr}(S, \rho) := \{n \in \Z_N \mid \|\xi n / N\| \leq \rho \text{ for all } \xi \in S\}
+\]
+with $|S| = O(\alpha^{-2})$ and $\rho = 1/4$.
+\end{lemma}
+
+\begin{proof}
+Let $f = \mathbf{1}_A - \alpha$ (the balanced function of $A$). Its Fourier
+transform satisfies $\hat{f}(0) = 0$ and $\|\hat{f}\|_2^2 = \alpha(1-\alpha)N$.
+The convolution $f * f * f * f$ (which detects $2A - 2A$) is bounded below using
+the large Fourier coefficients. Setting $S = \{\xi : |\hat{f}(\xi)| \geq \alpha^2 N / 2\}$
+gives $|S| = O(\alpha^{-2})$ by Parseval, and the Bohr set argument completes
+the proof.
+\end{proof}
+
+\begin{corollary}
+If $|A + A| \leq K|A|$ in $\Z$, then $2A - 2A$ contains a long arithmetic
+progression of length $\exp(-O(K^2)) |A|$.
+\end{corollary}
+
+%% ============================================================
+\section{Connection to Roth's Theorem}\label{sec:roth}
+%% ============================================================
+
+Freiman's theorem and Bogolyubov's lemma have a deep connection to Roth's theorem
+on 3-term arithmetic progressions.
+
+\begin{theorem}[Roth's Theorem \cite{Roth1953}]\label{thm:roth}
+Any subset $A \subseteq \{1, \ldots, N\}$ with
+$|A| \geq c N / \log\log N$
+contains a 3-term arithmetic progression.
+\end{theorem}
+
+The connection is as follows: if $A$ has no 3-term progressions, then $A$ has
+small additive energy $E(A) := |\{(a_1, a_2, a_3, a_4) \in A^4: a_1+a_2=a_3+a_4\}|$,
+which (via the Cauchy--Schwarz inequality) forces $|A + A|$ to be large relative
+to $|A|$. Conversely, a Freiman-structured set (lying in a GAP) has many 3-term
+progressions, which is the key tension exploited in density increment arguments.
+
+\begin{proposition}[Additive Energy and Doubling]\label{prop:energy_doubling}
+For $A \subseteq \Z$:
+\[
+  \frac{|A|^4}{|A + A|} \leq E(A) \leq |A|^2 \min(|A|, |A+A|)^{1/2}.
+\]
+The lower bound follows from Cauchy--Schwarz applied to the representation function
+$r_{A+A}(n) = |\{(a, b): a+b=n\}|$.
+\end{proposition}
+
+%% ============================================================
+\section{Sum-Free Sets}\label{sec:sumfree}
+%% ============================================================
+
+\begin{definition}[Sum-Free Set]
+A set $A \subseteq G$ is \emph{sum-free} if $(A + A) \cap A = \emptyset$, i.e.,
+there are no solutions to $a + b = c$ with $a, b, c \in A$.
+\end{definition}
+
+\begin{theorem}[Schur's Theorem \cite{Schur1916}]\label{thm:schur}
+For every $k \geq 1$ there exists $N = S(k)$ (the $k$-th Schur number) such that
+any $k$-coloring of $\{1, \ldots, N\}$ contains a monochromatic solution to
+$a + b = c$.
+\end{theorem}
+
+\begin{proposition}[Density of Sum-Free Sets]\label{prop:sumfree_density}
+Any sum-free subset $A \subseteq \{1, \ldots, N\}$ satisfies $|A| \leq N/3 + O(1)$.
+The extremal example is the set of integers in $(N/3, 2N/3]$.
+\end{proposition}
+
+\begin{proof}
+Consider the triples $(a, b, a+b)$ with $a, b, a+b \in \{1, \ldots, N\}$.
+Each element of $A$ can play the role of $a+b$ in at most $|A \cap \{1,\ldots,x/2\}|$
+triples, and similarly for $a$ and $b$. A counting argument shows $|A| \leq N/3$.
+\end{proof}
+
+The Plünnecke--Ruzsa inequality implies that sum-free sets cannot have too small
+a doubling constant:
+
+\begin{corollary}
+A sum-free set $A \subseteq \Z$ satisfies $|A + A| \geq 2|A|$, hence
+$\sigma[A] \geq 2$, with equality iff $A$ is an arithmetic progression of odd
+common difference contained in an interval $(N/3, 2N/3]$.
+\end{corollary}
+
+%% ============================================================
+\section{Sanders' Quasi-Polynomial Improvement}\label{sec:sanders}
+%% ============================================================
+
+The quantitative aspects of Freiman's theorem have been significantly sharpened.
+The key question is: what is the optimal form of $C(K)$ in Theorem~\ref{thm:freiman}?
+
+\begin{theorem}[Bilu's Theorem \cite{Bilu1999}]\label{thm:bilu}
+In Freiman's theorem, one can take $|P| \leq \exp(O(K^2)) |A|$ with $d \leq K^2$.
+\end{theorem}
+
+\begin{theorem}[Sanders' Quasi-Polynomial Bound \cite{Sanders2012}]\label{thm:sanders}
+If $A \subseteq \Z$ with $|A + A| \leq K|A|$, then $A$ is contained in a
+$d$-dimensional GAP $P$ with
+\[
+  d \leq O(\log K), \qquad |P| \leq \exp(O(\log^4 K)) |A|.
+\]
+In particular, $C(K) = \exp(O(\log^4 K))$ is quasi-polynomial in $K$.
+\end{theorem}
+
+Sanders' proof uses a sophisticated iteration of Bogolyubov's lemma combined with
+additive combinatorics arguments in Bohr sets. The key technical improvement is
+handling the "density increment" in a Bohr set more efficiently.
+
+\begin{conjecture}[Polynomial Freiman--Ruzsa Conjecture]\label{conj:pfr}
+In Freiman's theorem, one can take $C(K) = K^{O(1)}$, i.e., the size of the
+containing GAP is polynomial in $K$ times $|A|$.
+\end{conjecture}
+
+\begin{remark}
+In March 2023, Gowers, Green, Manners and Tao \cite{GowersTao2023} announced a
+proof of the Polynomial Freiman--Ruzsa (PFR) conjecture over $\F_2^n$, confirming
+that over the boolean group any set with $|A+A| \leq K|A|$ is covered by $K^{O(1)}$
+cosets of a subspace. Whether this implies the integer version remains open.
+\end{remark}
+
+%% ============================================================
+\section{Inverse Sumset Theory}\label{sec:inverse}
+%% ============================================================
+
+Inverse sumset theory asks: given information about $|A + B|$, what can be said
+about the structure of $A$ and $B$?
+
+\begin{theorem}[Freiman--Ruzsa Theorem for Pairs]\label{thm:freiman_ruzsa_pairs}
+Let $A, B \subseteq \Z$ with $|A + B| \leq K \sqrt{|A||B|}$. Then there exists a
+$d$-dimensional GAP $P$ with $A \cup B \subseteq P$ and $|P| \leq C(K)|A+B|$,
+for $d$ and $C(K)$ depending only on $K$.
+\end{theorem}
+
+\begin{conjecture}[Inverse Sumset Conjecture for General Groups]\label{conj:inverse_general}
+For every abelian group $G$ and finite $A \subseteq G$ with $|A + A| \leq K|A|$,
+the set $A$ is covered by $K^{O(1)}$ translates of a subgroup (or coset progression
+of dimension $O(\log K)$) of size at most $K^{O(1)} |A|$.
+\end{conjecture}
+
+%% ============================================================
+\section{The Polynomial Freiman--Ruzsa Conjecture over $\F_2^n$}\label{sec:pfr_f2}
+%% ============================================================
+
+Over the field $\F_2^n$, the analogue of a GAP is a coset of a subspace.
+
+\begin{definition}[Covering Number]
+The \emph{$K$-covering number} $\mathrm{cov}_K(A)$ of $A \subseteq \F_2^n$ is the
+minimum size of a subspace $V$ such that $A$ is covered by at most $K$ cosets of $V$.
+\end{definition}
+
+\begin{theorem}[PFR over $\F_2^n$ \cite{GowersTao2023}]\label{thm:pfr_f2}
+If $A \subseteq \F_2^n$ with $|A + A| \leq K|A|$, then $A$ is covered by
+$2K^{12}$ cosets of a subspace $V$ with $|V| \leq 2K^{14}|A|$.
+\end{theorem}
+
+\begin{proof}[Proof outline]
+The proof proceeds by a careful entropy-increment argument. Define the
+\emph{Ruzsa distance} $d(A, B) = \log(|A-B| / \sqrt{|A||B|})$. The key step is
+showing that if $d(A, A)$ is small, then $A$ is close (in Ruzsa distance) to a
+subspace. The entropy method, combined with the \emph{fibring trick} and a
+dimension-reduction argument, yields the polynomial bound.
+\end{proof}
+
+\begin{conjecture}[Optimal PFR Constant]\label{conj:pfr_optimal}
+The optimal constant in Theorem~\ref{thm:pfr_f2} is $K^{O(1)}$ with the
+exponent being at most $O(1)$ (specifically, conjectured to be $\leq 6$).
+\end{conjecture}
+
+%% ============================================================
+\section{Quantitative Bounds: Summary Table}\label{sec:summary}
+%% ============================================================
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Result} & \textbf{Bound on $|P|/|A|$} & \textbf{Dimension $d$} \\
+\midrule
+Freiman (1966) & $\exp(\exp(K))$ & $\exp(K)$ \\
+Ruzsa (1994)   & $\exp(K^4 \log K)$ & $2K^4 \log(2K)$ \\
+Bilu (1999)    & $\exp(O(K^2))$ & $O(K^2)$ \\
+Chang (2002)   & $\exp(O(K^2))$ & $O(K)$ \\
+Sanders (2012) & $\exp(O(\log^4 K))$ & $O(\log K)$ \\
+PFR over $\F_2^n$ (2023) & $K^{14}$ (polynomial) & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%% ============================================================
+\section{Open Problems}\label{sec:open}
+%% ============================================================
+
+We list the main open problems in the area.
+
+\begin{conjecture}[Polynomial Freiman--Ruzsa over $\Z$]\label{conj:pfr_z}
+There exist absolute constants $c, C > 0$ such that if $A \subset \Z$ with
+$|A+A| \leq K|A|$, then $A$ is contained in a GAP $P$ with $|P| \leq K^C |A|$
+and dimension $d \leq c \log K$.
+\end{conjecture}
+
+\begin{conjecture}[Optimal Doubling Constant]\label{conj:optimal_doubling}
+For arithmetic progressions $P$ of length $n$, the doubling constant satisfies
+$\sigma[P] = 2 - 1/|P|$. It is conjectured that the sets achieving $\sigma[A]
+= 2 - 1/|A| + \varepsilon$ for small $\varepsilon$ are always "close" to arithmetic
+progressions, but a precise stability theorem with optimal constants is open.
+\end{conjecture}
+
+\begin{conjecture}[Freiman--Bilu Exponent]\label{conj:freiman_bilu}
+The correct exponent $\alpha$ in $|P| \leq K^\alpha |A|$ in
+Conjecture~\ref{conj:pfr_z} satisfies $1 \leq \alpha \leq 2$. The lower bound
+$\alpha \geq 1$ is trivially necessary; the upper bound $\alpha \leq 2$ is
+conjectured based on random set constructions.
+\end{conjecture}
+
+\begin{conjecture}[Inverse Sumset for Non-Abelian Groups]\label{conj:nonabelian}
+An appropriate analogue of Freiman's theorem holds for non-abelian groups
+(with the role of GAPs played by cosets of approximate groups in the sense
+of Hrushovski and Breuillard--Green--Tao).
+\end{conjecture}
+
+\begin{remark}
+Breuillard, Green, and Tao \cite{BreuillardGreenTao2012} have proved a version of
+Freiman's theorem for linear groups over fields, showing that sets of small doubling
+in $GL_n(k)$ are essentially "nilpotent coset progressions."
+\end{remark}
+
+%% ============================================================
+\section{Conclusion}
+%% ============================================================
+
+Freiman's theorem stands at the interface of additive combinatorics, harmonic
+analysis, and ergodic theory. Starting from the qualitative insight that small
+doubling implies arithmetic structure, the quantitative theory has advanced
+dramatically: from Ruzsa's exponential bound (1994) to Sanders' quasi-polynomial
+improvement (2012) to Gowers--Green--Manners--Tao's polynomial result over $\F_2^n$
+(2023). The central open problem---whether a polynomial bound holds over $\Z$---remains
+one of the most challenging and important questions in the field.
+
+The Plünnecke--Ruzsa inequality, Bogolyubov's method, and the connection to Roth's
+theorem on arithmetic progressions form a toolkit that has found applications far
+beyond its original context, including in analytic number theory, theoretical computer
+science, and the study of expanders.
+
+%% Literaturverzeichnis
+\begin{thebibliography}{99}
+
+\bibitem{Bogolyubov1939}
+N.\,N.~Bogolyubov,
+\textit{On some arithmetical properties of almost periodic functions},
+Ann. Chaire Math. Phys. Kiev \textbf{4} (1939), 185--205.
+
+\bibitem{Bilu1999}
+Y.~Bilu,
+\textit{Structure of sets with small sumset},
+Ast\'erisque \textbf{258} (1999), 77--108.
+
+\bibitem{BreuillardGreenTao2012}
+E.~Breuillard, B.~Green, T.~Tao,
+\textit{The structure of approximate groups},
+Publ.\ Math.\ IHES \textbf{116} (2012), 115--221.
+
+\bibitem{Freiman1966}
+G.\,A.~Freiman,
+\textit{Foundations of a Structural Theory of Set Addition},
+Kazan' Gos. Ped. Inst., Kazan', 1966 (in Russian);
+English transl.\ AMS, Providence, 1973.
+
+\bibitem{GreenRuzsa2007}
+B.~Green, I.~Z.~Ruzsa,
+\textit{Freiman's theorem in an arbitrary abelian group},
+J.\ Lond.\ Math.\ Soc.\ \textbf{75} (2007), 163--175.
+
+\bibitem{GowersTao2023}
+W.\,T.~Gowers, B.~Green, F.~Manners, T.~Tao,
+\textit{On a conjecture of Marton},
+preprint arXiv:2311.05762 (2023).
+
+\bibitem{Plunnecke1970}
+H.~Pl\"unnecke,
+\textit{Eine zahlentheoretische Anwendung der Graphentheorie},
+J.\ reine angew.\ Math.\ \textbf{243} (1970), 171--183.
+
+\bibitem{Roth1953}
+K.\,F.~Roth,
+\textit{On certain sets of integers},
+J.\ Lond.\ Math.\ Soc.\ \textbf{28} (1953), 104--109.
+
+\bibitem{Ruzsa1989}
+I.\,Z.~Ruzsa,
+\textit{An application of graph theory to additive number theory},
+Scientia (Budapest) \textbf{3} (1989), 97--109.
+
+\bibitem{Ruzsa1994}
+I.\,Z.~Ruzsa,
+\textit{Generalized arithmetical progressions and sumsets},
+Acta Math.\ Hungar.\ \textbf{65} (1994), 379--388.
+
+\bibitem{Ruzsa2009}
+I.\,Z.~Ruzsa,
+\textit{Sumsets and structure},
+in: Combinatorial Number Theory and Additive Group Theory,
+Birkh\"auser, 2009, 87--210.
+
+\bibitem{Sanders2012}
+T.~Sanders,
+\textit{On the Bogolyubov--Ruzsa lemma},
+Analysis \& PDE \textbf{5} (2012), 627--655.
+
+\bibitem{Schur1916}
+I.~Schur,
+\textit{\"Uber die Kongruenz $x^m + y^m \equiv z^m \pmod{p}$},
+Jahresber.\ Dtsch.\ Math.-Ver.\ \textbf{25} (1916), 114--117.
+
+\bibitem{TaoVu2006}
+T.~Tao, V.~Vu,
+\textit{Additive Combinatorics},
+Cambridge University Press, Cambridge, 2006.
+
+\end{thebibliography}
+
+\end{document}

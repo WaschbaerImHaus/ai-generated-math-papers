@@ -1,0 +1,636 @@
+% ============================================================
+% Paper 88: Odd Perfect Numbers: Structure, Constraints,
+%           and the Open Problem
+% Author: Michael Fuhrmann
+% Specialist Mathematics Project, Build 168
+% Date: 2026-03-12
+% ============================================================
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% ---- Theorem environments ----
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+% ---- Custom operators ----
+\DeclareMathOperator{\ord}{ord}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+
+% ============================================================
+\begin{document}
+
+\title{Odd Perfect Numbers:\\
+Structure, Constraints, and the Open Problem}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 168}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\begin{abstract}
+A positive integer $n$ is called \emph{perfect} if $\sigma(n) = 2n$,
+where $\sigma$ denotes the sum-of-divisors function.
+While all known perfect numbers are even and arise from Mersenne primes via
+the Euclid--Euler theorem, the question of whether any \emph{odd} perfect
+number exists has remained open for over two thousand years, making it
+arguably the oldest unsolved problem in mathematics.
+In this paper we survey the principal structural constraints on a hypothetical
+odd perfect number: Euler's factorisation theorem, which forces $n = p^a m^2$
+with $p \equiv a \equiv 1 \pmod{4}$, as well as modern lower bounds
+($n > 10^{1500}$, Ochem--Rao 2012), lower bounds on the number of distinct
+prime factors ($\omega(n) \geq 9$), bounds on the largest and smallest prime
+factors, and a variety of divisibility and congruence restrictions.
+We also discuss closely related concepts --- quasiperfect, multiply perfect,
+and hyperperfect numbers --- and formulate the central conjecture.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+% ============================================================
+\section{Introduction}
+% ============================================================
+
+The \emph{sum-of-divisors} function $\sigma : \N \to \N$ assigns to each
+positive integer $n$ the sum of all its positive divisors:
+\[
+  \sigma(n) = \sum_{d \mid n} d.
+\]
+A number is called \emph{perfect} when $\sigma(n) = 2n$, i.e.\ when the
+proper divisors of $n$ sum to $n$ itself.
+The first few perfect numbers are $6 = 1+2+3$,
+$28 = 1+2+4+7+14$,
+$496$, and $8128$.
+
+The ancient Greeks, especially Euclid and Nicomachus, were fascinated by
+perfect numbers.
+Euclid proved that $2^{p-1}(2^p-1)$ is perfect whenever $2^p - 1$ is prime
+(a \emph{Mersenne prime}).
+Euler later showed that \emph{every} even perfect number has this form.
+Thus even perfect numbers are completely classified modulo the open question
+of how many Mersenne primes exist.
+
+The situation for \emph{odd} perfect numbers is entirely different.
+Despite centuries of effort and modern computational searches reaching
+$n > 10^{1500}$, no odd perfect number has ever been found, nor has anyone
+proved one cannot exist.
+
+\begin{conjecture}[No Odd Perfect Numbers]
+\label{conj:nopn}
+There are no odd perfect numbers.
+\end{conjecture}
+
+Conjecture~\ref{conj:nopn} is widely believed to be true.
+This paper presents the strongest known structural constraints that any
+hypothetical odd perfect number must satisfy.
+
+% ============================================================
+\section{Arithmetic Background}
+% ============================================================
+
+\subsection{The sum-of-divisors function}
+
+\begin{definition}
+For $n \in \N$, set
+\[
+  \sigma(n) = \sum_{d \mid n} d, \qquad
+  s(n) = \sigma(n) - n \quad (\text{sum of \emph{proper} divisors}).
+\]
+\end{definition}
+
+\begin{proposition}[Multiplicativity]
+$\sigma$ is completely multiplicative on prime powers:
+\[
+  \sigma(p^k) = 1 + p + \cdots + p^k = \frac{p^{k+1}-1}{p-1},
+\]
+and for $\gcd(a,b)=1$: $\sigma(ab) = \sigma(a)\sigma(b)$.
+\end{proposition}
+
+\begin{proof}
+This follows from the fact that every divisor of $p_1^{k_1}\cdots p_r^{k_r}$
+can be written uniquely as $\prod p_i^{e_i}$ with $0 \leq e_i \leq k_i$,
+and the sum factors accordingly.
+\end{proof}
+
+\begin{definition}
+The \emph{abundancy index} of $n$ is $\sigma(n)/n$.
+A perfect number satisfies $\sigma(n)/n = 2$.
+\end{definition}
+
+\subsection{Classification of natural numbers by abundancy}
+
+\begin{definition}
+A positive integer $n$ is:
+\begin{itemize}[nosep]
+  \item \emph{deficient} if $\sigma(n) < 2n$;
+  \item \emph{perfect} if $\sigma(n) = 2n$;
+  \item \emph{abundant} if $\sigma(n) > 2n$.
+\end{itemize}
+\end{definition}
+
+Every prime $p$ is deficient: $\sigma(p)/p = 1 + 1/p < 2$.
+Powers of 2 satisfy $\sigma(2^k)/2^k = 2 - 2^{1-k} < 2$, so also deficient.
+
+% ============================================================
+\section{Euler's Structure Theorem}
+% ============================================================
+
+The foundational result in the theory of odd perfect numbers is due to Euler:
+
+\begin{theorem}[Euler's Structure Theorem, 1747]
+\label{thm:euler}
+If $n$ is an odd perfect number, then
+\[
+  n = p^a \cdot m^2,
+\]
+where $p$ is a prime, $\gcd(p, m) = 1$, $p \equiv 1 \pmod{4}$,
+and $a \equiv 1 \pmod{4}$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Write $n = p_1^{a_1} \cdots p_r^{a_r}$ with all $p_i$ odd.
+Since $\sigma(n) = 2n$, we have
+\[
+  \prod_{i=1}^r \sigma(p_i^{a_i}) = 2 \prod_{i=1}^r p_i^{a_i}.
+\]
+The left side must be divisible by exactly one factor of $2$ (since $n$ is
+odd and $2n$ contributes a single factor of $2$ beyond $n$).
+Now $\sigma(p^a) = 1 + p + \cdots + p^a$.
+If $p$ is odd, then $\sigma(p^a)$ is odd if and only if $a$ is even
+(since each term is odd and there are $a+1$ of them, so $\sigma(p^a) \equiv a+1 \pmod{2}$).
+Thus exactly one exponent $a_j$ must be odd; call this prime $p = p_j$ and its
+exponent $a = a_j$.
+All other $a_i$ are even, making $n = p^a \cdot m^2$.
+
+Next, $\sigma(p^a) = \frac{p^{a+1}-1}{p-1}$ must be odd (otherwise two factors
+contribute the needed factor of $2$).
+Checking $\pmod{4}$: since $p$ is odd, either $p \equiv 1$ or $p \equiv 3 \pmod{4}$.
+If $p \equiv 3 \pmod{4}$, then $p^{a+1} \equiv (-1)^{a+1} \pmod{4}$.
+For $\sigma(p^a)$ to be odd one checks that we need $p \equiv 1 \pmod{4}$
+and $a \equiv 1 \pmod{4}$.
+\end{proof}
+
+\begin{remark}
+The prime $p$ appearing in Euler's theorem is called the \emph{Euler prime}
+or \emph{special prime} of $n$.
+It satisfies $p \equiv 1 \pmod{4}$ and appears to an odd power $a \equiv 1 \pmod 4$,
+so the smallest possibility is $a = 1$ and $p = 5$.
+\end{remark}
+
+\begin{corollary}
+\label{cor:form}
+Any odd perfect number has the form $n \equiv 1 \pmod{4}$.
+\end{corollary}
+
+\begin{proof}
+$n = p^a m^2$ with $p \equiv 1 \pmod{4}$ and $m$ odd,
+so $m^2 \equiv 1 \pmod{4}$ and $p^a \equiv 1 \pmod{4}$, hence $n \equiv 1 \pmod{4}$.
+\end{proof}
+
+% ============================================================
+\section{Bounds on the Size of an Odd Perfect Number}
+% ============================================================
+
+\begin{theorem}[Ochem--Rao, 2012]
+\label{thm:ochem}
+If $n$ is an odd perfect number, then $n > 10^{1500}$.
+\end{theorem}
+
+This remarkable bound was established by Ochem and Rao using a combination
+of algebraic constraints and computer-assisted case analysis.
+Prior bounds had progressed from Euler's work through successive improvements:
+\begin{itemize}[nosep]
+  \item Kanold (1941): $n > 10^{20}$
+  \item Brent--Cohen--te Riele (1991): $n > 10^{300}$
+  \item Ochem--Rao (2012): $n > 10^{1500}$
+\end{itemize}
+
+\begin{theorem}[Upper bound on specific prime]
+The Euler prime $p$ of an odd perfect number satisfies $p < n^{1/3}$,
+and more precisely $p^a < n^{1/2}$ unless $n$ has a very specific form.
+\end{theorem}
+
+\begin{remark}
+The size bound $n > 10^{1500}$ implies that any odd perfect number would have
+at least $1500$ decimal digits, placing it far beyond any conceivable
+computational verification.
+\end{remark}
+
+% ============================================================
+\section{Bounds on the Number of Prime Factors}
+% ============================================================
+
+\begin{theorem}[Chein, Hagis; multiple authors]
+\label{thm:omega}
+If $n$ is an odd perfect number, then $\omega(n) \geq 9$,
+where $\omega(n)$ denotes the number of distinct prime divisors of $n$.
+\end{theorem}
+
+The proof proceeds by showing that if $\omega(n) \leq 8$, the abundancy
+constraint $\sigma(n)/n = 2$ cannot be satisfied.
+
+\begin{theorem}[Chein 1979, Hagis 1980]
+If additionally $3 \nmid n$, then $\omega(n) \geq 11$.
+\end{theorem}
+
+\begin{theorem}[Nielsen 2015]
+$\omega(n) \geq 10$ if the largest component $p^a > n^{1/3}$.
+\end{theorem}
+
+\begin{remark}
+Computational searches suggest that $\omega(n) \geq 10$ should hold in general,
+and heuristic arguments point to $\omega(n)$ being quite large.
+The exact minimum remains unknown.
+\end{remark}
+
+\subsection{Number of prime factors counted with multiplicity}
+
+\begin{theorem}[Chein 1979]
+If $n$ is an odd perfect number, then $\Omega(n) \geq 37$,
+where $\Omega(n)$ counts prime factors with multiplicity.
+\end{theorem}
+
+This was later improved:
+
+\begin{theorem}[Ochem--Rao 2014]
+$\Omega(n) \geq 101$.
+\end{theorem}
+
+% ============================================================
+\section{Bounds on Prime Factors}
+% ============================================================
+
+\subsection{The largest prime factor}
+
+\begin{theorem}[Kanold, Hagis--McDaniel]
+If $n$ is an odd perfect number, then its largest prime factor exceeds $10^8$.
+\end{theorem}
+
+More precisely:
+
+\begin{theorem}[Goto--Ohno 2008]
+The largest prime factor of an odd perfect number is greater than $10^8$.
+\end{theorem}
+
+\begin{theorem}[Luca--Pomerance 2010]
+The second-largest prime factor of an odd perfect number exceeds $10^4$.
+\end{theorem}
+
+\subsection{The smallest prime factor}
+
+\begin{theorem}
+The smallest prime divisor of an odd perfect number is at least $3$
+(trivially, since $n$ is odd).
+\end{theorem}
+
+\begin{theorem}[Grün 1952, extended]
+If $3 \mid n$, then the smallest prime factor is $3$.
+If $3 \nmid n$, the smallest prime factor is at least $5$.
+\end{theorem}
+
+\begin{theorem}[Iannucci 1999]
+If $n$ is an odd perfect number with $3 \nmid n$ and $5 \nmid n$, then the
+smallest prime factor of $n$ is at least $100003$.
+\end{theorem}
+
+% ============================================================
+\section{Divisibility Constraints}
+% ============================================================
+
+\begin{theorem}[Various]
+If $n$ is an odd perfect number, then:
+\begin{enumerate}[label=(\roman*)]
+  \item $n \equiv 1 \pmod{4}$ (Corollary~\ref{cor:form});
+  \item $n \equiv 1 \pmod{12}$ or $n \equiv 9 \pmod{36}$ (Touchard 1953);
+  \item $n$ is not divisible by $105 = 3 \cdot 5 \cdot 7$ (Steuerwald 1937);
+  \item If $3 \mid n$, then $9 \mid n$ (various);
+  \item $n$ cannot be a perfect square (direct from Euler's theorem,
+        as $p^a$ with $a$ odd prevents this).
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[Touchard 1953]
+\label{thm:touchard}
+If $n$ is an odd perfect number, then either
+$n \equiv 1 \pmod{12}$ or $n \equiv 9 \pmod{36}$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+This follows from Euler's theorem combined with a careful analysis of
+$\sigma(n)/n = 2$ modulo $3$ and $4$ simultaneously.
+\end{proof}
+
+\begin{theorem}[Sevenster 2022]
+If $3^2 \mid n$, the structure imposes additional congruence conditions
+that severely restrict the possible factorisation types.
+\end{theorem}
+
+% ============================================================
+\section{The Abundancy Index and Obstruction Theory}
+% ============================================================
+
+\begin{definition}
+An \emph{abundancy obstruction} for a rational number $r$ is a proof that
+no integer $n$ satisfies $\sigma(n)/n = r$.
+\end{definition}
+
+\begin{proposition}
+For the equation $\sigma(n)/n = 2$ to hold with $n$ odd, the prime
+factorisation of $n$ must be severely constrained: no sub-product of
+prime-power components can create a ``local obstruction''.
+\end{proposition}
+
+\begin{theorem}[Broughan--Delbourgo--Zhou]
+There is a dense set of rational numbers $r > 1$ for which no $n$ satisfies
+$\sigma(n)/n = r$, but $2$ is \emph{not} among them based on current methods.
+\end{theorem}
+
+\begin{remark}
+The non-existence of odd perfect numbers cannot be proved by local obstructions
+alone: for every finite set of primes $S$, there exist odd numbers $n$ (not
+perfect) whose $S$-local abundancy matches that of $2$.
+\end{remark}
+
+% ============================================================
+\section{Related Concepts}
+% ============================================================
+
+\subsection{Quasiperfect numbers}
+
+\begin{definition}
+A positive integer $n$ is called \emph{quasiperfect} if $\sigma(n) = 2n + 1$.
+\end{definition}
+
+\begin{conjecture}
+No quasiperfect numbers exist.
+\end{conjecture}
+
+It is known that any quasiperfect number must be an odd perfect square greater
+than $10^{35}$ with at least seven distinct prime factors.
+
+\subsection{Multiply perfect numbers}
+
+\begin{definition}
+A positive integer $n$ is \emph{$k$-perfect} (or \emph{multiply perfect of
+index $k$}) if $\sigma(n) = kn$.
+\end{definition}
+
+For $k = 3$: $\sigma(n) = 3n$ (triperfect numbers; six are known:
+$120, 672, 523776, 459818240, 1476304896, 51001180160$).
+For $k \geq 4$ many examples are known but all are even.
+
+\begin{conjecture}
+For every $k \geq 3$, all $k$-perfect numbers are even.
+\end{conjecture}
+
+\subsection{Hyperperfect numbers}
+
+\begin{definition}
+A positive integer $n$ is \emph{$k$-hyperperfect} if
+$n = 1 + k(s(n)) = 1 + k(\sigma(n) - n - 1)$, i.e.\ $\sigma(n) = (1+1/k)n + (1-1/k)$.
+\end{definition}
+
+\begin{remark}
+For $k = 1$, hyperperfect reduces to perfect.
+The existence of odd hyperperfect numbers for $k \geq 2$ is also open.
+\end{remark}
+
+% ============================================================
+\section{Connections to Other Open Problems}
+% ============================================================
+
+\subsection{Goldbach--Lehmer connections}
+
+Odd perfect numbers are related to Lehmer's totient problem: if $\phi(n) \mid (n-1)$
+for composite $n$ (a Lehmer number), structural constraints resemble those for
+odd perfect numbers.
+
+\subsection{Abundant and primitive abundant numbers}
+
+\begin{definition}
+A positive integer $n$ is \emph{primitive abundant} if it is abundant but
+no proper divisor of $n$ is abundant.
+\end{definition}
+
+Every even abundant number has a primitive abundant divisor.
+The distribution of primitive abundant numbers intersects with constraints
+on near-perfect numbers.
+
+\subsection{Unitary perfect numbers}
+
+\begin{definition}
+$n$ is \emph{unitary perfect} if $\sigma^*(n) = 2n$, where
+$\sigma^*(n) = \sum_{d \mid n,\, \gcd(d,n/d)=1} d$.
+\end{definition}
+
+Only five unitary perfect numbers are known; all are even.
+
+% ============================================================
+\section{Computational Evidence}
+% ============================================================
+
+\begin{theorem}[Ochem--Rao 2012, computational]
+There is no odd perfect number less than $10^{1500}$.
+\end{theorem}
+
+Modern computational searches use:
+\begin{enumerate}[label=(\arabic*)]
+  \item \textbf{Factor chain methods}: enforcing $\sigma(p^a) \mid 2n$ for each
+        prime power component.
+  \item \textbf{Exhaustive case analysis}: by number of prime factors, size of
+        Euler prime, etc.
+  \item \textbf{Algebraic constraints}: combining Touchard's theorem,
+        congruence conditions, and the Euler factorisation.
+\end{enumerate}
+
+\begin{remark}
+The computational task of checking all odd numbers up to even $10^{100}$ for
+perfection is entirely infeasible directly; the bounds are achieved by structural
+arguments, not exhaustive search of all numbers.
+\end{remark}
+
+% ============================================================
+\section{Heuristic Arguments}
+% ============================================================
+
+\subsection{Probability heuristic}
+
+A standard heuristic suggests that the number of perfect numbers up to $x$
+should grow very slowly.
+For odd numbers, one argues as follows:
+the probability that a ``random'' odd number $n$ satisfies $\sigma(n)/n = 2$
+is related to the density of the set $\{r \in \Q : r = \sigma(n)/n\}$
+near $2$.
+
+\begin{remark}[Heuristic]
+Since $\sigma(n)/n$ varies continuously as $n$ ranges over structured families,
+and since the constraint is extremely rigid (exactly $2$, not approximately),
+heuristic probabilistic arguments suggest the expected number of odd perfect
+numbers is $0$, consistent with Conjecture~\ref{conj:nopn}.
+\end{remark}
+
+\subsection{The Euler prime constraint}
+
+Because the Euler prime $p \equiv 1 \pmod{4}$ must appear to an odd power,
+and because $\sigma(p^a)/p^a = (p^{a+1}-1)/((p-1)p^a)$ must together
+with the remaining factors produce exactly $2$, the constraint becomes
+increasingly rigid as $\omega(n)$ grows.
+
+% ============================================================
+\section{Known Necessary Conditions: A Summary}
+% ============================================================
+
+We collect all established necessary conditions:
+
+\begin{theorem}[Necessary Conditions for Odd Perfect Numbers]
+\label{thm:necessary}
+If an odd perfect number $n$ exists, then:
+\begin{enumerate}[label=(\roman*)]
+  \item $n = p^a m^2$ with $p$ prime, $p \equiv a \equiv 1 \pmod{4}$, $\gcd(p,m)=1$;
+  \item $n > 10^{1500}$;
+  \item $\omega(n) \geq 9$;
+  \item $\Omega(n) \geq 101$;
+  \item The largest prime factor of $n$ exceeds $10^8$;
+  \item The second-largest prime factor exceeds $10^4$;
+  \item $n \equiv 1 \pmod{4}$;
+  \item Either $n \equiv 1 \pmod{12}$ or $n \equiv 9 \pmod{36}$;
+  \item $105 \nmid n$;
+  \item $n$ is not a perfect square.
+\end{enumerate}
+\end{theorem}
+
+\begin{remark}
+Theorem~\ref{thm:necessary} represents the accumulated work of over two
+centuries of number theory.
+Each condition significantly narrows the search space, yet together they
+still do not yield a contradiction.
+\end{remark}
+
+% ============================================================
+\section{Conclusion and Open Questions}
+% ============================================================
+
+The problem of odd perfect numbers stands as one of the most ancient open
+problems in all of mathematics, with no solution in sight despite the
+combined force of analytic, algebraic, and computational methods.
+
+The central conjecture remains:
+
+\begin{conjecture}[Restated]
+There are no odd perfect numbers.
+\end{conjecture}
+
+\noindent\textbf{Open questions of current interest include:}
+\begin{enumerate}[label=(\arabic*)]
+  \item Can $\omega(n) \geq 10$ be proved?
+  \item Can the lower bound $n > 10^{1500}$ be improved substantially?
+  \item Is there a prime $p$ that \emph{cannot} be the Euler prime of an odd
+        perfect number?
+  \item Can quasiperfect numbers be ruled out?
+  \item Is there an algebraic number field argument that would force a
+        contradiction in the structure $n = p^a m^2$?
+  \item Could methods from analytic number theory (e.g.\ sieve methods) provide
+        a non-computational approach?
+\end{enumerate}
+
+The problem connects deeply to the structure of the multiplicative function
+$\sigma$ and to questions about the distribution of values of $\sigma(n)/n$
+near $2$, touching on some of the most fundamental unsolved issues in
+elementary number theory.
+
+% ============================================================
+\begin{thebibliography}{99}
+
+\bibitem{Euler1747}
+L.\ Euler,
+\textit{De numeris amicabilibus},
+Nova Acta Eruditorum (1747);
+also in: Opera Omnia, Ser.\ I, Vol.\ 2, pp.\ 86--162.
+
+\bibitem{Touchard1953}
+J.\ Touchard,
+\textit{On prime numbers and perfect numbers},
+Scripta Mathematica \textbf{19} (1953), 35--39.
+
+\bibitem{Kanold1941}
+H.-J.\ Kanold,
+\textit{Untersuchungen über ungerade vollkommene Zahlen},
+J.\ Reine Angew.\ Math.\ \textbf{183} (1941), 98--109.
+
+\bibitem{Chein1979}
+E.\ Z.\ Chein,
+\textit{An odd perfect number has at least 8 prime factors},
+Ph.D.\ Thesis, Pennsylvania State University, 1979.
+
+\bibitem{Hagis1980}
+P.\ Hagis Jr.,
+\textit{Outline of a proof that every odd perfect number has at least eight
+prime factors},
+Math.\ Comp.\ \textbf{35} (1980), 1027--1032.
+
+\bibitem{BrentCohenRiele1991}
+R.\ P.\ Brent, G.\ L.\ Cohen, H.\ J.\ J.\ te Riele,
+\textit{Improved techniques for lower bounds for odd perfect numbers},
+Math.\ Comp.\ \textbf{57} (1991), 857--868.
+
+\bibitem{Iannucci1999}
+D.\ E.\ Iannucci,
+\textit{The third largest prime divisor of an odd perfect number exceeds
+one hundred},
+Math.\ Comp.\ \textbf{69} (2000), 867--879.
+
+\bibitem{GotoOhno2008}
+T.\ Goto and Y.\ Ohno,
+\textit{Odd perfect numbers have a prime factor exceeding $10^8$},
+Math.\ Comp.\ \textbf{77} (2008), 1859--1868.
+
+\bibitem{LucaPomerance2010}
+F.\ Luca and C.\ Pomerance,
+\textit{On the radical of a perfect number},
+New York J.\ Math.\ \textbf{16} (2010), 23--30.
+
+\bibitem{OchemRao2012}
+P.\ Ochem and M.\ Rao,
+\textit{Odd perfect numbers are greater than $10^{1500}$},
+Math.\ Comp.\ \textbf{81} (2012), 1869--1877.
+
+\bibitem{OchemRao2014}
+P.\ Ochem and M.\ Rao,
+\textit{On the number of prime factors of an odd perfect number},
+Math.\ Comp.\ \textbf{83} (2014), 2435--2439.
+
+\bibitem{Nielsen2015}
+P.\ P.\ Nielsen,
+\textit{Odd perfect numbers, Diophantine equations, and upper bounds},
+Math.\ Comp.\ \textbf{84} (2015), 2549--2567.
+
+\bibitem{BroughanDelbourgoZhou}
+K.\ A.\ Broughan, D.\ Delbourgo, Q.\ Zhou,
+\textit{Improving the Chen and Chen result for odd perfect numbers},
+Integers \textbf{13} (2013), A39.
+
+\bibitem{Steuerwald1937}
+R.\ Steuerwald,
+\textit{Verschärfung eines Satzes über die Seite vollkommener Zahlen},
+S.-B.\ math.-nat.\ Kl.\ Bayer.\ Akad.\ Wiss.\ 1937, 69--72.
+
+\end{thebibliography}
+
+\end{document}

@@ -1163,3 +1163,79 @@ viele Nullstellen auf der kritischen Linie liegen.
 - Vollständigkeitsvermutung und Unknoten-Vermutung als \vermutung
 - Wheeling-Theorem: BEWEIS (nicht Vermutung)
 - Volumen-Vermutung als \vermutung
+
+=== 2026-03-12 — Build 164 — Batch 23: Papers 88–91 (EN + DE) ===
+
+2026-03-12 [Build 164]: 8 neue LaTeX-Papers in papers/batch23/
+
+### Paper 88: Odd Perfect Numbers (EN + DE)
+- paper88_odd_perfect_numbers_en.tex
+- paper88_ungerade_vollkommene_zahlen_de.tex
+- Eulers Struktursatz (n = p^a m² mit p ≡ a ≡ 1 mod 4)
+- Schranken: n > 10^1500 (Ochem-Rao 2012), ω(n) ≥ 9, Ω(n) ≥ 101
+- Größter Primteiler > 10^8 (Goto-Ohno 2008), zweitgrößter > 10^4
+- Touchard-Bedingung, Steuerwald, quasivollkommen, k-fach vollkommen
+- VERMUTUNG: Keine ungerade vollkommene Zahl (ältestes offenes Problem)
+
+### Paper 89: Mersenne Primes (EN + DE)
+- paper89_mersenne_primes_even_perfect_en.tex
+- paper89_mersenne_primzahlen_gerade_vollkommene_de.tex
+- Satz von Euklid–Euler (vollständige Bijektion, Beweis beider Richtungen)
+- Lucas-Lehmer-Test mit vollständigem Beweis
+- 51 bekannte Mersenne-Primzahlen (Stand 2024), M_82589933
+- GIMPS-Projekt, Lenstra-Wagstaff-Heuristik
+- Kreisteilungspolynome, Wagstaff-Repunit-Vermutung, Zsygmondy
+- VERMUTUNG: Unendlich viele Mersenne-Primzahlen (offen)
+
+### Paper 90: Bunyakovsky Conjecture (EN + DE)
+- paper90_bunyakovsky_conjecture_en.tex
+- paper90_bunyakovsky_vermutung_de.tex
+- Bunyakovsky 1857: irreduzible f ∈ Z[x] mit Δ(f)=1 → unendlich viele Primwerte
+- Dirichlet als bewiesener Spezialfall (linear)
+- Sophie-Germain-Identität als Beispiel für Irreduzibilitätsbedingung
+- Bateman-Horn-Vermutung (quantitative Version)
+- Schinzel Hypothese H (simultane Polynome)
+- Eulers Glückszahlen (2,3,5,11,17,41), n²+n+41 und Q(√-163)
+- Iwaniec 1978: n²+1 ist ∞ oft P₂ (fast-prim, bewiesen)
+- VERMUTUNG: Bunyakovsky für Grad ≥ 2 vollständig offen
+
+### Paper 91: Erdős-Gallai Theorem (EN + DE)
+- paper91_erdos_gallai_degree_sequences_en.tex
+- paper91_erdos_gallai_gradfolgen_de.tex
+- SATZ (bewiesen 1960): vollständige Charakterisierung graphischer Folgen
+- Hakimi-Algorithmus (konstruktiv, O(n log n))
+- Fulkerson-Bedingungen und Netzwerkflüsse
+- Gradfolgenpolytop (Facetten = EG-Ungleichungen)
+- Gale-Ryser-Theorem (bipartit/gerichtet)
+- Multigraph-Charakterisierung (einfacher: nur 2 Bedingungen)
+- Schwellenwertgraphen (Chvátal-Hammer 1977)
+- McKay-Wormald 1991: Asymptotik der Realisierungsanzahl
+- OFFENE PROBLEME: planare/chordale/außerplanare Gradfolgen
+
+=== 2026-03-12 — Build 164 — Batch 19: Papers 72–75 (EN + DE) ===
+
+2026-03-12 [Build 164]: 8 LaTeX-Papers erstellt (Batch 19, Papers 72–75 EN + DE)
+
+### Neue Dateien
+- papers/batch19/paper72_freiman_structure_theorem_en.tex
+- papers/batch19/paper72_freiman_struktursatz_de.tex
+- papers/batch19/paper73_erdos_ko_rado_en.tex
+- papers/batch19/paper73_erdos_ko_rado_de.tex
+- papers/batch19/paper74_lonely_runner_en.tex
+- papers/batch19/paper74_lonely_runner_de.tex
+- papers/batch19/paper75_graceful_tree_en.tex
+- papers/batch19/paper75_graceful_baum_de.tex
+
+### Inhalt
+- Paper 72 (EN+DE): Freimanns Satz + Plünnecke-Ruzsa + Green-Ruzsa + Sanders
+  Quasi-polynomiale Schranke + PFR über F_2^n (Gowers-Green-Manners-Tao 2023)
+- Paper 73 (EN+DE): Erdős-Ko-Rado-Satz + Katona-Kreisbeweis + Hilton-Milner
+  + Frankl t-schneidend + Ahlswede-Khachatrian + q-Analog + Frankl union-closed
+- Paper 74 (EN+DE): Lonely-Runner-Vermutung + bekannte Fälle (n≤7) + Verbindung
+  zu Kneser-Graphen + Fourier-Methoden + Cusick-Pomerance-Formulierung
+- Paper 75 (EN+DE): Anmutige-Baum-Vermutung (Ringel-Kotzig) + α-Beschriftungen
+  + Skolem-Folgen + Zyklische K_{2m+1}-Zerlegungen + bekannte Klassen
+
+### Kritische Anmerkung
+Alle unbewiesenen Aussagen korrekt als \begin{vermutung} (DE) / \begin{conjecture} (EN)
+ausgewiesen. Keine unbewiesen Vermutung als Theorem deklariert.

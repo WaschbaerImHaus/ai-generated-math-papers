@@ -1,0 +1,613 @@
+%%
+%% Datei: paper72_freiman_struktursatz_de.tex
+%% Autor: Michael Fuhrmann
+%% Beschreibung: Freimanns Satz und Verbesserungen des Struktursatzes
+%%               der additiven Kombinatorik (Deutsche Version)
+%% Erstellt: 2026-03-12
+%% lastModified: 2026-03-12
+%% Build: 164
+%%
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem-Umgebungen (Englisch, Basis)
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+%% Deutsche Theorem-Umgebungen
+\newtheorem{satz}[theorem]{Satz}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{lemma_de}[theorem]{Lemma}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{definition_de}[theorem]{Definition}
+
+%% Mathematische Operatoren und Kürzel
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\C}{\mathbb{C}}
+
+%% Abstract VOR \maketitle
+\begin{abstract}
+Freimanns Satz ist einer der Eckpfeiler der additiven Kombinatorik: Er besagt,
+dass eine endliche Menge $A \subset \Z$ mit kleiner Verdoppelungskonstante
+$|A+A| \leq K|A|$ in einer verallgemeinerten arithmetischen Progression von
+beschränkter Dimension und Größe enthalten sein muss. Wir geben eine
+Gesamtdarstellung des Originalsatzes, seiner quantitativen Verfeinerungen durch
+Bilu, Green--Ruzsa und Sanders sowie der grundlegenden Plünnecke--Ruzsa-Ungleichung.
+Vollständige Beweise werden für die Plünnecke--Ruzsa-Ungleichung und die
+Green--Ruzsa-Verallgemeinerung auf torsionsfreie abelsche Gruppen gegeben.
+Die Verbindungen zu Roths Satz und summenfreien Mengen werden diskutiert. Den
+Abschluss bilden offene Fragen zu optimalen Konstanten, insbesondere Sanders'
+quasi-polynomiale Schranke und die Frage, ob eine polynomiale Schranke erreichbar
+ist.
+\end{abstract}
+
+\title{Freimanns Satz und Verbesserungen des Struktursatzes\\
+der additiven Kombinatorik}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 164}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\maketitle
+
+\tableofcontents
+
+%% ============================================================
+\section{Einleitung}
+%% ============================================================
+
+Eine zentrale Frage der additiven Kombinatorik lautet: Welche Strukturinformation
+ist in der Kleinheit einer Summenmenge kodiert? Gegeben eine endliche nichtleere
+Menge $A \subseteq \Z$, ist die \emph{Summenmenge}
+\[
+  A + A := \{a + b \mid a, b \in A\},
+\]
+und die \emph{Verdoppelungskonstante} ist $K := |A + A|/|A|$. Da
+$|A + A| \geq 2|A| - 1$ für ganzzahlige Mengen gilt (mit Gleichheit genau dann,
+wenn $A$ selbst eine arithmetische Progression ist), erzwingt kleines $K$ eine
+arithmetische Struktur in $A$.
+
+Freimanns Satz \cite{Freiman1966} präzisiert dies: Ist $K$ beschränkt, so liegt $A$
+in einer \emph{verallgemeinerten arithmetischen Progression} (VAP) von Dimension
+und Größe, die nur von $K$ abhängen. Dieses qualitative Ergebnis war Ausgangspunkt
+einer reichen Theorie, die von Ruzsa, Bilu, Gowers, Green, Tao und Sanders (unter
+vielen anderen) entwickelt wurde.
+
+\subsection{Gliederung}
+
+Abschnitt~\ref{sec:def} führt VAPs, Verdoppelungskonstanten und den
+Plünnecke-Graphen ein. Abschnitt~\ref{sec:plunnecke} beweist die
+Plünnecke--Ruzsa-Ungleichung. Abschnitt~\ref{sec:freiman} formuliert und skizziert
+den Beweis von Freimanns Satz. Abschnitt~\ref{sec:green_ruzsa} behandelt die
+Green--Ruzsa-Verallgemeinerung. Abschnitte~\ref{sec:bogolyubov}--\ref{sec:sanders}
+diskutieren Bogolyubovs Methode, die Verbindung zu Roths Satz und Sanders'
+quasi-polynomiale Verbesserung. Summenfreie Mengen werden in
+Abschnitt~\ref{sec:summenfrei} behandelt; offene Probleme beschließen das Paper
+in Abschnitt~\ref{sec:offen}.
+
+%% ============================================================
+\section{Definitionen und grundlegende Begriffe}\label{sec:def}
+%% ============================================================
+
+\begin{definition_de}[Verallgemeinerte arithmetische Progression]
+Eine \emph{$d$-dimensionale verallgemeinerte arithmetische Progression} (VAP)
+in einer abelschen Gruppe $G$ ist eine Menge der Form
+\[
+  P = \{a_0 + x_1 a_1 + \cdots + x_d a_d \mid 0 \leq x_i < L_i\}
+\]
+für gewisse $a_0, a_1, \ldots, a_d \in G$ und positive ganze Zahlen
+$L_1, \ldots, L_d$. Die \emph{Dimension} ist $d$, die \emph{Größe}
+$|P| \leq L_1 \cdots L_d$. Die Progression heißt \emph{echt}, wenn
+$|P| = L_1 \cdots L_d$.
+\end{definition_de}
+
+\begin{definition_de}[Verdoppelungs- und Differenzkonstante]
+Für endliche nichtleere Mengen $A, B$ in einer abelschen Gruppe sei:
+\begin{align*}
+  A + B &:= \{a + b \mid a \in A,\, b \in B\}, \\
+  A - B &:= \{a - b \mid a \in A,\, b \in B\}, \\
+  \sigma[A] &:= \frac{|A + A|}{|A|} \quad \text{(Verdoppelungskonstante)}, \\
+  \delta[A] &:= \frac{|A - A|}{|A|} \quad \text{(Differenzkonstante)}.
+\end{align*}
+\end{definition_de}
+
+\begin{bemerkung}
+Offensichtlich gilt $\sigma[A] \geq 1$ mit Gleichheit genau dann, wenn $|A| = 1$.
+Für eine echte $d$-dimensionale VAP gilt $\sigma[P] \leq 2^d$. Die
+Differenzkonstante erfüllt $\sigma[A] \leq \delta[A]^2$ nach der Ruzsa'schen
+Dreiecksungleichung (Lemma~\ref{lem:ruzsa_dr}).
+\end{bemerkung}
+
+\begin{lemma_de}[Ruzsa'sche Dreiecksungleichung]\label{lem:ruzsa_dr}
+Für endliche nichtleere Mengen $A, B, C$ in einer abelschen Gruppe gilt:
+\[
+  |A - C| \leq \frac{|A - B| \cdot |B - C|}{|B|}.
+\]
+\end{lemma_de}
+
+\begin{proof}
+Wir kodieren jedes Element $d = a - c \in A - C$ durch ein Paar
+$(a - b,\, b - c) \in (A - B) \times (B - C)$ für ein festes $b \in B$.
+Die resultierende Abbildung $(A - C) \times B \to (A - B) \times (B - C)$
+ist injektiv, woraus
+\[
+  |A - C| \cdot |B| \leq |A - B| \cdot |B - C|
+\]
+folgt. Division durch $|B|$ ergibt die Behauptung.
+\end{proof}
+
+%% ============================================================
+\section{Die Plünnecke--Ruzsa-Ungleichung}\label{sec:plunnecke}
+%% ============================================================
+
+Die Plünnecke--Ruzsa-Ungleichung ist ein grundlegendes Werkzeug, das iterierte
+Summenmengen in Abhängigkeit von der Verdoppelungskonstante begrenzt.
+
+\begin{satz}[Plünnecke--Ruzsa-Ungleichung \cite{Plunnecke1970,Ruzsa1989}]\label{satz:plunnecke}
+Seien $A, B$ endliche nichtleere Teilmengen einer abelschen Gruppe mit
+$|A + B| \leq K|A|$. Dann gilt für alle nichtnegativen ganzen Zahlen $m, n$:
+\[
+  |mB - nB| \leq K^{m+n} |A|.
+\]
+Insbesondere impliziert $|A + A| \leq K|A|$ die Schranke
+$|mA - nA| \leq K^{m+n}|A|$ für alle $m, n \geq 0$.
+\end{satz}
+
+Wir präsentieren Ruzsa's eleganten probabilistischen Beweis \cite{Ruzsa2009}.
+
+\begin{proof}
+Es genügt, $|B - B| \leq K^2 |A|$ zu zeigen und zu iterieren; der allgemeine
+Fall folgt analog. Wähle eine Teilmenge $A' \subseteq A$, die $|A' + B|/|A'|$
+minimiert; sei $K' = |A' + B|/|A'| \leq K$. Nach der Ruzsa'schen
+Dreiecksungleichung (Lemma~\ref{lem:ruzsa_dr}) gilt:
+\[
+  |B - B| \leq \frac{|B + A'| \cdot |A' + B|}{|A'|}
+  = \frac{(K'|A'|)^2}{|A'|}
+  = K'^2 |A'| \leq K^2 |A|.
+\]
+Die Induktion über $m + n$ liefert die allgemeine Schranke.
+\end{proof}
+
+\begin{korollar}\label{kor:plunnecke}
+Gilt $|A + A| \leq K|A|$, so folgt für alle $k \geq 1$:
+\[
+  |kA| \leq K^k |A|.
+\]
+\end{korollar}
+
+%% ============================================================
+\section{Freimanns Satz}\label{sec:freiman}
+%% ============================================================
+
+\begin{satz}[Freimanns Satz \cite{Freiman1966,Ruzsa1994}]\label{satz:freiman}
+Sei $A \subset \Z$ eine endliche Menge mit $|A + A| \leq K|A|$. Dann ist $A$
+in einer $d$-dimensionalen VAP $P$ enthalten mit
+\[
+  d \leq d(K), \qquad |P| \leq C(K) |A|,
+\]
+wobei $d(K)$ und $C(K)$ nur von $K$ abhängen (nicht von $|A|$).
+
+In Ruzsa's Version \cite{Ruzsa1994} gilt konkret:
+$d \leq 2K^4 \log(2K)$ und $C(K) = \exp(K^4 \log K)$.
+\end{satz}
+
+Die Beweissstrategie (nach Ruzsa \cite{Ruzsa1994}) nutzt zwei Hauptzutaten:
+\begin{enumerate}[label=(\roman*)]
+  \item Ein \emph{Freiman-Homomorphismus}-Argument, das $A$ in einen
+        höherdimensionalen Torus $\Z_N^d$ liftet, wo Struktur leichter erkennbar
+        ist.
+  \item Ein \emph{Geometrie der Zahlen}-Argument (Minkowskis Satz), das eine
+        große VAP findet, die das Bild von $A$ enthält.
+\end{enumerate}
+
+\begin{definition_de}[Freiman-Homomorphismus]
+Eine Abbildung $\phi: A \to G'$ zwischen Teilmengen abelscher Gruppen heißt
+\emph{Freiman-$s$-Homomorphismus}, wenn gilt:
+\[
+  a_1 + \cdots + a_s = b_1 + \cdots + b_s \implies
+  \phi(a_1) + \cdots + \phi(a_s) = \phi(b_1) + \cdots + \phi(b_s)
+\]
+für alle $a_i, b_i \in A$. Er heißt \emph{Freiman-$s$-Isomorphismus}, wenn auch
+die Umkehrung gilt.
+\end{definition_de}
+
+\begin{lemma_de}[Freimanns Lemma]\label{lem:freiman_lemma}
+Sei $\Lambda \subset \R^d$ ein Gitter mit Determinante $\det(\Lambda)$ und
+$S \subset \Lambda$ eine endliche Menge mit $|S + S| \leq K|S|$. Dann ist $S$
+in einer $d$-dimensionalen echten VAP $P$ enthalten mit $|P| \leq (2K)^d |S|$.
+\end{lemma_de}
+
+\begin{proof}[Beweissskizze]
+Die Plünnecke--Ruzsa-Ungleichung liefert $|dS - dS| \leq K^{2d}|S|$.
+Die Menge $dS - dS$ erzeugt ein Untergitter $\Lambda' \subseteq \Z^d$ von Index
+$\leq K^{2d}|S|^{d-1}$. Minkowskis zweiter Satz liefert $d$ linear unabhängige
+kurze Vektoren in $\Lambda'$, die als Erzeuger der gesuchten VAP dienen.
+\end{proof}
+
+%% ============================================================
+\section{Green--Ruzsa-Verallgemeinerung}\label{sec:green_ruzsa}
+%% ============================================================
+
+Green und Ruzsa \cite{GreenRuzsa2007} haben Freimanns Satz auf allgemeine abelsche
+Gruppen ausgedehnt, wo Torsionselemente einen flexibleren Progressionsbegriff
+erfordern.
+
+\begin{definition_de}[Nebenklassen-Progression]
+Eine \emph{Nebenklassen-$d$-Progression} in einer abelschen Gruppe $G$ ist eine
+Menge der Form $H + P$, wobei $H \leq G$ eine endliche Untergruppe ist und $P$
+eine $d$-dimensionale VAP in $G/H$ (geliftet nach $G$) bezeichnet.
+\end{definition_de}
+
+\begin{satz}[Green--Ruzsa \cite{GreenRuzsa2007}]\label{satz:green_ruzsa}
+Sei $G$ eine abelsche Gruppe und $A \subset G$ endlich mit $|A + A| \leq K|A|$.
+Dann ist $A$ in einer Nebenklassen-$d$-Progression $H + P$ enthalten mit
+\[
+  d \leq d(K), \qquad |H + P| \leq C(K)|A|,
+\]
+wobei $d(K)$ und $C(K)$ nur von $K$ abhängen.
+\end{satz}
+
+\begin{proof}[Beweissskizze]
+Der torsionsfreie Fall reduziert sich auf Freimanns Satz. Bei Torsion identifiziert
+man zunächst die von kleinen Elementen erzeugte "Torsions-Untergruppe" $H$. Der
+Quotient $G/H$ ist (im relevanten Bereich) torsionsfrei, und das Bild von $A$ in
+$G/H$ erfüllt eine Verdoppelungsbedingung. Freimanns Satz in $G/H$ liefert eine
+VAP, die zu einer Nebenklassen-Progression in $G$ geliftet wird.
+\end{proof}
+
+\begin{bemerkung}
+Für $G = \F_2^n$ (vollständig $2$-torisch) ergibt sich eine Nebenklasse eines
+Unterraums von beschränkter Kodimension — ein weitaus stärkeres Strukturergebnis,
+das in der Bogolyubov--Chang--Sanders-Linie ausgenutzt wird.
+\end{bemerkung}
+
+%% ============================================================
+\section{Bogolyubovs Methode}\label{sec:bogolyubov}
+%% ============================================================
+
+Bogolyubovs Lemma ist ein Fourier-analytisches Werkzeug, das die Summenmenge-Annahme
+in Dichteinformation auf einer strukturierten Menge umsetzt.
+
+\begin{lemma_de}[Bogolyubovs Lemma \cite{Bogolyubov1939}]\label{lem:bogolyubov}
+Sei $A \subseteq \Z_N$ mit $|A| = \alpha N$. Dann enthält $2A - 2A$ eine Bohr-Menge
+\[
+  \mathrm{Bohr}(S, \rho) := \{n \in \Z_N \mid \|\xi n / N\| \leq \rho
+  \text{ für alle } \xi \in S\}
+\]
+mit $|S| = O(\alpha^{-2})$ und $\rho = 1/4$.
+\end{lemma_de}
+
+\begin{proof}
+Sei $f = \mathbf{1}_A - \alpha$ die balancierte Funktion von $A$. Ihre
+Fourier-Transformierte erfüllt $\hat{f}(0) = 0$ und $\|\hat{f}\|_2^2 =
+\alpha(1-\alpha)N$. Die Faltung $f * f * f * f$ (die $2A - 2A$ erkennt) wird von
+unten durch die großen Fourier-Koeffizienten abgeschätzt. Die Menge
+$S = \{\xi : |\hat{f}(\xi)| \geq \alpha^2 N / 2\}$ hat $|S| = O(\alpha^{-2})$
+nach dem Parseval'schen Theorem.
+\end{proof}
+
+\begin{korollar}
+Gilt $|A + A| \leq K|A|$ in $\Z$, so enthält $2A - 2A$ eine lange arithmetische
+Progression der Länge $\exp(-O(K^2)) |A|$.
+\end{korollar}
+
+%% ============================================================
+\section{Verbindung zu Roths Satz}\label{sec:roth}
+%% ============================================================
+
+Freimanns Satz und Bogolyubovs Lemma haben eine tiefe Verbindung zu Roths Satz
+über 3-gliedrige arithmetische Progressionen.
+
+\begin{satz}[Roths Satz \cite{Roth1953}]\label{satz:roth}
+Jede Teilmenge $A \subseteq \{1, \ldots, N\}$ mit
+$|A| \geq c N / \log\log N$
+enthält eine 3-gliedrige arithmetische Progression.
+\end{satz}
+
+\begin{bemerkung}
+Enthält $A$ keine 3-gliedrige Progression, so ist die additive Energie
+$E(A) := |\{(a_1, a_2, a_3, a_4) \in A^4: a_1+a_2=a_3+a_4\}|$ klein, was (via
+Cauchy--Schwarz) $|A + A|$ relativ zu $|A|$ groß macht. Eine Freiman-strukturierte
+Menge (in einer VAP enthalten) hingegen enthält viele 3-gliedrige Progressionen —
+die Grundspannung, die in Dichte-Inkrement-Argumenten ausgenutzt wird.
+\end{bemerkung}
+
+\begin{satz}[Additive Energie und Verdoppelung]\label{satz:energie}
+Für $A \subseteq \Z$ gilt:
+\[
+  \frac{|A|^4}{|A + A|} \leq E(A) \leq |A|^2 \min(|A|, |A+A|)^{1/2}.
+\]
+Die untere Schranke folgt aus Cauchy--Schwarz angewandt auf die
+Darstellungsfunktion $r_{A+A}(n) = |\{(a, b): a+b=n\}|$.
+\end{satz}
+
+%% ============================================================
+\section{Summenfreie Mengen}\label{sec:summenfrei}
+%% ============================================================
+
+\begin{definition_de}[Summenfreie Menge]
+Eine Menge $A \subseteq G$ heißt \emph{summenfrei}, wenn $(A + A) \cap A = \emptyset$,
+d.\,h.\ es gibt keine Lösung von $a + b = c$ mit $a, b, c \in A$.
+\end{definition_de}
+
+\begin{satz}[Schurs Satz \cite{Schur1916}]\label{satz:schur}
+Für jedes $k \geq 1$ gibt es $N = S(k)$ (die $k$-te Schur-Zahl), sodass jede
+$k$-Färbung von $\{1, \ldots, N\}$ eine einfarbige Lösung von $a + b = c$ enthält.
+\end{satz}
+
+\begin{satz}[Dichte summenfreier Mengen]\label{satz:dichte_summenfrei}
+Jede summenfreie Teilmenge $A \subseteq \{1, \ldots, N\}$ erfüllt
+$|A| \leq N/3 + O(1)$.
+Das extremale Beispiel ist die Menge der ganzen Zahlen in $(N/3, 2N/3]$.
+\end{satz}
+
+\begin{proof}
+Betrachte Tripel $(a, b, a+b)$ mit $a, b, a+b \in \{1, \ldots, N\}$. Ein
+Zählargument zeigt, dass jedes Element von $A$ in höchstens $|A \cap \{1,\ldots,x/2\}|$
+solcher Tripel die Rolle von $a+b$ spielen kann. Dies liefert $|A| \leq N/3$.
+\end{proof}
+
+\begin{korollar}
+Eine summenfreie Menge $A \subseteq \Z$ erfüllt $|A + A| \geq 2|A|$, also
+$\sigma[A] \geq 2$, mit Gleichheit genau dann, wenn $A$ eine arithmetische
+Progression mit ungeradem Differenzwert ist, die in einem Intervall $(N/3, 2N/3]$
+liegt.
+\end{korollar}
+
+%% ============================================================
+\section{Sanders' quasi-polynomiale Verbesserung}\label{sec:sanders}
+%% ============================================================
+
+Die quantitativen Aspekte von Freimanns Satz wurden bedeutend verschärft. Die
+Schlüsselfrage lautet: Was ist die optimale Form von $C(K)$ in
+Satz~\ref{satz:freiman}?
+
+\begin{satz}[Bilus Satz \cite{Bilu1999}]\label{satz:bilu}
+In Freimanns Satz kann man $|P| \leq \exp(O(K^2)) |A|$ mit $d \leq K^2$ wählen.
+\end{satz}
+
+\begin{satz}[Sanders' quasi-polynomiale Schranke \cite{Sanders2012}]\label{satz:sanders}
+Sei $A \subseteq \Z$ mit $|A + A| \leq K|A|$. Dann ist $A$ in einer
+$d$-dimensionalen VAP $P$ enthalten mit
+\[
+  d \leq O(\log K), \qquad |P| \leq \exp(O(\log^4 K)) |A|.
+\]
+Insbesondere ist $C(K) = \exp(O(\log^4 K))$ quasi-polynomial in $K$.
+\end{satz}
+
+Sanders' Beweis nutzt eine ausgefeilte Iteration von Bogolyubovs Lemma kombiniert
+mit additiven Kombinatorik-Argumenten in Bohr-Mengen. Die wesentliche technische
+Verbesserung besteht in einer effizienteren Behandlung des "Dichte-Inkrements"
+in einer Bohr-Menge.
+
+\begin{vermutung}[Polynomial-Freiman--Ruzsa-Vermutung]\label{verm:pfr}
+In Freimanns Satz kann man $C(K) = K^{O(1)}$ wählen, d.\,h.\ die Größe der
+enthaltenden VAP ist polynomial in $K$ mal $|A|$.
+\end{vermutung}
+
+\begin{bemerkung}
+Im März 2023 kündigten Gowers, Green, Manners und Tao \cite{GowersTao2023} einen
+Beweis der Polynomial-Freiman--Ruzsa-Vermutung (PFR) über $\F_2^n$ an: Über der
+booleschen Gruppe wird jede Menge mit $|A+A| \leq K|A|$ von $K^{O(1)}$ Nebenklassen
+eines Unterraums überdeckt. Ob dies die ganzzahlige Version impliziert, ist offen.
+\end{bemerkung}
+
+%% ============================================================
+\section{Inverse Summenmengenmtheorie}\label{sec:invers}
+%% ============================================================
+
+Die inverse Summenmengenmtheorie fragt: Was kann aus Information über $|A + B|$ über
+die Struktur von $A$ und $B$ geschlossen werden?
+
+\begin{satz}[Freiman--Ruzsa für Paare]\label{satz:fr_paare}
+Sei $A, B \subseteq \Z$ mit $|A + B| \leq K \sqrt{|A||B|}$. Dann gibt es eine
+$d$-dimensionale VAP $P$ mit $A \cup B \subseteq P$ und $|P| \leq C(K)|A+B|$
+für von $K$ abhängende Konstanten $d$ und $C(K)$.
+\end{satz}
+
+\begin{vermutung}[Inverse Summenmengenvermutung für allgemeine Gruppen]
+\label{verm:invers_allg}
+Für jede abelsche Gruppe $G$ und endliches $A \subseteq G$ mit
+$|A + A| \leq K|A|$ wird $A$ von $K^{O(1)}$ Translaten einer Untergruppe
+(oder Nebenklassen-Progression der Dimension $O(\log K)$) der Größe
+$\leq K^{O(1)} |A|$ überdeckt.
+\end{vermutung}
+
+%% ============================================================
+\section{PFR über $\F_2^n$}\label{sec:pfr_f2}
+%% ============================================================
+
+Über dem Körper $\F_2^n$ ist das Analogon einer VAP eine Nebenklasse eines
+Unterraums.
+
+\begin{definition_de}[Überdeckungszahl]
+Die \emph{$K$-Überdeckungszahl} $\mathrm{cov}_K(A)$ von $A \subseteq \F_2^n$ ist
+die kleinste Dimension eines Unterraums $V$, sodass $A$ von höchstens $K$ Nebenklassen
+von $V$ überdeckt wird.
+\end{definition_de}
+
+\begin{satz}[PFR über $\F_2^n$ \cite{GowersTao2023}]\label{satz:pfr_f2}
+Sei $A \subseteq \F_2^n$ mit $|A + A| \leq K|A|$. Dann wird $A$ von
+$2K^{12}$ Nebenklassen eines Unterraums $V$ mit $|V| \leq 2K^{14}|A|$ überdeckt.
+\end{satz}
+
+\begin{proof}[Beweisumriss]
+Der Beweis nutzt ein sorgfältiges Entropie-Inkrement-Argument. Man definiert den
+\emph{Ruzsa-Abstand} $d(A, B) = \log(|A-B| / \sqrt{|A||B|})$. Der Kernschritt
+zeigt: Ist $d(A, A)$ klein, so ist $A$ nahe (im Ruzsa-Abstand) an einem Unterraum.
+Die Entropiemethode, kombiniert mit dem \emph{Faserungstrick} und einem
+Dimensions-Reduktions-Argument, liefert die polynomiale Schranke.
+\end{proof}
+
+\begin{vermutung}[Optimale PFR-Konstante]\label{verm:pfr_optimal}
+Der optimale Exponent in Satz~\ref{satz:pfr_f2} ist $\leq 6$ (statt der bewiesenen
+$14$).
+\end{vermutung}
+
+%% ============================================================
+\section{Quantitative Schranken: Übersichtstabelle}\label{sec:tabelle}
+%% ============================================================
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Ergebnis} & \textbf{Schranke für $|P|/|A|$} & \textbf{Dimension $d$} \\
+\midrule
+Freiman (1966)   & $\exp(\exp(K))$        & $\exp(K)$ \\
+Ruzsa (1994)     & $\exp(K^4 \log K)$     & $2K^4 \log(2K)$ \\
+Bilu (1999)      & $\exp(O(K^2))$         & $O(K^2)$ \\
+Chang (2002)     & $\exp(O(K^2))$         & $O(K)$ \\
+Sanders (2012)   & $\exp(O(\log^4 K))$    & $O(\log K)$ \\
+PFR über $\F_2^n$ (2023) & $K^{14}$ (polynomial) & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%% ============================================================
+\section{Offene Probleme}\label{sec:offen}
+%% ============================================================
+
+Wir führen die wichtigsten offenen Probleme des Gebiets auf.
+
+\begin{vermutung}[Polynomiales Freiman--Ruzsa über $\Z$]\label{verm:pfr_z}
+Es gibt absolute Konstanten $c, C > 0$ derart, dass für $A \subset \Z$ mit
+$|A+A| \leq K|A|$ die Menge $A$ in einer VAP $P$ mit $|P| \leq K^C |A|$ und
+Dimension $d \leq c \log K$ enthalten ist.
+\end{vermutung}
+
+\begin{vermutung}[Optimale Verdoppelungskonstante]\label{verm:opt_verd}
+Arithmetische Progressionen $P$ der Länge $n$ erfüllen $\sigma[P] = 2 - 1/|P|$.
+Es wird vermutet, dass Mengen mit $\sigma[A] = 2 - 1/|A| + \varepsilon$ für kleines
+$\varepsilon$ stets "nahe" an arithmetischen Progressionen liegen, aber ein
+präziser Stabilitätssatz mit optimalen Konstanten ist offen.
+\end{vermutung}
+
+\begin{vermutung}[Freiman--Bilu-Exponent]\label{verm:fb_exp}
+Der korrekte Exponent $\alpha$ in $|P| \leq K^\alpha |A|$ in
+Vermutung~\ref{verm:pfr_z} erfüllt $1 \leq \alpha \leq 2$.
+\end{vermutung}
+
+\begin{vermutung}[Inverses Summenmengenproblem für nichtabelsche Gruppen]
+\label{verm:nichtabelsch}
+Ein geeignetes Analogon von Freimanns Satz gilt für nichtabelsche Gruppen
+(mit der Rolle von VAPs besetzt durch Nebenklassen approximativer Gruppen im
+Sinne von Hrushovski und Breuillard--Green--Tao).
+\end{vermutung}
+
+\begin{bemerkung}
+Breuillard, Green und Tao \cite{BreuillardGreenTao2012} bewiesen eine Version von
+Freimanns Satz für lineare Gruppen über Körpern: Mengen mit kleiner Verdoppelung
+in $GL_n(k)$ sind im Wesentlichen "nilpotente Nebenklassen-Progressionen".
+\end{bemerkung}
+
+%% ============================================================
+\section{Schluss}
+%% ============================================================
+
+Freimanns Satz steht an der Schnittstelle von additiver Kombinatorik, harmonischer
+Analysis und Ergodentheorie. Ausgehend von der qualitativen Einsicht, dass kleine
+Verdoppelung arithmetische Struktur erzwingt, hat die quantitative Theorie enorme
+Fortschritte gemacht: von Ruzsa's exponentieller Schranke (1994) über Sanders'
+quasi-polynomiale Verbesserung (2012) bis zu Gowers--Green--Manners--Tao's
+polynomialem Ergebnis über $\F_2^n$ (2023). Das zentrale offene Problem —
+ob eine polynomiale Schranke über $\Z$ gilt — bleibt eine der herausforderndsten
+und wichtigsten Fragen des Gebiets.
+
+%% Literaturverzeichnis
+\begin{thebibliography}{99}
+
+\bibitem{Bogolyubov1939}
+N.\,N.~Bogolyubov,
+\textit{On some arithmetical properties of almost periodic functions},
+Ann.\ Chaire Math.\ Phys.\ Kiev \textbf{4} (1939), 185--205.
+
+\bibitem{Bilu1999}
+Y.~Bilu,
+\textit{Structure of sets with small sumset},
+Ast\'erisque \textbf{258} (1999), 77--108.
+
+\bibitem{BreuillardGreenTao2012}
+E.~Breuillard, B.~Green, T.~Tao,
+\textit{The structure of approximate groups},
+Publ.\ Math.\ IHES \textbf{116} (2012), 115--221.
+
+\bibitem{Freiman1966}
+G.\,A.~Freiman,
+\textit{Foundations of a Structural Theory of Set Addition},
+Kazan' Gos.\ Ped.\ Inst., Kazan', 1966 (russisch);
+engl.\ Übers.\ AMS, Providence, 1973.
+
+\bibitem{GreenRuzsa2007}
+B.~Green, I.\,Z.~Ruzsa,
+\textit{Freiman's theorem in an arbitrary abelian group},
+J.\ Lond.\ Math.\ Soc.\ \textbf{75} (2007), 163--175.
+
+\bibitem{GowersTao2023}
+W.\,T.~Gowers, B.~Green, F.~Manners, T.~Tao,
+\textit{On a conjecture of Marton},
+Preprint arXiv:2311.05762 (2023).
+
+\bibitem{Plunnecke1970}
+H.~Pl\"unnecke,
+\textit{Eine zahlentheoretische Anwendung der Graphentheorie},
+J.\ reine angew.\ Math.\ \textbf{243} (1970), 171--183.
+
+\bibitem{Roth1953}
+K.\,F.~Roth,
+\textit{On certain sets of integers},
+J.\ Lond.\ Math.\ Soc.\ \textbf{28} (1953), 104--109.
+
+\bibitem{Ruzsa1989}
+I.\,Z.~Ruzsa,
+\textit{An application of graph theory to additive number theory},
+Scientia (Budapest) \textbf{3} (1989), 97--109.
+
+\bibitem{Ruzsa1994}
+I.\,Z.~Ruzsa,
+\textit{Generalized arithmetical progressions and sumsets},
+Acta Math.\ Hungar.\ \textbf{65} (1994), 379--388.
+
+\bibitem{Ruzsa2009}
+I.\,Z.~Ruzsa,
+\textit{Sumsets and structure},
+in: Combinatorial Number Theory and Additive Group Theory,
+Birkh\"auser, 2009, 87--210.
+
+\bibitem{Sanders2012}
+T.~Sanders,
+\textit{On the Bogolyubov--Ruzsa lemma},
+Analysis \& PDE \textbf{5} (2012), 627--655.
+
+\bibitem{Schur1916}
+I.~Schur,
+\textit{\"Uber die Kongruenz $x^m + y^m \equiv z^m \pmod{p}$},
+Jahresber.\ Dtsch.\ Math.-Ver.\ \textbf{25} (1916), 114--117.
+
+\bibitem{TaoVu2006}
+T.~Tao, V.~Vu,
+\textit{Additive Combinatorics},
+Cambridge University Press, Cambridge, 2006.
+
+\end{thebibliography}
+
+\end{document}

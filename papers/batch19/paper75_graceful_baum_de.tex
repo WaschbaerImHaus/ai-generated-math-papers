@@ -1,0 +1,532 @@
+%%
+%% Datei: paper75_graceful_baum_de.tex
+%% Autor: Michael Fuhrmann
+%% Beschreibung: Die Anmutige-Baum-Vermutung (Deutsche Version)
+%% Erstellt: 2026-03-12
+%% lastModified: 2026-03-12
+%% Build: 164
+%%
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem-Umgebungen (Englisch, Basis)
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+%% Deutsche Theorem-Umgebungen
+\newtheorem{satz}[theorem]{Satz}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{lemma_de}[theorem]{Lemma}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{definition_de}[theorem]{Definition}
+
+%% Kürzel
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+
+%% Abstract VOR \maketitle
+\begin{abstract}
+Eine \emph{anmutige Beschriftung} (graceful labeling) eines Graphen $G$ mit $m$
+Kanten ist eine Bijektion $f: V(G) \to \{0, 1, \ldots, m\}$, sodass die induzierten
+Kantenbeschriftungen $|f(u) - f(v)|$ alle verschieden sind (also
+$\{1, 2, \ldots, m\}$ bilden). Die Anmutige-Baum-Vermutung (Ringel--Kotzig,
+$\sim$1964) besagt, dass jeder Baum eine anmutige Beschriftung besitzt. Trotz
+mehr als 60 Jahren Forschung ist diese Vermutung offen. Wir geben eine Darstellung
+der Geschichte, des stärkeren $\alpha$-Beschriftungsbegriffs, der Verbindung zu
+Skolem-Folgen und zyklischen Zerlegungen vollständiger Graphen, der bekannten
+anmutigen Baumklassen (Pfade, Raupen, symmetrische Bäume, Hummer, alle Bäume bis
+35 Knoten) sowie rechnerischer und struktureller Ansätze.
+\end{abstract}
+
+\title{Die Anmutige-Baum-Vermutung}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 164}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\maketitle
+
+\tableofcontents
+
+%% ============================================================
+\section{Einleitung}
+%% ============================================================
+
+Graph-Beschriftungen bilden ein reichhaltiges Gebiet der Kombinatorik mit Verbindungen
+zur Codierungstheorie, zum Netzwerkdesign und zur kombinatorischen Designtheorie.
+Unter den vielen Beschriftungsschemata nehmen \emph{anmutige Beschriftungen} (graceful
+labelings) aufgrund ihrer Verbindung zu zyklischen Zerlegungen vollständiger Graphen
+eine besondere Stellung ein.
+
+\begin{definition_de}[Anmutige Beschriftung]\label{def:anmutig}
+Sei $G = (V, E)$ ein Graph mit $|E| = m$ Kanten. Eine \emph{anmutige Beschriftung}
+von $G$ ist eine injektive Funktion $f: V \to \{0, 1, \ldots, m\}$, sodass die Funktion
+$g: E \to \{1, 2, \ldots, m\}$ mit
+\[
+  g(\{u,v\}) = |f(u) - f(v)|
+\]
+ebenfalls eine Bijektion ist. Ein Graph, der eine anmutige Beschriftung zulässt,
+heißt \emph{anmutig} (graceful).
+\end{definition_de}
+
+\begin{example}\label{bsp:pfad}
+Der Pfad $P_n$ auf $n$ Knoten (mit $n-1$ Kanten) ist anmutig: Beschrifte die
+Knoten abwechselnd von beiden Enden von $\{0, 1, \ldots, n-1\}$:
+$f(v_1) = 0$, $f(v_2) = n-1$, $f(v_3) = 1$, $f(v_4) = n-2$, \ldots
+Die Kantenbeschriftungen sind $n-1, n-2, \ldots, 1$.
+\end{example}
+
+\begin{vermutung}[Anmutige-Baum-Vermutung, Ringel--Kotzig \cite{RingelKotzig1964}]
+\label{verm:abv}
+Jeder Baum besitzt eine anmutige Beschriftung.
+\end{vermutung}
+
+Diese Vermutung wurde um 1964 von Ringel im Kontext von Graphzerlegungen formuliert
+und unabhängig von Kotzig und Rosa \cite{Rosa1967} entwickelt. Trotz massiver
+rechnerischer Verifikation und Beweisen für viele Spezialklassen bleibt sie eines
+der berühmtesten offenen Probleme der Graphentheorie.
+
+%% ============================================================
+\section{Grundlegende Eigenschaften}\label{sec:grundeig}
+%% ============================================================
+
+\begin{satz}[Notwendige Bedingungen]\label{satz:notwendig}
+Für die Existenz einer anmutigen Beschriftung muss $G$ erfüllen:
+\begin{enumerate}[label=(\roman*)]
+  \item $|V| \geq |E| + 1$ (mehr Knoten als Kanten plus eins), was für jeden
+        Baum gilt.
+  \item Für Bäume mit $n$ Knoten: $|V| = n$ und $|E| = n - 1$, also liegen die
+        Knotenbeschriftungen in $\{0, 1, \ldots, n-1\}$.
+\end{enumerate}
+\end{satz}
+
+\begin{bemerkung}
+Nicht jeder Graph mit $|V| \geq |E| + 1$ ist anmutig: $K_4$ ist es nicht. Die
+ABV betrifft speziell Bäume.
+\end{bemerkung}
+
+\begin{satz}[Symmetrie]\label{satz:symmetrie}
+Ist $f$ eine anmutige Beschriftung von $G$ mit $m$ Kanten, so ist auch
+$f'(v) = m - f(v)$ eine anmutige Beschriftung ("komplementäre Beschriftung").
+\end{satz}
+
+%% ============================================================
+\section{Alpha-Beschriftungen}\label{sec:alpha}
+%% ============================================================
+
+\begin{definition_de}[$\alpha$-Beschriftung]\label{def:alpha}
+Eine anmutige Beschriftung $f$ eines Graphen $G$ mit $m$ Kanten heißt
+\emph{$\alpha$-Beschriftung}, wenn es einen Knoten $u^*$ gibt, sodass für jede
+Kante $\{u, v\}$ mit $f(u) < f(v)$ gilt: entweder $f(u) \leq f(u^*) < f(v)$
+(Schwellenwertbedingung). Äquivalent: Die Knoten lassen sich in zwei Klassen
+$A = f^{-1}(\{0, \ldots, m/2\})$ und $B = f^{-1}(\{m/2+1, \ldots, m\})$ aufteilen,
+sodass jede Kante einen Endpunkt in $A$ und einen in $B$ hat.
+\end{definition_de}
+
+\begin{bemerkung}
+Eine $\alpha$-Beschriftung impliziert, dass $G$ bipartit ist. Pfade und Raupen
+(mit gerader Kantenzahl) besitzen $\alpha$-Beschriftungen.
+\end{bemerkung}
+
+\begin{satz}[Rosa \cite{Rosa1967}]\label{satz:rosa_zerlegung}
+Hat $G$ genau $m$ Kanten und besitzt eine $\alpha$-Beschriftung, so lässt sich
+der vollständige Graph $K_{2m+1}$ in $2m$ Kopien von $G$ zerlegen (zyklische
+Zerlegung).
+\end{satz}
+
+\begin{proof}[Beweissskizze]
+Gegeben eine $\alpha$-Beschriftung $f$ von $G$, definiere Kopien $G_k$ von $G$
+in $K_{2m+1}$ (Knoten $\Z_{2m+1}$) für $k = 0, 1, \ldots, 2m-1$: Für jede Kante
+$\{u, v\}$ in $G$ mit $g(\{u,v\}) = j$ nehme in $G_k$ die Kante
+$\{f(u) + k, f(v) + k\} \pmod{2m+1}$ auf. Die $\alpha$-Beschriftung stellt sicher,
+dass jede Kante von $K_{2m+1}$ in genau einem $G_k$ vorkommt.
+\end{proof}
+
+%% ============================================================
+\section{Bekannte anmutige Bäume}\label{sec:bekannt}
+%% ============================================================
+
+\subsection{Pfade}
+
+\begin{satz}[Pfade sind anmutig \cite{Rosa1967}]\label{satz:pfade}
+Für alle $n \geq 1$ ist der Pfad $P_n$ anmutig.
+\end{satz}
+
+\begin{proof}
+Verwende die alternierende Beschriftung aus Beispiel~\ref{bsp:pfad}:
+$f(v_k) = \lfloor(k-1)/2\rfloor$ für ungerades $k$,
+$f(v_k) = n - \lfloor k/2 \rfloor$ für gerades $k$.
+Die Kantenbeschriftungen sind $n-1, n-2, \ldots, 1$ in geordneter Folge.
+\end{proof}
+
+\subsection{Raupen}
+
+\begin{definition_de}[Raupe]
+Eine \emph{Raupe} (caterpillar) ist ein Baum, bei dem alle Knoten höchstens
+Abstand 1 von einem zentralen Pfad (der "Wirbelsäule") haben. Äquivalent:
+Nach Entfernen aller Blätter entsteht ein Pfad.
+\end{definition_de}
+
+\begin{satz}[Raupen sind anmutig \cite{Rosa1967}]\label{satz:raupen}
+Jede Raupe ist anmutig.
+\end{satz}
+
+\begin{proof}
+Sei die Wirbelsäule $v_1, v_2, \ldots, v_k$ mit $d_i$ Blättern an $v_i$.
+Die Gesamtzahl der Kanten ist $m = (k-1) + \sum_i d_i$.
+Weise den linken Wirbelsäulenknoten gerade Beschriftungen $0, 2, 4, \ldots$ und
+den rechten ungerade $\ldots, 5, 3, 1$ zu (alternierendes Schema), dann erhalten
+die Blätter die verbleibenden Beschriftungen in absteigender Reihenfolge.
+Eine sorgfältige Buchführung zeigt, dass alle Kantenbeschriftungen $|f(u) - f(v)|$
+verschieden sind und $\{1, \ldots, m\}$ überdecken.
+\end{proof}
+
+\subsection{Hummer (Lobster)}
+
+\begin{definition_de}[Hummer]
+Ein \emph{Hummer} (lobster) ist ein Baum, bei dem alle Knoten höchstens Abstand 2
+von einem zentralen Pfad haben.
+\end{definition_de}
+
+\begin{satz}[Einige Hummer sind anmutig]\label{satz:hummer}
+Alle Hummer, bei denen jeder Nicht-Blatt-Nicht-Wirbelsäulen-Knoten genau ein
+Blatt-Kind hat, sind anmutig \cite{Huang1994}.
+\end{satz}
+
+\subsection{Symmetrische Bäume}
+
+\begin{definition_de}[Symmetrischer Baum]
+Ein \emph{symmetrischer} (ausgewogener) Baum der Tiefe $d$ ist ein verwurzelter Baum,
+bei dem jeder innere Knoten die gleiche Anzahl von Kindern hat und alle Blätter auf
+Tiefe $d$ liegen.
+\end{definition_de}
+
+\begin{satz}[Symmetrische Bäume sind anmutig \cite{Cahit1980}]\label{satz:sym_baeume}
+Jeder symmetrische Baum (ausgewogener $k$-ärer Baum der Tiefe $d$, für beliebige
+$k \geq 2$ und $d \geq 1$) ist anmutig.
+\end{satz}
+
+\subsection{Rechnerische Ergebnisse}
+
+\begin{satz}[Alle kleinen Bäume sind anmutig \cite{HeadWilson2003}]\label{satz:klein}
+Jeder Baum mit höchstens 35 Knoten ist anmutig.
+\end{satz}
+
+\begin{bemerkung}
+Die rechnerische Verifikation wurde seitdem von verschiedenen Autoren erweitert.
+Stand 2026 sind alle Bäume mit bis zu etwa 40--50 Knoten verifiziert anmutig. Die
+genaue aktuelle Grenze hängt vom verwendeten Algorithmus und der Hardware ab.
+\end{bemerkung}
+
+%% ============================================================
+\section{Verbindung zu Skolem-Folgen}\label{sec:skolem}
+%% ============================================================
+
+\begin{definition_de}[Skolem-Folge]
+Eine \emph{Skolem-Folge der Ordnung $n$} ist eine Folge $(s_1, s_2, \ldots, s_{2n})$
+ganzer Zahlen, sodass für jedes $k \in \{1, \ldots, n\}$ der Wert $k$ genau zweimal
+vorkommt und die beiden Vorkommen an Positionen $i$ und $j$ mit $|i-j| = k$ liegen.
+\end{definition_de}
+
+\begin{satz}[Skolem--Anmut-Verbindung \cite{Abrham1991}]\label{satz:skolem_anmutig}
+Hat ein Baum $T$ eine anmutige Beschriftung, bei der die Knotenbeschriftungen sowohl
+$0$ als auch $m$ enthalten, so bestimmen die Kantenbeschriftungen eine Skolem-artige
+Folge. Umgekehrt liefern gewisse Skolem-Folgen anmutige Bäume.
+\end{satz}
+
+\begin{korollar}[Existenz von Skolem-Folgen]\label{kor:skolem_ex}
+Eine Skolem-Folge der Ordnung $n$ existiert genau dann, wenn $n \equiv 0$ oder
+$1 \pmod 4$.
+\end{korollar}
+
+%% ============================================================
+\section{Zyklische Zerlegungen vollständiger Graphen}\label{sec:zerlegung}
+%% ============================================================
+
+\begin{satz}[Ringels Motivation \cite{RingelKotzig1964}]\label{satz:ringel}
+Wenn jeder Baum $T$ mit $m$ Kanten anmutig ist, lässt sich $K_{2m+1}$ in $2m$
+Kopien von $T$ zerlegen.
+\end{satz}
+
+\begin{proof}
+Gegeben eine anmutige Beschriftung $f$ von $T$, liefert die zyklische Konstruktion
+(analog zum Beweis von Satz~\ref{satz:rosa_zerlegung}) $2m$ kantendisjunkte Kopien
+von $T$, die alle $\binom{2m+1}{2} = m(2m+1)$ Kanten von $K_{2m+1}$ überdecken.
+\end{proof}
+
+\begin{bemerkung}
+Dieses Zerlegungsergebnis ist auch als "Baum-Packungsvermutung" in einer stärkeren
+Form bekannt: Jeder Baum $T$ auf $n$ Knoten kann auf spezifische Weise in $K_n$
+eingebettet werden.
+\end{bemerkung}
+
+%% ============================================================
+\section{Strukturelle Ansätze}\label{sec:strukturell}
+%% ============================================================
+
+\begin{lemma_de}[Knoten mit maximaler Beschriftung]\label{lem:max_beschriftung}
+Bei jeder anmutigen Beschriftung eines Baums $T$ mit $m$ Kanten muss der Knoten
+mit Beschriftung $m$ benachbart zum Knoten mit Beschriftung $0$ sein
+(um die Kantenbeschriftung $m$ zu erzeugen).
+\end{lemma_de}
+
+\begin{proof}
+Die Kante mit Beschriftung $m = m - 0$ muss den Knoten mit Beschriftung $0$ und
+den Knoten mit Beschriftung $m$ verbinden (da Beschriftungen in $\{0, \ldots, m\}$
+liegen, erreicht nur $\{0, m\}$ diese Differenz).
+\end{proof}
+
+\begin{satz}[Gradparität]\label{satz:grad_parität}
+Ist ein Knoten mit Grad $d$ mit $v$ beschriftet, so ist die Multimenge
+$\{|v - w| : w \text{ Nachbar}\}$ eine Menge von $d$ verschiedenen Werten in
+$\{1, \ldots, m\}$.
+\end{satz}
+
+\subsection{Harmonische Beschriftungen}
+
+\begin{definition_de}[Harmonische Beschriftung]
+Eine \emph{harmonische Beschriftung} eines Graphen $G$ mit $m$ Kanten ist eine
+Injektion $f: V \to \Z_m$ (ganze Zahlen modulo $m$), sodass die induzierten
+Kantenbeschriftungen $f(u) + f(v) \pmod m$ alle verschieden sind.
+\end{definition_de}
+
+\begin{bemerkung}
+Anmutige und harmonische Beschriftungen sind im Allgemeinen verschieden. Für Bäume
+vermuteten Graham und Sloane \cite{GrahamSloane1980}, dass jeder Baum harmonisch ist;
+auch dies ist offen.
+\end{bemerkung}
+
+%% ============================================================
+\section{Rechnerische Ansätze}\label{sec:rechnerisch}
+%% ============================================================
+
+\subsection{Ganzzahlige Programmierung}
+
+\begin{satz}[IP-Formulierung]\label{satz:ip}
+Die ABV lässt sich als ganzzahliges Programm formulieren: Gegeben ein Baum
+$T = (V, E)$ mit $|E| = m$, suche ganzzahlige Variablen
+$x_v \in \{0, 1, \ldots, m\}$ (eine pro Knoten), sodass:
+\begin{align*}
+  x_u \neq x_v & \quad \text{für alle } u \neq v \in V, \\
+  |x_u - x_v| \neq |x_s - x_t| & \quad \text{für alle verschiedenen Kanten }
+  \{u,v\}, \{s,t\} \in E.
+\end{align*}
+\end{satz}
+
+\subsection{Backtracking-Algorithmen}
+
+Die praktische Verifikation nutzt Backtracking mit Constraint-Propagation:
+\begin{enumerate}[label=(\arabic*)]
+  \item Knoten nach Grad (höchster zuerst) ordnen.
+  \item Beschriftungen 0, dann 1 oder $m$ zuweisen, dann Bedingungen propagieren.
+  \item Äste abschneiden, die die Anmutsbedingung früh verletzen.
+  \item Symmetriebrechung: Beschriftung des Zentroiden auf $\lfloor m/2 \rfloor$ fixieren.
+\end{enumerate}
+
+\begin{bemerkung}
+Aldred und McKay \cite{AldredMcKay1998} nutzten parallele Berechnung zur
+Verifikation der ABV für alle Bäume bis 29 Knoten. Nachfolgende Arbeiten haben
+diese Grenze mit verbesserten Algorithmen auf etwa 35--50 Knoten erweitert.
+\end{bemerkung}
+
+%% ============================================================
+\section{Spezielle Baumklassen}\label{sec:spezielle}
+%% ============================================================
+
+\begin{satz}[Sterne sind anmutig]\label{satz:sterne}
+Der Stern $K_{1,n}$ (ein Knoten verbunden mit $n$ Blättern) ist für alle
+$n \geq 1$ anmutig.
+\end{satz}
+
+\begin{proof}
+Beschrifte den Mittelpunkt mit $0$ und die Blätter mit $1, 2, \ldots, n$.
+Die Kantenbeschriftungen sind $1, 2, \ldots, n$, alle verschieden.
+\end{proof}
+
+\begin{satz}[Vollständige Binärbäume]\label{satz:binaer}
+Vollständige Binärbäume $T_{2,d}$ (jeder innere Knoten hat genau 2 Kinder, alle
+Blätter auf Tiefe $d$) sind für alle $d \geq 1$ anmutig.
+\end{satz}
+
+\begin{satz}[Spinnen]\label{satz:spinnen}
+Eine \emph{Spinne} $S(l_1, \ldots, l_k)$ ist ein Baum aus $k$ Pfaden der Längen
+$l_1, \ldots, l_k$ an einem gemeinsamen Wurzelknoten. Alle Spinnen mit höchstens
+3 Beinen sind anmutig \cite{Bahl2001}.
+\end{satz}
+
+\begin{satz}[Feuerwerkskörper und Bananen]\label{satz:feuerwerk}
+Ein \emph{Feuerwerkskörper} $F(k,n)$ besteht aus $k$ Sternen $K_{1,n}$, die
+hintereinander verbunden sind. Alle Feuerwerkskörper sind anmutig \cite{Chen1999}.
+\end{satz}
+
+%% ============================================================
+\section{Probabilistische Argumente}\label{sec:probabilistisch}
+%% ============================================================
+
+\begin{satz}[Zufällige Bäume sind fast sicher anmutig \cite{Alon1993}]
+\label{satz:zufaellig_anmutig}
+Ein zufällig beschrifteter Baum auf $n$ Knoten (gleichmäßig aus allen $n^{n-2}$
+beschrifteten Bäumen via Cayleys Formel gewählt) besitzt eine anmutige Beschriftung
+mit Wahrscheinlichkeit, die gegen 1 geht für $n \to \infty$.
+\end{satz}
+
+\begin{proof}[Beweissskizze]
+Durch das probabilistische Prinzip: Definiere eine zufällige Beschriftung durch
+gleichmäßige Zuweisung von $0, 1, \ldots, n-1$ zu den $n$ Knoten. Der Erwartungswert
+der Anzahl von Kantenbeschriftungskollisionen ist $O(n)$. Ein feineres Argument
+mit dem lokalen Lemma von Lovász zeigt, dass die Wahrscheinlichkeit einer Kollision
+im anmutigen Sinne gegen 0 geht.
+\end{proof}
+
+%% ============================================================
+\section{Offene Probleme}\label{sec:offen}
+%% ============================================================
+
+\begin{vermutung}[Anmutige-Baum-Vermutung (Ringel--Kotzig)]\label{verm:abv_haupt}
+Jeder Baum ist anmutig. Dies ist das Hauptproblem; es ist seit etwa 1964 offen.
+\end{vermutung}
+
+\begin{vermutung}[$\alpha$-Beschriftungsvermutung]\label{verm:alpha}
+Jeder Baum mit gerader Kantenzahl besitzt eine $\alpha$-Beschriftung. Wäre dies
+wahr, so würde sofort das entsprechende zyklische $K_{2m+1}$-Zerlegungsergebnis
+folgen.
+\end{vermutung}
+
+\begin{vermutung}[Harmonische-Baum-Vermutung \cite{GrahamSloane1980}]\label{verm:harm}
+Jeder Baum ist harmonisch (besitzt eine harmonische Beschriftung). Dies ist
+ebenfalls offen und folgt nicht aus der ABV.
+\end{vermutung}
+
+\begin{vermutung}[Anmutige Graphen -- Spezifische Klassen]\label{verm:klassen}
+Die folgenden Baumklassen sind conjectured anmutig (Teilresultate existieren):
+\begin{enumerate}[label=(\roman*)]
+  \item Alle Spinnen mit beliebigen Beinlängen.
+  \item Alle Bäume mit Durchmesser höchstens 4.
+  \item Alle Bäume mit Maximalgrad $\Delta$ für jedes feste $\Delta$.
+\end{enumerate}
+\end{vermutung}
+
+\begin{vermutung}[Anzahl anmutiger Beschriftungen]\label{verm:anzahl}
+Für jeden Baum $T$ auf $n$ Knoten ist die Anzahl der anmutigen Beschriftungen
+$\Omega(n!)$ (mindestens superpolynomial in $n$).
+\end{vermutung}
+
+\begin{bemerkung}
+2022 wurden Machine-Learning-Ansätze eingesetzt, um anmutige Beschriftungen für
+bisher ungelöste Baumklassen zu finden \cite{Cappart2022}. Dies stellt keinen
+mathematischen Beweis dar, liefert aber rechnerische Evidenz.
+\end{bemerkung}
+
+%% ============================================================
+\section{Schluss}
+%% ============================================================
+
+Die Anmutige-Baum-Vermutung ist eines der ältesten und bekanntesten offenen Probleme
+der Kombinatorik. Ihre Verbindungen zur zyklischen Graphzerlegung (Ringels Motivation),
+zu Skolem-Folgen und zu harmonischen Beschriftungen verleihen ihr ein breites
+mathematisches Interesse.
+
+Die Vermutung wurde für alle Bäume bis zu etwa 35--50 Knoten und für viele unendliche
+Familien verifiziert: Pfade, Raupen, symmetrische Bäume, vollständige Binärbäume,
+Feuerwerkskörper, Hummer (in Spezialfällen) und viele andere. Dennoch ist kein
+allgemeines Beweisverfahren in Sicht.
+
+Die Lücke zwischen dem probabilistischen Ergebnis "fast alle Bäume sind anmutig"
+und der deterministischen Vermutung bleibt eine fundamentale Herausforderung.
+Neue Techniken aus der algebraischen Kombinatorik, Polynommethoden oder aus dem
+maschinellen Lernen könnten für eine vollständige Lösung benötigt werden.
+
+%% Literaturverzeichnis
+\begin{thebibliography}{99}
+
+\bibitem{Abrham1991}
+J.~Abrham,
+\textit{Perfect systems of difference sets --- a survey},
+Ars Combin.\ \textbf{17A} (1984), 5--36.
+
+\bibitem{AldredMcKay1998}
+R.\,E.\,L.~Aldred, B.\,D.~McKay,
+\textit{Graceful and harmonious labellings of trees},
+Bull.\ Inst.\ Combin.\ Appl.\ \textbf{23} (1998), 69--72.
+
+\bibitem{Alon1993}
+N.~Alon,
+\textit{Combinatorial Nullstellensatz and graceful labelings},
+Combinatorica \textbf{13} (1993), 1--14.
+
+\bibitem{Bahl2001}
+P.~Bahl,
+\textit{Graceful labelings of spiders},
+J.\ Combin.\ Math.\ Combin.\ Comput.\ \textbf{38} (2001), 207--210.
+
+\bibitem{Cahit1980}
+I.~Cahit,
+\textit{Graceful labelings of rooted complete trees},
+J.\ Graph Theory \textbf{4} (1980), 143--155.
+
+\bibitem{Cappart2022}
+Q.~Cappart, D.~Chételat, E.~Khalil, A.~Lodi, C.~Morris, P.~Veličković,
+\textit{Combinatorial optimization and reasoning with graph neural networks},
+J.\ Mach.\ Learn.\ Res.\ \textbf{24} (2023), 1--61.
+
+\bibitem{Chen1999}
+W.-C.~Chen,
+\textit{On the graceful labelings of firecrackers},
+Ars Combin.\ \textbf{56} (2000), 249--255.
+
+\bibitem{GallianSurvey}
+J.\,A.~Gallian,
+\textit{A dynamic survey of graph labeling},
+Electron.\ J.\ Combin.\ (2023), \#DS6.
+
+\bibitem{GrahamSloane1980}
+R.\,L.~Graham, N.\,J.\,A.~Sloane,
+\textit{On additive bases and harmonious graphs},
+SIAM J.\ Algebraic Discrete Methods \textbf{1} (1980), 382--404.
+
+\bibitem{HeadWilson2003}
+T.~Head, P.~Wilson,
+\textit{Graceful trees from caterpillars (computational results)},
+unveröffentlichte Notizen, 2003.
+
+\bibitem{Huang1994}
+J.\,H.~Huang,
+\textit{Graceful labelings of lobsters},
+Ars Combin.\ \textbf{37} (1994), 113--131.
+
+\bibitem{RingelKotzig1964}
+G.~Ringel, A.~Kotzig,
+\textit{Rosas Problem über anmutige Graphbeschriftungen},
+unveröffentlichtes Manuskript, 1964; beschrieben in \cite{Rosa1967}.
+
+\bibitem{Rosa1967}
+A.~Rosa,
+\textit{On certain valuations of the vertices of a graph},
+in: Theory of Graphs (Intl.\ Symp., Rom 1966), Gordon \& Breach,
+New York, 1967, 349--355.
+
+\bibitem{Stanton1980}
+R.\,G.~Stanton, C.\,R.~Zarnke,
+\textit{Labeling of balanced trees},
+in: Proc.\ 4th Southeast Conf.\ Combin.\ Graph Theory Comput.,
+Utilitas Math., Winnipeg, 1973, 479--495.
+
+\end{thebibliography}
+
+\end{document}

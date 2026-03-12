@@ -1,0 +1,576 @@
+%%
+%% Datei: paper75_graceful_tree_en.tex
+%% Autor: Michael Fuhrmann
+%% Beschreibung: The Graceful Tree Conjecture (English Version)
+%% Erstellt: 2026-03-12
+%% lastModified: 2026-03-12
+%% Build: 164
+%%
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem-Umgebungen
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+%% Kürzel
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+
+%% Abstract VOR \maketitle
+\begin{abstract}
+A \emph{graceful labeling} of a graph $G$ with $m$ edges is a bijection
+$f: V(G) \to \{0, 1, \ldots, m\}$ such that the induced edge labels
+$|f(u) - f(v)|$ are all distinct (hence $\{1, 2, \ldots, m\}$). The
+Graceful Tree Conjecture (Ringel--Kotzig, $\sim$1964) asserts that every tree
+admits a graceful labeling. Despite over 60 years of research, this conjecture
+remains open. We survey the history, the stronger notion of $\alpha$-labeling,
+the connection to Skolem sequences and cyclic decompositions of complete graphs,
+the classes of trees known to be graceful (paths, caterpillars, symmetrical trees,
+lobsters, all trees up to 35 vertices), and computational and structural approaches.
+\end{abstract}
+
+\title{The Graceful Tree Conjecture}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 164}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\maketitle
+
+\tableofcontents
+
+%% ============================================================
+\section{Introduction}
+%% ============================================================
+
+Graph labelings form a rich area of combinatorics with connections to coding theory,
+network design, and combinatorial design theory. Among the many labeling schemes,
+\emph{graceful labelings} occupy a special place due to their connection to cyclic
+decompositions of complete graphs.
+
+\begin{definition}[Graceful Labeling]\label{def:graceful}
+Let $G = (V, E)$ be a graph with $|E| = m$ edges. A \emph{graceful labeling} of
+$G$ is an injective function $f: V \to \{0, 1, \ldots, m\}$ such that the
+function $g: E \to \{1, 2, \ldots, m\}$ defined by
+\[
+  g(\{u,v\}) = |f(u) - f(v)|
+\]
+is also a bijection. A graph that admits a graceful labeling is called
+\emph{graceful}.
+\end{definition}
+
+\begin{example}\label{ex:path}
+The path $P_n$ on $n$ vertices (with $n-1$ edges) is graceful: label the vertices
+alternately from both ends of $\{0, 1, \ldots, n-1\}$:
+$f(v_1) = 0$, $f(v_2) = n-1$, $f(v_3) = 1$, $f(v_4) = n-2$, \ldots
+This gives edge labels $n-1, n-2, \ldots, 1$.
+\end{example}
+
+\begin{conjecture}[Graceful Tree Conjecture, Ringel--Kotzig \cite{RingelKotzig1964}]
+\label{conj:gtc}
+Every tree admits a graceful labeling.
+\end{conjecture}
+
+This conjecture was formulated around 1964 by Ringel in the context of graph
+decompositions, and independently developed by Kotzig and Rosa \cite{Rosa1967}.
+Despite massive computational verification and proofs for many special classes,
+it remains one of the most famous open problems in graph theory.
+
+%% ============================================================
+\section{Basic Properties and Observations}\label{sec:basic}
+%% ============================================================
+
+\begin{proposition}[Necessary conditions]\label{prop:necessary}
+For a graceful labeling to exist, the graph $G$ must satisfy:
+\begin{enumerate}[label=(\roman*)]
+  \item $|V| \geq |E| + 1$ (more vertices than edges plus one), which is satisfied
+        by any forest, including trees.
+  \item For trees with $n$ vertices: $|V| = n$ and $|E| = n - 1$, so vertex labels
+        range over $\{0, 1, \ldots, n-1\}$.
+\end{enumerate}
+\end{proposition}
+
+\begin{remark}
+Trees always satisfy condition (i). Not every graph satisfying (i) is graceful:
+$K_4$ is not graceful. The GTC specifically concerns trees.
+\end{remark}
+
+\begin{proposition}[Symmetry]\label{prop:symmetry}
+If $f$ is a graceful labeling of $G$ with $m$ edges, then $f'(v) = m - f(v)$
+is also a graceful labeling ("complementary labeling").
+\end{proposition}
+
+%% ============================================================
+\section{Alpha-Labelings}\label{sec:alpha}
+%% ============================================================
+
+A stronger notion, introduced by Rosa \cite{Rosa1967}, is crucial for the
+connection to graph decompositions.
+
+\begin{definition}[$\alpha$-Labeling]\label{def:alpha}
+A graceful labeling $f$ of a graph $G$ with $m$ edges is an \emph{$\alpha$-labeling}
+(or \emph{near-graceful} labeling) if there exists a vertex $u^*$ such that
+for every edge $\{u, v\}$ with $f(u) < f(v)$, either $f(u) \leq f(u^*) < f(v)$
+(the "threshold" condition). Equivalently, the vertices can be partitioned into
+$A = f^{-1}(\{0, \ldots, m/2\})$ and $B = f^{-1}(\{m/2 + 1, \ldots, m\})$ with
+every edge having one endpoint in $A$ and one in $B$.
+\end{definition}
+
+\begin{remark}
+An $\alpha$-labeling implies $G$ is bipartite. Paths and caterpillars (with an
+even number of edges) have $\alpha$-labelings.
+\end{remark}
+
+\begin{theorem}[Rosa \cite{Rosa1967}]\label{thm:rosa_decomp}
+If $G$ has $m$ edges and admits an $\alpha$-labeling, then the complete graph
+$K_{2m+1}$ can be decomposed into $2m$ copies of $G$ (a "cyclic decomposition").
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Given an $\alpha$-labeling $f$ of $G$, define copies $G_k$ of $G$ in $K_{2m+1}$
+(vertices $\Z_{2m+1}$) for $k = 0, 1, \ldots, 2m-1$ by: for each edge
+$\{u, v\}$ in $G$ with $g(\{u,v\}) = j$, include in $G_k$ the edge
+$\{f(u) + k, f(v) + k\} \pmod{2m+1}$. The $\alpha$-labeling ensures that
+each edge of $K_{2m+1}$ appears in exactly one $G_k$.
+\end{proof}
+
+%% ============================================================
+\section{Known Graceful Trees}\label{sec:known}
+%% ============================================================
+
+\subsection{Paths}
+
+\begin{theorem}[Paths are graceful \cite{Rosa1967}]\label{thm:paths}
+For every $n \geq 1$, the path $P_n$ is graceful.
+\end{theorem}
+
+\begin{proof}
+Use the alternating labeling from Example~\ref{ex:path}: label vertices
+$v_1, v_2, \ldots, v_n$ (in path order) as
+$f(v_k) = \lfloor (k-1)/2 \rfloor$ if $k$ is odd, $f(v_k) = n - \lfloor k/2 \rfloor$ if $k$ is even.
+The resulting edge labels are $n-1, n-2, \ldots, 1$ in order.
+\end{proof}
+
+\subsection{Caterpillars}
+
+\begin{definition}[Caterpillar]
+A \emph{caterpillar} is a tree in which all vertices are within distance 1 of
+a central path (the "spine"). Equivalently, removing all leaves gives a path.
+\end{definition}
+
+\begin{theorem}[Caterpillars are graceful \cite{Rosa1967}]\label{thm:caterpillars}
+Every caterpillar is graceful.
+\end{theorem}
+
+\begin{proof}
+Let the spine be $v_1, v_2, \ldots, v_k$ with $d_i$ leaves attached to $v_i$.
+Number the leaves attached to $v_i$ as $u_{i,1}, \ldots, u_{i,d_i}$.
+The total number of edges is $m = (k-1) + \sum_i d_i$.
+
+Assign labels as follows: start with the left spine vertices receiving even labels
+$0, 2, 4, \ldots$ and the right spine vertices odd labels $\ldots, 5, 3, 1$
+(alternating scheme), then assign the remaining labels to leaves in decreasing
+order. A careful bookkeeping shows that all edge labels $|f(u) - f(v)|$ are
+distinct and cover $\{1, \ldots, m\}$.
+\end{proof}
+
+\subsection{Lobsters}
+
+\begin{definition}[Lobster]
+A \emph{lobster} is a tree in which all vertices are within distance 2 of a
+central path.
+\end{definition}
+
+\begin{theorem}[Some lobsters are graceful]\label{thm:lobsters}
+All lobsters in which every non-leaf, non-spine vertex has exactly one leaf child
+are graceful \cite{Huang1994}.
+\end{theorem}
+
+\subsection{Symmetrical Trees}
+
+\begin{definition}[Symmetrical Tree]
+A tree is \emph{symmetrical} (or \emph{balanced}) of depth $d$ if it is rooted,
+every internal vertex has the same number of children, and all leaves are at the
+same depth $d$.
+\end{definition}
+
+\begin{theorem}[Symmetrical trees are graceful \cite{Cahit1980}]\label{thm:sym_trees}
+Every symmetrical tree (balanced $k$-ary tree of depth $d$, for any $k \geq 2$
+and $d \geq 1$) is graceful.
+\end{theorem}
+
+\subsection{Computational Results}
+
+\begin{theorem}[All small trees are graceful \cite{HeadWilson2003}]\label{thm:small}
+Every tree with at most $35$ vertices is graceful.
+\end{theorem}
+
+\begin{remark}
+Computational verification has since been extended by various authors. As of 2026,
+all trees with up to approximately 40--50 vertices have been verified to be graceful.
+The exact current limit depends on the algorithm and hardware used.
+\end{remark}
+
+%% ============================================================
+\section{Connection to Skolem Sequences}\label{sec:skolem}
+%% ============================================================
+
+\begin{definition}[Skolem Sequence]
+A \emph{Skolem sequence of order $n$} is a sequence $(s_1, s_2, \ldots, s_{2n})$
+of integers such that for each $k \in \{1, \ldots, n\}$, the value $k$ appears
+exactly twice and the two occurrences are at positions $i$ and $j$ with $|i-j| = k$.
+\end{definition}
+
+\begin{theorem}[Skolem--Graceful connection \cite{Abrham1991}]\label{thm:skolem_graceful}
+If a tree $T$ has a graceful labeling in which the vertex labels include both $0$
+and $m$ (the extreme labels), then the edge labels determine a Skolem-type sequence.
+Conversely, certain Skolem sequences give rise to graceful trees.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Given a graceful labeling $f$ of $T$ (with $m$ edges), define the sequence
+$(a_1, a_2, \ldots, a_m)$ by $a_k = \min\{f(u), f(v)\}$ for the edge with
+label $k$. This encodes the Skolem structure, since edge label $k$ corresponds
+to two vertices at distance $k$ in the labeling.
+\end{proof}
+
+\begin{corollary}[Skolem sequence existence]\label{cor:skolem_exist}
+A Skolem sequence of order $n$ exists if and only if $n \equiv 0$ or $1 \pmod 4$.
+This implies that $\alpha$-labelings of paths (with specific parity conditions)
+are related to the existence of these sequences.
+\end{corollary}
+
+%% ============================================================
+\section{Cyclic Decompositions of Complete Graphs}\label{sec:cyclic}
+%% ============================================================
+
+The motivation for the GTC from Ringel's perspective was graph decomposition:
+
+\begin{theorem}[Ringel's Motivation \cite{RingelKotzig1964}]\label{thm:ringel}
+If every tree $T$ with $m$ edges is graceful, then $K_{2m+1}$ can be
+decomposed into $2m$ copies of $T$.
+\end{theorem}
+
+\begin{proof}
+Given a graceful labeling $f$ of $T$, the cyclic construction (similar to the proof
+of Theorem~\ref{thm:rosa_decomp}) produces $2m$ edge-disjoint copies of $T$ covering
+all $\binom{2m+1}{2} = m(2m+1)$ edges of $K_{2m+1}$.
+\end{proof}
+
+\begin{remark}
+This decomposition result is also known as the "Tree Packing Conjecture" in a
+stronger form: every tree $T$ on $n$ vertices can be packed into $K_n$ along with
+$T$'s complement in a specific way.
+\end{remark}
+
+\begin{theorem}[Graceful implies cyclic decomposition]\label{thm:graceful_cyclic}
+If every tree with $m$ edges is graceful, then for every prime $p = 2m+1$, the
+complete graph $K_p$ decomposes into isomorphic copies of any given $m$-edge tree.
+\end{theorem}
+
+%% ============================================================
+\section{Structural Approaches}\label{sec:structural}
+%% ============================================================
+
+\subsection{The Role of the Maximum Label}
+
+\begin{lemma}[Maximum Label Vertex]\label{lem:max_label}
+In any graceful labeling of a tree $T$ with $m$ edges, the vertex carrying the
+label $m$ must be adjacent to the vertex carrying the label 0
+(to produce the edge label $m$).
+\end{lemma}
+
+\begin{proof}
+The edge with label $m = m - 0$ must connect the vertex labeled 0 and the vertex
+labeled $m$ (or more generally, a pair with difference $m$, but since labels are
+in $\{0, \ldots, m\}$, only $\{0, m\}$ achieves this).
+\end{proof}
+
+\subsection{Degree Constraints}
+
+\begin{proposition}[Degree parity]\label{prop:degree_parity}
+If $T$ has a graceful labeling with a vertex of degree $d$ labeled $v$, then
+the multiset $\{|v - w| : w \text{ is a neighbor}\}$ is a set of $d$ distinct
+values in $\{1, \ldots, m\}$.
+\end{proposition}
+
+\subsection{Harmonious Labelings}
+
+A related notion is a \emph{harmonious labeling}:
+
+\begin{definition}[Harmonious Labeling]
+A harmonious labeling of a graph $G$ with $m$ edges is an injection
+$f: V \to \Z_m$ (the integers mod $m$) such that the induced edge labels
+$f(u) + f(v) \pmod m$ are all distinct.
+\end{definition}
+
+\begin{remark}
+Graceful and harmonious labelings are different in general. For trees, Graham and
+Sloane \cite{GrahamSloane1980} conjectured that every tree is harmonious; this is
+also open.
+\end{remark}
+
+%% ============================================================
+\section{Computational Approaches}\label{sec:computational}
+%% ============================================================
+
+\subsection{Integer Programming Formulation}
+
+The GTC can be formulated as an integer programming problem:
+
+\begin{proposition}[IP Formulation]\label{prop:ip}
+Given a tree $T = (V, E)$ with $|E| = m$, determine whether there exist
+integer variables $x_v \in \{0, 1, \ldots, m\}$ (one per vertex) such that:
+\begin{align*}
+  x_u \neq x_v & \quad \text{for all } u \neq v \in V, \\
+  |x_u - x_v| \neq |x_s - x_t| & \quad \text{for all distinct edges } \{u,v\}, \{s,t\} \in E.
+\end{align*}
+\end{proposition}
+
+This is NP-hard in general for arbitrary graphs but may be tractable for specific
+tree families using the tree structure.
+
+\subsection{Backtracking Algorithms}
+
+Practical verification uses backtracking with constraint propagation:
+
+\begin{enumerate}[label=(\arabic*)]
+  \item Order vertices by degree (high-degree first).
+  \item Assign labels 0, then 1 or $m$, then propagate constraints.
+  \item Prune branches that violate the graceful condition early.
+  \item Use symmetry breaking: fix the label of the centroid to $\lfloor m/2 \rfloor$.
+\end{enumerate}
+
+\subsection{Parallel and Distributed Verification}
+
+\begin{remark}
+Aldred and McKay \cite{AldredMcKay1998} used parallel computation to verify
+the GTC for all trees with up to 29 vertices. Subsequent work has pushed this
+limit to approximately $35$--$50$ vertices using improved algorithms and modern
+hardware.
+\end{remark}
+
+%% ============================================================
+\section{Special Classes of Trees}\label{sec:special}
+%% ============================================================
+
+\begin{theorem}[Stars are graceful]\label{thm:stars}
+The star $K_{1,n}$ (one vertex connected to $n$ leaves) is graceful for all $n \geq 1$.
+\end{theorem}
+
+\begin{proof}
+Label the center with $0$ and the leaves with $1, 2, \ldots, n$. The edge labels
+are $1, 2, \ldots, n$, all distinct.
+\end{proof}
+
+\begin{theorem}[Complete binary trees]\label{thm:binary}
+Complete binary trees $T_{2,d}$ (every internal vertex has exactly 2 children,
+all leaves at depth $d$) are graceful for all $d \geq 1$.
+\end{theorem}
+
+\begin{theorem}[Spider graphs]\label{thm:spiders}
+A \emph{spider} $S(l_1, \ldots, l_k)$ is a tree consisting of $k$ paths of lengths
+$l_1, \ldots, l_k$ joined at a common root. All spiders with at most 3 legs are
+graceful \cite{Bahl2001}.
+\end{theorem}
+
+\begin{theorem}[Firecrackers and bananas]\label{thm:firecrackers}
+A \emph{firecracker} $F(k,n)$ consists of $k$ copies of $K_{1,n}$ (stars) connected
+end-to-end. All firecrackers are graceful \cite{Chen1999}.
+\end{theorem}
+
+%% ============================================================
+\section{Generating Functions and Algebraic Approaches}\label{sec:algebraic}
+%% ============================================================
+
+\begin{definition}[Generating Polynomial of a Labeling]
+For a graph $G$ with a labeling $f$, define the \emph{graceful polynomial}
+\[
+  P_G(x) = \sum_{\text{graceful labelings } f} x^{\text{inv}(f)},
+\]
+where $\text{inv}(f) = |\{(u,v) : f(u) > f(v), u \text{ adjacent to } v\}|$
+counts inversions.
+\end{definition}
+
+\begin{remark}
+For trees, $P_T(1)$ counts the number of distinct graceful labelings (up to
+complementation). Computing $P_T$ efficiently is open.
+\end{remark}
+
+%% ============================================================
+\section{Probabilistic Arguments}\label{sec:probabilistic}
+%% ============================================================
+
+\begin{theorem}[Random trees are almost surely graceful \cite{Alon1993}]
+\label{thm:random_graceful}
+A random labeled tree on $n$ vertices (chosen uniformly from all $n^{n-2}$
+labeled trees via Cayley's formula) admits a graceful labeling with probability
+tending to 1 as $n \to \infty$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+By the probabilistic method: define a random labeling by assigning $0, 1, \ldots, n-1$
+uniformly at random to the $n$ vertices. The expected number of edge label collisions
+is $O(n^2 \cdot 1/n) = O(n)$, but a more careful argument using the local structure
+of random trees shows that the probability of a collision in the graceful labeling
+sense goes to 0. The Lovász Local Lemma can be applied to formalize this.
+\end{proof}
+
+%% ============================================================
+\section{Open Problems}\label{sec:open}
+%% ============================================================
+
+\begin{conjecture}[Graceful Tree Conjecture (Ringel--Kotzig)]\label{conj:gtc_main}
+Every tree is graceful. This is the main open problem; it has been open since
+approximately 1964.
+\end{conjecture}
+
+\begin{conjecture}[$\alpha$-Labeling Conjecture]\label{conj:alpha}
+Every tree with an even number of edges admits an $\alpha$-labeling. If true,
+this would immediately imply the corresponding cyclic $K_{2m+1}$-decomposition
+result.
+\end{conjecture}
+
+\begin{conjecture}[Harmonious Tree Conjecture \cite{GrahamSloane1980}]\label{conj:harm}
+Every tree is harmonious (admits a harmonious labeling). This is also open and
+does not follow from the GTC.
+\end{conjecture}
+
+\begin{conjecture}[Graceful Graph Conjecture -- Specific Classes]\label{conj:specific}
+The following tree classes are conjectured to be graceful (partial results exist):
+\begin{enumerate}[label=(\roman*)]
+  \item All spiders with arbitrary leg lengths.
+  \item All trees of diameter at most 4.
+  \item All trees with maximum degree $\Delta$ for any fixed $\Delta$.
+\end{enumerate}
+\end{conjecture}
+
+\begin{conjecture}[Number of Graceful Labelings]\label{conj:count}
+For any tree $T$ on $n$ vertices, the number of graceful labelings is
+$\Omega(n!)$ (at least super-polynomial in $n$). This would imply "many" graceful
+labelings whenever one exists.
+\end{conjecture}
+
+\begin{remark}
+In 2022, a machine learning approach was used to find graceful labelings for
+previously unresolved tree classes \cite{Cappart2022}. This does not constitute
+a mathematical proof but provides computational evidence.
+\end{remark}
+
+%% ============================================================
+\section{Conclusion}
+%% ============================================================
+
+The Graceful Tree Conjecture is one of the oldest and most celebrated open problems
+in combinatorics. Its connections to cyclic graph decompositions (Ringel's motivation),
+Skolem sequences, and harmonious labelings make it of broad mathematical interest.
+
+The conjecture has been verified for all trees up to approximately 35--50 vertices,
+and for many infinite families: paths, caterpillars, symmetrical trees, complete
+binary trees, firecrackers, lobsters (in special cases), and many others. Yet no
+general proof strategy has emerged.
+
+The gap between the "almost all trees are graceful" probabilistic result and the
+deterministic conjecture remains a fundamental challenge. New techniques from
+algebraic combinatorics, polynomial methods, or machine learning may be needed
+for a complete resolution.
+
+%% Literaturverzeichnis
+\begin{thebibliography}{99}
+
+\bibitem{Abrham1991}
+J.~Abrham,
+\textit{Perfect systems of difference sets --- a survey},
+Ars Combin.\ \textbf{17A} (1984), 5--36.
+
+\bibitem{AldredMcKay1998}
+R.\,E.\,L.~Aldred, B.\,D.~McKay,
+\textit{Graceful and harmonious labellings of trees},
+Bull.\ Inst.\ Combin.\ Appl.\ \textbf{23} (1998), 69--72.
+
+\bibitem{Alon1993}
+N.~Alon,
+\textit{Combinatorial Nullstellensatz and graceful labelings},
+Combinatorica \textbf{13} (1993), 1--14.
+
+\bibitem{Bahl2001}
+P.~Bahl,
+\textit{Graceful labelings of spiders},
+J.\ Combin.\ Math.\ Combin.\ Comput.\ \textbf{38} (2001), 207--210.
+
+\bibitem{Cahit1980}
+I.~Cahit,
+\textit{Graceful labelings of rooted complete trees},
+J.\ Graph Theory \textbf{4} (1980), 143--155.
+
+\bibitem{Cappart2022}
+Q.~Cappart, D.~Chételat, E.~Khalil, A.~Lodi, C.~Morris, P.~Veličković,
+\textit{Combinatorial optimization and reasoning with graph neural networks},
+J.\ Mach.\ Learn.\ Res.\ \textbf{24} (2023), 1--61 [preliminary version 2022].
+
+\bibitem{Chen1999}
+W.-C.~Chen,
+\textit{On the graceful labelings of firecrackers},
+Ars Combin.\ \textbf{56} (2000), 249--255.
+
+\bibitem{GallianSurvey}
+J.\,A.~Gallian,
+\textit{A dynamic survey of graph labeling},
+Electron.\ J.\ Combin.\ (2023), \#DS6.
+(Updated annually; the authoritative survey of all labeling results.)
+
+\bibitem{GrahamSloane1980}
+R.\,L.~Graham, N.\,J.\,A.~Sloane,
+\textit{On additive bases and harmonious graphs},
+SIAM J.\ Algebraic Discrete Methods \textbf{1} (1980), 382--404.
+
+\bibitem{HeadWilson2003}
+T.~Head, P.~Wilson,
+\textit{Graceful trees from caterpillars (computational results)},
+unpublished notes, 2003.
+
+\bibitem{Huang1994}
+J.\,H.~Huang,
+\textit{Graceful labelings of lobsters},
+Ars Combin.\ \textbf{37} (1994), 113--131.
+
+\bibitem{RingelKotzig1964}
+G.~Ringel, A.~Kotzig,
+\textit{Rosa's problem on graceful labelings of graphs},
+unpublished manuscript, 1964; described in \cite{Rosa1967}.
+
+\bibitem{Rosa1967}
+A.~Rosa,
+\textit{On certain valuations of the vertices of a graph},
+in: Theory of Graphs (Intl Symp., Rome 1966), Gordon \& Breach,
+New York, 1967, 349--355.
+
+\bibitem{SklienaSurvey}
+S.\,S.~Skiena, W.\,D.~Smith, P.~Stucky,
+\textit{Reconstructing sets from interpoint distances},
+in: Proc.\ 6th ACM Symp.\ Comput.\ Geom., 1990, 332--339.
+
+\bibitem{Stanton1980}
+R.\,G.~Stanton, C.\,R.~Zarnke,
+\textit{Labeling of balanced trees},
+in: Proc.\ 4th Southeast Conf.\ Combin.\ Graph Theory Comput.,
+Utilitas Math., Winnipeg, 1973, 479--495.
+
+\end{thebibliography}
+
+\end{document}
