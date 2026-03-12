@@ -1,0 +1,761 @@
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 141}
+
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\theoremstyle{remark}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{vermutung}[theorem]{Vermutung}
+
+\title{Zufallsmatrixtheorie: Universalität, Eigenwertstatistiken\\
+und das Montgomery-Odlyzko-Gesetz}
+
+\begin{abstract}
+Die Zufallsmatrixtheorie (ZMT), durch Wigner in den 1950er-Jahren zur
+Modellierung von Energieniveaus schwerer Atomkerne eingeführt, hat sich zu
+einem der mächtigsten vereinheitlichenden Rahmenprogramme der modernen
+Mathematik und mathematischen Physik entwickelt. Diese Arbeit gibt eine
+in sich abgeschlossene Darstellung der drei klassischen Gaußschen
+Ensembles -- GOE, GUE und GSE -- samt ihrer grundlegenden Spektralstatistiken.
+Wir beweisen das Wigner-Halbkreisgesetz mittels der Momentenmethode,
+stellen das Wigner-Surmise für Nächster-Nachbar-Abstände vor und präsentieren
+Montgomerys Paarkorrelationssatz für die Nullstellen der Riemann-Zeta-Funktion.
+Das zentrale Rätsel -- dass Nullstellen der Zetafunktion sich statistisch
+wie GUE-Eigenwerte verhalten (das Montgomery-Odlyzko-Gesetz) -- wird
+eingehend diskutiert, einschließlich der Hilbert-Pólya-Vermutung als tiefstmöglicher
+Erklärung. Darüber hinaus behandeln wir die Tracy-Widom-Verteilung für
+den größten Eigenwert, die Universalitätssätze von Erdős-Yau, das
+Marchenko-Pastur-Gesetz für Wishart-Matrizen sowie Anwendungen von der
+Kernphysik bis zur Statistik großer Korrelationsmatrizen.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+% ============================================================
+\section{Einleitung}
+% ============================================================
+
+Die Untersuchung großer Zufallsmatrizen geht auf die bahnbrechenden Arbeiten
+von Eugene Wigner \cite{Wigner1955} zurück. Wigner beobachtete, dass die
+statistischen Fluktuationen der Energieniveaus schwerer Atomkerne zwar
+außerordentlich komplex sind, aber universellen Mustern folgen, die unabhängig
+von der spezifischen Kernwechselwirkung sind. Der Schlüsselgedanke war,
+den Hamiltonoperator eines schweren Kerns nicht durch eine detaillierte
+mikroskopische Rechnung zu modellieren -- was undurchführbar ist -- sondern
+durch eine \emph{zufällige} hermitesche Matrix aus einem geeignet invarianten
+Wahrscheinlichkeitsensemble. Wigner zeigte, dass im Grenzfall großer Matrizen
+die empirische Verteilung der Eigenwerte gegen ein universelles Halbkreisgesetz
+konvergiert.
+
+Die Geschichte hätte ein faszinierendes Kapitel der Kernphysik bleiben können,
+wäre da nicht eine bemerkenswerte Entdeckung: Die Nullstellen der
+Riemann-Zeta-Funktion $\zeta(s)$ scheinen dieselben statistischen Fluktuationseigenschaften
+zu besitzen wie die Eigenwerte großer zufälliger unitärer Matrizen (GUE).
+Diese als \textbf{Montgomery-Odlyzko-Gesetz} bekannte Beobachtung wurde
+auf Grundlage von Montgomerys Paarkorrelationssatz von 1973 \cite{Montgomery1973}
+vermutet und von Odlyzko \cite{Odlyzko1987, Odlyzko2001} numerisch mit
+außerordentlicher Präzision für zig Millionen Nullstellen bestätigt.
+
+Der Zusammenhang zwischen Spektralstatistiken von Zufallsmatrizen und der
+Verteilung der Primzahlen über die Nullstellen von $\zeta(s)$ gehört zu den
+tiefsten ungelösten Rätseln der Mathematik. Er legt die Existenz eines
+natürlichen Operators -- des \textbf{Hilbert-Pólya-Operators} -- nahe,
+dessen Spektrum die Menge der Imaginärteile der nicht-trivialen Nullstellen
+von $\zeta(s)$ ist. Die Existenz eines solchen selbstadjungierten Operators
+würde unmittelbar die Riemann-Hypothese implizieren.
+
+\subsection*{Überblick über die Arbeit}
+Abschnitt~\ref{sec:ensembles} führt die drei Gaußschen Ensembles GOE, GUE
+und GSE mit ihren Invarianzeigenschaften ein. Abschnitt~\ref{sec:halbkreis}
+beweist das Wigner-Halbkreisgesetz. Abschnitt~\ref{sec:abstaende} behandelt
+Nächster-Nachbar-Abstände und das Wigner-Surmise.
+Abschnitt~\ref{sec:montgomery} stellt Montgomerys Paarkorrelationssatz vor.
+Abschnitt~\ref{sec:goe} behandelt das GOE und die Dyson-Mehta-Identitäten.
+Abschnitt~\ref{sec:tracywidom} führt die Tracy-Widom-Verteilung ein.
+Abschnitt~\ref{sec:universitaet} gibt einen Überblick über Universalitätssätze.
+Abschnitt~\ref{sec:rh} diskutiert den Zusammenhang zur Riemann-Hypothese.
+Abschnitt~\ref{sec:anwendungen} behandelt Anwendungen.
+
+% ============================================================
+\section{Zufallsmatrix-Ensembles}
+\label{sec:ensembles}
+% ============================================================
+
+\subsection{Die drei Gaußschen Ensembles}
+
+Die fundamentalen Ensembles der Zufallsmatrixtheorie werden durch die
+Symmetrieklasse des Matrixraums und den zugehörigen Dyson-Index $\beta$
+unterschieden.
+
+\begin{definition}[Gaußsche Ensembles]
+Sei $n \geq 1$ die Matrixdimension.
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Gaußsches Orthogonales Ensemble (GOE)}, $\beta = 1$:
+    Das Wahrscheinlichkeitsmaß auf dem Raum der reellen symmetrischen
+    $n \times n$-Matrizen $H = H^T$ mit Dichte proportional zu
+    \[
+      P(H)\,dH \;\propto\; \exp\!\bigl(-\tfrac{n}{4}\,\operatorname{Sp}(H^2)\bigr)\,dH,
+    \]
+    wobei $dH = \prod_{i \leq j} dH_{ij}$.
+
+  \item \textbf{Gaußsches Unitäres Ensemble (GUE)}, $\beta = 2$:
+    Das Wahrscheinlichkeitsmaß auf dem Raum der $n \times n$-hermiteschen
+    Matrizen $H = H^\dagger$ mit Dichte proportional zu
+    \[
+      P(H)\,dH \;\propto\; \exp\!\bigl(-\tfrac{n}{2}\,\operatorname{Sp}(H^2)\bigr)\,dH.
+    \]
+
+  \item \textbf{Gaußsches Symplektisches Ensemble (GSE)}, $\beta = 4$:
+    Das Wahrscheinlichkeitsmaß auf dem Raum der $n \times n$-selbstdualen
+    quaternionischen Matrizen $H = H^R$ mit Dichte proportional zu
+    \[
+      P(H)\,dH \;\propto\; \exp\!\bigl(-n\,\operatorname{Sp}(H^2)\bigr)\,dH.
+    \]
+\end{enumerate}
+\end{definition}
+
+\subsection{Invarianzeigenschaften und physikalische Interpretation}
+
+Eine entscheidende Eigenschaft dieser Ensembles ist ihre Invarianz:
+Das GOE ist invariant unter orthogonaler Konjugation $H \mapsto O H O^T$
+($O \in O(n)$), das GUE unter unitärer Konjugation $H \mapsto U H U^\dagger$
+($U \in U(n)$), und das GSE unter symplektischer Konjugation.
+
+Physikalisch kodiert der Dyson-Index $\beta$ die Symmetrie des zugrundeliegenden
+Quantensystems:
+\begin{itemize}
+  \item $\beta = 1$ (GOE): Systeme mit \emph{Zeitumkehrinvarianz} und
+    ganzzahligem Spin (z.\,B.\ schwere Kerne, Quantenbillards ohne Magnetfeld).
+  \item $\beta = 2$ (GUE): Systeme \emph{ohne} Zeitumkehrinvarianz
+    (z.\,B.\ Elektronen im Magnetfeld, komplexes Quantenchaos).
+  \item $\beta = 4$ (GSE): Systeme mit Zeitumkehrinvarianz und halbzahligem Spin
+    (Kramers-Entartung).
+\end{itemize}
+
+\subsection{Gemeinsame Eigenwertdichte}
+
+Ein Eckpfeilerresultat ist die explizite Form der gemeinsamen
+Wahrscheinlichkeitsdichte der Eigenwerte nach Integration über die
+Eigenvektorfreiheitsgrade.
+
+\begin{theorem}[Gemeinsame Eigenwertdichte]
+\label{thm:jpdf}
+Für jedes der drei Gaußschen Ensembles mit Parameter $\beta \in \{1,2,4\}$
+ist die gemeinsame Wahrscheinlichkeitsdichte der Eigenwerte
+$\lambda_1 \leq \cdots \leq \lambda_n$ gegeben durch
+\[
+  P_\beta(\lambda_1,\ldots,\lambda_n)
+  \;=\; C_{n,\beta}\;
+  \prod_{1 \leq i < j \leq n} |\lambda_i - \lambda_j|^\beta\;
+  \exp\!\Bigl(-\frac{n\beta}{4}\sum_{i=1}^n \lambda_i^2\Bigr),
+\]
+wobei $C_{n,\beta}$ eine explizite Normierungskonstante ist, die durch das
+Selberg-Integral gegeben wird.
+\end{theorem}
+
+Der Vandermonde-artige Faktor $|\lambda_i - \lambda_j|^\beta$ ist entscheidend:
+Er erzeugt \textbf{Niveau-Abstoßung} -- Eigenwerte meiden einander, wobei
+die Stärke der Abstoßung mit $\beta$ wächst.
+
+% ============================================================
+\section{Wigners Halbkreisgesetz}
+\label{sec:halbkreis}
+% ============================================================
+
+\subsection{Formulierung des Satzes}
+
+Das Halbkreisgesetz ist das Analogon des Zentralen Grenzwertsatzes für
+das empirische Spektralmaß großer Zufallsmatrizen.
+
+\begin{theorem}[Wigners Halbkreisgesetz, 1958]
+\label{thm:halbkreis}
+Sei $H_n$ eine $n \times n$-hermitesche Zufallsmatrix, deren Einträge
+$(H_{ij})_{i \leq j}$ unabhängig (bis auf die hermitesche Bedingung) sind
+mit Erwartungswert null und Varianz $\sigma^2 < \infty$. Betrachte die
+umskalierte Matrix $\tilde{H}_n = H_n / (\sigma\sqrt{n})$. Dann konvergiert
+das empirische Spektralmaß
+\[
+  \mu_n \;=\; \frac{1}{n}\sum_{k=1}^n \delta_{\lambda_k(\tilde{H}_n)}
+\]
+schwach in Wahrscheinlichkeit gegen die Wigner-Halbkreisverteilung
+\[
+  \rho_{\mathrm{HK}}(x) \;=\; \frac{1}{2\pi}\sqrt{(4-x^2)_+},
+\]
+getragen auf $[-2,2]$. Dabei ist $(y)_+ = \max(y,0)$.
+In der auf das Einheitsintervall normierten Form:
+\[
+  \rho(x) \;=\; \frac{2}{\pi}\sqrt{1-x^2}, \quad |x| \leq 1.
+\]
+\end{theorem}
+
+\begin{bemerkung}
+Die Formel $\rho_{\mathrm{HK}}(x) = \frac{1}{2\pi}\sqrt{4-x^2}$ (getragen
+auf $[-2,2]$) entsteht natürlich aus der im GUE verwendeten Normierung
+$\operatorname{Var}[H_{ij}] = 1/n$ mittels $H = (A + A^\dagger)/\sqrt{2n}$.
+Die beiden Konventionen sind durch die Substitution $x \mapsto 2x$ verbunden.
+\end{bemerkung}
+
+\subsection{Beweis mittels Momentenmethode}
+
+Wir skizzieren den Beweis mit der Momentenmethode, dem elementarsten Ansatz,
+der zugleich die exakte Universalitätsaussage liefert.
+
+\begin{proof}[Beweissskizze]
+Das $k$-te Moment von $\mu_n$ ist
+\[
+  m_k^{(n)} \;=\; \int x^k\,d\mu_n(x)
+  \;=\; \frac{1}{n}\operatorname{Sp}(\tilde{H}_n^k).
+\]
+Wir berechnen $\mathbb{E}[m_k^{(n)}]$ durch Entwicklung der Spur:
+\[
+  \mathbb{E}\!\left[\frac{1}{n}\operatorname{Sp}(H_n^k)\right]
+  = \frac{1}{n \cdot n^{k/2}} \sum_{i_1,\ldots,i_k=1}^n
+    \mathbb{E}[H_{i_1 i_2} H_{i_2 i_3} \cdots H_{i_k i_1}].
+\]
+Da die Einträge Erwartungswert null haben, verschwindet der Erwartungswert
+eines Produkts, sofern nicht jedes Indexpaar $(i_j, i_{j+1})$ mindestens
+zweimal auftritt. In führender Ordnung $n \to \infty$ überleben nur
+\emph{nicht-kreuzende Paarungen} (auch \emph{Catalan-Paarungen} genannt),
+und jede trägt $\sigma^{2k/2} \cdot n^{k/2+1}$ bei.
+Die Anzahl solcher Paarungen für $k = 2m$ ist die Catalan-Zahl
+\[
+  C_m \;=\; \frac{1}{m+1}\binom{2m}{m}.
+\]
+Diese sind genau die geraden Momente der Halbkreisverteilung:
+$\int x^{2m}\rho_{\mathrm{HK}}(x)\,dx = C_m$.
+Die ungeraden Momente verschwinden aus Symmetriegründen. Da die Momente
+die Halbkreisverteilung charakterisieren (Carlemans Bedingung ist erfüllt),
+folgt die Konvergenz $\mu_n \to \rho_{\mathrm{HK}}$.
+\end{proof}
+
+\subsection{Universalität des Halbkreisgesetzes}
+
+Der obige Beweis zeigt, dass das Halbkreisgesetz weit über den Gaußschen
+Fall hinaus gilt: Es gilt für beliebige Wigner-Matrizen, deren Einträge
+Erwartungswert null und endliche Varianz haben. Die Gaußsche Struktur ist
+für die globale Dichte nicht erforderlich.
+
+% ============================================================
+\section{Eigenwertabstandsstatistiken}
+\label{sec:abstaende}
+% ============================================================
+
+\subsection{Nächster-Nachbar-Abstände und Niveau-Abstoßung}
+
+Während das Halbkreisgesetz die \emph{globale} Eigenwertdichte beschreibt,
+ist die Zufallsmatrixtheorie am bekanntesten für ihre Vorhersagen über
+\emph{lokale} Statistiken -- insbesondere die Verteilung der Abstände
+zwischen benachbarten Eigenwerten.
+
+Seien $\lambda_1 \leq \lambda_2 \leq \cdots \leq \lambda_n$ die Eigenwerte
+einer Zufallsmatrix aus dem GUE (oder GOE). Man bildet die normierten
+Nächster-Nachbar-Abstände
+\[
+  s_k \;=\; \frac{\lambda_{k+1} - \lambda_k}{\langle \lambda_{k+1} - \lambda_k \rangle},
+\]
+normiert auf mittleren Abstand 1. Die empirische Verteilung der $s_k$
+konvergiert für $n \to \infty$ gegen eine Grenzverteilung.
+
+\subsection{Das Wigner-Surmise}
+
+Für $2 \times 2$-Matrizen berechnete Wigner \cite{Wigner1957} die exakte
+Abstandsverteilung, die sich als hervorragende Näherung für $n \times n$-Matrizen
+mit großem $n$ herausstellt. Dies ist das \textbf{Wigner-Surmise}.
+
+\begin{theorem}[Wigner-Surmise]
+\label{thm:surmise}
+Die Nächster-Nachbar-Abstandsverteilung der Eigenwerte des $n \times n$-GUE
+konvergiert nach Entfaltung (Normierung auf mittleren Abstand 1) gegen das
+Wigner-Surmise für $\beta = 2$:
+\[
+  p_{\mathrm{GUE}}(s) \;=\; \frac{32}{\pi^2}\,s^2\,\exp\!\left(-\frac{4s^2}{\pi}\right),
+  \quad s \geq 0.
+\]
+Für das GOE ($\beta = 1$):
+\[
+  p_{\mathrm{GOE}}(s) \;=\; \frac{\pi}{2}\,s\,\exp\!\left(-\frac{\pi s^2}{4}\right),
+  \quad s \geq 0.
+\]
+Für das GSE ($\beta = 4$):
+\[
+  p_{\mathrm{GSE}}(s) \;=\; \frac{2^{18}}{3^6\pi^3}\,s^4\,\exp\!\left(-\frac{64 s^2}{9\pi}\right),
+  \quad s \geq 0.
+\]
+\end{theorem}
+
+\subsection{Niveau-Abstoßung}
+
+Ein fundamentales Merkmal aller drei Formeln ist $p_\beta(0) = 0$:
+Eigenwerte \textbf{stoßen sich ab}. Das Verhalten nahe null ist
+\[
+  p_\beta(s) \;\sim\; c_\beta\, s^\beta, \quad s \to 0^+,
+\]
+die Abstoßung ist also \emph{linear} für GOE, \emph{quadratisch} für GUE
+und \emph{quartisch} für GSE. Dies steht im scharfen Kontrast zur
+Poisson-Verteilung $p_{\mathrm{Poisson}}(s) = e^{-s}$, für die $p(0) = 1$,
+was \emph{keiner Abstoßung} entspricht (Eigenwerte sind unabhängig).
+
+Der physikalische Mechanismus: Beim GOE ($\beta=1$) erfordert eine Matrix
+mit entartetem Eigenwert eine Bedingung der Kodimension 1 (eine reelle
+Gleichung), was Entartungen selten macht. Beim GUE ($\beta=2$) sind es zwei
+Bedingungen (eine komplexe Gleichung), daher eine höhere Potenz von $s$.
+
+% ============================================================
+\section{Montgomerys Paarkorrelation}
+\label{sec:montgomery}
+% ============================================================
+
+\subsection{Die Paarkorrelation der Zeta-Nullstellen}
+
+Sei $\rho_n = \frac{1}{2} + i\gamma_n$ die nicht-triviale Nullstellen von
+$\zeta(s)$, wobei wir für diesen Abschnitt die Riemann-Hypothese (RH)
+annehmen, sodass alle $\gamma_n$ reell und positiv sind. Die Nullstellen
+sind geordnet: $0 < \gamma_1 \leq \gamma_2 \leq \cdots$ mit
+$\gamma_1 \approx 14{,}135$.
+
+In Analogie zu Zufallsmatrix-Eigenwerten entfaltet man die Nullstellenfolge
+zunächst durch Anwendung der lokalen mittleren Dichte. Aus der expliziten
+Formel und dem Primzahlsatz folgt
+\[
+  \gamma_n \;\approx\; \frac{2\pi n}{\log(n/2\pi e)}.
+\]
+Nach Entfaltung (Setzen $\tilde{\gamma}_n = \frac{\gamma_n}{2\pi}\log\frac{\gamma_n}{2\pi}$)
+haben die normierten Abstände Mittelwert 1.
+
+\begin{theorem}[Montgomerys Paarkorrelationssatz, 1973]
+\label{thm:montgomery}
+Unter Annahme der Riemann-Hypothese gilt für jede gerade Schwartz-Funktion $f$,
+deren Fouriertransformierte $\hat{f}$ in $(-1,1)$ getragen ist:
+\[
+  \frac{1}{N(T)}\sum_{\substack{m,n \\ m \neq n}} f\!\left(\frac{\gamma_m - \gamma_n}{2\pi/\log T}\right)
+  \;\longrightarrow\;
+  \int_{-\infty}^\infty f(r)\,R_2(r)\,dr \quad \text{für } T \to \infty,
+\]
+wobei die Paarkorrelationsfunktion
+\[
+  R_2(r) \;=\; 1 - \left(\frac{\sin(\pi r)}{\pi r}\right)^2
+\]
+ist. Hierbei ist $N(T) = \#\{\gamma_n : 0 < \gamma_n \leq T\}$ die Nullstellen-Zählfunktion.
+\end{theorem}
+
+\begin{bemerkung}
+Die Funktion $R_2(r) = 1 - (\sin(\pi r)/\pi r)^2$ ist \emph{exakt} die
+Zweipunkt-Korrelationsfunktion des GUE (Eigenwerte großer unitärer Zufallsmatrizen).
+Montgomerys Satz beweist damit, dass die Paarkorrelation der $\zeta$-Nullstellen
+mit der der GUE-Eigenwerte übereinstimmt,
+\emph{im eingeschränkten Bereich, wo $\hat{f}$ in $(-1,1)$ getragen ist}.
+Die Erweiterung auf alle Testfunktionen und die vollen GUE-Statistiken
+(einschließlich aller $n$-Punkt-Korrelationen) für $\zeta$-Nullstellen bleiben
+eine offene Vermutung.
+\end{bemerkung}
+
+\subsection{Odlyzkos numerische Verifikation}
+
+Andrew Odlyzko \cite{Odlyzko1987} berechnete die ersten $10^6$ Nullstellen
+nahe $\gamma \approx 10^{20}$ mit hoher Genauigkeit und erstellte Histogramme
+der normierten Abstände. Die Übereinstimmung mit dem GUE-Wigner-Surmise
+$p_{\mathrm{GUE}}(s)$ ist bemerkenswert. Die Poisson-Verteilung ist klar
+ausgeschlossen.
+
+In einer späteren Arbeit \cite{Odlyzko2001} berechnete Odlyzko $10^{22}$
+Nullstellen und bestätigte die GUE-Statistiken mit noch höherer Genauigkeit.
+Diese Berechnungen stellen den stärksten numerischen Beleg für die Riemann-Hypothese dar.
+
+% ============================================================
+\section{Gaußsches Orthogonales Ensemble}
+\label{sec:goe}
+% ============================================================
+
+\subsection{GOE und Zeitumkehrinvarianz}
+
+Das GOE ($\beta = 1$) ist das geeignete Ensemble für Quantensysteme mit
+Zeitumkehrinvarianz und ganzzahligem (oder null) Spin. Das kanonische
+Beispiel ist ein Billardsystem mit klassisch chaotischer Geometrie
+(Sinai-Billard, Bunimovich-Stadion).
+
+Für das GOE haben die Eigenwerte $\lambda_1 \leq \cdots \leq \lambda_n$
+die gemeinsame Dichte (Satz~\ref{thm:jpdf} mit $\beta = 1$):
+\[
+  P_1(\lambda_1,\ldots,\lambda_n)
+  \;=\; C_{n,1}\;\prod_{i<j}|\lambda_i - \lambda_j|\;\exp\!\Bigl(-\frac{n}{4}\sum_i \lambda_i^2\Bigr).
+\]
+
+\subsection{Niveauzahlvarianz und die Dyson-Mehta-Formel}
+
+Eine wichtige Statistik ist die \textbf{Niveauzahlvarianz} $\Sigma^2(L)$,
+definiert als die Varianz der Anzahl von Eigenwerten in einem Fenster der
+Länge $L$ (in entfalteten Koordinaten). Für das GOE bewiesen Dyson und
+Mehta \cite{Mehta2004}:
+
+\begin{theorem}[Dyson-Mehta-Identität für das GOE]
+\label{thm:dysonmehta}
+Für das GOE im Grenzfall $n \to \infty$ gilt
+\[
+  \Sigma^2(L) \;=\; \frac{2}{\pi^2}\left(\log(2\pi L) + \gamma_{\mathrm{E}} + 1 - \frac{\pi^2}{8}\right)
+  + O\!\left(\frac{1}{L}\right),
+\]
+wobei $\gamma_{\mathrm{E}}$ die Euler-Mascheroni-Konstante ist. Im Gegensatz dazu
+gilt für Poisson: $\Sigma^2_{\mathrm{Poisson}}(L) = L$.
+Das logarithmische Wachstum von $\Sigma^2$ (statt linear für Poisson) spiegelt
+die starke \emph{langreichweitige Starrheit} des GOE-Eigenwertspektrums wider.
+\end{theorem}
+
+\subsection{GOE-Niveauabstand: die lineare Abstoßung}
+
+Wie im Wigner-Surmise (Satz~\ref{thm:surmise}) formuliert, zeigt die GOE-Abstandsverteilung
+$p_{\mathrm{GOE}}(s) = (\pi/2)\,s\,e^{-\pi s^2/4}$ lineare Niveau-Abstoßung:
+$p_{\mathrm{GOE}}(s) \sim (\pi/2)\,s$ für $s \to 0$.
+Dies ist charakteristisch für Quantensysteme mit Zeitumkehrinvarianz und
+wurde in Hunderten von Experimenten mit Kern-, Atom- und Molekülspektren bestätigt.
+
+% ============================================================
+\section{Tracy-Widom-Verteilung}
+\label{sec:tracywidom}
+% ============================================================
+
+\subsection{Der größte Eigenwert}
+
+Die \textbf{Tracy-Widom-Verteilungen} beschreiben die Fluktuationen des
+größten Eigenwerts $\lambda_{\max}$ einer Zufallsmatrix um seine erwartete
+Position am Rand des Spektrums.
+
+Für das GUE mit $n \times n$-Matrizen konzentriert sich $\lambda_{\max}$
+um den rechten Rand des Halbkreises bei $2$. Der Tracy-Widom-Satz liefert
+die präzise Grenzverteilung der Fluktuationen auf der Skala $n^{-2/3}$.
+
+\begin{theorem}[Tracy-Widom, 1994]
+\label{thm:tracywidom}
+Sei $H_n$ aus dem GUE mit Standardnormierung
+$\mathbb{E}[|H_{ij}|^2] = 1/n$ entnommen. Dann gilt
+\[
+  \mathbb{P}\!\left(\frac{\lambda_{\max} - 2}{n^{-2/3}} \leq s\right)
+  \;\longrightarrow\; F_2(s) \quad \text{für } n \to \infty,
+\]
+wobei $F_2$ die \textbf{GUE-Tracy-Widom-Verteilung} ist:
+\[
+  F_2(s) \;=\; \exp\!\left(-\int_s^\infty (x-s)\,q(x)^2\,dx\right).
+\]
+Dabei ist $q(x)$ die eindeutige Lösung der \textbf{Hastings-McLeod-Gleichung}
+\[
+  q'' \;=\; xq + 2q^3, \quad q(x) \sim \mathrm{Ai}(x) \text{ für } x \to +\infty,
+\]
+wobei $\mathrm{Ai}$ die Airy-Funktion ist.
+\end{theorem}
+
+\begin{bemerkung}
+Analoge Resultate gelten für GOE und GSE:
+\begin{align*}
+  F_1(s) &= \exp\!\left(-\frac{1}{2}\int_s^\infty q(x)\,dx\right)\cdot [F_2(s)]^{1/2}
+  \quad \text{(GOE-Tracy-Widom)},\\
+  F_4(s/\sqrt{2}) &= \cosh\!\left(\frac{1}{2}\int_s^\infty q(x)\,dx\right)\cdot [F_2(s)]^{1/2}
+  \quad \text{(GSE-Tracy-Widom)}.
+\end{align*}
+\end{bemerkung}
+
+\subsection{Anwendungen der Tracy-Widom-Verteilung}
+
+Die Tracy-Widom-Verteilungen erscheinen weit über die Zufallsmatrixtheorie hinaus:
+\begin{itemize}
+  \item Die Länge der längsten aufsteigenden Teilfolge einer zufälligen
+    Permutation von $\{1,\ldots,n\}$ (Satz von Baik-Deift-Johansson \cite{BaikDeiftJohansson1999}).
+  \item Die Höhenfluktuationen zufälliger Wachstumsinterfaces in der
+    Kardar-Parisi-Zhang (KPZ)-Universalitätsklasse.
+  \item Der größte Singulärwert bei der Hauptkomponentenanalyse (PCA)
+    von Rauschmatrizen.
+  \item Die freie Energie gerichteter Polymere in zufälligen Medien.
+\end{itemize}
+
+% ============================================================
+\section{Universalität}
+\label{sec:universitaet}
+% ============================================================
+
+\subsection{Was Universalität bedeutet}
+
+Eines der zentralen Themen der modernen Zufallsmatrixtheorie ist
+\textbf{Universalität}: Die lokalen Eigenwertstatistiken (Niveauabstände,
+$n$-Punkt-Korrelationen) hängen nur von der Symmetrieklasse ($\beta = 1, 2, 4$)
+des Ensembles ab, nicht von der spezifischen Verteilung der Matrixeinträge.
+
+Dies ist analog zur Universalität der Gaußschen Verteilung im Zentralen
+Grenzwertsatz: Die globale Spektraldichte ist universell (der Halbkreis),
+und ebenso sind es die lokalen Statistiken (GUE/GOE-Korrelationen).
+
+\subsection{Der Erdős-Yau-Universalitätssatz}
+
+Das folgende Durchbruchsergebnis erweiterte die GUE/GOE-Universalität weit
+über den Gaußschen Fall hinaus:
+
+\begin{theorem}[Erdős-Schlein-Yau-Yin, 2010--2012]
+\label{thm:universitaet}
+Sei $H_n$ eine Wigner-Matrix (d.\,h.\ hermitesch mit unabhängigen oberen
+Dreieckseinträgen mit Erwartungswert null und Varianz $1/n$), die eine
+sub-exponentielle Endbedingung erfüllt. Dann gilt:
+\begin{enumerate}[label=(\roman*)]
+  \item Das empirische Spektralmaß konvergiert gegen das Wigner-Halbkreisgesetz
+    (lokales Gesetz, Bulk und Rand).
+  \item Alle endlichdimensionalen Korrelationsfunktionen der entfalteten Eigenwerte
+    im Bulk konvergieren gegen die des GUE (für hermitesche Wigner-Matrizen)
+    bzw.\ GOE (für reell-symmetrische Wigner-Matrizen).
+  \item Das Tracy-Widom-Gesetz gilt für den größten Eigenwert.
+\end{enumerate}
+\end{theorem}
+
+\begin{bemerkung}
+Der Beweis von Satz~\ref{thm:universitaet} verwendet zwei Hauptwerkzeuge:
+(a) ein \emph{lokales Halbkreisgesetz} (Starrheit der Eigenwerte auf der Skala $1/n$)
+und (b) das \emph{Dyson-Brownsche-Bewegungs}-Interpolationsargument, das zeigt,
+dass die GUE-Statistiken unter kleinen Störungen der Eintragsverteilung
+lokal stabil sind.
+\end{bemerkung}
+
+\subsection{Beta-Ensembles und log-Gas}
+
+Für allgemeines $\beta > 0$ kann man $\beta$-Ensembles durch die gemeinsame
+Eigenwertdichte
+\[
+  P_\beta(\lambda_1,\ldots,\lambda_n) \;\propto\;
+  \prod_{i<j} |\lambda_i - \lambda_j|^\beta \cdot e^{-n\beta V(\lambda_i)/2}
+\]
+mit einem allgemeinen einschließenden Potential $V$ definieren. Das
+$\beta$-Ensemble interpoliert zwischen Poisson ($\beta \to 0$), GOE ($\beta=1$),
+GUE ($\beta=2$), GSE ($\beta=4$) und dem ``starren'' Kristall ($\beta \to \infty$).
+
+% ============================================================
+\section{Verbindung zur Riemann-Hypothese}
+\label{sec:rh}
+% ============================================================
+
+\subsection{Die Hilbert-Pólya-Vermutung}
+
+Die tiefstmögliche Erklärung der GUE-Statistiken der $\zeta$-Nullstellen
+ist die folgende:
+
+\begin{vermutung}[Hilbert-Pólya-Vermutung]
+\label{verm:hilbertpolya}
+Es gibt einen selbstadjungierten unbeschränkten Operator $\mathcal{L}$ auf einem
+Hilbert-Raum $\mathcal{H}$, so dass das Spektrum von $\mathcal{L}$ genau
+\[
+  \sigma(\mathcal{L}) \;=\; \left\{ \gamma_n \;:\; \zeta\!\left(\tfrac{1}{2} + i\gamma_n\right) = 0,\; \gamma_n \in \mathbb{R} \right\}
+\]
+ist.
+\end{vermutung}
+
+\noindent
+Würde ein solcher Operator existieren und hermitesch (selbstadjungiert) sein,
+wären seine Eigenwerte notwendigerweise reell -- was genau der Inhalt der
+Riemann-Hypothese ist. Wäre $\mathcal{L}$ zudem von der GUE-Universalitätsklasse
+(z.\,B.\ ein Quanten-Hamiltonoperator ohne Zeitumkehrinvarianz), erkläre dies
+die GUE-Statistiken.
+
+\begin{bemerkung}
+Die Hilbert-Pólya-Vermutung (Vermutung~\ref{verm:hilbertpolya}) ist
+\textbf{vollständig offen}. Kein konkreter Kandidat für $\mathcal{L}$ ist
+rigoros etabliert, obwohl viele Vorschläge existieren (Schrödinger-Operatoren
+auf modularen Flächen, $p$-adische Quantenmechanik, der Berry-Keating-Operator
+$xp + px$, usw.). Die Vermutung ist älter als die Zufallsmatrixtheorie und
+wurde von Hilbert und Pólya unabhängig um 1910--1920 formuliert.
+\end{bemerkung}
+
+\subsection{Das Montgomery-Odlyzko-Gesetz als numerischer Beleg}
+
+\begin{vermutung}[Montgomery-Odlyzko-Gesetz, vollständige Version]
+\label{verm:moo}
+Alle $n$-Punkt-Korrelationsfunktionen der normierten $\zeta$-Nullstellen
+konvergieren gegen die des GUE, nicht nur die Paarkorrelation (die unter RH
+für Testfunktionen mit eingeschränktem Fourier-Träger durch
+Satz~\ref{thm:montgomery} bewiesen ist).
+\end{vermutung}
+
+Der numerische Beleg aus Odlyzkos Berechnungen \cite{Odlyzko1987, Odlyzko2001}
+ist außerordentlich überzeugend: Das Wigner-Surmise $p_{\mathrm{GUE}}(s)$
+passt das Histogramm der $\zeta$-Abstände über $10^{22}$ Nullstellen
+im Rahmen statistischer Fluktuationen.
+
+\subsection{Weitere Evidenz und verwandte Resultate}
+
+\begin{itemize}
+  \item \textbf{$L$-Funktionen}: Ähnliche GUE- oder GOE-Statistiken gelten
+    für die Nullstellen von Dirichlet-$L$-Funktionen, wobei das Ensemble vom
+    Symmetrietyp der $L$-Funktion abhängt (Katz-Sarnak \cite{KatzSarnak1999}).
+  \item \textbf{Momente von $\zeta$}: Keating-Snaith \cite{KeatingSnaith2000}
+    verwendeten GUE-Charakteristikpolynommomente, um die genaue führende Konstante
+    in der Asymptotik $\int_0^T |\zeta(\frac{1}{2}+it)|^{2k}\,dt \sim c_k\,T(\log T)^{k^2}$
+    zu vermuten.
+  \item \textbf{Quantenchaos}: Die Bohigas-Giannoni-Schmit-Vermutung besagt,
+    dass die Energieniveaus eines Quantensystems, dessen klassische Dynamik chaotisch ist,
+    GUE- (oder GOE-)Statistiken folgen. Dies bleibt eine Vermutung, gestützt
+    durch überwältigende numerische Evidenz.
+\end{itemize}
+
+% ============================================================
+\section{Anwendungen}
+\label{sec:anwendungen}
+% ============================================================
+
+\subsection{Kernphysik}
+
+Wigners ursprüngliche Motivation war die Statistik der Energieniveaus schwerer
+Kerne ($A > 100$). Der Hamiltonoperator eines solchen Kerns enthält
+$\sim 10^{50}$ Matrixelemente, was direkte Berechnungen unmöglich macht.
+Das Zufallsmatrixmodell macht präzise statistische Vorhersagen, die in
+Hunderten von gemessenen Kernspektren bestätigt wurden, beginnend mit der
+Grundlagenanalyse von Bohigas-Haq-Pandey des ``Nuclear Data Ensemble'' (1983).
+
+\subsection{Quantenchaos}
+
+Die Zufallsmatrixtheorie ist das zentrale Werkzeug im Forschungsfeld
+\textbf{Quantenchaos}, das untersucht, wie sich klassisches Chaos in der
+Quantenmechanik manifestiert. Die zentrale empirische Tatsache
+(BGS-Vermutung) lautet:
+\begin{quote}
+  Quantisierungen klassisch chaotischer Hamiltonoperatoren haben GUE- oder GOE-Niveaustatistiken;
+  Quantisierungen klassisch integrabler Hamiltonoperatoren haben Poisson-Statistiken.
+\end{quote}
+Paradigmatische Beispiele sind das Sinai-Billard (GOE), das Bunimovich-Stadion (GOE)
+und Magnetbillards (GUE).
+
+\subsection{Große zufällige Korrelationsmatrizen und Finanzwissenschaft}
+
+In der hochdimensionalen Statistik bildet man häufig eine Stichprobenkovarianzmatrix
+$\hat{\Sigma} = \frac{1}{m} X X^T$, wobei $X$ eine $n \times m$-Datenmatrix ist
+mit $n, m \to \infty$, $n/m \to \gamma$. Das Marchenko-Pastur-Gesetz
+\cite{MarchenkoPastur1967} beschreibt die Grenzspektraldichte:
+
+\begin{theorem}[Marchenko-Pastur-Gesetz]
+\label{thm:marchenkopastur}
+Sei $X$ eine $n \times m$-Matrix mit unabhängig identisch verteilten Einträgen
+mit Erwartungswert null und Varianz $\sigma^2$, und sei $\gamma = n/m$. Dann
+konvergiert das empirische Spektralmaß von $\frac{1}{m} X X^T$ gegen die
+Marchenko-Pastur-Verteilung
+\[
+  \rho_{\gamma}(x)
+  \;=\; \frac{\sqrt{(\lambda_+ - x)(x - \lambda_-)}}{2\pi\,\gamma\,\sigma^2\,x},
+  \quad x \in [\lambda_-, \lambda_+],
+\]
+mit $\lambda_{\pm} = \sigma^2(1 \pm \sqrt{\gamma})^2$.
+\end{theorem}
+
+In der Finanzwirtschaft und den Datenwissenschaften wird dieses Gesetz verwendet,
+um in empirischen Korrelationsmatrizen von Aktienrenditen \emph{Signal}
+(Eigenwerte oberhalb von $\lambda_+$) von \emph{Rauschen} (Eigenwerte innerhalb
+von $[\lambda_-, \lambda_+]$) zu unterscheiden.
+
+\subsection{Drahtlose Kommunikation}
+
+In MIMO (Multiple-Input Multiple-Output)-Funksystemen wird die Kanalkapazität
+durch die Singulärwerte der Kanalmatrix bestimmt, die Marchenko-Pastur-Statistiken
+folgt, wenn der Kanal zufällig (Rayleigh-Fading) ist. Die Zufallsmatrixtheorie
+liefert präzise Vorhersagen für die ergodische Kapazität und
+Ausfallwahrscheinlichkeit von MIMO-Systemen.
+
+\subsection{Statistische Mechanik und Wachstumsmodelle}
+
+Die Tracy-Widom-Verteilung und verwandte Resultate verbinden die
+Zufallsmatrixtheorie mit:
+\begin{itemize}
+  \item Der KPZ-Universalitätsklasse zufälliger Wachstumsprozesse (Eden-Modell,
+    ASEP, polynukleares Wachstumsmodell).
+  \item Freier Wahrscheinlichkeitstheorie (Voiculescu), die klassische
+    Wahrscheinlichkeitstheorie auf nicht-kommutative Zufallsvariablen erweitert.
+  \item Integrablen Systemen und der Theorie isomonodromischer Deformationen.
+\end{itemize}
+
+% ============================================================
+\section{Literatur}
+\label{sec:literatur}
+% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Wigner1955}
+Wigner, E.P.\ (1955).
+\textit{Characteristic vectors of bordered matrices with infinite dimensions}.
+Annals of Mathematics, 62(3), 548--564.
+
+\bibitem{Wigner1957}
+Wigner, E.P.\ (1957).
+\textit{Distribution of neutron resonance level spacings}.
+Conference on Neutron Physics by Time-of-Flight, Gatlinburg, Tennessee,
+ORNL-2309.
+
+\bibitem{Montgomery1973}
+Montgomery, H.L.\ (1973).
+\textit{The pair correlation of zeros of the zeta function}.
+Analytic Number Theory (Proc.\ Sympos.\ Pure Math.\ Vol.\ XXIV),
+American Mathematical Society, Providence, RI, S.\ 181--193.
+
+\bibitem{Odlyzko1987}
+Odlyzko, A.M.\ (1987).
+\textit{On the distribution of spacings between zeros of the zeta function}.
+Mathematics of Computation, 48(177), 273--308.
+
+\bibitem{Odlyzko2001}
+Odlyzko, A.M.\ (2001).
+\textit{The $10^{22}$-nd zero of the Riemann zeta function}.
+Dynamical, Spectral, and Arithmetic Zeta Functions (San Antonio, TX, 1999),
+Contemporary Mathematics, 290, S.\ 139--144, AMS.
+
+\bibitem{TracyWidom1994}
+Tracy, C.A., Widom, H.\ (1994).
+\textit{Level-spacing distributions and the Airy kernel}.
+Communications in Mathematical Physics, 159(1), 151--174.
+
+\bibitem{Mehta2004}
+Mehta, M.L.\ (2004).
+\textit{Random Matrices}, 3.\ Auflage.
+Pure and Applied Mathematics, Bd.\ 142, Academic Press, Amsterdam.
+
+\bibitem{AndersonGuionnetZeitouni2010}
+Anderson, G.W., Guionnet, A., Zeitouni, O.\ (2010).
+\textit{An Introduction to Random Matrices}.
+Cambridge Studies in Advanced Mathematics, Bd.\ 118,
+Cambridge University Press.
+
+\bibitem{ErdosYau2012}
+Erdős, L., Yau, H.-T.\ (2012).
+\textit{Universality of local spectral statistics of random matrices}.
+Bulletin of the American Mathematical Society, 49(3), 377--414.
+
+\bibitem{MarchenkoPastur1967}
+Mar\v{c}enko, V.A., Pastur, L.A.\ (1967).
+\textit{Distribution of eigenvalues for some sets of random matrices}.
+Mathematics of the USSR-Sbornik, 1(4), 457--483.
+
+\bibitem{KatzSarnak1999}
+Katz, N.M., Sarnak, P.\ (1999).
+\textit{Random Matrices, Frobenius Eigenvalues, and Monodromy}.
+American Mathematical Society Colloquium Publications, Bd.\ 45, AMS.
+
+\bibitem{KeatingSnaith2000}
+Keating, J.P., Snaith, N.C.\ (2000).
+\textit{Random matrix theory and $\zeta(1/2+it)$}.
+Communications in Mathematical Physics, 214(1), 57--89.
+
+\bibitem{BaikDeiftJohansson1999}
+Baik, J., Deift, P., Johansson, K.\ (1999).
+\textit{On the distribution of the length of the longest increasing subsequence
+of random permutations}.
+Journal of the American Mathematical Society, 12(4), 1119--1178.
+
+\end{thebibliography}
+
+\end{document}
