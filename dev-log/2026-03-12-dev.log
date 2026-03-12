@@ -1393,3 +1393,43 @@ Alle unbewiesenen Aussagen korrekt als conjecture/vermutung deklariert.
 - Graceful Trees n=1..10: 201/201 graceful (kein Gegenbeispiel)
 - Frankl UC: 120 Familien auf Grundmenge ≤3 ohne Verletzung
 - Freiman PFR: Sanders-Schranke vs. PFR-Ziel demonstriert (K=3: exp(1456) vs. 9)
+
+=== 2026-03-12 — Build 172 — Batch 22 Gruppe B: 4 Vermutungen analysiert ===
+
+2026-03-12 [Build 172]: Mathematische Analyse und Verifikation Batch 22 (Papers 84–87)
+
+### Neue Dateien
+- src/py/gruppe_b_batch22_verification.py: Computational Verifikation der 4 Vermutungen
+  - Mahler-Maß-Berechnung für irreduzible Polynome bis Grad 10
+  - Lehmer-Polynom verifiziert: M(L) = 1.1762808182599178 ✓
+  - Dobrowolski-Schranke für d=10: 1.0000396 (Faktor ~4450 unter Lehmer)
+  - Rangverteilung für 10.196 elliptische Kurven (a,b ∈ [-50,50])
+  - Bateman-Horn-Verifikation für f(x)=x²+1 bis x=100.000
+
+- reviews/research_batch22_gruppe_b_2026_03_12.md: Vollständiger Review
+
+### Mathematische Ergebnisse
+Paper 84 – Fontaine-Mazur:
+  n=2: WEITGEHEND BEWIESEN (Wiles+BCDT+Kisin+Emerton)
+  n≥3: OFFEN (kein p-adisches lok. Langlands für GL_n)
+
+Paper 85 – Lehmer-Mahler:
+  OFFEN. Keine M ∈ (1, 1.17628) für irred. Polynome {-1,0,1} bis Grad 10 gefunden.
+  Dobrowolski-Schranke um Faktor ~4450 unter Ziel.
+
+Paper 86 – Elliptische Kurven Rang:
+  Goldfeld avg=1/2: OFFEN (best: ≤0.885 B-S 2015)
+  Boundedness: OFFEN und KONTROVERS
+  Elkies Rang ≥ 29 als empirische Untergrenze.
+
+Paper 87 – Bateman-Horn:
+  OFFEN (außer Dirichlet k=1,deg=1).
+  Ratio π(x,x²+1)/BH-Vorh. ≈ 1.12-1.28 für x ∈ [100,100000],
+  konvergiert langsam gegen 1.0.
+
+### Computational
+- 59.046 Polynome geprüft, 2 irreduzible Kandidate nahe Lehmer-Maß gefunden
+- 10.201 elliptische Kurven ausgewertet (davon 5 singulär)
+- avg Rang-Heuristik: 0.2305 (unter Goldfeld 0.5, da naive Methode)
+- Bateman-Horn-Eulerprodukt über 500 Primzahlen: 𝔖(x²+1) ≈ 1.3704
+
