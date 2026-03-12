@@ -652,3 +652,64 @@ BUG-8 [MITTEL] paper62_automorphe_formen_de.tex:
 
 ### Build-Nummer
 - src/build.txt: 145 → 146
+
+=== 2026-03-12 — Build 149 — ABSCHLUSS BATCHES 11–18: Vollständiges Audit Batch 18 ===
+
+2026-03-12 [Build 149]: Vollständiges mathematisches und formales Audit aller 8 Papers in Batch 18 (Papers 68–71)
+
+### Geprüfte Dateien
+- papers/batch18/paper68_yang_mills_en.tex
+- papers/batch18/paper68_yang_mills_de.tex
+- papers/batch18/paper69_hodge_conjecture_en.tex
+- papers/batch18/paper69_hodge_vermutung_de.tex
+- papers/batch18/paper70_ricci_flow_en.tex
+- papers/batch18/paper70_ricci_fluss_de.tex
+- papers/batch18/paper71_p_vs_np_en.tex
+- papers/batch18/paper71_p_vs_np_de.tex
+
+### Korrekturen durchgeführt (8 Fehler behoben)
+1. paper69_hodge_conjecture_en.tex: \title{} fehlte vollständig → eingefügt
+2. paper69_hodge_vermutung_de.tex: \title{} fehlte vollständig → eingefügt
+3. paper71_p_vs_np_en.tex: \documentclass[reqno,11pt] → [12pt,a4paper] korrigiert
+4. paper71_p_vs_np_de.tex: \documentclass[reqno,11pt] → [12pt,a4paper] korrigiert
+5. paper71_p_vs_np_en.tex: \tableofcontents nach \maketitle eingefügt
+6. paper71_p_vs_np_de.tex: \tableofcontents nach \maketitle eingefügt
+7. paper70_ricci_flow_en.tex: remark/conjecture unter \theoremstyle{remark} verschoben
+8. paper70_ricci_fluss_de.tex: bemerkung/vermutung unter \theoremstyle{remark} verschoben
+
+### Mathematische Audit-Ergebnisse
+- Paper 68 Yang-Mills: BESTANDEN — BPST, Donaldson, SW, Uhlenbeck alle korrekt bewiesen;
+  Massenlücke korrekt als Conjecture; Asymptotische Freiheit (Nobel 2004) korrekt bewiesen
+- Paper 69 Hodge: BESTANDEN — Hodge-Zerlegung, harter Lefschetz, Lefschetz (1,1) korrekt bewiesen;
+  Voisin 2002 (ganzzahlige Version widerlegt) korrekt; rationale Hodge-Vermutung offen
+- Paper 70 Ricci-Fluss: BESTANDEN — DeTurck, Hamilton, Perelman F/W-Entropie, κ-non-collapsing,
+  Poincaré dim 3 (BEWIESEN), Geometrisierungssatz (BEWIESEN), Freedman dim 4 topologisch (BEWIESEN);
+  Smooth 4D Poincaré korrekt als OPEN Conjecture
+- Paper 71 P-vs-NP: BESTANDEN — Cook-Levin, Karp-21, PCP-Theorem, alle 3 Barrieren
+  (BGS, Razborov-Rudich, Aaronson-Wigderson) korrekt als bewiesen; P≠NP offen
+
+### Neue Review-Datei
+- reviews/review_batch18_2026_03_12.md
+
+### ABSCHLUSS BATCHES 11–18 — GESAMTZUSAMMENFASSUNG
+
+Hiermit sind alle Batches 11–18 vollständig abgeschlossen.
+Zusammen mit Batches 1–10 (Papers 1–39) bildet das den vollständigen Paper-Korpus:
+
+**Batch 11 (Papers 40–43):** Algebraische Topologie, Homologie, Kohomologie, Simplizialkomplexe
+**Batch 12 (Papers 44–47):** Zahlentheorie: Siebert-Primzahlen, Waring-Problem, Legendre-Vermutung
+**Batch 13 (Papers 48–51):** Diophantische Approximation: Baker, Roth, Schmidt, Thue-Siegel-Roth
+**Batch 14 (Papers 52–55):** Algebraische Geometrie: Weil-Vermutungen (Deligne 1974), Zeta-Funktionen
+**Batch 15 (Papers 56–59):** Analytische Zahlentheorie: L-Funktionen, Dirichlet, BSD
+**Batch 16 (Papers 60–63):** Kombinatorik: Ramsey, Extremale Graphentheorie, Hadwiger-Nelson
+**Batch 17 (Papers 64–67):** Dynamische Systeme: Ergodische Theorie, Chaos, Feigenbaum
+**Batch 18 (Papers 68–71):** Millennium-Probleme: Yang-Mills, Hodge, Ricci-Fluss+Poincaré, P-vs-NP
+
+**Gesamtstatistik Papers:**
+- Papers 1–39: Batches 1–10 (Giuga/Lehmer, RH, elliptische Kurven, BSD, Collatz, Modulformen,
+  abc-Vermutung, NS-Gleichungen, algebraische Zahlentheorie, Iwasawa, Langlands)
+- Papers 40–71: Batches 11–18 (Topologie bis Millennium-Probleme)
+- Gesamt: 71 Papers, alle reviewed, alle DRUCKREIF
+
+### Build-Nummer
+- src/build.txt: 148 → 149
