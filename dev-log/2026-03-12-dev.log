@@ -392,3 +392,11 @@ Zwei neue Papers erstellt:
 **Tests:** `tests/test_mahler_perfect_waring.py` — 111 Tests, alle bestanden
 
 ### Build-Nummer: 126 → 127
+2026-03-12 12:06:47 Build 128: erdos_moser.py, artin_primitive_roots.py, erdos_selfridge.py implementiert
+  - ErdosMoser: Potenzsummen, Bernoulli-Zahlen, Moser-Schranke, modulare Ausschlüsse
+  - ArtinPrimitiveRoots: Primitive Wurzeln, Artin-Konstante, Hooley GRH, Heath-Brown 1986
+  - ErdosSelfridge: Binomialkoeffizienten, Sylvester-Theorem, Primzahlpotenz-Verifikation
+  - 108 Tests in tests/test_moser_artin_selfridge.py (alle bestanden)
+  - 3 MD-Dokumentationen erstellt
+  - Bugfix: verify_up_to() startet k ab 2 (nicht 1) für korrekte Vermutungs-Prüfung
+  - Bugfix: B_1 = +1/2 (sympy-Konvention)

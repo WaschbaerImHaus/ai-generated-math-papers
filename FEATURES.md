@@ -356,3 +356,73 @@ _(keine bekannten offenen Features mehr)_
 - [x] Historische Schranken-Tabelle: Λ-Bounds von 1990 bis 2021
 
 #### Gesamt neue Tests (Build 125): 347 Tests (50 + 89 + 93 + 115)
+
+#### Erdős-Moser-Vermutung (src/erdos_moser.py) - Build 122
+- [x] `ErdosMoser.is_solution(k, m)` — Prüft S_k(m-1) = m^k
+- [x] `find_solutions(k_max, m_max)` — Exhaustive Suche (Ergebnis: nur (1,3))
+- [x] `verify_k1_solution()` — Analytischer Beweis für k=1, m=3
+- [x] `modular_residues(k, q)` — Modulare Ausschluss-Analyse
+- [x] `is_excluded_by_modulus(k, m, q)` — Einzelprüfung per Modulus
+- [x] `bernoulli_number(n)` — Exakte Bernoulli-Zahlen B_n via sympy
+- [x] `faulhaber_formula(N, k)` — S_k(N) via Faulhaberscher Formel
+- [x] `mosers_lower_bound()` — Moser 1953: m > 10^(10^6), Gallot-Moree-Zudilin 2011
+- [x] CONJECTURE-Status korrekt dokumentiert
+
+#### Artin-Vermutung (src/artin_primitive_roots.py) - Build 122
+- [x] `ArtinPrimitiveRoots.is_primitive_root(a, p)` — ord_p(a) = p-1 Prüfung
+- [x] `primitive_root_check_detailed(a, p)` — Detailanalyse mit Ordnung
+- [x] `empirical_density(a, limit)` — Empirische Dichte vs Artin-Konstante
+- [x] `artin_constant(num_primes)` — C_A = ∏(1-1/(p(p-1))) ≈ 0.3739558...
+- [x] `hooley_density(a)` — GRH-basierte Dichte (Hooley 1967)
+- [x] `heath_brown_result()` — Unbedingtes Theorem (Heath-Brown 1986)
+- [x] Basen a=2,3,5,7 vollständig analysiert
+- [x] CONJECTURE-Status (unter GRH von Hooley bewiesen)
+
+#### Erdős-Selfridge-Vermutung (src/erdos_selfridge.py) - Build 122
+- [x] `ErdosSelfridge.is_binomial_prime_power(n, k)` — C(n,k) = p^a Prüfung
+- [x] `verify_up_to(n_max)` — Verifikation bis n=200 (keine Gegenbeispiele)
+- [x] `sylvester_theorem_check(n, k)` — Sylvester 1892: Primteiler > k wenn n≥2k
+- [x] `verify_sylvester(n_max)` — Massenverifikation des Theorems
+- [x] `analyze_k1(n_max)`, `analyze_k2(n_max)` — Spezialfälle
+- [x] `granville_special_cases()` — Granvilles Teilbeweise dokumentiert
+- [x] CONJECTURE-Status korrekt (k≥2, n≥k+2)
+
+---
+
+### Build 127: Mahler-Maß, Vollkommene Zahlen, Waring-Goldbach
+
+#### Mahler-Maß (src/mahler_measure.py)
+- [x] `MahlerMeasure.compute_product_formula()` — M(P) = |aₙ|·∏_{|αᵢ|>1}|αᵢ| (Produktformel)
+- [x] `MahlerMeasure.compute_jensen_integral(n)` — M(P) via exp(∫₀¹ log|P(e^{2πit})|dt)
+- [x] `MahlerMeasure.logarithmic_mahler_measure()` — m(P) = log M(P)
+- [x] `MahlerMeasure.is_kronecker()` — M(P)=1 ↔ Kronecker-Theorem
+- [x] `MahlerMeasure.is_reciprocal()` — palindromisch/antipalindromisch
+- [x] `MahlerMeasure.lehmer_polynomial()` — Lehmer-Dezim-Polynom, M≈1.17628
+- [x] `MahlerMeasure.smyth_polynomial()` — x³-x-1, Smyth-Konstante 1.3247...
+- [x] `MahlerMeasure.cyclotomic(n)` — Kreisteilungspolynome (M=1)
+- [x] `SchurSiegelSmythTrace.trace_ratio()` — Spurverhältnis total positiver alg. Zahlen
+- [x] Lehrers Problem korrekt als CONJECTURE markiert (offen seit 1933)
+
+#### Vollkommene Zahlen (src/perfect_numbers.py)
+- [x] `SigmaFunction.sigma(n)` — Teiler-Summenfunktion σ(n)
+- [x] `SigmaFunction.multiplicativity_check()` — Multiplikativität verifiziert
+- [x] `SigmaFunction.is_perfect/abundant/deficient()` — Klassifikation
+- [x] `SigmaFunction.abundancy_index()` — σ(n)/n
+- [x] `EvenPerfectNumbers.first_n_even_perfect(n)` — erste n gerade vollkommene Zahlen
+- [x] `EvenPerfectNumbers.is_mersenne_prime(p)` — Mersenne-Primzahltest
+- [x] `EvenPerfectNumbers.verify_euclid_euler(p)` — vollständige Theorem-Verifikation
+- [x] `OddPerfectNumberBounds.touchard_congruence(n)` — n ≡ 1(mod 12) oder n ≡ 9(mod 36)
+- [x] `OddPerfectNumberBounds.nielsen_bound_check(n)` — ≥9 verschiedene Primfaktoren
+- [x] `OddPerfectNumberBounds.euler_form_check(n)` — n = p^{4a+1}·m² Prüfung
+- [x] Ungerade vollkommene Zahlen korrekt als CONJECTURE markiert
+
+#### Waring-Goldbach (src/waring_goldbach.py)
+- [x] `WaringGoldbachK2.represent_as_prime_squares()` — Darstellung als ≤5 Primzahlquadrate
+- [x] `WaringGoldbachK2.count_representations()` — Anzahl der Darstellungen
+- [x] `WaringGoldbachK2.minimal_representation()` — minimale Termsanzahl
+- [x] `WaringGoldbachGeneral.g_bound_hua()` — Hua (1938) Schranken G(k)
+- [x] `WaringGoldbachGeneral.g_bound_vinogradov_wooley()` — Vinogradov-Wooley
+- [x] `WaringGoldbachGeneral.goldbach_conjecture_check()` — Goldbach (CONJECTURE)
+- [x] `WaringGoldbachGeneral.vinogradov_three_primes_check()` — Vinogradov/Helfgott
+- [x] Goldbach-Vermutung korrekt als CONJECTURE markiert
+- [x] 111 Tests in tests/test_mahler_perfect_waring.py
