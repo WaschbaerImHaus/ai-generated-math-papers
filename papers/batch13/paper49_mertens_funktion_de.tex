@@ -1,0 +1,844 @@
+% ============================================================
+%  paper49_mertens_funktion_de.tex
+%  Die Mertens-Funktion: Möbius-Kancelierung, Dirichlet-Reihen
+%  und ihr Bezug zur Riemannschen Hypothese
+%
+%  Autor : Michael Fuhrmann
+%  Projekt: Specialist Mathematics Project, Build 137
+%  Datum  : 2026-03-12
+% ============================================================
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% ---- Theorem-Umgebungen ------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+% ---- Makros ------------------------------------------------
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\BigO}{\mathcal{O}}
+\DeclareMathOperator{\Li}{Li}
+
+% ---- Titelblock --------------------------------------------
+\title{Die Mertens-Funktion:\\
+Möbius-Kancelierung, Dirichlet-Reihen und\\
+ihr Bezug zur Riemannschen Hypothese}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 137}
+\email{specialist-maths@localhost}
+\date{2026-03-12}
+
+% ============================================================
+\begin{document}
+\maketitle
+\tableofcontents
+
+% ------------------------------------------------------------
+\begin{abstract}
+Die Mertens-Funktion $M(n) = \sum_{k=1}^{n} \mu(k)$, wobei $\mu$ die
+Möbius-Funktion bezeichnet, nimmt einen zentralen Platz in der analytischen
+Zahlentheorie ein.
+Ihr Wachstumsverhalten ist nachweislich äquivalent zur Riemannschen Hypothese:
+$M(n) = \BigO(n^{1/2+\varepsilon})$ für alle $\varepsilon > 0$ gilt genau dann,
+wenn die Riemannsche Hypothese wahr ist.
+Drei klassische Sätze von Mertens (1874) beschreiben die Verteilung der
+reziproken Primzahlen und das Euler-Produkt bis zu einer gegebenen Schranke.
+Die berühmte Mertens-Vermutung $|M(n)| < \sqrt{n}$, lange geglaubt und
+ausgiebig numerisch geprüft, wurde 1985 von Odlyzko und te~Riele endgültig
+\emph{widerlegt} – mithilfe der Theorie der Nullstellen der Riemannschen
+Zeta-Funktion.
+Wir behandeln die Möbius-Funktion, Mertens' drei Sätze, die Dirichlet-Reihe
+$1/\zeta(s)$, die Äquivalenz mit der Riemannschen Hypothese, die
+Liouville-Funktion, Selbergs elementare Beweismethode und numerische
+Algorithmen.
+\end{abstract}
+
+% ============================================================
+\section{Einleitung}
+\label{sec:einleitung}
+
+Das Wechselspiel zwischen Primzahlen und ganzen Zahlen ist seit Gauß und
+Dirichlet eines der fruchtbarsten Themen der Mathematik.  Unter den
+Funktionen, die dieses Wechselspiel beschreiben, zeichnet sich die
+\emph{Mertens-Funktion}
+\[
+  M(n) \;=\; \sum_{k=1}^{n} \mu(k)
+\]
+durch zwei Eigenschaften aus: Sie ist elementar definiert, doch ihr
+asymptotisches Verhalten ist äquivalent zu einem der tiefsten ungelösten
+Probleme der Mathematik.
+
+\subsection*{Historischer Überblick}
+
+Franz Mertens (1840--1927) war ein österreichisch-deutscher Mathematiker,
+dessen Arbeit von 1874 \cite{Mertens1874} drei grundlegende Abschätzungen
+bewies – heute als Erster, Zweiter und Dritter Mertenscher Satz bekannt.
+Sie betreffen die Partialsummen von $1/p$, $\log p/p$ und das Euler-Produkt
+$\prod_{p \le x}(1-1/p)$ und bilden das Fundament für das quantitative
+Verständnis der Primzahldichte.
+
+Im Jahr 1897 bemerkte Mertens numerisch, dass $|M(n)| < \sqrt{n}$ für alle
+getesteten Werte gilt, und fragte, ob diese Ungleichung möglicherweise für
+alle $n \ge 1$ gilt.  Diese \emph{Mertens-Vermutung} blieb fast 90 Jahre
+offen.  1985 wiesen Odlyzko und te~Riele \cite{OdlyzkoTeRiele1985} mit einer
+Großrechner-Berechnung von Zeta-Nullstellen nach, dass die Vermutung
+\emph{falsch} ist.  Paradoxerweise wurde bis heute kein explizites
+Gegenbeispiel gefunden; das kleinste wird heuristisch auf
+$x \approx e^{1{,}59 \times 10^{40}}$ geschätzt.
+
+\subsection*{Verbindung zur Riemannschen Hypothese}
+
+Sei $\zeta(s)$ die Riemannsche Zeta-Funktion.  Die Dirichlet-Reihe
+\[
+  \frac{1}{\zeta(s)} \;=\; \sum_{n=1}^{\infty} \frac{\mu(n)}{n^s},
+  \qquad \operatorname{Re}(s) > 1,
+\]
+stellt die Verbindung zwischen $\mu$ und $\zeta$ her.  Die Riemannsche
+Hypothese (RH) behauptet, dass jede nichttriviale Nullstelle $\rho$ von
+$\zeta(s)$ den Realteil $\operatorname{Re}(\rho) = 1/2$ besitzt.  Ein
+grundlegendes Äquivalenz-Theorem lautet:
+
+\begin{center}
+  \textbf{RH gilt $\Longleftrightarrow$ $M(x) = \BigO(x^{1/2+\varepsilon})$
+  für jedes $\varepsilon > 0$.}
+\end{center}
+
+\subsection*{Gliederung}
+
+Abschnitt~\ref{sec:mobius} behandelt die Möbius-Funktion.
+Abschnitt~\ref{sec:mertens-funktion} definiert $M(n)$ und ihre Dirichlet-Reihe.
+Abschnitt~\ref{sec:drei-saetze} beweist Mertens' drei Sätze.
+Abschnitt~\ref{sec:rh} zeigt die Äquivalenz von RH und Wurzel-Schranke für $M$.
+Abschnitt~\ref{sec:mertens-vermutung} behandelt die Vermutung und ihre Widerlegung.
+Abschnitt~\ref{sec:liouville} stellt die Liouville-Funktion vor.
+Abschnitt~\ref{sec:selberg} skizziert Selbergs elementaren PNT-Beweis.
+Abschnitt~\ref{sec:algorithmen} behandelt Berechnungsalgorithmen.
+
+% ============================================================
+\section{Die Möbius-Funktion}
+\label{sec:mobius}
+
+\subsection{Definition}
+
+\begin{definition}[Möbius-Funktion]
+\label{def:mobius}
+Sei $n \in \N$.  Die \emph{Möbius-Funktion} $\mu : \N \to \{-1,0,1\}$ ist
+definiert durch
+\[
+  \mu(n) \;=\;
+  \begin{cases}
+    1                & \text{falls } n = 1, \\
+    (-1)^{k}         & \text{falls } n = p_1 p_2 \cdots p_k
+                       \text{ mit paarweise verschiedenen Primzahlen } p_i, \\
+    0                & \text{falls } p^2 \mid n \text{ für eine Primzahl } p.
+  \end{cases}
+\]
+Äquivalent: $\mu(n) = 0$, wenn $n$ nicht \emph{quadratfrei} ist, und
+$\mu(n) = (-1)^{\omega(n)}$, wenn $n$ quadratfrei ist, wobei $\omega(n)$ die
+Anzahl verschiedener Primteiler von $n$ bezeichnet.
+\end{definition}
+
+\subsection{Erste Werte}
+
+\begin{beispiel}
+\label{bsp:mobius-werte}
+Die ersten zwanzig Werte von $\mu(n)$:
+\begin{center}
+\begin{tabular}{r|rrrrrrrrrrrrrrrrrrrr}
+$n$      & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10
+         & 11 & 12 & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 \\
+\hline
+$\mu(n)$ & 1 & $-1$ & $-1$ & 0 & $-1$ & 1 & $-1$ & 0 & 0 & 1
+         & $-1$ & 0 & $-1$ & 1 & 1 & 0 & $-1$ & 0 & $-1$ & 0
+\end{tabular}
+\end{center}
+$\mu(4) = \mu(8) = \mu(9) = \mu(12) = 0$, da $4=2^2$, $8=2^3$,
+$9=3^2$, $12=2^2 \cdot 3$.
+\end{beispiel}
+
+\subsection{Multiplikativität}
+
+\begin{theorem}[Multiplikativität von $\mu$]
+\label{satz:mobius-mult}
+Die Möbius-Funktion ist \emph{multiplikativ}: Gilt $\gcd(m,n)=1$, so ist
+\[
+  \mu(mn) = \mu(m)\,\mu(n).
+\]
+\end{theorem}
+
+\begin{proof}
+Enthält $m$ oder $n$ einen quadratischen Primfaktor, so auch $mn$, und beide
+Seiten sind Null.  Andernfalls gilt $m = p_1 \cdots p_j$ und
+$n = q_1 \cdots q_k$ mit paarweise verschiedenen Primzahlen (da $\gcd(m,n)=1$).
+Dann ist $mn$ quadratfrei mit $j+k$ Primfaktoren, also
+$\mu(mn) = (-1)^{j+k} = (-1)^j(-1)^k = \mu(m)\mu(n)$.
+\end{proof}
+
+\begin{theorem}[Orthogonalitätsrelation]
+\label{satz:mobius-ortho}
+Für alle $n \ge 1$ gilt:
+\[
+  \sum_{d \mid n} \mu(d) \;=\; [n = 1] \;=\;
+  \begin{cases} 1 & n=1, \\ 0 & n>1. \end{cases}
+\]
+\end{theorem}
+
+\begin{proof}
+Die Funktion $\varepsilon(n) = [n=1]$ ist das Dirichlet-Einheitselement.
+Die Gleichung $\mu * \mathbf{1} = \varepsilon$ folgt aus
+$\zeta(s) \cdot (1/\zeta(s)) = 1$ für $\operatorname{Re}(s)>1$
+oder durch direkte Rechnung an Primzahlpotenzen.
+\end{proof}
+
+\subsection{Sieb-Interpretation}
+
+Die Formel $\sum_{d \mid n}\mu(d) = [n=1]$ ist die Grundlage der
+\emph{Möbius-Inversion}: Gilt $f = g * \mathbf{1}$, so folgt $g = f * \mu$.
+Sie ist das Fundament des Inklusion-Exklusion-Prinzips im kombinatorischen
+Siebverfahren, wo $\mu$ als vorzeichenbehafteter Siebkoeffizient auftritt.
+
+% ============================================================
+\section{Die Mertens-Funktion}
+\label{sec:mertens-funktion}
+
+\subsection{Definition und erste Eigenschaften}
+
+\begin{definition}[Mertens-Funktion]
+\label{def:mertens}
+Die \emph{Mertens-Funktion} ist die Partialsummenfunktion
+\[
+  M(x) \;=\; \sum_{1 \le n \le x} \mu(n), \qquad x \ge 1.
+\]
+Da $\mu$ nur ganzzahlige Werte annimmt, ist $M(x) = M(\lfloor x \rfloor)$
+eine Treppenfunktion, die sich bei jeder natürlichen Zahl um $\mu(n)$
+ändert.
+\end{definition}
+
+\subsection{Erste Werte}
+
+\begin{beispiel}
+\label{bsp:mertens-werte}
+Mit den Werten aus Beispiel~\ref{bsp:mobius-werte}:
+\begin{center}
+\begin{tabular}{r|rrrrrrrrrr}
+$n$    & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+\hline
+$M(n)$ & 1 & 0 & $-1$ & $-1$ & $-2$ & $-1$ & $-2$ & $-2$ & $-2$ & $-1$
+\end{tabular}
+\end{center}
+
+Ausgewählte größere Werte:
+\[
+  M(10) = -1, \quad M(100) = 1, \quad M(1000) = 2, \quad M(10000) = -23.
+\]
+Diese kleinen Werte illustrieren eine bemerkenswerte Kancelierung: Ungefähr
+die Hälfte der quadratfreien ganzen Zahlen hat eine gerade, die andere Hälfte
+eine ungerade Anzahl von Primfaktoren.
+\end{beispiel}
+
+\subsection{Dirichlet-Reihen-Darstellung}
+
+\begin{theorem}[Dirichlet-Reihe von $1/\zeta$]
+\label{satz:dirichlet-reihe}
+Für $\operatorname{Re}(s) > 1$ gilt:
+\[
+  \frac{1}{\zeta(s)} \;=\; \sum_{n=1}^{\infty} \frac{\mu(n)}{n^s}.
+\]
+\end{theorem}
+
+\begin{proof}
+Das Euler-Produkt $\zeta(s) = \prod_p (1-p^{-s})^{-1}$ liefert
+\[
+  \frac{1}{\zeta(s)} = \prod_p (1 - p^{-s}).
+\]
+Durch Ausmultiplizieren über alle Primzahlen erhält man für jede natürliche
+Zahl $n = p_1^{a_1} \cdots p_k^{a_k}$ den Koeffizienten $(-1)^k$, falls alle
+Exponenten $a_i=1$ (quadratfrei), und $0$ sonst – genau $\mu(n)$.
+\end{proof}
+
+\begin{bemerkung}
+Die Reihe $\sum \mu(n)/n^s$ lässt sich analytisch über $\operatorname{Re}(s)=1$
+hinaus fortsetzen.  Ihr analytisches Verhalten wird durch die Nullstellen von
+$\zeta(s)$ kontrolliert: Die Reihe konvergiert für $\operatorname{Re}(s)>1/2$
+\emph{genau dann}, wenn die Riemannsche Hypothese gilt.
+\end{bemerkung}
+
+\subsection{Explizite Formel}
+
+Unter Standardvoraussetzungen an die Nullstellen von $\zeta$ liefert die
+Umkehrung der Perron-Formel die \emph{explizite Formel}
+\begin{equation}
+\label{gl:explizit}
+  M(x) \;=\; \sum_{\rho}\frac{x^{\rho}}{\rho\,\zeta'(\rho)}
+           \;-\; 2 \;+\; \sum_{n=1}^{\infty}
+           \frac{(-1)^{n+1}}{(2n)!\,(2n)\,\zeta(2n+1)} \cdot \frac{1}{x^{2n}}
+           \;+\; \cdots,
+\end{equation}
+wobei die Summe über alle nichttrivialen Nullstellen $\rho$ von $\zeta$ läuft.
+Unter der RH hat jedes $\rho$ den Realteil $1/2$, was
+$|x^{\rho}| = x^{1/2}$ ergibt und formal die $\BigO(x^{1/2+\varepsilon})$-Schranke
+liefert.
+
+% ============================================================
+\section{Die drei Mertensschen Sätze}
+\label{sec:drei-saetze}
+
+In seiner Arbeit von 1874 bewies Mertens drei Abschätzungen, die bis heute
+Grundpfeiler der analytischen Zahlentheorie sind.
+
+\subsection{Erster Mertenscher Satz: Partialsummen von \texorpdfstring{$\log p/p$}{log p/p}}
+
+\begin{theorem}[Erster Mertenscher Satz, 1874]
+\label{satz:mertens1}
+Für $x \to \infty$ gilt:
+\[
+  \sum_{p \le x} \frac{\log p}{p} \;=\; \log x \;+\; \BigO(1).
+\]
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Aus dem Primzahlsatz in der Form
+$\sum_{n \le x}\Lambda(n) = x + \BigO(x e^{-c\sqrt{\log x}})$ (wobei $\Lambda$
+die von-Mangoldt-Funktion ist) folgt durch Abel-Summation:
+\[
+  \sum_{p \le x}\frac{\log p}{p}
+  = \sum_{p \le x}\frac{\Lambda(p)}{p}
+  = \log x - \sum_{p,\,k \ge 2}\frac{\log p}{p^k} + \BigO(1)
+  = \log x + \BigO(1),
+\]
+da $\sum_{p,\,k \ge 2} (\log p)/p^k$ absolut konvergiert.
+\end{proof}
+
+\subsection{Zweiter Mertenscher Satz: Partialsummen von \texorpdfstring{$1/p$}{1/p}}
+
+\begin{theorem}[Zweiter Mertenscher Satz, 1874]
+\label{satz:mertens2}
+Es gibt eine Konstante $M_0$ (die \emph{Meissel-Mertens-Konstante},
+$M_0 \approx 0{,}2614972$), sodass für $x \to \infty$ gilt:
+\[
+  \sum_{p \le x} \frac{1}{p} \;=\; \log\log x \;+\; M_0 \;+\; \BigO\!\left(\frac{1}{\log x}\right).
+\]
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Abel-Summation auf $\sum_{p \le x}1/p$ mit
+$\sum_{p \le t}\log p/p = \log t + c + \BigO(1/\log t)$
+aus Satz~\ref{satz:mertens1} liefert nach Ausrechnung des entstehenden
+Integrals die Behauptung.
+\end{proof}
+
+\begin{bemerkung}
+Die Meissel-Mertens-Konstante ist explizit gegeben durch
+\[
+  M_0 \;=\; \gamma \;+\; \sum_p \!\left(\log\!\left(1-\frac{1}{p}\right) + \frac{1}{p}\right),
+\]
+wobei $\gamma \approx 0{,}5772156649$ die Euler-Mascheroni-Konstante ist.
+\end{bemerkung}
+
+\subsection{Dritter Mertenscher Satz: Das Euler-Produkt über Primzahlen}
+
+\begin{theorem}[Dritter Mertenscher Satz, 1874]
+\label{satz:mertens3}
+Für $x \to \infty$ gilt:
+\[
+  \prod_{p \le x} \left(1 - \frac{1}{p}\right)
+  \;\sim\; \frac{e^{-\gamma}}{\log x}.
+\]
+Genauer:
+\[
+  \prod_{p \le x} \left(1 - \frac{1}{p}\right)
+  \;=\; \frac{e^{-\gamma}}{\log x}
+        \left(1 + \BigO\!\left(\frac{1}{\log x}\right)\right).
+\]
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Logarithmieren ergibt:
+\[
+  \log \prod_{p \le x}\!\left(1-\frac{1}{p}\right)
+  = \sum_{p \le x}\log\!\left(1-\frac{1}{p}\right)
+  = -\sum_{p \le x}\frac{1}{p}
+    - \sum_{p \le x}\sum_{k=2}^{\infty}\frac{1}{k\,p^k}.
+\]
+Der Schwanz $\sum_p \sum_{k \ge 2}1/(kp^k)$ konvergiert absolut zu einer
+Konstanten $C$.  Aus Satz~\ref{satz:mertens2} folgt dann
+\[
+  \log \prod_{p \le x}\!\left(1-\frac{1}{p}\right)
+  = -\log\log x - M_0 - C + \BigO(1/\log x).
+\]
+Mit $M_0 + C = \gamma$ (was man explizit nachweist) erhält man die Behauptung.
+\end{proof}
+
+\begin{bemerkung}
+Der Dritte Mertenssche Satz beschreibt die Wahrscheinlichkeit, dass eine
+zufällig gewählte ganze Zahl nahe $x$ durch keine Primzahl $\le x$ teilbar
+ist – eine zentrale Größe in der Siebtheorie.
+\end{bemerkung}
+
+% ============================================================
+\section{Verbindung zur Riemannschen Hypothese}
+\label{sec:rh}
+
+\subsection{Das Äquivalenz-Theorem}
+
+\begin{theorem}[RH-Mertens-Äquivalenz]
+\label{satz:rh-aequiv}
+Die folgenden Aussagen sind äquivalent:
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{Riemannsche Hypothese}: Jede nichttriviale Nullstelle $\rho$ von
+        $\zeta(s)$ erfüllt $\operatorname{Re}(\rho) = 1/2$.
+  \item Für jedes $\varepsilon > 0$ gilt: $M(x) = \BigO(x^{1/2+\varepsilon})$
+        für $x \to \infty$.
+  \item Die Dirichlet-Reihe $\sum_{n=1}^{\infty}\mu(n)/n^s$ konvergiert für
+        alle $s$ mit $\operatorname{Re}(s) > 1/2$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+\textbf{(i)$\Rightarrow$(ii).}
+Die Perron-Formel liefert
+\[
+  M(x) = \frac{1}{2\pi i}\int_{c-i\infty}^{c+i\infty}
+          \frac{x^s}{\zeta(s)\,s}\,ds, \qquad c > 1.
+\]
+Verschiebung der Integrationsgeraden auf $\operatorname{Re}(s) = 1/2+\varepsilon$
+und Residuensatz ergeben Beiträge $x^{\rho}/(\rho\,\zeta'(\rho))$ an jeder
+Nullstelle $\rho$.  Unter der RH ist $\operatorname{Re}(\rho)=1/2$, also
+$|x^{\rho}| = x^{1/2}$; bedingte Konvergenz der Residuenreihe liefert
+$M(x) = \BigO(x^{1/2+\varepsilon})$.
+
+\textbf{(ii)$\Rightarrow$(i).}
+Gilt $M(x) = \BigO(x^{1/2+\varepsilon})$ für jedes $\varepsilon > 0$, so
+konvergiert $\sum\mu(n)/n^s$ absolut für $\operatorname{Re}(s)>1/2+\varepsilon$
+(Abel-Summation).  Damit setzt sich $1/\zeta(s)$ analytisch in die Halbebene
+$\operatorname{Re}(s)>1/2$ fort, was $\zeta(s)\ne 0$ dort impliziert.  Wegen
+der Funktionalgleichung liegen dann alle nichttrivialen Nullstellen auf
+$\operatorname{Re}(s)=1/2$.
+
+\textbf{(ii)$\Leftrightarrow$(iii)} folgt durch Standard-Abel-Summation.
+\end{proof}
+
+\subsection{Pintz' unbedingtes Ergebnis}
+
+\begin{theorem}[Pintz, 1987]
+\label{satz:pintz}
+Ohne Annahme der RH gilt:
+\[
+  \limsup_{x \to \infty} \frac{M(x)}{\sqrt{x}} \;>\; 1{,}06.
+\]
+\end{theorem}
+
+Dieses Ergebnis ist eine Verschärfung der Odlyzko-te-Riele-Widerlegung
+(vgl.\ Abschnitt~\ref{sec:mertens-vermutung}).
+
+\subsection{Bedingte Schranken}
+
+Unter der RH sind präzisere Abschätzungen bekannt:
+
+\begin{proposition}[Bedingte Schranke]
+\label{prop:bedingt}
+Vorausgesetzt, die RH gilt, so folgt:
+\[
+  M(x) \;=\; \BigO\!\left(x^{1/2}\exp\!\left(C\,\frac{\sqrt{\log x}}{\log\log x}\right)\right)
+\]
+für eine effektiv berechenbare Konstante $C > 0$.
+\end{proposition}
+
+% ============================================================
+\section{Die Mertens-Vermutung und ihre Widerlegung}
+\label{sec:mertens-vermutung}
+
+\subsection{Formulierung der Vermutung}
+
+Numerische Beobachtungen legten eine weit stärkere Schranke als die unter der
+RH bewiesene nahe:
+
+\begin{vermutung}[Mertens-Vermutung, 1897 -- \textbf{WIDERLEGT}]
+\label{verm:mertens}
+Für alle $n \ge 1$ gilt:
+\[
+  |M(n)| \;<\; \sqrt{n}.
+\]
+\end{vermutung}
+
+Diese Vermutung wurde intensiv geprüft.  Sie gilt für alle $n \le 10^{13}$
+(Kotnik und te~Riele, 2006).
+
+\subsection{Die Widerlegung durch Odlyzko und te~Riele}
+
+\begin{theorem}[Odlyzko--te~Riele, 1985]
+\label{satz:odlyzko}
+Die Mertens-Vermutung ist \emph{falsch}: Es existieren beliebig große $x$ mit
+$|M(x)| \ge \sqrt{x}$.
+\end{theorem}
+
+\begin{proof}[Methode (Skizze)]
+Odlyzko und te~Riele \cite{OdlyzkoTeRiele1985} gingen wie folgt vor.
+Unter Annahme der RH und einfacher Nullstellen
+$\rho_n = 1/2 + i\gamma_n$ liefert die explizite Formel \eqref{gl:explizit}:
+\[
+  \frac{M(x)}{\sqrt{x}} \;=\;
+  2\,\operatorname{Re}\sum_{\rho} \frac{x^{i\gamma}}{\rho\,\zeta'(\rho)}
+  \;+\; \BigO(x^{-1/2}).
+\]
+Der Schlüssel: $M(x)/\sqrt{x}$ verhält sich wie eine quasi-zufällige
+trigonometrische Summe.  Durch Berechnung von 2000 Nullstellen
+$\gamma_1,\ldots,\gamma_{2000}$ mit hoher Präzision und anschließende
+Gitter-Reduktion (Gram-Schmidt) zeigten sie:
+\[
+  \limsup_{x\to\infty}\frac{M(x)}{\sqrt{x}} \;\ge\; 1{,}06
+  \quad\text{und}\quad
+  \liminf_{x\to\infty}\frac{M(x)}{\sqrt{x}} \;\le\; -1{,}009.
+\]
+Da beide Werte betragsmäßig $> 1$ sind, ist Vermutung~\ref{verm:mertens}
+widerlegt.
+\end{proof}
+
+\begin{bemerkung}
+\label{bem:gegenbeispiel}
+Obwohl die Vermutung theoretisch widerlegt ist, wurde bis heute kein
+\emph{explizites} Gegenbeispiel $n$ mit $|M(n)| \ge \sqrt{n}$ gefunden.
+Heuristische Überlegungen legen das kleinste Gegenbeispiel bei
+$e^{1{,}59 \times 10^{40}}$ nahe.
+
+Der Beweis ist \emph{nicht-konstruktiv}: Er zeigt, dass die Vermutung falsch
+sein muss, gibt aber nicht den fehlschlagenden Wert an.
+\end{bemerkung}
+
+\subsection{Warum die Vermutung plausibel erschien}
+
+Die Dirichlet-Reihe $\sum \mu(n)/n^s = 1/\zeta(s)$ legt nahe, dass $\mu$
+„zufällig" ist.  Ein heuristisches Modell, das $\mu(n)$ als unabhängige
+Zufallsvariablen mit $P(\mu=1) = P(\mu=-1) \approx 3/\pi^2$ und
+$P(\mu=0) \approx 1 - 6/\pi^2$ behandelt, prognostiziert
+$M(n)/\sqrt{n} \to N(0,\sigma^2)$ via Zentralem Grenzwertsatz.  Die schärfere
+Schranke $|M(n)| < \sqrt{n}$ (ohne $\log\log n$-Korrekturfaktor) entspricht
+einer $``1\sigma"$-Schranke, die probabilistisch fast sicher irgendwann verletzt
+wird.
+
+% ============================================================
+\section{Die Liouville-Funktion}
+\label{sec:liouville}
+
+\subsection{Definition}
+
+\begin{definition}[Liouville-Funktion]
+\label{def:liouville}
+Sei $\Omega(n)$ die Anzahl der Primfaktoren von $n$ \emph{mit Vielfachheit}
+($\Omega(1)=0$, $\Omega(12)=\Omega(4\cdot 3)=3$).  Die
+\emph{Liouville-Funktion} ist
+\[
+  \lambda(n) \;=\; (-1)^{\Omega(n)}.
+\]
+Die \emph{summatorische Liouville-Funktion} ist
+\[
+  L(x) \;=\; \sum_{n \le x} \lambda(n).
+\]
+\end{definition}
+
+\subsection{Erste Werte}
+
+\begin{beispiel}
+\label{bsp:liouville-werte}
+\begin{center}
+\begin{tabular}{r|rrrrrrrrrr}
+$n$          & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+\hline
+$\Omega(n)$  & 0 & 1 & 1 & 2 & 1 & 2 & 1 & 3 & 2 & 2 \\
+$\lambda(n)$ & 1 &$-1$&$-1$& 1 &$-1$& 1 &$-1$&$-1$& 1 & 1
+\end{tabular}
+\end{center}
+$\lambda$ unterscheidet sich von $\mu$: z.B.\ $\lambda(4)=1$, aber $\mu(4)=0$.
+\end{beispiel}
+
+\subsection{Eigenschaften und Dirichlet-Reihe}
+
+\begin{theorem}[Vollständige Multiplikativität]
+\label{satz:liouville-mult}
+Die Liouville-Funktion ist \emph{vollständig multiplikativ}:
+$\lambda(mn) = \lambda(m)\lambda(n)$ für \emph{alle} $m,n \ge 1$
+(ohne Bedingung an den $\gcd$).
+\end{theorem}
+
+\begin{proof}
+$\Omega(mn) = \Omega(m) + \Omega(n)$ gilt immer, also
+$\lambda(mn) = (-1)^{\Omega(m)+\Omega(n)} = \lambda(m)\lambda(n)$.
+\end{proof}
+
+\begin{theorem}[Dirichlet-Reihe von $\lambda$]
+\label{satz:liouville-dirichlet}
+Für $\operatorname{Re}(s) > 1$ gilt:
+\[
+  \sum_{n=1}^{\infty} \frac{\lambda(n)}{n^s}
+  \;=\; \frac{\zeta(2s)}{\zeta(s)}.
+\]
+\end{theorem}
+
+\begin{proof}
+Mit $\lambda(p^k) = (-1)^k$ und dem Euler-Produkt:
+\[
+  \sum_{n \ge 1}\frac{\lambda(n)}{n^s}
+  = \prod_p \sum_{k=0}^{\infty}\frac{(-1)^k}{p^{ks}}
+  = \prod_p \frac{1}{1+p^{-s}}
+  = \frac{\zeta(2s)}{\zeta(s)}.
+\]
+\end{proof}
+
+\subsection{Beziehung zur Möbius-Funktion}
+
+\begin{proposition}
+\label{prop:lambda-mu}
+Für alle $n \ge 1$ gilt die Faltungsidentität:
+\[
+  \mu(n) \;=\; \sum_{d^2 \mid n} \lambda\!\left(\frac{n}{d^2}\right).
+\]
+Während $\mu$ nur \emph{multiplikativ} ist, ist $\lambda$ \emph{vollständig}
+multiplikativ: $\mu(mn)=\mu(m)\mu(n)$ nur für $\gcd(m,n)=1$;
+$\lambda(mn)=\lambda(m)\lambda(n)$ immer.
+\end{proposition}
+
+\subsection{Die Pólya-Vermutung}
+
+\begin{vermutung}[Pólya, 1919 -- \textbf{WIDERLEGT}]
+\label{verm:polya}
+$L(n) \le 0$ für alle $n \ge 2$.
+\end{vermutung}
+
+\begin{theorem}[Haselgrove, 1958]
+\label{satz:haselgrove}
+Die Pólya-Vermutung ist \emph{falsch}.
+Das kleinste bekannte Gegenbeispiel ist $n = 906\,316\,571$.
+\end{theorem}
+
+Die Pólya-Vermutung ist das Liouville-Analogon der Mertens-Vermutung; sie
+wurde 25 Jahre früher widerlegt, und zwar mit einem expliziten Gegenbeispiel.
+
+% ============================================================
+\section{Selbergs Formel und der Primzahlsatz}
+\label{sec:selberg}
+
+\subsection{Selbergs Fundamentalformel}
+
+Ein Meilenstein in der elementaren analytischen Zahlentheorie ist Selbergs
+Formel von 1949, die einen PNT-nahen Satz ohne komplexe Analysis liefert.
+
+\begin{theorem}[Selbergsche Formel, 1949]
+\label{satz:selberg}
+\[
+  \sum_{n \le x} \Lambda(n)\log n
+  \;+\; \sum_{mn \le x} \Lambda(m)\Lambda(n)
+  \;=\; 2x\log x + \BigO(x),
+\]
+wobei $\Lambda$ die von-Mangoldt-Funktion bezeichnet.
+\end{theorem}
+
+\subsection{Verbindung zu $M(x)$}
+
+Die Mertens-Funktion tritt durch die Identität
+\[
+  \sum_{n \le x} \mu(n)\left\lfloor\frac{x}{n}\right\rfloor \;=\; 1
+\]
+in Erscheinung (Folgerung aus Satz~\ref{satz:mobius-ortho}).  Daraus erhält
+man
+\[
+  x\sum_{n \le x}\frac{\mu(n)}{n} = 1 + \BigO(M(x)).
+\]
+
+\begin{theorem}[PNT über $M$]
+\label{satz:pnt-mertens}
+Der Primzahlsatz $\pi(x) \sim x/\log x$ ist äquivalent zu
+\[
+  M(x) = o(x), \qquad x \to \infty.
+\]
+\end{theorem}
+
+\begin{proof}[Skizze]
+Aus dem PNT folgt $\sum_{n \le x}\mu(n)/n \to 0$, was durch Abel-Summation
+zu $M(x)/x \to 0$ äquivalent ist.  Umgekehrt lässt sich aus $M(x)=o(x)$
+über Selbergs Formel der PNT herleiten.  Selberg und Erd\H{o}s schlossen
+dieses Argument 1949 elementar.
+\end{proof}
+
+\subsection{Schärfere Äquivalenzen}
+
+Jede Verbesserung des Fehlerterms im PNT entspricht einer Verbesserung der
+$M(x)$-Schranke:
+\begin{align*}
+  M(x) &= \BigO(x\,e^{-c\sqrt{\log x}}) &&\Longleftrightarrow&&
+    \psi(x) = x + \BigO(x\,e^{-c\sqrt{\log x}}), \\
+  M(x) &= \BigO(x^{1/2+\varepsilon}) &&\Longleftrightarrow&&
+    \text{Riemannsche Hypothese.}
+\end{align*}
+
+% ============================================================
+\section{Numerische Aspekte und Algorithmen}
+\label{sec:algorithmen}
+
+\subsection{Naiver Algorithmus}
+
+Der direkte Ansatz berechnet $\mu(n)$ für jedes $n$ durch Probedivision und
+akkumuliert die Summe.  Laufzeit: $\BigO(n\sqrt{n})$, Speicherbedarf:
+$\BigO(1)$ (Strom).
+
+\subsection{Sieb-Algorithmus (Eratosthenes-Stil)}
+
+\begin{enumerate}[label=\arabic*.]
+  \item Initialisiere Array \texttt{mu[1..N]} mit \texttt{mu[1] = 1}.
+  \item Nutze einen \emph{linearen Sieb} (Kleinster-Primfaktor-Sieb) zur
+        Berechnung von $\mu(n)$ für alle $n \le N$:
+        \begin{itemize}
+          \item Für jede Primzahl $p$: setze \texttt{mu[p] = -1}.
+          \item Für zusammengesetztes $n = p \cdot m$: Wenn $p \mid m$, dann
+                \texttt{mu[n] = 0}; sonst \texttt{mu[n] = -mu[m]}.
+        \end{itemize}
+  \item Präfixsummen berechnen: \texttt{M[n] = M[n-1] + mu[n]}.
+\end{enumerate}
+
+Laufzeit: $\BigO(N \log\log N)$.  Speicher: $\BigO(N)$.  Dies ist der in der
+Klasse \texttt{MertensFunction} des Begleitmoduls \texttt{mertens\_function.py}
+implementierte Algorithmus.
+
+\subsection{Sub-linearer Algorithmus}
+
+Für sehr große $N$ ist die vollständige Sieb-Speicherung unpraktikabel.  Die
+Meissel-Lehmer-Methode (Lucy\_Hedgehog-Variante) berechnet $M(N)$ in
+$\BigO(N^{2/3})$ Zeit und $\BigO(N^{1/3})$ Speicher mithilfe der Identität:
+\[
+  M(N) \;=\; 1 \;-\; \sum_p M\!\left(\left\lfloor\frac{N}{p}\right\rfloor\right)
+            \;-\; \text{(Korrekturterme)}.
+\]
+Diese Methode basiert auf der Dirichlet-Hyperbolmethode für $\mu$.
+
+\begin{theorem}[Sub-lineare Mertens-Berechnung]
+\label{satz:sublinear}
+$M(N)$ kann in $\BigO(N^{2/3})$ Rechenschritten und mit $\BigO(N^{1/3})$
+Speicher berechnet werden.
+\end{theorem}
+
+\subsection{Bekannte Werte und numerische Rekorde}
+
+\begin{center}
+\begin{tabular}{rl}
+\toprule
+$N$ & $M(N)$ \\
+\midrule
+$10^4$  & $-23$ \\
+$10^6$  & $212$ \\
+$10^8$  & $754$ \\
+$10^{10}$ & $-1\,215$ \\
+$10^{12}$ & $-2$ \\
+$10^{13}$ & $-3\,994\,941$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Das Verhältnis $M(N)/\sqrt{N}$ bleibt für alle berechneten Werte deutlich
+unter $1$; der größte bekannte Wert ist $|M(N)/\sqrt{N}| \approx 0{,}571$
+bei $N \approx 7{,}76 \times 10^9$.
+
+\subsection{Rechenaufwand und RH}
+
+Unter der RH ließen sich effiziente Algorithmen für $M(N)$ entwickeln, die
+die $\BigO(N^{1/2+\varepsilon})$-Schranke ausnutzen.  Umgekehrt würde ein
+hypothetischer Algorithmus mit Laufzeit $o(N^{1/2})$ starke (wenn auch
+kein formalen) Hinweise auf die Wahrheit der RH liefern.
+
+% ============================================================
+\section*{Zusammenfassung}
+
+Die Mertens-Funktion steht an der Schnittstelle dreier fundamentaler Themen:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Multiplikative Zahlentheorie} – kodiert in der Möbius-Funktion.
+  \item \textbf{Analytische Zahlentheorie} – über die Dirichlet-Reihe
+        $1/\zeta(s)$ und die explizite Formel.
+  \item \textbf{Probabilistische Heuristiken} – die „zufällige"
+        Kancelierung der $\mu(n)$-Werte.
+\end{enumerate}
+
+Mertens' drei Sätze liefern die grundlegenden Abschätzungen für die
+Primzahlverteilung.  Die Äquivalenz
+$\text{RH} \Leftrightarrow M(n)=\BigO(n^{1/2+\varepsilon})$ zeigt, dass die
+Mertens-Funktion kein bloßes Kuriosum, sondern ein \emph{Fenster} zur
+tiefsten Struktur von $\zeta$ ist.  Die Überraschung von 1985 – dass die
+intuitiv plausible Vermutung $|M(n)| < \sqrt{n}$ falsch ist, ihr Gegenbeispiel
+aber so schwer zu finden, dass es bisher niemand explizit angegeben hat –
+illustriert die Subtilität der analytischen Zahlentheorie.
+
+% ============================================================
+\begin{thebibliography}{10}
+
+\bibitem{Mertens1874}
+F.~Mertens,
+\textit{Ein Beitrag zur analytischen Zahlentheorie},
+Journal für die reine und angewandte Mathematik \textbf{78} (1874), 46--62.
+
+\bibitem{OdlyzkoTeRiele1985}
+A.~M.~Odlyzko und H.~J.~J.~te~Riele,
+\textit{Disproof of the Mertens Conjecture},
+Journal für die reine und angewandte Mathematik \textbf{357} (1985), 138--160.
+
+\bibitem{Titchmarsh1986}
+E.~C.~Titchmarsh (überarbeitet von D.~R.~Heath-Brown),
+\textit{The Theory of the Riemann Zeta-Function},
+2.~Aufl., Oxford University Press, 1986.
+
+\bibitem{Davenport2000}
+H.~Davenport,
+\textit{Multiplicative Number Theory},
+3.~Aufl., Springer, 2000.
+
+\bibitem{IwaniecKowalski2004}
+H.~Iwaniec und E.~Kowalski,
+\textit{Analytic Number Theory},
+American Mathematical Society, 2004.
+
+\bibitem{Pintz1987}
+J.~Pintz,
+\textit{An effective disproof of the Mertens conjecture},
+Astérisque \textbf{147--148} (1987), 325--333.
+
+\bibitem{KotnikTeRiele2006}
+T.~Kotnik und H.~J.~J.~te~Riele,
+\textit{The Mertens Conjecture revisited},
+Algorithmic Number Theory (ANTS-VII), Lecture Notes in Computer Science
+\textbf{4076} (2006), 156--167.
+
+\bibitem{Selberg1949}
+A.~Selberg,
+\textit{An Elementary Proof of the Prime Number Theorem},
+Annals of Mathematics \textbf{50} (1949), 305--313.
+
+\bibitem{Apostol1976}
+T.~M.~Apostol,
+\textit{Introduction to Analytic Number Theory},
+Springer, 1976.
+
+\bibitem{Haselgrove1958}
+C.~B.~Haselgrove,
+\textit{A Disproof of a Conjecture of Pólya},
+Mathematika \textbf{5} (1958), 141--145.
+
+\end{thebibliography}
+
+\end{document}

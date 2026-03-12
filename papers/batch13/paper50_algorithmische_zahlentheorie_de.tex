@@ -1,0 +1,705 @@
+% ===========================================================================
+% Paper 50 (DE): Algorithmische Zahlentheorie
+% Specialist Mathematics Project
+% @author: Michael Fuhrmann
+% @date: 2026-03-12
+% @build: 137
+% ===========================================================================
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 137}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\title{Algorithmische Zahlentheorie:\\
+Grundlagen, Komplexit\"at und kryptographische Anwendungen}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+% ===========================================================================
+\section{Einleitung}
+% ===========================================================================
+
+Die Zahlentheorie gehört zu den ältesten Gebieten der Mathematik, hat aber
+durch die algorithmische Perspektive eine zentrale Rolle in der modernen
+Informatik gewonnen. Die \emph{algorithmische Zahlentheorie} untersucht
+ganzzahlige Probleme unter dem Gesichtspunkt ihrer Berechenbarkeit: Wie schnell
+lässt sich prüfen, ob eine Zahl prim ist? Wie aufwändig ist die Faktorisierung
+einer großen ganzen Zahl? Können diskrete Logarithmen effizient berechnet werden?
+
+Diese Fragen sind nicht nur theoretischer Natur. Sie bilden das mathematische
+Fundament der modernen Kryptographie. RSA-Verschlüsselung, Diffie-Hellman-
+Schlüsselaustausch und elliptische-Kurven-Kryptosysteme schöpfen ihre Sicherheit
+aus der angenommenen rechnerischen Schwierigkeit zahlentheoretischer Probleme.
+
+\subsection*{Gliederung}
+
+Wir behandeln fünf Kernthemen:
+\begin{itemize}[leftmargin=2em]
+  \item Größter gemeinsamer Teiler und erweiterter euklidischer Algorithmus
+  \item Primzahltests: von probabilistisch bis deterministisch polynomiell
+  \item Ganzzahlfaktorisierung und ihre Verbindung zur Kryptographie
+  \item Algorithmen zum diskreten Logarithmus
+  \item Chinesischer Restsatz, quadratische Reste, Kettenbrüche
+\end{itemize}
+Beweistheoretisch unterscheiden wir stets zwischen einem \emph{bewiesenen Satz}
+(mit vollständigem Beweis) und einer \emph{Vermutung} (offen, kein Beweis bekannt).
+
+\subsection*{Notation}
+
+$\log$ bezeichnet den natürlichen Logarithmus. $\mathbb{Z}_n = \mathbb{Z}/n\mathbb{Z}$
+ist der Restklassenring modulo $n$. $\varphi(n)$ bezeichnet Eulers Totient-Funktion.
+$L_n[\alpha, c] = \exp\bigl(c(\log n)^\alpha(\log\log n)^{1-\alpha}\bigr)$ ist
+die subexponentielle Komplexitätsnotation.
+
+% ===========================================================================
+\section{Größter gemeinsamer Teiler und erweiterter euklidischer Algorithmus}
+% ===========================================================================
+
+\subsection{Der euklidische Algorithmus}
+
+Der \emph{größte gemeinsame Teiler} (GGT) zweier nicht-negativer ganzer Zahlen
+$a$ und $b$, geschrieben $\gcd(a,b)$, ist die größte ganze Zahl, die beide teilt.
+Der euklidische Algorithmus berechnet $\gcd(a,b)$ durch wiederholte Division:
+\begin{align*}
+  a &= q_0 b + r_0, \quad 0 \le r_0 < b,\\
+  b &= q_1 r_0 + r_1, \quad 0 \le r_1 < r_0,\\
+  &\vdots\\
+  r_{k-2} &= q_k r_{k-1} + 0.
+\end{align*}
+Dann ist $\gcd(a,b) = r_{k-1}$, der letzte von Null verschiedene Rest.
+
+\begin{theorem}[Euklidischer Algorithmus, Laufzeit. \textbf{Bewiesen.}]
+Der euklidische Algorithmus terminiert nach $O(\log\min(a,b))$ Divisionsschritten.
+Jeder Schritt halbiert den kleineren der beiden Reste (bis auf einen konstanten
+Faktor), was eine geometrische Konvergenz garantiert.
+\end{theorem}
+
+\begin{proof}
+Es gilt $r_{i+2} < r_i/2$: Falls $r_{i+1} \le r_i/2$, gilt dies direkt;
+andernfalls ist $r_{i+2} = r_i - r_{i+1} < r_i/2$. Also halbiert sich der
+Rest alle zwei Schritte, und nach $2\lfloor\log_2 \min(a,b)\rfloor$ Schritten
+ist der Algorithmus beendet.
+\end{proof}
+
+\subsection{Erweiterter euklidischer Algorithmus und Bézout-Identität}
+
+\begin{theorem}[Bézout-Identität. \textbf{Bewiesen.}]
+Für ganze Zahlen $a,b$ (nicht beide null) existieren ganze Zahlen $s,t$ mit
+\[
+  sa + tb = \gcd(a,b).
+\]
+\end{theorem}
+
+Der \emph{erweiterte euklidische Algorithmus} berechnet $\gcd(a,b)$ und die
+Bézout-Koeffizienten $s,t$ gleichzeitig, indem er die Divisionsfolge
+rückwärts verfolgt. Er läuft ebenfalls in $O(\log\min(a,b))$.
+
+\subsubsection*{Modulares Inverses}
+
+Das modulare Inverse von $a$ modulo $m$ (d.\,h. $x$ mit $ax \equiv 1 \pmod{m}$)
+existiert genau dann, wenn $\gcd(a,m) = 1$, und ist gleich dem Bézout-Koeffizienten
+$s$ reduziert modulo $m$. Dies wird durchgehend in RSA-Entschlüsselung und
+CRT-Rekonstruktion verwendet.
+
+\begin{beispiel}
+Berechne $7^{-1} \pmod{11}$: Erweiterter Euklid liefert $1 = 8\cdot 7 - 5\cdot 11$,
+also $7^{-1} \equiv 8 \pmod{11}$. Probe: $7 \cdot 8 = 56 = 5\cdot 11 + 1 \equiv 1$.
+\end{beispiel}
+
+\subsection{Lehrers Algorithmus und binärer GGT}
+
+Für Multipräzisions-Arithmetik (Zahlen mit $k$ Maschinenwörtern) kostet
+Schuldivision $O(k^2)$ Operationen. \emph{Lehrers Algorithmus} reduziert dies
+auf $O(k\log^2 k \log\log k)$, indem er vollständige Divisionen durch
+Einwort-Approximationen ersetzt. Der \emph{binäre GGT} vermeidet Divisionen
+ganz durch Verschiebungen und Subtraktionen.
+
+% ===========================================================================
+\section{Primzahltests}
+% ===========================================================================
+
+\subsection{Probedivision}
+
+Der einfachste Primzahltest: prüfe alle Zahlen von $2$ bis $\lfloor\sqrt{n}\rfloor$.
+Teilt keine davon $n$, so ist $n$ prim. Laufzeit $O(\sqrt{n})$, exponentiell in
+der Stellenzahl. Praktikabel nur für $n \lesssim 10^{12}$.
+
+\subsection{Fermatscher Test und Pseudoprimzahlen}
+
+\begin{theorem}[Kleiner Satz von Fermat. \textbf{Bewiesen.}]
+Wenn $p$ eine Primzahl ist und $\gcd(a,p)=1$, so gilt $a^{p-1} \equiv 1 \pmod{p}$.
+\end{theorem}
+
+Prüfen von $a^{n-1} \equiv 1 \pmod{n}$ für mehrere Basen $a$ liefert eine
+schnelle Primalitätsheuristik. Jedoch sind \emph{Carmichael-Zahlen} (z.\,B.
+$561 = 3\cdot 11\cdot 17$) zusammengesetzte Zahlen, die $a^{n-1}\equiv 1\pmod{n}$
+für alle $\gcd(a,n)=1$ erfüllen. Es gibt unendlich viele Carmichael-Zahlen
+(bewiesen von Alford, Granville und Pomerance, 1994).
+
+\subsection{Miller-Rabin-Test}
+
+\begin{definition}[Starke Pseudoprimzahl]
+Schreibe $n-1 = 2^s \cdot d$ mit $d$ ungerade. Dann ist $n$ eine
+\emph{starke Pseudoprimzahl zur Basis $a$}, falls entweder
+$a^d \equiv 1 \pmod{n}$ oder $a^{2^r d} \equiv -1 \pmod{n}$ für ein
+$0 \le r < s$ gilt.
+\end{definition}
+
+\begin{theorem}[Miller--Rabin, 1976. \textbf{Bewiesen.}]
+Wenn $n$ zusammengesetzt ist, ist der Anteil der Basen $a \in \{1,\ldots,n-1\}$,
+für die $n$ eine starke Pseudoprimzahl zur Basis $a$ ist, höchstens $1/4$.
+Nach $k$ unabhängigen zufälligen Basen fällt die Fehlerwahrscheinlichkeit auf
+höchstens $4^{-k}$.
+\end{theorem}
+
+Mit $k = 40$ Runden sinkt die Fehlerwahrscheinlichkeit unter $10^{-24}$, was
+für alle praktischen Zwecke ausreicht. Die deterministische Variante mit festen
+Basen ist für alle $n < 3{,}3 \times 10^{24}$ beweisbar korrekt.
+
+\subsection{Solovay-Strassen-Test}
+
+\begin{theorem}[Eulerkriterium. \textbf{Bewiesen.}]
+Für eine ungerade Primzahl $p$ und $\gcd(a,p)=1$:
+$a^{(p-1)/2} \equiv \bigl(\frac{a}{p}\bigr) \pmod{p}$,
+wobei $\bigl(\frac{a}{p}\bigr)$ das Legendre-Symbol ist.
+\end{theorem}
+
+Der \emph{Solovay-Strassen-Test} verallgemeinert dies über das Jacobi-Symbol:
+Prüfe $a^{(n-1)/2} \equiv \bigl(\frac{a}{n}\bigr)_J \pmod{n}$. Es gibt keine
+analogen universellen Gegenbeispiele wie Carmichael-Zahlen beim Fermat-Test:
+Für zusammengesetztes $n$ besteht höchstens die Hälfte aller Basen den Test.
+
+\subsection{AKS-Primzahltest}
+
+\begin{theorem}[Agrawal--Kayal--Saxena, 2002. \textbf{Bewiesen.}]
+\textit{PRIMES liegt in P.} Es gibt einen deterministischen Algorithmus, der
+die Primalität von $n$ in Zeit $\tilde{O}(\log^6 n)$ entscheidet.
+\end{theorem}
+
+Der AKS-Test beruht auf der Polynomidentität: $n$ ist genau dann prim, wenn
+\[
+  (X+a)^n \equiv X^n + a \pmod{X^r - 1,\; n}
+\]
+für alle $a \le \lfloor\sqrt{\varphi(r)}\log n\rfloor$ gilt, wobei $r$ so
+gewählt wird, dass die multiplikative Ordnung von $n$ modulo $r$ den Wert
+$\log^2 n$ übersteigt.
+
+\subsubsection*{Algorithmusschritte}
+\begin{enumerate}[label=\arabic*.]
+  \item \textbf{Perfekte-Potenz-Test:} Falls $n = a^b$ mit $b \ge 2$,
+    gib \textsc{Zusammengesetzt} aus.
+  \item \textbf{$r$ bestimmen:} Finde das kleinste $r$ mit
+    $\operatorname{ord}_r(n) > \log^2 n$.
+  \item \textbf{Kleiner-Teiler-Test:} Falls $1 < \gcd(a,n) < n$ für ein
+    $a \le r$, gib \textsc{Zusammengesetzt} aus.
+  \item \textbf{Größenprüfung:} Falls $n \le r$, gib \textsc{Prim} aus.
+  \item \textbf{Polynomtest:} Prüfe $(X+a)^n \equiv X^n + a \pmod{X^r-1, n}$
+    für $a = 1, \ldots, \lfloor\sqrt{\varphi(r)}\log n\rfloor$.
+  \item Gib \textsc{Prim} aus.
+\end{enumerate}
+
+\begin{bemerkung}
+Die ursprüngliche Komplexität $O(\log^{12} n)$ wurde von Lenstra und Pomerance
+(2005) auf $O(\log^6 n)$ verbessert. AKS beweist, dass \textsc{PRIMES} $\in$ P,
+obwohl Miller-Rabin in der Praxis schneller bleibt.
+\end{bemerkung}
+
+% ===========================================================================
+\section{Ganzzahlfaktorisierung}
+% ===========================================================================
+
+\subsection{Das Faktorisierungsproblem}
+
+\begin{vermutung}[Schwierigkeit der Faktorisierung. \textbf{Offen.}]
+Kein Polynomialzeit-Algorithmus für die ganzzahlige Faktorisierung (IFP) ist bekannt.
+Insbesondere ist IFP vermutlich nicht in P. Die Verbindung zu P $\ne$ NP ist subtil:
+IFP liegt in NP $\cap$ co-NP, wäre also nicht NP-vollständig, es sei denn
+NP $=$ co-NP. Der beste bekannte klassische Algorithmus (GNFS) läuft in
+subexponentieller Zeit $L_n[1/3, c]$.
+\end{vermutung}
+
+Diese Vermutung ist das Fundament der RSA-Sicherheit. Kein polynomieller
+Algorithmus ist bekannt.
+
+\subsection{Pollards $\rho$-Algorithmus}
+
+\emph{Pollards $\rho$-Algorithmus} (1975) findet einen nicht-trivialen Teiler
+von $n$ über eine pseudozufällige Folge $x_{i+1} = f(x_i) \bmod n$
+(typischerweise $f(x) = x^2 + c$). Durch das Geburtstagsproblem ist eine
+Kollision $\gcd(|x_i - x_j|, n) > 1$ nach $O(n^{1/4})$ Schritten zu erwarten.
+Floyds Zykluserkennung reduziert den Speicherbedarf auf $O(1)$.
+
+\begin{theorem}[Erwartete Komplexität von Pollard $\rho$. Heuristisch.]
+Unter heuristischen Annahmen zur Pseudozufälligkeit von $f$ ist die erwartete
+Schrittzahl zum Finden eines Teilers $p \mid n$ gleich $O(p^{1/2}) = O(n^{1/4})$.
+\end{theorem}
+
+\subsection{Fermat-Faktorisierung und Quadratisches Sieb}
+
+\emph{Fermats Methode} nutzt $n = a^2 - b^2 = (a-b)(a+b)$: Suche
+$a \ge \lceil\sqrt{n}\rceil$ mit $a^2 - n$ als perfekte Quadratzahl. Effizient
+wenn $n$ zwei annähernd gleich große Primteiler hat.
+
+Das \emph{Quadratische Sieb} (Pomerance, 1981) ist für $n \lesssim 10^{100}$
+der schnellste bekannte Algorithmus. Es sucht Paare $(x,y)$ mit
+$x^2 \equiv y^2 \pmod{n}$, dann liefert $\gcd(x-y, n)$ einen Teiler.
+Die Siebphase findet viele $B$-glatte Werte von $x^2 \bmod n$ gleichzeitig
+und erreicht heuristisch $L_n[1/2, 1]$.
+
+\subsection{Das allgemeine Zahlkörpersieb (GNFS)}
+
+Das \emph{General Number Field Sieve} (GNFS) ist der aktuell schnellste bekannte
+Algorithmus für $n > 10^{100}$. Es operiert in einem algebraischen Zahlkörper
+$\mathbb{Z}[\theta]$ für eine Wurzel $\theta$ eines sorgsam gewählten Polynoms
+und siebt nach glatten Normen.
+
+\begin{theorem}[GNFS-Komplexität. Heuristisch.]
+GNFS faktorisiert $n$ in erwarteter Zeit
+\[
+  L_n\!\left[\tfrac{1}{3},\, \left(\tfrac{64}{9}\right)^{1/3}\right]
+  \approx \exp\!\left(1{,}923\,(\log n)^{1/3}(\log\log n)^{2/3}\right).
+\]
+\end{theorem}
+
+Der 512-Bit-RSA-155-Rekord (1999) benötigte 8000 MIPS-Jahre; der 829-Bit-RSA-250-Rekord
+(2020) erforderte etwa 2700 CPU-Kernjahre.
+
+\subsection{Implikationen für RSA}
+
+\begin{vermutung}[RSA-Sicherheit. \textbf{Offen.}]
+Gegeben ein Produkt $n = pq$ zweier großer Primzahlen und ein Chiffretext
+$c = m^e \bmod n$: Die Rückgewinnung von $m$ ohne Kenntnis von $p,q$ gilt als
+rechnerisch nicht machbar. Kein Polynomialzeit-Algorithmus für das RSA-Problem
+ist bekannt. Das RSA-Problem ist polynomial-Zeit-äquivalent zur Faktorisierung
+von $n$ unter natürlichen Reduktionen.
+\end{vermutung}
+
+Aktuelle Empfehlung: RSA-Schlüssellängen $\ge 3072$ Bit (NIST 2022) oder
+Umstieg auf elliptische-Kurven-Systeme.
+
+% ===========================================================================
+\section{Das Problem des diskreten Logarithmus}
+% ===========================================================================
+
+\subsection{Definition und Schwierigkeit}
+
+\begin{definition}[Diskreter Logarithmus]
+Sei $g$ ein Erzeuger der zyklischen Gruppe $(\mathbb{Z}/p\mathbb{Z})^*$ der
+Ordnung $p-1$. Der \emph{diskrete Logarithmus} von $h$ zur Basis $g$ ist das
+eindeutige $x \in \{0,1,\ldots,p-2\}$ mit $g^x \equiv h \pmod{p}$.
+\end{definition}
+
+\begin{vermutung}[Schwierigkeit des DLP. \textbf{Offen.}]
+Kein Polynomialzeit-Algorithmus für das diskrete-Logarithmus-Problem (DLP) in
+$(\mathbb{Z}/p\mathbb{Z})^*$ ist bekannt. Die besten Algorithmen erreichen
+subexponentielle Komplexität $L_p[1/3, c]$, dieselbe wie GNFS.
+\end{vermutung}
+
+\subsection{Baby-Step-Giant-Step (BSGS)}
+
+\begin{theorem}[Shanks, 1971. \textbf{Bewiesen.}]
+Der Baby-Step-Giant-Step-Algorithmus berechnet $\log_g h$ in
+$(\mathbb{Z}/p\mathbb{Z})^*$ in $O(\sqrt{p})$ Zeit und Speicher.
+\end{theorem}
+
+Setze $m = \lceil\sqrt{p-1}\rceil$ und schreibe $x = im - j$:
+\begin{itemize}
+  \item \textbf{Baby-Schritte:} Berechne die Tabelle
+    $\{(h \cdot g^j \bmod p, j) : 0 \le j < m\}$.
+  \item \textbf{Giant-Schritte:} Berechne $g^{im} \bmod p$ für $i = 1,\ldots,m$.
+  \item \textbf{Kollision:} Wenn $g^{im} = h \cdot g^j$, gilt $x = im - j$.
+\end{itemize}
+
+\subsection{Pohlig-Hellman-Algorithmus}
+
+\begin{theorem}[Pohlig--Hellman, 1978. \textbf{Bewiesen.}]
+Wenn $p-1 = \prod_i q_i^{e_i}$ mit allen $q_i$ klein ist, kann der diskrete
+Logarithmus in $(\mathbb{Z}/p\mathbb{Z})^*$ in
+$O\bigl(\sum_i e_i(\log(p-1) + \sqrt{q_i})\bigr)$ Operationen berechnet werden.
+\end{theorem}
+
+Der Algorithmus löst das DLP modulo jeder Primpotenz $q_i^{e_i}$ separat mittels
+BSGS in der entsprechenden Untergruppe, kombiniert dann via CRT. Dies macht das
+DLP leicht, wenn $p-1$ \emph{glatt} ist (alle Primfaktoren klein).
+
+\begin{bemerkung}
+Dies motiviert die Verwendung \emph{sicherer Primzahlen} $p = 2q+1$ (mit $q$
+ebenfalls prim) in Diffie-Hellman: Dann hat $p-1 = 2q$ den großen Primteiler $q$,
+was Pohlig-Hellman wirkungslos macht.
+\end{bemerkung}
+
+\subsection{Indexkalkül}
+
+Der \emph{Indexkalkül-Algorithmus} erreicht subexponentielle Komplexität für
+das DLP in $\mathbb{F}_p^*$. Er läuft in zwei Phasen:
+
+\begin{enumerate}[label=\arabic*.]
+  \item \textbf{Beziehungsphase:} Aufbau einer Faktorbasis
+    $\mathcal{B} = \{p_1,\ldots,p_k\}$ kleiner Primzahlen. Für zufällige
+    Exponenten $s$: Prüfe ob $g^s \bmod p$ glatt ist. Falls ja, notiere
+    $s \equiv \sum_i a_i \log_g p_i \pmod{p-1}$.
+  \item \textbf{Individueller Logarithmus:} Finde $r$ mit $h \cdot g^r$ glatt,
+    berechne $\log_g h$.
+\end{enumerate}
+
+\begin{theorem}[Indexkalkül-Komplexität. Heuristisch.]
+Indexkalkül berechnet diskrete Logarithmen in $(\mathbb{Z}/p\mathbb{Z})^*$
+heuristisch in Zeit $L_p[1/2, 1]$; mit Zahlkörpersieb-Variante in $L_p[1/3, c]$.
+\end{theorem}
+
+% ===========================================================================
+\section{Chinesischer Restsatz}
+% ===========================================================================
+
+\subsection{Aussage und Beweis}
+
+\begin{theorem}[Chinesischer Restsatz (CRS). \textbf{Bewiesen.}]
+Seien $m_1, m_2, \ldots, m_k$ paarweise teilerfremde positive ganze Zahlen mit
+$M = m_1 m_2 \cdots m_k$. Für beliebige ganze Zahlen $r_1, r_2, \ldots, r_k$
+hat das System
+\[
+  x \equiv r_i \pmod{m_i}, \quad i = 1, \ldots, k,
+\]
+eine eindeutige Lösung $x \pmod{M}$.
+\end{theorem}
+
+\begin{proof}
+Setze $M_i = M/m_i$ und $e_i = M_i \cdot (M_i^{-1} \bmod m_i)$. Dann gilt
+$e_i \equiv 1 \pmod{m_i}$ und $e_i \equiv 0 \pmod{m_j}$ für $j \ne i$.
+Also erfüllt $x = \sum_{i=1}^k r_i e_i \bmod M$ alle Kongruenzen. Die
+Eindeutigkeit folgt daraus, dass zwei Lösungen sich um ein Vielfaches von $M$
+unterscheiden.
+\end{proof}
+
+\subsection{Algorithmische Komplexität}
+
+Die CRS-Rekonstruktion läuft in $O(k \log^2 M)$ Bitoperationen (mit schneller
+modularer Arithmetik). Für konstantes $k$ ergibt sich $O(\log^2 M)$, d.\,h.
+quasi-linear in der Stellenzahl.
+
+\subsection{Kryptographische Anwendungen}
+
+\subsubsection*{RSA-CRT-Entschlüsselung}
+
+Statt $c^d \bmod n$ direkt zu berechnen ($d \approx n$), berechnet man
+$c^{d_p} \bmod p$ und $c^{d_q} \bmod q$ separat
+(mit $d_p = d \bmod (p-1)$, $d_q = d \bmod (q-1)$) und kombiniert via CRS.
+Dies liefert einen etwa $4$-fachen Geschwindigkeitsvorteil (Garners Formel).
+
+\subsubsection*{Multimodulare Arithmetik}
+
+Große Ganzzahlmultiplikation kann durch Arbeiten modulo mehrerer kleiner
+Primzahlen und anschließender CRS-Rekonstruktion ausgeführt werden, was
+Multipräzisions-Arithmetik vermeidet.
+
+% ===========================================================================
+\section{Quadratische Reste und der Tonelli-Shanks-Algorithmus}
+% ===========================================================================
+
+\subsection{Legendre-Symbol und Eulerkriterium}
+
+\begin{definition}[Legendre-Symbol]
+Für eine ungerade Primzahl $p$ und $\gcd(a,p)=1$:
+\[
+  \left(\frac{a}{p}\right) =
+  \begin{cases} 1 & \text{falls } a \text{ ein quadratischer Rest mod } p \text{ ist},\\
+                -1 & \text{sonst.}
+  \end{cases}
+\]
+\end{definition}
+
+\begin{theorem}[Eulerkriterium. \textbf{Bewiesen.}]
+$\left(\frac{a}{p}\right) \equiv a^{(p-1)/2} \pmod{p}$.
+\end{theorem}
+
+\subsection{Gaußsches quadratisches Reziprozitätsgesetz}
+
+\begin{theorem}[Gauß, 1796. \textbf{Bewiesen.}]
+Für verschiedene ungerade Primzahlen $p, q$:
+\[
+  \left(\frac{p}{q}\right)\left(\frac{q}{p}\right) =
+  (-1)^{\tfrac{p-1}{2}\cdot\tfrac{q-1}{2}}.
+\]
+Äquivalent: $\bigl(\frac{p}{q}\bigr) = \bigl(\frac{q}{p}\bigr)$,
+außer wenn $p \equiv q \equiv 3 \pmod{4}$; dann haben sie entgegengesetzte Vorzeichen.
+\end{theorem}
+
+Gauß gab acht Beweise. Zusammen mit dem ersten und zweiten Ergänzungssatz
+(für $(-1/p)$ und $(2/p)$) erlaubt das Reziprozitätsgesetz die effiziente
+Berechnung des Legendre-Symbols in $O(\log^2 p)$ Schritten.
+
+\subsection{Jacobi-Symbol}
+
+Das \emph{Jacobi-Symbol} $\bigl(\frac{a}{n}\bigr)_J$ erweitert das Legendre-Symbol
+auf zusammengesetzte $n$ via Multiplikativität über die Primfaktorzerlegung von $n$.
+Es ist in $O(\log^2 n)$ ohne Kenntnis der Faktorisierung von $n$ berechenbar.
+Jedoch gilt: $\bigl(\frac{a}{n}\bigr)_J = 1$ impliziert \emph{nicht}, dass $a$
+ein QR modulo $n$ ist, wenn $n$ zusammengesetzt ist.
+
+\subsection{Tonelli-Shanks-Algorithmus}
+
+Gegeben einem quadratischen Rest $a$ modulo einer ungeraden Primzahl $p$,
+berechnet der \emph{Tonelli-Shanks-Algorithmus} $\sqrt{a} \bmod p$ (d.\,h.
+$x$ mit $x^2 \equiv a \pmod p$) in erwarteter $O(\log^2 p)$-Zeit.
+
+Schreibe $p-1 = 2^s \cdot q$ mit $q$ ungerade. Finde ein Nicht-Rest $z$ und
+initialisiere $M = s$, $c = z^q \bmod p$, $t = a^q \bmod p$, $R = a^{(q+1)/2} \bmod p$.
+Der Algorithmus iteriert, halbiert $M$ und passt $R$ via $c$ an, bis $t = 1$.
+
+\begin{theorem}[Tonelli-Shanks-Komplexität. \textbf{Bewiesen.}]
+Die erwartete Laufzeit beträgt $O(\log^2 p)$ modulare Multiplikationen, wobei
+die Erwartung über die Zufallswahl des Nicht-Restes $z$ genommen wird.
+\end{theorem}
+
+% ===========================================================================
+\section{Kettenbrüche}
+% ===========================================================================
+
+\subsection{Definition und periodische Entwicklung}
+
+\begin{definition}[Kettenbruch]
+Ein \emph{einfacher Kettenbruch} ist ein Ausdruck
+$[a_0; a_1, a_2, \ldots] = a_0 + \cfrac{1}{a_1 + \cfrac{1}{a_2 + \cdots}}$
+mit $a_i \in \mathbb{Z}$, $a_i > 0$ für $i \ge 1$.
+\end{definition}
+
+\begin{theorem}[Lagrange, 1770. \textbf{Bewiesen.}]
+Die Kettenbruchentwicklung von $\sqrt{n}$ (für $n$ keine Quadratzahl) ist
+periodisch: $\sqrt{n} = [a_0; \overline{a_1, a_2, \ldots, a_k}]$ mit Periodenlänge
+$k \le 2a_0$.
+\end{theorem}
+
+Die Konvergenten $p_k/q_k$ von $\sqrt{n}$ erfüllen
+$|p_k - q_k\sqrt{n}| < 1/q_{k+1}$ — sie sind die besten rationalen
+Approximationen an $\sqrt{n}$.
+
+\subsection{Pell-Gleichung}
+
+\begin{theorem}[Lagrange. \textbf{Bewiesen.}]
+Die Gleichung $x^2 - ny^2 = 1$ (Pell-Gleichung, $n$ keine Quadratzahl) hat
+unendlich viele ganzzahlige Lösungen. Die Fundamentallösung $(x_1, y_1)$
+wird durch die Konvergenten von $\sqrt{n}$ geliefert.
+\end{theorem}
+
+\begin{beispiel}
+$n=2$: $\sqrt{2} = [1;\overline{2}]$, Periode $k=1$. Fundamentallösung:
+$(p_1, q_1) = (3, 2)$: $3^2 - 2\cdot 2^2 = 9-8 = 1$.
+\end{beispiel}
+
+\subsection{CFRAC-Faktorisierung}
+
+Der \emph{Kettenbruch-Faktorisierungsalgorithmus} (Morrison--Brillhart, 1975)
+ist ein frühes Glatt-Zahlen-Verfahren. Er sucht Paare $(x,y)$ mit
+$x^2 \equiv y^2 \pmod{n}$, indem er die Zähler $p_k$ der Konvergenten
+von $\sqrt{n}$ sammelt und auf $B$-Glattheit von $p_k^2 \bmod n$ siebt.
+Dies war einer der ersten Algorithmen mit subexponentieller Heuristik-Komplexität.
+
+\subsection{Kettenbrüche und Kryptoanalyse}
+
+Kettenbrüche erscheinen im \emph{Wiener-Angriff auf RSA}: Falls der geheime
+Exponent $d < n^{1/4}$, kann $d$ aus der Kettenbruchentwicklung von $e/n$
+zurückgewonnen werden (Wiener, 1990).
+
+\begin{bemerkung}
+Der Rekursionsalgorithmus für Konvergenten $p_k/q_k$:
+$p_k = a_k p_{k-1} + p_{k-2}$, $q_k = a_k q_{k-1} + q_{k-2}$,
+läuft in $O(k)$ Zeit und ist numerisch sehr stabil.
+\end{bemerkung}
+
+% ===========================================================================
+\section{Kryptographische Anwendungen}
+% ===========================================================================
+
+\subsection{RSA-Kryptosystem}
+
+\begin{definition}[RSA, Rivest--Shamir--Adleman, 1978]
+\textbf{Schlüsselerzeugung:} Wähle große Primzahlen $p,q$, setze $n = pq$,
+$\varphi(n) = (p-1)(q-1)$. Wähle öffentlichen Exponenten $e$ mit
+$\gcd(e, \varphi(n)) = 1$; berechne $d = e^{-1} \bmod \varphi(n)$ via
+Erweiterter Euklid. \textbf{Öffentlicher Schlüssel:} $(n, e)$.
+\textbf{Geheimer Schlüssel:} $d$.
+\textbf{Verschlüsselung:} $c = m^e \bmod n$.
+\textbf{Entschlüsselung:} $m = c^d \bmod n$ (folgt aus $ed \equiv 1 \pmod{\varphi(n)}$
+und dem Satz von Euler).
+\end{definition}
+
+Die RSA-Sicherheit beruht auf der Schwierigkeit der Faktorisierung von $n$
+(vgl.\ Abschnitt~4.4).
+
+\subsection{Diffie-Hellman-Schlüsselaustausch}
+
+\begin{definition}[DH-Protokoll, 1976]
+Öffentlich: große Primzahl $p$, Erzeuger $g$ von $(\mathbb{Z}/p\mathbb{Z})^*$.
+Alice sendet $g^a \bmod p$, Bob sendet $g^b \bmod p$. Beide berechnen das
+gemeinsame Geheimnis $g^{ab} \bmod p$. Ein Angreifer muss das DLP lösen,
+um $a$ oder $b$ zu erhalten.
+\end{definition}
+
+\begin{vermutung}[Computational Diffie-Hellman, CDH. \textbf{Offen.}]
+Gegeben $g^a$ und $g^b$ in $(\mathbb{Z}/p\mathbb{Z})^*$: Die Berechnung von
+$g^{ab}$ ist schwer. Die CDH-Annahme ist mindestens so schwer wie DLP.
+\end{vermutung}
+
+\subsection{Elliptische-Kurven-Kryptographie (ECC)}
+
+Sei $E: y^2 = x^3 + ax + b$ über $\mathbb{F}_p$. Die Gruppe $E(\mathbb{F}_p)$
+unter dem Sekanten-Tangenten-Gesetz hat Ordnung $\approx p$ (Satz von Hasse).
+Das ECDLP (Elliptic Curve DLP) gilt als schwerer als das klassische DLP bei
+gleicher Gruppengröße, da kein subexponentieller allgemeiner Algorithmus für
+elliptische Kurven bekannt ist.
+
+\begin{theorem}[Hasse, 1933. \textbf{Bewiesen.}]
+$\bigl||E(\mathbb{F}_p)| - (p+1)\bigr| \le 2\sqrt{p}$.
+\end{theorem}
+
+ECDSA und ECDH verwenden 256-Bit-Schlüssel für eine Sicherheit äquivalent zu
+RSA-3072, was einen erheblichen Effizienzgewinn darstellt.
+
+\subsection{Post-Quanten-Kryptographie}
+
+Shors Quantenalgorithmus (1994) löst sowohl Ganzzahlfaktorisierung als auch DLP
+in $O((\log n)^3)$ Quantenzeit und bricht RSA, DH und ECC. Dies motiviert die
+\emph{Post-Quanten-Kryptographie}:
+
+\begin{itemize}
+  \item \textbf{Gitterbasiert:} CRYSTALS-Kyber (NIST PQC Standard, 2022)
+  \item \textbf{Hashbasiert:} SPHINCS+
+  \item \textbf{Codebasiert:} McEliece (1978)
+  \item \textbf{Multivariat:} HQC
+\end{itemize}
+
+NIST standardisierte 2022--2024 die ersten Post-Quanten-Algorithmen. Die
+mathematische Schwierigkeit von Gitterproblemen (LWE, NTRU) beruht auf
+vermuteten Worst-Case-auf-Average-Case-Reduktionen.
+
+\subsection{Zusammenfassung der kryptographischen Annahmen}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Kryptosystem} & \textbf{Mathematisches Problem} & \textbf{Status} \\
+\midrule
+RSA & Ganzzahlfaktorisierung (IFP) & Offen (Vermutung) \\
+Diffie-Hellman & Diskreter Logarithmus (DLP) & Offen (Vermutung) \\
+ECDH/ECDSA & Elliptischer-Kurven-DLP & Offen (Vermutung) \\
+AKS & PRIMES $\in$ P & \textbf{Bewiesen} (2002) \\
+CRS-Korrektheit & Zahlentheoretisches Theorem & \textbf{Bewiesen} \\
+Reziprozitätsgesetz & Legendres/Jacobis Symbole & \textbf{Bewiesen} \\
+Pell-Gleichung & Kettenbrüche und $\sqrt{n}$ & \textbf{Bewiesen} \\
+\bottomrule
+\end{tabular}
+\caption{Kryptosysteme, ihre mathematischen Grundlagen und Beweisstatus}
+\end{table}
+
+% ===========================================================================
+\section{Schlussbetrachtung und Verbindungen}
+% ===========================================================================
+
+Die algorithmische Zahlentheorie steht an der Kreuzung von reiner Mathematik
+und theoretischer Informatik. Die Kernergebnisse gliedern sich in drei Bereiche:
+
+\medskip
+\noindent\textbf{Bewiesene Sätze} als Grundlage der Algorithmen:
+Euklidischer Algorithmus ($O(\log n)$ Schritte), Bézout-Identität, Fermatscher
+Kleiner Satz, AKS-Primalität in P, Gaußsches Reziprozitätsgesetz, Lagrange zur
+Pell-Gleichung, Hassescher Satz zu elliptischen Kurven.
+
+\medskip
+\noindent\textbf{Allgemein geglaubte, aber unbewiesene Vermutungen}:
+Schwierigkeit der Faktorisierung (IFP $\notin$ P), DLP-Schwierigkeit (CDH)
+und RSA-Sicherheit. Dies sind die tragenden Annahmen der modernen Kryptographie.
+Die Verbindung zu P $\ne$ NP ist indirekt: IFP $\in$ NP $\cap$ co-NP, wäre also
+nicht NP-vollständig, es sei denn die polynomielle Hierarchie kollabiert.
+
+\medskip
+\noindent\textbf{Offene Probleme}:
+Zwillingsprimzahlvermutung, Goldbachsche Vermutung, Verteilung von Primzahllücken
+(Cramérs Vermutung), effiziente Algorithmen für ECDLP.
+
+Der Übergang zur Post-Quanten-Kryptographie, getrieben durch Shors Algorithmus,
+illustriert, wie Fortschritte in der algorithmischen Zahlentheorie die
+Sicherheitslandschaft globaler Kommunikation direkt umgestalten.
+
+% ===========================================================================
+\begin{thebibliography}{99}
+% ===========================================================================
+
+\bibitem{AKS2002}
+M.~Agrawal, N.~Kayal, N.~Saxena,
+\emph{PRIMES is in P},
+Ann.\ of Math.\ \textbf{160} (2004), 781--793.
+
+\bibitem{CP2005}
+R.~Crandall, C.~Pomerance,
+\emph{Prime Numbers: A Computational Perspective},
+2.~Aufl., Springer, New York, 2005.
+
+\bibitem{Cohen1993}
+H.~Cohen,
+\emph{A Course in Computational Algebraic Number Theory},
+Graduate Texts in Mathematics \textbf{138}, Springer, 1993.
+
+\bibitem{MenezesOV1996}
+A.~Menezes, P.~van Oorschot, S.~Vanstone,
+\emph{Handbook of Applied Cryptography},
+CRC Press, 1996. (\url{https://cacr.uwaterloo.ca/hac/}).
+
+\bibitem{Shoup2009}
+V.~Shoup,
+\emph{A Computational Introduction to Number Theory and Algebra},
+2.~Aufl., Cambridge University Press, 2009.
+
+\bibitem{Pollard1975}
+J.~M.~Pollard,
+\emph{A Monte Carlo method for factorization},
+BIT Numerical Mathematics \textbf{15} (1975), 331--334.
+
+\bibitem{Miller1976}
+G.~L.~Miller,
+\emph{Riemann's hypothesis and tests for primality},
+J.~Comput.\ System Sci.\ \textbf{13} (1976), 300--317.
+
+\bibitem{PohligHellman1978}
+S.~C.~Pohlig, M.~E.~Hellman,
+\emph{An improved algorithm for computing logarithms over $GF(p)$ and its cryptographic significance},
+IEEE Trans.\ Inform.\ Theory \textbf{24} (1978), 106--110.
+
+\bibitem{Shanks1971}
+D.~Shanks,
+\emph{Class Number, a Theory of Factorization and Genera},
+Proc.\ Symp.\ Pure Math.\ \textbf{20}, AMS, 1971, S.~415--440.
+
+\bibitem{Shor1994}
+P.~W.~Shor,
+\emph{Algorithms for quantum computation: discrete logarithms and factoring},
+Proc.\ 35th FOCS, 1994, S.~124--134.
+
+\end{thebibliography}
+
+\end{document}

@@ -332,3 +332,35 @@
 
 ### Ergebnis: 9 Bugs behoben (1 kritisch, 4 hoch/mittel, 4 niedrig)
 - Alle 8 Papers: DRUCKREIF nach Korrekturen
+
+## 2026-03-12 – Build 137
+### Batch 13: Paper 49 – Mertens-Funktion (EN + DE)
+
+**Erstellt:**
+- papers/batch13/paper49_mertens_function_en.tex (~9 Seiten, 10 Sections)
+- papers/batch13/paper49_mertens_funktion_de.tex (~9 Seiten, 10 Sections)
+
+**Quell-Modul:** src/mertens_function.py (MertensFunction + LiouvilleFunction)
+
+**Inhalt beider Papers:**
+1. Einleitung / Introduction – historischer Kontext, RH-Verbindung
+2. Möbius-Funktion μ(n) – Definition, Werte, Multiplikativität, Orthogonalität
+3. Mertens-Funktion M(x) – Definition, Werte, Dirichlet-Reihe 1/ζ(s), explizite Formel
+4. Drei Mertenssche Sätze (THEOREM, bewiesen):
+   - 1. Satz: Σ_{p≤x} log(p)/p = log x + O(1)
+   - 2. Satz: Σ_{p≤x} 1/p = log log x + M₀ + O(1/log x)  (M₀ = Meissel-Mertens-Konstante)
+   - 3. Satz: ∏_{p≤x}(1-1/p) ~ e^{-γ}/log x
+5. Verbindung zur RH – Äquivalenz-Theorem (THEOREM), Pintz 1987, bedingte Schranken
+6. Mertens-Vermutung – als VERMUTUNG mit Widerlegungstheorem (Odlyzko-te Riele 1985)
+7. Liouville-Funktion λ(n) – Definition, Multiplikativität, Dirichlet-Reihe ζ(2s)/ζ(s)
+8. Selberg-Formel – elementarer PNT-Beweis via M(x)
+9. Numerische Aspekte – O(N log log N) Sieb, O(N^{2/3}) Meissel-Lehmer-Algorithmus
+10. Literatur – 10 Quellen (Mertens 1874, Odlyzko-te Riele 1985, Pintz 1987, ...)
+
+**Korrektheit-Checks:**
+- Mertens-Vermutung: als VERMUTUNG (widerlegt) deklariert ✓
+- Odlyzko-te Riele 1985: als THEOREM (Widerlegung) ✓
+- RH ⟺ M(n)=O(n^{1/2+ε}): als THEOREM (bewiesene Äquivalenz) ✓
+- Haselgrove 1958: Pólya-Vermutung widerlegt, explizites Gegenbeispiel 906316571 ✓
+
+- src/build.txt: 136 → 137

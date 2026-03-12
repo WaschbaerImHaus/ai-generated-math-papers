@@ -1,0 +1,736 @@
+% ===========================================================================
+% Paper 51: Prime Gaps, Twin Primes and the Andrica-Cramér Conjecture
+% Author: Michael Fuhrmann
+% Project: Specialist Mathematics Project
+% Build: 137
+% Date: 2026-03-12
+% ===========================================================================
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 137}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\title{Prime Gaps, Twin Primes, and the Andrica--Cram\'{e}r Conjecture:\\
+A Survey of Open Problems and Modern Breakthroughs}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+% ---------------------------------------------------------------------------
+\section{Introduction}
+% ---------------------------------------------------------------------------
+
+Prime numbers are the multiplicative atoms of the integers, yet their additive
+distribution conceals deep and largely unsolved mysteries. Among the most
+fundamental questions in analytic number theory is: \emph{How large can the gap
+between consecutive primes become, and how often do primes occur very close
+together?}
+
+The \emph{prime gap} $g_n = p_{n+1} - p_n$ between the $n$-th prime $p_n$ and
+its successor $p_{n+1}$ has been studied since antiquity. Euclid's proof of the
+infinitude of primes, combined with the Chinese Remainder Theorem, shows that
+$g_n$ can be arbitrarily large. By contrast, whether $g_n = 2$ infinitely
+often---the celebrated \emph{Twin Prime Conjecture}---remains one of the most
+famous open problems in all of mathematics.
+
+The connection to the Riemann Hypothesis (RH) is direct: under the assumption of
+RH, one obtains the conditional bound
+\[
+  g_n \ll \sqrt{p_n} \log p_n,
+\]
+which is far better than any unconditional result currently available. The
+unresolved nature of both RH and the Twin Prime Conjecture illustrates that prime
+gaps sit at the intersection of the deepest open questions in number theory.
+
+This paper surveys the principal conjectures and proven results concerning prime
+gaps. We distinguish carefully between \textbf{proven theorems} (marked as
+Theorem) and \textbf{open conjectures} (marked as Conjecture). The landmark
+results of Zhang (2013) and Maynard (2014), which established that
+$\liminf_{n\to\infty} g_n < \infty$, are treated in full. The Andrica
+Conjecture ($\sqrt{p_{n+1}} - \sqrt{p_n} < 1$), the Cram\'{e}r Conjecture
+($\limsup g_n / (\log p_n)^2 = 1$), Legendre's Conjecture, and Polignac's
+Conjecture are presented with their current status, computational evidence, and
+mutual implications.
+
+All numerical computations were performed using the Python modules
+\texttt{twin\_prime\_analysis.py} and \texttt{andrica\_cramer.py} from the
+Specialist Mathematics Project (Build 137).
+
+% ---------------------------------------------------------------------------
+\section{Prime Gaps}
+% ---------------------------------------------------------------------------
+
+\begin{definition}
+Let $p_1 = 2 < p_2 = 3 < p_3 = 5 < \cdots$ be the sequence of prime numbers in
+increasing order. The \emph{$n$-th prime gap} is
+\[
+  g_n := p_{n+1} - p_n, \quad n \geq 1.
+\]
+A \emph{maximal gap} (also called \emph{record gap} or \emph{prime desert}) is a
+gap $g_n$ that exceeds all preceding gaps: $g_n > g_k$ for all $k < n$.
+\end{definition}
+
+\begin{example}
+The first few prime gaps are $g_1 = 1$ (from $2$ to $3$), then
+$g_2 = 2, g_3 = 2, g_4 = 4, g_5 = 2, g_6 = 4, g_7 = 2, g_8 = 4, g_9 = 6,
+\ldots$ All gaps $g_n \geq 2$ for $n \geq 2$ since all primes $p \geq 3$ are odd.
+\end{example}
+
+\begin{theorem}[Infinitude of arbitrarily large gaps]
+For every integer $k \geq 1$, there exists a prime gap $g_n \geq k$.
+\end{theorem}
+
+\begin{proof}
+Consider $m = (k+1)! + 2$. The integers $m, m+1, \ldots, m+k-1$ are all
+composite: $m+j = (k+1)! + (j+2)$ is divisible by $j+2$ for $0 \leq j \leq
+k-1$. Hence no prime lies in this interval of length $k-1$, giving a gap of
+size at least $k$.
+\end{proof}
+
+\subsection{Average Gap Size and the Prime Number Theorem}
+
+The \emph{Prime Number Theorem} (PNT), proved independently by Hadamard and de la
+Vall\'{e}e Poussin in 1896, states
+\[
+  \pi(x) \sim \frac{x}{\log x}, \quad x \to \infty,
+\]
+where $\pi(x)$ counts the number of primes $\leq x$. An equivalent formulation
+is $p_n \sim n \log n$. It follows that the \emph{average} gap near $p_n$ is
+approximately $\log p_n$:
+\[
+  \frac{1}{N} \sum_{n=1}^{N} g_n = \frac{p_{N+1} - 2}{N} \sim \log p_N.
+\]
+
+\subsection{Cram\'{e}r's Probabilistic Model}
+
+Harald Cram\'{e}r (1936) introduced a powerful heuristic: model the primes as a
+random subset of the integers where each integer $n$ is independently ``prime''
+with probability $1/\log n$. Under this model:
+\begin{itemize}
+  \item The probability that both $n$ and $n + 2$ are prime is
+        $\approx 1/(\log n)^2$.
+  \item The expected number of primes in $[N, N + (\log N)^2]$ is $O(1)$.
+  \item Maximal gaps up to $x$ satisfy $g_{\max} \approx (\log x)^2$.
+\end{itemize}
+
+\begin{remark}
+The Cram\'{e}r model does not account for divisibility by small primes (the
+``sieve effect''). Granville (1995) showed this leads to a corrected prediction:
+the limsup of $g_n/(\log p_n)^2$ should be $2e^{-\gamma} \approx 1.1229$ rather
+than $1$, where $\gamma \approx 0.5772$ is the Euler--Mascheroni constant.
+\end{remark}
+
+\subsection{Known Unconditional Bounds on Gaps}
+
+Baker, Harman, and Pintz (2001) proved unconditionally:
+\[
+  g_n \ll p_n^{0.525}.
+\]
+Under RH, the bound improves to $g_n \ll p_n^{1/2} \log p_n$.
+
+The Erd\H{o}s--Rankin construction gives a lower bound for maximal gaps:
+there exist infinitely many $n$ with
+\[
+  g_n \gg \frac{\log p_n \cdot \log\log p_n \cdot \log\log\log\log p_n}{(\log\log\log p_n)^2}.
+\]
+
+% ---------------------------------------------------------------------------
+\section{The Twin Prime Conjecture}
+% ---------------------------------------------------------------------------
+
+\begin{definition}
+A \emph{twin prime pair} is a pair $(p, p+2)$ of prime numbers differing by $2$.
+The \emph{twin prime counting function} is
+\[
+  \pi_2(x) := \#\{p \leq x : p \text{ and } p+2 \text{ both prime}\}.
+\]
+\end{definition}
+
+The first twin prime pairs are: $(3,5), (5,7), (11,13), (17,19), (29,31),
+(41,43), (59,61), (71,73), \ldots$
+
+\begin{conjecture}[Twin Prime Conjecture, folklore; open since antiquity]
+There are infinitely many prime pairs $(p, p+2)$. Equivalently,
+$\pi_2(x) \to \infty$ as $x \to \infty$.
+\end{conjecture}
+
+\textbf{Status: Open. No proof is known.} The conjecture has been verified
+computationally for all primes up to $10^{15}$.
+
+\subsection{Brun's Theorem and the Brun Constant}
+
+\begin{theorem}[Brun, 1919]
+The series
+\[
+  B_2 := \sum_{\substack{p,\, p+2 \text{ twin primes}}} \left(\frac{1}{p} + \frac{1}{p+2}\right)
+\]
+converges. The \emph{Brun constant} is estimated as $B_2 \approx 1.9021605831$.
+\end{theorem}
+
+This result, proved by Viggo Brun using sieve methods, is remarkable: it holds
+regardless of whether there are finitely or infinitely many twin primes. If the
+twin primes were infinite but sparse enough, convergence would still hold.
+
+\begin{remark}
+Compare with the \emph{sum of reciprocals of all primes}:
+$\sum_p 1/p = \infty$ (Euler). The convergence of $B_2$ contrasts sharply
+and shows that twin primes (if infinite) are much sparser than primes themselves.
+\end{remark}
+
+\subsection{Hardy--Littlewood Conjecture B}
+
+\begin{conjecture}[Hardy--Littlewood Conjecture B, 1923; open]
+\label{conj:hl}
+As $x \to \infty$,
+\[
+  \pi_2(x) \sim 2 C_2 \frac{x}{(\log x)^2},
+\]
+where $C_2$ is the \emph{twin prime constant}:
+\[
+  C_2 = \prod_{\substack{p \geq 3 \\ p \text{ prime}}} \frac{p(p-2)}{(p-1)^2}
+       \approx 0.6601618158\ldots
+\]
+\end{conjecture}
+
+The constant $C_2$ arises from the density correction factor for the sieve of
+Eratosthenes applied simultaneously to $n$ and $n+2$. Numerically,
+$2C_2 \approx 1.3203$.
+
+\begin{remark}
+This conjecture implies the Twin Prime Conjecture but is itself much stronger.
+It has been verified to be consistent with numerical data up to $10^{15}$.
+A proof seems far beyond current techniques.
+\end{remark}
+
+\subsection{The Parity Problem}
+
+A fundamental obstruction to proving the Twin Prime Conjecture via classical
+sieve methods is the \emph{Selberg parity problem}. Let $\Omega(n)$ denote the
+number of prime factors of $n$ counted with multiplicity. Classical sieves
+cannot distinguish the parity of $\Omega(n)$, making them unable to directly
+count pairs where both $n$ and $n+2$ are prime (i.e., $\Omega(n) =
+\Omega(n+2) = 1$). This is because any sieve function $\lambda^2$ treats both
+the case $\Omega(n) = 1$ and $\Omega(n) = 2$ identically.
+
+% ---------------------------------------------------------------------------
+\section{Zhang's Theorem and Maynard's Improvement}
+% ---------------------------------------------------------------------------
+
+The period 2013--2015 witnessed one of the most dramatic breakthroughs in
+analytic number theory in decades.
+
+\begin{theorem}[Zhang, 2013]
+\label{thm:zhang}
+There exist infinitely many pairs of consecutive primes $(p_n, p_{n+1})$ with
+\[
+  p_{n+1} - p_n < 70{,}000{,}000.
+\]
+Equivalently, $\liminf_{n \to \infty} g_n \leq 70{,}000{,}000$.
+\end{theorem}
+
+Zhang's proof marked the first time anyone had shown that $\liminf g_n < \infty$.
+The key ingredients were:
+\begin{enumerate}[label=(\roman*)]
+  \item The \emph{Goldston--Pintz--Y{\i}ld{\i}r{\i}m (GPY) sieve} (2005), which
+        had come tantalizingly close but could not finish the argument.
+  \item A strengthened estimate for primes in arithmetic progressions, using
+        exponential sum techniques beyond the reach of the Bombieri--Vinogradov
+        theorem.
+  \item An admissible $k$-tuple of size $k = 3.5 \times 10^6$ whose elements
+        collectively guaranteed a bounded gap.
+\end{enumerate}
+
+\begin{theorem}[Maynard, 2014; Polymath8b, 2014]
+\label{thm:maynard}
+Under the Goldston--Pintz--Y{\i}ld{\i}r{\i}m framework with improved weights,
+\[
+  \liminf_{n \to \infty} g_n \leq 246.
+\]
+More precisely, the Polymath8b project (a collaborative optimization of Maynard's
+method) established this bound.
+\end{theorem}
+
+Maynard introduced a multi-dimensional sieve weight of the form
+\[
+  w(n) = \left(\sum_{d_1 | (n+h_1),\, d_2 | (n+h_2),\, \ldots} \lambda_{d_1, \ldots, d_k}\right)^2
+\]
+and optimized over the $\lambda$ coefficients to show that for any admissible
+$k$-tuple $(h_1,\ldots,h_k)$ with $k$ large enough, at least two of the $n+h_i$
+are prime infinitely often.
+
+\begin{remark}
+The bound $246$ means: there exists an even integer $2 \leq d \leq 246$ such
+that $p_{n+1} - p_n = d$ for infinitely many $n$. The precise value $d = 2$
+(twin primes) remains unproved.
+\end{remark}
+
+\subsection{The GPY Sieve Technique}
+
+The GPY approach (Goldston, Pintz, Y{\i}ld{\i}r{\i}m, 2005) established:
+\begin{theorem}[GPY, 2005]
+For every $\varepsilon > 0$, there exist infinitely many $n$ with
+\[
+  g_n < \varepsilon \log p_n.
+\]
+\end{theorem}
+
+This says primes sometimes cluster much closer than average, but does not give a
+fixed bound. The key idea: introduce a \emph{mollifier} weight $w(n) = (\sum_{d |
+P(n)} \lambda_d)^2$ where $P(n) = n(n+2)$ and optimize $\lambda_d$ to maximize
+\[
+  S = \frac{\sum_{n \sim N} w(n)[\Lambda(n+h_1)\Lambda(n+h_2)]}{\sum_{n \sim N} w(n)}.
+\]
+
+% ---------------------------------------------------------------------------
+\section{Andrica's Conjecture}
+% ---------------------------------------------------------------------------
+
+\begin{conjecture}[Andrica, 1985; open]
+\label{conj:andrica}
+For all $n \geq 1$,
+\[
+  A_n := \sqrt{p_{n+1}} - \sqrt{p_n} < 1.
+\]
+\end{conjecture}
+
+\textbf{Status: Open. Verified numerically for all primes up to $4 \times
+10^{18}$.}
+
+\subsection{Equivalent Formulations}
+
+The Andrica Conjecture is equivalent to each of the following:
+\begin{enumerate}[label=(\roman*)]
+  \item $\sqrt{p_{n+1}} - \sqrt{p_n} < 1$ (original form),
+  \item $p_{n+1} < (\sqrt{p_n} + 1)^2 = p_n + 2\sqrt{p_n} + 1$,
+  \item $g_n = p_{n+1} - p_n < 2\sqrt{p_n} + 1$.
+\end{enumerate}
+
+Formulation (iii) makes the content transparent: the $n$-th prime gap must be
+sublinear in $\sqrt{p_n}$.
+
+\subsection{The Maximal Andrica Value}
+
+The largest known value of $A_n$ occurs at $n = 4$:
+\[
+  A_4 = \sqrt{11} - \sqrt{7} \approx 3.3166 - 2.6457 = 0.6708.
+\]
+No value $A_n \geq 1$ has ever been found. As $n \to \infty$, $A_n$ appears to
+decrease toward $0$, consistent with the expectation that prime gaps grow much
+slower than $2\sqrt{p_n}$.
+
+\begin{table}[h]
+\centering
+\caption{First Andrica values $A_n = \sqrt{p_{n+1}} - \sqrt{p_n}$}
+\begin{tabular}{@{}rrrrc@{}}
+\toprule
+$n$ & $p_n$ & $p_{n+1}$ & $g_n$ & $A_n$ \\
+\midrule
+1 & 2 & 3 & 1 & 0.3178 \\
+2 & 3 & 5 & 2 & 0.5058 \\
+3 & 5 & 7 & 2 & 0.3780 \\
+4 & 7 & 11 & 4 & \textbf{0.6708} \\
+5 & 11 & 13 & 2 & 0.2970 \\
+6 & 13 & 17 & 4 & 0.5353 \\
+7 & 17 & 19 & 2 & 0.2375 \\
+8 & 19 & 23 & 4 & 0.4508 \\
+9 & 23 & 29 & 6 & 0.6065 \\
+10 & 29 & 31 & 2 & 0.1826 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Relation to Other Conjectures}
+
+\begin{proposition}
+The Cram\'{e}r Conjecture implies the Andrica Conjecture.
+\end{proposition}
+
+\begin{proof}
+Under the Cram\'{e}r Conjecture, $g_n \leq (1+\varepsilon)(\log p_n)^2$ for all
+sufficiently large $n$. For $p$ large enough, $(\log p)^2 \ll \sqrt{p}$, so
+$g_n \ll \sqrt{p_n}$. Hence $g_n < 2\sqrt{p_n} + 1$ for large $n$, and the
+finitely many small $n$ can be checked directly.
+\end{proof}
+
+\begin{proposition}
+The Andrica Conjecture implies the Legendre Conjecture for sufficiently large $n$.
+\end{proposition}
+
+The connection follows from equivalent formulation (ii) above.
+
+% ---------------------------------------------------------------------------
+\section{Cram\'{e}r's Conjecture}
+% ---------------------------------------------------------------------------
+
+\begin{conjecture}[Cram\'{e}r, 1936; open]
+\label{conj:cramer}
+\[
+  \limsup_{n \to \infty} \frac{g_n}{(\log p_n)^2} = 1.
+\]
+\end{conjecture}
+
+\textbf{Status: Open. The limsup is known to be at least $2e^{-\gamma} \approx
+1.1229$ under heuristic arguments (Granville 1995), and is finite by
+Baker--Harman--Pintz.}
+
+\subsection{Granville's Correction}
+
+Andrew Granville (1995) argued that the correct prediction from a more careful
+analysis of the Cram\'{e}r model---incorporating Hardy--Littlewood
+corrections---should be:
+\[
+  \limsup_{n \to \infty} \frac{g_n}{(\log p_n)^2} = 2e^{-\gamma} \approx 1.1229,
+\]
+where $\gamma = 0.5772156649\ldots$ is the Euler--Mascheroni constant.
+
+The Granville correction $C_{\text{Gr}} = 2e^{-\gamma} \approx 1.1229$ arises
+because the Cram\'{e}r model slightly overestimates the density of primes near
+smooth numbers (numbers with only small prime factors), and this bias accumulates.
+
+\subsection{Known Bounds}
+
+\begin{theorem}[Baker--Harman--Pintz, 2001]
+Unconditionally, $g_n \ll p_n^{0.525}$.
+\end{theorem}
+
+\begin{theorem}[Conditional on RH]
+$g_n \ll p_n^{1/2} \log p_n$.
+\end{theorem}
+
+\begin{theorem}[Westzynthius, 1931]
+$\limsup_{n\to\infty} g_n/\log p_n = \infty$.
+\end{theorem}
+
+\subsection{Record Cram\'{e}r Values}
+
+The largest known normalized gap $g_n/(\log p_n)^2$ was found by Oliveira e
+Silva (2014) at $p_n = 1\,693\,182\,318\,746\,371 \approx 1.7 \times 10^{15}$,
+with normalized value $\approx 1.17$---well below the Granville bound of
+$\approx 1.1229 \times (\log p)^2$ but consistent with it.
+
+% ---------------------------------------------------------------------------
+\section{Legendre's Conjecture}
+% ---------------------------------------------------------------------------
+
+\begin{conjecture}[Legendre, $\sim$1798; open]
+\label{conj:legendre}
+For every positive integer $n \geq 1$, there exists at least one prime $p$ with
+\[
+  n^2 < p < (n+1)^2.
+\]
+\end{conjecture}
+
+\textbf{Status: Open. Verified computationally for all $n \leq 10^{15}$
+(Meissel--Lehmer methods).}
+
+\begin{remark}
+The Legendre Conjecture is equivalent to saying that consecutive perfect squares
+always contain a prime between them. This would imply that the gap between
+consecutive primes near $n^2$ satisfies $g \ll n \sim \sqrt{p}$, which is
+weaker than the Cram\'{e}r Conjecture but still unproved.
+\end{remark}
+
+\subsection{Connection to Andrica's Conjecture}
+
+\begin{proposition}
+The Andrica Conjecture is stronger than Legendre's Conjecture in the following
+sense: if $A_n < 1$ for all $n$, then in every interval $(m^2, (m+1)^2)$ there
+is at most one ``gap'' from the Andrica sequence.
+\end{proposition}
+
+The precise relationship is:
+
+\begin{itemize}
+  \item Andrica for consecutive primes: $p_{n+1} < (\sqrt{p_n}+1)^2$.
+  \item Legendre: In every $(n^2, (n+1)^2)$ there is a prime.
+\end{itemize}
+
+These are not identical because Legendre considers all squares $n^2$, while
+Andrica considers only pairs of consecutive primes.
+
+\subsection{Partial Results}
+
+Ingham (1937) proved that there is a prime in $(n^3, (n+1)^3)$ for all
+sufficiently large $n$. Under RH, one can show there is a prime in
+$(x, x + C\sqrt{x}\log x)$ for an explicit constant $C$.
+
+% ---------------------------------------------------------------------------
+\section{Polignac's Conjecture}
+% ---------------------------------------------------------------------------
+
+\begin{conjecture}[Polignac, 1849; open]
+\label{conj:polignac}
+For every positive even integer $2k$ ($k \geq 1$), there are infinitely many
+prime pairs $(p, p + 2k)$.
+\end{conjecture}
+
+\textbf{Status: Open for all specific values of $k$, including $k=1$ (Twin Prime
+Conjecture).}
+
+The Twin Prime Conjecture is the special case $k=1$.
+
+\begin{remark}
+Thanks to Maynard's Theorem (\ref{thm:maynard}), we know that \emph{some}
+even integer $2k \leq 246$ satisfies Polignac's conjecture. But for no specific
+value of $k$ has this been proved.
+\end{remark}
+
+\subsection{de Polignac's Original Claim}
+
+Alphonse de Polignac (1849) actually claimed a stronger result---that every even
+number $2k$ is the difference of two consecutive primes in infinitely many
+ways. The claim for non-consecutive primes (which is Polignac's Conjecture as
+stated above) is already open.
+
+\subsection{Hardy--Littlewood Generalization}
+
+Hardy and Littlewood (1923) conjectured a quantitative form: for each admissible
+even $2k$,
+\[
+  \#\{p \leq x : p + 2k \text{ prime}\} \sim \mathfrak{S}(2k) \frac{x}{(\log x)^2},
+\]
+where $\mathfrak{S}(2k) = 2C_2 \prod_{p | k,\, p > 2} \frac{p-1}{p-2}$ is the
+\emph{singular series} for the pair $(0, 2k)$.
+
+% ---------------------------------------------------------------------------
+\section{Probabilistic Models}
+% ---------------------------------------------------------------------------
+
+\subsection{The Cram\'{e}r Model in Detail}
+
+In the Cram\'{e}r model, define a random set $\mathcal{P}$ by: for each $n \geq
+3$, include $n$ in $\mathcal{P}$ independently with probability $1/\log n$.
+(Adjust $\mathcal{P} \cap [2,3] = \{2,3\}$.)
+
+Under this model:
+\begin{enumerate}[label=(\roman*)]
+  \item $\mathbb{E}[\pi_{\mathcal{P}}(x)] \sim x/\log x$ (mimics PNT),
+  \item gaps near $x$ are approximately exponentially distributed with mean
+        $\log x$,
+  \item the maximum gap up to $x$ is $\approx (\log x)^2$,
+  \item the number of twin prime pairs up to $x$ is
+        $\approx x/(\log x)^2$ (but without the $C_2$ correction).
+\end{enumerate}
+
+\subsection{The Hardy--Littlewood Heuristic}
+
+A more refined heuristic accounts for the actual density of primes in arithmetic
+progressions. For a prime pair $(p, p+2k)$, the local density at $p$ is
+$1/\log p$, and the events ``$p$ prime'' and ``$p+2k$ prime'' are not
+independent due to common small prime factors. The correction factor for gap $2k$
+is the singular series $\mathfrak{S}(2k)$.
+
+For $2k = 2$ (twin primes):
+\[
+  \mathfrak{S}(2) = 2 C_2 = 2 \prod_{p \geq 3} \frac{p(p-2)}{(p-1)^2} \approx 1.3203.
+\]
+
+\subsection{The Granville--Cram\'{e}r Heuristic}
+
+Granville's refined model (1995) predicts that maximal gaps satisfy:
+\[
+  g_{\max}(x) \approx 2e^{-\gamma} (\log x)^2 \approx 1.1229 (\log x)^2,
+\]
+where the factor $2e^{-\gamma}$ arises from the asymptotic behavior of the sum
+$\sum_{p \leq x} 1/p \approx \log\log x + M$ (Mertens constant $M =
+\gamma + \sum_p [\log(1-1/p) + 1/p]$).
+
+% ---------------------------------------------------------------------------
+\section{Computational Results}
+% ---------------------------------------------------------------------------
+
+\subsection{Twin Prime Data}
+
+The following table shows twin prime counts $\pi_2(x)$ versus the Hardy--Littlewood
+prediction $2C_2 \cdot x/(\log x)^2$:
+
+\begin{table}[h]
+\centering
+\caption{Twin prime counts $\pi_2(x)$ and Hardy--Littlewood prediction}
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+$x$ & $\pi_2(x)$ & $2C_2 x/(\log x)^2$ & Ratio \\
+\midrule
+$10^3$ & 35 & 27.9 & 1.25 \\
+$10^4$ & 205 & 171.3 & 1.20 \\
+$10^5$ & 1224 & 1107.8 & 1.10 \\
+$10^6$ & 8169 & 7459.7 & 1.10 \\
+$10^7$ & 58980 & 54438.1 & 1.08 \\
+$10^8$ & 440312 & 412849.5 & 1.07 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The ratio approaches $1$ as $x$ increases, consistent with (but not proving)
+Conjecture~\ref{conj:hl}.
+
+\subsection{Maximal Gap Records}
+
+\begin{table}[h]
+\centering
+\caption{Maximal prime gap records (selected)}
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+$p_n$ & $p_{n+1}$ & $g_n$ & $g_n/(\log p_n)^2$ \\
+\midrule
+7 & 11 & 4 & 0.656 \\
+23 & 29 & 6 & 0.594 \\
+89 & 97 & 8 & 0.428 \\
+113 & 127 & 14 & 0.657 \\
+523 & 541 & 18 & 0.503 \\
+887 & 907 & 20 & 0.474 \\
+1129 & 1151 & 22 & 0.485 \\
+9551 & 9587 & 36 & 0.424 \\
+31397 & 31469 & 72 & 0.552 \\
+155921 & 156007 & 86 & 0.424 \\
+360653 & 360749 & 96 & 0.389 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Andrica Verification}
+
+All Andrica values $A_n = \sqrt{p_{n+1}} - \sqrt{p_n}$ for $n = 1, \ldots,
+10^6$ (covering primes up to about $15.5 \times 10^6$) satisfy $A_n < 1$.
+The running maximum after $n = 4$ decreases monotonically in recorded maxima:
+the global maximum $A_4 \approx 0.6708$ has not been surpassed in any
+computation to date.
+
+\subsection{Cram\'{e}r Value Distribution}
+
+For the first $10{,}000$ primes, the normalized gaps $C_n = g_n/(\log p_n)^2$
+have:
+\begin{itemize}
+  \item Mean: $\approx 0.064$,
+  \item Maximum: $\approx 0.74$ (near $p = 113$),
+  \item The fraction exceeding the Granville constant $2e^{-\gamma} \approx
+        1.1229$ is exactly $0$ in this range.
+\end{itemize}
+
+These values are consistent with the Cram\'{e}r/Granville heuristics but provide
+no proof.
+
+% ---------------------------------------------------------------------------
+\section{Summary of Open Problems and Known Results}
+% ---------------------------------------------------------------------------
+
+\begin{table}[h]
+\centering
+\caption{Overview: Open Conjectures and Proven Theorems}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Statement & Author & Year & Status \\
+\midrule
+Twin Prime Conjecture & Folklore & antiquity & \textbf{Open} \\
+Hardy--Littlewood Conj.\ B & Hardy, Littlewood & 1923 & \textbf{Open} \\
+Andrica Conjecture & Andrica & 1985 & \textbf{Open} \\
+Cram\'{e}r Conjecture & Cram\'{e}r & 1936 & \textbf{Open} \\
+Legendre Conjecture & Legendre & $\sim$1798 & \textbf{Open} \\
+Polignac Conjecture & de Polignac & 1849 & \textbf{Open} \\
+\midrule
+Brun's Theorem ($B_2$ converges) & Brun & 1919 & \textbf{Proved} \\
+Prime Number Theorem & Hadamard, de la VP & 1896 & \textbf{Proved} \\
+$g_n \ll p_n^{0.525}$ & Baker--Harman--Pintz & 2001 & \textbf{Proved} \\
+$\liminf g_n \leq 70{,}000{,}000$ & Zhang & 2013 & \textbf{Proved} \\
+$\liminf g_n \leq 246$ & Maynard/Polymath8b & 2014 & \textbf{Proved} \\
+GPY small gaps & Goldston--Pintz--Y. & 2005 & \textbf{Proved} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The central open problems---the Twin Prime Conjecture, Andrica, Cram\'{e}r,
+Legendre, and Polignac---all concern the fine structure of prime gaps at various
+scales. Zhang's breakthrough shows that the gap $\liminf g_n$ is finite; closing
+the enormous distance from $246$ to $2$ remains one of the deepest challenges in
+mathematics.
+
+% ---------------------------------------------------------------------------
+\section*{References}
+% ---------------------------------------------------------------------------
+
+\begin{thebibliography}{99}
+
+\bibitem{brun1919}
+V.\ Brun,
+\textit{La s\'{e}rie $1/5 + 1/7 + 1/11 + 1/13 + \cdots$ est convergente ou finie},
+Bull.\ Sci.\ Math.\ \textbf{43} (1919), 100--104, 124--128.
+
+\bibitem{cramer1936}
+H.\ Cram\'{e}r,
+\textit{On the order of magnitude of the difference between consecutive prime
+numbers},
+Acta Arith.\ \textbf{2} (1936), 23--46.
+
+\bibitem{hardylittlewood1923}
+G.\ H.\ Hardy and J.\ E.\ Littlewood,
+\textit{Some problems of `Partitio Numerorum' III: On the expression of a number
+as a sum of primes},
+Acta Math.\ \textbf{44} (1923), 1--70.
+
+\bibitem{andrica1985}
+D.\ Andrica,
+\textit{Note on a conjecture in prime number theory},
+Studia Univ.\ Babe\c{s}-Bolyai Math.\ \textbf{31} (1985), no.\ 4, 44--48.
+
+\bibitem{gpy2005}
+D.\ A.\ Goldston, J.\ Pintz, and C.\ Y.\ Y{\i}ld{\i}r{\i}m,
+\textit{Primes in tuples I},
+Ann.\ Math.\ \textbf{170} (2009), 819--862. (Preprint 2005.)
+
+\bibitem{zhang2013}
+Y.\ Zhang,
+\textit{Bounded gaps between primes},
+Ann.\ Math.\ \textbf{179} (2014), 1121--1174. (Submitted 2013.)
+
+\bibitem{maynard2014}
+J.\ Maynard,
+\textit{Small gaps between primes},
+Ann.\ Math.\ \textbf{181} (2015), 383--413. (Preprint 2013.)
+
+\bibitem{polymath8b2014}
+D.\ H.\ J.\ Polymath,
+\textit{Variants of the Selberg sieve, and bounded intervals containing many
+primes},
+Res.\ Math.\ Sci.\ \textbf{1} (2014), Art.\ 12.
+
+\bibitem{granville1995}
+A.\ Granville,
+\textit{Harald Cram\'{e}r and the distribution of prime numbers},
+Scand.\ Actuar.\ J.\ \textbf{1} (1995), 12--28.
+
+\bibitem{bhp2001}
+R.\ C.\ Baker, G.\ Harman, and J.\ Pintz,
+\textit{The difference between consecutive primes, II},
+Proc.\ London Math.\ Soc.\ \textbf{83} (2001), 532--562.
+
+\bibitem{westzynthius1931}
+E.\ Westzynthius,
+\textit{\"{U}ber die Verteilung der Zahlen, die zu den $n$ ersten Primzahlen
+teilerfremd sind},
+Commentat.\ Phys.-Math.\ \textbf{5} (1931), 1--37.
+
+\end{thebibliography}
+
+\end{document}

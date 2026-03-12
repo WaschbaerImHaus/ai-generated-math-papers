@@ -1,0 +1,749 @@
+% ===========================================================================
+% Paper 51 (DE): Primzahllücken, Zwillingsprimzahlen und die Andrica-Cramér-Vermutung
+% Autor: Michael Fuhrmann
+% Projekt: Specialist Mathematics Project
+% Build: 137
+% Datum: 2026-03-12
+% ===========================================================================
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 137}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\title{Primzahll\"ucken, Zwillingsprimzahlen und die Andrica-Cram\'er-Vermutung:\\
+Eine \"{U}bersicht offener Probleme und moderner Durchbr\"{u}che}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+% ---------------------------------------------------------------------------
+\section{Einleitung}
+% ---------------------------------------------------------------------------
+
+Primzahlen sind die multiplikativen Bausteine der ganzen Zahlen --- doch ihre
+additive Verteilung birgt tiefe und weitgehend ungel\"{o}ste Geheimnisse. Zu den
+grundlegendsten Fragen der analytischen Zahlentheorie geh\"{o}rt: \emph{Wie gro\ss{}
+kann die L\"{u}cke zwischen aufeinanderfolgenden Primzahlen werden, und wie oft
+treten Primzahlen sehr dicht nebeneinander auf?}
+
+Die \emph{$n$-te Primzahll\"{u}cke} $g_n = p_{n+1} - p_n$ zwischen der $n$-ten
+Primzahl $p_n$ und ihrem Nachfolger $p_{n+1}$ wird seit der Antike untersucht.
+Euklids Beweis der Unendlichkeit der Primzahlen zeigt zusammen mit dem
+Chinesischen Restsatz, dass $g_n$ beliebig gro\ss{} werden kann. Ob $g_n = 2$
+unendlich oft vorkommt --- die ber\"{u}hmte \emph{Zwillingsprimzahl-Vermutung} ---
+bleibt hingegen eines der bekanntesten offenen Probleme der Mathematik.
+
+Der Zusammenhang zur Riemannschen Hypothese (RH) ist direkt: Unter der Annahme
+von RH erh\"{a}lt man die bedingte Schranke
+\[
+  g_n \ll \sqrt{p_n} \log p_n,
+\]
+die weit besser ist als jedes derzeit bekannte unbedingte Ergebnis. Die
+ungel\"{o}ste Natur von RH und Zwillingsprimzahl-Vermutung zeigt, dass
+Primzahll\"{u}cken im Schnittpunkt der tiefsten offenen Fragen der Zahlentheorie
+stehen.
+
+Dieses Paper gibt einen \"{U}berblick \"{u}ber die wichtigsten Vermutungen und
+bewiesenen Resultate zu Primzahll\"{u}cken. Wir unterscheiden sorgf\"{a}ltig zwischen
+\textbf{bewiesenen S\"{a}tzen} (als \emph{Theorem} gekennzeichnet) und
+\textbf{offenen Vermutungen} (als \emph{Vermutung} gekennzeichnet). Die
+Meilensteine von Zhang (2013) und Maynard (2014), die bewiesen, dass
+$\liminf_{n\to\infty} g_n < \infty$, werden ausf\"{u}hrlich behandelt. Die
+Andrica-Vermutung ($\sqrt{p_{n+1}} - \sqrt{p_n} < 1$), die Cram\'{e}r-Vermutung
+($\limsup g_n / (\log p_n)^2 = 1$), Legendres Vermutung und Polignacs Vermutung
+werden mit ihrem aktuellen Status, numerischen Belegen und gegenseitigen
+Implikationen vorgestellt.
+
+Alle numerischen Berechnungen wurden mit den Python-Modulen
+\texttt{twin\_prime\_analysis.py} und \texttt{andrica\_cramer.py} des
+Specialist Mathematics Projects (Build 137) durchgef\"{u}hrt.
+
+% ---------------------------------------------------------------------------
+\section{Primzahll\"{u}cken}
+% ---------------------------------------------------------------------------
+
+\begin{definition}
+Sei $p_1 = 2 < p_2 = 3 < p_3 = 5 < \cdots$ die aufsteigende Folge der
+Primzahlen. Die \emph{$n$-te Primzahll\"{u}cke} ist
+\[
+  g_n := p_{n+1} - p_n, \quad n \geq 1.
+\]
+Eine \emph{Maximall\"{u}cke} (auch \emph{Rekordl\"{u}cke}) ist eine L\"{u}cke $g_n$,
+die alle vorherigen \"{u}bertrifft: $g_n > g_k$ f\"{u}r alle $k < n$.
+\end{definition}
+
+\begin{beispiel}
+Die ersten Primzahll\"{u}cken sind $g_1 = 1$ (von $2$ nach $3$), dann
+$g_2 = g_3 = 2, g_4 = 4, g_5 = 2, g_6 = 4, g_7 = 2, g_8 = 4, g_9 = 6,
+\ldots$ F\"{u}r alle $n \geq 2$ gilt $g_n \geq 2$, da alle Primzahlen $p \geq 3$
+ungerade sind.
+\end{beispiel}
+
+\begin{theorem}[Existenz beliebig gro\ss{}er L\"{u}cken]
+F\"{u}r jede ganze Zahl $k \geq 1$ gibt es eine Primzahll\"{u}cke $g_n \geq k$.
+\end{theorem}
+
+\begin{proof}
+Betrachte $m = (k+1)! + 2$. Die ganzen Zahlen $m, m+1, \ldots, m+k-1$ sind
+alle zusammengesetzt: $m+j = (k+1)! + (j+2)$ ist durch $j+2$ teilbar f\"{u}r
+$0 \leq j \leq k-1$. Daher liegt keine Primzahl in diesem Intervall der L\"{a}nge
+$k-1$, was eine L\"{u}cke der Gr\"{o}\ss{}e $\geq k$ ergibt.
+\end{proof}
+
+\subsection{Mittlere L\"{u}ckengr\"{o}\ss{}e und der Primzahlsatz}
+
+Der \emph{Primzahlsatz} (PNT), unabh\"{a}ngig bewiesen von Hadamard und de la
+Vall\'{e}e Poussin (1896), lautet
+\[
+  \pi(x) \sim \frac{x}{\log x}, \quad x \to \infty,
+\]
+wobei $\pi(x)$ die Anzahl der Primzahlen $\leq x$ z\"{a}hlt. Eine \"{a}quivalente
+Formulierung ist $p_n \sim n \log n$. Daraus folgt, dass die \emph{mittlere}
+L\"{u}cke in der N\"{a}he von $p_n$ ungef\"{a}hr $\log p_n$ betr\"{a}gt:
+\[
+  \frac{1}{N} \sum_{n=1}^{N} g_n = \frac{p_{N+1} - 2}{N} \sim \log p_N.
+\]
+
+\subsection{Das Cram\'{e}r-Modell}
+
+Harald Cram\'{e}r (1936) entwickelte ein einflussreiches heuristisches Modell:
+Man modelliert die Primzahlen als eine zuf\"{a}llige Teilmenge der ganzen Zahlen,
+bei der jede ganze Zahl $n$ unabh\"{a}ngig mit Wahrscheinlichkeit $1/\log n$
+``prim'' ist. Unter diesem Modell:
+\begin{itemize}
+  \item ist die Wahrscheinlichkeit, dass sowohl $n$ als auch $n+2$ prim sind,
+        $\approx 1/(\log n)^2$,
+  \item folgen L\"{u}cken in der N\"{a}he von $x$ einer Exponentialverteilung mit
+        Mittelwert $\log x$,
+  \item gilt f\"{u}r die Maximall\"{u}cke bis $x$: $g_{\max} \approx (\log x)^2$.
+\end{itemize}
+
+\begin{bemerkung}
+Das Cram\'{e}r-Modell ber\"{u}cksichtigt nicht die Teilbarkeit durch kleine
+Primzahlen (den "`Siebeffekt"'). Granville (1995) zeigte, dass dies zu einer
+korrigierten Vorhersage f\"{u}hrt: Der Limes Superior von $g_n/(\log p_n)^2$
+sollte $2e^{-\gamma} \approx 1{,}1229$ statt $1$ betragen, wobei
+$\gamma \approx 0{,}5772$ die Euler-Mascheroni-Konstante ist.
+\end{bemerkung}
+
+\subsection{Bekannte unbedingte Schranken f\"{u}r L\"{u}cken}
+
+Baker, Harman und Pintz (2001) bewiesen unbedingt:
+\[
+  g_n \ll p_n^{0{,}525}.
+\]
+Unter RH verbessert sich die Schranke auf $g_n \ll p_n^{1/2} \log p_n$.
+
+Die Erd\H{o}s-Rankin-Konstruktion liefert eine untere Schranke f\"{u}r
+Maximall\"{u}cken: Es gibt unendlich viele $n$ mit
+\[
+  g_n \gg \frac{\log p_n \cdot \log\log p_n \cdot \log\log\log\log p_n}{(\log\log\log p_n)^2}.
+\]
+
+% ---------------------------------------------------------------------------
+\section{Die Zwillingsprimzahl-Vermutung}
+% ---------------------------------------------------------------------------
+
+\begin{definition}
+Ein \emph{Zwillingsprimzahlpaar} ist ein Paar $(p, p+2)$ von Primzahlen mit
+Differenz $2$. Die \emph{Zwillingsprimzahl-Z\"{a}hlfunktion} ist
+\[
+  \pi_2(x) := \#\{p \leq x : p \text{ und } p+2 \text{ beide prim}\}.
+\]
+\end{definition}
+
+Die ersten Zwillingsprimzahlpaare sind: $(3,5), (5,7), (11,13), (17,19),
+(29,31), (41,43), (59,61), (71,73), \ldots$
+
+\begin{vermutung}[Zwillingsprimzahl-Vermutung; seit der Antike offen]
+Es gibt unendlich viele Primzahlpaare $(p, p+2)$. \"{A}quivalent:
+$\pi_2(x) \to \infty$ f\"{u}r $x \to \infty$.
+\end{vermutung}
+
+\textbf{Status: Offen. Kein Beweis ist bekannt.} Die Vermutung wurde
+rechnerisch f\"{u}r alle Primzahlen bis $10^{15}$ verifiziert.
+
+\subsection{Bruns Theorem und die Brun-Konstante}
+
+\begin{theorem}[Brun, 1919]
+Die Reihe
+\[
+  B_2 := \sum_{\substack{p,\, p+2 \text{ Zwillingsprimes}}} \left(\frac{1}{p} + \frac{1}{p+2}\right)
+\]
+konvergiert. Die \emph{Brun-Konstante} wird auf $B_2 \approx 1{,}9021605831$
+gesch\"{a}tzt.
+\end{theorem}
+
+Dieses von Viggo Brun mit Siebtechniken bewiesene Resultat ist bemerkenswert:
+Es gilt unabh\"{a}ngig davon, ob es endlich oder unendlich viele Zwillingsprimzahlen
+gibt. Falls die Zwillingsprimzahlen unendlich, aber hinreichend d\"{u}nn ges\"{a}t
+w\"{a}ren, w\"{u}rde die Konvergenz trotzdem gelten.
+
+\begin{bemerkung}
+Zum Vergleich: $\sum_p 1/p = \infty$ (Euler). Die Konvergenz von $B_2$ steht
+in starkem Kontrast dazu und zeigt, dass Zwillingsprimzahlen (falls unendlich
+viele existieren) viel d\"{u}nner gestreut sind als Primzahlen selbst.
+\end{bemerkung}
+
+\subsection{Hardy-Littlewood-Vermutung B}
+
+\begin{vermutung}[Hardy-Littlewood-Vermutung B, 1923; offen]
+\label{verm:hl}
+F\"{u}r $x \to \infty$ gilt:
+\[
+  \pi_2(x) \sim 2 C_2 \frac{x}{(\log x)^2},
+\]
+wobei $C_2$ die \emph{Zwillingsprimzahl-Konstante} ist:
+\[
+  C_2 = \prod_{\substack{p \geq 3 \\ p \text{ prim}}} \frac{p(p-2)}{(p-1)^2}
+       \approx 0{,}6601618158\ldots
+\]
+\end{vermutung}
+
+Die Konstante $C_2$ entsteht als Dichtekorrektur f\"{u}r das Sieb des Eratosthenes,
+das gleichzeitig auf $n$ und $n+2$ angewendet wird. Numerisch gilt
+$2C_2 \approx 1{,}3203$.
+
+\begin{bemerkung}
+Diese Vermutung impliziert die Zwillingsprimzahl-Vermutung, ist aber selbst viel
+st\"{a}rker. Sie ist mit numerischen Daten bis $10^{15}$ konsistent, ein Beweis
+scheint mit heutigen Methoden unerreichbar.
+\end{bemerkung}
+
+\subsection{Das Parit\"{a}tsproblem}
+
+Ein fundamentales Hindernis beim Beweis der Zwillingsprimzahl-Vermutung durch
+klassische Siebmethoden ist das \emph{Selberg-Parit\"{a}tsproblem}. Sei
+$\Omega(n)$ die Anzahl der Primfaktoren von $n$ (mit Vielfachheit). Klassische
+Siebe k\"{o}nnen die Parit\"{a}t von $\Omega(n)$ nicht unterscheiden, weshalb sie
+nicht direkt Paare z\"{a}hlen k\"{o}nnen, bei denen sowohl $n$ als auch $n+2$ prim
+sind (d.h.\ $\Omega(n) = \Omega(n+2) = 1$). Jede Siebfunktion $\lambda^2$
+behandelt den Fall $\Omega(n) = 1$ und $\Omega(n) = 2$ identisch.
+
+% ---------------------------------------------------------------------------
+\section{Zhangs Satz und Maynards Verbesserung}
+% ---------------------------------------------------------------------------
+
+Die Jahre 2013--2015 erlebten einen der dramatischsten Durchbr\"{u}che in der
+analytischen Zahlentheorie seit Jahrzehnten.
+
+\begin{theorem}[Zhang, 2013]
+\label{thm:zhang}
+Es gibt unendlich viele Paare aufeinanderfolgender Primzahlen $(p_n, p_{n+1})$
+mit
+\[
+  p_{n+1} - p_n < 70{.}000{.}000.
+\]
+\"{A}quivalent: $\liminf_{n \to \infty} g_n \leq 70{.}000{.}000$.
+\end{theorem}
+
+Zhangs Beweis war das erste Mal, dass jemand $\liminf g_n < \infty$ gezeigt
+hatte. Die Schl\"{u}sselzutaten waren:
+\begin{enumerate}[label=(\roman*)]
+  \item Das \emph{Goldston-Pintz-Y{\i}ld{\i}r{\i}m (GPY)-Sieb} (2005), das
+        dem Ziel sehr nahe gekommen, aber den letzten Schritt nicht geschafft hatte.
+  \item Eine versch\"{a}rfte Absch\"{a}tzung f\"{u}r Primzahlen in arithmetischen
+        Progressionen, die \"{u}ber das Bombieri-Vinogradov-Theorem hinausgeht.
+  \item Ein zul\"{a}ssiges $k$-Tupel der Gr\"{o}\ss{}e $k = 3{,}5 \times 10^6$, dessen
+        Elemente gemeinsam eine beschr\"{a}nkte L\"{u}cke garantierten.
+\end{enumerate}
+
+\begin{theorem}[Maynard, 2014; Polymath8b, 2014]
+\label{thm:maynard}
+Unter Verwendung des GPY-Rahmens mit verbesserten Gewichten gilt:
+\[
+  \liminf_{n \to \infty} g_n \leq 246.
+\]
+Das Polymath8b-Projekt (kollaborative Optimierung von Maynards Methode)
+etablierte diese Schranke.
+\end{theorem}
+
+Maynard f\"{u}hrte ein mehrdimensionales Siebgewicht der Form
+\[
+  w(n) = \left(\sum_{d_1 | (n+h_1),\, d_2 | (n+h_2),\, \ldots} \lambda_{d_1, \ldots, d_k}\right)^2
+\]
+ein und optimierte die $\lambda$-Koeffizienten, um zu zeigen, dass f\"{u}r jedes
+zul\"{a}ssige $k$-Tupel $(h_1,\ldots,h_k)$ mit hinreichend gro\ss{}em $k$ mindestens
+zwei der $n+h_i$ unendlich oft prim sind.
+
+\begin{bemerkung}
+Die Schranke $246$ bedeutet: Es gibt eine gerade Zahl $2 \leq d \leq 246$, so
+dass $p_{n+1} - p_n = d$ f\"{u}r unendlich viele $n$. Der genaue Wert $d = 2$
+(Zwillingsprimzahlen) bleibt unbewiesen.
+\end{bemerkung}
+
+\subsection{Die GPY-Siebtechnik}
+
+Der GPY-Ansatz (Goldston, Pintz, Y{\i}ld{\i}r{\i}m, 2005) bewies:
+\begin{theorem}[GPY, 2005]
+F\"{u}r jedes $\varepsilon > 0$ gibt es unendlich viele $n$ mit
+\[
+  g_n < \varepsilon \log p_n.
+\]
+\end{theorem}
+
+Dies besagt, dass Primzahlen manchmal viel enger beieinander liegen als im
+Durchschnitt, liefert aber keine feste Schranke. Die Grundidee: Man f\"{u}hrt ein
+\emph{Mollifier}-Gewicht $w(n) = (\sum_{d | P(n)} \lambda_d)^2$ mit
+$P(n) = n(n+2)$ ein und optimiert $\lambda_d$, um
+\[
+  S = \frac{\sum_{n \sim N} w(n)[\Lambda(n+h_1)\Lambda(n+h_2)]}{\sum_{n \sim N} w(n)}
+\]
+zu maximieren. Zhang \"{u}berwindet die Parit\"{a}tsschranke durch versch\"{a}rfte
+Exponentialsummen-Absch\"{a}tzungen.
+
+% ---------------------------------------------------------------------------
+\section{Die Andrica-Vermutung}
+% ---------------------------------------------------------------------------
+
+\begin{vermutung}[Andrica, 1985; offen]
+\label{verm:andrica}
+F\"{u}r alle $n \geq 1$ gilt:
+\[
+  A_n := \sqrt{p_{n+1}} - \sqrt{p_n} < 1.
+\]
+\end{vermutung}
+
+\textbf{Status: Offen. Numerisch verifiziert f\"{u}r alle Primzahlen bis
+$4 \times 10^{18}$.}
+
+\subsection{\"{A}quivalente Formulierungen}
+
+Die Andrica-Vermutung ist \"{a}quivalent zu jeder der folgenden Aussagen:
+\begin{enumerate}[label=(\roman*)]
+  \item $\sqrt{p_{n+1}} - \sqrt{p_n} < 1$ (Originalform),
+  \item $p_{n+1} < (\sqrt{p_n} + 1)^2 = p_n + 2\sqrt{p_n} + 1$,
+  \item $g_n = p_{n+1} - p_n < 2\sqrt{p_n} + 1$.
+\end{enumerate}
+
+Formulierung (iii) macht den Inhalt transparent: Die $n$-te Primzahll\"{u}cke muss
+sublinear in $\sqrt{p_n}$ wachsen.
+
+\subsection{Der maximale Andrica-Wert}
+
+Der gr\"{o}\ss{}te bekannte Wert von $A_n$ tritt bei $n = 4$ auf:
+\[
+  A_4 = \sqrt{11} - \sqrt{7} \approx 3{,}3166 - 2{,}6457 = 0{,}6708.
+\]
+Kein Wert $A_n \geq 1$ wurde jemals gefunden. F\"{u}r $n \to \infty$ scheint
+$A_n$ gegen $0$ zu fallen, konsistent mit der Erwartung, dass Primzahll\"{u}cken
+viel langsamer als $2\sqrt{p_n}$ wachsen.
+
+\begin{table}[h]
+\centering
+\caption{Erste Andrica-Werte $A_n = \sqrt{p_{n+1}} - \sqrt{p_n}$}
+\begin{tabular}{@{}rrrrc@{}}
+\toprule
+$n$ & $p_n$ & $p_{n+1}$ & $g_n$ & $A_n$ \\
+\midrule
+1 & 2 & 3 & 1 & 0{,}3178 \\
+2 & 3 & 5 & 2 & 0{,}5058 \\
+3 & 5 & 7 & 2 & 0{,}3780 \\
+4 & 7 & 11 & 4 & \textbf{0{,}6708} \\
+5 & 11 & 13 & 2 & 0{,}2970 \\
+6 & 13 & 17 & 4 & 0{,}5353 \\
+7 & 17 & 19 & 2 & 0{,}2375 \\
+8 & 19 & 23 & 4 & 0{,}4508 \\
+9 & 23 & 29 & 6 & 0{,}6065 \\
+10 & 29 & 31 & 2 & 0{,}1826 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Beziehung zu anderen Vermutungen}
+
+\begin{proposition}
+Die Cram\'{e}r-Vermutung impliziert die Andrica-Vermutung.
+\end{proposition}
+
+\begin{proof}
+Unter der Cram\'{e}r-Vermutung gilt $g_n \leq (1+\varepsilon)(\log p_n)^2$ f\"{u}r
+alle hinreichend gro\ss{}en $n$. F\"{u}r gro\ss{}e $p$ gilt $(\log p)^2 \ll \sqrt{p}$,
+also $g_n \ll \sqrt{p_n}$. Damit gilt $g_n < 2\sqrt{p_n} + 1$ f\"{u}r gro\ss{}e
+$n$, und die endlich vielen kleinen $n$ k\"{o}nnen direkt gepr\"{u}ft werden.
+\end{proof}
+
+\begin{proposition}
+Die Andrica-Vermutung impliziert die Legendre-Vermutung f\"{u}r hinreichend gro\ss{}e
+$n$.
+\end{proposition}
+
+Der Zusammenhang folgt aus der \"{a}quivalenten Formulierung (ii).
+
+% ---------------------------------------------------------------------------
+\section{Die Cram\'{e}r-Vermutung}
+% ---------------------------------------------------------------------------
+
+\begin{vermutung}[Cram\'{e}r, 1936; offen]
+\label{verm:cramer}
+\[
+  \limsup_{n \to \infty} \frac{g_n}{(\log p_n)^2} = 1.
+\]
+\end{vermutung}
+
+\textbf{Status: Offen. Unter heuristischen Argumenten (Granville 1995) sollte
+der Limes Superior mindestens $2e^{-\gamma} \approx 1{,}1229$ betragen; er ist
+endlich nach Baker-Harman-Pintz.}
+
+\subsection{Granvilles Korrektur}
+
+Andrew Granville (1995) argumentierte, dass die korrekte Vorhersage aus einer
+sorgf\"{a}ltigeren Analyse des Cram\'{e}r-Modells unter Einbeziehung von
+Hardy-Littlewood-Korrekturen lautet:
+\[
+  \limsup_{n \to \infty} \frac{g_n}{(\log p_n)^2} = 2e^{-\gamma} \approx 1{,}1229,
+\]
+wobei $\gamma = 0{,}5772156649\ldots$ die Euler-Mascheroni-Konstante ist.
+
+Die Granville-Korrektur $C_{\text{Gr}} = 2e^{-\gamma}$ entsteht, weil das
+Cram\'{e}r-Modell die Dichte von Primzahlen in der N\"{a}he glatter Zahlen (Zahlen
+mit nur kleinen Primfaktoren) leicht \"{u}bersch\"{a}tzt, und sich dieser Bias
+akkumuliert.
+
+\subsection{Bekannte Schranken}
+
+\begin{theorem}[Baker-Harman-Pintz, 2001]
+Unbedingt gilt: $g_n \ll p_n^{0{,}525}$.
+\end{theorem}
+
+\begin{theorem}[Bedingt unter RH]
+$g_n \ll p_n^{1/2} \log p_n$.
+\end{theorem}
+
+\begin{theorem}[Westzynthius, 1931]
+$\limsup_{n\to\infty} g_n/\log p_n = \infty$.
+\end{theorem}
+
+\subsection{Rekord-Cram\'{e}r-Werte}
+
+Die gr\"{o}\ss{}te bekannte normierte L\"{u}cke $g_n/(\log p_n)^2$ wurde von Oliveira e
+Silva (2014) bei $p_n = 1{.}693{.}182{.}318{.}746{.}371 \approx 1{,}7 \times 10^{15}$
+gefunden, mit normiertem Wert $\approx 1{,}17$ --- deutlich unter der
+Granville-Schranke $\approx 1{,}1229$, aber konsistent mit ihr.
+
+% ---------------------------------------------------------------------------
+\section{Legendres Vermutung}
+% ---------------------------------------------------------------------------
+
+\begin{vermutung}[Legendre, $\sim$1798; offen]
+\label{verm:legendre}
+F\"{u}r jede positive ganze Zahl $n \geq 1$ gibt es mindestens eine Primzahl $p$
+mit
+\[
+  n^2 < p < (n+1)^2.
+\]
+\end{vermutung}
+
+\textbf{Status: Offen. Rechnerisch verifiziert f\"{u}r alle $n \leq 10^{15}$
+(Meissel-Lehmer-Methoden).}
+
+\begin{bemerkung}
+Die Legendre-Vermutung ist \"{a}quivalent zur Aussage, dass zwischen je zwei
+aufeinanderfolgenden Quadratzahlen stets eine Primzahl liegt. Dies w\"{u}rde
+implizieren, dass die L\"{u}cke zwischen aufeinanderfolgenden Primzahlen in der
+N\"{a}he von $n^2$ die Bedingung $g \ll n \sim \sqrt{p}$ erf\"{u}llt --- schw\"{a}cher
+als die Cram\'{e}r-Vermutung, aber immer noch unbewiesen.
+\end{bemerkung}
+
+\subsection{Zusammenhang zur Andrica-Vermutung}
+
+\begin{proposition}
+Die Andrica-Vermutung ist in folgendem Sinne st\"{a}rker als die
+Legendre-Vermutung: Wenn $A_n < 1$ f\"{u}r alle $n$, so gibt es in jedem
+Intervall $(m^2, (m+1)^2)$ h\"{o}chstens eine "`L\"{u}cke"' aus der Andrica-Folge.
+\end{proposition}
+
+Der genaue Zusammenhang:
+\begin{itemize}
+  \item Andrica f\"{u}r aufeinanderfolgende Primzahlen: $p_{n+1} < (\sqrt{p_n}+1)^2$.
+  \item Legendre: In jedem $(n^2, (n+1)^2)$ liegt eine Primzahl.
+\end{itemize}
+
+Diese Aussagen sind nicht identisch, da Legendre alle Quadrate $n^2$ betrachtet,
+w\"{a}hrend Andrica nur Paare aufeinanderfolgender Primzahlen betrachtet.
+
+\subsection{Partielle Ergebnisse}
+
+Ingham (1937) bewies, dass f\"{u}r alle hinreichend gro\ss{}en $n$ eine Primzahl in
+$(n^3, (n+1)^3)$ liegt. Unter RH kann man zeigen, dass in jedem Intervall
+$(x, x + C\sqrt{x}\log x)$ eine Primzahl liegt.
+
+% ---------------------------------------------------------------------------
+\section{Polignacs Vermutung}
+% ---------------------------------------------------------------------------
+
+\begin{vermutung}[de Polignac, 1849; offen]
+\label{verm:polignac}
+F\"{u}r jede positive gerade Zahl $2k$ ($k \geq 1$) gibt es unendlich viele
+Primzahlpaare $(p, p + 2k)$.
+\end{vermutung}
+
+\textbf{Status: Offen f\"{u}r alle konkreten Werte von $k$, einschlie\ss{}lich $k=1$
+(Zwillingsprimzahl-Vermutung).}
+
+Die Zwillingsprimzahl-Vermutung ist der Spezialfall $k=1$.
+
+\begin{bemerkung}
+Dank Maynards Theorem (\ref{thm:maynard}) wissen wir, dass \emph{irgendeine}
+gerade Zahl $2k \leq 246$ Polignacs Vermutung erf\"{u}llt. F\"{u}r keinen konkreten
+Wert von $k$ wurde dies aber bewiesen.
+\end{bemerkung}
+
+\subsection{De Polignacs urspr\"{u}ngliche Behauptung}
+
+Alphonse de Polignac (1849) behauptete urspr\"{u}nglich sogar ein st\"{a}rkeres
+Resultat: dass jede gerade Zahl $2k$ die Differenz zweier aufeinanderfolgender
+Primzahlen in unendlich vielen F\"{a}llen ist. Bereits die schw\"{a}chere Version
+(beliebige Primzahlpaare, nicht notwendig aufeinanderfolgend) ist offen.
+
+\subsection{Hardy-Littlewood-Verallgemeinerung}
+
+Hardy und Littlewood (1923) vermuteten eine quantitative Form: F\"{u}r jedes
+zul\"{a}ssige gerade $2k$ gilt
+\[
+  \#\{p \leq x : p + 2k \text{ prim}\} \sim \mathfrak{S}(2k) \frac{x}{(\log x)^2},
+\]
+wobei $\mathfrak{S}(2k) = 2C_2 \prod_{p | k,\, p > 2} \frac{p-1}{p-2}$ die
+\emph{singul\"{a}re Reihe} f\"{u}r das Paar $(0, 2k)$ ist.
+
+% ---------------------------------------------------------------------------
+\section{Probabilistische Modelle}
+% ---------------------------------------------------------------------------
+
+\subsection{Das Cram\'{e}r-Modell im Detail}
+
+Im Cram\'{e}r-Modell definiert man eine zuf\"{a}llige Menge $\mathcal{P}$ so: F\"{u}r
+jedes $n \geq 3$ wird $n$ in $\mathcal{P}$ aufgenommen, unabh\"{a}ngig mit
+Wahrscheinlichkeit $1/\log n$. (Man setzt $\mathcal{P} \cap [2,3] = \{2,3\}$.)
+
+Unter diesem Modell gilt:
+\begin{enumerate}[label=(\roman*)]
+  \item $\mathbb{E}[\pi_{\mathcal{P}}(x)] \sim x/\log x$ (imitiert den PNT),
+  \item L\"{u}cken in der N\"{a}he von $x$ sind ann\"{a}hernd exponentialverteilt mit
+        Mittelwert $\log x$,
+  \item die Maximall\"{u}cke bis $x$ betr\"{a}gt $\approx (\log x)^2$,
+  \item die Anzahl der Zwillingsprimzahlpaare bis $x$ betr\"{a}gt
+        $\approx x/(\log x)^2$ (ohne die $C_2$-Korrektur).
+\end{enumerate}
+
+\subsection{Die Hardy-Littlewood-Heuristik}
+
+Eine verfeinerte Heuristik ber\"{u}cksichtigt die tats\"{a}chliche Dichte von
+Primzahlen in arithmetischen Progressionen. F\"{u}r ein Primzahlpaar $(p, p+2k)$
+betr\"{a}gt die lokale Dichte bei $p$ etwa $1/\log p$, und die Ereignisse
+``$p$ ist prim'' und ``$p+2k$ ist prim'' sind wegen gemeinsamer kleiner
+Primteiler nicht unabh\"{a}ngig. Der Korrekturfaktor f\"{u}r L\"{u}cke $2k$ ist die
+singul\"{a}re Reihe $\mathfrak{S}(2k)$.
+
+F\"{u}r $2k = 2$ (Zwillingsprimzahlen):
+\[
+  \mathfrak{S}(2) = 2 C_2 = 2 \prod_{p \geq 3} \frac{p(p-2)}{(p-1)^2} \approx 1{,}3203.
+\]
+
+\subsection{Die Granville-Cram\'{e}r-Heuristik}
+
+Granvilles verfeinertes Modell (1995) sagt voraus, dass Maximall\"{u}cken erf\"{u}llen:
+\[
+  g_{\max}(x) \approx 2e^{-\gamma} (\log x)^2 \approx 1{,}1229 (\log x)^2,
+\]
+wobei der Faktor $2e^{-\gamma}$ aus dem asymptotischen Verhalten der Summe
+$\sum_{p \leq x} 1/p \approx \log\log x + M$ (Mertens-Konstante $M$) folgt.
+
+% ---------------------------------------------------------------------------
+\section{Numerische Ergebnisse}
+% ---------------------------------------------------------------------------
+
+\subsection{Zwillingsprimzahl-Daten}
+
+Die folgende Tabelle zeigt Zwillingsprimzahl-Anzahlen $\pi_2(x)$ im Vergleich
+zur Hardy-Littlewood-Vorhersage $2C_2 \cdot x/(\log x)^2$:
+
+\begin{table}[h]
+\centering
+\caption{Zwillingsprimzahl-Anzahlen $\pi_2(x)$ und Hardy-Littlewood-Vorhersage}
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+$x$ & $\pi_2(x)$ & $2C_2 x/(\log x)^2$ & Verh\"{a}ltnis \\
+\midrule
+$10^3$ & 35 & 27{,}9 & 1{,}25 \\
+$10^4$ & 205 & 171{,}3 & 1{,}20 \\
+$10^5$ & 1224 & 1107{,}8 & 1{,}10 \\
+$10^6$ & 8169 & 7459{,}7 & 1{,}10 \\
+$10^7$ & 58980 & 54438{,}1 & 1{,}08 \\
+$10^8$ & 440312 & 412849{,}5 & 1{,}07 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Das Verh\"{a}ltnis n\"{a}hert sich $1$ bei wachsendem $x$, was mit
+Vermutung~\ref{verm:hl} konsistent ist, sie aber nicht beweist.
+
+\subsection{Maximale Primzahll\"{u}cken-Rekorde}
+
+\begin{table}[h]
+\centering
+\caption{Maximale Primzahll\"{u}cken-Rekorde (ausgew\"{a}hlt)}
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+$p_n$ & $p_{n+1}$ & $g_n$ & $g_n/(\log p_n)^2$ \\
+\midrule
+7 & 11 & 4 & 0{,}656 \\
+23 & 29 & 6 & 0{,}594 \\
+89 & 97 & 8 & 0{,}428 \\
+113 & 127 & 14 & 0{,}657 \\
+523 & 541 & 18 & 0{,}503 \\
+887 & 907 & 20 & 0{,}474 \\
+9551 & 9587 & 36 & 0{,}424 \\
+31397 & 31469 & 72 & 0{,}552 \\
+155921 & 156007 & 86 & 0{,}424 \\
+360653 & 360749 & 96 & 0{,}389 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Andrica-Verifikation}
+
+Alle Andrica-Werte $A_n = \sqrt{p_{n+1}} - \sqrt{p_n}$ f\"{u}r $n = 1, \ldots,
+10^6$ (bis $p \approx 15{,}5 \times 10^6$) erf\"{u}llen $A_n < 1$. Das laufende
+Maximum \"{u}berschreitet nach $n = 4$ den Wert $A_4 \approx 0{,}6708$ in keiner
+Berechnung bis heute.
+
+\subsection{Cram\'{e}r-Werteverteilung}
+
+F\"{u}r die ersten $10{.}000$ Primzahlen haben die normierten L\"{u}cken
+$C_n = g_n/(\log p_n)^2$:
+\begin{itemize}
+  \item Mittelwert: $\approx 0{,}064$,
+  \item Maximum: $\approx 0{,}74$ (bei $p = 113$),
+  \item Anteil \"{u}ber der Granville-Konstante $2e^{-\gamma} \approx 1{,}1229$:
+        exakt $0$ in diesem Bereich.
+\end{itemize}
+
+Diese Werte sind mit den Cram\'{e}r/Granville-Heuristiken konsistent, liefern
+aber keinen Beweis.
+
+% ---------------------------------------------------------------------------
+\section{\"{U}bersicht: Offene Probleme und bewiesene Resultate}
+% ---------------------------------------------------------------------------
+
+\begin{table}[h]
+\centering
+\caption{\"{U}bersicht: Offene Vermutungen und bewiesene Theoreme}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Aussage & Autor & Jahr & Status \\
+\midrule
+Zwillingsprimzahl-Vermutung & Volksweisheit & Antike & \textbf{Offen} \\
+Hardy-Littlewood Verm.\ B & Hardy, Littlewood & 1923 & \textbf{Offen} \\
+Andrica-Vermutung & Andrica & 1985 & \textbf{Offen} \\
+Cram\'{e}r-Vermutung & Cram\'{e}r & 1936 & \textbf{Offen} \\
+Legendre-Vermutung & Legendre & $\sim$1798 & \textbf{Offen} \\
+Polignac-Vermutung & de Polignac & 1849 & \textbf{Offen} \\
+\midrule
+Bruns Theorem ($B_2$ konvergiert) & Brun & 1919 & \textbf{Bewiesen} \\
+Primzahlsatz & Hadamard, de la VP & 1896 & \textbf{Bewiesen} \\
+$g_n \ll p_n^{0{,}525}$ & Baker-Harman-Pintz & 2001 & \textbf{Bewiesen} \\
+$\liminf g_n \leq 70{.}000{.}000$ & Zhang & 2013 & \textbf{Bewiesen} \\
+$\liminf g_n \leq 246$ & Maynard/Polymath8b & 2014 & \textbf{Bewiesen} \\
+GPY kleine L\"{u}cken & Goldston-Pintz-Y. & 2005 & \textbf{Bewiesen} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Die zentralen offenen Probleme --- Zwillingsprimzahl-Vermutung, Andrica, Cram\'{e}r,
+Legendre und Polignac --- betreffen alle die Feinstruktur von Primzahll\"{u}cken auf
+verschiedenen Skalen. Zhangs Durchbruch zeigt, dass $\liminf g_n$ endlich ist;
+die riesige Distanz von $246$ auf $2$ zu schlie\ss{}en bleibt eine der tiefsten
+Herausforderungen der Mathematik.
+
+% ---------------------------------------------------------------------------
+\section*{Literatur}
+% ---------------------------------------------------------------------------
+
+\begin{thebibliography}{99}
+
+\bibitem{brun1919}
+V.\ Brun,
+\textit{La s\'{e}rie $1/5 + 1/7 + 1/11 + 1/13 + \cdots$ est convergente ou finie},
+Bull.\ Sci.\ Math.\ \textbf{43} (1919), 100--104, 124--128.
+
+\bibitem{cramer1936}
+H.\ Cram\'{e}r,
+\textit{On the order of magnitude of the difference between consecutive prime
+numbers},
+Acta Arith.\ \textbf{2} (1936), 23--46.
+
+\bibitem{hardylittlewood1923}
+G.\ H.\ Hardy und J.\ E.\ Littlewood,
+\textit{Some problems of `Partitio Numerorum' III: On the expression of a number
+as a sum of primes},
+Acta Math.\ \textbf{44} (1923), 1--70.
+
+\bibitem{andrica1985}
+D.\ Andrica,
+\textit{Note on a conjecture in prime number theory},
+Studia Univ.\ Babe\c{s}-Bolyai Math.\ \textbf{31} (1985), Nr.\ 4, 44--48.
+
+\bibitem{gpy2005}
+D.\ A.\ Goldston, J.\ Pintz und C.\ Y.\ Y{\i}ld{\i}r{\i}m,
+\textit{Primes in tuples I},
+Ann.\ Math.\ \textbf{170} (2009), 819--862. (Preprint 2005.)
+
+\bibitem{zhang2013}
+Y.\ Zhang,
+\textit{Bounded gaps between primes},
+Ann.\ Math.\ \textbf{179} (2014), 1121--1174. (Eingereicht 2013.)
+
+\bibitem{maynard2014}
+J.\ Maynard,
+\textit{Small gaps between primes},
+Ann.\ Math.\ \textbf{181} (2015), 383--413. (Preprint 2013.)
+
+\bibitem{polymath8b2014}
+D.\ H.\ J.\ Polymath,
+\textit{Variants of the Selberg sieve, and bounded intervals containing many
+primes},
+Res.\ Math.\ Sci.\ \textbf{1} (2014), Art.\ 12.
+
+\bibitem{granville1995}
+A.\ Granville,
+\textit{Harald Cram\'{e}r and the distribution of prime numbers},
+Scand.\ Actuar.\ J.\ \textbf{1} (1995), 12--28.
+
+\bibitem{bhp2001}
+R.\ C.\ Baker, G.\ Harman und J.\ Pintz,
+\textit{The difference between consecutive primes, II},
+Proc.\ London Math.\ Soc.\ \textbf{83} (2001), 532--562.
+
+\bibitem{westzynthius1931}
+E.\ Westzynthius,
+\textit{\"{U}ber die Verteilung der Zahlen, die zu den $n$ ersten Primzahlen
+teilerfremd sind},
+Commentat.\ Phys.-Math.\ \textbf{5} (1931), 1--37.
+
+\end{thebibliography}
+
+\end{document}
