@@ -1,0 +1,151 @@
+============================================================
+Kurepa Heavy Computation — Start: 2026-03-12 12:03:58
+Grenze: p ≤ 10,000,000 | Kerne: 20 | Chunk: 5,000
+============================================================
+Generiere Primzahlen...
+  664,578 Primzahlen bis 10,000,000 (11.1s)
+Numba JIT warm-up...
+  JIT bereit.
+
+Verarbeite 133 Chunks mit 20 Kernen...
+
+  Chunk   0:    5,000 Primzahlen (3–48,619) — 3.4s — Verletzungen: 0
+  Chunk   1:    5,000 Primzahlen (48,623–104,743) — 13.4s — Verletzungen: 0
+  Chunk   2:    5,000 Primzahlen (104,759–163,847) — 29.4s — Verletzungen: 0
+  Chunk   4:    5,000 Primzahlen (224,759–287,137) — 37.3s — Verletzungen: 0
+  Chunk   6:    5,000 Primzahlen (350,411–414,991) — 63.8s — Verletzungen: 0
+  Chunk   3:    5,000 Primzahlen (163,853–224,743) — 36.1s — Verletzungen: 0
+  Chunk   8:    5,000 Primzahlen (479,951–545,749) — 88.5s — Verletzungen: 0
+  Chunk   5:    5,000 Primzahlen (287,141–350,381) — 52.1s — Verletzungen: 0
+  Chunk  10:    5,000 Primzahlen (611,969–679,279) — 97.1s — Verletzungen: 0
+  Chunk   7:    5,000 Primzahlen (415,013–479,939) — 55.5s — Verletzungen: 0
+  Chunk  12:    5,000 Primzahlen (746,791–814,309) — 125.4s — Verletzungen: 0
+  Chunk  14:    5,000 Primzahlen (882,391–951,193) — 128.7s — Verletzungen: 0
+  Chunk  16:    5,000 Primzahlen (1,020,401–1,090,381) — 156.0s — Verletzungen: 0
+  Chunk  18:    5,000 Primzahlen (1,159,541–1,229,273) — 164.6s — Verletzungen: 0
+  Chunk   9:    5,000 Primzahlen (545,759–611,957) — 89.5s — Verletzungen: 0
+  Chunk  20:    5,000 Primzahlen (1,299,743–1,370,461) — 219.6s — Verletzungen: 0
+  Chunk  11:    5,000 Primzahlen (679,297–746,777) — 131.2s — Verletzungen: 0
+  Chunk  22:    5,000 Primzahlen (1,441,057–1,511,563) — 238.6s — Verletzungen: 0
+  Chunk  26:    5,000 Primzahlen (1,726,957–1,798,987) — 253.8s — Verletzungen: 0
+  Chunk  13:    5,000 Primzahlen (814,327–882,389) — 140.9s — Verletzungen: 0
+  Chunk  24:    5,000 Primzahlen (1,583,599–1,655,141) — 266.4s — Verletzungen: 0
+  Chunk  15:    5,000 Primzahlen (951,221–1,020,389) — 145.5s — Verletzungen: 0
+  Chunk  28:    5,000 Primzahlen (1,870,709–1,942,751) — 287.8s — Verletzungen: 0
+  Chunk  30:    5,000 Primzahlen (2,015,183–2,088,139) — 312.1s — Verletzungen: 0
+  Chunk  34:    5,000 Primzahlen (2,307,247–2,381,149) — 367.0s — Verletzungen: 0
+  Chunk  17:    5,000 Primzahlen (1,090,387–1,159,531) — 213.8s — Verletzungen: 0
+  Chunk  32:    5,000 Primzahlen (2,160,589–2,234,143) — 384.7s — Verletzungen: 0
+  Chunk  19:    5,000 Primzahlen (1,229,279–1,299,721) — 235.6s — Verletzungen: 0
+  Chunk  36:    5,000 Primzahlen (2,454,623–2,528,419) — 413.1s — Verletzungen: 0
+  Chunk  38:    5,000 Primzahlen (2,601,899–2,675,921) — 443.6s — Verletzungen: 0
+  Chunk  21:    5,000 Primzahlen (1,370,471–1,441,051) — 253.2s — Verletzungen: 0
+  Chunk  23:    5,000 Primzahlen (1,511,569–1,583,591) — 303.7s — Verletzungen: 0
+  Chunk  40:    5,000 Primzahlen (2,750,171–2,823,607) — 536.7s — Verletzungen: 0
+  Chunk  27:    5,000 Primzahlen (1,798,997–1,870,669) — 344.6s — Verletzungen: 0
+  Chunk  42:    5,000 Primzahlen (2,898,557–2,973,073) — 560.1s — Verletzungen: 0
+  Chunk  25:    5,000 Primzahlen (1,655,153–1,726,951) — 362.5s — Verletzungen: 0
+  Chunk  44:    5,000 Primzahlen (3,047,789–3,122,341) — 619.2s — Verletzungen: 0
+  Chunk  29:    5,000 Primzahlen (1,942,753–2,015,179) — 421.7s — Verletzungen: 0
+  Chunk  46:    5,000 Primzahlen (3,196,951–3,271,321) — 640.1s — Verletzungen: 0
+  Chunk  31:    5,000 Primzahlen (2,088,199–2,160,563) — 475.7s — Verletzungen: 0
+  Chunk  48:    5,000 Primzahlen (3,346,633–3,421,793) — 654.4s — Verletzungen: 0
+  Chunk  33:    5,000 Primzahlen (2,234,149–2,307,233) — 483.3s — Verletzungen: 0
+  Chunk  50:    5,000 Primzahlen (3,497,873–3,573,887) — 665.3s — Verletzungen: 0
+  Chunk  35:    5,000 Primzahlen (2,381,153–2,454,619) — 548.6s — Verletzungen: 0
+  Chunk  37:    5,000 Primzahlen (2,528,441–2,601,869) — 561.5s — Verletzungen: 0
+  Chunk  39:    5,000 Primzahlen (2,675,923–2,750,161) — 570.3s — Verletzungen: 0
+  Chunk  52:    5,000 Primzahlen (3,648,943–3,724,243) — 813.8s — Verletzungen: 0
+  Chunk  41:    5,000 Primzahlen (2,823,617–2,898,541) — 554.8s — Verletzungen: 0
+  Chunk  54:    5,000 Primzahlen (3,800,219–3,875,869) — 926.2s — Verletzungen: 0
+  Chunk  56:    5,000 Primzahlen (3,951,173–4,027,927) — 893.9s — Verletzungen: 0
+  Chunk  43:    5,000 Primzahlen (2,973,077–3,047,773) — 683.0s — Verletzungen: 0
+  Chunk  58:    5,000 Primzahlen (4,103,651–4,180,153) — 930.7s — Verletzungen: 0
+  Chunk  60:    5,000 Primzahlen (4,256,257–4,333,099) — 963.9s — Verletzungen: 0
+  Chunk  45:    5,000 Primzahlen (3,122,347–3,196,939) — 760.5s — Verletzungen: 0
+  Chunk  47:    5,000 Primzahlen (3,271,357–3,346,621) — 741.7s — Verletzungen: 0
+  Chunk  62:    5,000 Primzahlen (4,410,347–4,485,487) — 1001.0s — Verletzungen: 0
+  Chunk  64:    5,000 Primzahlen (4,562,711–4,639,277) — 973.1s — Verletzungen: 0
+  Chunk  49:    5,000 Primzahlen (3,421,799–3,497,867) — 762.2s — Verletzungen: 0
+  Chunk  66:    5,000 Primzahlen (4,716,091–4,793,317) — 1119.9s — Verletzungen: 0
+  Chunk  51:    5,000 Primzahlen (3,573,917–3,648,941) — 967.9s — Verletzungen: 0
+  Chunk  68:    5,000 Primzahlen (4,869,889–4,946,237) — 1232.2s — Verletzungen: 0
+  Chunk  70:    5,000 Primzahlen (5,023,331–5,100,593) — 1219.9s — Verletzungen: 0
+  Chunk  53:    5,000 Primzahlen (3,724,249–3,800,213) — 986.3s — Verletzungen: 0
+  Chunk  55:    5,000 Primzahlen (3,875,873–3,951,169) — 955.6s — Verletzungen: 0
+  Chunk  72:    5,000 Primzahlen (5,178,067–5,254,861) — 1338.7s — Verletzungen: 0
+  Chunk  74:    5,000 Primzahlen (5,332,541–5,410,127) — 1343.1s — Verletzungen: 0
+  Chunk  76:    5,000 Primzahlen (5,487,761–5,566,087) — 1401.2s — Verletzungen: 0
+  Chunk  78:    5,000 Primzahlen (5,644,043–5,721,493) — 1427.6s — Verletzungen: 0
+  Chunk  80:    5,000 Primzahlen (5,800,159–5,878,139) — 1376.2s — Verletzungen: 0
+  Chunk  57:    5,000 Primzahlen (4,027,957–4,103,641) — 1034.9s — Verletzungen: 0
+  Chunk  59:    5,000 Primzahlen (4,180,157–4,256,249) — 1031.6s — Verletzungen: 0
+  Chunk  61:    5,000 Primzahlen (4,333,103–4,410,323) — 1054.0s — Verletzungen: 0
+  Chunk  65:    5,000 Primzahlen (4,639,289–4,716,083) — 1109.0s — Verletzungen: 0
+  Chunk  82:    5,000 Primzahlen (5,955,067–6,033,103) — 1417.8s — Verletzungen: 0
+  Chunk  84:    5,000 Primzahlen (6,111,643–6,190,033) — 1349.2s — Verletzungen: 0
+  Chunk  63:    5,000 Primzahlen (4,485,497–4,562,707) — 993.5s — Verletzungen: 0
+  Chunk  67:    5,000 Primzahlen (4,793,363–4,869,877) — 1010.3s — Verletzungen: 0
+  Chunk  86:    5,000 Primzahlen (6,268,313–6,345,803) — 1469.4s — Verletzungen: 0
+  Chunk  71:    5,000 Primzahlen (5,100,611–5,178,053) — 1209.1s — Verletzungen: 0
+  Chunk  69:    5,000 Primzahlen (4,946,257–5,023,309) — 1038.8s — Verletzungen: 0
+  Chunk  73:    5,000 Primzahlen (5,254,889–5,332,531) — 1108.9s — Verletzungen: 0
+  Chunk  90:    5,000 Primzahlen (6,581,977–6,660,733) — 1426.8s — Verletzungen: 0
+  Chunk  88:    5,000 Primzahlen (6,424,969–6,503,513) — 1460.1s — Verletzungen: 0
+  Chunk  75:    5,000 Primzahlen (5,410,201–5,487,707) — 1173.9s — Verletzungen: 0
+  Chunk  81:    5,000 Primzahlen (5,878,219–5,955,043) — 1196.4s — Verletzungen: 0
+  Chunk  77:    5,000 Primzahlen (5,566,091–5,644,033) — 1305.6s — Verletzungen: 0
+  Chunk  79:    5,000 Primzahlen (5,721,517–5,800,139) — 1242.3s — Verletzungen: 0
+  Chunk  92:    5,000 Primzahlen (6,738,913–6,817,631) — 1446.3s — Verletzungen: 0
+  Chunk  94:    5,000 Primzahlen (6,895,403–6,973,919) — 1557.3s — Verletzungen: 0
+  Chunk  83:    5,000 Primzahlen (6,033,133–6,111,617) — 1249.1s — Verletzungen: 0
+  Chunk  96:    5,000 Primzahlen (7,052,147–7,131,647) — 1519.3s — Verletzungen: 0
+  Chunk  98:    5,000 Primzahlen (7,210,807–7,289,467) — 1490.4s — Verletzungen: 0
+  Chunk 100:    5,000 Primzahlen (7,368,811–7,447,799) — 1556.4s — Verletzungen: 0
+  Chunk  85:    5,000 Primzahlen (6,190,043–6,268,303) — 1273.3s — Verletzungen: 0
+  Chunk 102:    5,000 Primzahlen (7,528,151–7,606,579) — 1580.4s — Verletzungen: 0
+  Chunk 104:    5,000 Primzahlen (7,685,809–7,765,391) — 1504.0s — Verletzungen: 0
+  Chunk  87:    5,000 Primzahlen (6,345,821–6,424,961) — 1373.4s — Verletzungen: 0
+  Chunk 106:    5,000 Primzahlen (7,844,773–7,923,953) — 1660.1s — Verletzungen: 0
+  Chunk  89:    5,000 Primzahlen (6,503,533–6,581,969) — 1355.4s — Verletzungen: 0
+  Chunk  91:    5,000 Primzahlen (6,660,751–6,738,899) — 1420.2s — Verletzungen: 0
+  Chunk 108:    5,000 Primzahlen (8,003,561–8,083,477) — 1678.3s — Verletzungen: 0
+  Chunk 110:    5,000 Primzahlen (8,163,107–8,242,277) — 1730.8s — Verletzungen: 0
+  Chunk 112:    5,000 Primzahlen (8,322,257–8,401,721) — 1781.8s — Verletzungen: 0
+  Chunk  93:    5,000 Primzahlen (6,817,651–6,895,397) — 1499.0s — Verletzungen: 0
+  Chunk 114:    5,000 Primzahlen (8,482,277–8,561,321) — 1761.9s — Verletzungen: 0
+  Chunk  95:    5,000 Primzahlen (6,973,921–7,052,141) — 1485.0s — Verletzungen: 0
+  Chunk 116:    5,000 Primzahlen (8,640,689–8,720,281) — 1786.7s — Verletzungen: 0
+  Chunk 118:    5,000 Primzahlen (8,799,941–8,880,463) — 1961.2s — Verletzungen: 0
+  Chunk  97:    5,000 Primzahlen (7,131,661–7,210,781) — 1617.7s — Verletzungen: 0
+  Chunk  99:    5,000 Primzahlen (7,289,479–7,368,791) — 1662.6s — Verletzungen: 0
+  Chunk 120:    5,000 Primzahlen (8,960,477–9,041,129) — 2052.3s — Verletzungen: 0
+  Chunk 101:    5,000 Primzahlen (7,447,801–7,528,141) — 1628.4s — Verletzungen: 0
+  Chunk 103:    5,000 Primzahlen (7,606,597–7,685,807) — 1596.4s — Verletzungen: 0
+  Chunk 122:    5,000 Primzahlen (9,121,523–9,201,287) — 2045.9s — Verletzungen: 0
+  Chunk 105:    5,000 Primzahlen (7,765,393–7,844,741) — 1796.4s — Verletzungen: 0
+  Chunk 124:    5,000 Primzahlen (9,281,071–9,361,249) — 2092.5s — Verletzungen: 0
+  Chunk 107:    5,000 Primzahlen (7,923,959–8,003,539) — 1692.4s — Verletzungen: 0
+  Chunk 126:    5,000 Primzahlen (9,442,247–9,522,607) — 2117.5s — Verletzungen: 0
+  Chunk 109:    5,000 Primzahlen (8,083,541–8,163,049) — 1832.6s — Verletzungen: 0
+  Chunk 111:    5,000 Primzahlen (8,242,279–8,322,253) — 1877.1s — Verletzungen: 0
+  Chunk 130:    5,000 Primzahlen (9,763,469–9,844,279) — 2106.7s — Verletzungen: 0
+  Chunk 128:    5,000 Primzahlen (9,602,479–9,682,613) — 2183.6s — Verletzungen: 0
+  Chunk 113:    5,000 Primzahlen (8,401,741–8,482,261) — 1858.1s — Verletzungen: 0
+  Chunk 115:    5,000 Primzahlen (8,561,339–8,640,683) — 1811.3s — Verletzungen: 0
+  Chunk 132:    4,578 Primzahlen (9,925,519–9,999,991) — 2009.2s — Verletzungen: 0
+  Chunk 117:    5,000 Primzahlen (8,720,311–8,799,929) — 1883.3s — Verletzungen: 0
+  Chunk 119:    5,000 Primzahlen (8,880,479–8,960,467) — 1835.0s — Verletzungen: 0
+  Chunk 121:    5,000 Primzahlen (9,041,141–9,121,493) — 1811.0s — Verletzungen: 0
+  Chunk 123:    5,000 Primzahlen (9,201,307–9,281,017) — 1683.3s — Verletzungen: 0
+  Chunk 125:    5,000 Primzahlen (9,361,273–9,442,231) — 1655.3s — Verletzungen: 0
+  Chunk 127:    5,000 Primzahlen (9,522,637–9,602,471) — 1508.3s — Verletzungen: 0
+  Chunk 131:    5,000 Primzahlen (9,844,283–9,925,471) — 1459.3s — Verletzungen: 0
+  Chunk 129:    5,000 Primzahlen (9,682,619–9,763,447) — 1435.2s — Verletzungen: 0
+
+============================================================
+Fertig: 8396s (2.33h)
+Geprüfte Primzahlen: 664,578
+Verletzungen (Gegenbeispiele): 0
+BESTÄTIGT: Kein Gegenbeispiel bis p = 10000000
+Ergebnis gespeichert: /home/claude-code/project/specialist-maths/research/kurepa_result.json
