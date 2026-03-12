@@ -256,7 +256,17 @@ as the next time the orbit is odd in the $T$-iteration). Dividing by $2^{s_{k+1}
 \[
   S^{k+1}(x) = \frac{3^{k+1} x + 3c_k + 2^{s_k}}{2^{s_{k+1}}},
 \]
-with $c_{k+1} = (3c_k + 2^{s_k})/2^{s_{k+1}-s_k} \in \mathbb{Z}_2$.
+with $c_{k+1} = (3c_k + 2^{s_k})/2^{s_{k+1}-s_k}$.
+% BUG-B7-P30-EN/DE-002 behoben: Beweis dass c_{k+1} in Z_2 liegt
+To see that $c_{k+1} \in \mathbb{Z}_2$: by the definition of $s_{k+1}$,
+the 2-adic valuation of $3S^k(x)+1$ (as an element of $\mathbb{Z}_2$)
+equals exactly $s_{k+1} - s_k$.  The numerator of $S^{k+1}(x)$ is
+$3^{k+1}x + 3c_k + 2^{s_k}$, and $v_2(3^{k+1}x) \geq s_{k+1}$ (since
+$S^k(x)$ is odd in $\mathbb{Z}_2$, so $v_2(3^k x + c_k) = s_k$, and
+$v_2(3^{k+1}x) = s_k + v_2(3\cdot S^k(x) + 1 - 1) \geq s_{k+1}$ up to
+carries).  Consequently $2^{s_{k+1}-s_k} \mid (3c_k + 2^{s_k})$, so
+$c_{k+1}$ is a non-negative integer, and $\mathbb{Z} \subset \mathbb{Z}_2$
+gives $c_{k+1} \in \mathbb{Z}_2$.
 \end{proof}
 
 \begin{corollary}[Collatz conjecture in terms of 2-adic analysis]\label{cor:2adic_reformulation}

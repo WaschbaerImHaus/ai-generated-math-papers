@@ -1,0 +1,49 @@
+## 2026-03-12 — Entwicklungs-Log
+
+### 2026-03-12 06:23:13 — Build 117: Review-Bugs aus vollständigem externem Review behoben
+
+Externen Review `reviews/review_vollständig_alle_batches_2026_03_12.md` verarbeitet.
+36 Papers in 8 Batches geprüft. 5 kritische/hohe Bugs behoben.
+
+#### BUG-B5-P24-EN/DE-002 — BEHOBEN (Historischer Fehler, HOCH)
+- Paper: `papers/batch5/paper24_rh_approaches_en.tex` + `_de.tex`
+- Problem: "Weil (1940) und Deligne (1974) bewiesen die Weil-Vermutungen"
+- Fakten: Weil *stellte auf* (1949), Weil bewies nur den Kurvenfall (1940), Deligne *bewies* den allgemeinen Fall (1974)
+- Fix: Formulierung zu "Weil vermutete... Deligne bewies..." korrigiert
+
+#### BUG-B7-P30-EN/DE-002 — BEHOBEN (Beweislücke, HOCH)
+- Paper: `papers/batch7/paper30_collatz_p_adic_en.tex` + `_de.tex`
+- Problem: Syracuse Representation Theorem — c_{k+1} ∈ Z₂ im Induktionsbeweis nicht explizit nachgewiesen
+- Fix: Begründung hinzugefügt: 2-adische Bewertung von s_{k+1}-s_k teilt Zähler → c_{k+1} ∈ Z ⊂ Z₂
+
+#### BUG-B7-P31-EN/DE-001 — BEHOBEN (Beweislücke, HOCH)
+- Paper: `papers/batch7/paper31_tao_probabilistic_collatz_en.tex` + `_de.tex`
+- Problem: Key Estimate — Proof Sketch zu informell; Übergang Summe→Produkt nicht rigoros;
+  ξ ∉ Z/log₂3 irreführend (für ξ∈Q trivial erfüllt)
+- Fix: Disclaimer "informal — nicht rigoroser Beweis" hinzugefügt;
+  Bedingung korrigiert: ξ ∉ Z (d.h. ‖ξ‖_{R/Z} > 0) statt ξ ∉ Z/log₂3
+
+#### BUG-B7-P32-EN/DE-004 — BEHOBEN (Falsche Aussage, HOCH)
+- Paper: `papers/batch7/paper32_collatz_ergodic_en.tex` + `_de.tex`
+- Problem: "Theorem" über Hausdorff-Dimension der Ausnahmemenge — logdens 0 ⟹ dim < 1 gilt NICHT allgemein
+- Fix: Theorem → conjecture/Vermutung umklassifiziert + Remark/Bemerkung mit Erklärung hinzugefügt
+
+#### BUG-B8-P34-STATUS — BEHOBEN (Darstellungsfehler, MITTEL→HOCH)
+- Paper: `papers/batch8/paper34_abc_conjecture_en.tex` + `_de.tex`
+- Problem: abc-Vermutung als "disputed" statt klar als "OFFEN" klassifiziert;
+  Scholze-Stix nicht als von Mehrheit anerkannt dargestellt
+- Fix: Explizite \begin{remark}[Offizieller Status...] Box hinzugefügt mit:
+  - abc ist OFFEN (nicht bewiesen)
+  - Scholze-Stix von Mehrheit der Gemeinschaft als stichhaltig angesehen
+  - Konsequenz: abc-abhängige Resultate bleiben bedingt
+
+#### Verbleibende MITTEL-Bugs (noch offen):
+- BUG-B4-P18-DE-002: Simplex-Fallunterscheidung (sing. Integral) unvollständig
+- BUG-B4-P19-EN-001: Querverweis "Paper 17, Theorem 6.1" — Nummer falsch
+- BUG-B4-P20-EN-001: GRH-Beweisskizze lückenhaft
+- BUG-B5-P23-EN/DE-002: PNT-Beweis Mertens-Argument zu schnell
+- BUG-B5-P23-EN/DE-001: Konstante -ζ'(0)/ζ(0) konzeptuell unklar
+- BUG-B7-P30-EN/DE-001,-003,-004: T vs. S Verwechslung, unbewiesen Behauptungen
+- BUG-B7-P32-EN/DE-001,-002,-003: Maß ν, Mixing, Spektralradius
+
+#### Build-Nummer: 116 → 117

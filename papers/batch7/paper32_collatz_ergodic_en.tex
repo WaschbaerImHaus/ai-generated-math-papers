@@ -243,22 +243,26 @@ if $a_0 = 1$ (odd), it applies $(3n+1)/2$ and shifts. Under Haar measure, each b
 $a_k$ is independent Bernoulli(1/2), giving the Bernoulli measure on $\{0,1\}^{\mathbb{N}_0}$.
 \end{proof}
 
-\begin{theorem}[Dimension of Collatz exceptional set]\label{thm:dimension}
+% BUG-B7-P32-EN/DE-004 behoben: War als Theorem deklariert, ist aber unbewiesen.
+% Die Implikation logdens 0 => Hausdorff-dim < 1 gilt NICHT allgemein.
+% Korrekte Klassifikation: offene Vermutung / spekulatives Resultat.
+\begin{conjecture}[Dimension of Collatz exceptional set]\label{conj:dimension}
 Assume the Collatz conjecture fails, and let $\mathcal{E} \subset \mathbb{N}$ be the set
-of integers whose Collatz orbit never reaches 1 (i.e.\ either diverges to $\infty$ or
-enters a non-trivial cycle). If $\mathcal{E}$ is non-empty, then its closure
-$\overline{\mathcal{E}} \subset \mathbb{Z}_2$ in the 2-adic topology has Hausdorff
-dimension (with respect to the 2-adic metric) strictly less than 1.
-\end{theorem}
+of integers whose Collatz orbit never reaches 1. If $\mathcal{E}$ is non-empty, then
+its closure $\overline{\mathcal{E}} \subset \mathbb{Z}_2$ in the 2-adic topology is
+conjectured to have Hausdorff dimension (with respect to the 2-adic metric) strictly
+less than 1.
+\end{conjecture}
 
-\begin{proof}[Proof sketch]
-From Tao's theorem, $\mathrm{logdens}(\mathcal{E}) = 0$, which in the 2-adic context
-implies that $\mathcal{E}$ is a thin set in $\mathbb{Z}_2$. The connection to Hausdorff
-dimension uses the fact that logarithmic density 0 implies Hausdorff dimension $\leq 1$
-for ``uniform'' sets; any exceptional set $\mathcal{E}$ arising from dynamical constraints
-(cycle structure) must satisfy further arithmetic constraints that force its 2-adic
-Hausdorff dimension below 1.
-\end{proof}
+\begin{remark}[Status of the dimension bound]
+This conjecture is \textbf{not proven}.  From Tao's theorem, $\mathrm{logdens}(\mathcal{E}) = 0$,
+which shows $\mathcal{E}$ is sparse in a logarithmic density sense.  However,
+\emph{logarithmic density $0$ does not imply Hausdorff dimension $< 1$ in general}:
+there exist sets of logarithmic density $0$ with full Hausdorff dimension.  A genuine
+proof of the dimension bound would require additional arithmetic structure (e.g.\ the
+cycle equations imposing Diophantine constraints on $\mathcal{E}$), which has not been
+established.  The conjecture is therefore listed here as a plausible but open claim.
+\end{remark}
 
 \section{Stochastic Matrices and the Collatz Markov Chain}
 

@@ -248,22 +248,27 @@ $a_0 = 1$ (ungerade), wendet sie $(3n+1)/2$ an und verschiebt. Unter dem Haar-Ma
 jedes Bit $a_k$ unabhängig Bernoulli(1/2), was das Bernoulli-Maß auf $\{0,1\}^{\mathbb{N}_0}$ ergibt.
 \end{proof}
 
-\begin{theorem}[Dimension der Collatz-Ausnahmemenge]\label{thm:dimension}
+% BUG-B7-P32-EN/DE-004 behoben: War als Theorem deklariert, ist aber unbewiesen.
+% Die Implikation logDichte 0 => Hausdorff-Dim < 1 gilt NICHT allgemein.
+% Korrekte Klassifikation: offene Vermutung / spekulatives Resultat.
+\begin{conjecture}[Dimension der Collatz-Ausnahmemenge]\label{conj:dimension}
 Angenommen, die Collatz-Vermutung ist falsch, und sei $\mathcal{E} \subset \mathbb{N}$
 die Menge der ganzen Zahlen, deren Collatz-Bahn nie 1 erreicht. Falls $\mathcal{E}$
-nicht leer ist, hat ihr Abschluss $\overline{\mathcal{E}} \subset \mathbb{Z}_2$ in der
-2-adischen Topologie eine Hausdorff-Dimension (bezüglich der 2-adischen Metrik) echt
-kleiner als 1.
-\end{theorem}
+nicht leer ist, so wird vermutet, dass ihr Abschluss $\overline{\mathcal{E}} \subset \mathbb{Z}_2$
+in der 2-adischen Topologie eine Hausdorff-Dimension (bezüglich der 2-adischen Metrik)
+echt kleiner als 1 hat.
+\end{conjecture}
 
-\begin{proof}[Beweisansatz]
-Aus Taos Satz folgt $\mathrm{logDichte}(\mathcal{E}) = 0$, was im 2-adischen Kontext
-impliziert, dass $\mathcal{E}$ eine dünne Menge in $\mathbb{Z}_2$ ist. Die Verbindung
-zur Hausdorff-Dimension nutzt die Tatsache, dass logarithmische Dichte 0 die
-Hausdorff-Dimension $\leq 1$ impliziert; jede Ausnahmemenge $\mathcal{E}$, die aus
-dynamischen Einschränkungen (Zyklusstruktur) entsteht, muss weitere arithmetische
-Bedingungen erfüllen, die ihre 2-adische Hausdorff-Dimension unter 1 zwingen.
-\end{proof}
+\begin{remark}[Status der Dimensionsschranke]
+Diese Vermutung ist \textbf{nicht bewiesen}. Aus Taos Satz folgt $\mathrm{logDichte}(\mathcal{E}) = 0$,
+was zeigt, dass $\mathcal{E}$ im Sinne der logarithmischen Dichte dünn ist.
+Jedoch gilt \emph{logarithmische Dichte $0$ impliziert im Allgemeinen \textbf{nicht}
+Hausdorff-Dimension $< 1$}: Es existieren Mengen mit logarithmischer Dichte $0$ und
+voller Hausdorff-Dimension. Ein echter Beweis der Dimensionsschranke würde zusätzliche
+arithmetische Struktur erfordern (z.\,B.\ Zyklusgleichungen als Diophantische Nebenbedingungen
+für $\mathcal{E}$), die bisher nicht etabliert wurde. Die Vermutung wird daher als
+plausible, aber offene Behauptung aufgeführt.
+\end{remark}
 
 \section{Stochastische Matrizen und die Collatz-Markov-Kette}
 

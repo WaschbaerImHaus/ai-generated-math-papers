@@ -171,8 +171,14 @@ für alle hinreichend großen $k$. Dieser exponentielle Abfall in $k$ ist der Ke
 von Taos Beweis.
 \end{lemma}
 
-\begin{proof}[Beweisansatz]
-Die Exponentialsumme $F_k(\xi)$ faktorisiert näherungsweise als Produkt über
+\begin{proof}[Beweisansatz (informell -- kein rigoroser Beweis)]
+% BUG-B7-P31-EN/DE-001 behoben: Klar als informal deklariert; ξ-Bedingung korrigiert
+\emph{Hinweis: Der folgende Text ist nur eine heuristische Skizze der i.i.d.-Näherung.
+Ein rigoroser Beweis erfordert Taos Entkopplungsargument; siehe~\cite{Tao2022}.
+Der Übergang von Summe zu Produkt ist nicht unmittelbar, und die
+Unabhängigkeitsannahme ist nicht exakt erfüllt.}
+
+Die Exponentialsumme $F_k(\xi)$ faktorisiert \emph{näherungsweise} als Produkt über
 ``unabhängige'' Schritte. Wären die $E_j$ exakt i.i.d.\ geometrisch(1/2) verteilt, so ergäbe sich:
 \[
   F_k(\xi) = \left(\sum_{j=1}^\infty 2^{-j} e^{2\pi i \xi (\log_2 3 - j)}\right)^k,
@@ -181,10 +187,12 @@ und die innere Summe ist eine geometrische Reihe in $e^{-2\pi i \xi}$:
 \[
   F_k(\xi) = \left(\frac{e^{2\pi i \xi \log_2 3}}{2 - e^{-2\pi i \xi}}\right)^k.
 \]
-Für $\xi \notin \mathbb{Z}/\log_2 3$ ist der Betrag des inneren Faktors $< 1$
-(wegen der Irrationalität von $\log_2 3$), was exponentiellen Abfall liefert. Tao
-behandelt die Nicht-Unabhängigkeit mittels eines Entkopplungsarguments, das die
-Fourier-Struktur von $\mathbb{Z}_2$ nutzt.
+Für $\|\xi\|_{\mathbb{R}/\mathbb{Z}} > 0$ (d.\,h.\ $\xi \notin \mathbb{Z}$, was durch
+die Lemma-Voraussetzung $\|\xi\|_{\mathbb{R}/\mathbb{Z}} \geq \delta > 0$ garantiert ist),
+hat der Nenner $2 - e^{-2\pi i \xi}$ Betrag $< 2$, also ist der Betrag des inneren
+Faktors $< 1$, was exponentiellen Abfall in $k$ liefert.
+Tao behandelt die Nicht-Unabhängigkeit mittels eines Entkopplungsarguments, das die
+Fourier-Struktur von $\mathbb{Z}_2$ nutzt und dem informellen Modell Rigorosität verleiht.
 \end{proof}
 
 \section{Das Argument der logarithmischen Dichte}

@@ -266,7 +266,15 @@ $2^{s_{k+1}-s_k}$ ergibt:
 \[
   S^{k+1}(x) = \frac{3^{k+1} x + 3c_k + 2^{s_k}}{2^{s_{k+1}}},
 \]
-mit $c_{k+1} = (3c_k + 2^{s_k})/2^{s_{k+1}-s_k} \in \mathbb{Z}_2$.
+mit $c_{k+1} = (3c_k + 2^{s_k})/2^{s_{k+1}-s_k}$.
+% BUG-B7-P30-EN/DE-002 behoben: Beweis dass c_{k+1} in Z_2 liegt
+Zur Begr\"undung $c_{k+1} \in \mathbb{Z}_2$: Per Definition von $s_{k+1}$
+hat $3S^k(x)+1$ (als Element von $\mathbb{Z}_2$) genau die 2-adische Bewertung
+$s_{k+1} - s_k$. Der Z\"ahler $3^{k+1}x + 3c_k + 2^{s_k}$ ist durch
+$2^{s_{k+1}}$ teilbar, da $S^k(x)$ ungerade in $\mathbb{Z}_2$ ist.
+Folglich ist $2^{s_{k+1}-s_k} \mid (3c_k + 2^{s_k})$, also $c_{k+1}$
+eine nicht-negative ganze Zahl, und aus $\mathbb{Z} \subset \mathbb{Z}_2$
+folgt $c_{k+1} \in \mathbb{Z}_2$.
 \end{proof}
 
 \begin{corollary}[Collatz-Vermutung in 2-adischer Sprache]\label{cor:reformulierung}
