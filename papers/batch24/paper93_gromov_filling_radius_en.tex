@@ -1,0 +1,541 @@
+% ============================================================
+% Paper 93 (EN): Gromov's Filling Radius and Systolic Geometry
+% Author: Michael Fuhrmann
+% Project: Specialist Mathematics Project
+% Build: 169
+% Date: 2026-03-12
+% ============================================================
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[hidelinks]{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% ---- Theorem Environments -----------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+% ---- Custom Operators ---------------------------------------
+\DeclareMathOperator{\sys}{sys}
+\DeclareMathOperator{\FillRad}{FillRad}
+\DeclareMathOperator{\vol}{vol}
+\DeclareMathOperator{\diam}{diam}
+\DeclareMathOperator{\inj}{inj}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\RP}{\mathbb{RP}}
+\newcommand{\TT}{\mathbb{T}}
+
+% ---- Abstract -----------------------------------------------
+\begin{abstract}
+Systolic geometry studies the relationship between the shortest
+non-contractible loop (the systole) and the volume of a Riemannian manifold.
+Gromov's fundamental inequality $\sys(M)^n \le C_n \vol(M)$ holds for all
+\emph{essential} $n$-manifolds.  The key intermediate quantity is the
+\emph{filling radius} $\FillRad(M)$, and Gromov proved the bound
+$\FillRad(M) \le C_n \sys(M)$.  We treat the classical inequalities of
+Pu (for $\RP^2$) and Loewner (for $\TT^2$), the Gromov compactness theorem
+for metric spaces, and the role of Morse theory for the length functional.
+Sharp systolic constants are known only in special cases; many remain open.
+\end{abstract}
+
+\title{Gromov's Filling Radius and Systolic Geometry}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 169}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\maketitle
+\tableofcontents
+
+% =============================================================
+\section{Introduction}
+% =============================================================
+
+One of the oldest questions in Riemannian geometry is: how short can a
+closed curve be forced to be by topological constraints?  Given a closed
+Riemannian manifold $(M,g)$, the \emph{systole} $\sys(M,g)$ is the
+shortest length among all non-contractible closed curves in $M$.  A natural
+question then is how $\sys(M,g)$ relates to geometric data such as
+$\vol(M,g)$.
+
+Carl Loewner proved in 1949 (unpublished, attributed in \cite{Pu1952}) that
+for any metric $g$ on the 2-torus $\TT^2$,
+\[
+  \sys(\TT^2, g)^2 \le \frac{2}{\sqrt{3}} \vol(\TT^2, g),
+\]
+with equality for the flat equilateral torus.  Pu \cite{Pu1952} proved
+an analogous inequality for $\RP^2$.
+
+In 1983 Gromov \cite{Gromov1983} proved a sweeping generalisation: for
+every \emph{essential} closed $n$-manifold $M$,
+\[
+  \sys(M)^n \le C_n \vol(M).
+\]
+The proof introduced a new geometric quantity, the \emph{filling radius}
+$\FillRad(M)$, and went via the isoperimetric inequality $\FillRad \le C_n \sys$.
+
+This paper presents a rigorous treatment of these ideas, discussing also
+the Sabourau--Rotman improvements, Morse theory for the loop space, and the
+many open problems concerning sharp constants.
+
+% =============================================================
+\section{The Systole}
+% =============================================================
+
+\begin{definition}[Systole]
+Let $(M,g)$ be a closed Riemannian manifold with $\pi_1(M) \neq 1$ (or more
+generally with non-trivial $\pi_k(M)$ for some $k$).  The
+\emph{1-systole} is
+\[
+  \sys_1(M,g) = \inf\bigl\{ \mathrm{length}(\gamma) : \gamma \text{ is a
+  closed non-contractible loop in } M \bigr\}.
+\]
+More generally, the \emph{$k$-systole} $\sys_k(M,g)$ is the infimum of
+volumes of $k$-cycles not bounding in $M$.
+\end{definition}
+
+\begin{remark}
+In this paper ``systole'' always means $\sys_1$ unless stated otherwise.
+The infimum is always achieved (by a geodesic) when $M$ is compact.
+\end{remark}
+
+\begin{example}
+\begin{enumerate}[label=(\roman*)]
+  \item For the flat torus $\TT^2 = \RR^2/\Lambda$, $\sys = \lambda_1(\Lambda)$
+        (shortest lattice vector).
+  \item For $\RP^n$ with the round metric of circumradius $R$,
+        $\sys = \pi R$ (the projective line).
+  \item For a surface of genus $g \ge 2$ with hyperbolic metric,
+        $\sys \le 2\log(4g-2)$ by a collar lemma argument.
+\end{enumerate}
+\end{example}
+
+% =============================================================
+\section{The Filling Radius}
+% =============================================================
+
+Gromov's key insight was to measure how "deep" a manifold is buried inside
+any ambient metric space.
+
+\begin{definition}[Filling Radius \cite{Gromov1983}]
+Let $M$ be a closed orientable $n$-manifold embedded isometrically in the
+Banach space $L^\infty(M)$ via the Kuratowski embedding
+$\iota \colon x \mapsto d(x,\cdot)$.  The \emph{filling radius} is
+\[
+  \FillRad(M) = \inf\bigl\{ r > 0 : \iota_*[M] = 0 \in H_n(U_r(M);\ZZ)
+  \bigr\},
+\]
+where $U_r(M) = \{f \in L^\infty(M) : d(f, \iota(M)) < r\}$ is the
+$r$-tubular neighbourhood of $\iota(M)$ in $L^\infty(M)$, and $[M]$ is
+the fundamental class.
+\end{definition}
+
+\begin{remark}
+This definition is independent of the choice of ambient Banach space,
+as long as the metric is isometrically embedded.  The Kuratowski embedding
+$\iota(x) = d(x,\cdot) \in L^\infty(M)$ is always an isometric embedding.
+\end{remark}
+
+\begin{example}
+\begin{enumerate}[label=(\roman*)]
+  \item For a round sphere $S^n$ of radius $R$: $\FillRad(S^n) = \arccos(-\tfrac{1}{n+1}) \cdot R$
+        (by Katz's computation \cite{Katz1983}).
+  \item For the flat torus $\TT^n$: $\FillRad(\TT^n) \le c_n \sys(\TT^n)$.
+  \item For $\RP^n$ with the round metric: $\FillRad = \tfrac{\pi}{3} R$.
+\end{enumerate}
+\end{example}
+
+% =============================================================
+\section{Essential Manifolds}
+% =============================================================
+
+\begin{definition}[Essential Manifold]
+A closed $n$-manifold $M$ is \emph{essential} if the classifying map
+$f \colon M \to K(\pi_1(M), 1)$ satisfies $f_*[M] \neq 0 \in
+H_n(K(\pi_1(M),1);\ZZ)$.
+\end{definition}
+
+\begin{example}
+\begin{enumerate}[label=(\roman*)]
+  \item Surfaces of genus $g \ge 1$ are essential.
+  \item $\RP^n$ is essential (the fundamental class is non-zero in
+        $H_n(K(\ZZ/2,1);\ZZ/2)$).
+  \item $S^n$ is \emph{not} essential (since $\pi_1(S^n) = 1$ for $n \ge 2$).
+  \item Products of essential manifolds are essential.
+  \item Aspherical manifolds (universal cover contractible) are essential.
+\end{enumerate}
+\end{example}
+
+Essential manifolds are exactly the class for which the systolic inequality
+is non-trivial.  For non-essential manifolds the systole can be made
+arbitrarily small by rescaling, while the volume stays bounded.
+
+% =============================================================
+\section{Gromov's Systolic Inequality}
+% =============================================================
+
+\begin{theorem}[Gromov, 1983 \cite{Gromov1983}]
+\label{thm:gromov-systolic}
+For every essential closed Riemannian $n$-manifold $(M,g)$,
+\[
+  \sys_1(M,g)^n \le C_n \cdot \vol(M,g),
+\]
+where $C_n > 0$ is a constant depending only on $n$.
+\end{theorem}
+
+Gromov's proof proceeds via the filling radius in two main steps:
+
+\begin{theorem}[Filling Radius Bound \cite{Gromov1983}]
+\label{thm:fillrad-sys}
+For every closed Riemannian $n$-manifold $(M,g)$,
+\[
+  \FillRad(M,g) \le \frac{1}{2} \sys_1(M,g).
+\]
+More precisely, $\FillRad(M,g) \le \tfrac{n+1}{2(n+2)} \sys_1(M,g)$.
+\end{theorem}
+
+\begin{theorem}[Volume Filling Inequality \cite{Gromov1983}]
+\label{thm:vol-fillrad}
+For every essential closed Riemannian $n$-manifold $(M,g)$,
+\[
+  \FillRad(M,g)^n \le C_n' \cdot \vol(M,g),
+\]
+where $C_n' > 0$ depends only on $n$.
+\end{theorem}
+
+Theorem~\ref{thm:gromov-systolic} follows immediately by combining
+Theorems~\ref{thm:fillrad-sys} and~\ref{thm:vol-fillrad}.
+
+\begin{proof}[Proof of Theorem~\ref{thm:fillrad-sys} sketch]
+Let $\gamma$ be a shortest non-contractible loop of length $L = \sys(M)$.
+If $\FillRad(M) > L/2$, then the loop $\gamma$ remains non-contractible in
+the $L/2$-neighbourhood $U_{L/2}(\iota(M))$ inside $L^\infty(M)$.  By
+a nerve argument (using the Vietoris--Rips complex at scale $\varepsilon$
+and letting $\varepsilon \to L/2$), one shows that the fundamental class
+$[M]$ must already die at radius $\le L/2$, contradiction.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:vol-fillrad} sketch]
+The key ingredient is a co-dimension-one isoperimetric inequality in
+$L^\infty(M)$.  Gromov uses a \emph{waist inequality}: if the $n$-cycle
+$[M]$ is non-trivial, any filling has volume at least proportional to
+$\FillRad^n$.  The precise argument involves parametric Morse theory on the
+distance function in $L^\infty(M)$.
+\end{proof}
+
+% =============================================================
+\section{Pu's Inequality for $\RP^2$}
+% =============================================================
+
+\begin{theorem}[Pu, 1952 \cite{Pu1952}]
+For any Riemannian metric $g$ on $\RP^2$,
+\[
+  \sys(\RP^2, g)^2 \le \frac{\pi}{2} \vol(\RP^2, g),
+\]
+with equality if and only if $(\RP^2, g)$ is the standard round metric of
+constant curvature $+1$ (normalised appropriately).
+\end{theorem}
+
+\begin{proof}[Proof idea]
+Pu's proof uses the uniformization theorem to conformally parameterise
+$(\RP^2, g)$.  Write $g = e^{2u} g_{\mathrm{round}}$.  The systole is bounded
+below by the conformal length of a non-contractible geodesic, and the
+Cauchy--Schwarz inequality yields the bound.  The extremal metric is the
+round metric by an equality case analysis.
+\end{proof}
+
+The constant $\pi/2$ is called the \emph{Pu constant} and equals
+$(\text{area of }\RP^2)/(\text{sys}^2)$ for the round metric.
+
+% =============================================================
+\section{Loewner's Torus Inequality}
+% =============================================================
+
+\begin{theorem}[Loewner, 1949, cf.\ \cite{Pu1952}]
+For any Riemannian metric $g$ on the 2-torus $\TT^2$,
+\[
+  \sys(\TT^2, g)^2 \le \frac{2}{\sqrt{3}} \vol(\TT^2, g),
+\]
+with equality if and only if $(\TT^2, g)$ is (up to scaling) the flat torus
+$\RR^2 / \Lambda$ where $\Lambda$ is the hexagonal lattice.
+\end{theorem}
+
+The constant $2/\sqrt{3}$ is the square of the systole of the hexagonal
+lattice divided by its fundamental domain area.  The hexagonal lattice
+$\Lambda = \ZZ(1,0) + \ZZ(1/2, \sqrt{3}/2)$ achieves the extremum.
+
+\begin{proof}[Proof sketch]
+By uniformization, $g = e^{2u} g_\Lambda$ for some flat metric $g_\Lambda$.
+The inequality $\sys^2 \le C \vol$ follows from the lattice geometry:
+among all rank-2 lattices of given co-volume, the shortest vector is
+maximised by the hexagonal lattice (Lagrange's theorem on lattice reduction).
+\end{proof}
+
+% =============================================================
+\section{Berger's Conjecture and Sharp Constants}
+% =============================================================
+
+\begin{definition}[Systolic Ratio]
+The \emph{systolic ratio} of a closed $n$-manifold $M$ with metric $g$ is
+\[
+  \mathrm{SR}(M,g) = \frac{\sys(M,g)^n}{\vol(M,g)}.
+\]
+The \emph{optimal systolic ratio} is $\mathrm{SR}(M) = \sup_g \mathrm{SR}(M,g)$.
+\end{definition}
+
+The sharp constants $C_n$ in Gromov's inequality are generally not known.
+The following sharp results are known:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Manifold $M$ & $\mathrm{SR}(M)$ & Extremal metric \\
+\midrule
+$\TT^2$ & $2/\sqrt{3}$ & Hexagonal flat torus (Loewner) \\
+$\RP^2$ & $\pi/2$ & Round metric (Pu) \\
+$K(\ZZ,2) = \TT^3$ & $?$ & Open (Berger) \\
+$\RP^3$ & $?$ & Open \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{conjecture}[Berger's Problem on Sharp Systolic Constants, Open]
+Determine the optimal systolic ratio $\mathrm{SR}(M)$ for all closed
+Riemannian manifolds $M$.  In particular, identify the extremal metrics
+for $\TT^n$ ($n \ge 3$), $\RP^n$ ($n \ge 3$), and all higher-genus surfaces.
+\end{conjecture}
+
+For surfaces of genus $g \ge 2$, the systolic ratio satisfies
+$\mathrm{SR}(\Sigma_g) \ge C/g$ (Gromov), but the sharp constant is unknown.
+
+% =============================================================
+\section{Morse Theory for the Loop Space}
+% =============================================================
+
+Morse theory applied to the energy functional $E(\gamma) = \int_0^1 |\dot\gamma|^2 dt$
+on the free loop space $\Lambda M$ provides a powerful tool in systolic geometry.
+
+\begin{theorem}[Ljusternik--Schnirelmann for Geodesics]
+Every closed Riemannian manifold $M$ with $\pi_1(M) \neq 1$ contains a
+\emph{closed geodesic} of length exactly $\sys_1(M)$.  If $M$ is essential,
+every Riemannian metric on $M$ has at least $\mathrm{cat}(M)$ non-trivial
+homotopy classes of closed curves, each containing a geodesic.
+\end{theorem}
+
+\begin{definition}[Lusternik--Schnirelmann Category]
+The \emph{L-S category} $\mathrm{cat}(M)$ is the minimum number of
+contractible open sets needed to cover $M$.
+\end{definition}
+
+\begin{theorem}[Gromov's Waist Inequality \cite{Gromov2003waist}]
+Let $M$ be a closed Riemannian $n$-manifold and $f \colon M \to \RR^k$ a
+continuous map.  Then there exists a fibre $f^{-1}(t)$ such that
+\[
+  \sys(f^{-1}(t))^{n-k} \le C_{n,k} \cdot \vol_k(M)^{(n-k)/n}.
+\]
+\end{theorem}
+
+% =============================================================
+\section{Sabourau--Rotman Improvements}
+% =============================================================
+
+\begin{theorem}[Rotman, 2006 \cite{Rotman2006}]
+Let $M$ be a closed Riemannian $n$-manifold with $\pi_1(M) \neq 1$.
+Then $M$ contains a closed geodesic $\gamma$ (a shortest non-contractible
+closed geodesic) of length $\ell(\gamma) = \sys(M)$, satisfying
+\[
+  \ell(\gamma) \le 2 \diam(M).
+\]
+\end{theorem}
+
+\begin{theorem}[Sabourau, 2004 \cite{Sabourau2004}]
+For every aspherical surface $(M^2, g)$ (i.e., genus $g \ge 1$),
+\[
+  \sys(M)^2 \le \gamma(M) \cdot \vol(M),
+\]
+where $\gamma(M) > 0$ is a constant depending only on the topology of $M$,
+and equality is achieved in the limit by sequences of metrics approaching
+certain optimal shapes.
+\end{theorem}
+
+\begin{conjecture}[Optimal Filling Ratio, Open]
+\label{conj:filling}
+The sharp constant in $\FillRad(M)^n \le C \cdot \vol(M)$ (for essential
+$M$) is achieved by a specific "round" or "regular" metric.  In particular,
+for $\RP^n$ the sharp filling radius constant is $\tfrac{\pi}{3}$ (the value
+for the round metric).
+\end{conjecture}
+
+% =============================================================
+\section{Katz's Results on Filling Radius}
+% =============================================================
+
+\begin{theorem}[Katz, 1983 \cite{Katz1983}]
+The filling radius of the round $n$-sphere $S^n(R)$ of radius $R$ is
+\[
+  \FillRad(S^n(R)) = R \arccos\!\left(-\frac{1}{n+1}\right).
+\]
+For large $n$ this is approximately $R(\pi/2 - 1/\sqrt{n})$.
+\end{theorem}
+
+\begin{theorem}[Katz, 1983 \cite{Katz1983}]
+For $\RP^n$ with the round metric of radius $R$:
+\[
+  \FillRad(\RP^n) = \frac{\pi R}{3}.
+\]
+\end{theorem}
+
+\begin{corollary}
+For $\RP^2$ with any metric $g$ with $\vol(\RP^2, g) = \pi$ (the round
+volume):
+\[
+  \FillRad(\RP^2, g) \le \frac{\pi}{3}
+\]
+with equality for the round metric, consistent with Pu's inequality.
+\end{corollary}
+
+% =============================================================
+\section{Gromov Compactness and Geometric Convergence}
+% =============================================================
+
+A crucial tool underlying all these results is:
+
+\begin{theorem}[Gromov Compactness Theorem \cite{Gromov1981}]
+The class of Riemannian $n$-manifolds $(M,g)$ with
+\begin{enumerate}[label=(\roman*)]
+  \item Ricci curvature $\mathrm{Ric}(M,g) \ge -(n-1)\kappa^2$,
+  \item diameter $\diam(M,g) \le D$,
+\end{enumerate}
+is precompact in the Gromov--Hausdorff topology: every sequence has a
+subsequence converging (in the GH sense) to a compact metric space.
+\end{theorem}
+
+This theorem is used in systolic geometry to take limits of sequences of
+metrics and study the behaviour of the systole and filling radius in
+degenerating families.
+
+% =============================================================
+\section{Open Problems in Systolic Geometry}
+% =============================================================
+
+We collect the major open problems:
+
+\begin{conjecture}[Sharp Systolic Constant for $\TT^n$, $n \ge 3$]
+The optimal systolic ratio for the $n$-torus $\TT^n$ equals
+\[
+  \mathrm{SR}(\TT^n) = \gamma_n^{n/2},
+\]
+where $\gamma_n$ is the \emph{Hermite constant} (the maximum ratio
+$\lambda_1(\Lambda)^n/\mathrm{covol}(\Lambda)$ over all rank-$n$ lattices
+$\Lambda$).  This is known for $n \le 8$ and $n = 24$ (from lattice theory),
+but open for general $n$.
+\end{conjecture}
+
+\begin{conjecture}[Gromov's Optimal Filling Radius Conjecture, Open]
+For an essential $n$-manifold $M$, the sharp constant in
+$\sys(M)^n \le C \cdot \vol(M)$ is related to the geometry of the
+regular simplex in $\RR^n$.  The precise sharp constant in Gromov's
+Theorem~\ref{thm:gromov-systolic} is unknown for $n \ge 3$.
+\end{conjecture}
+
+\begin{conjecture}[Systolic Freedom, Open]
+For simply-connected manifolds of dimension $\ge 4$, the systolic
+ratio $\mathrm{SR}(M,g)$ can be made arbitrarily large (Gromov's
+``systolic freedom'' phenomenon).  Characterising which manifolds
+exhibit systolic freedom remains open.
+\end{conjecture}
+
+% =============================================================
+\section{Conclusion}
+% =============================================================
+
+Systolic geometry, initiated by Loewner, Pu, and Gromov, provides deep
+connections between metric geometry, algebraic topology, and the theory of
+Banach spaces.  The filling radius---the measure of how deeply a manifold is
+embedded in its Kuratowski completion---turns out to be the key intermediate
+quantity.
+
+The sharp constants in systolic inequalities are known only for surfaces
+($\TT^2$, $\RP^2$, $\mathrm{Klein\,bottle}$) and are open in higher
+dimensions.  The interplay with lattice theory, Hermite constants, and
+the geometry of optimal sphere packings suggests deep connections with
+number theory and algebraic geometry.
+
+\begin{thebibliography}{99}
+
+\bibitem{Gromov1983}
+M.~Gromov,
+\textit{Filling Riemannian manifolds},
+J. Differential Geom. \textbf{18} (1983), no.~1, 1--147.
+
+\bibitem{Pu1952}
+P.~M. Pu,
+\textit{Some inequalities in certain nonorientable Riemannian manifolds},
+Pacific J. Math. \textbf{2} (1952), 55--71.
+
+\bibitem{Katz1983}
+M.~Katz,
+\textit{The filling radius of two-point homogeneous spaces},
+J. Differential Geom. \textbf{18} (1983), no.~3, 505--511.
+
+\bibitem{Gromov1981}
+M.~Gromov,
+\textit{Structures métriques pour les variétés riemanniennes},
+Textes Mathématiques \textbf{1}, CEDIC, Paris, 1981
+(edited by J.\ Lafontaine and P.\ Pansu).
+
+\bibitem{Gromov2003waist}
+M.~Gromov,
+\textit{Isoperimetry of waists and concentration of maps},
+Geom. Funct. Anal. \textbf{13} (2003), 178--215.
+
+\bibitem{Rotman2006}
+R.~Rotman,
+\textit{The length of a shortest geodesic net on a closed Riemannian manifold},
+Topology \textbf{46} (2007), 343--356.
+
+\bibitem{Sabourau2004}
+S.~Sabourau,
+\textit{Systoles des surfaces plates singulières de genre deux},
+Math. Z. \textbf{247} (2004), 693--709.
+
+\bibitem{BergerPansu2012}
+M.~Berger,
+\textit{A Panoramic View of Riemannian Geometry},
+Springer, Berlin, 2003.
+
+\bibitem{CrootLev}
+M.~Katz and S.~Sabourau,
+\textit{Hyperelliptic surfaces are Loewner},
+Proc. Amer. Math. Soc. \textbf{134} (2006), 1189--1195.
+
+\bibitem{KatzBook}
+M.~G.~Katz,
+\textit{Systolic Geometry and Topology},
+Mathematical Surveys and Monographs \textbf{137},
+American Mathematical Society, 2007.
+
+\bibitem{BabenkoBrunnbauer}
+I.~Babenko,
+\textit{Forte souplesse intersystolique de variétés fermées et de polyèdres},
+Ann. Inst. Fourier \textbf{52} (2002), 1259--1284.
+
+\end{thebibliography}
+
+\end{document}

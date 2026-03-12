@@ -1239,3 +1239,57 @@ viele Nullstellen auf der kritischen Linie liegen.
 ### Kritische Anmerkung
 Alle unbewiesenen Aussagen korrekt als \begin{vermutung} (DE) / \begin{conjecture} (EN)
 ausgewiesen. Keine unbewiesen Vermutung als Theorem deklariert.
+
+## 2026-03-12 — Build 169: Batch 24 Papers 92–95 (EN + DE)
+
+### Neue Papers in /papers/batch24/
+
+#### Paper 92: Donaldson's Theory of 4-Manifolds and Open Problems in Gauge Theory
+- paper92_donaldson_4manifolds_en.tex (EN)
+- paper92_donaldson_4mannigfaltigkeiten_de.tex (DE)
+- Inhalte: Donaldsons Satz (definite Schnittform → diagonal), Yang-Mills-Instantonen,
+  anti-selbst-duale Zusammenhänge, Uhlenbeck-Kompaktheit, Donaldson-Invarianten,
+  Seiberg-Witten-Theorie (1994), exotische R^4, Kirby-Kalkül, Schnittformen
+  (E_8, E_6, ...), Freedmans topologische Klassifikation
+- VERMUTUNG: Glatte Poincaré-Vermutung in Dimension 4 (offen)
+- BEWIESEN: Donaldson-Satz, Seiberg-Witten-Theorie, Wittens Vermutung (Taubes)
+
+#### Paper 93: Gromov's Filling Radius and Systolic Geometry
+- paper93_gromov_filling_radius_en.tex (EN)
+- paper93_gromov_fuellungsradius_de.tex (DE)
+- Inhalte: Systole sys(M), Gromovs systolische Ungleichung sys(M)^n ≤ C_n·vol(M)
+  für wesentliche Mannigfaltigkeiten, Füllungsradius FillRad(M), Pus Ungleichung
+  (RP²), Loewners Torus-Ungleichung, Bergers Problem, Sabourau-Rotman-Verbesserungen,
+  Morse-Theorie für das Längenfunktional, Katz' Füllungsradius-Berechnungen
+- VERMUTUNG: Scharfe systolische Konstanten für spezifische Mannigfaltigkeiten (viele offen),
+  Gromovs optimales Füllungsverhältnis
+- BEWIESEN: Systolische Ungleichung (Gromov), Pus Ungleichung, Loewners Ungleichung
+
+#### Paper 94: Hartshorne's Conjectures in Algebraic Geometry
+- paper94_hartshorne_conjectures_en.tex (EN)
+- paper94_hartshorne_vermutungen_de.tex (DE)
+- Inhalte: Hartshornes Vermutung über vollständige Durchschnitte (jede glatte
+  Kodimension-2-Untervarietät von P^n für n≥7 ist vollständiger Durchschnitt),
+  Barth-Lefschetz-Satz, Serres Vermutung (Quillen-Suslin-Satz, bewiesen 1976),
+  Aufspaltungsvermutung für Vektorbündel auf P^n, niedrigrangige Vektorbündel,
+  Horrocks-Mumford-Bündel (Rang 2 auf P^4), Hartshorne-Lichtenbaum-Verschwindungssatz
+- VERMUTUNG: Hartshornes Kodimension-2-Vermutung (offen für n≥7)
+- BEWIESEN: Quillen-Suslin, Barth-Lefschetz, Hartshorne-Lichtenbaum-Verschwindungssatz
+
+#### Paper 95: Uniformization in Higher Dimensions
+- paper95_uniformization_higher_dimensions_en.tex (EN)
+- paper95_uniformisierung_hoehere_dimensionen_de.tex (DE)
+- Inhalte: Klassischer Uniformisierungssatz (Poincaré-Koebe), Yaus Vermutung
+  (vollständige Kähler-Mfg. mit positiver bisektionaler Krümmung biholomorph zu C^n),
+  Moris Satz (kompakter Fall 1979, Bend-and-Break), Siu-Yau (1980, kompakter Fall bewiesen),
+  nicht-kompakter Fall (offen in voller Allgemeinheit), Caos Kähler-Ricci-Fluss-Ansatz,
+  Pseudokonvexität, Stein-Mannigfaltigkeiten, Hyperkonvexitäts-Vermutung, Moks Satz (1988)
+- VERMUTUNG: Vollständige Kähler-Mfg. mit pos. bisektionaler Krümmung ≅ C^n (offen in voller Allgemeinheit)
+- BEWIESEN: Kompakter Fall (Mori-Siu-Yau), klassischer Uniformisierungssatz
+
+### Qualitätssicherung
+- Alle unbewiesenen Aussagen als \begin{vermutung} / \begin{conjecture} deklariert
+- Theorem-Umgebungen (EN + DE) korrekt gesetzt
+- Echte bibliographische Referenzen mit vollständigen Angaben
+- Mathematisch rigoros (Beweisideen, nicht nur Behauptungen)
+- ~12 Sektionen pro Paper

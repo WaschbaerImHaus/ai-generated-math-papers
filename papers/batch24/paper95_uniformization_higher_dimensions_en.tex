@@ -1,0 +1,547 @@
+% ============================================================
+% Paper 95 (EN): Uniformization in Higher Dimensions:
+%                Yau's Conjecture and Complex Geometry
+% Author: Michael Fuhrmann
+% Project: Specialist Mathematics Project
+% Build: 169
+% Date: 2026-03-12
+% ============================================================
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[hidelinks]{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% ---- Theorem Environments -----------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+% ---- Custom Operators ---------------------------------------
+\DeclareMathOperator{\Ric}{Ric}
+\DeclareMathOperator{\Bsc}{Bsc}
+\DeclareMathOperator{\Hol}{Hol}
+\DeclareMathOperator{\vol}{vol}
+\DeclareMathOperator{\diam}{diam}
+\DeclareMathOperator{\rank}{rank}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\dd}{\partial}
+
+% ---- Abstract -----------------------------------------------
+\begin{abstract}
+The classical uniformization theorem classifies all Riemann surfaces up to
+biholomorphism.  In higher dimensions, analogous classification results for
+Kähler manifolds with positive curvature are provided by the theorem of
+Mori (compact case, 1979) and Siu--Yau (compact Kähler, 1980): a compact
+Kähler manifold with positive bisectional curvature is biholomorphic to
+$\PP^n$.  Yau's conjecture---that a \emph{complete} (non-compact) Kähler
+manifold with positive bisectional curvature is biholomorphic to $\CC^n$---
+remains open in full generality.  We survey Cao's Kähler--Ricci flow
+approach, pseudoconvexity, Stein manifolds, and related open problems.
+\end{abstract}
+
+\title{Uniformization in Higher Dimensions:\\
+\large Yau's Conjecture and Complex Geometry}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 169}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\maketitle
+\tableofcontents
+
+% =============================================================
+\section{Introduction}
+% =============================================================
+
+The \emph{uniformization theorem} for Riemann surfaces, proved by Poincaré
+and Koebe, is one of the cornerstones of complex analysis:
+
+\begin{theorem}[Poincaré--Koebe Uniformization, 1907]
+Every simply-connected Riemann surface is biholomorphic to exactly one of:
+\begin{enumerate}[label=(\roman*)]
+  \item the Riemann sphere $\hat{\CC} \cong S^2$,
+  \item the complex plane $\CC$,
+  \item the upper half-plane $\mathbb{H} = \{z \in \CC : \Im z > 0\}$.
+\end{enumerate}
+\end{theorem}
+
+This is a profound result: it says that the complex structure is determined
+by topology (genus 0) together with completeness conditions.  In higher
+dimensions, the situation is vastly more complex.
+
+The natural higher-dimensional analogue asks: when is a complete Kähler
+manifold with positive curvature biholomorphic to $\CC^n$ or $\PP^n$?
+Yau formulated this as a conjecture in the 1970s, and the compact case was
+fully resolved.  The non-compact case remains one of the central open
+problems in complex geometry.
+
+% =============================================================
+\section{Kähler Manifolds and Bisectional Curvature}
+% =============================================================
+
+\begin{definition}[Kähler Manifold]
+A complex manifold $(M, J)$ of complex dimension $n$ is \emph{Kähler} if
+it admits a Hermitian metric $g$ whose associated $(1,1)$-form
+$\omega(X,Y) = g(JX, Y)$ is closed: $d\omega = 0$.  Equivalently, the
+Levi-Civita connection of $g$ is $J$-invariant: $\nabla J = 0$.
+\end{definition}
+
+\begin{example}
+\begin{enumerate}[label=(\roman*)]
+  \item $\CC^n$ with the Euclidean metric (flat Kähler).
+  \item $\PP^n$ with the Fubini--Study metric (positive sectional curvature).
+  \item Complex tori $\CC^n/\Lambda$ (flat Kähler, $\Lambda$ a lattice).
+  \item Smooth projective varieties (Kodaira embedding + Fubini--Study restriction).
+\end{enumerate}
+\end{example}
+
+\begin{definition}[Bisectional Curvature \cite{GoldbergKobayashi1967}]
+Let $(M, g, J)$ be a Kähler manifold with curvature tensor $R$.  For unit
+tangent vectors $X, Y \in T_p M$, the \emph{holomorphic bisectional curvature}
+is
+\[
+  \Bsc(X,Y) = R(X, JX, Y, JY).
+\]
+The manifold has \emph{positive bisectional curvature} if
+$\Bsc(X,Y) > 0$ for all non-zero $X, Y \in T_p M$ and all $p \in M$.
+\end{definition}
+
+\begin{remark}
+Positive bisectional curvature implies positive sectional curvature, which
+in turn implies positive Ricci curvature.  The implications are strict:
+$\CC^n$ has zero bisectional curvature; the Fubini--Study metric on $\PP^n$
+has constant positive bisectional curvature.
+\end{remark}
+
+% =============================================================
+\section{The Classical Uniformization Theorem}
+% =============================================================
+
+We revisit the proof structure to identify what may generalise.
+
+\begin{proof}[Sketch of Uniformization]
+The proof proceeds in two steps:
+
+\medskip
+\noindent\textbf{Step 1 (Existence of harmonic maps).}
+For a Riemannian surface $(\Sigma, g)$, construct a harmonic function
+solving a Dirichlet problem to produce a conformal map to one of the
+three models.
+
+\medskip
+\noindent\textbf{Step 2 (Curvature characterisation).}
+Equivalently, the three models correspond to constant curvature $+1$
+(sphere), $0$ (plane), $-1$ (half-plane). By the Gauss--Bonnet theorem,
+the Euler characteristic determines which model applies:
+$\chi > 0 \Rightarrow S^2$, $\chi = 0 \Rightarrow \CC$ (or torus),
+$\chi < 0 \Rightarrow \mathbb{H}$.
+\end{proof}
+
+The higher-dimensional analogue of curvature $+1$ for Kähler manifolds is
+\emph{positive bisectional curvature}, which motivates Yau's conjecture.
+
+% =============================================================
+\section{Mori's Bend-and-Break Theorem (Compact Case)}
+% =============================================================
+
+\begin{theorem}[Mori, 1979 \cite{Mori1979}]
+\label{thm:mori}
+Every smooth compact Kähler manifold $(M, g)$ with positive bisectional
+curvature is biholomorphic to $\PP^n$ (for some $n = \dim_\CC M$).
+\end{theorem}
+
+Mori's proof is algebraic and uses the following key tool:
+
+\begin{theorem}[Bend-and-Break \cite{Mori1979}]
+Let $M$ be a smooth projective variety of dimension $n$ over an algebraically
+closed field.  If $M$ contains a smooth curve $C$ with
+$(-K_M \cdot C) > 0$ (i.e., $M$ has positive anti-canonical class in the
+direction of $C$), then $M$ contains a rational curve.
+\end{theorem}
+
+\begin{proof}[Proof sketch of Mori's Theorem~\ref{thm:mori}]
+\textbf{Step 1.}  By the Kodaira embedding theorem, a compact Kähler manifold
+with positive bisectional curvature is projective.
+
+\textbf{Step 2.}  Positive bisectional curvature implies
+$c_1(M) > 0$ (by the Chern--Weil formula and positivity).  Thus
+$-K_M$ is ample.
+
+\textbf{Step 3.}  Using characteristic-$p$ techniques (Frobenius), Mori
+deforms a curve in $M$ (bend-and-break) to produce rational curves.
+These cover $M$: every point lies on a rational curve.
+
+\textbf{Step 4.}  By a theorem of Kobayashi--Ochiai, if $M$ has index
+$i(M) = n+1$ (i.e., $-K_M = (n+1)H$ for some ample $H$), then
+$M \cong \PP^n$. $\square$
+\end{proof}
+
+% =============================================================
+\section{Siu--Yau's Theorem: The Differential-Geometric Proof}
+% =============================================================
+
+\begin{theorem}[Siu--Yau, 1980 \cite{SiuYau1980}]
+\label{thm:siuyau}
+Every compact Kähler manifold with positive bisectional curvature is
+biholomorphic to $\PP^n$.
+\end{theorem}
+
+Siu--Yau's proof is differential-geometric and predates Mori's algebraic
+proof (they were proved around the same time, 1979--1980).
+
+\begin{proof}[Proof sketch]
+\textbf{Step 1 (Frankel Conjecture).}  The result was conjectured by Frankel
+(1961) as: "a compact Kähler manifold with positive bisectional curvature is
+homeomorphic to $\PP^n$."
+
+\textbf{Step 2 (Existence of harmonic map).}  Using the theory of harmonic
+maps, Siu--Yau show the existence of a holomorphic map
+$f \colon M \to \PP^n$ of degree 1, using Bochner--Weitzenböck formulas.
+The positivity of bisectional curvature ensures rigidity.
+
+\textbf{Step 3 (Biholomorphism).}  The degree-1 holomorphic map $f$, combined
+with the classification of holomorphic maps $\PP^n \to \PP^n$, implies that
+$f$ is a biholomorphism. $\square$
+\end{proof}
+
+\begin{remark}
+The hypothesis of \emph{positive} bisectional curvature is essential.
+Non-negative bisectional curvature leads to a weaker conclusion (Mok's
+theorem, 1988: biholomorphic to a compact Hermitian symmetric space).
+\end{remark}
+
+% =============================================================
+\section{Yau's Conjecture: The Non-Compact Case}
+% =============================================================
+
+\begin{conjecture}[Yau, 1970s \cite{Yau1977}, Open in Full Generality]
+\label{conj:yau}
+Let $(M, g)$ be a complete Kähler manifold with positive bisectional
+curvature.  Then $M$ is biholomorphic to $\CC^n$.
+\end{conjecture}
+
+\begin{remark}
+Here "complete" means geodesically complete (every geodesic extends to
+$\RR$).  This is the natural completeness condition; without it,
+open balls in $\CC^n$ with flat metric would be trivial counterexamples.
+\end{remark}
+
+The conjecture is known in special cases:
+
+\begin{theorem}[Partial Results on Conjecture~\ref{conj:yau}]
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Complex dimension 2 (Mok, 1984 \cite{Mok1984})}:
+        A complete Kähler surface with positive bisectional curvature and
+        finite volume is biholomorphic to $\CC^2$.
+  \item \textbf{Bounded curvature (Shi, 1989 \cite{Shi1989})}:
+        If additionally the curvature is bounded ($|R| \le C$), then
+        $M \cong \CC^n$.
+  \item \textbf{Maximum volume growth (Chen--Tang--Zhu, 2004 \cite{ChenTangZhu2004})}:
+        If $M$ has maximal volume growth ($\vol(B(p,r)) \ge c r^{2n}$), then
+        $M \cong \CC^n$.
+\end{enumerate}
+\end{conjecture}
+\end{theorem}
+
+% =============================================================
+\section{The Kähler--Ricci Flow Approach}
+% =============================================================
+
+Hamilton's Ricci flow \cite{Hamilton1982} deforms a Riemannian metric by
+$\frac{\partial g}{\partial t} = -2\Ric(g)$.  For Kähler manifolds,
+Cao \cite{Cao1985} showed the flow preserves the Kähler condition.
+
+\begin{theorem}[Cao, 1985 \cite{Cao1985}]
+The Kähler--Ricci flow
+\[
+  \frac{\partial g_{i\bar{j}}}{\partial t} = -R_{i\bar{j}}
+\]
+has a unique solution for all $t \in [0,\infty)$ starting from any compact
+Kähler metric of positive bisectional curvature.  The flow converges (after
+normalisation) to the Fubini--Study metric on $\PP^n$.
+\end{theorem}
+
+\begin{theorem}[Hamilton, 1988 \cite{Hamilton1988}]
+In complex dimension 1 (Riemann surfaces), the normalised Kähler--Ricci flow
+converges to a metric of constant curvature.  This gives an analytical proof
+of the uniformization theorem for compact Riemann surfaces.
+\end{theorem}
+
+For the non-compact case:
+
+\begin{theorem}[Shi, 1989 \cite{Shi1989}]
+The Ricci flow on a complete non-compact Riemannian manifold with bounded
+curvature has a unique solution for short time.  For complete Kähler manifolds
+with bounded positive bisectional curvature, the flow preserves the Kähler
+structure and remains complete.
+\end{theorem}
+
+The strategy for Yau's conjecture via Kähler--Ricci flow:
+\begin{enumerate}[label=(\roman*)]
+  \item Run Kähler--Ricci flow from $(M,g)$ with positive bisectional curvature.
+  \item Show the flow exists for all time.
+  \item Show the flow converges to the flat metric on $\CC^n$.
+  \item Conclude $M \cong \CC^n$.
+\end{enumerate}
+Steps (i) and (ii) are known under bounded curvature assumptions;
+steps (iii) and (iv) require additional work.
+
+% =============================================================
+\section{Stein Manifolds and Pseudoconvexity}
+% =============================================================
+
+Yau's conjecture is also related to the theory of Stein manifolds, which are
+the natural "affine" objects in complex geometry.
+
+\begin{definition}[Stein Manifold]
+A complex manifold $M$ is \emph{Stein} if it satisfies:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Holomorphic convexity}: for every compact $K \subseteq M$,
+        the holomorphic hull $\hat K_\OO = \{p \in M : |f(p)| \le \sup_K |f|
+        \text{ for all holomorphic } f\}$ is compact.
+  \item \textbf{Holomorphic separability}: for $p \neq q$ there exists $f$
+        holomorphic with $f(p) \neq f(q)$.
+  \item \textbf{Holomorphic generation of cotangent bundle}: at each point,
+        $\{df_p : f \text{ holomorphic on } M\}$ spans $T^*_p M$.
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[Grauert, 1958 \cite{Grauert1958}]
+A complex manifold $M$ is Stein if and only if it admits a strictly
+plurisubharmonic exhaustion function $\varphi \colon M \to \RR$ (a smooth
+function with $i\dd\bar\dd\varphi > 0$ in the sense of $(1,1)$-forms,
+with compact sublevel sets).
+\end{theorem}
+
+\begin{theorem}[Greene--Wu, 1978 \cite{GreeneWu1978}]
+A complete Kähler manifold with positive bisectional curvature is Stein.
+\end{theorem}
+
+\begin{corollary}
+Yau's conjecture would imply that the only Stein Kähler manifold with
+positive bisectional curvature is $\CC^n$.
+\end{corollary}
+
+% =============================================================
+\section{The Hyperconvexity Conjecture}
+% =============================================================
+
+\begin{definition}[Hyperconvex Domain]
+A domain $\Omega \subseteq \CC^n$ is \emph{hyperconvex} if it admits a
+bounded plurisubharmonic exhaustion function $u \colon \Omega \to [-\infty, 0)$
+(i.e., $u$ is plurisubharmonic, bounded above, and $\{u \le c\} \Subset \Omega$
+for all $c < 0$).
+\end{definition}
+
+\begin{conjecture}[Hyperconvexity Conjecture, Open]
+\label{conj:hyperconvex}
+Every pseudoconvex domain in $\CC^n$ with $C^1$ boundary is hyperconvex.
+\end{conjecture}
+
+\begin{remark}
+Hyperconvex domains have especially nice properties: the Dirichlet problem
+for the complex Monge--Ampère equation
+$(i\partial\bar\partial u)^n = f \cdot \omega^n$
+is solvable, and the Bergman kernel behaves well.
+\end{remark}
+
+\begin{theorem}[Diederich--Fornæss, 1977 \cite{DiederichFornaess1977}]
+Every bounded pseudoconvex domain with $C^2$ boundary in $\CC^n$ is hyperconvex.
+\end{theorem}
+
+The conjecture for $C^1$ domains remains open.  Counterexamples exist for
+merely Lipschitz domains (Worm domains).
+
+% =============================================================
+\section{Mok's Theorem on Non-Negative Bisectional Curvature}
+% =============================================================
+
+\begin{theorem}[Mok, 1988 \cite{Mok1988}]
+\label{thm:mok}
+Let $(M, g)$ be a compact irreducible Kähler manifold with non-negative
+bisectional curvature.  Then $M$ is biholomorphic to one of the following
+\emph{compact irreducible Hermitian symmetric spaces}:
+\begin{enumerate}[label=(\roman*)]
+  \item $\PP^n$ (complex projective space),
+  \item $\mathrm{Gr}(k,n)$ (complex Grassmannian),
+  \item $\mathrm{SO}(n)/U(n/2)$ (type DIII),
+  \item $\mathrm{Sp}(n)/U(n)$ (type CI),
+  \item $E_6/\mathrm{Spin}(10)\cdot U(1)$,
+  \item $E_7/E_6 \cdot U(1)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{remark}
+Mok's theorem is the full classification under the weaker hypothesis of
+non-negative (rather than strictly positive) bisectional curvature.
+It confirms that positive curvature is far more rigid than non-negative.
+\end{remark}
+
+% =============================================================
+\section{The Riemann Surface Case Revisited}
+% =============================================================
+
+For Riemann surfaces, the uniformization theorem classifies all surfaces.
+The higher-dimensional analogue has distinct compact and non-compact versions:
+
+\begin{center}
+\begin{tabular}{p{3cm}p{3.5cm}p{3.5cm}p{3.5cm}}
+\toprule
+ & Riemann surface & Compact Kähler & Complete Kähler \\
+\midrule
+Positive curvature & $S^2 \cong \PP^1$ & $M \cong \PP^n$ (Mori--Siu--Yau, proved) & $M \cong \CC^n$? (Yau, open) \\[4pt]
+Zero curvature & $\CC$ or $\TT^2$ & Kähler flat (CY) & Flat ($M \cong \CC^n/\Gamma$) \\[4pt]
+Negative curvature & $\mathbb{H}$ & $M$ = general type & Cartan--Hadamard \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% =============================================================
+\section{Open Problems}
+% =============================================================
+
+\begin{conjecture}[Yau's Conjecture on Positive Bisectional Curvature,
+= Conjecture~\ref{conj:yau}, Open in Full Generality]
+Every complete Kähler manifold with positive bisectional curvature is
+biholomorphic to $\CC^n$.
+\end{conjecture}
+
+\begin{conjecture}[Yau's Uniformization Conjecture for Positive Ricci, Open]
+Every complete Kähler manifold with positive Ricci curvature, bounded
+curvature, and maximal volume growth is biholomorphic to $\CC^n$.
+\end{conjecture}
+
+\begin{conjecture}[Frankel Conjecture (Non-Compact Version), Open]
+Every complete simply-connected Kähler manifold with positive sectional
+curvature is biholomorphic to $\CC^n$.
+\end{conjecture}
+
+\begin{conjecture}[Hyperconvexity for $C^1$ Domains,
+= Conjecture~\ref{conj:hyperconvex}, Open]
+Every pseudoconvex domain in $\CC^n$ with $C^1$ boundary is hyperconvex.
+\end{conjecture}
+
+\begin{conjecture}[Grauert Tube Conjecture, Open]
+The Grauert tube of a real-analytic Riemannian manifold with positive
+sectional curvature is biholomorphic to a ball in $\CC^n$.
+\end{conjecture}
+
+% =============================================================
+\section{Conclusion}
+% =============================================================
+
+The uniformization theorem for Riemann surfaces has inspired decades of
+effort to understand complex manifolds in higher dimensions.  The compact
+case of Yau's conjecture was resolved by Mori and Siu--Yau: compact Kähler
+manifolds with positive bisectional curvature are $\PP^n$.
+
+The non-compact case---Yau's conjecture proper---remains open in full
+generality.  Partial results under curvature bounds (Shi, 1989) and
+maximum volume growth (Chen--Tang--Zhu, 2004) give evidence for the
+conjecture.  The Kähler--Ricci flow approach (Cao, 1985) provides a
+potentially powerful tool, but the flow's long-time behaviour in the
+non-compact case without bounded curvature is not fully understood.
+
+The connections to pseudoconvexity, Stein manifolds, and the Monge--Ampère
+equation make this an active intersection of complex analysis, differential
+geometry, and partial differential equations.
+
+\begin{thebibliography}{99}
+
+\bibitem{Yau1977}
+S.-T. Yau,
+\textit{Calabi's conjecture and some new results in algebraic geometry},
+Proc. Nat. Acad. Sci. USA \textbf{74} (1977), 1798--1799.
+
+\bibitem{Mori1979}
+S.~Mori,
+\textit{Projective manifolds with ample tangent bundles},
+Ann. of Math. (2) \textbf{110} (1979), 593--606.
+
+\bibitem{SiuYau1980}
+Y.-T. Siu and S.-T. Yau,
+\textit{Compact Kähler manifolds of positive bisectional curvature},
+Invent. Math. \textbf{59} (1980), 189--204.
+
+\bibitem{Mok1984}
+N.~Mok,
+\textit{An embedding theorem of complete Kähler manifolds of positive bisectional curvature onto affine algebraic varieties},
+Bull. Soc. Math. France \textbf{112} (1984), 197--258.
+
+\bibitem{Mok1988}
+N.~Mok,
+\textit{The uniformization theorem for compact Kähler manifolds of nonnegative holomorphic bisectional curvature},
+J. Differential Geom. \textbf{27} (1988), 179--214.
+
+\bibitem{Cao1985}
+H.-D. Cao,
+\textit{Deformation of Kähler metrics to Kähler--Einstein metrics on compact
+Kähler manifolds},
+Invent. Math. \textbf{81} (1985), 359--372.
+
+\bibitem{Hamilton1982}
+R.~S. Hamilton,
+\textit{Three-manifolds with positive Ricci curvature},
+J. Differential Geom. \textbf{17} (1982), 255--306.
+
+\bibitem{Hamilton1988}
+R.~S. Hamilton,
+\textit{The Ricci flow on surfaces},
+Contemp. Math. \textbf{71} (1988), 237--262.
+
+\bibitem{Shi1989}
+W.-X. Shi,
+\textit{Ricci deformation of the metric on complete noncompact Riemannian
+manifolds},
+J. Differential Geom. \textbf{30} (1989), 223--301.
+
+\bibitem{ChenTangZhu2004}
+B.-L. Chen, S.-H. Tang, and X.-P. Zhu,
+\textit{A uniformization theorem for complete non-compact Kähler surfaces
+with positive bisectional curvature},
+J. Differential Geom. \textbf{67} (2004), 519--570.
+
+\bibitem{GoldbergKobayashi1967}
+S.~I. Goldberg and S.~Kobayashi,
+\textit{Holomorphic bisectional curvature},
+J. Differential Geom. \textbf{1} (1967), 225--233.
+
+\bibitem{Grauert1958}
+H.~Grauert,
+\textit{On Levi's problem and the imbedding of real-analytic manifolds},
+Ann. of Math. (2) \textbf{68} (1958), 460--472.
+
+\bibitem{GreeneWu1978}
+R.~E. Greene and H.~Wu,
+\textit{$C^\infty$ approximations of convex, subharmonic, and plurisubharmonic
+functions},
+Ann. Sci. Éc. Norm. Supér. (4) \textbf{12} (1979), 47--84.
+
+\bibitem{DiederichFornaess1977}
+K.~Diederich and J.~E. Fornæss,
+\textit{Pseudoconvex domains: bounded strictly plurisubharmonic exhaustion
+functions},
+Invent. Math. \textbf{39} (1977), 129--141.
+
+\end{thebibliography}
+
+\end{document}
