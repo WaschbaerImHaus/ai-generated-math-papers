@@ -25,13 +25,13 @@
 @lastModified 2026-03-11
 """
 
+import math
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')  # Headless-Modus (kein Display nötig)
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401  – wird für 3D-Plots gebraucht
 from typing import Callable, Optional, List, Tuple
-import math
 
 
 # ===========================================================================
@@ -2053,22 +2053,23 @@ def plot_function_2d_adaptive(
     @author Michael Fuhrmann
     @lastModified 2026-03-10
     """
-    # Sichere Auswertungsumgebung mit numpy-Funktionen
-    _eval_env = {
-        'sin': np.sin, 'cos': np.cos, 'tan': np.tan,
-        'exp': np.exp, 'log': np.log, 'log2': np.log2, 'log10': np.log10,
-        'sqrt': np.sqrt, 'abs': np.abs, 'pi': np.pi, 'e': np.e,
-        'arcsin': np.arcsin, 'arccos': np.arccos, 'arctan': np.arctan,
-        'sinh': np.sinh, 'cosh': np.cosh, 'tanh': np.tanh,
-        'np': np,
-    }
+    # Funktion sicher mit sympy.lambdify parsen (kein eval auf Benutzereingabe)
+    try:
+        import sympy as _sp
+        from sympy.parsing.sympy_parser import parse_expr, standard_transformations, \
+            implicit_multiplication_application
+        _x_sym = _sp.Symbol('x')
+        _transformations = standard_transformations + (implicit_multiplication_application,)
+        _expr = parse_expr(func_str, local_dict={'x': _x_sym},
+                           transformations=_transformations)
+        _lambdified = _sp.lambdify(_x_sym, _expr, modules=['numpy'])
+    except Exception as _parse_err:
+        raise ValueError(f"Ungültiger Funktionsausdruck '{func_str}': {_parse_err}")
 
     def _eval_func(x_val: np.ndarray) -> np.ndarray:
-        """Wertet func_str an einem numpy-Array x_val aus."""
-        env = dict(_eval_env)
-        env['x'] = x_val
+        """Wertet func_str an einem numpy-Array x_val aus (via lambdify)."""
         try:
-            result = eval(func_str, {"__builtins__": {}}, env)  # noqa: S307
+            result = _lambdified(x_val)
             return np.asarray(result, dtype=float)
         except Exception:
             return np.full_like(x_val, np.nan, dtype=float)
@@ -4206,10 +4207,11 @@ def plot_cantor_set(steps: int = 6, figsize=(12, 4)) -> plt.Figure:
     ax.set_ylim(-0.6, steps + 0.6)
     ax.set_xlabel('x ∈ [0, 1]', fontsize=12)
     ax.set_ylabel('Iterationsstufe', fontsize=12)
+    # Hausdorff-Dimension der Cantor-Menge: log(2)/log(3) ≈ 0.630930
+    _hausdorff_dim = math.log(2) / math.log(3)
     ax.set_title(
         f'Cantor-Menge (Mitteldrittels-Konstruktion, {steps} Schritte)\n'
-        f'Hausdorff-Dimension: log(2)/log(3) ≈ {(2**0.5):.4f} → '  # Platzhalter
-        f'{__import__("math").log(2) / __import__("math").log(3):.6f}',
+        f'Hausdorff-Dimension: log(2)/log(3) ≈ {_hausdorff_dim:.6f}',
         fontsize=13
     )
 

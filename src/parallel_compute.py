@@ -30,7 +30,36 @@
 
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import Any, Callable, Optional
+import re as _re_pc
 import sympy as sp
+from sympy.parsing.sympy_parser import (
+    parse_expr as _parse_expr_pc,
+    standard_transformations as _std_tr_pc,
+    implicit_multiplication_application as _impl_mult_pc,
+)
+
+# Erlaubte Transformationen für sicheres Parsing
+_SAFE_TR_PC = _std_tr_pc + (_impl_mult_pc,)
+
+# Whitelist-Muster: Nur mathematische Ausdrücke erlaubt
+_SAFE_CHARS_PC = _re_pc.compile(r'^[a-zA-Z0-9\s\+\-\*\/\^\(\)\.\,\_\=\<\>]+$')
+
+
+def _safe_sympify(s: str) -> sp.Basic:
+    """
+    @brief Parst einen Ausdruck sicher mit parse_expr statt sympify.
+    @description
+        Validiert Länge und Zeichenmenge, bevor der Ausdruck geparst wird.
+        Verhindert Code-Injection über sympify().
+    @param s: Mathematischer Ausdruck als String
+    @return SymPy-Ausdruck
+    @raises ValueError bei ungültigem Ausdruck
+    @author Michael Fuhrmann
+    @lastModified 2026-03-12
+    """
+    if len(s) > 1000 or not _SAFE_CHARS_PC.match(s):
+        raise ValueError(f"Ungültiger Ausdruck (unerlaubte Zeichen oder zu lang): '{s}'")
+    return _parse_expr_pc(s, transformations=_SAFE_TR_PC)
 
 
 # ===========================================================================
@@ -51,7 +80,7 @@ def _integrate_single(args: tuple) -> tuple:
     expr_str, x_str = args
     # Ausdruck und Variable in Kindprozess neu aufbauen (pickle-Sicherheit)
     x = sp.Symbol(x_str)
-    expr = sp.sympify(expr_str)
+    expr = _safe_sympify(expr_str)
     result = sp.integrate(expr, x)
     return (expr_str, str(result))
 
@@ -66,9 +95,9 @@ def _limit_single(args: tuple) -> tuple:
     """
     expr_str, x_str, point_str, direction = args
     x = sp.Symbol(x_str)
-    expr = sp.sympify(expr_str)
+    expr = _safe_sympify(expr_str)
     # Punkt parsen (kann 'oo', '-oo' oder eine Zahl sein)
-    point = sp.sympify(point_str)
+    point = _safe_sympify(point_str)
     result = sp.limit(expr, x, point, direction)
     return (expr_str, str(result))
 
@@ -83,7 +112,7 @@ def _derivative_single(args: tuple) -> tuple:
     """
     expr_str, x_str, order = args
     x = sp.Symbol(x_str)
-    expr = sp.sympify(expr_str)
+    expr = _safe_sympify(expr_str)
     result = sp.diff(expr, x, order)
     return (expr_str, str(result))
 
@@ -132,10 +161,12 @@ def parallel_symbolic(
         for future in as_completed(futures):
             args = futures[future]
             try:
-                results[args] = future.result()
+                # Strukturiertes Ergebnis: {"success": True, "value": ..., "error": None}
+                results[args] = {"success": True, "value": future.result(), "error": None}
             except Exception as exc:
-                # Fehler aufzeichnen, aber andere Berechnungen nicht abbrechen
-                results[args] = exc
+                # Strukturierter Fehler: {"success": False, "value": None, "error": str}
+                # Ermöglicht Callers, Fehler eindeutig von Ergebnissen zu unterscheiden.
+                results[args] = {"success": False, "value": None, "error": str(exc)}
 
     return results
 
@@ -172,13 +203,14 @@ def parallel_integrate(
 
     # Ergebnisse in benutzerfreundliches Format umwandeln
     result: dict[str, str] = {}
-    for args, value in raw_results.items():
+    for args, entry in raw_results.items():
         expr_str = args[0]
-        if isinstance(value, Exception):
-            result[expr_str] = f"Fehler: {value}"
+        # Strukturiertes Ergebnis auswerten: {"success": bool, "value": ..., "error": ...}
+        if not entry["success"]:
+            result[expr_str] = f"Fehler: {entry['error']}"
         else:
             # value ist Tupel (expr_str, integral_str)
-            result[expr_str] = value[1]
+            result[expr_str] = entry["value"][1]
 
     return result
 
@@ -214,12 +246,13 @@ def parallel_limit(
     raw_results = parallel_symbolic(_limit_single, args_list, max_workers)
 
     result: dict[str, str] = {}
-    for args, value in raw_results.items():
+    for args, entry in raw_results.items():
         expr_str = args[0]
-        if isinstance(value, Exception):
-            result[expr_str] = f"Fehler: {value}"
+        # Strukturiertes Ergebnis auswerten: {"success": bool, "value": ..., "error": ...}
+        if not entry["success"]:
+            result[expr_str] = f"Fehler: {entry['error']}"
         else:
-            result[expr_str] = value[1]
+            result[expr_str] = entry["value"][1]
 
     return result
 
@@ -253,11 +286,12 @@ def parallel_derivative(
     raw_results = parallel_symbolic(_derivative_single, args_list, max_workers)
 
     result: dict[str, str] = {}
-    for args, value in raw_results.items():
+    for args, entry in raw_results.items():
         expr_str = args[0]
-        if isinstance(value, Exception):
-            result[expr_str] = f"Fehler: {value}"
+        # Strukturiertes Ergebnis auswerten: {"success": bool, "value": ..., "error": ...}
+        if not entry["success"]:
+            result[expr_str] = f"Fehler: {entry['error']}"
         else:
-            result[expr_str] = value[1]
+            result[expr_str] = entry["value"][1]
 
     return result

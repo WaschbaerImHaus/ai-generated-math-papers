@@ -20,8 +20,43 @@
 @lastModified 2026-03-11
 """
 
+import re as _re_fs
 import sympy as sp
 from typing import Any
+from sympy.parsing.sympy_parser import (
+    parse_expr as _parse_expr_fs,
+    standard_transformations as _std_tr_fs,
+    implicit_multiplication_application as _impl_mult_fs,
+)
+
+# Erlaubte Transformationen für sicheres Parsing
+_SAFE_TR_FS = _std_tr_fs + (_impl_mult_fs,)
+
+# Whitelist-Muster: Nur mathematische Ausdrücke (Buchstaben, Ziffern, Operatoren)
+_SAFE_CHARS_FS = _re_fs.compile(r'^[a-zA-Z0-9\s\+\-\*\/\^\(\)\.\,\_\=\<\>]+$')
+
+
+def _safe_to_sympy(expr: Any) -> sp.Basic:
+    """
+    @brief Konvertiert Eingabe sicher in einen SymPy-Ausdruck.
+    @description
+        Wenn expr bereits ein SymPy-Ausdruck ist, wird er unverändert zurückgegeben.
+        Strings werden mit parse_expr geparst (sicherer als sympify).
+        Andere Typen (int, float) werden direkt konvertiert.
+    @param expr: SymPy-Ausdruck, String oder numerischer Wert
+    @return SymPy-Ausdruck
+    @raises ValueError bei ungültigem String-Ausdruck
+    @author Michael Fuhrmann
+    @lastModified 2026-03-12
+    """
+    if isinstance(expr, sp.Basic):
+        return expr
+    if isinstance(expr, str):
+        if len(expr) > 1000 or not _SAFE_CHARS_FS.match(expr):
+            raise ValueError(f"Ungültiger Ausdruck (unerlaubte Zeichen oder zu lang): '{expr}'")
+        return _parse_expr_fs(expr, transformations=_SAFE_TR_FS)
+    # int, float und ähnliche Typen direkt via sp.sympify konvertieren (kein String → sicher)
+    return sp.sympify(expr)
 
 
 class FormulaSimplifier:
@@ -59,9 +94,8 @@ class FormulaSimplifier:
         @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
-        # Eingabe zu SymPy-Ausdruck konvertieren
-        if not isinstance(expr, sp.Basic):
-            expr = sp.sympify(expr)
+        # Eingabe sicher zu SymPy-Ausdruck konvertieren (parse_expr statt sympify)
+        expr = _safe_to_sympy(expr)
 
         # Schrittweise Vereinfachungen anwenden
         simplified = sp.simplify(expr)
@@ -106,9 +140,8 @@ class FormulaSimplifier:
         @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
-        # Eingabe zu SymPy konvertieren
-        if not isinstance(expr, sp.Basic):
-            expr = sp.sympify(expr)
+        # Eingabe sicher zu SymPy konvertieren (parse_expr statt sympify)
+        expr = _safe_to_sympy(expr)
 
         # Kandidaten-Liste aller Vereinfachungsformen
         candidates = [expr]
@@ -156,9 +189,8 @@ class FormulaSimplifier:
         @author Michael Fuhrmann
         @lastModified 2026-03-11
         """
-        # Eingabe zu SymPy konvertieren
-        if not isinstance(expr, sp.Basic):
-            expr = sp.sympify(expr)
+        # Eingabe sicher zu SymPy konvertieren (parse_expr statt sympify)
+        expr = _safe_to_sympy(expr)
 
         # LaTeX erzeugen mit SymPy
         return sp.latex(expr)

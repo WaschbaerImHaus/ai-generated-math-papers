@@ -516,12 +516,22 @@ def safe_parse_expr(expr_str: str):
     @brief Parst einen mathematischen Ausdruck sicher mit SymPy.
     @description
         Wandelt einen String wie "sin(x)**2 + x" in einen SymPy-Ausdruck um.
-        Erlaubt nur bekannte mathematische Funktionen (kein eval mit beliebigem Code).
+        Erlaubt nur bekannte mathematische Funktionen. Nutzt parse_expr statt
+        sympify, um Code-Injection zu verhindern.
     @param expr_str: Mathematischer Ausdruck als String
     @return Tupel (expr, x_symbol) – SymPy-Ausdruck und das x-Symbol
-    @raises ValueError wenn der Ausdruck nicht parsbar ist
+    @raises ValueError wenn der Ausdruck nicht parsbar ist oder ungültige Zeichen enthält
     @date 2026-03-10
+    @lastModified 2026-03-12
     """
+    import re as _re
+    from sympy.parsing.sympy_parser import parse_expr, standard_transformations, \
+        implicit_multiplication_application
+    # Längen- und Zeichenvalidierung vor dem Parsen
+    if len(expr_str) > 1000:
+        raise ValueError("Ausdruck zu lang (max. 1000 Zeichen)")
+    if not _re.match(r'^[a-zA-Z0-9\s\+\-\*\/\^\(\)\.\,\_\=\<\>]+$', expr_str):
+        raise ValueError(f"Ungültige Zeichen im Ausdruck: '{expr_str}'")
     # x als Symbol definieren
     x = sp.Symbol('x')
     # Erlaubte Funktionen und Konstanten für sicheres Parsing
@@ -536,8 +546,9 @@ def safe_parse_expr(expr_str: str):
         'oo': sp.oo, 'inf': sp.oo,
     }
     try:
-        # sympify parst den String in einen SymPy-Ausdruck
-        expr = sp.sympify(expr_str, locals=allowed_locals)
+        # parse_expr ist sicherer als sympify – führt keinen beliebigen Python-Code aus
+        transformations = standard_transformations + (implicit_multiplication_application,)
+        expr = parse_expr(expr_str, local_dict=allowed_locals, transformations=transformations)
         return expr, x
     except Exception as e:
         raise ValueError(f"Ungültiger Ausdruck '{expr_str}': {e}")
@@ -4431,9 +4442,14 @@ def api_logic_truth_table():
         # Propositions erstellen
         props = {v: Proposition(v) for v in vars_list}
 
-        # Formel parsen (einfache eval mit Whitelist)
-        allowed = {
-            **props,
+        # Formel parsen (sicherer rekursiver Descent-Parser ohne eval)
+        # Sicherheitsvalidierung: Nur erlaubte Zeichen in der Formel
+        import re as _re
+        if not _re.match(r'^[a-zA-Z0-9\s\(\),_]+$', formula_str) or len(formula_str) > 512:
+            return jsonify({"error": "Ungültige Formel: Nur Buchstaben, Ziffern, Leerzeichen, Klammern und Kommas erlaubt"}), 400
+
+        # Erlaubte Operatoren und Variablen (keine eval-Ausführung)
+        _allowed_ops = {
             'AND': lambda a, b: LogicFormula('AND', a, b),
             'OR': lambda a, b: LogicFormula('OR', a, b),
             'NOT': lambda a: LogicFormula('NOT', a),
@@ -4441,7 +4457,45 @@ def api_logic_truth_table():
             'IFF': lambda a, b: LogicFormula('IFF', a, b),
             'XOR': lambda a, b: LogicFormula('XOR', a, b),
         }
-        formula = eval(formula_str, {"__builtins__": {}}, allowed)
+
+        def _safe_parse_logic(s: str):
+            """Parst eine logische Formel sicher ohne eval."""
+            s = s.strip()
+            # Funktionsaufruf erkennen: NAME(arg1, arg2, ...)
+            m = _re.match(r'^([A-Z_][A-Z0-9_]*)\((.+)\)$', s)
+            if m:
+                func_name = m.group(1)
+                if func_name not in _allowed_ops:
+                    raise ValueError(f"Unbekannter Operator: {func_name}")
+                # Argumente auf oberster Ebene aufteilen (Klammerntiefe beachten)
+                args_str = m.group(2)
+                args = []
+                depth = 0
+                current = []
+                for ch in args_str:
+                    if ch == '(':
+                        depth += 1
+                        current.append(ch)
+                    elif ch == ')':
+                        depth -= 1
+                        current.append(ch)
+                    elif ch == ',' and depth == 0:
+                        args.append(''.join(current).strip())
+                        current = []
+                    else:
+                        current.append(ch)
+                if current:
+                    args.append(''.join(current).strip())
+                parsed_args = [_safe_parse_logic(a) for a in args]
+                return _allowed_ops[func_name](*parsed_args)
+            # Einfache Variable
+            if _re.match(r'^[a-zA-Z][a-zA-Z0-9_]*$', s):
+                if s not in props:
+                    raise ValueError(f"Unbekannte Variable: {s}")
+                return props[s]
+            raise ValueError(f"Ungültiger Ausdruck: {s}")
+
+        formula = _safe_parse_logic(formula_str)
 
         table = truth_table(formula, vars_list)
         taut = is_tautology(formula, vars_list)
@@ -5841,7 +5895,16 @@ def api_invariant_reynolds():
             if i < n:
                 local_dict[name] = symbols[i]
 
-        poly_expr = sp.sympify(poly_str, locals=local_dict)
+        # parse_expr statt sympify verwenden (sicherer gegen Code-Injection)
+        import re as _re2
+        from sympy.parsing.sympy_parser import parse_expr as _parse_expr2, \
+            standard_transformations as _std_tr2, \
+            implicit_multiplication_application as _impl_mult2
+        if len(poly_str) > 1000 or not _re2.match(
+                r'^[a-zA-Z0-9\s\+\-\*\/\^\(\)\.\,\_\=\<\>]+$', poly_str):
+            return error_response("Ungültiger Polynomausdruck")
+        poly_expr = _parse_expr2(poly_str, local_dict=local_dict,
+                                  transformations=_std_tr2 + (_impl_mult2,))
 
         # Reynolds-Operator: Mittlung über alle Permutationen von S_n
         # reynolds_operator(poly_expr, group_elements, action)
@@ -7406,8 +7469,19 @@ def api_alg_geom_groebner():
         gen_strs = data.get('generators', ['x**2 - y', 'x - 1'])
         var_strs = data.get('variables', ['x', 'y'])
         import sympy
+        import re as _re_geom
+        from sympy.parsing.sympy_parser import parse_expr as _pe_geom, \
+            standard_transformations as _st_geom, \
+            implicit_multiplication_application as _im_geom
         variables = [sympy.Symbol(v) for v in var_strs]
-        generators = [sympy.sympify(g) for g in gen_strs]
+        _local_geom = {v: sympy.Symbol(v) for v in var_strs}
+        _tr_geom = _st_geom + (_im_geom,)
+        def _safe_sympify_geom(s):
+            if len(s) > 1000 or not _re_geom.match(
+                    r'^[a-zA-Z0-9\s\+\-\*\/\^\(\)\.\,\_\=\<\>]+$', s):
+                raise ValueError(f"Ungültiger Ausdruck: {s}")
+            return _pe_geom(s, local_dict=_local_geom, transformations=_tr_geom)
+        generators = [_safe_sympify_geom(g) for g in gen_strs]
         gb = compute_groebner_basis(generators, variables)
         return jsonify({'title': 'Gröbner-Basis', 'generators': gen_strs,
                         'variables': var_strs, 'groebner_basis': [str(p) for p in gb], 'size': len(gb)})
@@ -7425,8 +7499,19 @@ def api_alg_geom_nullstellensatz():
         gen_strs = data.get('generators', ['x**2 + 1'])
         var_strs = data.get('variables', ['x'])
         import sympy
+        import re as _re_nss
+        from sympy.parsing.sympy_parser import parse_expr as _pe_nss, \
+            standard_transformations as _st_nss, \
+            implicit_multiplication_application as _im_nss
         variables = [sympy.Symbol(v) for v in var_strs]
-        generators = [sympy.sympify(g) for g in gen_strs]
+        _local_nss = {v: sympy.Symbol(v) for v in var_strs}
+        _tr_nss = _st_nss + (_im_nss,)
+        def _safe_sympify_nss(s):
+            if len(s) > 1000 or not _re_nss.match(
+                    r'^[a-zA-Z0-9\s\+\-\*\/\^\(\)\.\,\_\=\<\>]+$', s):
+                raise ValueError(f"Ungültiger Ausdruck: {s}")
+            return _pe_nss(s, local_dict=_local_nss, transformations=_tr_nss)
+        generators = [_safe_sympify_nss(g) for g in gen_strs]
         nss = NullstellensatzDemo()
         result = nss.weak_nullstellensatz(generators, variables)
         return jsonify({'title': 'Nullstellensatz', **result})
@@ -7669,8 +7754,19 @@ def api_diff_top_form():
         var_strs = data.get('variables', ['x', 'y'])
         degree = int(data.get('degree', 1))
         import sympy
+        import re as _re_form
+        from sympy.parsing.sympy_parser import parse_expr as _pe_form, \
+            standard_transformations as _st_form, \
+            implicit_multiplication_application as _im_form
         variables = [sympy.Symbol(v) for v in var_strs]
-        coefficients = [sympy.sympify(c) for c in coeff_strs]
+        _local_form = {v: sympy.Symbol(v) for v in var_strs}
+        _tr_form = _st_form + (_im_form,)
+        def _safe_sympify_form(s):
+            if len(s) > 1000 or not _re_form.match(
+                    r'^[a-zA-Z0-9\s\+\-\*\/\^\(\)\.\,\_\=\<\>]+$', s):
+                raise ValueError(f"Ungültiger Koeffizient: {s}")
+            return _pe_form(s, local_dict=_local_form, transformations=_tr_form)
+        coefficients = [_safe_sympify_form(c) for c in coeff_strs]
         form = DifferentialForm(degree, coefficients, variables)
         d_form = form.exterior_derivative()
         return jsonify({'title': f'{degree}-Form', 'coefficients': coeff_strs,
@@ -7686,11 +7782,20 @@ def api_diff_top_morse():
         return error_response('Modul differential_topology nicht verfügbar')
     try:
         import sympy
+        import re as _re_morse
+        from sympy.parsing.sympy_parser import parse_expr as _pe_morse, \
+            standard_transformations as _st_morse, \
+            implicit_multiplication_application as _im_morse
         data = request.get_json()
         f_str = data.get('function', 'x**2 + y**2')
         var_strs = data.get('variables', ['x', 'y'])
         variables = [sympy.Symbol(v) for v in var_strs]
-        f_expr = sympy.sympify(f_str)
+        if len(f_str) > 1000 or not _re_morse.match(
+                r'^[a-zA-Z0-9\s\+\-\*\/\^\(\)\.\,\_\=\<\>]+$', f_str):
+            return error_response("Ungültiger Funktionsausdruck")
+        _local_morse = {v: sympy.Symbol(v) for v in var_strs}
+        f_expr = _pe_morse(f_str, local_dict=_local_morse,
+                           transformations=_st_morse + (_im_morse,))
         mt = MorseTheory()
         crit_pts = mt.morse_function_critical_points(f_expr, variables)
         results = [{'point': str(pt), 'morse_index': mt.morse_index(f_expr, pt, variables)}

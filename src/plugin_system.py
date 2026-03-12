@@ -35,7 +35,64 @@
 import importlib
 import importlib.util
 import os
+import re as _re_ps
 from typing import Any, Dict, List, Optional
+
+
+# Absoluter Basispfad für Plugins – Plugins dürfen NUR aus diesem Verzeichnis geladen werden.
+# Verhindert Path-Traversal-Angriffe (z.B. ../../etc/passwd als Plugin-Pfad).
+PLUGIN_BASE_DIR: str = os.path.realpath(
+    os.path.join(os.path.dirname(__file__), '..', 'plugins')
+)
+
+# Gefährliche Muster im Plugin-Quellcode, die eine Ausführung verhindern sollen.
+# Diese Liste deckt die häufigsten Code-Injection-Vektoren ab.
+_DANGEROUS_PATTERNS = [
+    r'\bos\.system\b',
+    r'\bsubprocess\b',
+    r'\b__import__\b',
+    r'\beval\s*\(',
+    r'\bexec\s*\(',
+    r'\bopen\s*\(',
+    r'\bimport\s+os\b',
+    r'\bimport\s+sys\b',
+    r'\bimport\s+subprocess\b',
+    r'\bshutil\b',
+    r'\bsocket\b',
+    r'\burllib\b',
+    r'\brequests\b',
+    r'\bpickle\b',
+    r'\bctypes\b',
+]
+
+# Kompilierte Muster für schnelle Suche
+_DANGEROUS_RE = [_re_ps.compile(p) for p in _DANGEROUS_PATTERNS]
+
+
+def _scan_plugin_content(path: str) -> None:
+    """
+    @brief Prüft den Quellcode einer Plugin-Datei auf gefährliche Muster.
+    @description
+        Liest die Datei als Text und sucht nach bekannten gefährlichen Konstrukten
+        (os.system, subprocess, eval, exec, open, etc.). Wirft SecurityError wenn
+        ein gefährliches Muster gefunden wird.
+    @param path  Absoluter Pfad zur Plugin-Datei.
+    @raises SecurityError  Wenn ein gefährliches Muster gefunden wird.
+    @author Michael Fuhrmann
+    @lastModified 2026-03-12
+    """
+    try:
+        with open(path, 'r', encoding='utf-8', errors='replace') as f:
+            content = f.read()
+    except OSError as e:
+        raise ImportError(f"Konnte Plugin-Datei nicht lesen: {path}: {e}")
+
+    for pattern in _DANGEROUS_RE:
+        if pattern.search(content):
+            raise PermissionError(
+                f"Plugin '{path}' enthält gefährliches Muster '{pattern.pattern}' "
+                f"und wird nicht geladen."
+            )
 
 
 # Globale Plugin-Registry: Name → Modul-Objekt
@@ -78,13 +135,27 @@ def load_plugin(path: str) -> Any:
     if not os.path.isfile(path):
         raise FileNotFoundError(f"Plugin-Datei nicht gefunden: {path}")
 
+    # Sicherheit: Kanonischen (absoluten, symlink-aufgelösten) Pfad bestimmen
+    real_path = os.path.realpath(os.path.abspath(path))
+
+    # Sicherheit: Plugin-Pfad muss innerhalb von PLUGIN_BASE_DIR liegen
+    # Verhindert Path-Traversal (z.B. ../../evil.py als Plugin laden)
+    if not real_path.startswith(PLUGIN_BASE_DIR + os.sep) and real_path != PLUGIN_BASE_DIR:
+        raise PermissionError(
+            f"Plugin '{real_path}' liegt außerhalb des erlaubten Verzeichnisses "
+            f"'{PLUGIN_BASE_DIR}'. Zugriff verweigert."
+        )
+
+    # Sicherheit: Quellcode auf gefährliche Muster prüfen
+    _scan_plugin_content(real_path)
+
     # Modulnamen aus dem Dateinamen ableiten (ohne .py-Endung)
-    module_name = os.path.splitext(os.path.basename(path))[0]
+    module_name = os.path.splitext(os.path.basename(real_path))[0]
 
     # Modul-Spezifikation aus dem Dateipfad erstellen
-    spec = importlib.util.spec_from_file_location(module_name, path)
+    spec = importlib.util.spec_from_file_location(module_name, real_path)
     if spec is None or spec.loader is None:
-        raise ImportError(f"Konnte Modul-Spec nicht erstellen für: {path}")
+        raise ImportError(f"Konnte Modul-Spec nicht erstellen für: {real_path}")
 
     # Leeres Modul-Objekt erzeugen
     module = importlib.util.module_from_spec(spec)
@@ -95,7 +166,7 @@ def load_plugin(path: str) -> Any:
     return module
 
 
-def discover_plugins(plugin_dir: str = "plugins/") -> List[str]:
+def discover_plugins(plugin_dir: str = PLUGIN_BASE_DIR) -> List[str]:
     """
     @brief Sucht im angegebenen Verzeichnis nach Python-Dateien und lädt sie.
     @description
@@ -104,10 +175,14 @@ def discover_plugins(plugin_dir: str = "plugins/") -> List[str]:
         PLUGIN_REGISTRY. Gibt eine Liste der Namen aller erfolgreich geladenen
         Plugins zurück.
 
-    @param plugin_dir  Pfad zum Plugin-Verzeichnis (Standard: "plugins/").
+        Sicherheit: plugin_dir wird auf den kanonischen Pfad normalisiert und
+        muss ein Unterverzeichnis von PLUGIN_BASE_DIR sein. Dateien außerhalb
+        werden abgewiesen (Path-Traversal-Schutz).
+
+    @param plugin_dir  Pfad zum Plugin-Verzeichnis (Standard: PLUGIN_BASE_DIR).
     @return            Liste der Namen der geladenen Plugins.
     @author Michael Fuhrmann
-    @lastModified 2026-03-10
+    @lastModified 2026-03-12
     """
     loaded: List[str] = []
 

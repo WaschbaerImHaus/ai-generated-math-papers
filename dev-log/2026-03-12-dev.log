@@ -954,3 +954,47 @@ BEHOBEN: Ergänzung nach der Formel:
 
 **BUG-B4-P20-BIBLIO (GERING):** Vinogradov 1937 in paper20 DE auf EN-Quelle angeglichen.
   - Neu: "Representation of an odd number as a sum of three primes." Dokl. Akad. Nauk SSSR, 15:169--172, 1937.
+
+=== 2026-03-12 — Build 159 — Security Fixes: BUG-PY-001 bis BUG-PY-005, BUG-PY-010 ===
+
+2026-03-12 [Build 159]: 6 Python-Sicherheitslücken behoben
+
+### Behobene Sicherheitsfehler
+
+**BUG-PY-001 (KRITISCH)** src/webapp/app.py — eval() in /api/logic/truth_table:
+- Ersetzt eval(formula_str, {"__builtins__": {}}, allowed) durch rekursiven Descent-Parser
+- Eingabevalidierung: Regex-Whitelist + max. 512 Zeichen
+- Kein Python-Code wird mehr ausgeführt — nur vordefinierte logische Operatoren (AND/OR/NOT/IMPLIES/IFF/XOR)
+
+**BUG-PY-002 (KRITISCH)** src/visualization.py — eval() in plot_function_2d_adaptive():
+- Ersetzt eval(func_str, {"__builtins__": {}}, env) durch sympy.lambdify()
+- Funktionsausdruck wird über parse_expr() zu SymPy-Ausdruck geparst, dann via lambdify zu numpy-Funktion
+- Kein direktes eval auf Benutzereingabe mehr
+
+**BUG-PY-003 (HOCH)** src/webapp/app.py, src/parallel_compute.py, src/formula_simplifier.py — sympify() auf Benutzereingabe:
+- safe_parse_expr() in app.py: sympify → parse_expr + Längen-/Zeichen-Validierung
+- Reynolds-Operator (line ~5898), Gröbner-Basis (7464), Nullstellensatz (7483),
+  DifferentialForm (7727), MorseTheory (7747): alle sympify → _safe_sympify_*() mit parse_expr
+- parallel_compute.py: _safe_sympify() Hilfsfunktion eingeführt, alle 3 Helper-Funktionen umgestellt
+- formula_simplifier.py: _safe_to_sympy() Hilfsfunktion eingeführt, strings via parse_expr (non-strings via sp.sympify, da sicher)
+
+**BUG-PY-004 (HOCH)** src/plugin_system.py — exec_module() ohne Einschränkung:
+- PLUGIN_BASE_DIR als fester absoluter Pfad definiert
+- load_plugin(): realpath-Prüfung ob Plugin innerhalb PLUGIN_BASE_DIR liegt (Path-Traversal-Schutz)
+- _scan_plugin_content(): Quellcode-Scan auf 15 gefährliche Muster (os.system, subprocess, eval, exec, open, import os/sys, etc.)
+- discover_plugins(): Standard-Argument auf PLUGIN_BASE_DIR geändert (statt relativer "plugins/")
+
+**BUG-PY-005 (HOCH)** src/parallel_compute.py — Exception swallowing:
+- parallel_symbolic(): return-Struktur geändert zu {"success": bool, "value": ..., "error": str|None}
+- parallel_integrate/limit/derivative(): Consumer-Code auf neue Struktur angepasst
+
+**BUG-PY-010 (MITTEL)** src/visualization.py — __import__() in f-string (line 4212):
+- math bereits am Dateianfang importiert (Import vorgezogen)
+- __import__("math").log(2) / __import__("math").log(3) → math.log(2) / math.log(3) + Variable _hausdorff_dim
+
+### Betroffene Dateien
+- src/webapp/app.py
+- src/visualization.py
+- src/parallel_compute.py
+- src/formula_simplifier.py
+- src/plugin_system.py
