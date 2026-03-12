@@ -151,11 +151,13 @@ Every 4-chromatic graph contains $K_4$ as a minor.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-Dirac~\cite{Dirac52} proved that every $4$-chromatic graph contains $K_4$
-as a topological minor (i.e., a subdivision of $K_4$). Since a topological
-minor is also a minor, the result follows. The proof uses the fact that
-$4$-chromatic graphs cannot be planar (by the planar $5$-color theorem) and
-a structural analysis via Kempe chains.
+The cases $k \leq 3$ are trivial. For $k = 4$: Dirac~\cite{Dirac52} proved
+that every graph with minimum degree $\delta(G) \geq 3$ contains a subdivision
+of $K_4$. Since a $4$-chromatic graph $G$ has $\delta(G) \geq 3$ (otherwise
+a vertex of degree $\leq 2$ could be recolored, contradicting $4$-chromaticity
+in a minimal counterexample), Dirac's theorem gives a topological $K_4$ minor,
+hence a $K_4$ minor. Alternatively, Wagner's theorem characterizes graphs
+with no $K_4$ minor as series-parallel graphs, which are $3$-colorable.
 \end{proof}
 
 %% =============================================================================
@@ -171,9 +173,13 @@ as a minor.
 \end{theorem}
 
 \begin{remark}
-This is a minor-version of Kuratowski's theorem (1930), which uses topological
-minors (subdivisions) instead of minors. Wagner's theorem is slightly stronger
-since minor is a weaker condition than topological minor.
+This is the minor-version of Kuratowski's theorem (1930), which uses topological
+minors (subdivisions) instead of minors. Both theorems are equivalent
+characterizations of planarity: Kuratowski uses the absence of $K_5$- and
+$K_{3,3}$-subdivisions, Wagner uses the absence of $K_5$ and $K_{3,3}$ as
+minors. Since every topological minor is a minor (but not vice versa),
+Wagner's condition is \emph{a priori} weaker — yet both are equivalent
+to planarity, so neither theorem is strictly stronger than the other.
 \end{remark}
 
 \begin{theorem}[Four-Color Theorem, Appel--Haken 1977; Robertson et al.\ 1997]\label{thm:4CT}
@@ -188,16 +194,11 @@ Hadwiger's conjecture for $k = 5$ is equivalent to the Four-Color Theorem.
 ($\Leftarrow$) Assume the Four-Color Theorem. Let $G$ be a graph with $\chi(G) \geq 5$.
 We must show $G \succeq K_5$.
 
-Since $\chi(G) \geq 5$, by the 4CT $G$ is not planar. By Wagner's theorem
-(Theorem~\ref{thm:wagner}), $G$ contains $K_5$ or $K_{3,3}$ as a minor.
-If $G \succeq K_5$, we are done. If $G \succeq K_{3,3}$, then since
-$\chi(K_{3,3}) = 2$... but wait, $G$ is $(5)$-chromatic. We need a more
-careful argument.
-
-The full proof uses Wagner's structure theorem: a graph with no $K_5$ minor
-is built from planar graphs and a specific graph $V_8$ (the Wagner graph) via
-$3$-sum operations. Such graphs are $4$-colorable by the Four-Color Theorem
-applied piecewise. Hence if $\chi(G) \geq 5$, then $G$ must have a $K_5$ minor.
+Wagner's structure theorem states that every graph with no $K_5$ minor can
+be constructed from planar graphs and the Wagner graph $V_8$ via clique-sum
+operations. Such graphs are $4$-colorable by the Four-Color Theorem applied
+piecewise to the components. Hence if $\chi(G) \geq 5$, the graph $G$
+cannot be built this way, so $G$ must have a $K_5$ minor.
 
 ($\Rightarrow$) If Hadwiger holds for $k=5$, then every planar graph $G$
 (which has no $K_5$ minor by Wagner's theorem) satisfies $\chi(G) \leq 4$.
@@ -218,7 +219,7 @@ counterexample to Hadwiger's conjecture for $k = 6$ would be a graph $G$ that:
 \begin{enumerate}[label=(\roman*)]
   \item is $6$-chromatic (hence $\chi(G) = 6$),
   \item contains no $K_6$ minor,
-  \item is vertex-transitive (by minimality arguments).
+  \item is vertex-critical (by minimality arguments, i.e.\ $\chi(G - v) < \chi(G)$ for every vertex $v$).
 \end{enumerate}
 
 They then showed that any such graph must have an \emph{apex vertex} $v$ such
@@ -363,9 +364,9 @@ $(2^{k-2}+1)$-colorable.
 \end{theorem}
 
 \begin{remark}
-For $k = 5$: Mader's bound gives $5$-colorability (since $2^{4-2}+1 = 5$),
-without the Four-Color Theorem. For $k = 6$: $9$-colorability without further
-work, but the RST theorem improves this to $5$. The exponential gap between
+For $k = 5$: Mader's bound gives $9$-colorability (since $2^{5-2}+1 = 9$),
+without the Four-Color Theorem. For $k = 6$: $2^{6-2}+1 = 17$-colorability
+without further work, but the RST theorem improves this to $5$. The exponential gap between
 Mader's bound $2^{k-2}$ and Hadwiger's prediction $k-1$ is enormous for large $k$.
 \end{remark}
 

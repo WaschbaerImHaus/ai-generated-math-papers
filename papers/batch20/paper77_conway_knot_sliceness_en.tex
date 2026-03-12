@@ -106,7 +106,7 @@ manifestations of the difference between the topological and smooth
 categories in dimension 4.
 
 The \emph{Conway knot} $C$ (Figure~1) is the unique 11-crossing prime knot
-denoted $11n34$ in the Rolfsen table~\cite{Rolfsen1976}. It is the mutant
+denoted $11n34$ in the Hoste--Thistlethwaite table. It is the mutant
 of the Kinoshita--Terasaka knot $KT$ ($11n42$), obtained by cutting along
 a Conway sphere and regluing with a $180°$ rotation. The Conway knot
 satisfies all known necessary conditions for being smoothly slice: its
@@ -160,11 +160,14 @@ there exist topologically but not smoothly slice knots.
 \end{definition}
 
 \begin{example}
-The first known examples of topologically but not smoothly slice knots
-are torus knots $T(2, 2k+1)$ for large $k$, established using gauge theory
-(Donaldson invariants, Kronheimer--Mrowka~\cite{KronheimerMrowka1993}).
-The Rasmussen $s$-invariant (Section~\ref{sec:s-invariant}) provides
-purely combinatorial obstructions to smooth sliceness.
+Whitehead doubles of non-slice knots provide the standard examples of
+topologically but not smoothly slice knots: for a non-slice knot $J$,
+the (untwisted) Whitehead double $\mathrm{Wh}(J)$ is topologically slice
+(since $\Delta_{\mathrm{Wh}(J)}(t) = 1$, Freedman's theorem applies) but
+not smoothly slice, as detected by the Rasmussen $s$-invariant or
+Heegaard Floer $\tau$-invariant~\cite{Hedden2007}.
+Note: torus knots $T(2, 2k+1)$ are \emph{not} topologically slice
+(their signatures are non-zero and $\Delta_{T(2,2k+1)}(t) \neq 1$).
 \end{example}
 
 %% -------------------------------------------------------------------------
@@ -317,10 +320,15 @@ a sequence of handle slides and cancellations.
 \subsection{Freedman's Theorem}
 
 \begin{theorem}[Freedman 1982~\cite{Freedman1982}]
-A knot $K \subset S^3$ with vanishing Arf invariant is topologically slice.
-More precisely, any knot $K$ whose Alexander polynomial is trivial
+Any knot $K \subset S^3$ whose Alexander polynomial is trivial
 ($\Delta_K(t) = 1$) is topologically slice.
 \end{theorem}
+
+\begin{remark}
+Note that a vanishing Arf invariant alone does \emph{not} suffice for
+topological sliceness. Freedman's theorem requires the stronger condition
+$\Delta_K(t) = 1$ (equivalently, $\pi_1(S^3 \setminus K) \cong \Z$).
+\end{remark}
 
 The stronger version relevant here is:
 
