@@ -432,8 +432,14 @@ and is related to Mertens' constant by:
   (see Section~\ref{sec:parity}).
 
   Under GRH the key gain is in the \emph{major arc} approximation:
-  GRH implies $|S(\alpha) - \mu(q)/\phi(q)\cdot I(\beta)| \ll \sqrt{N}(\log N)^2$
-  (instead of $O(Ne^{-c\sqrt{\log N}})$).  The major arc integral then gives
+  % BUG-B4-P20-EN-001 behoben: Fehlerterm mit expliziter q-Abhängigkeit ergänzt
+  GRH implies, for each individual major arc $\mathfrak{M}(q,a)$ with $q \leq Q$:
+  \[
+    \bigl|S(\alpha) - \frac{\mu(q)}{\phi(q)}\cdot I(\beta)\bigr|
+    \;\ll\; \frac{\sqrt{N}\,(\log N)^2}{\phi(q)},
+  \]
+  so that the $q$-averaged error over all major arcs is $O(\sqrt{N}(\log N)^2)$
+  (instead of $O(Ne^{-c\sqrt{\log N}})$ unconditionally).  The major arc integral then gives
   $\mathfrak{S}(n)\cdot n + O(\sqrt{n}(\log n)^2)$.
   For the minor arcs, the GRH zero-free region $\mathrm{Re}(s)\geq 1/2$ and
   partial summation yield $|S(\alpha)| \ll \sqrt{N}(\log N)^2$ on $\mathfrak{m}$

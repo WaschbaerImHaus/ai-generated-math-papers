@@ -130,10 +130,14 @@ $T$-invariant measurable set $A$ (i.e.\ $T^{-1}A = A$ up to null sets) satisfies
 $\mu(A) \in \{0, 1\}$.
 \end{definition}
 
+% BUG-B7-P32-EN/DE-001 behoben: Eindeutigkeit von ν war unbegründet; Krylov-Bogolyubov verwendet.
+% BUG-B7-P32-EN/DE-002 behoben: Zirkuläre Begründung (Ergodizität → Mixing → Ergodizität) entfernt.
 \begin{theorem}[Ergodic theorem for the Syracuse map]\label{thm:ergodic_theorem}
-Let $\nu$ be the unique $S$-invariant measure on $\mathbb{Z}_2^{\text{odd}}$ that is
-absolutely continuous with respect to Haar measure (whose existence follows from the
-unique ergodicity of the shift). Then for $\nu$-almost every odd $x \in \mathbb{Z}_2$
+Let $\nu$ be any $T$-invariant Borel probability measure on $\mathbb{Z}_2^{\text{odd}}$
+(whose existence is guaranteed by the Krylov--Bogolyubov theorem, cf.\ Proposition~\ref{prop:exist_inv}).
+Assuming that $(\mathbb{Z}_2^{\text{odd}}, \nu, S)$ is ergodic
+(which is a \emph{conditional} statement; rigorous verification requires
+Theorem~\ref{thm:mixing}), then for $\nu$-almost every odd $x \in \mathbb{Z}_2$
 and every continuous function $\phi\colon \mathbb{Z}_2^{\text{odd}} \to \mathbb{R}$:
 \[
   \lim_{N \to \infty} \frac{1}{N} \sum_{k=0}^{N-1} \phi(S^k(x)) \;=\; \int_{\mathbb{Z}_2^{\text{odd}}} \phi \, d\nu.
@@ -141,9 +145,12 @@ and every continuous function $\phi\colon \mathbb{Z}_2^{\text{odd}} \to \mathbb{
 \end{theorem}
 
 \begin{proof}
-This is Birkhoff's ergodic theorem applied to the ergodic system $(\mathbb{Z}_2^{\text{odd}}, \nu, S)$.
-The key step is verifying ergodicity, which follows from the mixing property of $S$
-(Theorem~\ref{thm:mixing} below).
+\emph{Conditional proof:} Assuming ergodicity of $(\mathbb{Z}_2^{\text{odd}}, \nu, S)$,
+this is Birkhoff's ergodic theorem.  The ergodicity itself is established (conditionally)
+via the mixing property in Theorem~\ref{thm:mixing} below, which in turn relies on
+the exponential decay of correlations (Lemma~\ref{lem:decay_corr}), whose proof
+involves a spectral gap claim that is asserted but not fully proved; see
+Remark~\ref{rem:spectral_gap} below.
 \end{proof}
 
 \begin{theorem}[Mixing property of $S$]\label{thm:mixing}
@@ -171,15 +178,33 @@ $C > 0$ and $\rho < 1$ such that
 for all $k \geq 0$.
 \end{lemma}
 
-\begin{proof}
+% BUG-B7-P32-EN/DE-003 behoben: Spektralradius-Berechnung als nicht rigoros markiert
+\begin{proof}[Proof sketch (informal — spectral gap not rigorously proved)]
 The correlations are controlled by the spectral radius of the transfer operator
 $\mathcal{L}_S\colon L^2(\nu) \to L^2(\nu)$, defined by
 $\mathcal{L}_S f(x) = \sum_{y: S(y)=x} \frac{f(y)}{|S'(y)|_2}$
-(where $|\cdot|_2$ is the 2-adic derivative). The spectral gap of $\mathcal{L}_S$
-follows from the expansion properties of $S$ in the 2-adic metric: $S$ expands
-distances by a factor of at least $2$ on average (since $S$ maps odd elements and
-removes at least one factor of 2 from $3x+1$), implying $\rho < 1$.
+(where $|\cdot|_2$ is the 2-adic derivative).
+
+\emph{Claim (unproved):} The spectral gap of $\mathcal{L}_S$ (i.e.\ that the
+spectral radius of $\mathcal{L}_S$ on the orthogonal complement of constants is
+$\rho < 1$) follows from the expansion properties of $S$ in the 2-adic metric.
+Heuristically, $S$ removes at least one factor of 2 from $3x+1$, expanding
+2-adic distances by a factor of at least 2 on average, which is expected to imply
+$\rho \leq 1/2 < 1$.
+
+\emph{Caveat:} A rigorous calculation of the spectral radius of $\mathcal{L}_S$
+on $L^2(\nu)$ requires: (i) a precise definition of $\nu$ as a $S$-invariant measure,
+(ii) verification that $S'(y)$ in the 2-adic sense is well-defined and bounded, and
+(iii) an explicit operator norm estimate.  None of these steps have been fully
+carried out here. The exponential decay rate $\rho$ is thus \emph{asserted}, not proved.
 \end{proof}
+
+\begin{remark}[Spectral gap status]\label{rem:spectral_gap}
+The spectral gap of the transfer operator $\mathcal{L}_S$ is a key unproved claim
+in this paper.  It underlies the mixing property (Theorem~\ref{thm:mixing}) and,
+via Birkhoff's theorem, the ergodic theorem (Theorem~\ref{thm:ergodic_theorem}).
+Without a rigorous proof of the spectral gap, both theorems are conditional.
+\end{remark}
 
 \section{Furstenberg's Correspondence Principle}
 

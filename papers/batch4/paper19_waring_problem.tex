@@ -238,7 +238,12 @@ The representation count is
 \end{corollary}
 
 \begin{proof}
-  Apply Weyl's inequality (Paper~17, Theorem~6.1) with $s = (k-2)2^{k-1}+5$:
+  % BUG-B4-P19-EN-001 überprüft: Paper 17 hat \newtheorem{theorem}{Theorem}[section] und
+  % \newtheorem{lemma}[theorem]{Lemma} (geteilter Zähler). Weyl's inequality ist das erste
+  % Theorem/Lemma in Section 6 von Paper 17 → korrekte Nummer ist Theorem 6.1. ✓ KEIN BUG.
+  Apply Weyl's inequality (Paper~17, Theorem~6.1\footnote{%
+    Theorem 6.1 in Paper~17 is the Weyl inequality \texttt{thm:weyl}, the first numbered
+    statement in Section~6 (``Minor Arc Bounds'') of that paper.}) with $s = (k-2)2^{k-1}+5$:
   the minor arc saving $N^{-\sigma}$ with $\sigma = 2^{1-k}$ gives a minor arc
   error of order $N^{s/k - 1 - \delta}$ for some $\delta > 0$, which is absorbed
   into the main term $N^{s/k - 1}$ of Theorem~\ref{thm:HL}.

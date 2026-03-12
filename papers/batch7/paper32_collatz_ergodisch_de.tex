@@ -133,21 +133,27 @@ $T$-invariante messbare Menge $A$ (d.h.\ $T^{-1}A = A$ bis auf Nullmengen) die E
 $\mu(A) \in \{0, 1\}$ hat.
 \end{definition}
 
+% BUG-B7-P32-EN/DE-001 behoben: Eindeutigkeit von ν war unbegründet; Krylov-Bogolyubov
+% BUG-B7-P32-EN/DE-002 behoben: Zirkuläre Begründung Ergodizität → Mixing → Ergodizität entfernt
 \begin{theorem}[Ergodensatz für die Syrakus-Abbildung]\label{thm:ergodensatz}
-Sei $\nu$ das eindeutige $S$-invariante Maß auf $\mathbb{Z}_2^{\text{ungerade}}$, das
-absolut stetig bezüglich des Haar-Maßes ist (dessen Existenz aus der einzigartigen
-Ergodizität des Shifts folgt). Dann gilt für $\nu$-fast alle ungeraden $x \in \mathbb{Z}_2$
-und jede stetige Funktion $\phi\colon \mathbb{Z}_2^{\text{ungerade}} \to \mathbb{R}$:
+Sei $\nu$ ein beliebiges $S$-invariantes Borel-Wahrscheinlichkeitsmaß auf
+$\mathbb{Z}_2^{\text{ungerade}}$ (dessen Existenz durch den Satz von
+Krylov--Bogoljubow gesichert ist, vgl.\ Proposition~\ref{prop:exist_inv}).
+Unter der \emph{Annahme}, dass $(\mathbb{Z}_2^{\text{ungerade}}, \nu, S)$ ergodisch
+ist (was durch Satz~\ref{thm:mischung} bedingt gilt), gilt für $\nu$-fast alle
+ungeraden $x \in \mathbb{Z}_2$ und jede stetige Funktion
+$\phi\colon \mathbb{Z}_2^{\text{ungerade}} \to \mathbb{R}$:
 \[
   \lim_{N \to \infty} \frac{1}{N} \sum_{k=0}^{N-1} \phi(S^k(x)) \;=\; \int_{\mathbb{Z}_2^{\text{ungerade}}} \phi \, d\nu.
 \]
 \end{theorem}
 
-\begin{proof}
-Dies ist Birkhoffs Ergodensatz angewendet auf das ergodische System
-$(\mathbb{Z}_2^{\text{ungerade}}, \nu, S)$. Der entscheidende Schritt ist der Nachweis
-der Ergodizität, die aus der Mischungseigenschaft von $S$ folgt
-(Satz~\ref{thm:mischung}).
+\begin{proof}[Bedingter Beweis]
+\emph{Unter Annahme der Ergodizität} ist dies Birkhoffs Ergodensatz. Die Ergodizität
+selbst wird (bedingt) durch die Mischungseigenschaft (Satz~\ref{thm:mischung}) und
+den Abfall von Korrelationen (Lemma~\ref{lem:abfall_korr}) etabliert. Da der Beweis
+der Spektrallücke im Lemma nicht rigoros ausgeführt wird (vgl.\ Bemerkung nach
+Lemma~\ref{lem:abfall_korr}), ist der gesamte Satz ebenfalls als bedingt zu betrachten.
 \end{proof}
 
 \begin{theorem}[Mischungseigenschaft von $S$]\label{thm:mischung}
@@ -175,14 +181,31 @@ existieren $C > 0$ und $\rho < 1$ mit
 für alle $k \geq 0$.
 \end{lemma}
 
-\begin{proof}
+% BUG-B7-P32-EN/DE-003 behoben: Spektralradius als nicht-rigoros markiert
+\begin{proof}[Beweisansatz (informell — Spektrallücke nicht rigoros bewiesen)]
 Die Korrelationen werden durch den Spektralradius des Transfer-Operators
-$\mathcal{L}_S\colon L^2(\nu) \to L^2(\nu)$ kontrolliert, der durch
-$\mathcal{L}_S f(x) = \sum_{y: S(y)=x} f(y) / |S'(y)|_2$ definiert ist.
-Die Spektrallücke von $\mathcal{L}_S$ folgt aus den Expansionseigenschaften von $S$
-in der 2-adischen Metrik: $S$ dehnt Abstände im Durchschnitt um mindestens den Faktor 2,
-was $\rho < 1$ impliziert.
+$\mathcal{L}_S\colon L^2(\nu) \to L^2(\nu)$, $\mathcal{L}_S f(x) = \sum_{y: S(y)=x} f(y)/|S'(y)|_2$,
+kontrolliert.
+
+\emph{Behauptung (unbewiesen):} Die Spektrallücke (d.h.\ der Spektralradius von
+$\mathcal{L}_S$ auf dem Orthogonalkomplement der Konstanten ist $\rho < 1$) folgt
+aus den Expansionseigenschaften von $S$ in der 2-adischen Metrik. Heuristisch:
+$S$ entfernt mindestens einen Faktor 2 aus $3x+1$, was 2-adische Abstände im
+Mittel um mindestens den Faktor 2 dehnt und $\rho \leq 1/2 < 1$ erwarten lässt.
+
+\emph{Vorbehalt:} Ein rigoroser Beweis der Spektrallücke erfordert: (i) eine präzise
+Definition von $\nu$ als $S$-invariantes Maß, (ii) Nachweis, dass $S'(y)$ im
+2-adischen Sinne wohldefiniert und beschränkt ist, und (iii) eine explizite
+Operatornorm-Abschätzung. Keiner dieser Schritte wird hier vollständig durchgeführt.
+Der exponentielle Abfallrate $\rho$ ist daher \emph{behauptet, nicht bewiesen}.
 \end{proof}
+
+\begin{remark}[Status der Spektrallücke]\label{rem:spektrallücke}
+Die Spektrallücke des Transfer-Operators $\mathcal{L}_S$ ist eine zentrale unbewiesene
+Behauptung in diesem Paper. Sie liegt der Mischungseigenschaft (Satz~\ref{thm:mischung})
+und — über Birkhoffs Satz — dem Ergodensatz (Satz~\ref{thm:ergodensatz}) zugrunde.
+Ohne rigoriosen Beweis der Spektrallücke sind beide Sätze als bedingt zu betrachten.
+\end{remark}
 
 \section{Furstenbergs Korrespondenzprinzip}
 

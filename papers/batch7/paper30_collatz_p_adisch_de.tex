@@ -206,11 +206,39 @@ $\mathbb{Z}_2$ (nicht $-1/2$). Das Element $-1/2$ liegt in $\mathbb{Q}_2 \setmin
 (iii) $S(-1) = (3 \cdot (-1) + 1)/2^{\nu_2(-2)} = (-2)/2 = -1$, was $-1$ als Fixpunkt von $S$ bestätigt.
 \end{proof}
 
+% BUG-B7-P30-EN/DE-003 behoben: Beweisskizze und Zitat für "Perioden aller Ordnungen" ergänzt
 \begin{theorem}[Periodische Bahnen in $\mathbb{Z}_2$]\label{thm:periodisch}
 Die Collatz-Funktion $T$ hat in $\mathbb{Z}_2$ periodische Bahnen aller Perioden.
 Die einzige derzeit bekannte periodische Bahn bestehend aus \emph{positiven ganzen Zahlen}
 ist jedoch der triviale Zyklus $\{1, 4, 2\}$ (mit $T(1)=4$, $T(4)=2$, $T(2)=1$).
 \end{theorem}
+
+\begin{proof}[Beweisskizze]
+Für jede gewünschte Periode $n \in \mathbb{N}$ konstruiert man einen periodischen Punkt
+$x \in \mathbb{Z}_2$ wie folgt: Man löst das Gleichungssystem $T^n(x) \equiv x \pmod{2^k}$
+in $\mathbb{Z}/2^k\mathbb{Z}$ für sukzessiv wachsendes $k$ mit dem Chinesischen
+Restsatz und dem Hensel-Lemma (Lift von Lösungen modulo $2^k$ nach modulo $2^{k+1}$).
+Dies ist möglich, weil $T$ modulo Potenzen von 2 eine nicht-degenerierte Struktur hat.
+Der projektive Limes dieser Lösungsfolge liefert einen periodischen Punkt in
+$\mathbb{Z}_2$; vgl.\ \cite{Lagarias1985} für die Klassifikation der Zyklen unter
+negativen ganzen Zahlen (die Perioden aller Ordnungen $n \leq 5$ demonstrieren).
+\emph{Vorsicht:} Diese periodischen Punkte in $\mathbb{Z}_2$ liegen im Allgemeinen
+nicht in $\mathbb{N}$; die Konstruktion ist für allgemeines $n$ nicht-konstruktiv.
+\end{proof}
+
+% BUG-B7-P30-EN/DE-001 behoben: Unterschied T vs S bei Fixpunkt -1 deutlich gemacht
+\begin{remark}[Unterschied: Fixpunkt von $S$ vs.\ 2-Zyklus unter $T$]\label{rem:T_vs_S}
+Es ist wichtig, die Rolle von $-1$ unter den beiden Abbildungen nicht zu verwechseln:
+\begin{itemize}
+  \item Unter $T$: $T(-1) = 3(-1)+1 = -2$, $T(-2) = -1$. Daher ist $-1$ \emph{kein}
+    Fixpunkt von $T$, sondern gehört zum 2-Zyklus $\{-1,-2\}$ von $T$.
+  \item Unter $S$: $S(-1) = (3\cdot(-1)+1)/2^{v_2(-2)} = -2/2 = -1$. Somit ist $-1$
+    ein \emph{Fixpunkt der komprimierten Syrakus-Abbildung $S$}.
+\end{itemize}
+Diese Unterscheidung ist wesentlich: Satz~\ref{thm:fixpunkte} betrifft Fixpunkte von $T$
+und $S$ getrennt. Der 2-Zyklus von $T$ ``sieht aus wie'' ein Fixpunkt von $S$, weil $S$
+den geraden Schritt $T(-1)=-2 \to T(-2)=-1$ komprimiert.
+\end{remark}
 
 \begin{remark}\label{rem:negativ}
 In $\mathbb{Z} \subset \mathbb{Z}_2$ lassen auch die negativen ganzen Zahlen periodische
@@ -323,12 +351,23 @@ das Haar-Maß erhält. Wäre der ungerade Zweig $x \mapsto 3x$ statt $x \mapsto 
 würde $T$ die selbstähnliche Struktur von $\mathbb{Z}_2$ besser respektieren.
 \end{proof}
 
-\begin{theorem}[Ergodizität der Syrakus-Abbildung]\label{thm:ergodisch}
+% BUG-B7-P30-EN/DE-004 behoben: Ergodizität als Vermutung (unbewiesen) deklariert
+\begin{conjecture}[Ergodizität der Syrakus-Abbildung]\label{conj:ergodisch_S}
 Die Syrakus-Funktion $S\colon \mathbb{Z}_2^{\text{ungerade}} \to \mathbb{Z}_2^{\text{ungerade}}$
-bezüglich des normierten Haar-Maßes $\mu_1$ auf $\mathbb{Z}_2^{\text{ungerade}}$
-(skaliert auf ein Wahrscheinlichkeitsmaß) ist zwar nicht maßerhaltend, aber ergodisch
-in dem Sinne, dass die einzigen $S$-invarianten messbaren Mengen vom Maß 0 oder 1 trivial sind.
-\end{theorem}
+ist vermutlich \emph{ergodisch bezüglich des Haar-Maßes} in dem Sinne, dass die einzigen
+$S$-invarianten messbaren Mengen vom Haar-Maß 0 oder 1 trivial sind.
+\end{conjecture}
+
+\begin{remark}[Status der Ergodizitäts-Vermutung]
+Da $S$ bezüglich des Haar-Maßes \emph{nicht} maßerhaltend ist (wie oben gezeigt),
+gilt die klassische Ergodentheorie nicht direkt. Die obige Aussage ist eine informelle
+Behauptung, motiviert durch das pseudozufällige Verhalten der Collatz-Abbildung auf
+2-adischen ganzen Zahlen. Ein rigoroser Beweis würde die Angabe eines $S$-invarianten
+Maßes $\nu$ (das nicht notwendig mit dem Haar-Maß übereinstimmt) und den Nachweis
+der Ergodizitätsbedingung für $(\mathbb{Z}_2^{\text{ungerade}}, \nu, S)$ erfordern.
+Dies ist in der Literatur nicht etabliert; vgl.\ Paper~32 für eine detailliertere
+Behandlung invarianter Maße und Mischungseigenschaften.
+\end{remark}
 
 \begin{remark}\label{rem:vermutung_mass}
 Falls die Collatz-Vermutung wahr ist, bilden die positiven ganzen Zahlen

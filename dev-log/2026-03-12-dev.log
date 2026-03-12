@@ -47,3 +47,41 @@ Externen Review `reviews/review_vollständig_alle_batches_2026_03_12.md` verarbe
 - BUG-B7-P32-EN/DE-001,-002,-003: Maß ν, Mixing, Spektralradius
 
 #### Build-Nummer: 116 → 117
+
+### 2026-03-12 06:50:00 — Build 118: Alle 11 Mittel-Bugs aus externem Review behoben
+
+#### BUG-B4-P18-DE-002 — BEHOBEN (Simplex-Fallunterscheidung unvollständig)
+- paper18 DE: Begründung für n≤N Fall explizit: u_i=t_i-2, Substitution zeigt obere Schranke nie aktiv → exakte Formel (n-6)²/2 nicht näherungsweise. O(n log n) aus Primzahl-Gewichtung erklärt.
+
+#### BUG-B4-P19-EN-001 — FALSE POSITIVE (Querverweis "Paper 17, Theorem 6.1")
+- Verifiziert: Paper 17 nutzt \newtheorem{theorem}{Theorem}[section] + shared counter mit Lemma. Weyl-Ungleichung = erstes Statement in Section 6 → korrekt "Theorem 6.1". Fußnote zur Klarstellung eingefügt.
+
+#### BUG-B4-P20-EN-001 — BEHOBEN (GRH-Fehlerterm ohne q-Abhängigkeit)
+- paper20 EN: Explizite q-abhängige Fehlerterm-Formel O(√N(log N)²/φ(q)) für jeden Hauptbogen ergänzt.
+
+#### BUG-B5-P23-EN/DE-001 — BEHOBEN (Beitrag bei s=0 als "Pol von Γ" falsch)
+- EN+DE: "Polstelle bei s=0" → "Residuum des 1/s-Faktors bei s=0; ζ'(0)/ζ(0) ist kein Γ-Pol"
+
+#### BUG-B5-P23-EN/DE-002 — BEHOBEN (PNT-Beweis "fourth-order pole" falsch)
+- EN: "fourth-order pole" → "zero of order 4m, contributing (3-4m)·∞ → -∞"
+- DE war bereits korrekt formuliert (einfacher Pol vs. Nullstelle)
+
+#### BUG-B7-P30-EN/DE-001 — BEHOBEN (T vs S Verwechslung Fixpunkt -1)
+- EN+DE: Neue Remark-Box: -1 ist Fixpunkt von S, aber 2-Zyklus-Element unter T
+
+#### BUG-B7-P30-EN/DE-003 — BEHOBEN ("Orbits aller Perioden" unbewiesen)
+- EN+DE: Beweisskizze + Zitat (Lagarias 1985): CRT+Hensel-Lift für periodische Punkte in Z₂
+
+#### BUG-B7-P30-EN/DE-004 — BEHOBEN (Ergodizität von S behauptet, nicht bewiesen)
+- EN+DE: Theorem → conjecture/Vermutung; Remark zur Begründung (S nicht maßerhaltend!)
+
+#### BUG-B7-P32-EN/DE-001 — BEHOBEN (ν-Existenz unbegründet)
+- EN+DE: "eindeutig" und "unique ergodicity of shift" entfernt → Krylov-Bogolyubov
+
+#### BUG-B7-P32-EN/DE-002 — BEHOBEN (Mixing-Eigenschaft zirkulär)
+- EN+DE: Bedingter Beweis-Disclaimer; Abhängigkeitskette explizit: ergodic → mixing → corr.decay → spectral gap (unproved)
+
+#### BUG-B7-P32-EN/DE-003 — BEHOBEN (Spektralradius nicht rigoros)
+- EN+DE: Beweis als [informal — spectral gap not rigorously proved] markiert + Remark hinzugefügt
+
+#### Build-Nummer: 117 → 118

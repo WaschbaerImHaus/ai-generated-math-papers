@@ -204,7 +204,14 @@ $-\zeta'(s)/\zeta(s)$:
     This term appears in the formula as $-\tfrac{1}{2}\log(1-x^{-2})$
     because we move it to the right-hand side; note $\log(1-x^{-2}) < 0$
     for $x > 1$, so $-\tfrac{1}{2}\log(1-x^{-2}) > 0$ is a small positive correction.
-  \item Contribution of the pole of $\Gamma$ at $s = 0$: $-\zeta'(0)/\zeta(0)$.
+  % BUG-B5-P23-EN/DE-001 behoben: Beitrag bei s=0 korrekt erklärt
+  \item Contribution at $s = 0$: The function $-\zeta'(s)/\zeta(s)$ is
+    holomorphic at $s=0$ (since $\zeta(0) = -1/2 \ne 0$), so the integrand
+    $x^s \cdot (-\zeta'(s)/\zeta(s)) / s$ has a simple pole at $s=0$ coming
+    from the factor $1/s$ alone. Its residue is $x^0 \cdot (-\zeta'(0)/\zeta(0))
+    = -\zeta'(0)/\zeta(0) = \log(2\pi)$.
+    (Note: this is \emph{not} a contribution from a pole of $\Gamma$; rather,
+    it is the residue of $1/s$ at $s=0$.)
 \end{itemize}
 A fully rigorous proof (handling convergence carefully) is in
 \cite{Davenport2000}, Chapter~17.
@@ -231,8 +238,14 @@ Mertens (1898) observed: for $\sigma > 1$ and real $t$,
   \log|\zeta^3(\sigma)\,\zeta^4(\sigma+it)\,\zeta(\sigma+2it)| \ge 0.
 \]
 This follows from $3 + 4\cos\theta + \cos 2\theta = 2(1+\cos\theta)^2 \ge 0$.
-As $\sigma \to 1^+$, if $\zeta(1+it) = 0$, the fourth-order pole of
-$\zeta^4$ would give $-\infty$ on the left, contradicting $\ge 0$.
+% BUG-B5-P23-EN/DE-002 behoben: "fourth-order pole" ist falsch; ζ^4 hat eine
+% 4-fache Nullstelle bei 1+it, keinen Pol. Korrekte Formulierung:
+As $\sigma \to 1^+$: $\zeta(\sigma)$ has a simple pole, contributing
+$\log|\zeta^3(\sigma)| \to +3\cdot\infty$. If $\zeta(1+it_0) = 0$ with
+multiplicity $m \geq 1$, then $\zeta^4(\sigma+it_0)$ has a zero of order $4m$,
+so $\log|\zeta^4(\sigma+it_0)| \to -4m \cdot \log(1/(\sigma-1)) \to -\infty$.
+The net behaviour is $(3 - 4m)\log(1/(\sigma-1)) \to -\infty$ (since $3-4m \leq -1$),
+contradicting $\log|\zeta^3(\sigma)\,\zeta^4(\sigma+it_0)\,\zeta(\sigma+2it_0)| \ge 0$.
 Hence $\zeta(1+it) \ne 0$ for $t \ne 0$.
 
 \textbf{Step 2} (PNT from zero-free region):

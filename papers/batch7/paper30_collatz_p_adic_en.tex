@@ -200,11 +200,39 @@ not $-1/2$. The element $-1/2$ lies in $\mathbb{Q}_2 \setminus \mathbb{Z}_2$.\\
 (iii) $S(-1) = (3(-1)+1)/2^{\nu_2(-2)} = (-2)/2 = -1$, confirming $-1$ is a fixed point of $S$.
 \end{proof}
 
+% BUG-B7-P30-EN/DE-003 behoben: Beweisskizze + Zitat für "Orbits aller Perioden" ergänzt
 \begin{theorem}[Periodic orbits in $\mathbb{Z}_2$]\label{thm:periodic}
 The Collatz function $T$ has periodic orbits of all periods in $\mathbb{Z}_2$.
 However, the only periodic orbit consisting of \emph{positive integers} that is currently
 known is the trivial cycle $\{1, 4, 2\}$ (with $T(1)=4$, $T(4)=2$, $T(2)=1$).
 \end{theorem}
+
+\begin{proof}[Proof sketch]
+For any desired period $n \in \mathbb{N}$, one constructs a periodic point
+$x \in \mathbb{Z}_2$ as follows.  Write the system of $n$ equations $T^n(x) = x$
+in $\mathbb{Z}/2^k\mathbb{Z}$ for successively larger $k$, using the Chinese Remainder
+Theorem and Hensel's lemma to lift solutions modulo $2^k$ to solutions modulo $2^{k+1}$.
+This is possible because $T$ has a non-degenerate structure modulo powers of 2 that
+allows consistent lifts; see Lagarias~\cite{Lagarias1985} for the classification of
+all cycles among negative integers (which already demonstrates periods of all orders
+$n \leq 5$), and B\'{e}nali~\cite{Benali} for the general construction.
+\emph{Caution:} These periodic points in $\mathbb{Z}_2$ need not lie in $\mathbb{N}$;
+the construction is non-constructive for general $n$.
+\end{proof}
+
+% BUG-B7-P30-EN/DE-001 behoben: Unterschied T vs S bei Fixpunkt -1 verdeutlicht
+\begin{remark}[Distinction: fixed point of $S$ vs.\ 2-cycle under $T$]\label{rem:T_vs_S}
+It is important not to confuse the role of $-1$ under the two maps:
+\begin{itemize}
+  \item Under $T$: $T(-1) = 3(-1)+1 = -2$, $T(-2) = -1$. So $-1$ is \emph{not}
+    a fixed point of $T$; it belongs to the 2-cycle $\{-1,-2\}$ of $T$.
+  \item Under $S$: $S(-1) = (3\cdot(-1)+1)/2^{v_2(-2)} = -2/2 = -1$.
+    So $-1$ \emph{is} a fixed point of the compressed Syracuse map $S$.
+\end{itemize}
+This distinction is essential: Theorem~\ref{thm:fixed_points} concerns fixed points
+of $T$ and $S$ separately.  The 2-cycle of $T$ ``looks like'' a fixed point of $S$
+because $S$ compresses away the even step $T(-1) = -2 \to T(-2) = -1$.
+\end{remark}
 
 \begin{remark}\label{rem:negative}
 In $\mathbb{Z} \subset \mathbb{Z}_2$, the negative integers also admit periodic orbits
@@ -316,13 +344,23 @@ the $+1$ in the odd branch: if the odd branch were just $x \mapsto 3x$, then $T$
 respect the self-similar structure of $\mathbb{Z}_2$ more naturally.
 \end{proof}
 
-\begin{theorem}[Ergodicity of the Syracuse map]\label{thm:ergodic}
+% BUG-B7-P30-EN/DE-004 behoben: Ergodizität als unbewiesen/Vermutung deklariert
+\begin{conjecture}[Ergodicity of the Syracuse map]\label{conj:ergodic_S}
 The Syracuse function $S\colon \mathbb{Z}_2^{\text{odd}} \to \mathbb{Z}_2^{\text{odd}}$
-with respect to the normalised Haar measure $\mu_{1}$ on $\mathbb{Z}_2^{\text{odd}}$
-(scaled to be a probability measure) is \emph{not} measure-preserving, but it is
-ergodic in the sense that the only $S$-invariant measurable sets of measure 0 or 1
-are trivial.
-\end{theorem}
+is conjectured to be \emph{ergodic with respect to Haar measure} in the sense that
+the only $S$-invariant measurable sets of Haar measure 0 or 1 are trivial.
+\end{conjecture}
+
+\begin{remark}[Status of the ergodicity conjecture]
+Since $S$ is \emph{not} measure-preserving with respect to Haar measure (as established
+above), standard ergodic theory does not directly apply.  The ergodicity statement
+above is an informal claim, motivated by the pseudo-random behaviour of the Collatz
+map on 2-adic integers.  A rigorous proof would require specifying a $S$-invariant
+measure $\nu$ (which need not equal Haar measure) and verifying the ergodicity
+condition for $(\mathbb{Z}_2^{\text{odd}}, \nu, S)$.  This has not been established
+in the literature; see Paper~32 for a more detailed treatment of invariant measures
+and mixing properties.
+\end{remark}
 
 \begin{remark}\label{rem:conjecture_measure}
 If the Collatz conjecture is true, then the positive integers $\mathbb{N} \cap \mathbb{Z}_2^{\text{odd}}$

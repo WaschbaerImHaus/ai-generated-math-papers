@@ -211,7 +211,13 @@ sammelt die Residuen der Polstellen und Nullstellen von $-\zeta'(s)/\zeta(s)$:
     In der Endformel erscheint dieser Term als $-\tfrac{1}{2}\log(1-x^{-2})$;
     da $\log(1-x^{-2}) < 0$ f\"ur $x > 1$, ist $-\tfrac{1}{2}\log(1-x^{-2}) > 0$
     eine kleine positive Korrektur.
-  \item Polstelle bei $s = 0$: Beitrag $-\zeta'(0)/\zeta(0)$.
+  % BUG-B5-P23-EN/DE-001 behoben: s=0 ist KEINE Polstelle, sondern Residuum des 1/s-Faktors
+  \item Residuum bei $s = 0$: Die Funktion $-\zeta'(s)/\zeta(s)$ ist holomorph bei $s=0$
+    (da $\zeta(0) = -1/2 \ne 0$). Der Integrand $x^s \cdot (-\zeta'/\zeta(s)) / s$ hat bei
+    $s=0$ einen einfachen Pol durch den Faktor $1/s$ allein. Das Residuum ist
+    $x^0 \cdot (-\zeta'(0)/\zeta(0)) = -\zeta'(0)/\zeta(0) = \log(2\pi)$.
+    (Achtung: Dies ist \emph{kein} Beitrag einer Polstelle von $\Gamma$, sondern das
+    Residuum des Faktors $1/s$ bei $s=0$.)
 \end{itemize}
 Vollst\"andiger Beweis in \cite{Davenport2000}, Kapitel~17.
 \end{proof}
