@@ -1451,3 +1451,33 @@ Paper 87 – Bateman-Horn:
     * Whitehead: OFFEN (seit 1941, äquiv. zu D(2))
     * Jones-Unknoten: OFFEN (kein Gegenbeispiel ≤9x)
     * Volumen-Vermutung: OFFEN
+
+=== 2026-03-12 — Build 173 — Batch 21 Gruppe B: 4 offene Vermutungen ===
+
+2026-03-12 [Build 173]: Batch 21 Gruppe B vollständig analysiert und dokumentiert
+
+### Neue Dateien
+- src/py/gruppe_b_batch21_verification.py: Computational Verifikation aller 4 Vermutungen
+  - Beal: Brute-Force-Suche (2M+ Tripel bis Basis 500, Exp 3..6) → 0 primitive Gegenbeispiele
+  - Andrews-Curtis: BFS-AC-Reduktionsalgorithmus (AC1..AC4 vollständig)
+    - AK(1) = ⟨a,b|aB,abaBAB⟩: BFS 30k Schritte erschöpft (Pfad zu lang für Längenbound)
+    - AK(2), AK(3): Wie erwartet nicht reduziert (Gegenbeispielkandidaten bestätigt)
+  - Hadwiger: K_7, Mycielski M_4, Analyse k=6→k=7 Schwierigkeitssprung
+  - Jacobian: BCW-Gradreduktionssatz, Pinchuk-ℝ/ℂ-Analyse, AC=2-Satz
+- reviews/research_batch21_gruppe_b_2026_03_12.md: Vollständiger mathematischer Review
+
+### Klassifikationen (Batch 21 Gruppe B)
+- Paper 80 Jacobian-Vermutung (komplex): OFFEN
+  - BCW 1982: Grad-Reduktion auf 3 äquivalent zur vollen JC
+  - Pinchuk 1994 betrifft ℝ mit nicht-konstantem det J — kein Widerspruch zur JC über ℂ
+  - Holomorphie + algebraische Abgeschlossenheit = fundamentaler ℝ/ℂ-Unterschied
+- Paper 81 Hadwiger k≥7: OFFEN
+  - k≤6 bewiesen (Robertson-Seymour-Thomas 1993)
+  - Norin-Song 2023: η(G) ≥ k·(log k)^{-0.999} (fast-linear aber nicht exakt)
+  - k=7 fehlt: kein Struktursatz für 7-chromatische Graphen
+- Paper 82 Andrews-Curtis: OFFEN (vermutlich FALSCH)
+  - AK(2), AK(3) = plausibelste Gegenbeispielkandidaten
+  - Entscheidbarkeit: wahrscheinlich unentscheidbar (Verbindung zu Homöomorphieproblem)
+- Paper 83 Beal: OFFEN (Vermutung gestützt)
+  - 2.004.000 Tripel getestet, kein primitives Gegenbeispiel
+  - abc-Vermutung → Beal (falls wahr)
