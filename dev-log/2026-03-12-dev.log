@@ -1,402 +1,141 @@
-## 2026-03-12 — Entwicklungs-Log
-
-### 2026-03-12 06:23:13 — Build 117: Review-Bugs aus vollständigem externem Review behoben
-
-Externen Review `reviews/review_vollständig_alle_batches_2026_03_12.md` verarbeitet.
-36 Papers in 8 Batches geprüft. 5 kritische/hohe Bugs behoben.
-
-#### BUG-B5-P24-EN/DE-002 — BEHOBEN (Historischer Fehler, HOCH)
-- Paper: `papers/batch5/paper24_rh_approaches_en.tex` + `_de.tex`
-- Problem: "Weil (1940) und Deligne (1974) bewiesen die Weil-Vermutungen"
-- Fakten: Weil *stellte auf* (1949), Weil bewies nur den Kurvenfall (1940), Deligne *bewies* den allgemeinen Fall (1974)
-- Fix: Formulierung zu "Weil vermutete... Deligne bewies..." korrigiert
-
-#### BUG-B7-P30-EN/DE-002 — BEHOBEN (Beweislücke, HOCH)
-- Paper: `papers/batch7/paper30_collatz_p_adic_en.tex` + `_de.tex`
-- Problem: Syracuse Representation Theorem — c_{k+1} ∈ Z₂ im Induktionsbeweis nicht explizit nachgewiesen
-- Fix: Begründung hinzugefügt: 2-adische Bewertung von s_{k+1}-s_k teilt Zähler → c_{k+1} ∈ Z ⊂ Z₂
-
-#### BUG-B7-P31-EN/DE-001 — BEHOBEN (Beweislücke, HOCH)
-- Paper: `papers/batch7/paper31_tao_probabilistic_collatz_en.tex` + `_de.tex`
-- Problem: Key Estimate — Proof Sketch zu informell; Übergang Summe→Produkt nicht rigoros;
-  ξ ∉ Z/log₂3 irreführend (für ξ∈Q trivial erfüllt)
-- Fix: Disclaimer "informal — nicht rigoroser Beweis" hinzugefügt;
-  Bedingung korrigiert: ξ ∉ Z (d.h. ‖ξ‖_{R/Z} > 0) statt ξ ∉ Z/log₂3
-
-#### BUG-B7-P32-EN/DE-004 — BEHOBEN (Falsche Aussage, HOCH)
-- Paper: `papers/batch7/paper32_collatz_ergodic_en.tex` + `_de.tex`
-- Problem: "Theorem" über Hausdorff-Dimension der Ausnahmemenge — logdens 0 ⟹ dim < 1 gilt NICHT allgemein
-- Fix: Theorem → conjecture/Vermutung umklassifiziert + Remark/Bemerkung mit Erklärung hinzugefügt
-
-#### BUG-B8-P34-STATUS — BEHOBEN (Darstellungsfehler, MITTEL→HOCH)
-- Paper: `papers/batch8/paper34_abc_conjecture_en.tex` + `_de.tex`
-- Problem: abc-Vermutung als "disputed" statt klar als "OFFEN" klassifiziert;
-  Scholze-Stix nicht als von Mehrheit anerkannt dargestellt
-- Fix: Explizite \begin{remark}[Offizieller Status...] Box hinzugefügt mit:
-  - abc ist OFFEN (nicht bewiesen)
-  - Scholze-Stix von Mehrheit der Gemeinschaft als stichhaltig angesehen
-  - Konsequenz: abc-abhängige Resultate bleiben bedingt
-
-#### Verbleibende MITTEL-Bugs (noch offen):
-- BUG-B4-P18-DE-002: Simplex-Fallunterscheidung (sing. Integral) unvollständig
-- BUG-B4-P19-EN-001: Querverweis "Paper 17, Theorem 6.1" — Nummer falsch
-- BUG-B4-P20-EN-001: GRH-Beweisskizze lückenhaft
-- BUG-B5-P23-EN/DE-002: PNT-Beweis Mertens-Argument zu schnell
-- BUG-B5-P23-EN/DE-001: Konstante -ζ'(0)/ζ(0) konzeptuell unklar
-- BUG-B7-P30-EN/DE-001,-003,-004: T vs. S Verwechslung, unbewiesen Behauptungen
-- BUG-B7-P32-EN/DE-001,-002,-003: Maß ν, Mixing, Spektralradius
-
-#### Build-Nummer: 116 → 117
-
-### 2026-03-12 06:50:00 — Build 118: Alle 11 Mittel-Bugs aus externem Review behoben
-
-#### BUG-B4-P18-DE-002 — BEHOBEN (Simplex-Fallunterscheidung unvollständig)
-- paper18 DE: Begründung für n≤N Fall explizit: u_i=t_i-2, Substitution zeigt obere Schranke nie aktiv → exakte Formel (n-6)²/2 nicht näherungsweise. O(n log n) aus Primzahl-Gewichtung erklärt.
-
-#### BUG-B4-P19-EN-001 — FALSE POSITIVE (Querverweis "Paper 17, Theorem 6.1")
-- Verifiziert: Paper 17 nutzt \newtheorem{theorem}{Theorem}[section] + shared counter mit Lemma. Weyl-Ungleichung = erstes Statement in Section 6 → korrekt "Theorem 6.1". Fußnote zur Klarstellung eingefügt.
-
-#### BUG-B4-P20-EN-001 — BEHOBEN (GRH-Fehlerterm ohne q-Abhängigkeit)
-- paper20 EN: Explizite q-abhängige Fehlerterm-Formel O(√N(log N)²/φ(q)) für jeden Hauptbogen ergänzt.
-
-#### BUG-B5-P23-EN/DE-001 — BEHOBEN (Beitrag bei s=0 als "Pol von Γ" falsch)
-- EN+DE: "Polstelle bei s=0" → "Residuum des 1/s-Faktors bei s=0; ζ'(0)/ζ(0) ist kein Γ-Pol"
-
-#### BUG-B5-P23-EN/DE-002 — BEHOBEN (PNT-Beweis "fourth-order pole" falsch)
-- EN: "fourth-order pole" → "zero of order 4m, contributing (3-4m)·∞ → -∞"
-- DE war bereits korrekt formuliert (einfacher Pol vs. Nullstelle)
-
-#### BUG-B7-P30-EN/DE-001 — BEHOBEN (T vs S Verwechslung Fixpunkt -1)
-- EN+DE: Neue Remark-Box: -1 ist Fixpunkt von S, aber 2-Zyklus-Element unter T
-
-#### BUG-B7-P30-EN/DE-003 — BEHOBEN ("Orbits aller Perioden" unbewiesen)
-- EN+DE: Beweisskizze + Zitat (Lagarias 1985): CRT+Hensel-Lift für periodische Punkte in Z₂
-
-#### BUG-B7-P30-EN/DE-004 — BEHOBEN (Ergodizität von S behauptet, nicht bewiesen)
-- EN+DE: Theorem → conjecture/Vermutung; Remark zur Begründung (S nicht maßerhaltend!)
-
-#### BUG-B7-P32-EN/DE-001 — BEHOBEN (ν-Existenz unbegründet)
-- EN+DE: "eindeutig" und "unique ergodicity of shift" entfernt → Krylov-Bogolyubov
-
-#### BUG-B7-P32-EN/DE-002 — BEHOBEN (Mixing-Eigenschaft zirkulär)
-- EN+DE: Bedingter Beweis-Disclaimer; Abhängigkeitskette explizit: ergodic → mixing → corr.decay → spectral gap (unproved)
-
-#### BUG-B7-P32-EN/DE-003 — BEHOBEN (Spektralradius nicht rigoros)
-- EN+DE: Beweis als [informal — spectral gap not rigorously proved] markiert + Remark hinzugefügt
-
-#### Build-Nummer: 117 → 118
-
----
-
-## 2026-03-12 Build 119
-
-### Aufgabe 1: BUGS.md geprüft
-- Build 117 (5 kritische Bugs) und Build 118 (11 Mittel-Bugs) sind bereits in BUGS.md dokumentiert
-- Keine neuen Einträge nötig — alle Bugs waren korrekt erfasst
-
-### Aufgabe 2: MEMORY.md
-- MEMORY.md hat bereits Auslagerung: numerical_insights.md + papers_review_status.md existieren
-- MEMORY.md ist aktuell auf Stand Build 119 mit korrekten Verweisen
-
-### Aufgabe 3: Papers reviewed/ Struktur
-- Alle Batch 4/5/7/8 Papers befinden sich bereits in papers/reviewed/batch4/5/7/8/
-- Keine Verschiebungen nötig — Struktur war bereits korrekt
-
-### Aufgabe 4: Stilfehler geprüft
-- BUG-011 (paper7 DE Zeile 98): Bereits auf `\geq (1)(2) - 1 = 1 > 0` verbessert
-- BUG-B4-P18-EN-001 (Remark 4.3 Goldston): Bereits mit Goldston-Schranke ergänzt
-- BUG-B5-P23-EN/DE-003 (Schoenfeld/Büthe): Bereits mit Büthe (2018) Remark versehen
-- BUG-B5-P24-EN/DE-001 (Barrier 1): Bereits mit Nullstellen als URSACHE erklärt
-- BUG-B5-P24-EN-003 (PT-symmetrisch): Bereits vollständig in paper24 EN eingebaut
-- BUG-B8-P34-WERT: Bereits "Mehrheit" Formulierung in beiden Dateien korrekt
-- Fazit: Alle 7 Stilfehler waren bereits behoben
-
-### Aufgabe 5: Neue Papers (Batch 9) erstellt
-- papers/batch9/paper37_algebraic_number_theory_en.tex (Alg. Zahlentheorie EN)
-  - Ganzheitsringe, Dedekind-Ringe, Minkowski-Einbettung, Dirichlet-Einheitensatz (vollst. Beweis)
-  - Klassengruppe, Minkowski-Schranke, Klassenzahlformel
-  - Quadratische Körper Q(√d) als Hauptbeispiele
-- papers/batch9/paper37_algebraische_zahlentheorie_de.tex (Deutsche Übersetzung)
-- papers/batch9/paper38_iwasawa_theory_en.tex (Iwasawa-Theorie EN)
-  - Iwasawa-Algebra Λ = Z_p[[T]], Weierstraß-Vorbereitungssatz
-  - Kubota-Leopoldt p-adische L-Funktionen (Konstruktion)
-  - Hauptvermutung (Mazur-Wiles 1984/Wiles 1990) mit Beweissskizze
-  - μ/λ-Invarianten, Ferrero-Washington, BSD-Verbindung
-- papers/batch9/paper38_iwasawa_theorie_de.tex (Deutsche Übersetzung)
-
-### Aufgabe 6: OPTIMIZED_WORKER.md aktualisiert
-- Stand auf Build 119 aktualisiert
-- Papers-Stand-Tabelle mit allen 10 Batches eingefügt
-- Review-Erkenntnisse: 5 Hauptfehlertypen mit Beispielen dokumentiert
-- Mathematische Erkenntnisse: Weil/Deligne, Hausdorff-Dim, Syracuse, PNT-ζ^4, abc ergänzt
-
-### Build-Nummer: 118 → 119
-
----
-
-## 2026-03-12 Build 120
-
-### Aufgabe 1: Batch 9 Review — Papers 37+38 (EN+DE)
-
-Review-Dokument erstellt: `reviews/review_batch9_2026_03_12.md`
-4 Papers geprüft: paper37 (Alg. Zahlentheorie), paper38 (Iwasawa-Theorie), je EN+DE.
-
-#### BUG-B9-P37-EN/DE-001 — BEHOBEN (Mittel): Theorem 6.1 Hypothese widersprüchlich
-- EN+DE: "p not dividing D / $p \nmid D$" aber Fall 2 behandelt "$p \mid D$" → Widerspruch
-- Fix: Hypothesen-Restriktion entfernt → Satz gilt für alle ungeraden Primzahlen $p$
-
-#### BUG-B9-P38-EN/DE-001 — BEHOBEN (Mittel): Kubota-Leopoldt Interpolationsbedingung
-- EN+DE: Formel nur für $n \equiv 1 \pmod{p-1}$; Standard (Washington Thm 5.11): gilt für alle $n \geq 1$
-- Fix: Kongruenzbedingung entfernt
-
-#### Batch 9 Papers nach reviewed/batch9/ verschoben
-- papers/reviewed/batch9/paper37_algebraic_number_theory_en.tex
-- papers/reviewed/batch9/paper37_algebraische_zahlentheorie_de.tex
-- papers/reviewed/batch9/paper38_iwasawa_theory_en.tex
-- papers/reviewed/batch9/paper38_iwasawa_theorie_de.tex
-
-### Aufgabe 3: Lehmer 3-Prim-Fall
-- Bereits vollständig implementiert (Build 119, beweisversuche.py):
-  - satz_kein_3prim_gerade_beweis() (2·q·r-Fall) ✓
-  - satz_kein_3prim_alle_ungerade_beweis() (p·q·r-Fall, 3-stufiger Beweis) ✓
-  - Papers: reviewed/batch1/paper2_lehmer_three_primes.tex + _de.tex ✓
-- Keine neue Arbeit nötig — alle Fälle bewiesen.
-
-### Aufgabe 4: CLAUDE.md Fortschrittscheckliste
-- Alle veralteten Einträge (Algebra, Analysis als offen) auf [x] gesetzt
-- Vollständige Liste aller 93+ Module dokumentiert
-- Themengebiete 11–14 ergänzt (L-Funktionen, Modulformen, p-adisch, Alg. Zahlentheorie)
-- Review-Workflow und Theorem-vs-Conjecture-Regel hinzugefügt
-
-### Aufgabe 5: OPTIMIZE.md
-- galois_theory.py Aufteilung als erledigt dokumentiert (148 Zeilen Wrapper)
-- math_helpers-Migration für geplante Module als erledigt dokumentiert
-- Neue offene Punkte: Langlands-Korrespondenz, Etale Kohomologie, weitere Module
-- Prioritäten auf Build 120 Stand aktualisiert
-
-### Build-Nummer: 119 → 120
-
----
-
-## 2026-03-12 Build 121
-
-### Aufgabe 2: Batch 10 — Paper 39 Langlands-Programm (EN + DE)
-
-Zwei neue Papers erstellt:
-- `papers/batch10/paper39_langlands_program_en.tex`
-- `papers/batch10/paper39_langlands_programm_de.tex`
-
-**Inhalt:**
-1. Motivation: Quadratische Reziprozität → Klassenkörpertheorie → Langlands
-2. Galois-Darstellungen: zyklotomischer Charakter, Tate-Modul, L-Funktionen
-3. Automorphe Darstellungen: Adèlen-Ring, $\otimes'_v \pi_v$, Satake-Parameter
-4. Lokale Langlands-Korrespondenz: WD-Gruppe, Harris-Taylor-Henniart (bewiesen)
-5. Globale Langlands-Vermutung: offene Vermutung für $n \ge 2$
-6. Shimura-Taniyama-Wiles: vollständiger Beweis-Abriss (Wiles 1995 + BCDT 2001)
-7. Fermat'scher Satz: Korollar über Frey-Kurve + Ribet
-8. Fontaine-Mazur-Vermutung: geometrische Darstellungen
-9. Funktorialitätsvermutung: Basiswechsel, Sym^m-Lifts
-10. p-adische Langlands: Colmez 2010 für GL_2(Q_p)
-11. Tabelle: bekannte Fälle (lokal bewiesen, global offen)
-12. Geometrische Langlands 2024: Gaitsgory-Team
-
-### Build-Nummer: 120 → 121
-
-### 2026-03-12 — Build 122: LaTeX-Bugfixes Batch4/Batch5 Papers
-
-#### BUG-B4-P19-DE-MISSING-THM — BEHOBEN (KRITISCH)
-- Datei: `papers/reviewed/batch4/paper19_waringsches_problem_de.tex`
-- Problem: `\begin{bemerkung}[Idee des effizienten Kongruenzrechnens]` enthielt Wooleys Hauptresultat, war aber als Bemerkung statt als Satz deklariert.
-- Fix: Umgewandelt zu `\begin{theorem}[Wooley, Efficient Congruencing]` / `\end{theorem}`.
-
-#### BUG-B4-P19-DE-REFS — GEPRÜFT (KEIN BUG)
-- Bibitems HardyLittlewood1920, Wooley2012, Wooley2013 waren bereits vorhanden (Zeilen 385–398). Kein Fix nötig.
-
-#### BUG-B4-P19-DE-KOROLLAR — GEPRÜFT (KEIN BUG)
-- Korollar 4.1 (Weyl-Schranke) war bereits korrekt als `\begin{korollar}` in Abschnitt 4 vorhanden.
-
-#### BUG-B5-P24-DE-MISSING-SECTION — GEPRÜFT (KEIN BUG)
-- Abschnitt "Verbindung zur Physik: Quantenchaos und darüber hinaus" war bereits in der DE-Version vorhanden (Zeilen 368–407) mit Lee-Yang, Connes und Bender.
-
-#### BUG-B5-P24-DE-001 — BEHOBEN (MITTEL)
-- Datei: `papers/reviewed/batch5/paper24_rh_approaches_de.tex`
-- Problem: DE-Abstract fehlte abschließender Satz über GRH und Dirichlet-L-Funktionen.
-- Fix: Satz "Analoge Resultate gelten für verallgemeinerte Riemann-Hypothesen (GRH) für Dirichlet-$L$-Funktionen $L(s,\chi)$." eingefügt.
-
-#### BUG-B5-P24-EN-001 + DE-001 — BEHOBEN (MITTEL)
-- Dateien: `papers/reviewed/batch5/paper24_rh_approaches_en.tex` + `_de.tex`
-- Problem: `\bibitem{Deligne1974}` fehlte in beiden Bibliographien, obwohl `\cite{Deligne1974}` im Text verwendet wird.
-- Fix: Bibitem in beide Dateien eingefügt (vor `\bibitem{Davenport2000}`).
-
-### 2026-03-12 — Build 123: Batch10 Paper39 + Batch9 Paper38 Bugfixes
-
-#### BUG-B10-P39-EN/DE-LLC-HISTORY — BEHOBEN (HOCH)
-- Paper: `papers/batch10/paper39_langlands_program_en.tex` + `_de.tex`
-- Problem: Chronologisch unmögliche Aussage "Kutzko (1980) building on Henniart (1993)"
-- Fix EN: "For GL₂(F): Proved by Kutzko (1980). For GL_n(F): Proved independently by Henniart (2000) and Harris--Taylor (2001)."
-- Fix DE: "Für GL₂(F): Bewiesen von Kutzko (1980). Für GL_n(F): Unabhängig bewiesen von Henniart (2000) und Harris--Taylor (2001)."
-
-#### BUG-B10-P39-DE-MISSING-SECTIONS — BEHOBEN (HOCH)
-- Paper: `papers/batch10/paper39_langlands_programm_de.tex`
-- Problem: Fehlende Sektionen 7 "Langlands-Funktorialitätsvermutung" und 8 "Das p-adische Langlands-Programm"
-- Fix: Sektion 7 (Basiswechsel, Sym^m-Lifts) und Sektion 8 (Colmez 2010) aus EN übersetzt und eingefügt
-
-#### BUG-B10-P39-DE-MISSING-BIBITEMS — BEHOBEN (MITTEL)
-- Paper: `papers/batch10/paper39_langlands_programm_de.tex`
-- Problem: Fehlende \bibitem{Henniart2000} und \bibitem{FrenkelBenZvi}
-- Fix: Beide bibitems aus EN-Version übernommen und eingefügt
-
-#### BUG-B9-P38-EN/DE-WILES1990-STEP3 — BEHOBEN (MITTEL)
-- Papers: `papers/reviewed/batch9/paper38_iwasawa_theory_en.tex` + `_de.tex`
-- Problem: Schritt 3 der Beweisskizze beschrieb Wiles 1990 fälschlicherweise mit "Euler system machinery (Kolyvagin, Rubin)"
-- Fix EN+DE: Wiles (1990) verwendet Hecke-Algebren und Modulkurven (Erweiterung von Mazur–Wiles 1984); Euler-System-Ansatz ist Rubin (1991) für imaginär-quadratische Körper
-
-### 2026-03-12 — Build 123: Batch7 Collatz-Papers — Circular-Argument + Ergodizitäts-Bugs behoben
-
-#### BUG-B7-P29-CIRCULAR-PROP4 — BEHOBEN (HOCH)
-- Papers: `papers/reviewed/batch7/paper29_collatz_conjecture_en.tex` + `paper29_collatz_vermutung_de.tex`
-- Problem: Proposition 4.1 (EN) / Satz 4.1 (DE) über Bahndichten enthielt zirkuläres Argument — Beweis setzte die Collatz-Vermutung stillschweigend voraus, ohne dies im Propositions-Statement zu deklarieren.
-- Fix EN: Propositionstitel geändert zu "..., conditional on the Collatz Conjecture"; Beweis beginnt jetzt mit `\emph{We assume the Collatz Conjecture throughout this proof.}`
-- Fix DE: Propositionstitel geändert zu "..., bedingt durch die Collatz-Vermutung"; Beweis beginnt mit `\emph{Wir setzen die Collatz-Vermutung im gesamten Beweis voraus.}`
-
-#### BUG-B7-P30-CONCLUSION — BEHOBEN (HOCH)
-- Papers: `papers/reviewed/batch7/paper30_collatz_p_adic_en.tex` + `paper30_collatz_p_adisch_de.tex`
-- Problem: Schlussfolgerung behauptete "S is ergodic" als Tatsache.
-- Fix EN: geändert zu "but $S$ is conjectured to be ergodic"
-- Fix DE: geändert zu "aber $S$ wird vermutet, ergodisch zu sein"
-
-#### BUG-B7-P32-CONCLUSION — BEHOBEN (HOCH)
-- Papers: `papers/reviewed/batch7/paper32_collatz_ergodic_en.tex` + `paper32_collatz_ergodisch_de.tex`
-- Problem: Zusammenfassung behauptete "The Syracuse map S is ergodic and mixing with exponential decay of correlations" als bewiesene Tatsache.
-- Fix EN: geändert zu "...is conjectured to be ergodic and mixing with exponential decay of correlations"
-- Fix DE: geändert zu "...wird vermutungsweise als ergodisch und mischend mit exponentiellem Korrelationsabfall angesehen"
-
-#### BUG-B7-P31-FURSTENBERG-REF — BEHOBEN (MITTEL)
-- Papers: `papers/reviewed/batch7/paper31_tao_probabilistic_collatz_en.tex` + `paper31_tao_probabilistischer_ansatz_de.tex`
-- Problem: Lemma 5.3 zitierte Furstenberg (1977) für ein "Korrespondenzprinzip" im Collatz-Kontext. Furstenberg (1977) behandelt Szemerédi-Theorem, nicht Collatz.
-- Fix EN: Lemma-Titel geändert zu "Correspondence principle in the Collatz context"; Zitat auf `\cite{Tao2022}` (cf.) umgestellt.
-- Fix DE: Lemma-Titel geändert zu "Korrespondenzprinzip im Collatz-Kontext"; `\cite{Furstenberg1977}` ersetzt durch `\cite{Tao2022}` (vgl.).
-
-### 2026-03-12 — Build 124: Vollständiges Audit 2026-03-12 — Bugfixes
-
-**Quelle:** 5 parallele Review-Agenten (vollständige Lektüre aller 39 Papers)
-**Neue Review-Dateien:** VOLLSTAENDIGES_AUDIT_MAENGELLISTE_2026_03_12.md, review_batch1_batch2_audit_2026_03_12.md, review_batch5_batch6_riemann_bsd_2026_03_12.md, review_batch7_8_papers29_36.md, review_batch9_10_papers37_39_2026_03_12.md
-
-**Kritische/Hohe Fixes (Build 122–124):**
-- Paper 29 EN+DE: Proposition 4.1 konditionalisiert (zirkulärer Beweis)
-- Paper 30 EN+DE: "S ist ergodisch" → "wird vermutet ergodisch zu sein"
-- Paper 32 EN+DE: Conclusion konditionalisiert (ergodisch/mischend)
-- Paper 31 EN+DE: Furstenberg(1977)-Zitat → Tao(2022)
-- Paper 39 EN+DE: LLC-Chronologie korrigiert (Kutzko 1980, Henniart 2000, Harris-Taylor 2001)
-- Paper 39 DE: Sektionen 7+8 übersetzt und eingefügt
-- Paper 39 DE: Bibitems Henniart2000 + FrenkelBenZvi ergänzt
-- Paper 38 EN+DE: Wiles 1990 → Hecke-Algebren+Modulkurven (nicht Euler-Systeme)
-- Paper 19 DE: Wooley-Theorem von Bemerkung zu Theorem hochgestuft
-- Paper 24 DE: Abstract-Letztsatz ergänzt; Deligne1974-Bibitem in EN+DE
-- Paper 24 EN: Deligne1974-Bibitem ergänzt
-
-**Mittlere/Geringe Fixes (Build 124):**
-- Paper 2 DE: Algebraischer Fehler Lemma 4.1 Zeile 217 korrigiert
-- Paper 10 DE: Interner Build-Kommentar entfernt
-- Paper 20 DE: Section 8 Einleitungstext ergänzt + Granville1995-Bibitem
-- Paper 37 DE: Tippfehler "Kürzbarkei" → "Kürzbarkeit"
-
-**Hinweis:** Review-Bug KRITISCH-1 (Δ=64n⁶ vs 4n⁶) als FALSE POSITIVE bestätigt:
-  Für E: y²=x³-n²x gilt Δ = -16·(4·(-n²)³+27·0²) = 64n⁶ — mathematisch korrekt.
-
-**Verbleibende offene Bugs:** 8 (in BUGS.md dokumentiert)
-
-2026-03-12 11:45:23 [Build 125] Offene Vermutungen — Gruppe A implementiert
-  - 8 neue Module: giuga_4prim.py, erdos_straus_ext.py, brocard_extension.py,
-    kurepa_ext.py, lehmer_tau.py, bruns_constant.py, schur_numbers.py, debruijn_newman.py
-  - 4 neue Testdateien: 347 Tests, alle bestanden (pytest-xdist, 82.5s)
-  - giuga_4prim: 4-Prim-Analyse, numerische Verifikation bis 10^6
-  - erdos_straus_ext: formaler Beweis für p≡3(mod 4), Verifikation bis 10^7
-  - brocard_extension: Brocard-Ramanujan bis n≤1000, Modular-Exclusion
-  - kurepa_ext: Kurepa-Verifikation bis p=50000
-  - lehmer_tau: Ramanujan τ(n)≠0 bis n=1000, Deligne-Schranken
-  - bruns_constant: Bruns-Konstante B₂≈1.9021605831 mit Extrapolation
-  - schur_numbers: Schur-Zahlen S(1)–S(5), Schranken 536≤S(6)≤1836
-  - debruijn_newman: de Bruijn-Newman-Konstante Λ, Schranke 0≤Λ≤0.2
-  - FEATURES.md aktualisiert (Gruppe A Sektion)
-  - Review-Bugfixes aus 5 Audit-Dateien: LLC-Chronologie, Wiles 1990,
-    Collatz-Ergodizität (conditional), Proposition 4.1 (circular), Lehmer Lemma 4.1
-
-### 2026-03-12 — Build 126: Neue Module euler_gamma_irrationality, zeta_odd_values, pillai_chowla
-
-**Neue Module:**
-- `src/euler_gamma_irrationality.py`: EulerMascheroniConstant + StieltjesConstants
-  - γ auf bis zu 100 Stellen (mpmath Brent-McMillan)
-  - Harmonische-Reihen-, ζ-Grenzwert-, Vacca-, Apéry-artige Darstellungen
-  - Stieltjes-Konstanten γ_n (n=0..10), Laurent-Entwicklung von ζ(s)
-  - Papanikolaou-Schranke q > 10^{242080} dokumentiert
-
-- `src/zeta_odd_values.py`: ZetaOddValues
-  - ζ(3) auf 50 Stellen; ζ(5), ζ(7) hochpräzise
-  - Apéry-Approximationsfolge und Kettenbruch
-  - Hypergeometrische Darstellungen
-  - Ball-Rivoal-Theorem (2001) und Zudilin-Theorem (2004) formell implementiert
-  - Irrationalitätsmaß μ(ζ(3)) ≤ 5.513890 (Rhin-Viola 2001)
-
-- `src/pillai_chowla.py`: PillaiChowla
-  - Pillai-Chowla-Vermutung (schwach) verifiziert für n ≤ 200
-  - Wichtige Korrektur: Stärkere Form (alle n≠m) ist FALSCH (Gegenbeispiele: n=3,m=6 → gcd=7)
-  - Wilson-Theorem, Wilson-Primzahlen (5, 13, 563)
-  - Sylvester-Produkt und Sylvester-Folge
-  - Mertens' 3. Theorem: ∏_{p≤n} p/(p-1) ~ e^γ ln n
-
-**MD-Dokumentation:**
-- `src/euler_gamma_irrationality.md`
-- `src/zeta_odd_values.md`
-- `src/pillai_chowla.md`
-
-**Tests:** `tests/test_gamma_zeta_pillai.py` — 97 Tests, alle bestanden
-
-### 2026-03-12 12:05:48 — Build 127: Mahler-Maß, Vollkommene Zahlen, Waring-Goldbach
-
-**Neue Module:**
-- `src/mahler_measure.py`: MahlerMeasure + SchurSiegelSmythTrace
-  - Mahler-Maß via Produktformel und Jensen-Integral
-  - Lehmer-Dezim-Polynom: M ≈ 1.17628 (auf 4 Dezimalstellen verifiziert)
-  - Smyth-Konstante 1.3247... für nicht-reziproke Polynome
-  - Kronecker-Theorem: M(P)=1 ↔ alle Wurzeln auf Einheitskreis
-  - Kreisteilungspolynome via sympy.cyclotomic_poly
-  - SchurSiegelSmythTrace: Spurverhältnis für total positive alg. Zahlen
-
-- `src/perfect_numbers.py`: SigmaFunction + EvenPerfectNumbers + OddPerfectNumberBounds
-  - σ(n), Multiplikativität, Abundanzindex
-  - Euklid-Euler-Theorem: erste 8 gerade vollkommene Zahlen
-  - Mersenne-Primzahltest, Verifikation Euklid-Euler
-  - Touchard-Kongruenz: n ≡ 1 (mod 12) oder n ≡ 9 (mod 36)
-  - Nielsen-Schranke: ≥ 9 verschiedene Primfaktoren
-  - Chein-Struktur, Euler-Form n = p^{4a+1}·m²
-
-- `src/waring_goldbach.py`: WaringGoldbachK2 + WaringGoldbachGeneral
-  - k=2: Darstellung als Summe von ≤5 Primzahlquadraten (Hua 1938)
-  - Sieb-basierte Darstellungssuche
-  - Hua's G(k)-Schranken für k=1..8
-  - Vinogradov-Wooley Efficient Congruencing-Formel
-  - Goldbach-Vermutung-Prüfung (CONJECTURE-Status korrekt markiert)
-  - Vinogradov/Helfgott Drei-Primzahlen-Theorem
-
-**Mathematische Korrektur (Test-TDD):**
-  - n=10 ist NICHT als Summe von Primzahlquadraten darstellbar
-    (1 ist keine Primzahl; einzige P² ≤ 10 sind 4=2² und 9=3²)
-  - Test auf n=13 = 2²+3² (korrekt) korrigiert
-
-**MD-Dokumentation:**
-- `src/mahler_measure.md`
-- `src/perfect_numbers.md`
-- `src/waring_goldbach.md`
-
-**Tests:** `tests/test_mahler_perfect_waring.py` — 111 Tests, alle bestanden
-
-### Build-Nummer: 126 → 127
-2026-03-12 12:06:47 Build 128: erdos_moser.py, artin_primitive_roots.py, erdos_selfridge.py implementiert
-  - ErdosMoser: Potenzsummen, Bernoulli-Zahlen, Moser-Schranke, modulare Ausschlüsse
-  - ArtinPrimitiveRoots: Primitive Wurzeln, Artin-Konstante, Hooley GRH, Heath-Brown 1986
-  - ErdosSelfridge: Binomialkoeffizienten, Sylvester-Theorem, Primzahlpotenz-Verifikation
-  - 108 Tests in tests/test_moser_artin_selfridge.py (alle bestanden)
-  - 3 MD-Dokumentationen erstellt
-  - Bugfix: verify_up_to() startet k ab 2 (nicht 1) für korrekte Vermutungs-Prüfung
-  - Bugfix: B_1 = +1/2 (sympy-Konvention)
+=== 2026-03-12 — Build 122 — Hadwiger-Nelson + Cohen-Lenstra ===
+
+2026-03-12 [Build 122]: 2 neue Module hadwiger_nelson.py + cohen_lenstra.py
+
+### Neue Dateien
+- src/hadwiger_nelson.py: Hadwiger-Nelson-Problem, Einheitsdistanzgraphen
+  - UnitDistanceGraph: Moser-Spindle (7K/11E/χ=4), Golomb-Graph (10K/12E),
+    build_from_points(), chromatische Zahl exakt + greedy, Verifikation
+  - HadwigerNelsonProblem: untere Schranken (Moser-Spindle χ=4, de Grey χ≥5),
+    obere Schranke χ≤7 (hexagonales Färbungsschema Nelson 1950)
+- src/cohen_lenstra.py: Cohen-Lenstra-Heuristiken für Klassengruppen
+  - ClassNumberComputation: h(-d) via reduzierte quadratische Formen,
+    Dirichlet-Formel, Genus-Theorie-Schranke, Heegner-Zahlen (9 Stück)
+  - CohenLenstraHeuristics: Pr[p|h(-d)] = 1-∏(1-p^{-k}),
+    empirische Verifikation, Cohen-Lenstra-Gewichte, p-Rang-Verteilung,
+    Bhargava-Shankar-Zusammenfassung
+- src/hadwiger_nelson.md: Vollständige Modulbeschreibung mit Konstruktionen
+- src/cohen_lenstra.md: Vollständige Modulbeschreibung mit Formeln
+
+### Tests
+- tests/test_hadwiger_cohen.py: 123 Tests, alle bestanden
+  - TestHelperFunctions: 9 Tests (Euklidische Distanz, Einheitsdistanz)
+  - TestMoserSpindle: 12 Tests (7 Knoten, 11 Kanten, χ=4, unit-dist)
+  - TestGolombGraph: 7 Tests (10 Knoten, 12 Kanten)
+  - TestBuildFromPoints: 8 Tests (Dreieck, leerer Graph, Verifikation)
+  - TestHadwigerNelsonLowerBounds: 14 Tests (Moser, Golomb, de Grey)
+  - TestHexagonal7Coloring: 15 Tests (obere Schranke, Verifikation)
+  - TestKroneckerAndDiscriminant: 7 Tests
+  - TestClassNumberComputation: 22 Tests (Heegner-Zahlen, h(-5)=2, h(-23)=3)
+  - TestCohenLenstraHeuristics: 21 Tests (Pr[3|h]≈0.4399, Konvergenz)
+  - TestIntegration: 5 Tests
+
+### Besonderheiten
+- Moser-Spindle-Koordinaten: Algebraisch-exakt mit cos(θ)=5/6, sin(θ)=√11/6
+  Zwei gleichseitige Dreiecke erzwingen Farbe-Konflikte → χ=4
+- Cohen-Lenstra p=3: theoretisch ≈ 0.4399 (verifiziert durch Produktformel)
+- Heegner-Zahlen alle korrekt: h(-1)=h(-2)=...=h(-163)=1
+
+=== 2026-03-12 — Build 130 ===
+
+2026-03-12 [Session]: Implementierung van_der_waerden.py und lonely_runner.py
+
+### Neue Dateien
+- src/van_der_waerden.py: Van-der-Waerden-Zahlen W(k;r) + SAT-Kodierung
+  - Klasse ArithmeticProgressionColoring: CNF-Kodierung des AP-Färbungsproblems via pysat
+  - Klasse VanDerWaerdenNumbers: Berechnung, Verifikation, Berlekamp/Gowers-Schranken
+  - Bekannte Werte: W(3;2)=9, W(4;2)=35, W(5;2)=178, W(3;3)=27, W(3;4)=293
+  - SAT-basierte compute()-Methode für exakte Berechnung kleiner W(k;r)
+- src/lonely_runner.py: Lonely-Runner-Vermutung (CONJECTURE, n≥8 unbewiesen)
+  - Klasse LonelyRunnerConjecture: Numerische + exakte Verifikation für n≤6
+  - Klasse LonelyRunnerVerifier: Systematische Suche rationaler Loneliness-Zeitpunkte
+  - Blocki-Beweis-Sketch für n=4 (2010) implementiert
+  - Diophantische Reformulierung beschrieben
+- src/van_der_waerden.md: Vollständige Modulbeschreibung mit KaTeX-Formeln
+- src/lonely_runner.md: Vollständige Modulbeschreibung mit Beweisstatus-Tabelle
+
+### Tests
+- tests/test_waerden_lonely.py: 99 Tests, alle bestanden
+  - TestArithmeticProgressionBasics: 14 Tests
+  - TestVanDerWaerdenKnownValues: 8 Tests
+  - TestVanDerWaerdenSATCompute: 14 Tests
+  - TestBerlekampBound: 6 Tests
+  - TestArithmeticProgressionColoringDirect: 8 Tests
+  - TestLonelyRunnerConjecture: 27 Tests
+  - TestLonelyRunnerVerifier: 9 Tests
+  - TestEdgeCases: 13 Tests
+
+### Bugfixes während Entwicklung
+- KNOWN_VALUES-Konvention korrigiert: (k,r) statt (r,k)
+  W(3;2)=9 (nicht (2;3)=9)
+- compute() respektiert jetzt max_N auch bei bekannten Werten
+- verify_runner_exact: Kandidaten-Generierung überarbeitet
+  Fehler: Nur Mittelpunkte von (v_i-v_j)-Differenzen, aber t=1/3 nicht enthalten
+  Fix: Zusätzliche Bruchsuche a/b mit b ≤ max_denom
+
+=== 2026-03-12 — Build 131 ===
+
+2026-03-12 [Session]: 4 neue Module + 152 Tests: Mertens, Goldfeld, Sun-Tzu-Quadrate, Agoh-Giuga
+
+### Neue Dateien
+- src/mertens_function.py: Mertens-Funktion M(x), Möbius-Sieb, Liouville-Funktion
+  - MertensFunction: M(x) via linearem Sieb, M(10)=-1, M(100)=1, M(1000)=2 verifiziert
+  - LiouvilleFunction: λ(n)=(-1)^Ω(n), L(x), Pólya-Vermutung (widerlegt 1960)
+  - Odlyzko/te Riele (1985): Mertens-Vermutung widerlegt, kein explizites Gegenbeispiel
+  - Pintz (1987): lim-sup M(x)/√x > 1.06
+
+- src/goldfeld_rank.py: Goldfeld-Rangvermutung, Bhargava-Shankar, Selmer-Gruppen
+  - EllipticCurveRank: y²=x³+Ax+B, Hasse-Schranke, Frobenius-Spur a_p
+  - GoldfeldRankConjecture: avg. Rang=1/2 (CONJECTURE), Bhargava-Shankar ≤7/6 (THEOREM)
+  - SelmerGroupAnalysis: 2-Selmer-Schranke, Torsionspunkte (Nagell-Lutz)
+  - h(-163)=1: Baker-Heegner-Stark, Gross-Zagier, Kolyvagin korrekt eingebunden
+
+- src/sun_tzu_squares.py: CRT, Tonelli-Shanks, quadratische Reste
+  - ChineseRemainderTheorem: CRT-Solver mit paarweise-Teilerfremdheit-Prüfung
+  - SunTzuSquares: CONJECTURE #285, CRT-Reduktion, Brute-Force-Fallback
+  - QuadraticResidueAnalysis: Legendre-Symbol, Euler-Kriterium, Reziprozitätsgesetz (Gauss)
+
+- src/agoh_giuga.py: Bernoulli-Zahlen, Agoh-Vermutung, Giuga-Vermutung
+  - BernoulliNumbers: B_0..B_N exakt via sympy (Konvention B₁=+1/2)
+  - AgohConjecture: n prim ↔ n·B_{n-1}≡-1(mod n), verifiziert für n≤50
+  - GiugaConjecture: Giuga-Bedingung, keine Giuga-Zahlen bis 100
+  - AgohGiuga: Äquivalenz Agoh↔Giuga (Borwein et al. 1996)
+
+### Neue Tests
+- tests/test_mertens_goldfeld_agoh.py: 152 Tests, alle bestanden
+  - Exakte Werte: M(10)=-1, M(100)=1, M(1000)=2, λ(1)=1, λ(2)=-1, λ(4)=1, λ(6)=1
+  - B_0=1, B_1=1/2 (sympy), B_2=1/6, B_4=-1/30, B_20=-174611/330
+  - h(-163)=1 Heegner-Punkt-Test
+  - Mertens-Vermutung: gilt für x=2..1000 (x=1 Grenzfall: M(1)=1=√1)
+  - Pólya-Vermutung: keine Verletzungen bis 1000, Gegenbeispiel 906316571
+  - Giuga: keine zusammengesetzten n mit Giuga-Eigenschaft bis 100
+
+### Neue MD-Dokumente
+- src/mertens_function.md, goldfeld_rank.md, sun_tzu_squares.md, agoh_giuga.md
+
+
+2026-03-12 [Build 122] — 4 neue Module + 111 Tests
+  - NEU: src/riemann_siegel_ext.py — Klassen RiemannSiegelExtended + GramBlocks
+    * Siegelsche θ-Funktion (mpmath + Stirling-Näherung)
+    * Hardy-Z-Funktion Z(t) via Riemann-Siegel-Hauptformel
+    * Fehlerterm C₀(p)·(-1)^{N-1}·t^{-1/4} (Gabcke 1979)
+    * Gram-Punkte: Newton-Verfahren θ(gₙ)=nπ
+    * Gram-Gesetz, -Blöcke, Rosser-Regel, Statistik
+  - NEU: src/twin_prime_analysis.py — Klassen TwinPrimeAnalysis + PrimeSieveGaps
+    * Sieb-basierte Zwillingsprimzahlsuche bis 10^6
+    * Hardy-Littlewood C₂ ≈ 0.6601618 (Eulerprodukt)
+    * Zhang/Maynard/Polymath8b-Übersicht, GPY-Sieb, Parity Problem
+    * Cramér-Modell-Vergleich, Erdős-Rankin-Konstruktion
+  - NEU: src/bunyakovsky.py — Klasse BunyakovskyConjecture
+    * gcd-basierte Fixteiler-Detektion
+    * Hardy-Littlewood C_f via ρ_f(p)-Eulerprodukt
+    * Bateman-Horn-Zusammenfassung
+    * Hilfsfunktionen: make_x_squared_plus_1, make_linear, etc.
+  - NEU: src/goldbach_extended.py — Klassen GoldbachExtended + VinogradovMethod
+    * Goldbach-Darstellungen, -Komet, -Zählung
+    * Ternäre Goldbach mit Helfgott-2013-Referenz
+    * Chen-Theorem-Verifikation
+    * Schnirelmann-Dichte (s ≤ 4)
+    * Vinogradov-Exponentialsumme, Major/Minor-Bögen, Singuläre Reihe
+  - NEU: tests/test_riemann_twin_goldbach.py — 111 Tests (alle bestanden)
+  - NEU: MD-Dokumentation für alle 4 Module
