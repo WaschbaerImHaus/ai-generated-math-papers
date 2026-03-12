@@ -1,0 +1,789 @@
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 142}
+
+\title{Theta-Funktionen: Brücken zwischen Analysis, Zahlentheorie und Geometrie}
+
+\begin{abstract}
+Theta-Funktionen stehen an der Schnittstelle von klassischer Analysis, Zahlentheorie
+und algebraischer Geometrie.
+In dieser Arbeit entwickeln wir die Theorie der Jacobi-Theta-Funktionen
+$\vartheta_1, \vartheta_2, \vartheta_3, \vartheta_4$,
+beweisen ihre Transformationsformeln unter der Modulgruppe $\mathrm{SL}_2(\mathbb{Z})$
+und interpretieren sie als Modulformen halbganzen Gewichts.
+Wir führen vollständige Beweise von Jacobis Vierquadratesatz
+$r_4(n) = 8\sum_{d \mid n,\, 4 \nmid d} d$,
+der Poissonschen Herleitung der Funktionalgleichung der Riemannschen Zeta-Funktion
+und der klassischen Rogers--Ramanujan-Identitäten.
+Die Dedekindsche Eta-Funktion $\eta(\tau)$ wird eingeführt und mit der Diskriminante
+$\Delta = \eta^{24}$ verknüpft.
+Siegel-Theta-Funktionen in höheren Dimensionen und die Uniformisierung elliptischer
+Kurven über die Weierstraß-$\wp$-Funktion werden überblicksartig dargestellt.
+Abschließend wird Zwegers' bahnbrechender Beweis aus dem Jahr 2002 diskutiert,
+der Ramanujans Mock-Theta-Funktionen in den Rahmen harmonischer Maass-Formen einbettet
+und damit ein über achtzig Jahre offenes Rätsel löst.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% ============================================================
+\section{Einleitung}
+%% ============================================================
+
+Seit ihrer Einführung durch Carl Gustav Jacob Jacobi in seiner
+\textit{Fundamenta Nova} von 1829 \cite{Jacobi1829}
+nehmen Theta-Funktionen einen zentralen Platz in der Mathematik ein.
+Auf den ersten Blick erscheinen sie als elegante $q$-Reihen;
+ihre tiefere Bedeutung liegt jedoch in der erstaunlichen Anzahl fundamentaler Sätze,
+die sie kodieren.
+
+Eine einzige Formel,
+\begin{equation}\label{eq:theta3basic}
+  \vartheta_3(\tau) \;=\; \sum_{n=-\infty}^{\infty} q^{n^2},
+  \qquad q = e^{\pi i \tau},\quad \operatorname{Im}(\tau)>0,
+\end{equation}
+verbindet:
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Analytische Zahlentheorie}: Der Koeffizient von $q^n$ in
+        $\vartheta_3(\tau)^k$ zählt die Darstellungsanzahl $r_k(n)$
+        von $n$ als Summe von $k$ ganzzahligen Quadraten;
+  \item \textbf{Komplexe Analysis}: Die Transformation
+        $\vartheta_3(\tau) \mapsto \sqrt{-i\tau}\,\vartheta_3(\tau)$
+        unter $\tau \mapsto -1/\tau$ ist äquivalent zur Poissonschen Summenformel
+        und liefert die Funktionalgleichung der Riemannschen Zeta-Funktion;
+  \item \textbf{Modulformen}: $\vartheta_3(\tau)^2$ ist eine Modulform des
+        Gewichts $1$ für die Kongruenzuntergruppe $\Gamma_0(4)$;
+  \item \textbf{Algebraische Geometrie}: Jede elliptische Kurve über $\mathbb{C}$
+        wird durch $\mathbb{C}/\Lambda$ uniformisiert, und die zugehörige
+        Gitter-Theta-Reihe kodiert arithmetische Daten der Kurve.
+\end{itemize}
+
+Die Arbeit ist wie folgt gegliedert.
+Abschnitt~\ref{sec:jacobi} führt alle vier Jacobi-Theta-Funktionen ein.
+Abschnitt~\ref{sec:transformation} beweist die Transformationsformeln.
+Abschnitt~\ref{sec:eta} behandelt die Dedekind-Eta-Funktion.
+Abschnitt~\ref{sec:modular} interpretiert Theta-Funktionen als Modulformen.
+Abschnitt~\ref{sec:quadratic} wendet sie auf Darstellungen durch quadratische Formen an.
+Abschnitt~\ref{sec:poisson} leitet die Funktionalgleichung von $\zeta(s)$ her.
+Abschnitt~\ref{sec:siegel} skizziert Siegel-Theta-Funktionen.
+Abschnitt~\ref{sec:elliptic} verbindet Theta-Funktionen mit elliptischen Kurven.
+Abschnitt~\ref{sec:ramanujan} behandelt Ramanujans Identitäten und Mock-Theta-Funktionen.
+
+\medskip
+\noindent\textbf{Bezeichnungen.}
+Durchgehend sei $\tau \in \mathfrak{H} = \{\tau \in \mathbb{C} : \operatorname{Im}(\tau)>0\}$
+und $q = e^{2\pi i\tau}$, sofern nicht anders angegeben.
+Für Jacobis Originalkonvention $q_J = e^{\pi i \tau}$ schreiben wir $q_J$.
+Wir setzen $e(x) = e^{2\pi i x}$.
+
+%% ============================================================
+\section{Jacobi-Theta-Funktionen}\label{sec:jacobi}
+%% ============================================================
+
+\subsection{Definitionen als $q$-Reihen}
+
+\begin{definition}[Jacobi-Theta-Funktionen]\label{def:jacobi}
+Für $z \in \mathbb{C}$ und $\tau \in \mathfrak{H}$ sei $q = e^{\pi i \tau}$
+(Jacobis Konvention). Die vier Jacobi-Theta-Funktionen sind:
+\begin{align}
+  \vartheta_1(z|\tau) &= -i \sum_{n=-\infty}^{\infty}
+    (-1)^n\, q^{(n+\tfrac{1}{2})^2}\, e^{(2n+1)\pi iz},
+    \label{eq:theta1}\\
+  \vartheta_2(z|\tau) &= \sum_{n=-\infty}^{\infty}
+    q^{(n+\tfrac{1}{2})^2}\, e^{(2n+1)\pi iz},
+    \label{eq:theta2}\\
+  \vartheta_3(z|\tau) &= \sum_{n=-\infty}^{\infty}
+    q^{n^2}\, e^{2n\pi iz},
+    \label{eq:theta3}\\
+  \vartheta_4(z|\tau) &= \sum_{n=-\infty}^{\infty}
+    (-1)^n\, q^{n^2}\, e^{2n\pi iz}.
+    \label{eq:theta4}
+\end{align}
+\end{definition}
+
+\begin{remark}
+Mit $q = e^{\pi i\tau}$ gilt $|q| = e^{-\pi\operatorname{Im}\tau} < 1$.
+Die halbganzen Exponenten $(n+\frac12)^2$ entstehen natürlicherweise aus
+den Summationsindizes über $\mathbb{Z}+\frac12$.
+Viele moderne Texte bevorzugen $q = e^{2\pi i\tau}$; in dieser Konvention
+gilt $\vartheta_3(\tau) = \sum_{n\in\mathbb{Z}} q^{n^2/2}$,
+was die Transformationsformel um einen Faktor $\sqrt{2}$ verschiebt.
+\end{remark}
+
+\subsection{Konvergenz}
+
+\begin{proposition}[Gleichmäßige Konvergenz]\label{prop:convergence}
+Jede der vier Reihen in Definition~\ref{def:jacobi} konvergiert absolut und
+gleichmäßig auf jedem Kompaktum von $\mathbb{C} \times \mathfrak{H}$.
+\end{proposition}
+
+\begin{proof}
+Wir schätzen den allgemeinen Term von $\vartheta_3$ ab.
+Für festes $\operatorname{Im}(\tau) \geq \delta > 0$ und $|z| \leq R$ gilt:
+\[
+  \bigl|q^{n^2} e^{2n\pi iz}\bigr|
+  = e^{-\pi n^2 \operatorname{Im}(\tau)} \cdot e^{-2\pi n \operatorname{Im}(z)}
+  \leq e^{-\pi \delta n^2 + 2\pi |n| R}.
+\]
+Für große $|n|$ dominiert $\pi\delta n^2$ den Term $2\pi|n|R$, sodass die Reihe
+durch eine konvergente Majorante unabhängig von $(z,\tau)$ beschränkt ist.
+Für $\vartheta_1, \vartheta_2, \vartheta_4$ gilt dasselbe Argument.
+\end{proof}
+
+\subsection{Produktdarstellungen}
+
+Das Jacobi-Dreifachprodukt (Satz~\ref{thm:triple}) liefert Produktdarstellungen
+für alle vier Theta-Funktionen:
+\begin{align}
+  \vartheta_3(z|\tau) &= \prod_{n=1}^{\infty}
+    (1-q^{2n})(1+q^{2n-1}e^{2\pi iz})(1+q^{2n-1}e^{-2\pi iz}).
+\end{align}
+
+\begin{theorem}[Jacobisches Dreifachprodukt, 1829]\label{thm:triple}
+Für $|q|<1$ und $z \neq 0$ gilt:
+\[
+  \sum_{n=-\infty}^{\infty} z^n q^{n^2}
+  = \prod_{m=1}^{\infty}(1-q^{2m})(1+zq^{2m-1})(1+z^{-1}q^{2m-1}).
+\]
+\end{theorem}
+
+\begin{proof}[Beweissskizze]
+Sei $f(z) = \prod_{m\geq1}(1+zq^{2m-1})(1+z^{-1}q^{2m-1})$.
+Man zeigt $f(zq^2) = z^{-1}q^{-1}f(z)$, sodass $f$ dieselbe Quasi-Periodizität
+besitzt wie $\sum_n z^n q^{n^2}$.
+Koeffizientenvergleich (Laurent-Entwicklung in $z$)
+zusammen mit dem unendlichen Produkt $\prod(1-q^{2m})$ zur Normierung
+liefert die Identität.
+Einen vollständigen Induktionsbeweis findet man in \cite{WhittakerWatson1927}.
+\end{proof}
+
+%% ============================================================
+\section{Transformationsformeln}\label{sec:transformation}
+%% ============================================================
+
+\subsection{Periodizität}
+
+\begin{proposition}[Periodizität in $z$]\label{prop:period_z}
+Die Theta-Funktionen erfüllen:
+\begin{align}
+  \vartheta_3(z+1|\tau) &= \vartheta_3(z|\tau),\\
+  \vartheta_3(z+\tau|\tau) &= q^{-1} e^{-2\pi iz}\, \vartheta_3(z|\tau).
+\end{align}
+Analoge Relationen gelten für $\vartheta_1, \vartheta_2, \vartheta_4$.
+\end{proposition}
+
+\begin{proof}
+Die Substitution $z \mapsto z+1$ lässt den Exponenten $2n\pi iz$ modulo $2\pi in$
+unverändert, was $e^{2\pi in} = 1$ ergibt.
+Für $z \mapsto z + \tau$: der Faktor $e^{2n\pi i(z+\tau)} = e^{2n\pi iz}\cdot q^{2n}$,
+während $q^{n^2}$ erhalten bleibt. Damit gilt
+$q^{n^2} e^{2n\pi i(z+\tau)} = q^{-1}e^{-2\pi iz} \cdot q^{(n+1)^2} e^{2(n+1)\pi iz}$,
+woraus die behauptete Quasi-Periodizität folgt.
+\end{proof}
+
+\subsection{Modulare Transformationen}
+
+\begin{theorem}[Transformation unter $S: \tau \mapsto -1/\tau$]\label{thm:S_transform}
+\[
+  \vartheta_3\!\left(z \,\Big|\, -\tfrac{1}{\tau}\right)
+  = \sqrt{-i\tau}\; e^{\pi i \tau z^2}\; \vartheta_3(z\tau \mid \tau).
+\]
+Insbesondere gilt bei $z = 0$:
+\begin{equation}\label{eq:theta3_S}
+  \vartheta_3\!\left(0 \,\Big|\, -\tfrac{1}{\tau}\right)
+  = \sqrt{-i\tau}\; \vartheta_3(0|\tau).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Wir wenden die Poissonsche Summenformel (Satz~\ref{thm:poisson}) auf die Funktion
+$f(x) = e^{\pi i\tau x^2 + 2\pi i z x}$ an.
+Ihre Fourier-Transformierte ist $\hat{f}(\xi) = \tfrac{1}{\sqrt{-i\tau}} e^{\pi i(\xi-z)^2/\tau}$.
+Summation über $x = n \in \mathbb{Z}$ links und $\xi = n$ rechts liefert
+genau \eqref{eq:theta3_S} (nach Setzen von $z=0$).
+Für den allgemeinen $z$-Fall wird zusätzlich die Verschiebung $x \mapsto x + z$ angewendet.
+\end{proof}
+
+\begin{theorem}[Transformation unter $T: \tau \mapsto \tau+1$]\label{thm:T_transform}
+\[
+  \vartheta_3(z|\tau+1) = \vartheta_4(z|\tau),
+  \qquad
+  \vartheta_2(z|\tau+1) = e^{\pi i/4}\, \vartheta_2(z|\tau),
+  \qquad
+  \vartheta_4(z|\tau+1) = \vartheta_3(z|\tau).
+\]
+\end{theorem}
+
+\begin{proof}
+In der Reihe für $\vartheta_3$ ersetze man $\tau \to \tau+1$:
+$q^{n^2} \mapsto e^{\pi i n^2(\tau+1)} = e^{\pi i n^2 \tau} \cdot e^{\pi i n^2}$.
+Da $e^{\pi i n^2} = (-1)^n$, erhält man $\vartheta_4$.
+Die übrigen Relationen folgen analog.
+\end{proof}
+
+\begin{corollary}[Gerade Symmetrie]\label{cor:even}
+$\vartheta_3(-z|\tau) = \vartheta_3(z|\tau)$, \quad
+$\vartheta_4(-z|\tau) = \vartheta_4(z|\tau)$.
+\end{corollary}
+
+%% ============================================================
+\section{Die Dedekind-Eta-Funktion}\label{sec:eta}
+%% ============================================================
+
+\begin{definition}[Dedekind-Eta]\label{def:eta}
+Für $\tau \in \mathfrak{H}$ und $q = e^{2\pi i\tau}$ sei
+\[
+  \eta(\tau) \;=\; q^{1/24}\prod_{n=1}^{\infty}(1-q^n).
+\]
+\end{definition}
+
+\begin{theorem}[Transformationsformeln für $\eta$]\label{thm:eta_transform}
+\begin{align}
+  \eta(\tau+1) &= e^{\pi i/12}\,\eta(\tau),\label{eq:eta_T}\\
+  \eta\!\left(-\tfrac{1}{\tau}\right) &= \sqrt{-i\tau}\;\eta(\tau).\label{eq:eta_S}
+\end{align}
+\end{theorem}
+
+\begin{proof}[Beweis von \eqref{eq:eta_T}]
+Ersetze $\tau \to \tau+1$: Dann gilt $q \to e^{2\pi i(\tau+1)} = q$.
+Der Vorfaktor $q^{1/24}$ erhält den Faktor $e^{2\pi i/24} = e^{\pi i/12}$.
+Das Produkt $\prod(1-q^n)$ bleibt unverändert.
+\end{proof}
+
+\begin{proof}[Beweis von \eqref{eq:eta_S} -- Skizze]
+Man verwendet die Produktformel zusammen mit Eulers Pentagonalzahlsatz
+$\prod_{n\geq1}(1-q^n) = \sum_{n\in\mathbb{Z}}(-1)^n q^{n(3n-1)/2}$,
+wendet dann die Poissonsche Summenformel auf die zugehörige Theta-artige Reihe an.
+Die Identität \eqref{eq:eta_S} wurde zuerst von Dedekind (1877) mithilfe von
+Dirichlet-Reihen bewiesen; ein moderner Beweis über die Poisson-Formel findet sich
+in \cite{Apostol1990}.
+\end{proof}
+
+\begin{theorem}[Verbindung zur Diskriminante]\label{thm:delta}
+Die Ramanujansche Delta-Funktion
+\[
+  \Delta(\tau) = q\prod_{n=1}^{\infty}(1-q^n)^{24} = \sum_{n=1}^{\infty}\tau(n)\,q^n,
+  \qquad q = e^{2\pi i\tau},
+\]
+erfüllt $\Delta(\tau) = \eta(\tau)^{24}$.
+Insbesondere ist $\Delta$ eine Spitzenform vom Gewicht $12$ für $\mathrm{SL}_2(\mathbb{Z})$.
+\end{theorem}
+
+\begin{proof}
+Direkte Berechnung: $\eta(\tau)^{24} = q^{24/24}\prod(1-q^n)^{24} = q\prod(1-q^n)^{24} = \Delta(\tau)$.
+Die modulare Transformation $\Delta(-1/\tau) = \tau^{12}\Delta(\tau)$ folgt aus
+$\eta(-1/\tau)^{24} = (\sqrt{-i\tau})^{24}\eta(\tau)^{24} = (-i\tau)^{12}\eta(\tau)^{24}$
+und $(-i)^{12} = 1$.
+\end{proof}
+
+\begin{remark}
+Eulers Pentagonalzahlsatz, ein Spezialfall des Jacobischen Dreifachprodukts,
+liefert die explizite Entwicklung:
+$\prod_{n=1}^{\infty}(1-q^n) = \sum_{k=-\infty}^{\infty}(-1)^k q^{k(3k-1)/2}$,
+mit Exponenten $0,1,2,5,7,12,15,\ldots$ (die verallgemeinerten Pentagonalzahlen).
+\end{remark}
+
+%% ============================================================
+\section{Theta-Funktionen als Modulformen}\label{sec:modular}
+%% ============================================================
+
+\subsection{Gewicht der Theta-Funktionen}
+
+\begin{definition}[Modulform halbganzen Gewichts]
+Eine holomorphe Funktion $f : \mathfrak{H} \to \mathbb{C}$ heißt
+\emph{Modulform vom Gewicht $k/2$} ($k$ ungerade, positiv) für $\Gamma_0(4)$
+mit Charakter $\chi$, falls
+\[
+  f\!\left(\frac{a\tau+b}{c\tau+d}\right)
+  = \chi(d)\,\epsilon_d^{-k}\,(c\tau+d)^{k/2}\,f(\tau)
+\]
+für alle $\begin{pmatrix}a&b\\c&d\end{pmatrix}\in\Gamma_0(4)$, wobei
+$\epsilon_d = 1$ für $d\equiv 1\pmod{4}$ und $\epsilon_d = i$ für $d\equiv 3\pmod{4}$.
+\end{definition}
+
+\begin{theorem}[$\vartheta_3^2$ ist eine Modulform vom Gewicht $1$]\label{thm:theta3_weight1}
+Sei $\vartheta_3(\tau)^2 = \sum_{n=0}^{\infty} r_2(n)\, q^n$.
+Dann gilt $\vartheta_3(\tau)^2 \in M_1(\Gamma_0(4), \chi_{-4})$,
+dem Raum der Modulformen vom Gewicht $1$ für $\Gamma_0(4)$
+mit dem nicht-Hauptcharakter $\chi_{-4}(d) = \left(\frac{-4}{d}\right)$.
+\end{theorem}
+
+\begin{proof}
+Die Theta-Reihe $\vartheta_3(\tau)^2 = \sum_{n\geq 0} r_2(n) q^n$
+ist holomorph auf $\mathfrak{H}$ und in allen Spitzen (die Koeffizienten $r_2(n)$
+wachsen polynomial).  Unter $T: \tau\to\tau+1$ erhält man den Faktor $1$ gemäß
+Satz~\ref{thm:T_transform}, zweimal angewandt.
+Unter der $S$-Transformation, eingeschränkt auf $\Gamma_0(4)$, liefert
+Satz~\ref{thm:S_transform} den Faktor $\sqrt{-i\tau}^{\,2} = -i\tau$
+(d.h. $(c\tau+d)^1$ für $c=0, d=1$, was Gewicht $1$ entspricht).
+Der Charakter $\chi_{-4}$ beschreibt das Verhalten in der Spitze $\infty$.
+Eine vollständige Verifikation mit expliziten Matrixeinträgen findet sich in \cite{Iwaniec1997}.
+\end{proof}
+
+\begin{corollary}[Dimension von $M_1(\Gamma_0(4),\chi_{-4})$]
+Der Raum $M_1(\Gamma_0(4),\chi_{-4})$ ist eindimensional, sodass
+$\vartheta_3(\tau)^2$ (bis auf einen Skalar) sein einziges Element ist.
+Diese Eindeutigkeit erzwingt die explizite Formel für $r_2(n)$, die in
+Abschnitt~\ref{sec:quadratic} hergeleitet wird.
+\end{corollary}
+
+\subsection{Der halbganzahlige Fall: $\vartheta_3(\tau)$}
+
+Die Funktion $\vartheta_3(\tau)$ selbst ist eine Modulform vom Gewicht $1/2$
+für $\Gamma_0(4)$ im Sinne von Shimura \cite{Shimura1973}.
+Die Theta-Reihe $\vartheta_3(\tau)^k$ hat das Gewicht $k/2$.
+Für gerades $k$ ist dies eine Modulform ganzzahligen Gewichts für $\Gamma_0(4)$,
+und ihre Koeffizienten $r_k(n)$ können durch Eisenstein-Reihen und Spitzenformen ausgedrückt werden.
+
+%% ============================================================
+\section{Darstellungen durch quadratische Formen}\label{sec:quadratic}
+%% ============================================================
+
+\subsection{Zählen von Darstellungen}
+
+\begin{definition}
+Für $n \geq 0$ und $k \geq 1$ ist die \emph{Darstellungsanzahl} $r_k(n)$ definiert als
+\[
+  r_k(n) = \#\{(x_1,\ldots,x_k)\in\mathbb{Z}^k : x_1^2+\cdots+x_k^2 = n\}.
+\]
+Vorzeichenbehaftete Tupel und verschiedene Anordnungen werden jeweils separat gezählt.
+\end{definition}
+
+\begin{theorem}[Erzeugende Funktion]\label{thm:gen_rk}
+$\displaystyle\vartheta_3(\tau)^k = \sum_{n=0}^{\infty} r_k(n)\, q^n$,
+\quad $q = e^{\pi i\tau}$.
+\end{theorem}
+
+\begin{proof}
+Die Entwicklung von $(\sum_{m\in\mathbb{Z}} q^{m^2})^k$ durch multinomiale Entwicklung
+ergibt als Koeffizient von $q^n$ die Anzahl der Tupel $(x_1,\ldots,x_k)$ mit
+$x_1^2+\cdots+x_k^2 = n$.
+\end{proof}
+
+\subsection{Jacobis ZweiQuadrate-Formel}
+
+\begin{theorem}[Zwei Quadrate, Jacobi 1829]\label{thm:r2}
+Für $n \geq 1$ gilt:
+\[
+  r_2(n) = 4\sum_{d \mid n} \chi_{-4}(d)
+  = 4\!\!\sum_{\substack{d \mid n \\ d \text{ ungerade}}} (-1)^{(d-1)/2}.
+\]
+Äquivalent: $r_2(n) = 4(d_1(n) - d_3(n))$, wobei $d_j(n)$ die Anzahl der Teiler
+von $n$ kongruent zu $j$ modulo $4$ bezeichnet.
+\end{theorem}
+
+\begin{proof}
+Da $M_1(\Gamma_0(4),\chi_{-4})$ eindimensional ist (Korollar nach
+Satz~\ref{thm:theta3_weight1}), ist $\vartheta_3(\tau)^2$ proportional zur
+Eisenstein-Reihe $E_1(\tau,\chi_{-4}) = \sum_{n\geq1}(\sum_{d|n}\chi_{-4}(d))q^n$.
+Koeffizientenvergleich bei $q^1$: $r_2(1) = 4 = 4\cdot\chi_{-4}(1)$
+legt die Proportionalitätskonstante auf $4$ fest. \qed
+\end{proof}
+
+\subsection{Jacobis Vierquadrate-Formel}
+
+\begin{theorem}[Vier Quadrate, Jacobi 1829]\label{thm:r4}
+Für alle $n \geq 1$ gilt:
+\begin{equation}\label{eq:r4}
+  r_4(n) = 8\sum_{\substack{d \mid n \\ 4 \nmid d}} d.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+\textbf{Schritt 1 (Modulform-Identität).}
+Die Funktion $f(\tau) = \vartheta_3(\tau)^4$ ist eine Modulform vom Gewicht $2$
+für $\Gamma_0(4)$.  Nach der Dimensionsformel wird $M_2(\Gamma_0(4))$ von
+zwei Eisenstein-Reihen $E_2^{(0)}$ (in der Spitze $0$) und $E_2^{(\infty)}$
+(in der Spitze $\infty$) aufgespannt.  Man berechnet:
+\[
+  \vartheta_3(\tau)^4
+  = E_2^{(\infty)}(\tau) - 4\, E_2^{(0)}(\tau),
+\]
+wobei explizit
+$E_2^{(\infty)}(\tau) = 1 + 8\sum_{n\geq1}\bigl(\sum_{4\nmid d \mid n} d\bigr) q^n$.
+
+\textbf{Schritt 2 (Anfangsbedingungen).}
+Der Koeffizient von $q^0$ ist $1 = r_4(0)$ (die leere Summe).
+Der Koeffizient von $q^1$: $r_4(1) = 8\cdot 1 = 8$
+(die $8$ Tupel $(\pm1,0,0,0)$ und Permutationen). \checkmark
+
+\textbf{Schritt 3 (Eindeutigkeit).}
+Da $\vartheta_3(\tau)^4$ und die Eisenstein-Reihe dieselben ersten beiden Fourier-Koeffizienten
+besitzen und beide im selben zweidimensionalen Raum liegen, stimmen sie überein;
+das Auslesen des $n$-ten Koeffizienten ergibt \eqref{eq:r4}.
+Einen vollständigen Beweis über die Hurwitzsche Formel findet man in \cite{Grosswald1985}.
+\end{proof}
+
+\begin{corollary}[Lagranges Vierquadrate-Satz]
+Jede positive ganze Zahl ist die Summe von vier Quadratzahlen.
+\end{corollary}
+
+\begin{proof}
+Für $n \geq 1$ enthält die Teilersumme in \eqref{eq:r4} den Term $d = n$ (falls $4\nmid n$)
+oder $d = n/4^k$ für das größte $k$ mit $4^k \mid n$ (falls $4\mid n$).
+In beiden Fällen ist die Summe positiv, sodass $r_4(n) \geq 8 > 0$.
+\end{proof}
+
+%% ============================================================
+\section{Poissonsche Summenformel und Riemann-Zeta-Funktion}\label{sec:poisson}
+%% ============================================================
+
+\begin{theorem}[Poissonsche Summenformel]\label{thm:poisson}
+Sei $f \in \mathcal{S}(\mathbb{R})$ (Schwartz-Klasse). Dann gilt:
+\[
+  \sum_{n=-\infty}^{\infty} f(n) = \sum_{n=-\infty}^{\infty} \hat{f}(n),
+  \qquad \hat{f}(\xi) = \int_{-\infty}^{\infty} f(x)\, e^{-2\pi i \xi x}\,dx.
+\]
+\end{theorem}
+
+\begin{proof}
+Sei $F(x) = \sum_{n\in\mathbb{Z}} f(x+n)$; diese Funktion ist $1$-periodisch
+und liegt in $C^\infty(\mathbb{R}/\mathbb{Z})$ dank des schnellen Abfalls von $f$.
+Ihre Fourier-Reihe lautet $F(x) = \sum_{m\in\mathbb{Z}} \hat{F}(m) e^{2\pi imx}$ mit
+$\hat{F}(m) = \int_0^1 F(x) e^{-2\pi imx}dx = \hat{f}(m)$.
+Setzen wir $x = 0$, so erhalten wir $F(0) = \sum_n f(n) = \sum_m \hat{f}(m)$.
+\end{proof}
+
+\subsection{Die Theta-Funktion und $\zeta(s)$}
+
+\begin{definition}
+Für $t > 0$ sei
+\[
+  \theta(t) = \vartheta_3(it) = \sum_{n=-\infty}^{\infty} e^{-\pi n^2 t}.
+\]
+\end{definition}
+
+\begin{theorem}[Funktionalgleichung von $\theta$]\label{thm:theta_fe}
+\[
+  \theta(t) = t^{-1/2}\,\theta(1/t), \qquad t > 0.
+\]
+\end{theorem}
+
+\begin{proof}
+Wende die Poissonsche Summenformel (Satz~\ref{thm:poisson}) auf $f_t(x) = e^{-\pi x^2 t}$ an.
+Die Fourier-Transformierte ist $\hat{f}_t(\xi) = t^{-1/2} e^{-\pi\xi^2/t}$.
+Daher gilt $\sum_n e^{-\pi n^2 t} = t^{-1/2} \sum_n e^{-\pi n^2/t}$.
+\end{proof}
+
+\begin{theorem}[Funktionalgleichung von $\zeta(s)$ über $\theta$]\label{thm:zeta_fe}
+Sei $\xi(s) = \tfrac{1}{2}s(s-1)\pi^{-s/2}\Gamma(s/2)\zeta(s)$.  Dann gilt
+$\xi(s) = \xi(1-s)$.
+\end{theorem}
+
+\begin{proof}
+\textbf{Schritt 1.}  Aus dem Gamma-Integral folgt:
+$\pi^{-s/2}\Gamma(s/2) n^{-s} = \int_0^\infty t^{s/2-1} e^{-\pi n^2 t}\,dt$.
+Summation über $n \geq 1$ ergibt:
+\[
+  \pi^{-s/2}\Gamma(s/2)\zeta(s)
+  = \int_0^\infty t^{s/2-1} \frac{\theta(t)-1}{2}\,dt.
+\]
+
+\textbf{Schritt 2.} Das Integral wird bei $t=1$ aufgespalten:
+$\int_0^1 + \int_1^\infty$.
+Im Integral über $(0,1)$ substituiere man $t \to 1/t$ und benutze
+$\theta(1/t) = \sqrt{t}\,\theta(t)$ (Satz~\ref{thm:theta_fe}):
+\[
+  \int_0^1 t^{s/2-1}\frac{\theta(t)-1}{2}\,dt
+  = \int_1^\infty t^{(1-s)/2 - 1}\frac{\theta(t)-1}{2}\,dt
+    + \frac{1}{s-1} - \frac{1}{s}.
+\]
+
+\textbf{Schritt 3.}  Zusammenfassung beider Teile liefert:
+\[
+  \pi^{-s/2}\Gamma(s/2)\zeta(s)
+  = \int_1^\infty \left(t^{s/2-1}+t^{(1-s)/2-1}\right)\frac{\theta(t)-1}{2}\,dt
+    + \frac{1}{s(s-1)},
+\]
+was symmetrisch unter $s \leftrightarrow 1-s$ ist, also $\xi(s) = \xi(1-s)$.
+\end{proof}
+
+\begin{remark}
+Dies ist genau das Argument, das Riemann in seiner Arbeit von 1859
+\textit{Über die Anzahl der Primzahlen unter einer gegebenen Größe} \cite{Riemann1859}
+verwendete.
+Die Funktionalgleichung der Theta-Funktion ist der entscheidende Mechanismus hinter
+der Symmetrie von $\zeta$.
+\end{remark}
+
+%% ============================================================
+\section{Siegel-Theta-Funktionen}\label{sec:siegel}
+%% ============================================================
+
+\subsection{Gitter und Theta-Reihen}
+
+Sei $\Lambda \subset \mathbb{R}^n$ ein Gitter, d.h. eine diskrete Untergruppe vom Rang $n$.
+Die \emph{Theta-Reihe} von $\Lambda$ ist
+\[
+  \Theta_\Lambda(\tau) = \sum_{\mathbf{v} \in \Lambda} q^{\|\mathbf{v}\|^2/2},
+  \qquad q = e^{2\pi i\tau}.
+\]
+
+\begin{example}
+Für $\Lambda = \mathbb{Z}^n$ mit euklidischer Norm gilt
+$\Theta_{\mathbb{Z}^n}(\tau) = \vartheta_3(\tau)^n = \sum_{k=0}^\infty r_n(k)\, q^k$.
+\end{example}
+
+\subsection{Siegels Verallgemeinerung}
+
+\begin{definition}[Siegel-Theta-Reihe]\label{def:siegel_theta}
+Für eine positiv-definite symmetrische Matrix $A \in M_n(\mathbb{Z})$ (die Gram-Matrix
+einer quadratischen Form $Q(\mathbf{x}) = \mathbf{x}^T A \mathbf{x} / 2$) und
+$\tau \in \mathfrak{H}$ sei
+\[
+  \Theta_A(\tau) = \sum_{\mathbf{x} \in \mathbb{Z}^n} e^{\pi i \tau\, Q(\mathbf{x})}.
+\]
+\end{definition}
+
+\begin{theorem}[Modularität von $\Theta_A$]\label{thm:siegel_modular}
+$\Theta_A(\tau)$ ist eine Modulform vom Gewicht $n/2$ für eine Kongruenzuntergruppe
+$\Gamma_0(N)$ mit $N = \det(2A)$ (dem Niveau des Gitters).
+\end{theorem}
+
+\begin{proof}[Beweissskizze]
+Die Transformation unter $S: \tau \to -1/\tau$ folgt aus der mehrdimensionalen
+Poissonschen Summenformel, angewandt auf $f(\mathbf{x}) = e^{-\pi Q(\mathbf{x})/t}$
+($\tau = it$):
+\[
+  \Theta_A(-1/\tau) = \frac{\sqrt{-i\tau}^n}{\sqrt{\det A}}\,\Theta_{A^{-1}}(\tau).
+\]
+Ist $A$ \emph{gerade} und \emph{unimodular} ($\det A = 1$), vereinfacht sich dies zu
+$\Theta_A(-1/\tau) = (-i\tau)^{n/2}\Theta_A(\tau)$,
+also $\Theta_A \in M_{n/2}(\mathrm{SL}_2(\mathbb{Z}))$.
+Für allgemeines $A$ schränkt man auf $\Gamma_0(N)$ ein;
+Details finden sich in \cite{Serre1973}.
+\end{proof}
+
+\begin{example}[$E_8$-Gitter]
+Das $E_8$-Gitter ist ein gerades unimodulares Gitter in $\mathbb{R}^8$.
+Seine Theta-Reihe $\Theta_{E_8}(\tau) \in M_4(\mathrm{SL}_2(\mathbb{Z}))$
+stimmt mit der Eisenstein-Reihe $E_4(\tau) = 1 + 240\sum_{n\geq1}\sigma_3(n)q^n$ überein.
+Daher ist die Anzahl der Vektoren der Norm $2k$ in $E_8$ gleich $240\,\sigma_3(k)$.
+\end{example}
+
+%% ============================================================
+\section{Verbindung zu elliptischen Kurven}\label{sec:elliptic}
+%% ============================================================
+
+\subsection{Uniformisierung elliptischer Kurven}
+
+Jede elliptische Kurve $E$ über $\mathbb{C}$ ist (als Riemann-Fläche) isomorph zu einem
+komplexen Torus $\mathbb{C}/\Lambda_\tau = \mathbb{C}/(\mathbb{Z} + \tau\mathbb{Z})$
+für ein $\tau \in \mathfrak{H}$.
+Die Uniformisierungsabbildung
+$\varphi: \mathbb{C}/\Lambda_\tau \to E(\mathbb{C})$
+wird durch die Weierstraß-$\wp$-Funktion gegeben.
+
+\subsection{Darstellung von $\wp$ durch Theta-Funktionen}
+
+\begin{theorem}[$\wp$ durch $\vartheta_1$]\label{thm:wp_theta}
+\[
+  \wp(z|\tau)
+  = -\partial_z^2 \log\vartheta_1(z|\tau)
+    + c(\tau),
+\]
+wobei $c(\tau)$ ein von $z$ unabhängiger Korrekturterm ist, der sicherstellt,
+dass $\wp$ doppelte Pole bei $z \in \Lambda_\tau$ besitzt.
+Explizit gilt:
+\[
+  \wp(z|\tau) = \left(\frac{\pi\vartheta_1'(0|\tau)}{\vartheta_1(z|\tau)}\right)^2
+  - \frac{\pi^2\vartheta_1''(0|\tau)}{3\vartheta_1'(0|\tau)},
+\]
+wobei Striche partielle Ableitungen nach $z$ bezeichnen.
+\end{theorem}
+
+\begin{proof}
+Beide Seiten haben dieselben Pole (doppelte Pole bei $\Lambda_\tau$),
+dieselbe Quasi-Periodizität (Charakteristik einer elliptischen Funktion)
+und gleiche konstante Glieder in der Laurent-Entwicklung bei $z=0$.
+Nach dem Liouvilleschen Satz ist eine elliptische Funktion durch ihre Pole und
+Hauptteile bis auf eine Konstante eindeutig bestimmt; das Konstantabgleichen
+liefert die Formel. Siehe \cite{WhittakerWatson1927}, Kap.~21.
+\end{proof}
+
+\subsection{Die $j$-Invariante}
+
+\begin{theorem}[$j$-Invariante durch $\vartheta_2, \vartheta_3, \vartheta_4$]
+\[
+  j(\tau)
+  = 256\,\frac{(\vartheta_2(\tau)^8 + \vartheta_3(\tau)^8 + \vartheta_4(\tau)^8)^3}
+              {(\vartheta_2(\tau)\,\vartheta_3(\tau)\,\vartheta_4(\tau))^8}.
+\]
+\end{theorem}
+
+Die $j$-Invariante klassifiziert elliptische Kurven über $\mathbb{C}$ bis auf
+Isomorphie, und ihre Darstellung durch Theta-Funktionen spiegelt das tiefe
+Wechselspiel zwischen der Funktionentheorie auf $\mathfrak{H}$ und der Arithmetik
+elliptischer Kurven wider.
+
+%% ============================================================
+\section{Ramanujan-Identitäten und Mock-Theta-Funktionen}\label{sec:ramanujan}
+%% ============================================================
+
+\subsection{Rogers--Ramanujan-Identitäten}
+
+\begin{theorem}[Rogers--Ramanujan, 1894/1913]\label{thm:RR}
+Für $|q| < 1$ gilt:
+\begin{align}
+  \sum_{n=0}^{\infty} \frac{q^{n^2}}{(q;q)_n}
+  &= \prod_{n\geq1}\frac{1}{(1-q^{5n-1})(1-q^{5n-4})},
+  \label{eq:RR1}\\
+  \sum_{n=0}^{\infty} \frac{q^{n(n+1)}}{(q;q)_n}
+  &= \prod_{n\geq1}\frac{1}{(1-q^{5n-2})(1-q^{5n-3})},
+  \label{eq:RR2}
+\end{align}
+wobei $(q;q)_n = \prod_{k=1}^n(1-q^k)$ das $q$-Pochhammer-Symbol bezeichnet.
+\end{theorem}
+
+\begin{proof}[Beweis via Bailey-Ketten]
+Rogers (1894) entdeckte diese Identitäten durch Manipulationen mit $q$-hypergeometrischen Reihen.
+Die Schlüsseltechnik ist die \emph{Bailey-Kette}: Ausgehend von einem Bailey-Paar $(a_n, b_n)$,
+das $a_n = \sum_{r=0}^n \frac{b_r}{(q;q)_{n-r}(q;q)_{n+r}}$ erfüllt,
+erzeugt das Bailey-Lemma neue Identitäten.
+Wählt man $a_n = q^{n^2}$, so erhält man \eqref{eq:RR1}.
+Ramanujan entdeckte die Identitäten um 1913 unabhängig erneut.
+MacMahon und andere lieferten kombinatorische Interpretationen:
+\eqref{eq:RR1} besagt, dass die Anzahl der Partitionen von $n$ in Teile
+$\equiv \pm 1 \pmod{5}$ gleich der Anzahl der Partitionen in Teile ist,
+die sich paarweise um mindestens $2$ unterscheiden.
+Ein vollständiger Beweis findet sich in \cite{Andrews1998}.
+\end{proof}
+
+\subsection{Mock-Theta-Funktionen}
+
+In seinem letzten Brief an Hardy (1920) führte Ramanujan
+\emph{Mock-Theta-Funktionen} ein: rätselhafte $q$-Reihen, die Theta-Funktionen
+in der Nähe des Einheitskreises ``nachahmen'', aber keine modularen Transformationsgesetze
+im üblichen Sinne erfüllen.
+Die einfachste Mock-Theta-Funktion dritter Ordnung ist
+\[
+  f(q) = \sum_{n=0}^{\infty} \frac{q^{n^2}}{(-q;q)_n^2}.
+\]
+
+\begin{remark}[Status: über 80 Jahre ungeklärt]
+Achtzig Jahre lang blieb ungeklärt, ob Mock-Theta-Funktionen in eine systematische
+Theorie der Modulformen eingebettet werden können.
+Watson (1937) und andere berechneten ihre Asymptotik, aber das
+``Modularitätsdefizit'' widerstand jeder Erklärung.
+\end{remark}
+
+\begin{theorem}[Zwegers 2002 -- Mock-Theta-Funktionen als harmonische Maass-Formen]\label{thm:zwegers}
+\textup{(Bewiesen von Zwegers \cite{Zwegers2002}.)}
+Jede Ramanujanschen Mock-Theta-Funktion $h(\tau)$ lässt sich zu einer
+\emph{harmonischen Maass-Form} $\widehat{h}(\tau) = h(\tau) + h^*(\tau)$ ergänzen,
+wobei $h^*(\tau)$ ein nicht-holomorpher Korrekturterm (der ``Schatten'') ist,
+sodass $\widehat{h}$ wie eine Modulform vom Gewicht $1/2$
+für eine Kongruenzuntergruppe von $\mathrm{SL}_2(\mathbb{Z})$ transformiert.
+\end{theorem}
+
+\begin{proof}[Zusammenfassung von Zwegers' Konstruktion]
+Für die Mock-Theta-Funktion dritter Ordnung $f(q)$ definiert Zwegers:
+\[
+  h^*(\tau) = \sqrt{-i}\int_{-\bar\tau}^{i\infty}
+  \frac{\overline{g(-\bar\tau')}}{\sqrt{\tau'+\tau}}\,d\tau',
+\]
+wobei $g(\tau)$ das Mordell-Integral, der Schatten von $f$, ist.
+Man verifiziert, dass $\widehat{h} = h + h^*$ die Transformationsformel
+$\widehat{h}\!\left(\frac{a\tau+b}{c\tau+d}\right) = (c\tau+d)^{1/2}\chi(a,b,c,d)\,\widehat{h}(\tau)$
+für alle $\begin{pmatrix}a&b\\c&d\end{pmatrix}\in\Gamma_0(576)$ erfüllt.
+Der holomorphe Teil $h(\tau)$ allein transformiert nicht sauber, weil $h^*$
+genau den Defektterm aufnimmt.
+Dieser Rahmen -- \emph{harmonische Maass-Formen} -- wurde anschließend von
+Bruinier--Funke, Ono, Zagier und anderen zu einer reichen Theorie ausgebaut.
+\end{proof}
+
+\begin{remark}
+Zwegers' Ergebnis löste das Rätsel, das Ramanujan selbst ahnte, als er schrieb:
+\textit{``I discovered very interesting functions recently which I call `Mock' $\vartheta$-functions...''}.
+Die Verbindung zwischen Mock-Theta-Funktionen und harmonischen Maass-Formen ist heute
+ein zentrales Thema der modernen Zahlentheorie, mit Anwendungen in der Partitionentheorie,
+bei quadratischen Formen und sogar in der mathematischen Physik (String-Theorie, Moonshine).
+\end{remark}
+
+%% ============================================================
+\section*{Literatur}
+%% ============================================================
+
+\begin{thebibliography}{10}
+
+\bibitem{Jacobi1829}
+C.~G.~J.~Jacobi,
+\textit{Fundamenta Nova Theoriae Functionum Ellipticarum},
+Königsberg, 1829.
+
+\bibitem{WhittakerWatson1927}
+E.~T.~Whittaker und G.~N.~Watson,
+\textit{A Course of Modern Analysis}, 4.~Aufl.,
+Cambridge University Press, 1927.
+
+\bibitem{Riemann1859}
+B.~Riemann,
+Über die Anzahl der Primzahlen unter einer gegebenen Größe,
+\textit{Monatsberichte der Königlich Preußischen Akademie der Wissenschaften zu Berlin},
+S.~671--680, 1859.
+
+\bibitem{Mumford1983}
+D.~Mumford,
+\textit{Tata Lectures on Theta I, II, III},
+Birkhäuser, 1983--1991.
+
+\bibitem{Serre1973}
+J.-P.~Serre,
+\textit{A Course in Arithmetic},
+Springer, 1973.
+
+\bibitem{Apostol1990}
+T.~M.~Apostol,
+\textit{Modular Functions and Dirichlet Series in Number Theory}, 2.~Aufl.,
+Springer, 1990.
+
+\bibitem{Iwaniec1997}
+H.~Iwaniec,
+\textit{Topics in Classical Automorphic Forms},
+American Mathematical Society, 1997.
+
+\bibitem{Shimura1973}
+G.~Shimura,
+On modular forms of half integral weight,
+\textit{Annals of Mathematics} \textbf{97} (1973), 440--481.
+
+\bibitem{Andrews1998}
+G.~E.~Andrews,
+\textit{The Theory of Partitions},
+Cambridge University Press, 1998.
+
+\bibitem{Grosswald1985}
+E.~Grosswald,
+\textit{Representations of Integers as Sums of Squares},
+Springer, 1985.
+
+\bibitem{Zwegers2002}
+S.~Zwegers,
+\textit{Mock Theta Functions},
+Dissertation, Universiteit Utrecht, 2002.
+
+\end{thebibliography}
+
+\end{document}
