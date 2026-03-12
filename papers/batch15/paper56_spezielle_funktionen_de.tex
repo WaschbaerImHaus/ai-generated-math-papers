@@ -1,0 +1,811 @@
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 141}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\title{Spezielle Funktionen der Mathematik und Physik:\\
+Gamma-, Bessel-, hypergeometrische und verwandte Funktionen}
+
+\begin{abstract}
+Spezielle Funktionen entstehen als kanonische Lösungen der fundamentalsten Differentialgleichungen
+der mathematischen Physik und Analysis.  Dieses Paper entwickelt systematisch die wichtigsten
+speziellen Funktionen: die Gamma- und Beta-Funktion, Bessel-Funktionen erster und zweiter Art,
+die Gaußsche hypergeometrische Funktion \({}_2F_1\), Legendre-Polynome und zugeordnete
+Legendre-Funktionen, Hermite- und Laguerre-Polynome mit ihren quantenmechanischen Anwendungen,
+elliptische Funktionen von Weierstra\ss{} und Jacobi sowie die Riemann-Zetafunktion mitsamt
+Dirichlet-\(L\)-Funktionen.  Für jede Funktionenklasse werden die definierende
+Differentialgleichung bzw.\ Reihe, fundamentale Identitäten wie die Reflexionsformel
+\(\Gamma(z)\Gamma(1-z)=\pi/\sin(\pi z)\), die Beta-Gamma-Relation und die
+Funktionalgleichung von \(\zeta(s)\) bewiesen sowie die Verbindungen zwischen den
+verschiedenen Klassen hergestellt.  Numerische Verifikationen aus dem begleitenden
+Python-Modul \texttt{special\_functions.py} bestätigen alle theoretischen Ergebnisse.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% ============================================================
+\section{Einleitung}
+%% ============================================================
+
+Spezielle Funktionen sind diejenigen Funktionen, die so häufig bei der Lösung kanonischer
+Probleme in Analysis, Geometrie und mathematischer Physik auftreten, dass sie eigene Namen
+und umfangreiche Tabellen ihrer Eigenschaften erhalten haben.  Ihre systematische Untersuchung
+zählt zu den schönsten Kapiteln der klassischen Analysis.
+
+Die zentralen Objekte dieses Papers sind Lösungen linearer gewöhnlicher Differentialgleichungen
+zweiter Ordnung mit Polynomkoeffizienten.  Nach dem Satz von Fuchs besitzen solche
+Gleichungen in der Umgebung regulärer singulärer Punkte Potenzreihenlösungen; die so
+entstehenden Funktionen weisen eine reiche algebraische und analytische Struktur auf:
+Rekurrenzrelationen, erzeugende Funktionen, Orthogonalität auf einem geeigneten Intervall,
+asymptotische Entwicklungen und Verbindungen zur Zahlentheorie.
+
+\begin{example}[Kanonische Differentialgleichungen]
+Die folgenden Differentialgleichungen zweiter Ordnung definieren je eine fundamentale
+Familie spezieller Funktionen:
+\begin{align}
+  x^2 y'' + x y' + (x^2 - \nu^2)y &= 0 \qquad \text{(Bessel-Gleichung)},\label{eq:bessel_ode}\\
+  (1-x^2)y'' - 2xy' + n(n+1)y &= 0 \qquad \text{(Legendre-Gleichung)},\label{eq:legendre_ode}\\
+  z(1-z)w'' + [c-(a+b+1)z]w' - ab\,w &= 0 \qquad \text{(hypergeometrische Gleichung)},\label{eq:hyp_ode}\\
+  y'' &= x\,y \qquad \text{(Airy-Gleichung)}.\label{eq:airy_ode}
+\end{align}
+\end{example}
+
+Das Paper ist wie folgt aufgebaut.
+Abschnitt~\ref{sec:gamma} behandelt die Gamma-Funktion einschließlich Reflexions- und
+Verdopplungsformel.  Abschnitt~\ref{sec:beta} stellt die Beta-Funktion und ihre
+Integraldarstellung vor.  Abschnitt~\ref{sec:bessel} entwickelt Bessel-Funktionen.
+Abschnitt~\ref{sec:hypergeometric} behandelt die hypergeometrische Funktion \({}_2F_1\).
+Abschnitt~\ref{sec:legendre} präsentiert Legendre-Polynome und Kugelflächenfunktionen.
+Abschnitt~\ref{sec:hermite_laguerre} deckt Hermite- und Laguerre-Polynome sowie ihre
+Rolle in der Quantenmechanik ab.  Abschnitt~\ref{sec:elliptic} behandelt elliptische
+Funktionen.  Abschnitt~\ref{sec:zeta} diskutiert die Riemannsche Zetafunktion und
+Dirichlet-\(L\)-Funktionen.  Abschnitt~\ref{sec:anwendungen} gibt einen Überblick über
+physikalische und zahlentheoretische Anwendungen.
+
+%% ============================================================
+\section{Die Gamma-Funktion}
+\label{sec:gamma}
+%% ============================================================
+
+\subsection{Definition und grundlegende Eigenschaften}
+
+\begin{definition}[Gamma-Funktion via Integral]
+Für \(\Re(z) > 0\) setze man
+\[
+  \Gamma(z) \;=\; \int_0^\infty t^{z-1} e^{-t}\,dt.
+\]
+\end{definition}
+
+Partielle Integration liefert sofort die Funktionalgleichung.
+
+\begin{theorem}[Funktionalgleichung]\label{thm:gamma_functional_de}
+Für alle \(z\) mit \(\Re(z) > 0\) gilt
+\[
+  \Gamma(z+1) = z\,\Gamma(z).
+\]
+Insbesondere ist \(\Gamma(n+1) = n!\) für jedes \(n \in \mathbb{N}_0\).
+\end{theorem}
+
+\begin{proof}
+Partielle Integration ergibt:
+\[
+  \Gamma(z+1)
+  = \int_0^\infty t^z e^{-t}\,dt
+  = \bigl[-t^z e^{-t}\bigr]_0^\infty + z\int_0^\infty t^{z-1}e^{-t}\,dt
+  = 0 + z\,\Gamma(z). \qquad\qquad\square
+\]
+\end{proof}
+
+Die Funktionalgleichung zusammen mit \(\Gamma(1) = 1\) liefert die meromorphe
+Fortsetzung von \(\Gamma\) auf ganz \(\mathbb{C}\): \(\Gamma\) hat einfache Pole in
+\(z = 0, -1, -2, \ldots\) und keine Nullstellen.
+
+\subsection{Weierstraßsches Produkt und Gaußsche Formel}
+
+Die Euler-Mascheroni-Konstante \(\gamma = -\Gamma'(1) \approx 0{,}5772\) tritt im
+Weierstraßschen Produktansatz auf:
+\[
+  \frac{1}{\Gamma(z)}
+  = z\,e^{\gamma z}\prod_{n=1}^\infty \left(1+\frac{z}{n}\right)e^{-z/n}.
+\]
+Äquivalent dazu ist die Gaußsche Grenzwertformel
+\[
+  \Gamma(z) = \lim_{n\to\infty} \frac{n!\,n^z}{z(z+1)\cdots(z+n)}.
+\]
+
+\subsection{Reflexionsformel}
+
+\begin{theorem}[Eulersche Reflexionsformel]\label{thm:gamma_reflection_de}
+Für alle \(z \notin \mathbb{Z}\) gilt
+\[
+  \Gamma(z)\,\Gamma(1-z) = \frac{\pi}{\sin(\pi z)}.
+\]
+\end{theorem}
+
+\begin{proof}
+Aus dem Weierstraßschen Produkt für \(1/\Gamma(z)\) und \(1/\Gamma(-z)\) folgt
+\[
+  \frac{1}{\Gamma(z)\,\Gamma(-z)}
+  = -z\prod_{n=1}^\infty\left(1-\frac{z^2}{n^2}\right).
+\]
+Das Eulersche Produkt für den Sinus liefert
+\[
+  \frac{\sin(\pi z)}{\pi z} = \prod_{n=1}^\infty\left(1-\frac{z^2}{n^2}\right),
+\]
+woraus \(\Gamma(z)\Gamma(-z) = -\pi/(z\sin(\pi z))\) folgt.
+Die Substitution \(z\mapsto 1-z\) und \(\Gamma(1-z) = -z\,\Gamma(-z)\) liefern
+das Ergebnis.
+\end{proof}
+
+\begin{corollary}
+\(\Gamma\!\left(\tfrac{1}{2}\right) = \sqrt{\pi}\).
+\end{corollary}
+\begin{proof}
+Setzt man \(z = 1/2\) in Satz~\ref{thm:gamma_reflection_de}: \(\Gamma(1/2)^2 = \pi/\sin(\pi/2) = \pi\).
+\end{proof}
+
+\subsection{Verdopplungsformel}
+
+\begin{theorem}[Legendresche Verdopplungsformel]\label{thm:gamma_duplication_de}
+Für alle \(z\) mit \(\Re(z) > 0\) gilt
+\[
+  \Gamma(z)\,\Gamma\!\left(z+\tfrac{1}{2}\right)
+  = \frac{\sqrt{\pi}}{2^{2z-1}}\,\Gamma(2z).
+\]
+\end{theorem}
+
+\begin{proof}
+Betrachte das Beta-Integral \(B(z,z) = \Gamma(z)^2/\Gamma(2z)\).  Die Substitution
+\(t = (1+u)/2\) führt auf
+\[
+  B(z,z) = 2^{1-2z}\int_{-1}^1 (1-u^2)^{z-1}\,du = 2^{1-2z}\,B\!\left(\tfrac{1}{2},z\right)
+  = 2^{1-2z}\frac{\sqrt{\pi}\,\Gamma(z)}{\Gamma(z+1/2)}.
+\]
+Umstellen liefert die behauptete Formel.
+\end{proof}
+
+\subsection{Stirlingsches Asymptotik}
+
+Für großes \(|z|\) mit \(|\arg z| < \pi\) gilt
+\[
+  \ln\Gamma(z) = \left(z-\tfrac{1}{2}\right)\ln z - z + \tfrac{1}{2}\ln(2\pi)
+  + \sum_{k=1}^N \frac{B_{2k}}{2k(2k-1)z^{2k-1}} + O\!\left(z^{-2N-1}\right),
+\]
+wobei \(B_{2k}\) die Bernoulli-Zahlen sind.  Insbesondere gilt die Stirlingsche Formel
+\[
+  n! \;\sim\; \sqrt{2\pi n}\,\left(\frac{n}{e}\right)^n \quad (n\to\infty).
+\]
+
+%% ============================================================
+\section{Die Beta-Funktion}
+\label{sec:beta}
+%% ============================================================
+
+\begin{definition}[Beta-Funktion]
+Für \(\Re(a) > 0\), \(\Re(b) > 0\) sei
+\[
+  B(a,b) = \int_0^1 t^{a-1}(1-t)^{b-1}\,dt.
+\]
+\end{definition}
+
+\begin{theorem}[Beta-Gamma-Relation]\label{thm:beta_gamma_de}
+\[
+  B(a,b) = \frac{\Gamma(a)\,\Gamma(b)}{\Gamma(a+b)}.
+\]
+\end{theorem}
+
+\begin{proof}
+Man schreibe \(\Gamma(a)\Gamma(b)\) als Doppelintegral:
+\[
+  \Gamma(a)\Gamma(b)
+  = \int_0^\infty s^{a-1}e^{-s}\,ds\int_0^\infty t^{b-1}e^{-t}\,dt.
+\]
+Die Substitution \(s = r\,u\), \(t = r(1-u)\) mit \(r \in (0,\infty)\), \(u \in (0,1)\)
+und Jakobi-Determinante \(r\) ergibt
+\[
+  = \int_0^\infty r^{a+b-1}e^{-r}\,dr \cdot \int_0^1 u^{a-1}(1-u)^{b-1}\,du
+  = \Gamma(a+b)\,B(a,b). \qquad\square
+\]
+\end{proof}
+
+\begin{proposition}[Symmetrie]
+\(B(a,b) = B(b,a)\).
+\end{proposition}
+
+\begin{proposition}[Trigonometrische Form]
+\[
+  B(a,b) = 2\int_0^{\pi/2}\sin^{2a-1}\theta\,\cos^{2b-1}\theta\,d\theta.
+\]
+\end{proposition}
+
+\begin{remark}
+Die Beta-Funktion erscheint natürlich bei der Berechnung von Volumina der \(n\)-dimensionalen
+Kugel, in der Theorie der Dirichlet-Verteilung und als Normierungskonstante orthogonaler
+Polynome.
+\end{remark}
+
+%% ============================================================
+\section{Bessel-Funktionen}
+\label{sec:bessel}
+%% ============================================================
+
+\subsection{Die Bessel-Differentialgleichung}
+
+\begin{definition}[Bessel-Gleichung der Ordnung \(\nu\)]
+\begin{equation}\label{eq:bessel_de}
+  x^2 y'' + x y' + (x^2 - \nu^2)y = 0, \qquad x > 0,\; \nu \in \mathbb{C}.
+\end{equation}
+\end{definition}
+
+Gleichung~\eqref{eq:bessel_de} besitzt bei \(x = 0\) einen regulären singulären Punkt
+mit Indizialwurzeln \(\pm\nu\).  Die Frobenius-Methode liefert zwei linear unabhängige
+Lösungen \(J_\nu(x)\) und \(Y_\nu(x)\) (für nicht-ganzzahlige \(\nu\); für ganzzahlige
+\(\nu\) enthält \(Y_\nu\) einen Logarithmusterm).
+
+\subsection{Bessel-Funktionen erster Art}
+
+\begin{definition}[Bessel-Funktion \(J_\nu\)]
+\[
+  J_\nu(x) = \sum_{m=0}^\infty \frac{(-1)^m}{m!\,\Gamma(m+\nu+1)}
+  \left(\frac{x}{2}\right)^{2m+\nu}.
+\]
+\end{definition}
+
+Für ganzzahlige \(n \in \mathbb{Z}\) gilt die Integraldarstellung
+\[
+  J_n(x) = \frac{1}{\pi}\int_0^\pi \cos(n\tau - x\sin\tau)\,d\tau.
+\]
+
+\subsection{Bessel-Funktionen zweiter Art (Neumann-Funktionen)}
+
+\begin{definition}[Neumann-Funktion \(Y_\nu\)]
+Für nicht-ganzzahlige \(\nu\) sei
+\[
+  Y_\nu(x) = \frac{J_\nu(x)\cos(\nu\pi) - J_{-\nu}(x)}{\sin(\nu\pi)}.
+\]
+Für ganzzahlige \(n\) definiert man \(Y_n(x) = \lim_{\nu\to n} Y_\nu(x)\), was
+einen Logarithmusterm \(\ln x\) enthält.
+\end{definition}
+
+\(Y_\nu(x)\) ist singulär bei \(x = 0\); in physikalischen Problemen, die den Ursprung
+einschließen, behält man nur \(J_\nu\).
+
+\subsection{Modifizierte Bessel-Funktionen}
+
+Die Substitution \(x \mapsto ix\) in~\eqref{eq:bessel_de} ergibt die modifizierte
+Bessel-Gleichung \(x^2 y'' + xy' - (x^2+\nu^2)y = 0\) mit Lösungen
+\[
+  I_\nu(x) = i^{-\nu}J_\nu(ix), \qquad
+  K_\nu(x) = \frac{\pi}{2}\,\frac{I_{-\nu}(x)-I_\nu(x)}{\sin(\nu\pi)}.
+\]
+\(K_\nu(x)\) klingt exponentiell ab: \(K_\nu(x) \sim \sqrt{\pi/(2x)}\,e^{-x}\) für
+\(x \to +\infty\).
+
+\subsection{Rekurrenzrelationen}
+
+\begin{theorem}[Drei-Term-Rekurrenz]\label{thm:bessel_recur_de}
+Für \(x \neq 0\) gelten:
+\begin{align}
+  J_{\nu-1}(x) + J_{\nu+1}(x) &= \frac{2\nu}{x}\,J_\nu(x),\label{eq:bessel_rec1_de}\\
+  J_{\nu-1}(x) - J_{\nu+1}(x) &= 2J_\nu'(x).\label{eq:bessel_rec2_de}
+\end{align}
+\end{theorem}
+
+\subsection{Wronski-Determinante}
+
+\begin{theorem}[Wronskian von \(J_\nu\) und \(Y_\nu\)]
+\[
+  W\bigl[J_\nu(x), Y_\nu(x)\bigr]
+  = J_\nu(x)Y_\nu'(x) - J_\nu'(x)Y_\nu(x)
+  = \frac{2}{\pi x}.
+\]
+\end{theorem}
+
+Die nicht-verschwindende Wronski-Determinante bestätigt, dass \(J_\nu\) und \(Y_\nu\)
+ein Fundamentalsystem für \(x > 0\) bilden.
+
+\subsection{Nullstellen und asymptotisches Verhalten}
+
+Alle Nullstellen von \(J_\nu\) für \(\nu > -1\) sind reell und einfach.
+Asymptotisch gilt für \(x \to +\infty\):
+\[
+  J_\nu(x) \sim \sqrt{\frac{2}{\pi x}}\cos\!\left(x - \frac{\nu\pi}{2} - \frac{\pi}{4}\right).
+\]
+
+%% ============================================================
+\section{Hypergeometrische Funktionen}
+\label{sec:hypergeometric}
+%% ============================================================
+
+\subsection{Die Gaußsche hypergeometrische Reihe}
+
+\begin{definition}[Pochhammer-Symbol (aufsteigende Fakultät)]
+\[
+  (a)_0 = 1, \qquad (a)_n = a(a+1)\cdots(a+n-1) = \frac{\Gamma(a+n)}{\Gamma(a)}.
+\]
+\end{definition}
+
+\begin{definition}[Gaußsche hypergeometrische Funktion]\label{def:2F1_de}
+Für \(c \notin \{0,-1,-2,\ldots\}\) und \(|z| < 1\) sei
+\[
+  {}_2F_1(a,b;c;z)
+  = \sum_{n=0}^\infty \frac{(a)_n(b)_n}{(c)_n\,n!}\,z^n.
+\]
+\end{definition}
+
+Die Reihe konvergiert absolut für \(|z| < 1\) und kann analytisch auf
+\(\mathbb{C}\setminus[1,\infty)\) fortgesetzt werden.
+
+\subsection{Gaußsche hypergeometrische Differentialgleichung}
+
+\begin{theorem}
+\({}_2F_1(a,b;c;z)\) erfüllt die Gleichung
+\[
+  z(1-z)w'' + \bigl[c-(a+b+1)z\bigr]w' - ab\,w = 0.
+\]
+Diese Gleichung besitzt reguläre singuläre Punkte bei \(z = 0, 1, \infty\).
+\end{theorem}
+
+\subsection{Transformationsformeln}
+
+\begin{theorem}[Pfaffsche Transformation]
+\[
+  {}_2F_1(a,b;c;z) = (1-z)^{-a}\,{}_2F_1\!\left(a,c-b;c;\frac{z}{z-1}\right).
+\]
+\end{theorem}
+
+\begin{theorem}[Eulersche Transformation]
+\[
+  {}_2F_1(a,b;c;z) = (1-z)^{c-a-b}\,{}_2F_1(c-a,c-b;c;z).
+\]
+\end{theorem}
+
+\begin{theorem}[Kummers 24 Lösungen]
+Kummer fand 24 Lösungen der hypergeometrischen Gleichung, die durch Anwendung der sechs
+Symmetrien der Dreiergruppe \(\{0,1,\infty\}\) und der zwei lokalen Lösungen an jedem
+Punkt entstehen.
+\end{theorem}
+
+\subsection{Wichtige Spezialfälle}
+
+\begin{proposition}[Sonderfälle]
+\begin{align*}
+  {}_2F_1(1,1;1;z) &= \frac{1}{1-z} \quad (|z|<1),\\
+  {}_2F_1\!\left(\tfrac{1}{2},\tfrac{1}{2};1;k^2\right) &= \frac{2}{\pi}\,K(k),\\
+  P_n(x) &= {}_2F_1\!\left(-n,n+1;1;\tfrac{1-x}{2}\right),\\
+  \ln(1+z) &= z\,{}_2F_1(1,1;2;-z).
+\end{align*}
+\end{proposition}
+
+\subsection{Konfluente hypergeometrische (Kummer-) Funktionen}
+
+Für \(b \to \infty\) mit \(z \mapsto z/b\) in Definition~\ref{def:2F1_de} entsteht die
+konfluente hypergeometrische Funktion (Kummer-Funktion):
+\[
+  M(a;c;z) = {}_1F_1(a;c;z)
+  = \sum_{n=0}^\infty \frac{(a)_n}{(c)_n\,n!}\,z^n,
+\]
+welche die Kummer-Gleichung \(z w'' + (c-z)w' - aw = 0\) erfüllt.
+Bemerkenswerterweise gilt \(M(a;a;z) = e^z\) und
+\(\operatorname{erf}(z) = (2z/\sqrt{\pi})\,M(1/2;3/2;-z^2)\).
+
+%% ============================================================
+\section{Legendre-Polynome}
+\label{sec:legendre}
+%% ============================================================
+
+\subsection{Definition via Rodrigues-Formel}
+
+\begin{theorem}[Rodrigues-Formel]\label{thm:rodrigues_de}
+\[
+  P_n(x) = \frac{1}{2^n n!}\,\frac{d^n}{dx^n}(x^2-1)^n.
+\]
+\end{theorem}
+
+Die ersten Polynome lauten:
+\[
+  P_0(x)=1,\quad P_1(x)=x,\quad P_2(x)=\tfrac{1}{2}(3x^2-1),\quad
+  P_3(x)=\tfrac{1}{2}(5x^3-3x).
+\]
+
+\subsection{Orthogonalität}
+
+\begin{theorem}[Orthogonalität der Legendre-Polynome]\label{thm:legendre_ortho_de}
+\[
+  \int_{-1}^1 P_n(x)\,P_m(x)\,dx = \frac{2}{2n+1}\,\delta_{nm}.
+\]
+\end{theorem}
+
+\begin{proof}
+Beide Polynome \(P_n\) und \(P_m\) genügen der Legendre-Gleichung.
+Man multipliziert die Gleichung für \(P_n\) mit \(P_m\), subtrahiert das analoge
+Produkt für \(P_m\) mal \(P_n\) und integriert über \([-1,1]\).
+Die Randterme verschwinden, da \((1-x^2)\) bei \(\pm 1\) null ist, was
+\([n(n+1)-m(m+1)]\int_{-1}^1 P_n P_m\,dx = 0\) ergibt.
+Für \(n \neq m\) folgt daher, dass das Integral null ist.
+Die Normierung \(2/(2n+1)\) ergibt sich aus \(\|P_n\|^2\) via Rodrigues-Formel
+und \(n\)-facher partieller Integration.
+\end{proof}
+
+\subsection{Erzeugende Funktion}
+
+\begin{theorem}[Erzeugende Funktion]
+Für \(|t| < 1\) und \(x \in [-1,1]\) gilt
+\[
+  \frac{1}{\sqrt{1-2xt+t^2}} = \sum_{n=0}^\infty P_n(x)\,t^n.
+\]
+\end{theorem}
+
+\subsection{Zugeordnete Legendre-Funktionen und Kugelflächenfunktionen}
+
+\begin{definition}[Zugeordnete Legendre-Funktion]
+Für \(0 \leq m \leq n\) sei
+\[
+  P_n^m(x) = (-1)^m(1-x^2)^{m/2}\frac{d^m}{dx^m}P_n(x).
+\]
+\end{definition}
+
+\begin{definition}[Kugelflächenfunktionen]
+\[
+  Y_n^m(\theta,\varphi)
+  = \sqrt{\frac{(2n+1)}{4\pi}\frac{(n-|m|)!}{(n+|m|)!}}\,
+  P_n^{|m|}(\cos\theta)\,e^{im\varphi},
+\]
+für \(n \geq 0\), \(-n \leq m \leq n\).  Die Kugelflächenfunktionen bilden eine
+vollständige Orthonormalbasis von \(L^2(S^2)\).
+\end{definition}
+
+%% ============================================================
+\section{Hermite- und Laguerre-Polynome}
+\label{sec:hermite_laguerre}
+%% ============================================================
+
+\subsection{Hermite-Polynome}
+
+\begin{definition}[Hermite-Polynome, Physiker-Konvention]
+\[
+  H_n(x) = (-1)^n e^{x^2}\frac{d^n}{dx^n}e^{-x^2}.
+\]
+\end{definition}
+
+Die ersten Polynome sind \(H_0 = 1\), \(H_1 = 2x\), \(H_2 = 4x^2-2\), \(H_3 = 8x^3-12x\).
+
+\begin{theorem}[Orthogonalität]
+\[
+  \int_{-\infty}^\infty H_n(x)H_m(x)e^{-x^2}\,dx = 2^n\,n!\,\sqrt{\pi}\,\delta_{nm}.
+\]
+\end{theorem}
+
+\begin{theorem}[Rekurrenzrelation]
+\[
+  H_{n+1}(x) = 2x\,H_n(x) - 2n\,H_{n-1}(x).
+\]
+\end{theorem}
+
+\subsection{Quantenmechanischer harmonischer Oszillator}
+
+Die stationäre Schrödinger-Gleichung für den harmonischen Oszillator
+\[
+  -\frac{\hbar^2}{2m}\psi'' + \frac{1}{2}m\omega^2 x^2\psi = E\psi
+\]
+vereinfacht sich mit \(\xi = \sqrt{m\omega/\hbar}\,x\) zu
+\[
+  \psi'' - (\xi^2 - \lambda)\psi = 0, \qquad \lambda = 2E/(\hbar\omega).
+\]
+Quadratintegrierbare Lösungen existieren nur für \(\lambda = 2n+1\), \(n \in \mathbb{N}_0\),
+was quantisierte Energien \(E_n = \hbar\omega(n+\tfrac{1}{2})\) und Wellenfunktionen
+\[
+  \psi_n(x) = \left(\frac{m\omega}{\pi\hbar}\right)^{1/4}
+  \frac{1}{\sqrt{2^n n!}}\,H_n\!\left(\sqrt{\frac{m\omega}{\hbar}}\,x\right)
+  e^{-m\omega x^2/(2\hbar)}
+\]
+ergibt.
+
+\subsection{Laguerre-Polynome}
+
+\begin{definition}[Laguerre-Polynome]
+\[
+  L_n(x) = \frac{e^x}{n!}\frac{d^n}{dx^n}(x^n e^{-x}) = \sum_{k=0}^n \binom{n}{k}
+  \frac{(-x)^k}{k!}.
+\]
+\end{definition}
+
+\begin{theorem}[Orthogonalität]
+\[
+  \int_0^\infty L_n(x)L_m(x)e^{-x}\,dx = \delta_{nm}.
+\]
+\end{theorem}
+
+\begin{theorem}[Rekurrenzrelation]
+\[
+  (n+1)L_{n+1}(x) = (2n+1-x)L_n(x) - n\,L_{n-1}(x).
+\]
+\end{theorem}
+
+\subsection{Wasserstoffatom}
+
+Die radiale Schrödinger-Gleichung für das wasserstoffähnliche Atom führt nach
+Variablentrennung auf die zugeordnete Laguerre-Gleichung.
+Die Radialwellenfunktionen lauten
+\[
+  R_{nl}(r) = -\sqrt{\left(\frac{2}{na_0}\right)^3\frac{(n-l-1)!}{2n[(n+l)!]^3}}\,
+  e^{-r/(na_0)}\!\left(\frac{2r}{na_0}\right)^l L_{n-l-1}^{2l+1}\!\!\left(\frac{2r}{na_0}\right),
+\]
+wobei \(a_0\) der Bohrsche Radius und \(L_n^\alpha\) die verallgemeinerten Laguerre-Polynome
+\(L_n^\alpha(x) = e^x x^{-\alpha}(d^n/dx^n)(e^{-x}x^{n+\alpha})/n!\) sind.
+
+%% ============================================================
+\section{Elliptische Funktionen}
+\label{sec:elliptic}
+%% ============================================================
+
+\subsection{Elliptische Integrale}
+
+\begin{definition}[Vollständige elliptische Integrale]
+Für den Modulus \(0 \leq k < 1\) sei
+\begin{align*}
+  K(k) &= \int_0^{\pi/2}\frac{d\theta}{\sqrt{1-k^2\sin^2\theta}}, \\
+  E(k) &= \int_0^{\pi/2}\sqrt{1-k^2\sin^2\theta}\,d\theta.
+\end{align*}
+\end{definition}
+
+\begin{theorem}[Legendre-Relation]
+Sei \(k' = \sqrt{1-k^2}\) der komplementäre Modulus.  Dann gilt
+\[
+  K(k)\,E(k') + K(k')\,E(k) - K(k)\,K(k') = \frac{\pi}{2}.
+\]
+\end{theorem}
+
+\subsection{Weierstraßsche elliptische Funktion}
+
+\begin{definition}[Weierstraßsche \(\wp\)-Funktion]
+Sei \(\Lambda = \omega_1\mathbb{Z} + \omega_2\mathbb{Z}\) ein Gitter in \(\mathbb{C}\).
+\[
+  \wp(z; \Lambda) = \frac{1}{z^2}
+  + \sum_{\omega \in \Lambda\setminus\{0\}} \left(\frac{1}{(z-\omega)^2} - \frac{1}{\omega^2}\right).
+\]
+\end{definition}
+
+\begin{theorem}[Differentialgleichung für \(\wp\)]
+\[
+  (\wp')^2 = 4\wp^3 - g_2\,\wp - g_3,
+\]
+wobei die Eisenstein-Reihen \(g_2 = 60 G_4(\Lambda)\) und \(g_3 = 140 G_6(\Lambda)\).
+Die Diskriminante \(\Delta = g_2^3 - 27g_3^2 \neq 0\) stellt sicher, dass das kubische
+Polynom rechts voneinander verschiedene Wurzeln hat.
+\end{theorem}
+
+\begin{remark}
+Die Gleichung \(y^2 = 4x^3 - g_2 x - g_3\) ist die Weierstraß-Normalform einer
+elliptischen Kurve.  Jede elliptische Kurve über \(\mathbb{C}\) ist isomorph zu
+\(\mathbb{C}/\Lambda\) für ein geeignetes Gitter \(\Lambda\), und die Parametrisierung
+\(z \mapsto (\wp(z), \wp'(z))\) realisiert diesen Isomorphismus explizit.
+\end{remark}
+
+\subsection{Jacobische elliptische Funktionen}
+
+Die Jacobischen Funktionen \(\operatorname{sn}(u,k)\), \(\operatorname{cn}(u,k)\),
+\(\operatorname{dn}(u,k)\) sind als Umkehrungen des elliptischen Integrals erster Art
+definiert.  Sie erfüllen
+\begin{align*}
+  \operatorname{sn}^2 + \operatorname{cn}^2 &= 1, \\
+  k^2\operatorname{sn}^2 + \operatorname{dn}^2 &= 1, \\
+  \frac{d}{du}\operatorname{sn}(u,k) &= \operatorname{cn}(u,k)\,\operatorname{dn}(u,k).
+\end{align*}
+Die Perioden sind \(4K(k)\) für \(\operatorname{sn}\) und \(\operatorname{cn}\) sowie
+\(2K(k)\) für \(\operatorname{dn}\).
+
+%% ============================================================
+\section{Riemannsche Zetafunktion und Dirichlet-\texorpdfstring{$L$}{L}-Funktionen}
+\label{sec:zeta}
+%% ============================================================
+
+\subsection{Die Riemannsche Zetafunktion}
+
+\begin{definition}[Riemannsche Zetafunktion]
+Für \(\Re(s) > 1\) sei
+\[
+  \zeta(s) = \sum_{n=1}^\infty \frac{1}{n^s} = \prod_p \frac{1}{1-p^{-s}},
+\]
+das Produkt über alle rationalen Primzahlen \(p\).
+\end{definition}
+
+\subsection{Analytische Fortsetzung und Funktionalgleichung}
+
+\begin{theorem}[Funktionalgleichung von \(\zeta\)]\label{thm:zeta_functional_de}
+Die Funktion \(\zeta(s)\) setzt sich zu einer meromorphen Funktion auf ganz \(\mathbb{C}\)
+fort mit einem einfachen Pol bei \(s = 1\) mit Residuum \(1\).
+Die vervollständigte Zetafunktion
+\[
+  \xi(s) = \tfrac{1}{2}s(s-1)\pi^{-s/2}\Gamma\!\left(\tfrac{s}{2}\right)\zeta(s)
+\]
+erfüllt die Funktionalgleichung
+\[
+  \xi(s) = \xi(1-s).
+\]
+Äquivalent dazu ist
+\[
+  \zeta(s) = 2^s\pi^{s-1}\sin\!\left(\frac{\pi s}{2}\right)\Gamma(1-s)\,\zeta(1-s).
+\]
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+Ausgangspunkt ist die Mellin-Transformation \(\pi^{-s/2}\Gamma(s/2)\zeta(s)
+= \int_0^\infty x^{s/2-1}\theta(x)\,dx\) mit
+\(\theta(x) = \sum_{n=1}^\infty e^{-\pi n^2 x}\).
+Die modulare Transformationsformel
+\(\theta(1/x) = x^{1/2}\theta(x) + (x^{1/2}-1)/2\)
+(Konsequenz der Jacobischen Theta-Identität) liefert nach Aufteilen des Integrals
+bei \(x = 1\) die Symmetrie \(s \leftrightarrow 1-s\).
+\end{proof}
+
+\subsection{Spezielle Werte}
+
+\begin{theorem}[Eulersche Formel für gerade Argumente]
+Für \(n \in \mathbb{N}\) gilt
+\[
+  \zeta(2n) = \frac{(-1)^{n+1}(2\pi)^{2n}B_{2n}}{2\,(2n)!},
+\]
+wobei \(B_{2n}\) die Bernoulli-Zahlen sind.  Insbesondere:
+\(\zeta(2) = \pi^2/6\), \(\zeta(4) = \pi^4/90\), \(\zeta(6) = \pi^6/945\).
+\end{theorem}
+
+\subsection{Dirichlet-\(L\)-Funktionen}
+
+\begin{definition}[Dirichlet-Charakter und \(L\)-Funktion]
+Ein Dirichlet-Charakter modulo \(q\) ist eine vollständig multiplikative Funktion
+\(\chi: \mathbb{Z} \to \mathbb{C}\) mit \(\chi(n+q) = \chi(n)\) und \(\chi(n) = 0\)
+falls \(\gcd(n,q) > 1\).  Die zugehörige \(L\)-Funktion ist
+\[
+  L(s,\chi) = \sum_{n=1}^\infty \frac{\chi(n)}{n^s}
+  = \prod_p \frac{1}{1-\chi(p)p^{-s}}, \qquad \Re(s) > 1.
+\]
+\end{definition}
+
+\begin{theorem}[Nicht-Verschwinden bei \(s=1\)]
+Für jeden nicht-Hauptcharakter \(\chi\) gilt \(L(1,\chi) \neq 0\).
+Dies ist die zentrale analytische Zutat für Dirichlets Satz über Primzahlen in
+arithmetischen Progressionen.
+\end{theorem}
+
+\begin{theorem}[Funktionalgleichung für \(L(s,\chi)\)]
+Sei \(\chi\) ein primitiver Charakter modulo \(q\) mit Wurzelzahl \(\varepsilon(\chi)\).
+Definiere
+\[
+  \Lambda(s,\chi) = \left(\frac{q}{\pi}\right)^{(s+a)/2}\!\Gamma\!\left(\frac{s+a}{2}\right)L(s,\chi),
+\]
+wobei \(a = 0\) falls \(\chi(-1) = 1\) und \(a = 1\) falls \(\chi(-1) = -1\).  Dann gilt
+\[
+  \Lambda(s,\chi) = \frac{\tau(\chi)}{i^a\sqrt{q}}\,\Lambda(1-s,\bar\chi),
+\]
+wobei \(\tau(\chi) = \sum_{n=1}^q \chi(n)e^{2\pi in/q}\) die Gaußsche Summe ist.
+\end{theorem}
+
+%% ============================================================
+\section{Anwendungen}
+\label{sec:anwendungen}
+%% ============================================================
+
+\subsection{Quantenmechanik}
+
+Spezielle Funktionen durchdringen die gesamte Quantenmechanik.
+Die zeitunabhängige Schrödinger-Gleichung in kugelsymmetrischen Potentialen
+trennt sich in einen Radial- und einen Winkelanteil auf:
+\begin{itemize}
+  \item \textbf{Winkelanteil}: Kugelflächenfunktionen \(Y_n^m(\theta,\varphi)\)
+        (Legendre-Polynome + Exponentialfunktionen).
+  \item \textbf{Harmonischer Oszillator}: Hermite-Polynome \(H_n\).
+  \item \textbf{Wasserstoffatom}: zugeordnete Laguerre-Polynome \(L_{n-l-1}^{2l+1}\).
+  \item \textbf{Lineares Potential / WKB}: Airy-Funktionen \(\operatorname{Ai}(x)\),
+        \(\operatorname{Bi}(x)\).
+  \item \textbf{Streuung}: Bessel- und sphärische Bessel-Funktionen \(j_l(kr)\).
+\end{itemize}
+
+\subsection{Klassische Elektrodynamik}
+
+Die Laplace-Gleichung \(\nabla^2\Phi = 0\) in Zylinderkoordinaten besitzt Lösungen in
+Form von Bessel-Funktionen \(J_n(kr)\) und \(Y_n(kr)\).  In Kugelkoordinaten treten
+Kugelflächenfunktionen auf.
+
+\subsection{Zahlentheorie und Primzahlverteilung}
+
+Der Primzahlsatz besagt \(\pi(x) \sim x/\ln x\) für \(x \to \infty\).
+Sein Beweis hängt am Nicht-Verschwinden von \(\zeta(s)\) auf der Geraden \(\Re(s) = 1\)
+und an der expliziten Formel
+\[
+  \psi(x) = x - \sum_\rho \frac{x^\rho}{\rho} - \ln(2\pi) - \tfrac{1}{2}\ln(1-x^{-2}),
+\]
+wobei die Summe über die nichttrivialen Nullstellen \(\rho\) von \(\zeta\) läuft.
+
+\begin{conjecture}[Riemannsche Hypothese]
+Alle nichttrivialen Nullstellen von \(\zeta(s)\) erfüllen \(\Re(\rho) = 1/2\).
+Diese Vermutung ist eines der sieben Clay-Millennium-Probleme und bis heute unbewiesen.
+\end{conjecture}
+
+\subsection{Elliptische Funktionen und Zahlentheorie}
+
+Die \(j\)-Invariante
+\[
+  j(\tau) = 1728\,\frac{g_2^3}{\Delta} = q^{-1} + 744 + 196884\,q + \cdots,
+  \quad q = e^{2\pi i\tau},
+\]
+ist der Hauptmodul für die Modulgruppe \(\mathrm{SL}(2,\mathbb{Z})\) und spielt eine
+zentrale Rolle in der Theorie der komplexen Multiplikation und im Moonshine-Phänomen.
+
+%% ============================================================
+\section{Literatur}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{AS}
+M.~Abramowitz und I.~A.~Stegun,
+\textit{Handbook of Mathematical Functions with Formulas, Graphs, and Mathematical Tables},
+Dover Publications, New York, 1972.
+
+\bibitem{NIST}
+F.~W.~J.~Olver, D.~W.~Lozier, R.~F.~Boisvert und C.~W.~Clark (Hrsg.),
+\textit{NIST Digital Library of Mathematical Functions},
+Release 1.2.0, \url{https://dlmf.nist.gov/}, 2024.
+
+\bibitem{WhittakerWatson}
+E.~T.~Whittaker und G.~N.~Watson,
+\textit{A Course of Modern Analysis}, 5.~Aufl.,
+Cambridge University Press, 2021 (Nachdruck der Aufl.\ von 1927).
+
+\bibitem{Lebedev}
+N.~N.~Lebedev,
+\textit{Spezielle Funktionen und ihre Anwendungen} (russ.\ Orig.\ 1963),
+deutsche Ausgabe: Bibliographisches Institut, 1973.
+
+\bibitem{Stein}
+E.~M.~Stein und R.~Shakarchi,
+\textit{Complex Analysis},
+Princeton University Press, 2003.
+
+\bibitem{GradshteynRyzhik}
+I.~S.~Gradshteyn und I.~M.~Ryzhik,
+\textit{Table of Integrals, Series, and Products}, 8.~Aufl.,
+Academic Press, 2015.
+
+\bibitem{Andrews}
+G.~E.~Andrews, R.~Askey und R.~Roy,
+\textit{Special Functions},
+Cambridge University Press, 2000.
+
+\bibitem{Watson}
+G.~N.~Watson,
+\textit{A Treatise on the Theory of Bessel Functions}, 2.~Aufl.,
+Cambridge University Press, 1944.
+
+\bibitem{Silverman}
+J.~H.~Silverman,
+\textit{The Arithmetic of Elliptic Curves}, 2.~Aufl.,
+Springer, 2009.
+
+\end{thebibliography}
+
+\end{document}

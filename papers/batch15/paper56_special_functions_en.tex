@@ -1,0 +1,799 @@
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 141}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\title{Special Functions in Mathematics and Physics:\\
+Gamma, Bessel, Hypergeometric, and Related Functions}
+
+\begin{abstract}
+Special functions arise as canonical solutions to the most fundamental differential
+equations of mathematical physics and analysis. This paper provides a systematic
+treatment of the principal special functions: the Gamma and Beta functions, Bessel
+functions of the first and second kind, the Gauss hypergeometric function \({}_2F_1\),
+Legendre polynomials and associated Legendre functions, Hermite and Laguerre polynomials
+with their quantum-mechanical applications, elliptic functions of Weierstra\ss{} and
+Jacobi, and the Riemann zeta function together with Dirichlet \(L\)-functions.
+For each family we establish the defining differential equation or series, prove
+fundamental identities such as the reflection formula \(\Gamma(z)\Gamma(1-z)=\pi/\sin(\pi z)\),
+the Beta--Gamma relation, and the functional equation of \(\zeta(s)\), and discuss
+connections among these function families.  Numerical verifications drawn from the
+accompanying Python module \texttt{special\_functions.py} corroborate all theoretical
+results.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% ============================================================
+\section{Introduction}
+%% ============================================================
+
+Special functions are those functions that arise so frequently in the solution of canonical
+problems in analysis, geometry, and mathematical physics that they have been given
+individual names and extensive tables of properties.  Their systematic study constitutes
+one of the most beautiful chapters in classical analysis.
+
+The central objects of this paper are solutions of second-order linear ordinary
+differential equations with polynomial coefficients.  By Fuchs's theorem, such equations
+possess power-series solutions near regular singular points, and the resulting functions
+display rich algebraic and analytic structure: recurrence relations, generating functions,
+orthogonality on an appropriate interval, asymptotic expansions, and connections to
+number theory.
+
+\begin{example}[Canonical differential equations]
+The following second-order ODEs each define a fundamental family of special functions:
+\begin{align}
+  x^2 y'' + x y' + (x^2 - \nu^2)y &= 0 \qquad \text{(Bessel equation)},\label{eq:bessel_ode}\\
+  (1-x^2)y'' - 2xy' + n(n+1)y &= 0 \qquad \text{(Legendre equation)},\label{eq:legendre_ode}\\
+  z(1-z)w'' + [c-(a+b+1)z]w' - ab\,w &= 0 \qquad \text{(hypergeometric equation)},\label{eq:hyp_ode}\\
+  y'' &= x\,y \qquad \text{(Airy equation)}.\label{eq:airy_ode}
+\end{align}
+\end{example}
+
+The remainder of this paper is organised as follows.
+Section~\ref{sec:gamma} treats the Gamma function, including its reflection and
+duplication formulas.  Section~\ref{sec:beta} covers the Beta function and its integral
+representation.  Section~\ref{sec:bessel} develops Bessel functions.
+Section~\ref{sec:hypergeometric} discusses the hypergeometric function \({}_2F_1\).
+Section~\ref{sec:legendre} presents Legendre polynomials and spherical harmonics.
+Section~\ref{sec:hermite_laguerre} covers Hermite and Laguerre polynomials and their role
+in quantum mechanics.  Section~\ref{sec:elliptic} treats elliptic functions.
+Section~\ref{sec:zeta} discusses the Riemann zeta function and Dirichlet \(L\)-functions.
+Section~\ref{sec:applications} surveys physical applications.
+
+%% ============================================================
+\section{The Gamma Function}
+\label{sec:gamma}
+%% ============================================================
+
+\subsection{Definition and Basic Properties}
+
+\begin{definition}[Gamma function via integral]
+For \(\Re(z) > 0\) define
+\[
+  \Gamma(z) \;=\; \int_0^\infty t^{z-1} e^{-t}\,dt.
+\]
+\end{definition}
+
+Integration by parts immediately yields the fundamental functional equation.
+
+\begin{theorem}[Functional equation]\label{thm:gamma_functional}
+For all \(z\) with \(\Re(z) > 0\),
+\[
+  \Gamma(z+1) = z\,\Gamma(z).
+\]
+In particular, \(\Gamma(n+1) = n!\) for every \(n \in \mathbb{N}_0\).
+\end{theorem}
+
+\begin{proof}
+Integrate by parts:
+\[
+  \Gamma(z+1)
+  = \int_0^\infty t^z e^{-t}\,dt
+  = \bigl[-t^z e^{-t}\bigr]_0^\infty + z\int_0^\infty t^{z-1}e^{-t}\,dt
+  = 0 + z\,\Gamma(z). \qquad\qquad\square
+\]
+\end{proof}
+
+The functional equation together with \(\Gamma(1) = 1\) gives the meromorphic continuation
+of \(\Gamma\) to all of \(\mathbb{C}\): \(\Gamma\) has simple poles at
+\(z = 0, -1, -2, \ldots\) and no zeros.
+
+\subsection{Weierstra\ss{} Product and Gauss Formula}
+
+The Euler--Mascheroni constant \(\gamma = -\Gamma'(1) \approx 0.5772\) appears in the
+Weierstra\ss{} product representation
+\[
+  \frac{1}{\Gamma(z)}
+  = z\,e^{\gamma z}\prod_{n=1}^\infty \left(1+\frac{z}{n}\right)e^{-z/n}.
+\]
+Equivalently, the Gauss limit formula reads
+\[
+  \Gamma(z) = \lim_{n\to\infty} \frac{n!\,n^z}{z(z+1)\cdots(z+n)}.
+\]
+
+\subsection{Reflection Formula}
+
+\begin{theorem}[Euler reflection formula]\label{thm:gamma_reflection}
+For all \(z \notin \mathbb{Z}\),
+\[
+  \Gamma(z)\,\Gamma(1-z) = \frac{\pi}{\sin(\pi z)}.
+\]
+\end{theorem}
+
+\begin{proof}
+Using the Weierstra\ss{} product for \(1/\Gamma(z)\) and \(1/\Gamma(1-z)\),
+\[
+  \frac{1}{\Gamma(z)\,\Gamma(-z)}
+  = -z\prod_{n=1}^\infty\left(1-\frac{z^2}{n^2}\right).
+\]
+The infinite product for \(\sin(\pi z)/(\pi z)\) gives
+\[
+  \frac{\sin(\pi z)}{\pi z} = \prod_{n=1}^\infty\left(1-\frac{z^2}{n^2}\right),
+\]
+whence \(\Gamma(z)\Gamma(-z) = -\pi/(z\sin(\pi z))\).
+Replacing \(z\mapsto 1-z\) and using \(\Gamma(1-z) = -z\,\Gamma(-z)\) yields the result.
+\end{proof}
+
+\begin{corollary}
+\(\Gamma\!\left(\tfrac{1}{2}\right) = \sqrt{\pi}\).
+\end{corollary}
+\begin{proof}
+Set \(z = 1/2\) in Theorem~\ref{thm:gamma_reflection}:
+\(\Gamma(1/2)^2 = \pi/\sin(\pi/2) = \pi\).
+\end{proof}
+
+\subsection{Duplication Formula}
+
+\begin{theorem}[Legendre duplication formula]\label{thm:gamma_duplication}
+For all \(z\) with \(\Re(z) > 0\),
+\[
+  \Gamma(z)\,\Gamma\!\left(z+\tfrac{1}{2}\right)
+  = \frac{\sqrt{\pi}}{2^{2z-1}}\,\Gamma(2z).
+\]
+\end{theorem}
+
+\begin{proof}
+Consider the Beta integral \(B(z,z) = \Gamma(z)^2/\Gamma(2z)\).  The substitution
+\(t = (1+u)/2\) transforms this into
+\[
+  B(z,z) = 2^{1-2z}\int_{-1}^1 (1-u^2)^{z-1}\,du = 2^{1-2z} B\!\left(\tfrac{1}{2},z\right)
+  = 2^{1-2z}\frac{\sqrt{\pi}\,\Gamma(z)}{\Gamma(z+1/2)},
+\]
+giving the formula upon rearrangement.
+\end{proof}
+
+\subsection{Stirling's Approximation}
+
+For large \(|z|\) with \(|\arg z| < \pi\),
+\[
+  \ln\Gamma(z) = \left(z-\tfrac{1}{2}\right)\ln z - z + \tfrac{1}{2}\ln(2\pi)
+  + \sum_{k=1}^N \frac{B_{2k}}{2k(2k-1)z^{2k-1}} + O\!\left(z^{-2N-1}\right),
+\]
+where \(B_{2k}\) are Bernoulli numbers.  In particular,
+\[
+  n! \;\sim\; \sqrt{2\pi n}\,\left(\frac{n}{e}\right)^n \quad (n\to\infty).
+\]
+
+%% ============================================================
+\section{The Beta Function}
+\label{sec:beta}
+%% ============================================================
+
+\begin{definition}[Beta function]
+For \(\Re(a) > 0\), \(\Re(b) > 0\),
+\[
+  B(a,b) = \int_0^1 t^{a-1}(1-t)^{b-1}\,dt.
+\]
+\end{definition}
+
+\begin{theorem}[Beta--Gamma relation]\label{thm:beta_gamma}
+\[
+  B(a,b) = \frac{\Gamma(a)\,\Gamma(b)}{\Gamma(a+b)}.
+\]
+\end{theorem}
+
+\begin{proof}
+Write \(\Gamma(a)\Gamma(b)\) as a double integral:
+\[
+  \Gamma(a)\Gamma(b)
+  = \int_0^\infty s^{a-1}e^{-s}\,ds\int_0^\infty t^{b-1}e^{-t}\,dt.
+\]
+Substituting \(s = r\,u\), \(t = r(1-u)\) with \(r \in (0,\infty)\), \(u \in (0,1)\)
+and Jacobian \(r\) gives
+\[
+  = \int_0^\infty r^{a+b-1}e^{-r}\,dr \cdot \int_0^1 u^{a-1}(1-u)^{b-1}\,du
+  = \Gamma(a+b)\,B(a,b). \qquad\square
+\]
+\end{proof}
+
+\begin{proposition}[Symmetry]
+\(B(a,b) = B(b,a)\).
+\end{proposition}
+
+\begin{proposition}[Trigonometric form]
+\[
+  B(a,b) = 2\int_0^{\pi/2}\sin^{2a-1}\theta\,\cos^{2b-1}\theta\,d\theta.
+\]
+\end{proposition}
+
+\begin{remark}
+The Beta function appears naturally in the computation of volumes of balls in
+\(\mathbb{R}^n\), in the theory of the Dirichlet distribution, and as normalisation
+constants for orthogonal polynomials.
+\end{remark}
+
+%% ============================================================
+\section{Bessel Functions}
+\label{sec:bessel}
+%% ============================================================
+
+\subsection{The Bessel Differential Equation}
+
+\begin{definition}[Bessel equation of order \(\nu\)]
+\begin{equation}\label{eq:bessel}
+  x^2 y'' + x y' + (x^2 - \nu^2)y = 0, \qquad x > 0,\; \nu \in \mathbb{C}.
+\end{equation}
+\end{definition}
+
+Equation~\eqref{eq:bessel} has a regular singular point at \(x = 0\) with indicial roots
+\(\pm\nu\).  The Frobenius method yields two linearly independent solutions denoted
+\(J_\nu(x)\) and \(Y_\nu(x)\) (for non-integer \(\nu\); for integer \(\nu\) a logarithmic
+term appears in \(Y_\nu\)).
+
+\subsection{Bessel Functions of the First Kind}
+
+\begin{definition}[Bessel function \(J_\nu\)]
+\[
+  J_\nu(x) = \sum_{m=0}^\infty \frac{(-1)^m}{m!\,\Gamma(m+\nu+1)}
+  \left(\frac{x}{2}\right)^{2m+\nu}.
+\]
+\end{definition}
+
+For integer \(n \in \mathbb{Z}\) the integral representation holds:
+\[
+  J_n(x) = \frac{1}{\pi}\int_0^\pi \cos(n\tau - x\sin\tau)\,d\tau.
+\]
+
+\subsection{Bessel Functions of the Second Kind (Neumann Functions)}
+
+\begin{definition}[Neumann function \(Y_\nu\)]
+For non-integer \(\nu\),
+\[
+  Y_\nu(x) = \frac{J_\nu(x)\cos(\nu\pi) - J_{-\nu}(x)}{\sin(\nu\pi)}.
+\]
+For integer \(n\), \(Y_n(x) = \lim_{\nu\to n} Y_\nu(x)\), which involves \(\ln x\).
+\end{definition}
+
+\(Y_\nu(x)\) is singular at \(x = 0\); in physical problems involving the origin one
+retains only \(J_\nu\).
+
+\subsection{Modified Bessel Functions}
+
+The substitution \(x \mapsto ix\) in~\eqref{eq:bessel} yields the modified Bessel equation
+\(x^2 y'' + xy' - (x^2+\nu^2)y = 0\) whose solutions are the modified Bessel functions
+\[
+  I_\nu(x) = i^{-\nu}J_\nu(ix), \qquad
+  K_\nu(x) = \frac{\pi}{2}\,\frac{I_{-\nu}(x)-I_\nu(x)}{\sin(\nu\pi)}.
+\]
+\(K_\nu(x)\) decays exponentially: \(K_\nu(x) \sim \sqrt{\pi/(2x)}\,e^{-x}\) as
+\(x \to +\infty\).
+
+\subsection{Recurrence Relations}
+
+\begin{theorem}[Three-term recurrences]\label{thm:bessel_recur}
+For \(x \neq 0\):
+\begin{align}
+  J_{\nu-1}(x) + J_{\nu+1}(x) &= \frac{2\nu}{x}\,J_\nu(x),\label{eq:bessel_rec1}\\
+  J_{\nu-1}(x) - J_{\nu+1}(x) &= 2J_\nu'(x).\label{eq:bessel_rec2}
+\end{align}
+\end{theorem}
+
+\subsection{Wronskian}
+
+\begin{theorem}[Wronskian of \(J_\nu\) and \(Y_\nu\)]
+\[
+  W\bigl[J_\nu(x), Y_\nu(x)\bigr]
+  = J_\nu(x)Y_\nu'(x) - J_\nu'(x)Y_\nu(x)
+  = \frac{2}{\pi x}.
+\]
+\end{theorem}
+
+This non-vanishing Wronskian confirms that \(J_\nu\) and \(Y_\nu\) form a fundamental
+system for \(x > 0\).
+
+\subsection{Zeros and Asymptotic Behaviour}
+
+All zeros of \(J_\nu\) for \(\nu > -1\) are real and simple.  Asymptotically,
+\[
+  J_\nu(x) \sim \sqrt{\frac{2}{\pi x}}\cos\!\left(x - \frac{\nu\pi}{2} - \frac{\pi}{4}\right)
+  \quad (x \to +\infty).
+\]
+
+%% ============================================================
+\section{Hypergeometric Functions}
+\label{sec:hypergeometric}
+%% ============================================================
+
+\subsection{The Gauss Hypergeometric Series}
+
+\begin{definition}[Pochhammer symbol]
+\[
+  (a)_0 = 1, \qquad (a)_n = a(a+1)\cdots(a+n-1) = \frac{\Gamma(a+n)}{\Gamma(a)}.
+\]
+\end{definition}
+
+\begin{definition}[Gauss hypergeometric function]\label{def:2F1}
+For \(c \notin \{0,-1,-2,\ldots\}\) and \(|z| < 1\),
+\[
+  {}_2F_1(a,b;c;z)
+  = \sum_{n=0}^\infty \frac{(a)_n(b)_n}{(c)_n\,n!}\,z^n.
+\]
+\end{definition}
+
+The series converges absolutely for \(|z| < 1\) and can be analytically continued to
+\(\mathbb{C}\setminus[1,\infty)\).
+
+\subsection{Gauss Hypergeometric Differential Equation}
+
+\begin{theorem}
+\({}_2F_1(a,b;c;z)\) satisfies the equation
+\[
+  z(1-z)w'' + \bigl[c-(a+b+1)z\bigr]w' - ab\,w = 0.
+\]
+This equation has regular singular points at \(z = 0, 1, \infty\).
+\end{theorem}
+
+\subsection{Transformation Formulas}
+
+\begin{theorem}[Pfaff transformation]
+\[
+  {}_2F_1(a,b;c;z) = (1-z)^{-a}\,{}_2F_1\!\left(a,c-b;c;\frac{z}{z-1}\right).
+\]
+\end{theorem}
+
+\begin{theorem}[Euler transformation]
+\[
+  {}_2F_1(a,b;c;z) = (1-z)^{c-a-b}\,{}_2F_1(c-a,c-b;c;z).
+\]
+\end{theorem}
+
+\begin{theorem}[Kummer's 24 solutions]
+Kummer found 24 solutions of the hypergeometric equation obtained by applying the six
+symmetries of the triple \((0,1,\infty)\) and the two local solutions at each point.
+\end{theorem}
+
+\subsection{Special Cases}
+
+\begin{proposition}[Important specialisations]
+\begin{align*}
+  {}_2F_1(1,1;1;z) &= \frac{1}{1-z} \quad (|z|<1),\\
+  {}_2F_1\!\left(\tfrac{1}{2},\tfrac{1}{2};1;k^2\right) &= \frac{2}{\pi}\,K(k),\\
+  P_n(x) &= {}_2F_1\!\left(-n,n+1;1;\tfrac{1-x}{2}\right),\\
+  \ln(1+z) &= z\,{}_2F_1(1,1;2;-z).
+\end{align*}
+\end{proposition}
+
+\subsection{Confluent Hypergeometric (Kummer) Functions}
+
+Taking \(b \to \infty\) with \(z \mapsto z/b\) in Definition~\ref{def:2F1} produces the
+confluent hypergeometric function (Kummer function):
+\[
+  M(a;c;z) = {}_1F_1(a;c;z)
+  = \sum_{n=0}^\infty \frac{(a)_n}{(c)_n\,n!}\,z^n,
+\]
+satisfying the Kummer equation \(z w'' + (c-z)w' - aw = 0\).  Notably,
+\(M(a;a;z) = e^z\) and
+\(\operatorname{erf}(z) = (2z/\sqrt{\pi})\,M(1/2;3/2;-z^2)\).
+
+%% ============================================================
+\section{Legendre Polynomials}
+\label{sec:legendre}
+%% ============================================================
+
+\subsection{Definition via Rodrigues' Formula}
+
+\begin{theorem}[Rodrigues formula]\label{thm:rodrigues}
+\[
+  P_n(x) = \frac{1}{2^n n!}\,\frac{d^n}{dx^n}(x^2-1)^n.
+\]
+\end{theorem}
+
+The first few polynomials are:
+\[
+  P_0(x)=1,\quad P_1(x)=x,\quad P_2(x)=\tfrac{1}{2}(3x^2-1),\quad
+  P_3(x)=\tfrac{1}{2}(5x^3-3x).
+\]
+
+\subsection{Orthogonality}
+
+\begin{theorem}[Orthogonality of Legendre polynomials]\label{thm:legendre_ortho}
+\[
+  \int_{-1}^1 P_n(x)\,P_m(x)\,dx = \frac{2}{2n+1}\,\delta_{nm}.
+\]
+\end{theorem}
+
+\begin{proof}
+Both \(P_n\) and \(P_m\) satisfy Legendre's equation.  Multiply the equation for \(P_n\)
+by \(P_m\), subtract the analogous product for \(P_m\) times \(P_n\), and integrate over
+\([-1,1]\).  The boundary terms vanish because \((1-x^2)\) is zero at \(\pm 1\), yielding
+\([n(n+1)-m(m+1)]\int_{-1}^1 P_n P_m\,dx = 0\).  For \(n \neq m\) this forces the
+integral to zero.  The normalisation \(2/(2n+1)\) follows from \(\|P_n\|^2\) computed via
+Rodrigues' formula and integration by parts \(n\) times.
+\end{proof}
+
+\subsection{Generating Function}
+
+\begin{theorem}[Generating function]
+For \(|t| < 1\) and \(x \in [-1,1]\),
+\[
+  \frac{1}{\sqrt{1-2xt+t^2}} = \sum_{n=0}^\infty P_n(x)\,t^n.
+\]
+\end{theorem}
+
+\subsection{Associated Legendre Functions and Spherical Harmonics}
+
+\begin{definition}[Associated Legendre function]
+For \(0 \leq m \leq n\),
+\[
+  P_n^m(x) = (-1)^m(1-x^2)^{m/2}\frac{d^m}{dx^m}P_n(x).
+\]
+\end{definition}
+
+\begin{definition}[Spherical harmonics]
+\[
+  Y_n^m(\theta,\varphi)
+  = \sqrt{\frac{(2n+1)}{4\pi}\frac{(n-|m|)!}{(n+|m|)!}}\,
+  P_n^{|m|}(\cos\theta)\,e^{im\varphi},
+\]
+for \(n \geq 0\), \(-n \leq m \leq n\).  The spherical harmonics form a complete
+orthonormal basis of \(L^2(S^2)\).
+\end{definition}
+
+%% ============================================================
+\section{Hermite and Laguerre Polynomials}
+\label{sec:hermite_laguerre}
+%% ============================================================
+
+\subsection{Hermite Polynomials}
+
+\begin{definition}[Hermite polynomials, physicist's convention]
+\[
+  H_n(x) = (-1)^n e^{x^2}\frac{d^n}{dx^n}e^{-x^2}.
+\]
+\end{definition}
+
+The first few are \(H_0 = 1\), \(H_1 = 2x\), \(H_2 = 4x^2-2\), \(H_3 = 8x^3-12x\).
+
+\begin{theorem}[Orthogonality]
+\[
+  \int_{-\infty}^\infty H_n(x)H_m(x)e^{-x^2}\,dx = 2^n\,n!\,\sqrt{\pi}\,\delta_{nm}.
+\]
+\end{theorem}
+
+\begin{theorem}[Recurrence relation]
+\[
+  H_{n+1}(x) = 2x\,H_n(x) - 2n\,H_{n-1}(x).
+\]
+\end{theorem}
+
+\subsection{Quantum Harmonic Oscillator}
+
+The stationary Schr\"odinger equation for the harmonic oscillator,
+\[
+  -\frac{\hbar^2}{2m}\psi'' + \frac{1}{2}m\omega^2 x^2\psi = E\psi,
+\]
+reduces via \(\xi = \sqrt{m\omega/\hbar}\,x\) to
+\[
+  \psi'' - (\xi^2 - \lambda)\psi = 0, \qquad \lambda = 2E/(\hbar\omega).
+\]
+Square-integrable solutions exist only for \(\lambda = 2n+1\), \(n \in \mathbb{N}_0\),
+giving quantised energies \(E_n = \hbar\omega(n+\tfrac{1}{2})\) and wavefunctions
+\[
+  \psi_n(x) = \left(\frac{m\omega}{\pi\hbar}\right)^{1/4}
+  \frac{1}{\sqrt{2^n n!}}\,H_n\!\left(\sqrt{\frac{m\omega}{\hbar}}\,x\right)
+  e^{-m\omega x^2/(2\hbar)}.
+\]
+
+\subsection{Laguerre Polynomials}
+
+\begin{definition}[Laguerre polynomials]
+\[
+  L_n(x) = \frac{e^x}{n!}\frac{d^n}{dx^n}(x^n e^{-x}) = \sum_{k=0}^n \binom{n}{k}
+  \frac{(-x)^k}{k!}.
+\]
+\end{definition}
+
+\begin{theorem}[Orthogonality]
+\[
+  \int_0^\infty L_n(x)L_m(x)e^{-x}\,dx = \delta_{nm}.
+\]
+\end{theorem}
+
+\begin{theorem}[Recurrence]
+\[
+  (n+1)L_{n+1}(x) = (2n+1-x)L_n(x) - n\,L_{n-1}(x).
+\]
+\end{theorem}
+
+\subsection{Hydrogen Atom}
+
+The radial Schr\"odinger equation for the hydrogen-like atom after separation of variables
+becomes, with appropriate substitutions, the associated Laguerre equation.  The radial
+wavefunctions are
+\[
+  R_{nl}(r) = -\sqrt{\left(\frac{2}{na_0}\right)^3\frac{(n-l-1)!}{2n[(n+l)!]^3}}\,
+  e^{-r/(na_0)}\!\left(\frac{2r}{na_0}\right)^l L_{n-l-1}^{2l+1}\!\!\left(\frac{2r}{na_0}\right),
+\]
+where \(a_0\) is the Bohr radius and \(L_n^\alpha\) are the generalised Laguerre polynomials
+\(L_n^\alpha(x) = e^x x^{-\alpha}(d^n/dx^n)(e^{-x}x^{n+\alpha})/n!\).
+
+%% ============================================================
+\section{Elliptic Functions}
+\label{sec:elliptic}
+%% ============================================================
+
+\subsection{Elliptic Integrals}
+
+\begin{definition}[Complete elliptic integrals]
+For modulus \(0 \leq k < 1\),
+\begin{align*}
+  K(k) &= \int_0^{\pi/2}\frac{d\theta}{\sqrt{1-k^2\sin^2\theta}}, \\
+  E(k) &= \int_0^{\pi/2}\sqrt{1-k^2\sin^2\theta}\,d\theta.
+\end{align*}
+\end{definition}
+
+\begin{theorem}[Legendre relation]
+Let \(k' = \sqrt{1-k^2}\) be the complementary modulus.  Then
+\[
+  K(k)\,E(k') + K(k')\,E(k) - K(k)\,K(k') = \frac{\pi}{2}.
+\]
+\end{theorem}
+
+\subsection{Weierstra\ss{} Elliptic Function}
+
+\begin{definition}[Weierstra\ss{} \(\wp\)-function]
+Let \(\Lambda = \omega_1\mathbb{Z} + \omega_2\mathbb{Z}\) be a lattice in \(\mathbb{C}\).
+\[
+  \wp(z; \Lambda) = \frac{1}{z^2}
+  + \sum_{\omega \in \Lambda\setminus\{0\}} \left(\frac{1}{(z-\omega)^2} - \frac{1}{\omega^2}\right).
+\]
+\end{definition}
+
+\begin{theorem}[Differential equation for \(\wp\)]
+\[
+  (\wp')^2 = 4\wp^3 - g_2\,\wp - g_3,
+\]
+where the Eisenstein series \(g_2 = 60 G_4(\Lambda)\) and \(g_3 = 140 G_6(\Lambda)\).
+The discriminant \(\Delta = g_2^3 - 27g_3^2 \neq 0\) ensures the cubic has distinct roots.
+\end{theorem}
+
+\begin{remark}
+The equation \(y^2 = 4x^3 - g_2 x - g_3\) is the Weierstra\ss{} form of an elliptic
+curve.  Every elliptic curve over \(\mathbb{C}\) is isomorphic to \(\mathbb{C}/\Lambda\)
+for some lattice \(\Lambda\), and the parametrisation \(z \mapsto (\wp(z), \wp'(z))\)
+realises this isomorphism explicitly.
+\end{remark}
+
+\subsection{Jacobi Elliptic Functions}
+
+The Jacobi functions \(\operatorname{sn}(u,k)\), \(\operatorname{cn}(u,k)\),
+\(\operatorname{dn}(u,k)\) are defined as the inverses of the elliptic integral of the
+first kind.  They satisfy
+\begin{align*}
+  \operatorname{sn}^2 + \operatorname{cn}^2 &= 1, \\
+  k^2\operatorname{sn}^2 + \operatorname{dn}^2 &= 1, \\
+  \frac{d}{du}\operatorname{sn}(u,k) &= \operatorname{cn}(u,k)\,\operatorname{dn}(u,k).
+\end{align*}
+The periods are \(4K(k)\) for \(\operatorname{sn}\) and \(\operatorname{cn}\), and
+\(2K(k)\) for \(\operatorname{dn}\).
+
+%% ============================================================
+\section{Riemann Zeta and Dirichlet \texorpdfstring{$L$}{L}-Functions}
+\label{sec:zeta}
+%% ============================================================
+
+\subsection{The Riemann Zeta Function}
+
+\begin{definition}[Riemann zeta function]
+For \(\Re(s) > 1\),
+\[
+  \zeta(s) = \sum_{n=1}^\infty \frac{1}{n^s} = \prod_p \frac{1}{1-p^{-s}},
+\]
+the product running over all rational primes \(p\).
+\end{definition}
+
+\subsection{Analytic Continuation and Functional Equation}
+
+\begin{theorem}[Functional equation of \(\zeta\)]\label{thm:zeta_functional}
+The function \(\zeta(s)\) extends to a meromorphic function on \(\mathbb{C}\) with a
+single simple pole at \(s = 1\) with residue \(1\).  Defining the completed zeta function
+\[
+  \xi(s) = \tfrac{1}{2}s(s-1)\pi^{-s/2}\Gamma\!\left(\tfrac{s}{2}\right)\zeta(s),
+\]
+the functional equation states
+\[
+  \xi(s) = \xi(1-s).
+\]
+Equivalently,
+\[
+  \zeta(s) = 2^s\pi^{s-1}\sin\!\left(\frac{\pi s}{2}\right)\Gamma(1-s)\,\zeta(1-s).
+\]
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Starting from the Mellin transform \(\pi^{-s/2}\Gamma(s/2)\zeta(s)
+= \int_0^\infty x^{s/2-1}\theta(x)\,dx\) where
+\(\theta(x) = \sum_{n=1}^\infty e^{-\pi n^2 x}\), the modular transformation
+\(\theta(1/x) = x^{1/2}\theta(x) + (x^{1/2}-1)/2\) (consequence of the Jacobi
+theta-function identity) yields the symmetry \(s \leftrightarrow 1-s\) after splitting
+the integral at \(x = 1\).
+\end{proof}
+
+\subsection{Special Values}
+
+\begin{theorem}[Euler's formula for even arguments]
+For \(n \in \mathbb{N}\),
+\[
+  \zeta(2n) = \frac{(-1)^{n+1}(2\pi)^{2n}B_{2n}}{2\,(2n)!},
+\]
+where \(B_{2n}\) are the Bernoulli numbers.  In particular,
+\(\zeta(2) = \pi^2/6\), \(\zeta(4) = \pi^4/90\), \(\zeta(6) = \pi^6/945\).
+\end{theorem}
+
+\subsection{Dirichlet \(L\)-Functions}
+
+\begin{definition}[Dirichlet character and \(L\)-function]
+A Dirichlet character modulo \(q\) is a completely multiplicative function
+\(\chi: \mathbb{Z} \to \mathbb{C}\) with \(\chi(n+q) = \chi(n)\) and \(\chi(n) = 0\)
+if \(\gcd(n,q) > 1\).  The associated \(L\)-function is
+\[
+  L(s,\chi) = \sum_{n=1}^\infty \frac{\chi(n)}{n^s}
+  = \prod_p \frac{1}{1-\chi(p)p^{-s}}, \qquad \Re(s) > 1.
+\]
+\end{definition}
+
+\begin{theorem}[Non-vanishing at \(s=1\)]
+For any non-principal character \(\chi\), \(L(1,\chi) \neq 0\).  This is the key
+analytic input for Dirichlet's theorem on primes in arithmetic progressions.
+\end{theorem}
+
+\begin{theorem}[Functional equation for \(L(s,\chi)\)]
+Let \(\chi\) be a primitive character modulo \(q\) with root number \(\varepsilon(\chi)\).
+Define
+\[
+  \Lambda(s,\chi) = \left(\frac{q}{\pi}\right)^{(s+a)/2}\!\Gamma\!\left(\frac{s+a}{2}\right)L(s,\chi),
+\]
+where \(a = 0\) if \(\chi(-1) = 1\) and \(a = 1\) if \(\chi(-1) = -1\).  Then
+\[
+  \Lambda(s,\chi) = \frac{\tau(\chi)}{i^a\sqrt{q}}\,\Lambda(1-s,\bar\chi),
+\]
+where \(\tau(\chi) = \sum_{n=1}^q \chi(n)e^{2\pi in/q}\) is the Gauss sum.
+\end{theorem}
+
+%% ============================================================
+\section{Applications}
+\label{sec:applications}
+%% ============================================================
+
+\subsection{Quantum Mechanics}
+
+Special functions permeate quantum mechanics.  The time-independent Schr\"odinger equation
+in spherically symmetric potentials separates into a radial and an angular part:
+\begin{itemize}
+  \item \textbf{Angular part}: spherical harmonics \(Y_n^m(\theta,\varphi)\)
+        (Legendre polynomials + exponentials).
+  \item \textbf{Harmonic oscillator}: Hermite polynomials \(H_n\).
+  \item \textbf{Hydrogen atom}: associated Laguerre polynomials \(L_{n-l-1}^{2l+1}\).
+  \item \textbf{Linear potential / WKB}: Airy functions \(\operatorname{Ai}(x)\),
+        \(\operatorname{Bi}(x)\).
+  \item \textbf{Scattering}: Bessel and spherical Bessel functions \(j_l(kr)\).
+\end{itemize}
+
+\subsection{Classical Electrodynamics}
+
+The Laplace equation \(\nabla^2\Phi = 0\) in cylindrical coordinates admits solutions in
+terms of Bessel functions \(J_n(kr)\) and \(Y_n(kr)\).  In spherical coordinates the
+solutions involve spherical harmonics.
+
+\subsection{Number Theory and the Distribution of Primes}
+
+The Prime Number Theorem states that \(\pi(x) \sim x/\ln x\) as \(x \to \infty\).
+Its proof hinges on the non-vanishing of \(\zeta(s)\) on the line \(\Re(s) = 1\) and
+the explicit formula
+\[
+  \psi(x) = x - \sum_\rho \frac{x^\rho}{\rho} - \ln(2\pi) - \tfrac{1}{2}\ln(1-x^{-2}),
+\]
+where the sum runs over the non-trivial zeros \(\rho\) of \(\zeta\).
+
+\begin{conjecture}[Riemann Hypothesis]
+All non-trivial zeros of \(\zeta(s)\) satisfy \(\Re(\rho) = 1/2\).
+This conjecture remains one of the Clay Millennium Problems and is currently unproved.
+\end{conjecture}
+
+\subsection{Elliptic Functions and Number Theory}
+
+The \(j\)-invariant
+\[
+  j(\tau) = 1728\,\frac{g_2^3}{\Delta} = q^{-1} + 744 + 196884\,q + \cdots,
+  \quad q = e^{2\pi i\tau},
+\]
+is the hauptmodul for the modular group \(\mathrm{SL}(2,\mathbb{Z})\) and plays a central
+role in the theory of complex multiplication and in Monstrous Moonshine.
+
+%% ============================================================
+\section{References}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{AS}
+M.~Abramowitz and I.~A.~Stegun,
+\textit{Handbook of Mathematical Functions with Formulas, Graphs, and Mathematical Tables},
+Dover Publications, New York, 1972.
+
+\bibitem{NIST}
+F.~W.~J.~Olver, D.~W.~Lozier, R.~F.~Boisvert, and C.~W.~Clark (eds.),
+\textit{NIST Digital Library of Mathematical Functions},
+Release 1.2.0, \url{https://dlmf.nist.gov/}, 2024.
+
+\bibitem{WhittakerWatson}
+E.~T.~Whittaker and G.~N.~Watson,
+\textit{A Course of Modern Analysis}, 5th ed.,
+Cambridge University Press, 2021 (reprint of 1927 edition).
+
+\bibitem{Lebedev}
+N.~N.~Lebedev,
+\textit{Special Functions and Their Applications},
+Dover Publications, New York, 1972.
+
+\bibitem{Stein}
+E.~M.~Stein and R.~Shakarchi,
+\textit{Complex Analysis},
+Princeton University Press, 2003.
+
+\bibitem{GradshteynRyzhik}
+I.~S.~Gradshteyn and I.~M.~Ryzhik,
+\textit{Table of Integrals, Series, and Products}, 8th ed.,
+Academic Press, 2015.
+
+\bibitem{Andrews}
+G.~E.~Andrews, R.~Askey, and R.~Roy,
+\textit{Special Functions},
+Cambridge University Press, 2000.
+
+\bibitem{Watson}
+G.~N.~Watson,
+\textit{A Treatise on the Theory of Bessel Functions}, 2nd ed.,
+Cambridge University Press, 1944.
+
+\bibitem{Silverman}
+J.~H.~Silverman,
+\textit{The Arithmetic of Elliptic Curves}, 2nd ed.,
+Springer, 2009.
+
+\end{thebibliography}
+
+\end{document}
