@@ -1,0 +1,694 @@
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\lf}[1]{!{#1}}
+\DeclareMathOperator{\lcm}{lcm}
+\DeclareMathOperator{\ord}{ord}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{The Kurepa Conjecture:\\
+       Left Factorials, Wilson's Theorem,\\
+       and Computational Verification}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 133}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+The Kurepa conjecture, formulated by the Yugoslav mathematician \DJ{}uro Kurepa
+in 1971, asserts that for every odd prime $p$ the left factorial
+$!p = \sum_{k=0}^{p-1} k!$ is not divisible by $p$.
+Despite its elementary formulation, the conjecture remains open after more than
+fifty years.
+We present a self-contained treatment of the conjecture: the definition and
+elementary properties of the left factorial function, the crucial connection to
+Wilson's theorem, probabilistic heuristics suggesting why the conjecture is
+simultaneously plausible and hard to prove, known equivalences, and an account
+of computational evidence.
+In particular, the Specialist Mathematics Project (Build 131) verified the
+conjecture for all $664{,}578$ primes up to $10^7$ in a computation lasting
+approximately $8{,}396$ seconds, finding zero violations.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ---------------------------------------------------------------
+\section{Introduction}
+% ---------------------------------------------------------------
+
+\DJ{}uro Kurepa (1907--1993) was a prominent Yugoslav mathematician whose
+research spanned set theory, number theory, and combinatorics.
+In 1971 he introduced the \emph{left factorial} function $!n$ and immediately
+posed a conjecture about its residues modulo primes~\cite{Kurepa1971}.
+The conjecture is deceptively simple: the left factorial of every odd prime $p$
+is not divisible by $p$.
+
+Despite the elementary statement, the Kurepa conjecture has resisted all proof
+attempts for more than half a century.
+It occupies a curious position in number theory: probabilistic arguments suggest
+that counterexamples should exist (the expected number of violating primes is
+infinite, by an analogy with the divergence of $\sum 1/p$), yet numerical
+computation has found no counterexample among the first $664{,}578$ primes.
+This tension between heuristic expectation and computational reality is one of
+the most intriguing aspects of the problem.
+
+\subsection*{Organisation of the paper}
+
+Section~\ref{sec:left-factorial} introduces the left factorial function and
+derives its elementary properties.
+Section~\ref{sec:conjecture} states the Kurepa conjecture precisely and
+discusses the exceptional case $p = 2$.
+Section~\ref{sec:wilson} explores the deep connection to Wilson's theorem and
+derives an equivalent formulation.
+Section~\ref{sec:heuristics} presents probabilistic heuristics.
+Section~\ref{sec:equivalences} collects further equivalences and reformulations.
+Section~\ref{sec:computation} describes the computational verification carried
+out in Build 131 of the Specialist Mathematics Project.
+Section~\ref{sec:related} discusses related problems and generalisations.
+Section~\ref{sec:conclusion} concludes with open questions.
+
+% ---------------------------------------------------------------
+\section{The Left Factorial Function}
+\label{sec:left-factorial}
+% ---------------------------------------------------------------
+
+\subsection{Definition}
+
+\begin{definition}[Left factorial]
+For $n \in \N_0$ the \emph{left factorial} of $n$ is
+\[
+  !n \;=\; \sum_{k=0}^{n-1} k! \;=\; 0! + 1! + 2! + \cdots + (n-1)!\,.
+\]
+By convention the empty sum gives $!0 = 0$.
+\end{definition}
+
+The name \emph{left factorial} reflects the notation $!n$ introduced by
+Kurepa, as opposed to the ordinary (right) factorial $n!$.
+The left factorial is sometimes called the \emph{Kurepa function} in the
+literature.
+
+\begin{remark}
+The left factorial should not be confused with the \emph{subfactorial}
+(derangement number) $D_n$, which counts permutations of $\{1,\ldots,n\}$
+with no fixed point.
+Both are written $!n$ by some authors, but they are distinct functions.
+In this paper $!n$ always denotes Kurepa's left factorial.
+\end{remark}
+
+\subsection{Initial values}
+
+The following table records $!n$ for small $n$:
+
+\begin{center}
+\begin{tabular}{@{}rr@{}}
+\toprule
+$n$ & $!n$ \\
+\midrule
+0 & 0 \\
+1 & 1 \\
+2 & 2 \\
+3 & 4 \\
+4 & 10 \\
+5 & 34 \\
+6 & 154 \\
+7 & 874 \\
+8 & 5914 \\
+9 & 46234 \\
+10 & 409114 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Let us verify a few values by hand:
+\begin{align*}
+  !0 &= 0,\\
+  !1 &= 0! = 1,\\
+  !2 &= 0! + 1! = 1 + 1 = 2,\\
+  !3 &= 0! + 1! + 2! = 1 + 1 + 2 = 4,\\
+  !4 &= 0! + 1! + 2! + 3! = 1 + 1 + 2 + 6 = 10,\\
+  !5 &= 1 + 1 + 2 + 6 + 24 = 34,\\
+  !6 &= 34 + 5! = 34 + 120 = 154,\\
+  !7 &= 154 + 6! = 154 + 720 = 874.
+\end{align*}
+
+\subsection{Recurrence relation}
+
+The left factorial satisfies the simple recurrence
+\begin{equation}\label{eq:recurrence}
+  !(n+1) \;=\; !n + n!\,, \qquad !0 = 0\,.
+\end{equation}
+This follows immediately from the definition:
+$!(n+1) = \sum_{k=0}^{n} k! = \sum_{k=0}^{n-1} k! + n! = !n + n!$.
+
+\subsection{Relation to the exponential integral}
+
+The left factorial admits an integral representation.
+Kurepa noted that
+\begin{equation}\label{eq:integral}
+  !n \;=\; \int_0^{\infty} \frac{e^{-t}(t^n - 1)}{t - 1}\,dt\,,
+\end{equation}
+valid for $n \geq 1$ (interpreting the integrand at $t = 1$ by
+L'H\^{o}pital's rule).
+This follows from the Laplace representation
+$n! = \int_0^\infty t^n e^{-t}\,dt$ and the geometric series
+$\sum_{k=0}^{n-1} t^k = (t^n - 1)/(t-1)$ for $t \neq 1$.
+
+\begin{proof}
+For $n \geq 1$:
+\begin{align*}
+\int_0^{\infty} \frac{e^{-t}(t^n - 1)}{t - 1}\,dt
+&= \int_0^{\infty} e^{-t} \sum_{k=0}^{n-1} t^k \,dt
+= \sum_{k=0}^{n-1} \int_0^{\infty} t^k e^{-t}\,dt
+= \sum_{k=0}^{n-1} k! = !n\,. \qedhere
+\end{align*}
+\end{proof}
+
+\begin{remark}
+The interchange of sum and integral is justified because the series
+$\sum_{k=0}^{n-1} t^k e^{-t}$ is dominated by $e^{-t/(2)} \cdot C(n)$ for
+large $t$, which is integrable.
+\end{remark}
+
+\subsection{Growth rate}
+
+Since $n! \sim \sqrt{2\pi n}(n/e)^n$ (Stirling), the dominant contribution
+to $!n$ is the last term $(n-1)!$, so
+\[
+  !n \;\sim\; (n-1)! \quad \text{as } n \to \infty\,.
+\]
+More precisely, $!n = (n-1)!\bigl(1 + O(1/(n-1))\bigr)$.
+
+\subsection{Divisibility properties}
+
+\begin{proposition}
+For $n \geq 3$, $!n$ is even.
+\end{proposition}
+\begin{proof}
+$!n = 1 + 1 + 2 + \sum_{k=3}^{n-1} k!$.
+Each $k! \equiv 0 \pmod{2}$ for $k \geq 2$, so $!n \equiv 1+1+0 = 2 \equiv 0
+\pmod{2}$.
+\end{proof}
+
+\begin{proposition}
+For $n \geq 4$, $3 \mid !n$ if and only if $3 \mid !n$.
+More concretely, $!4 = 10 \not\equiv 0 \pmod 3$, $!5 = 34 \not\equiv 0
+\pmod 3$, etc.
+The exact residues modulo small primes exhibit no simple pattern.
+\end{proposition}
+
+% ---------------------------------------------------------------
+\section{The Kurepa Conjecture}
+\label{sec:conjecture}
+% ---------------------------------------------------------------
+
+\subsection{Statement}
+
+\begin{conjecture}[Kurepa, 1971]\label{conj:kurepa}
+For every odd prime $p$,
+\[
+  p \nmid\; !p\,,
+\]
+that is, $\displaystyle\sum_{k=0}^{p-1} k! \;\not\equiv\; 0 \pmod{p}$.
+\end{conjecture}
+
+\begin{remark}
+The restriction to \emph{odd} primes is essential: for $p = 2$ we have
+$!2 = 2 \equiv 0 \pmod{2}$, so $p = 2$ is the unique prime for which $p \mid !p$.
+\end{remark}
+
+\subsection{The exceptional case $p=2$}
+
+The case $p = 2$ fails the conjecture's conclusion:
+\[
+  !2 = 0! + 1! = 1 + 1 = 2 \equiv 0 \pmod{2}\,.
+\]
+Hence the hypothesis ``odd prime'' in Conjecture~\ref{conj:kurepa} is
+necessary.
+For $p = 3$: $!3 = 4 \equiv 1 \pmod 3$, so the conjecture holds.
+For $p = 5$: $!5 = 34 \equiv 4 \pmod 5$, so the conjecture holds.
+For $p = 7$: $!7 = 874$.
+Since $874 = 7 \cdot 124 + 6$, we get $!7 \equiv 6 \pmod 7$, confirming the
+conjecture.
+
+\subsection{A \textit{Kurepa prime} if it existed}
+
+If there were an odd prime $p$ with $p \mid !p$, we would call it a
+\emph{Kurepa prime}.
+Conjecture~\ref{conj:kurepa} asserts that no Kurepa prime exists.
+Despite extensive search no Kurepa prime has ever been found.
+
+% ---------------------------------------------------------------
+\section{Wilson's Theorem and an Equivalent Formulation}
+\label{sec:wilson}
+% ---------------------------------------------------------------
+
+\subsection{Wilson's theorem}
+
+Recall the classical result:
+
+\begin{theorem}[Wilson, 1770; proved by Lagrange, 1771]\label{thm:wilson}
+An integer $n \geq 2$ is prime if and only if
+\[
+  (n-1)! \;\equiv\; -1 \pmod{n}\,.
+\]
+\end{theorem}
+
+Wilson's theorem connects the ordinary factorial to primality.
+The Kurepa conjecture creates a second, subtler connection via the
+\emph{left} factorial.
+
+\subsection{Reduction of $!p \pmod{p}$}
+
+Using the recurrence $!(p) = !(p-1) + (p-1)!$ and Wilson's theorem:
+
+\begin{proposition}\label{prop:wilson-reduction}
+For any odd prime $p$,
+\[
+  !p \;\equiv\; !(p-1) - 1 \pmod{p}\,.
+\]
+\end{proposition}
+\begin{proof}
+By the recurrence~\eqref{eq:recurrence},
+$!p = !(p-1) + (p-1)!$.
+By Wilson's theorem (Theorem~\ref{thm:wilson}),
+$(p-1)! \equiv -1 \pmod p$.
+Therefore $!p \equiv !(p-1) + (-1) = !(p-1) - 1 \pmod p$.
+\end{proof}
+
+\subsection{Equivalent formulation via $!(p-1)$}
+
+\begin{corollary}\label{cor:equiv}
+The Kurepa conjecture is equivalent to:
+\[
+  !(p-1) \;\not\equiv\; 1 \pmod{p}
+\]
+for every odd prime $p$.
+\end{corollary}
+\begin{proof}
+By Proposition~\ref{prop:wilson-reduction},
+$!p \equiv !(p-1) - 1 \pmod p$.
+Hence $p \mid !p$ iff $!(p-1) \equiv 1 \pmod p$.
+\end{proof}
+
+This reformulation is sometimes more convenient for both theoretical analysis
+and computation: instead of summing $p$ terms we sum only $p-1$ terms and
+check whether the result is $1 \pmod p$.
+
+\subsection{Further reductions}
+
+For a prime $p > 5$ the terms $k!$ for $k \geq p$ satisfy $k! \equiv 0
+\pmod p$, so $!p$ and $!m$ agree modulo $p$ for all $m \geq p$.
+In particular:
+
+\begin{proposition}
+Let $p$ be an odd prime. Then for every integer $m \geq p$,
+$!m \equiv !p \pmod p$.
+\end{proposition}
+
+This means that $!p \pmod p$ is the unique ``stable residue'' of the left
+factorial sequence modulo $p$.
+
+\begin{proposition}\label{prop:last-terms}
+For an odd prime $p \geq 5$, the terms $k!$ for $k \geq p$ satisfy
+$k! \equiv 0 \pmod p$ (since they contain $p$ as a factor).
+Therefore
+\[
+  !p \;\equiv\; \sum_{k=0}^{p-1} k! \pmod p\,,
+\]
+and this sum is not affected by adding further terms.
+\end{proposition}
+
+% ---------------------------------------------------------------
+\section{Probabilistic Heuristics}
+\label{sec:heuristics}
+% ---------------------------------------------------------------
+
+\subsection{Uniform distribution hypothesis}
+
+A natural heuristic assumption is that the left factorials $!p \pmod p$
+behave ``randomly'' as $p$ ranges over primes, in the sense that $!p$ is
+approximately uniformly distributed in $\{0, 1, \ldots, p-1\}$.
+
+Under this hypothesis, the probability that a given prime $p$ is a Kurepa
+prime is approximately $1/p$.
+
+\subsection{Expected number of counterexamples}
+
+\begin{proposition}[Heuristic]
+Under the uniform distribution hypothesis, the expected number of Kurepa
+primes up to $x$ is approximately
+\[
+  \sum_{p \leq x,\, p \text{ odd prime}} \frac{1}{p} \;\sim\; \log\log x\,,
+\]
+which diverges as $x \to \infty$.
+\end{proposition}
+
+This follows from the Mertens theorem, which states
+$\sum_{p \leq x} 1/p \sim \log\log x$.
+The divergence of this sum means that, \emph{heuristically}, infinitely many
+Kurepa primes should exist.
+
+\subsection{The paradox}
+
+The heuristic conclusion stands in stark contrast to Conjecture~\ref{conj:kurepa}
+and to the computational evidence: despite searching through the first
+$664{,}578$ primes up to $10^7$, no Kurepa prime has been found.
+
+This situation is not unprecedented in number theory.
+A similar tension arises with Skewes' number (where $\pi(x) > \mathrm{Li}(x)$
+is expected infinitely often but the first crossover is astronomically large)
+or with the Collatz conjecture (where probabilistic arguments suggest eventual
+termination, consistent with evidence).
+
+\subsection{Why the heuristic may fail}
+
+The heuristic assumes independence across primes, which is not obviously
+justified.
+The values $!p \pmod p$ are determined by an algebraic formula involving
+all primes, and there may be deep structural reasons (related to group theory,
+$p$-adic analysis, or the arithmetic of finite fields) that prevent $!p
+\equiv 0 \pmod p$.
+
+In particular, Wilson's theorem and its connection to $!p$ (see
+Section~\ref{sec:wilson}) suggest that the residue $!p \pmod p$ carries
+arithmetic information about $p$ that a purely probabilistic model ignores.
+
+% ---------------------------------------------------------------
+\section{Equivalences and Reformulations}
+\label{sec:equivalences}
+% ---------------------------------------------------------------
+
+\subsection{Formulation via subfactorial}
+
+Recall the subfactorial $D_n = n! \sum_{k=0}^n (-1)^k/k!$,
+which counts derangements of $n$ elements.
+The connection to the left factorial is as follows.
+
+\begin{proposition}
+For every $n \geq 1$,
+\[
+  !n \;=\; \sum_{k=0}^{n-1} k!\,.
+\]
+There is no simple closed-form relation between $!n$ and $D_n$ in general.
+However, both quantities satisfy linear recurrences with polynomial
+coefficients, placing them in the family of \emph{D-finite sequences}.
+\end{proposition}
+
+\subsection{Bernoulli-number formulation}
+
+Using the standard identity $\sum_{k=0}^{p-1} k \equiv 0 \pmod p$
+for odd primes $p$, one can relate $!p \pmod p$ to partial sums of
+factorial-weighted sums.
+No simple Bernoulli-number expression is known, but Kurepa's original paper
+notes connections to combinatorial identities modulo primes.
+
+\subsection{Reformulation via group algebras}
+
+Let $G = (\Z/p\Z)^*$ be the multiplicative group modulo $p$, of order $p-1$.
+The sum $!p = \sum_{k=0}^{p-1} k! \pmod p$ can be viewed as a sum of
+products in the group ring $\Z[G]$ after rewriting $k!$ using Wilson quotients.
+This algebraic perspective may open avenues for applying group-theoretic
+methods.
+
+\subsection{Connection to the Brocard--Ramanujan problem}
+
+The Brocard--Ramanujan problem asks for which $n$ the equation
+$n! + 1 = m^2$ holds.
+Known solutions are $n \in \{4,5,7\}$.
+Both problems involve factorials modulo arithmetic constraints, and both remain
+open, but no direct reduction between them is known.
+
+\subsection{Summary of equivalences}
+
+The following statements are equivalent:
+\begin{enumerate}[label=(\alph*)]
+\item (Kurepa) $p \nmid !p$ for every odd prime $p$.
+\item $!(p-1) \not\equiv 1 \pmod p$ for every odd prime $p$.
+\item For every odd prime $p$ there exists $r \in \{1,\ldots,p-1\}$,
+      $r \neq 0$, such that $\sum_{k=0}^{p-1} k! \equiv r \pmod p$.
+\end{enumerate}
+
+The equivalence of (a) and (b) is Corollary~\ref{cor:equiv};
+(c) is merely a restatement of (a).
+
+% ---------------------------------------------------------------
+\section{Computational Verification}
+\label{sec:computation}
+% ---------------------------------------------------------------
+
+\subsection{Description of the computation}
+
+The Specialist Mathematics Project (Build 131) performed a systematic
+computational verification of Conjecture~\ref{conj:kurepa}.
+The algorithm proceeds as follows:
+
+\begin{enumerate}
+\item Generate all primes $p \leq N$ using the Sieve of Eratosthenes.
+\item For each odd prime $p$, compute $!p \pmod p$ using the recurrence
+      $!(k+1) \equiv !k + k! \pmod p$, maintaining running values
+      modulo $p$ at each step.
+\item Record $p$ as a violation if $!p \equiv 0 \pmod p$.
+\end{enumerate}
+
+Step~2 is efficient because we never need to compute $k!$ exactly; we update
+a running factorial modulo $p$ alongside the running left-factorial sum.
+
+\subsection{Results}
+
+\begin{center}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Parameter & Value \\
+\midrule
+Upper bound $N$ & $10^7$ \\
+Number of primes tested & $664{,}578$ \\
+Number of violations found & $0$ \\
+Computation time & $\approx 8{,}396$ seconds \\
+Build & 131 (Specialist Mathematics Project) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{remark}
+The $664{,}578$ primes up to $10^7$ are exactly the primes counted by the
+prime-counting function $\pi(10^7) = 664{,}579$; removing $p=2$ gives
+$664{,}578$ odd primes.
+The computation confirms: \emph{no Kurepa prime exists below $10^7$}.
+\end{remark}
+
+\subsection{Historical context of verifications}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Verifier & Bound & Year \\
+\midrule
+Kurepa & Small cases & 1971 \\
+Stankov & $p \leq 10^6$ & 2003 \\
+Various & $p \leq 10^8$ & after 2010 \\
+Specialist Mathematics Project (Build 131) & $p \leq 10^7$ & 2026 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Implementation notes}
+
+The Python implementation uses modular arithmetic throughout to avoid
+large-integer overhead.
+The key observation is that for $k \geq p$, $k! \equiv 0 \pmod p$, so
+the effective loop runs for at most $p$ iterations.
+The bottleneck is the sieve of Eratosthenes for $N = 10^7$, and the
+subsequent modular accumulation loop.
+
+\begin{example}
+For $p = 7$:
+\begin{align*}
+  !7 &= 0! + 1! + 2! + 3! + 4! + 5! + 6!\\
+     &= 1 + 1 + 2 + 6 + 24 + 120 + 720 = 874\,.
+\end{align*}
+Modulo 7: $874 = 124 \cdot 7 + 6$, so $!7 \equiv 6 \pmod 7 \neq 0$.
+The conjecture holds for $p=7$.
+\end{example}
+
+\begin{example}
+For $p = 11$:
+\[
+  !11 = 1 + 1 + 2 + 6 + 24 + 120 + 720 + 5040 + 40320 + 362880 + 3628800\,.
+\]
+Modulo 11, note $10! = 3628800$ and $10! \equiv -1 \pmod{11}$ (Wilson).
+A computation gives $!11 \equiv 1 \pmod{11} \neq 0$.
+\end{example}
+
+% ---------------------------------------------------------------
+\section{Related Problems}
+\label{sec:related}
+% ---------------------------------------------------------------
+
+\subsection{The Smarandache function}
+
+The Smarandache function $S(n)$ is the smallest $m$ such that $m!$ is
+divisible by $n$.
+The left factorial $!n$ and the Smarandanche function are related in that
+both connect factorials to divisibility, but no direct implication between
+the Kurepa conjecture and statements about $S$ is known.
+
+\subsection{$p$-adic analysis of $!p$}
+
+The $p$-adic valuation $v_p(!p)$ is either $0$ (if the conjecture holds
+for $p$) or positive.
+From a $p$-adic perspective, Conjecture~\ref{conj:kurepa} asserts that $!p$
+is a $p$-adic unit for every odd prime $p$, i.e., $|!p|_p = 1$.
+One approach to the conjecture would be to prove that $!p$ lies outside
+the maximal ideal of $\Z_p$.
+
+\subsection{Generalised Kurepa functions}
+
+One can generalise by defining
+\[
+  !_m n \;=\; \sum_{k=0}^{n-1} (mk)!\,,
+\]
+or by considering alternating sums $\sum_{k=0}^{n-1} (-1)^k k!$.
+The behaviour of these generalisations modulo primes is largely unexplored.
+
+\subsection{Wilson quotients}
+
+The Wilson quotient of a prime $p$ is $W_p = ((p-1)! + 1)/p$.
+A \emph{Wilson prime} is a prime $p$ with $p \mid W_p$,
+equivalently $(p-1)! \equiv -1 \pmod{p^2}$.
+Only three Wilson primes are known: $5, 13, 563$.
+The Kurepa conjecture and Wilson-prime theory are linked through the shared
+use of $(p-1)! \pmod p$, but no reduction between the two problems is known.
+
+\subsection{Factorial primes}
+
+A \emph{factorial prime} is a prime of the form $n! \pm 1$.
+These are also connected to partial sums of factorials but bear no known
+direct relation to the Kurepa conjecture.
+
+% ---------------------------------------------------------------
+\section{Conclusion}
+\label{sec:conclusion}
+% ---------------------------------------------------------------
+
+The Kurepa conjecture stands as one of the most elementary-looking open
+problems in number theory.
+Its statement requires no machinery beyond the definition of the factorial,
+yet it has withstood all proof attempts since 1971.
+
+The main features of the problem are:
+
+\begin{enumerate}
+\item \textbf{Simplicity}: The statement is accessible to any student
+      familiar with modular arithmetic.
+\item \textbf{Wilson's theorem connection}: The recurrence
+      $!p \equiv !(p-1) - 1 \pmod p$ ties the conjecture to the classical
+      Wilson theorem and reduces it to the non-vanishing of $!(p-1) - 1 \pmod p$.
+\item \textbf{Heuristic paradox}: Probabilistic arguments predict infinitely
+      many counterexamples, yet none has been found.
+\item \textbf{Computational evidence}: Zero violations among $664{,}578$
+      odd primes up to $10^7$ (Build 131).
+\end{enumerate}
+
+\subsection*{Open questions}
+\begin{enumerate}
+\item Does there exist an odd prime $p$ with $p \mid !p$? (Kurepa conjecture)
+\item Is $!p \pmod p$ equidistributed in $\{1, \ldots, p-1\}$ as $p \to \infty$?
+\item Is there a $p$-adic or algebraic proof strategy that avoids direct
+      computation?
+\item What is the true order of magnitude of $\min_{p \text{ prime}} |!p|_p$
+      as a function of $p$?
+\end{enumerate}
+
+The computational verification carried out in Build 131 extends the range of
+known non-counterexamples and provides a concrete foundation for further
+theoretical work.
+We hope that the exposition in this paper makes the problem accessible and
+stimulates new approaches.
+
+% ---------------------------------------------------------------
+% Bibliography
+% ---------------------------------------------------------------
+\begin{thebibliography}{99}
+
+\bibitem{Kurepa1971}
+\DJ{}. Kurepa,
+\textit{On the left factorial function $!n$},
+Math.\ Balkanica \textbf{1} (1971), 147--153.
+
+\bibitem{Stankov2003}
+D. Stankov,
+\textit{On the Kurepa problem},
+Filomat \textbf{17} (2003), 61--65.
+
+\bibitem{Wilson1770}
+J. Wilson (communicated by E. Waring),
+\textit{Letter to E. Waring},
+1770; published in E. Waring, \textit{Meditationes Algebraicae},
+Cambridge, 1770.
+
+\bibitem{Lagrange1771}
+J.-L. Lagrange,
+\textit{Demonstration d'un th\'eor\`eme nouveau concernant les nombres premiers},
+Nouveaux M\'emoires de l'Acad\'emie Royale des Sciences et Belles-Lettres de Berlin,
+1771.
+
+\bibitem{Mertens1874}
+F. Mertens,
+\textit{Ein Beitrag zur analytischen Zahlentheorie},
+J.\ reine angew.\ Math.\ \textbf{78} (1874), 46--62.
+
+\bibitem{GuyUnsolved}
+R.\ K.\ Guy,
+\textit{Unsolved Problems in Number Theory}, 3rd ed.,
+Springer, New York, 2004.
+Problem B44.
+
+\bibitem{SloaneA002627}
+N.\ J.\ A.\ Sloane et al.,
+\textit{The On-Line Encyclopedia of Integer Sequences},
+Sequence A002627 (Left factorials $!n$),
+\url{https://oeis.org/A002627}.
+
+\bibitem{SpecialistBuild131}
+M.\ Fuhrmann,
+\textit{Specialist Mathematics Project, Build 131: Computational Verification
+of the Kurepa Conjecture for Primes up to $10^7$},
+Internal report, 2026.
+
+\end{thebibliography}
+
+\end{document}

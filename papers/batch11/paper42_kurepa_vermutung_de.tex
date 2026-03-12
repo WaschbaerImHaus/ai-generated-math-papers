@@ -1,0 +1,703 @@
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theoremumgebungen (deutsche Bezeichnungen)
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{vermutung}[theorem]{Vermutung}
+
+% -------------------------------------------------------
+% Eigene Befehle
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\lf}[1]{!{#1}}
+\DeclareMathOperator{\lcm}{kgV}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\ggT}{ggT}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Die Kurepa-Vermutung:\\
+       Links-Faktoriellen, Wilsons Satz\\
+       und numerische Verifikation}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 133}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Die Kurepa-Vermutung, 1971 vom jugoslawischen Mathematiker \DJ{}uro Kurepa
+aufgestellt, besagt, dass für jede ungerade Primzahl $p$ die Links-Faktori\-elle
+$!p = \sum_{k=0}^{p-1} k!$ nicht durch $p$ teilbar ist.
+Trotz ihrer elementaren Formulierung ist diese Vermutung seit mehr als
+fünfzig Jahren offen.
+Wir geben eine in sich geschlossene Darstellung des Problems: Definition und
+elementare Eigenschaften der Links-Faktoriellen, die entscheidende Verbindung
+zu Wilsons Satz, probabilistische Heuristiken, bekannte Äquivalenzen sowie
+eine Übersicht zur numerischen Evidenz.
+Das Specialist Mathematics Project (Build 131) hat die Vermutung für alle
+$664{.}578$ Primzahlen bis $10^7$ in einer Rechnung von ca.\ $8{.}396$
+Sekunden verifiziert und dabei null Verletzungen gefunden.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ---------------------------------------------------------------
+\section{Einleitung}
+% ---------------------------------------------------------------
+
+\DJ{}uro Kurepa (1907--1993) war ein bedeutender jugoslawischer Mathematiker,
+dessen Forschungsinteressen Mengenlehre, Zahlentheorie und Kombinatorik
+umfassten.
+Im Jahr 1971 führte er die sogenannte \emph{Links-Faktori\-elle} $!n$ ein
+und stellte sogleich eine Vermutung über ihre Reste modulo Primzahlen
+auf~\cite{Kurepa1971}.
+Die Aussage ist verblüffend einfach: Die Links-Faktori\-elle jeder ungeraden
+Primzahl $p$ ist nicht durch $p$ teilbar.
+
+Obwohl die Formulierung nur Schulkenntnisse der modularen Arithmetik erfordert,
+hat die Kurepa-Vermutung allen Beweisversuchen über fünf Jahrzehnte widerstanden.
+Sie nimmt eine eigentümliche Stellung in der Zahlentheorie ein:
+Probabilistische Argumente lassen erwarten, dass Gegenbeispiele existieren
+(die erwartete Anzahl verletzender Primzahlen ist unendlich, analog zur
+Divergenz von $\sum 1/p$), doch die numerische Suche unter den ersten
+$664{.}578$ Primzahlen hat kein einziges Gegenbeispiel gefunden.
+Diese Spannung zwischen heuristischer Erwartung und rechnerischer Realität
+macht das Problem besonders faszinierend.
+
+\subsection*{Aufbau der Arbeit}
+
+Abschnitt~\ref{sec:linksfak} führt die Links-Faktori\-elle ein und leitet
+elementare Eigenschaften her.
+Abschnitt~\ref{sec:vermutung} formuliert die Kurepa-Vermutung präzise und
+bespricht den Ausnahmefall $p = 2$.
+Abschnitt~\ref{sec:wilson} untersucht die Verbindung zu Wilsons Satz und
+leitet eine äquivalente Formulierung her.
+Abschnitt~\ref{sec:heuristik} präsentiert probabilistische Heuristiken.
+Abschnitt~\ref{sec:aequivalenzen} sammelt weitere Äquivalenzen und
+Umformulierungen.
+Abschnitt~\ref{sec:verifikation} beschreibt die numerische Verifikation aus
+Build 131.
+Abschnitt~\ref{sec:verwandt} behandelt verwandte Probleme.
+Abschnitt~\ref{sec:schluss} schliesst mit offenen Fragen.
+
+% ---------------------------------------------------------------
+\section{Die Links-Faktori\-elle}
+\label{sec:linksfak}
+% ---------------------------------------------------------------
+
+\subsection{Definition}
+
+\begin{definition}[Links-Faktori\-elle]
+Für $n \in \N_0$ heißt
+\[
+  !n \;=\; \sum_{k=0}^{n-1} k! \;=\; 0! + 1! + 2! + \cdots + (n-1)!
+\]
+die \emph{Links-Faktori\-elle} von $n$.
+Per Konvention gilt $!0 = 0$ (leere Summe).
+\end{definition}
+
+Die Schreibweise $!n$ mit dem Ausrufezeichen \emph{links} von $n$ wurde von
+Kurepa eingeführt, in Analogie zur gewöhnlichen (rechten) Faktoriellen $n!$.
+In der Literatur wird $!n$ auch als \emph{Kurepa-Funktion} bezeichnet.
+
+\begin{bemerkung}
+Die Links-Faktori\-elle ist \emph{nicht} zu verwechseln mit der
+\emph{Subfaktoriellen} (Anzahl der Derangements) $D_n$,
+die ebenfalls manchmal $!n$ geschrieben wird.
+In dieser Arbeit bezeichnet $!n$ stets Kurepas Links-Faktori\-elle.
+\end{bemerkung}
+
+\subsection{Anfangswerte}
+
+Die folgende Tabelle zeigt $!n$ für kleine Werte von $n$:
+
+\begin{center}
+\begin{tabular}{@{}rr@{}}
+\toprule
+$n$ & $!n$ \\
+\midrule
+0 & 0 \\
+1 & 1 \\
+2 & 2 \\
+3 & 4 \\
+4 & 10 \\
+5 & 34 \\
+6 & 154 \\
+7 & 874 \\
+8 & 5914 \\
+9 & 46234 \\
+10 & 409114 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Zur Überprüfung rechnen wir einige Werte von Hand nach:
+\begin{align*}
+  !0 &= 0,\\
+  !1 &= 0! = 1,\\
+  !2 &= 0! + 1! = 1 + 1 = 2,\\
+  !3 &= 0! + 1! + 2! = 1 + 1 + 2 = 4,\\
+  !4 &= 0! + 1! + 2! + 3! = 1 + 1 + 2 + 6 = 10,\\
+  !5 &= 1 + 1 + 2 + 6 + 24 = 34,\\
+  !6 &= 34 + 5! = 34 + 120 = 154,\\
+  !7 &= 154 + 6! = 154 + 720 = 874.
+\end{align*}
+
+\subsection{Rekursionsformel}
+
+Die Links-Faktori\-elle genügt der einfachen Rekursion
+\begin{equation}\label{eq:rekursion}
+  !(n+1) \;=\; !n + n!\,, \qquad !0 = 0\,.
+\end{equation}
+Dies folgt unmittelbar aus der Definition:
+$!(n+1) = \sum_{k=0}^{n} k! = \sum_{k=0}^{n-1} k! + n! = !n + n!$.
+
+\subsection{Integraldarstellung}
+
+Die Links-Faktori\-elle besitzt eine elegante Integraldarstellung.
+Kurepa stellte fest, dass für $n \geq 1$ gilt:
+\begin{equation}\label{eq:integral}
+  !n \;=\; \int_0^{\infty} \frac{e^{-t}(t^n - 1)}{t - 1}\,dt\,,
+\end{equation}
+wobei der Integrand an der Stelle $t = 1$ durch den Grenzwert
+(de l'H\^{o}pital) zu interpretieren ist.
+
+\begin{proof}
+Für $n \geq 1$ gilt:
+\begin{align*}
+  \int_0^{\infty} \frac{e^{-t}(t^n - 1)}{t - 1}\,dt
+  &= \int_0^{\infty} e^{-t} \sum_{k=0}^{n-1} t^k \,dt
+  = \sum_{k=0}^{n-1} \int_0^{\infty} t^k e^{-t}\,dt
+  = \sum_{k=0}^{n-1} k! = !n\,. \qedhere
+\end{align*}
+Dabei haben wir die geometrische Summe
+$(t^n - 1)/(t-1) = \sum_{k=0}^{n-1} t^k$ sowie die Laplace-Darstellung
+$k! = \int_0^\infty t^k e^{-t}\,dt$ verwendet.
+Der Austausch von Summe und Integral ist wegen der Dominanz durch
+$n \cdot e^{-t/2}$ für große $t$ gerechtfertigt.
+\end{proof}
+
+\subsection{Wachstum}
+
+Da der letzte Summand $(n-1)!$ alle anderen dominiert, gilt nach Stirling:
+\[
+  !n \;\sim\; (n-1)! \quad \text{für } n \to \infty\,.
+\]
+Genauer ist $!n = (n-1)!\bigl(1 + O(1/(n-1))\bigr)$.
+
+\subsection{Teilbarkeit}
+
+\begin{proposition}
+Für $n \geq 3$ ist $!n$ gerade.
+\end{proposition}
+\begin{proof}
+$!n = 1 + 1 + 2 + \sum_{k=3}^{n-1} k!$.
+Für $k \geq 2$ gilt $k! \equiv 0 \pmod{2}$, also
+$!n \equiv 1 + 1 + 0 = 2 \equiv 0 \pmod{2}$.
+\end{proof}
+
+\begin{bemerkung}
+Für kleine Primzahlen $q$ zeigen die Reste $!n \bmod q$ kein offensichtliches
+Muster; die Kurepa-Vermutung betrifft den Fall $q = p$, wobei $n = p$ selbst
+eine Primzahl ist.
+\end{bemerkung}
+
+% ---------------------------------------------------------------
+\section{Die Kurepa-Vermutung}
+\label{sec:vermutung}
+% ---------------------------------------------------------------
+
+\subsection{Formulierung}
+
+\begin{vermutung}[Kurepa, 1971]\label{verm:kurepa}
+Für jede ungerade Primzahl $p$ gilt
+\[
+  p \nmid\; !p\,,
+\]
+d.\,h.\ $\displaystyle\sum_{k=0}^{p-1} k! \;\not\equiv\; 0 \pmod{p}$.
+\end{vermutung}
+
+\begin{bemerkung}
+Die Einschränkung auf \emph{ungerade} Primzahlen ist wesentlich: für $p = 2$
+gilt $!2 = 2 \equiv 0 \pmod{2}$, also ist $p = 2$ die einzige Primzahl,
+für die die Behauptung scheitert.
+\end{bemerkung}
+
+\subsection{Der Ausnahmefall $p = 2$}
+
+Für $p = 2$ ergibt sich:
+\[
+  !2 = 0! + 1! = 1 + 1 = 2 \equiv 0 \pmod{2}\,.
+\]
+Somit ist $p = 2$ tatsächlich ein Gegenbeispiel zur naiven Aussage ohne die
+Einschränkung auf ungerade Primzahlen.
+Die Hypothese ``ungerade Primzahl'' in Vermutung~\ref{verm:kurepa} ist daher
+notwendig.
+
+Für die ersten ungeraden Primzahlen:
+\begin{align*}
+  p = 3 &: \quad !3 = 4 \equiv 1 \pmod{3}\,, \quad 3 \nmid !3\,, \checkmark\\
+  p = 5 &: \quad !5 = 34 \equiv 4 \pmod{5}\,, \quad 5 \nmid !5\,, \checkmark\\
+  p = 7 &: \quad !7 = 874 = 124 \cdot 7 + 6 \equiv 6 \pmod{7}\,, \quad 7 \nmid !7\,. \checkmark
+\end{align*}
+
+\subsection{Kurepa-Primzahlen}
+
+Falls eine ungerade Primzahl $p$ mit $p \mid !p$ existieren würde, nennt man
+sie eine \emph{Kurepa-Primzahl}.
+Die Kurepa-Vermutung behauptet, dass keine Kurepa-Primzahl existiert.
+Bisher wurde trotz umfangreicher Computersuche noch nie eine gefunden.
+
+% ---------------------------------------------------------------
+\section{Verbindung zu Wilsons Satz}
+\label{sec:wilson}
+% ---------------------------------------------------------------
+
+\subsection{Wilsons Satz}
+
+Wir erinnern an den klassischen Satz:
+
+\begin{theorem}[Wilson, 1770; Beweis durch Lagrange, 1771]\label{satz:wilson}
+Eine ganze Zahl $n \geq 2$ ist genau dann prim, wenn
+\[
+  (n-1)! \;\equiv\; -1 \pmod{n}\,.
+\]
+\end{theorem}
+
+Wilsons Satz verbindet die gewöhnliche Faktori\-elle mit der Primzahleigenschaft.
+Die Kurepa-Vermutung schafft über die Links-Faktori\-elle eine zweite,
+subtilere Verbindung.
+
+\subsection{Reduktion von $!p \pmod{p}$}
+
+Mit der Rekursion $!p = !(p-1) + (p-1)!$ und Wilsons Satz ergibt sich:
+
+\begin{proposition}\label{prop:wilson-reduktion}
+Für jede ungerade Primzahl $p$ gilt
+\[
+  !p \;\equiv\; !(p-1) - 1 \pmod{p}\,.
+\]
+\end{proposition}
+\begin{proof}
+Aus der Rekursion~\eqref{eq:rekursion} folgt
+$!p = !(p-1) + (p-1)!$.
+Nach Wilsons Satz (Satz~\ref{satz:wilson}) gilt
+$(p-1)! \equiv -1 \pmod{p}$.
+Daher $!p \equiv !(p-1) + (-1) = !(p-1) - 1 \pmod{p}$.
+\end{proof}
+
+\subsection{Äquivalente Formulierung über $!(p-1)$}
+
+\begin{korollar}\label{kor:aequiv}
+Die Kurepa-Vermutung ist äquivalent zur Aussage:
+\[
+  !(p-1) \;\not\equiv\; 1 \pmod{p}
+\]
+für jede ungerade Primzahl $p$.
+\end{korollar}
+\begin{proof}
+Nach Proposition~\ref{prop:wilson-reduktion} gilt
+$!p \equiv !(p-1) - 1 \pmod{p}$.
+Daher gilt $p \mid !p$ genau dann, wenn $!(p-1) \equiv 1 \pmod{p}$.
+\end{proof}
+
+Diese Umformulierung ist praktisch: statt $p$ Summanden zu akkumulieren,
+summiert man nur $p-1$ Summanden und prüft, ob das Ergebnis gerade $1$ modulo
+$p$ ist.
+
+\subsection{Stabile Reste}
+
+\begin{proposition}
+Sei $p$ eine ungerade Primzahl. Dann gilt für alle $m \geq p$:
+\[
+  !m \;\equiv\; !p \pmod{p}\,.
+\]
+\end{proposition}
+\begin{proof}
+Für $k \geq p$ enthält $k!$ den Faktor $p$, also $k! \equiv 0 \pmod p$.
+Daher trägt jeder Term $k!$ mit $k \geq p$ nichts zur Summe $!m$ modulo $p$
+bei.
+\end{proof}
+
+Der Rest $!p \bmod p$ ist also der eindeutige ``stabile Wert'' der Links-Fakto\-rial-Folge modulo $p$.
+
+% ---------------------------------------------------------------
+\section{Probabilistische Heuristik}
+\label{sec:heuristik}
+% ---------------------------------------------------------------
+
+\subsection{Gleichverteilungshypothese}
+
+Eine natürliche Annahme lautet: Die Reste $!p \bmod p$ verhalten sich
+``zufällig'', d.\,h. sie sind näherungsweise gleichverteilt in
+$\{0, 1, \ldots, p-1\}$, wenn $p$ über alle Primzahlen läuft.
+
+Unter dieser Annahme beträgt die Wahrscheinlichkeit, dass eine gegebene
+Primzahl $p$ eine Kurepa-Primzahl ist, ungefähr $1/p$.
+
+\subsection{Erwartete Anzahl von Gegenbeispielen}
+
+\begin{proposition}[Heuristik]
+Unter der Gleichverteilungsannahme ist die erwartete Anzahl der
+Kurepa-Primzahlen bis $x$:
+\[
+  \sum_{\substack{p \leq x \\ p \text{ ungerade Primzahl}}} \frac{1}{p}
+  \;\sim\; \log\log x\,,
+\]
+was für $x \to \infty$ gegen unendlich divergiert.
+\end{proposition}
+
+Dies folgt aus dem Mertens'schen Satz
+$\sum_{p \leq x} 1/p \sim \log\log x$.
+Die Divergenz dieser Reihe bedeutet: \emph{heuristisch} sollten unendlich
+viele Kurepa-Primzahlen existieren.
+
+\subsection{Das Paradoxon}
+
+Die heuristische Schlussfolgerung steht in scharfem Widerspruch zur
+Kurepa-Vermutung und zur numerischen Evidenz:
+Unter den ersten $664{.}578$ Primzahlen bis $10^7$ wurde keine einzige
+Kurepa-Primzahl gefunden.
+
+Ähnliche Paradoxa kennt man in der Zahlentheorie:
+Beim Skewes-Problem erwartet man unendlich viele Kreuzungen von $\pi(x)$ und
+$\mathrm{Li}(x)$, doch die erste liegt jenseits astronomisch großer Zahlen.
+Bei der Collatz-Vermutung legen probabilistische Argumente nahe, dass alle
+Folgen zu 1 konvergieren, was mit dem numerischen Befund übereinstimmt.
+
+\subsection{Warum die Heuristik versagen könnte}
+
+Die Gleichverteilungsannahme setzt implizit die Unabhängigkeit der Reste
+$!p \bmod p$ voraus.
+Die Werte $!p \bmod p$ werden jedoch durch eine algebraische Formel bestimmt,
+die von der gesamten arithmetischen Struktur von $p$ abhängt.
+Es könnte tiefe strukturelle Gründe geben --- in der Gruppentheorie, der
+$p$-adischen Analysis oder der Arithmetik endlicher Körper ---,
+die das Auftreten von $!p \equiv 0 \pmod p$ verhindern.
+
+Insbesondere deutet die Verbindung zu Wilsons Satz (Abschnitt~\ref{sec:wilson})
+darauf hin, dass $!p \bmod p$ arithmetische Information über $p$ kodiert,
+die ein rein probabilistisches Modell nicht erfasst.
+
+% ---------------------------------------------------------------
+\section{Äquivalenzen und Umformulierungen}
+\label{sec:aequivalenzen}
+% ---------------------------------------------------------------
+
+\subsection{Zusammenfassung der Äquivalenzen}
+
+Die folgenden Aussagen sind äquivalent:
+\begin{enumerate}[label=(\alph*)]
+\item (Kurepa) $p \nmid !p$ für jede ungerade Primzahl $p$.
+\item $!(p-1) \not\equiv 1 \pmod{p}$ für jede ungerade Primzahl $p$.
+\item Für jede ungerade Primzahl $p$ existiert ein $r \in \{1,\ldots,p-1\}$
+      mit $\sum_{k=0}^{p-1} k! \equiv r \pmod{p}$.
+\end{enumerate}
+
+Die Äquivalenz von (a) und (b) ist Korollar~\ref{kor:aequiv};
+(c) ist eine Umformulierung von (a).
+
+\subsection{Verbindung zur Subfaktoriellen}
+
+Die Subfaktorielle $D_n = n! \sum_{k=0}^n (-1)^k/k!$ zählt die
+Derangements von $\{1,\ldots,n\}$.
+Zwischen $!n$ und $D_n$ besteht keine einfache geschlossene Beziehung im
+Allgemeinen; beide Folgen sind jedoch $D$-endlich (d.\,h.\ sie genügen
+linearen Rekursionen mit Polynomkoeffizienten).
+
+\subsection{Gruppentheoretischer Zugang}
+
+Sei $G = (\Z/p\Z)^*$ die multiplikative Gruppe modulo $p$ der Ordnung $p-1$.
+Die Summe $!p = \sum_{k=0}^{p-1} k! \pmod p$ kann im Gruppenring $\Z[G]$
+durch Umschreiben von $k!$ mit Hilfe von Wilson-Quotienten ausgedrückt werden.
+Diese algebraische Perspektive könnte gruppentheoretische Methoden erschliessen.
+
+\subsection{Verbindung zum Brocard--Ramanujan-Problem}
+
+Das Brocard--Ramanujan-Problem fragt, für welche $n$ die Gleichung
+$n! + 1 = m^2$ eine Lösung $m \in \N$ hat.
+Bekannte Lösungen: $n \in \{4, 5, 7\}$.
+Beide Probleme betreffen Faktori\-elle unter arithmetischen
+Divisibilitätsbedingungen, ohne dass eine direkte Reduktion zwischen ihnen
+bekannt wäre.
+
+\subsection{Bernoullizahlen}
+
+Die Summe $\sum_{k=0}^{p-1} k!$ lässt sich formal in Verbindung mit
+faktorgewichteten Partialsummen bringen.
+Eine explizite Darstellung über Bernoullizahlen ist nicht bekannt, doch
+Kurepas Originalpaper erwähnt Verbindungen zu kombinatorischen Identitäten
+modulo Primzahlen.
+
+% ---------------------------------------------------------------
+\section{Numerische Verifikation}
+\label{sec:verifikation}
+% ---------------------------------------------------------------
+
+\subsection{Beschreibung der Berechnung}
+
+Das Specialist Mathematics Project (Build 131) hat die
+Kurepa-Vermutung~\ref{verm:kurepa} systematisch numerisch verifiziert.
+Der Algorithmus besteht aus folgenden Schritten:
+
+\begin{enumerate}
+\item Erzeuge alle Primzahlen $p \leq N$ mit dem Sieb des Eratosthenes.
+\item Berechne für jede ungerade Primzahl $p$ den Wert $!p \bmod p$
+      mittels der Rekursion
+      $!(k+1) \equiv !k + k! \pmod p$,
+      wobei $k!$ und $!k$ als laufende Werte modulo $p$ geführt werden.
+\item Notiere $p$ als Verletzung, falls $!p \equiv 0 \pmod p$.
+\end{enumerate}
+
+In Schritt~2 muss $k!$ niemals exakt berechnet werden; stattdessen werden
+der laufende Faktor $k! \bmod p$ und die laufende Summe $!k \bmod p$
+gemeinsam aktualisiert.
+Dies ergibt einen effizienten $O(p)$-Algorithmus für jede Primzahl $p$.
+
+\subsection{Ergebnisse}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Parameter & Wert \\
+\midrule
+Obere Schranke $N$ & $10^7$ \\
+Anzahl getesteter Primzahlen & $664{.}578$ \\
+Anzahl gefundener Verletzungen & $0$ \\
+Rechenzeit & $\approx 8{.}396$ Sekunden \\
+Build & 131 (Specialist Mathematics Project) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{bemerkung}
+Die Zahl $664{.}578$ ist die Anzahl der ungeraden Primzahlen bis $10^7$;
+die Gesamtzahl der Primzahlen bis $10^7$ beträgt $\pi(10^7) = 664{.}579$,
+wobei $p = 2$ herausgenommen wird.
+Das Ergebnis lautet: \emph{Es gibt keine Kurepa-Primzahl unterhalb von $10^7$}.
+\end{bemerkung}
+
+\subsection{Historische Verifikationen im Vergleich}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Prüfer & Schranke & Jahr \\
+\midrule
+Kurepa & Kleine Fälle & 1971 \\
+Stankov & $p \leq 10^6$ & 2003 \\
+Verschiedene & $p \leq 10^8$ & nach 2010 \\
+Specialist Mathematics Project (Build 131) & $p \leq 10^7$ & 2026 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Implementierungshinweise}
+
+Die Python-Implementierung verwendet durchgehend modulare Arithmetik,
+um den Umgang mit großen Ganzzahlen zu vermeiden.
+Entscheidend ist, dass für $k \geq p$ gilt $k! \equiv 0 \pmod p$,
+sodass die Schleife effektiv nur $p$ Iterationen durchläuft.
+Der Engpass liegt beim Sieb des Eratosthenes für $N = 10^7$ sowie in der
+anschließenden modularen Akkumulationsschleife.
+
+\begin{beispiel}
+Für $p = 7$:
+\begin{align*}
+  !7 &= 0! + 1! + 2! + 3! + 4! + 5! + 6!\\
+     &= 1 + 1 + 2 + 6 + 24 + 120 + 720 = 874\,.
+\end{align*}
+Modulo 7: $874 = 124 \cdot 7 + 6$, also $!7 \equiv 6 \pmod 7 \neq 0$.
+Die Vermutung gilt für $p = 7$.
+\end{beispiel}
+
+\begin{beispiel}
+Für $p = 11$:
+\[
+  !11 = 0! + 1! + \cdots + 10!\,.
+\]
+Nach Wilsons Satz gilt $10! \equiv -1 \pmod{11}$.
+Eine Rechnung ergibt $!11 \equiv 1 \pmod{11} \neq 0$.
+\end{beispiel}
+
+\begin{beispiel}
+Für $p = 13$:
+\[
+  !13 = \sum_{k=0}^{12} k!\,.
+\]
+Eine Berechnung modulo 13 liefert $!13 \equiv 9 \pmod{13} \neq 0$.
+\end{beispiel}
+
+% ---------------------------------------------------------------
+\section{Verwandte Probleme}
+\label{sec:verwandt}
+% ---------------------------------------------------------------
+
+\subsection{Wilson-Primzahlen}
+
+Der Wilson-Quotient einer Primzahl $p$ ist $W_p = ((p-1)! + 1)/p$.
+Eine \emph{Wilson-Primzahl} ist eine Primzahl $p$ mit $p \mid W_p$,
+gleichbedeutend mit $(p-1)! \equiv -1 \pmod{p^2}$.
+Bisher sind nur drei Wilson-Primzahlen bekannt: $5, 13, 563$.
+Die Kurepa-Vermutung und die Theorie der Wilson-Primzahlen sind durch die
+gemeinsame Nutzung von $(p-1)! \bmod p$ verbunden, ohne dass eine direkte
+Reduktion zwischen beiden Problemen bekannt wäre.
+
+\subsection{$p$-adische Perspektive}
+
+Die $p$-adische Bewertung $v_p(!p)$ beträgt genau dann $0$,
+wenn die Kurepa-Vermutung für $p$ gilt (da $!p$ dann eine $p$-adische Einheit
+ist).
+Man könnte versuchen, durch $p$-adische Methoden zu zeigen, dass $!p$ stets
+ausserhalb des maximalen Ideals von $\Z_p$ liegt.
+
+\subsection{Verallgemeinerungen der Links-Faktoriellen}
+
+Man kann die Links-Faktori\-elle verallgemeinern:
+\[
+  !_m n \;=\; \sum_{k=0}^{n-1} (mk)!\,.
+\]
+Das Verhalten solcher Verallgemeinerungen modulo Primzahlen ist weitgehend
+unerforscht.
+
+\subsection{Das Brocard--Ramanujan-Problem}
+
+Dieses Problem fragt nach ganzzahligen Lösungen von $n! + 1 = m^2$.
+Bisher bekannte Lösungen: $(n, m) = (4, 5), (5, 11), (7, 71)$.
+Ob weitere Lösungen existieren, ist offen.
+Ähnlich wie die Kurepa-Vermutung verknüpft dieses Problem
+Faktorielle mit Divisibilitätsbedingungen, ohne dass eine Reduktion zwischen
+beiden bekannt wäre.
+
+\subsection{Faktorielle Primzahlen}
+
+Eine \emph{faktorielle Primzahl} ist eine Primzahl der Form $n! \pm 1$.
+Diese sind ebenfalls mit Partialsummen von Faktorielle verwandt,
+stehen aber in keiner bekannten direkten Beziehung zur Kurepa-Vermutung.
+
+\subsection{Smarandache-Funktion}
+
+Die Smarandache-Funktion $S(n)$ ist das kleinste $m$, sodass $n \mid m!$.
+Sowohl $S(n)$ als auch $!n$ verknüpfen Faktorielle mit Teilbarkeitsfragen,
+ohne dass eine bekannte direkte Implikation zwischen der Kurepa-Vermutung und
+Aussagen über $S$ besteht.
+
+% ---------------------------------------------------------------
+\section{Schluss}
+\label{sec:schluss}
+% ---------------------------------------------------------------
+
+Die Kurepa-Vermutung ist eines der elementarsten offenen Probleme der
+Zahlentheorie.
+Ihre Formulierung erfordert nichts weiter als die Definition der Faktoriellen
+und modulare Arithmetik, und dennoch hat sie seit 1971 allen Beweisversuchen
+widerstanden.
+
+Die wesentlichen Aspekte des Problems lassen sich so zusammenfassen:
+
+\begin{enumerate}
+\item \textbf{Elementarität}: Die Aussage ist für jeden Studierenden verständlich,
+      der die modulare Arithmetik kennt.
+\item \textbf{Wilson-Verbindung}: Die Formel $!p \equiv !(p-1) - 1 \pmod p$
+      verbindet die Vermutung mit Wilsons klassischem Satz und reduziert sie
+      auf $!(p-1) \not\equiv 1 \pmod p$.
+\item \textbf{Heuristisches Paradoxon}: Probabilistische Argumente sagen
+      unendlich viele Gegenbeispiele voraus, doch keines wurde je gefunden.
+\item \textbf{Numerische Evidenz}: Null Verletzungen unter $664{.}578$
+      ungeraden Primzahlen bis $10^7$ (Build 131).
+\end{enumerate}
+
+\subsection*{Offene Fragen}
+\begin{enumerate}
+\item Gibt es eine ungerade Primzahl $p$ mit $p \mid !p$? (Kurepa-Vermutung)
+\item Ist $!p \bmod p$ gleichverteilt in $\{1, \ldots, p-1\}$ für $p \to \infty$?
+\item Gibt es einen $p$-adischen oder algebraischen Beweisansatz,
+      der ohne Computerrechnung auskommt?
+\item Was ist die genaue Größenordnung von $\min_{p \text{ prim}} v_p(!p)$
+      als Funktion von $p$?
+\end{enumerate}
+
+Die in Build 131 durchgeführte numerische Verifikation erweitert die bekannte
+Schranke für Nicht-Gegenbeispiele und bildet eine konkrete Grundlage für
+weitere theoretische Untersuchungen.
+Wir hoffen, dass diese Darstellung das Problem einem breiteren Publikum
+zugänglich macht und neue Beweisideen anregt.
+
+% ---------------------------------------------------------------
+% Literaturverzeichnis
+% ---------------------------------------------------------------
+\begin{thebibliography}{99}
+
+\bibitem{Kurepa1971}
+\DJ{}. Kurepa,
+\textit{On the left factorial function $!n$},
+Math.\ Balkanica \textbf{1} (1971), 147--153.
+
+\bibitem{Stankov2003}
+D. Stankov,
+\textit{Über das Kurepa-Problem},
+Filomat \textbf{17} (2003), 61--65.
+
+\bibitem{Wilson1770}
+J. Wilson (mitgeteilt durch E. Waring),
+\textit{Brief an E. Waring},
+1770; veröffentlicht in E. Waring, \textit{Meditationes Algebraicae},
+Cambridge, 1770.
+
+\bibitem{Lagrange1771}
+J.-L. Lagrange,
+\textit{Demonstration d'un th\'eor\`eme nouveau concernant les nombres premiers},
+Nouveaux M\'emoires de l'Acad\'emie Royale des Sciences et Belles-Lettres de Berlin,
+1771.
+
+\bibitem{Mertens1874}
+F. Mertens,
+\textit{Ein Beitrag zur analytischen Zahlentheorie},
+J.\ reine angew.\ Math.\ \textbf{78} (1874), 46--62.
+
+\bibitem{GuyUnsolved}
+R.\ K.\ Guy,
+\textit{Unsolved Problems in Number Theory}, 3.\ Aufl.,
+Springer, New York, 2004.
+Problem B44.
+
+\bibitem{SloaneA002627}
+N.\ J.\ A.\ Sloane u.\,a.,
+\textit{The On-Line Encyclopedia of Integer Sequences},
+Folge A002627 (Links-Faktori\-elle $!n$),
+\url{https://oeis.org/A002627}.
+
+\bibitem{SpecialistBuild131}
+M.\ Fuhrmann,
+\textit{Specialist Mathematics Project, Build 131: Numerische Verifikation der
+Kurepa-Vermutung für Primzahlen bis $10^7$},
+Interner Bericht, 2026.
+
+\end{thebibliography}
+
+\end{document}

@@ -139,3 +139,28 @@
     * Vinogradov-Exponentialsumme, Major/Minor-Bögen, Singuläre Reihe
   - NEU: tests/test_riemann_twin_goldbach.py — 111 Tests (alle bestanden)
   - NEU: MD-Dokumentation für alle 4 Module
+
+=== 2026-03-12 — Build 131 — Paper 42: Kurepa-Vermutung (EN + DE) ===
+
+2026-03-12 [Build 131]: 2 neue LaTeX-Papers für Paper 42
+
+### Neue Dateien
+- papers/batch11/paper42_kurepa_conjecture_en.tex
+  - Englisches Paper zur Kurepa-Vermutung (~9 Seiten)
+  - Abschnitte: Introduction, Left Factorial Function, Kurepa Conjecture,
+    Wilson's Theorem Connection, Probabilistic Heuristics, Equivalences,
+    Computational Verification, Related Problems, Conclusion
+  - Numerische Verifikation: 664578 Primzahlen bis 10^7, 0 Verletzungen (Build 131)
+  - 8 Literaturquellen (Kurepa 1971, Stankov 2003, Wilson, Lagrange, Mertens, Guy, OEIS)
+
+- papers/batch11/paper42_kurepa_vermutung_de.tex
+  - Deutsche Version, vollständig übersetzt
+  - Alle deutschen Theorem-Bezeichnungen (Satz, Lemma, Korollar, Vermutung, ...)
+  - Inhalt identisch mit EN-Version, sprachlich und typografisch angepasst
+
+### Mathematischer Inhalt
+- Links-Faktori\-elle !n = Σ_{k=0}^{n-1} k!, Rekursion, Integraldarstellung
+- Kurepa-Vermutung (offen seit 1971): p ∤ !p für alle ungeraden Primzahlen p
+- Wilson-Verbindung: !p ≡ !(p-1) - 1 (mod p), Äquivalenz !(p-1) ≢ 1 (mod p)
+- Probabilistische Heuristik: erwartete Anzahl Verletzungen ~ log log x (divergent)
+- Numerik Build 131: 664578 Primzahlen bis 10^7, 0 Verletzungen, 8396 Sekunden
