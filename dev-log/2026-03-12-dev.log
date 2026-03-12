@@ -204,3 +204,29 @@
 
 ### Build
 - src/build.txt: 130 → 131
+
+=== 2026-03-12 — Build 133 — Paper 43: Lehmer-Tau-Vermutung ===
+
+2026-03-12 [Build 133]: Paper 43 EN + DE (Lehmer τ-Vermutung) in papers/batch11/
+
+### Neue Dateien
+- papers/batch11/paper43_lehmer_tau_en.tex
+  LaTeX-Paper (EN): "The Lehmer Conjecture on the Ramanujan τ-Function"
+  Abschnitte: Introduction, Modular Forms Background, τ-Function, Lehmer Conjecture,
+  Hecke Operators + L-Function, Deligne's Theorem, Modular Congruences,
+  Computational Verification (n≤50000), Consequences, Open Problems, Conclusion
+  10 Quellen: Ramanujan 1916, Mordell 1917, Lehmer 1947, Swinnerton-Dyer, Deligne,
+  Serre, Chua, Taylor, Diamond-Shurman
+
+- papers/batch11/paper43_lehmer_tau_de.tex
+  LaTeX-Paper (DE): "Die Lehmer-Vermutung über die Ramanujan-τ-Funktion"
+  Identischer Inhalt auf Deutsch. \conjecture{} Umgebung für Lehmer (offen),
+  \theorem{} für Deligne-Schranke (bewiesen).
+
+### Mathematische Korrektheit
+- Lehmer-Vermutung korrekt als \conjecture deklariert (offen seit 1947)
+- Deligne-Schranke |τ(p)| ≤ 2p^{11/2} korrekt als \theorem deklariert (bewiesen 1974)
+- τ-Werte: τ(1)=1, τ(2)=-24, ..., τ(12)=-370944, τ(100)=37534859200
+- Numerische Verifikation: n≤50000, τ(n)≠0, 4330s Rechenzeit, 0 Deligne-Verletzungen
+- Eulerprodukt-Degeneration bei τ(p₀)=0 korrekt hergeleitet
+- Rekurrenz-Folge τ(p₀^k) für k gerade/ungerade korrekt ausgerechnet

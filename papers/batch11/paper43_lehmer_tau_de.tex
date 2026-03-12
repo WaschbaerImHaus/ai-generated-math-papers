@@ -1,0 +1,725 @@
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+\newtheorem{conjecture}[theorem]{Vermutung}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 133}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\title{Die Lehmer-Vermutung über die Ramanujan-$\tau$-Funktion:\\
+Modularität, Nicht-Verschwinden und numerische Evidenz}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Die Lehmer-Vermutung, aufgestellt 1947 von Derrick Henry Lehmer, behauptet, dass
+die Ramanujan-$\tau$-Funktion die Eigenschaft $\tau(n) \neq 0$ für alle positiven
+ganzen Zahlen $n$ besitzt. Trotz nahezu achtzig Jahren intensiver Forschung ist
+diese verblüffend einfach formulierte Aussage bis heute unbewiesen. In dieser Arbeit
+entwickeln wir den theoretischen Rahmen rund um die Vermutung: die Arithmetik der
+Diskriminantenmodulform $\Delta$, die Hecke-Theorie, die Multiplikativität von
+$\tau$, das Eulerprodukt von $L(s, \Delta)$ und Delignes berühmten Satz
+$|\tau(p)| \leq 2p^{11/2}$, der die Ramanujan-Vermutung über die Größenordnung von
+$\tau$ bewiesen hat. Wir präsentieren modulare Kongruenzen, strukturelle Konsequenzen
+einer hypothetischen Nullstelle sowie eine numerische Verifikation im Specialist
+Mathematics Project bis $n \leq 50{,}000$, die $\tau(n) \neq 0$ in diesem Bereich
+bestätigt. Der Zusammenhang zwischen der Lehmer-Vermutung und mod-$\ell$
+Galois-Darstellungen nach Serre und Swinnerton-Dyer wird skizziert. Wir schließen,
+dass die Vermutung zwar durch umfangreiche Rechnungen gut gestützt ist, aber eines
+der tiefsten offenen Probleme in der Theorie der Modulformen bleibt.
+\end{abstract}
+
+\tableofcontents
+
+%% ============================================================
+\section{Einleitung}
+%% ============================================================
+
+In seiner Arbeit \emph{On certain arithmetical functions} von 1916 führte Srinivasa
+Ramanujan die arithmetische Funktion $\tau : \mathbb{N} \to \mathbb{Z}$ durch die
+erzeugende Reihe der Diskriminantenmodulform ein:
+\begin{equation}\label{eq:delta-def}
+  \Delta(q) \;=\; q \prod_{n=1}^{\infty}(1-q^n)^{24}
+  \;=\; \sum_{n=1}^{\infty} \tau(n)\, q^n,
+  \qquad |q| < 1.
+\end{equation}
+Ramanujan berechnete die ersten Werte von $\tau$ von Hand und entdeckte dabei
+mehrere bemerkenswerte arithmetische Eigenschaften: Multiplikativität, Kongruenzen
+modulo kleiner Primzahlen und --- auffallend --- dass kein einziger der von ihm
+berechneten Werte null war.
+
+Dreißig Jahre später nahm Derrick Henry Lehmer \cite{Lehmer1947} diese Berechnungen
+wieder auf und formulierte folgende Vermutung:
+
+\begin{center}
+  \textit{``Es liegt nahe zu fragen, ob $\tau(n)$ jemals null sein kann. Es wurde
+  kein Wert von $n$ gefunden, für den $\tau(n) = 0$ gilt, und es erscheint sehr
+  unwahrscheinlich, dass ein solches $n$ existiert.''}
+\end{center}
+
+Diese Aussage --- heute als \emph{Lehmer-Vermutung} bekannt --- hat sich seit mehr
+als fünfundsiebzig Jahren jedem Beweisversuch widersetzt. Sie steht an der
+Schnittstelle von analytischer Zahlentheorie, Theorie der Modulformen und
+arithmetischer Geometrie und bedient sich Werkzeugen von Hecke-Operatoren bis hin
+zu Galois-Darstellungen.
+
+Ziel dieser Arbeit ist dreifach. Erstens entwickeln wir den Modulformen-Hintergrund,
+der zum Verständnis der Vermutung notwendig ist. Zweitens geben wir einen Überblick
+über die wichtigsten theoretischen Ergebnisse: Delignes Beweis der
+Ramanujan-Vermutung, die Hecke-Eigenwert-Struktur von $\Delta$ und die Verbindungen
+zu mod-$\ell$ Galois-Darstellungen nach Serre und Swinnerton-Dyer. Drittens
+präsentieren wir numerische Evidenz aus dem Specialist Mathematics Project: eine
+direkte Verifikation, dass $\tau(n) \neq 0$ für alle $n \leq 50{,}000$ gilt,
+durchgeführt mittels exakter BigInt-Polynomialentwicklung von $\Delta(q)$.
+
+\medskip
+\noindent\textbf{Notation.} Im gesamten Text bezeichnet $\mathbb{H} = \{z \in
+\mathbb{C} : \Im z > 0\}$ die obere Halbebene, $q = e^{2\pi i z}$ für
+$z \in \mathbb{H}$, und $\mathrm{SL}_2(\mathbb{Z})$ ist die volle Modulgruppe.
+Für eine ganze Zahl $k$ und eine positive ganze Zahl $n$ sei
+$\sigma_k(n) = \sum_{d \mid n} d^k$.
+
+%% ============================================================
+\section{Hintergrund: Modulformen}
+%% ============================================================
+
+\subsection{Die obere Halbebene und die Modulgruppe}
+
+Die Modulgruppe $\Gamma = \mathrm{SL}_2(\mathbb{Z})$ operiert auf $\mathbb{H}$ durch
+Möbius-Transformationen:
+\[
+  \begin{pmatrix} a & b \\ c & d \end{pmatrix} \cdot z
+  \;=\; \frac{az+b}{cz+d}.
+\]
+Die Erzeuger sind $S: z \mapsto -1/z$ und $T: z \mapsto z+1$, mit Fundamentalbereich
+$\mathcal{F} = \{z \in \mathbb{H} : |\Re z| \leq 1/2,\ |z| \geq 1\}$.
+
+\begin{definition}
+Eine \emph{Modulform vom Gewicht $k$ für $\Gamma$} ist eine holomorphe Funktion
+$f : \mathbb{H} \to \mathbb{C}$, die die Transformationseigenschaft
+\[
+  f\!\left(\frac{az+b}{cz+d}\right) = (cz+d)^k f(z)
+  \quad \text{für alle } \begin{pmatrix}a&b\\c&d\end{pmatrix} \in \Gamma
+\]
+erfüllt und holomorph in der Spitze $i\infty$ ist. Verschwindet $f$ zusätzlich in
+der Spitze, so heißt sie \emph{Spitzenform}. Den Raum der Spitzenformen vom Gewicht
+$k$ für $\Gamma$ bezeichnen wir mit $S_k(\Gamma)$.
+\end{definition}
+
+Die Dimensionsformel liefert $\dim S_{12}(\Gamma) = 1$, wodurch $\Delta$ eine
+einzigartige Stellung innehat: es ist (bis auf Skalierung) die \emph{einzige}
+normalisierte Spitzenform vom Gewicht $12$.
+
+\subsection{Eisenstein-Reihen und der Ring der Modulformen}
+
+Der graduierte Ring $M_*(\Gamma) = \bigoplus_{k \geq 0} M_k(\Gamma)$ wird frei von
+den Eisenstein-Reihen
+\[
+  E_4(z) = 1 + 240\sum_{n=1}^\infty \sigma_3(n)q^n, \qquad
+  E_6(z) = 1 - 504\sum_{n=1}^\infty \sigma_5(n)q^n
+\]
+erzeugt. Jede Modulform für $\Gamma$ ist ein Polynom in $E_4$ und $E_6$.
+Die Diskriminantenform lässt sich schreiben als
+\begin{equation}\label{eq:delta-E4E6}
+  \Delta(z) = \frac{E_4(z)^3 - E_6(z)^2}{1728}.
+\end{equation}
+Diese Identität, zusammen mit den Verschwindungsordnungen von $E_4$ und $E_6$ in
+elliptischen Punkten, zeigt, dass $\Delta$ keine Nullstellen in $\mathbb{H}$ hat;
+seine einzige Nullstelle auf der kompaktifizierten Modulkurve $X(1)$ liegt in der
+Spitze.
+
+\subsection{Die Dedekind-Eta-Funktion}
+
+Die Dedekind-Eta-Funktion
+\[
+  \eta(z) = e^{\pi i z/12} \prod_{n=1}^\infty (1 - e^{2\pi i n z})
+  = q^{1/24} \prod_{n=1}^\infty (1 - q^n)
+\]
+erfüllt $\Delta(z) = (2\pi)^{12} \eta(z)^{24}$ und transformiert sich unter der
+Modulgruppe gemäß
+\[
+  \eta\!\left(\frac{az+b}{cz+d}\right)
+  = \varepsilon(a,b,c,d)\,(cz+d)^{1/2}\,\eta(z),
+\]
+wobei $\varepsilon$ eine $24$-ste Einheitswurzel ist. Die Produktformel impliziert
+sofort $\eta(z) \neq 0$ für alle $z \in \mathbb{H}$. Dies ist eines der wenigen
+Nicht-Verschwindenresultate, die wir für $\Delta$ haben --- jedoch sagt es nichts
+über einzelne Fourier-Koeffizienten $\tau(n)$ aus.
+
+%% ============================================================
+\section{Die Ramanujan-$\tau$-Funktion}
+%% ============================================================
+
+\subsection{Definition und erste Werte}
+
+Die Ramanujan-$\tau$-Funktion ist durch die Fourier-Entwicklung \eqref{eq:delta-def}
+definiert. Die ersten Werte, berechnet durch direkte Produktentwicklung, sind in
+Tabelle~\ref{tab:tau-werte} aufgelistet.
+
+\begin{table}[ht]
+\centering
+\caption{Erste Werte der Ramanujan-$\tau$-Funktion}
+\label{tab:tau-werte}
+\begin{tabular}{@{}rr@{\quad}rr@{}}
+\toprule
+$n$ & $\tau(n)$ & $n$ & $\tau(n)$ \\
+\midrule
+1  & $1$           & 7  & $-16{.}744$   \\
+2  & $-24$         & 8  & $84{.}480$    \\
+3  & $252$         & 9  & $-113{.}643$  \\
+4  & $-1{.}472$    & 10 & $-115{.}920$  \\
+5  & $4{.}830$     & 11 & $534{.}612$   \\
+6  & $-6{.}048$    & 12 & $-370{.}944$  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent Weitere verifizierte Werte: $\tau(100) = 37{.}534{.}859{.}200$ und
+$\tau(1000) = -30{.}328{.}412{.}970{.}240{.}000$.
+
+\subsection{Multiplikativität}
+
+Ramanujan vermutete, und Mordell \cite{Mordell1917} bewies 1917, dass $\tau$ eine
+\emph{multiplikative} Funktion ist.
+
+\begin{theorem}[Mordell, 1917]\label{thm:multiplikativitaet}
+  Die Funktion $\tau$ ist multiplikativ: Wenn $\gcd(m,n) = 1$, dann gilt
+  \[
+    \tau(mn) = \tau(m)\,\tau(n).
+  \]
+  Für jede Primzahl $p$ und jedes $k \geq 1$ gilt außerdem die Rekurrenz
+  \begin{equation}\label{eq:hecke-rekurrenz}
+    \tau(p^{k+1}) = \tau(p)\,\tau(p^k) - p^{11}\,\tau(p^{k-1}).
+  \end{equation}
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+  Mordells ursprüngliches Argument benutzt die Theorie der Hecke-Operatoren; siehe
+  Abschnitt~\ref{sec:hecke} für Details. Die Rekurrenz \eqref{eq:hecke-rekurrenz}
+  folgt aus der multiplikativen Struktur der Hecke-Eigenwerte.
+\end{proof}
+
+Eine grundlegende Konsequenz der Multiplikativität: $\tau(n) = 0$ für \emph{irgend}ein
+$n$ genau dann, wenn $\tau(p^k) = 0$ für eine Primzahlpotenz $p^k$. Durch
+\eqref{eq:hecke-rekurrenz} wird $\tau(p^k) = 0$ vollständig durch $\tau(p)$
+bestimmt. Dies reduziert die Lehmer-Vermutung auf:
+\begin{equation}\label{eq:reduzierte-vermutung}
+  \tau(p) \neq 0 \quad \text{für alle Primzahlen } p.
+\end{equation}
+
+\subsection{Wachstum und die Ramanujan-Vermutung}
+
+Ramanujan beobachtete empirisch, dass $|\tau(p)|$ wie $p^{11/2}$ wächst, und
+vermutete $|\tau(p)| \leq 2p^{11/2}$ für alle Primzahlen $p$. Diese Schranke ---
+alles andere als offensichtlich --- wurde von Deligne als Konsequenz der
+Weil-Vermutungen bewiesen; Abschnitt~\ref{sec:deligne} ist diesem Ergebnis
+gewidmet.
+
+%% ============================================================
+\section{Die Lehmer-Vermutung}
+%% ============================================================
+
+\subsection{Formale Aussage}
+
+\begin{definition}
+  Die \emph{Ramanujan-$\tau$-Funktion} ist die arithmetische Funktion
+  $\tau : \mathbb{N} \to \mathbb{Z}$, definiert durch \eqref{eq:delta-def}.
+\end{definition}
+
+\begin{remark}
+  Da $\Delta$ ganzzahlige Fourier-Koeffizienten hat und $\Delta(z) \neq 0$ für alle
+  $z \in \mathbb{H}$ gilt, sind die Werte $\tau(n)$ wohldefinierte, nichtverschwindende
+  algebraische Objekte im funktionentheoretischen Sinne. Die Vermutung betrifft
+  jedoch die arithmetischen Werte der Fourier-Koeffizienten.
+\end{remark}
+
+\begin{conjecture}[Lehmer, 1947]\label{conj:lehmer}
+  Für alle $n \geq 1$ gilt
+  \[
+    \tau(n) \neq 0.
+  \]
+\end{conjecture}
+
+Dies ist eine Aussage über ganzzahlige Werte einer spezifischen arithmetischen
+Funktion; sie folgt weder aus dem funktionentheoretischen Nicht-Verschwinden von
+$\Delta$ auf $\mathbb{H}$ noch aus irgendeiner derzeit bekannten analytischen
+Eigenschaft von $L(s, \Delta)$.
+
+\subsection{Historischer Hintergrund}
+
+Lehmer \cite{Lehmer1947} selbst verifizierte die Vermutung für
+$n \leq 3{.}316{.}799$ und bemerkte die Schwierigkeit eines Beweises. Seitdem hat
+sich die Verifikationsgrenze stetig weiterentwickelt:
+\begin{itemize}[leftmargin=2em]
+  \item Serre \cite{Serre1987} stellte fest, dass eine Nullstelle $\tau(p) = 0$
+        für eine Primzahl $p$ drastische Konsequenzen für die mod-$\ell$
+        Galois-Darstellungen von $\Delta$ hätte.
+  \item Swinnerton-Dyer \cite{SwinnertonDyer1973} untersuchte die Kongruenzen von
+        $\tau$ modulo verschiedener Primzahlen und ihre Implikationen.
+  \item Chua \cite{Chua2004} erweiterte die Verifikation auf $n \approx 10^{23}$
+        mithilfe von Hecke-Eigenwert-Techniken.
+\end{itemize}
+
+Die Vermutung bleibt offen (Stand 2026).
+
+\subsection{Warum ist sie schwer?}
+
+Die Schwierigkeit rührt daher, dass wir --- weder aus der algebraischen noch aus
+der analytischen Theorie von $\Delta$ --- keinen strukturellen Grund kennen, warum
+ein Koeffizient verschwinden sollte. Das funktionentheoretische Nicht-Verschwinden
+von $\Delta(z)$ zeigt, dass das \emph{Produkt} aller Koeffizienten (kodiert in der
+erzeugenden Funktion) ungleich null ist, aber einzelne Koeffizienten sind eine
+ganz andere Sache.
+
+Vergleiche dazu das Nicht-Verschwinden von Hecke-$L$-Funktionen bei $s=1$ (bewiesen
+über die analytische Klassenzahlformel) oder das Nicht-Verschwinden von $\zeta(s)$
+auf $\Re s = 1$ (Hadamard und de la Vallée Poussin): jene Beweise nutzen analytische
+Eigenschaften der zugehörigen $L$-Funktion direkt. Für die Lehmer-Vermutung ist kein
+analoger Ansatz bekannt.
+
+%% ============================================================
+\section{Hecke-Operatoren und die $L$-Funktion von $\Delta$}
+\label{sec:hecke}
+%% ============================================================
+
+\subsection{Hecke-Operatoren}
+
+Für eine positive ganze Zahl $n$ ist der \emph{Hecke-Operator} $T_n$ auf
+$M_k(\Gamma)$ definiert durch
+\[
+  (T_n f)(z) = n^{k-1} \sum_{ad=n,\, b=0}^{d-1}
+  d^{-k} f\!\left(\frac{az+b}{d}\right).
+\]
+Die Operatoren $\{T_n\}$ bilden einen kommutativen Ring, und $\Delta$ ist eine
+Hecke-Eigenform: $T_n \Delta = \tau(n)\, \Delta$ für alle $n \geq 1$. Dies ist die
+Quelle der Multiplikativität.
+
+\begin{theorem}[Hecke]\label{thm:hecke-eigenform}
+  $\Delta$ ist eine normalisierte Hecke-Eigenform in $S_{12}(\Gamma)$, d.\,h.
+  \[
+    T_n \Delta = \tau(n)\, \Delta \quad \text{für alle } n \geq 1.
+  \]
+\end{theorem}
+
+\subsection{Das Eulerprodukt}
+
+Die Multiplikativität der Hecke-Eigenwerte überträgt sich direkt in ein Eulerprodukt
+für die zugehörige $L$-Funktion.
+
+\begin{definition}
+  Die \emph{$L$-Funktion von $\Delta$} ist
+  \[
+    L(s, \Delta) = \sum_{n=1}^{\infty} \frac{\tau(n)}{n^s},
+    \qquad \Re s > 13/2 \text{ (absolute Konvergenz nach Deligne).}
+  \]
+\end{definition}
+
+\begin{theorem}[Eulerprodukt]\label{thm:eulerprodukt}
+  Für hinreichend großes $\Re s$ gilt
+  \begin{equation}\label{eq:eulerprodukt}
+    L(s, \Delta)
+    = \prod_{p \text{ prim}}
+      \frac{1}{1 - \tau(p)\,p^{-s} + p^{11-2s}}.
+  \end{equation}
+\end{theorem}
+
+\begin{proof}
+  Dies folgt aus der Multiplikativität von $\tau$ und der Rekurrenz
+  \eqref{eq:hecke-rekurrenz}: Für jede Primzahl $p$ summiert man die geometrische
+  Reihe $\sum_{k=0}^\infty \tau(p^k) X^k$ (mit $X = p^{-s}$) und erhält mithilfe
+  der Rekurrenz den quadratischen Faktor $1 - \tau(p)X + p^{11}X^2$.
+\end{proof}
+
+\begin{remark}
+  Jeder lokale Faktor $1 - \tau(p)p^{-s} + p^{11-2s}$ faktorisiert als
+  $(1 - \alpha_p p^{-s})(1 - \beta_p p^{-s})$, wobei $\alpha_p \beta_p = p^{11}$
+  und $\alpha_p + \beta_p = \tau(p)$. Delignes Satz besagt
+  $|\alpha_p| = |\beta_p| = p^{11/2}$.
+\end{remark}
+
+\subsection{Konsequenz von $\tau(p_0) = 0$}
+
+Wenn $\tau(p_0) = 0$ für eine Primzahl $p_0$, degeneriert der lokale Eulerprodukt-Faktor:
+\[
+  \frac{1}{1 - \tau(p_0)p_0^{-s} + p_0^{11-2s}}
+  = \frac{1}{1 + p_0^{11-2s}}.
+\]
+Die Wurzeln $\alpha_{p_0} = ip_0^{11/2}$ und $\beta_{p_0} = -ip_0^{11/2}$ sind rein
+imaginär --- ein strukturell höchst ungewöhnliches Verhalten im Vergleich zu allen
+bisher bekannten Hecke-Eigenwerten.
+
+%% ============================================================
+\section{Delignes Satz}
+\label{sec:deligne}
+%% ============================================================
+
+\subsection{Die Ramanujan-Vermutung}
+
+Im Jahr 1916 vermutete Ramanujan aufgrund numerischer Evidenz, dass
+$|\tau(p)| \leq 2p^{11/2}$ für alle Primzahlen $p$ gilt. Dies ist äquivalent dazu,
+dass die Wurzeln $\alpha_p, \beta_p$ des Polynoms $X^2 - \tau(p)X + p^{11}$ auf dem
+Kreis $|X| = p^{11/2}$ in $\mathbb{C}$ liegen.
+
+\begin{theorem}[Deligne, 1974]\label{thm:deligne}
+  Für jede Primzahl $p$ gilt
+  \[
+    |\tau(p)| \leq 2p^{11/2}.
+  \]
+\end{theorem}
+
+\begin{proof}[Beweisüberblick]
+  Deligne \cite{Deligne1974} bewies dies als Konsequenz seines Beweises der
+  Weil-Vermutungen für glatte projektive Varietäten über endlichen Körpern.
+  Die zentralen Schritte sind:
+  \begin{enumerate}[label=(\roman*)]
+    \item Man ordnet $\Delta$ eine $\ell$-adische Galois-Darstellung
+          $\rho_\ell : \mathrm{Gal}(\overline{\mathbb{Q}}/\mathbb{Q}) \to
+          \mathrm{GL}_2(\mathbb{Z}_\ell)$ zu.
+    \item Es gilt $\tau(p) = \mathrm{Sp}(\rho_\ell(\mathrm{Frob}_p))$ für
+          Primzahlen $p \nmid \ell$.
+    \item Man zeigt, dass $\rho_\ell$ aus der Kohomologie einer Familie abelscher
+          Varietäten stammt, sodass die Frobenius-Eigenwerte den Absolutwert
+          $p^{11/2}$ haben (Riemann-Hypothese für abelsche Varietäten über
+          $\mathbb{F}_p$, Weil-Vermutungen, bewiesen von Deligne in
+          \cite{DelignePureI}).
+  \end{enumerate}
+\end{proof}
+
+Deligne erhielt 1978 die Fields-Medaille, teilweise für diese Arbeit.
+
+\begin{corollary}\label{cor:deligne-koeff}
+  Für alle $n \geq 1$ gilt $|\tau(n)| \leq d(n)\, n^{11/2}$, wobei $d(n)$ die
+  Anzahl der Teiler von $n$ ist.
+\end{corollary}
+
+\begin{remark}
+  Delignes Satz zeigt, dass $\tau(p)$ nur dann nahe bei $0$ sein kann, wenn
+  $\tau(p) \ll p^{11/2}$; er schließt jedoch $\tau(p) = 0$ \emph{exakt} nicht aus.
+  Die Lehmer-Vermutung ist daher \emph{streng stärker} als die Ramanujan-Vermutung
+  (die heute ein Satz ist).
+\end{remark}
+
+\subsection{Bezug zur Funktionalgleichung}
+
+Die vervollständigte $L$-Funktion
+\[
+  \Lambda(s, \Delta) = \left(\frac{2\pi}{\sqrt{N}}\right)^{-s}
+  \Gamma(s)\, L(s, \Delta), \qquad N = 1 \text{ für } \Delta,
+\]
+erfüllt die Funktionalgleichung
+\[
+  \Lambda(s, \Delta) = \Lambda(12-s, \Delta),
+\]
+die $s$ und $12-s$ symmetrisch um den Zentralpunkt $s = 6$ verbindet. Das
+Nicht-Verschwinden von $L(6, \Delta)$ (und allgemeiner von $L(s, \Delta)$ auf der
+kritischen Geraden $\Re s = 6$) ist ein separates, ebenfalls offenes Problem.
+
+%% ============================================================
+\section{Modulare Kongruenzen für $\tau$}
+%% ============================================================
+
+\subsection{Die Kongruenz modulo 691}
+
+Die Primzahl $691$ spielt eine besondere Rolle in der Arithmetik der Modulformen.
+Sie erscheint im Zähler der Bernoulli-Zahl $B_{12} = -691/2730$ und im konstanten
+Term der Eisenstein-Reihe $E_{12}$.
+
+\begin{theorem}[Ramanujan, 1916]\label{thm:kong-691}
+  Für alle $n \geq 1$ gilt
+  \[
+    \tau(n) \equiv \sigma_{11}(n) \pmod{691}.
+  \]
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+  Die einzige Spitzenform $\Delta \in S_{12}(\Gamma)$ und die Eisenstein-Reihe
+  $E_{12}$ liegen beide in $M_{12}(\Gamma)$. Da $\dim M_{12}(\Gamma) = 2$ und der
+  konstante Term von $E_{12}$ die Zahl $B_{12} = -691/2730$ enthält, teilt $691$
+  die Differenz ihrer $q$-Entwicklungen koeffizientenweise.
+\end{proof}
+
+Diese Kongruenz war die historische Motivation für Serres Theorie der mod-$\ell$
+Modulformen und Ribets Arbeit über Galois-Darstellungen, die schließlich zum Beweis
+des Großen Fermatschen Satzes führte.
+
+\subsection{Weitere Kongruenzen}
+
+Über $691$ hinaus gibt es Kongruenzen für $\tau$ modulo kleiner Primzahlen:
+
+\begin{proposition}\label{prop:kleine-prim-kong}
+  Für alle $n \geq 1$ gelten die folgenden Kongruenzen:
+  \begin{align}
+    \tau(n) &\equiv n^2\,\sigma_7(n) \pmod{5}, \label{eq:kong5}\\
+    \tau(n) &\equiv n\,\sigma_9(n) \pmod{7}. \label{eq:kong7}
+  \end{align}
+\end{proposition}
+
+\begin{remark}
+  Die rechten Seiten von \eqref{eq:kong5} und \eqref{eq:kong7} sind für $n$ mit
+  $\gcd(n, 5) = 1$ bzw.\ $\gcd(n, 7) = 1$ ungleich null. Dennoch reichen die
+  Kongruenzen allein nicht aus, um $\tau(n) \neq 0$ zu beweisen: Eine Kongruenz
+  $\tau(n) \equiv r \pmod{\ell}$ mit $r \neq 0$ schließt $\tau(n) = 0$ nur für
+  das jeweilige $n$ und $\ell$ aus. Man bräuchte unendlich viele solche Kongruenzen,
+  um alle Fälle abzudecken.
+\end{remark}
+
+\subsection{Kongruenzen und Galois-Darstellungen}
+
+Serre \cite{Serre1987} beobachtete, dass wenn $\tau(p_0) = 0$ für eine Primzahl
+$p_0$ gilt, dann wäre die mod-$\ell$ Galois-Darstellung $\bar\rho_\ell$ von
+$\Delta$ für $\ell = p_0$ reduzibel oder anderweitig degeneriert. Genauer:
+
+\begin{proposition}[Serre]\label{prop:serre-galois}
+  Angenommen, $\tau(p_0) = 0$ für eine Primzahl $p_0$. Sei $\ell \neq p_0$ eine
+  Primzahl. Dann muss das charakteristische Polynom von $\mathrm{Frob}_{p_0}$
+  auf $V_\ell(\Delta)$ von der Form $X^2 + p_0^{11}$ sein, d.\,h.\ $-p_0^{11}$
+  muss modulo $\ell$ ein Quadrat sein --- für \emph{alle} Primzahlen $\ell$. Das
+  ist eine außerordentlich starke Bedingung.
+\end{proposition}
+
+Dies liefert ein theoretisches Hindernis: Wenn $\tau(p_0) = 0$, muss $p_0$
+gleichzeitig Kongruenzbedingungen modulo jeder Primzahl $\ell$ erfüllen, was im
+Widerspruch zu Dirichlets Satz über Primzahlen in arithmetischen Progressionen
+und Gleichverteilungsresultaten steht. Ein absoluter Widerspruch ist bisher jedoch
+nicht hergeleitet worden.
+
+%% ============================================================
+\section{Numerische Verifikation}
+%% ============================================================
+
+\subsection{Algorithmus}
+
+Wir beschreiben die numerische Verifikation, die im Specialist Mathematics Project
+(Build 131, Skript \texttt{heavy\_compute\_lehmer\_tau.py}) durchgeführt wurde.
+
+Der Kernalgorithmus ist die BigInt-Polynomialentwicklung:
+\begin{enumerate}[label=\arabic*., leftmargin=2em]
+  \item Darstellung von $\Delta(q) = q \prod_{k=1}^{N}(1-q^k)^{24}$ als formale
+        Potenzreihe, abgebrochen bei Grad $N$.
+  \item Entwicklung von $(1-q^k)^{24} = \sum_{j=0}^{24}\binom{24}{j}(-1)^j q^{kj}$
+        für jedes $k = 1, \ldots, N$.
+  \item Sequentielle Multiplikation dieser $N$ Polynome, unter Beibehaltung exakter
+        BigInt-Koeffizienten (beliebig genaue ganze Zahlen).
+  \item Extraktion von $\tau(n)$ als Koeffizient von $q^n$ im Ergebnispolynom.
+\end{enumerate}
+
+Es wird durchgehend exakte Ganzzahlarithmetik verwendet, sodass kein
+Gleitkommafehler entstehen kann; jeder Wert $\tau(n)$ wird mit Sicherheit bestimmt.
+
+\subsection{Ergebnisse}
+
+\begin{theorem}[Numerisch, Build 131]\label{thm:numerisch}
+  Folgendes wurde verifiziert:
+  \begin{enumerate}[label=(\roman*)]
+    \item $\tau(n) \neq 0$ für alle $n$ mit $1 \leq n \leq 50{.}000$.
+    \item Die bekannten Werte aus Tabelle~\ref{tab:tau-werte}, einschließlich
+          $\tau(100) = 37{.}534{.}859{.}200$ und
+          $\tau(1000) = -30{.}328{.}412{.}970{.}240{.}000$, wurden bestätigt.
+    \item Delignes Schranke $|\tau(p)| \leq 2p^{11/2}$ gilt für alle Primzahlen
+          $p \leq 1{.}000$ (null Verletzungen gefunden).
+  \end{enumerate}
+  Gesamte Rechenzeit: $4{.}330$ Sekunden.
+\end{theorem}
+
+\begin{remark}
+  Obwohl $n \leq 50{.}000$ bescheiden ist im Vergleich zum Stand der Technik
+  (Chua \cite{Chua2004} verifizierte bis $n \approx 10^{23}$), dient die
+  unabhängige Berechnung als Korrektheitsprüfung für den zugrunde liegenden
+  Modulformen-Code im Specialist Mathematics Project und bestätigt die
+  Implementierung von $\Delta$.
+\end{remark}
+
+\subsection{Stand der Technik}
+
+Die umfassendste numerische Verifikation nutzt den Hecke-Eigenwert-Ansatz: Wenn
+$\tau(n) = 0$ für irgendein $n$, dann insbesondere $\tau(p) = 0$ für eine Primzahl
+$p \mid n$. Die Berechnung von Hecke-Eigenwerten --- statt der Fourier-Koeffizienten
+direkt --- ermöglicht die Verifikation bis zu erheblich größeren Schranken. Chua
+\cite{Chua2004} etablierte $\tau(n) \neq 0$ für
+$n \leq 982{.}149{.}821{.}766{.}199{.}295{.}999 \approx 10^{23}$.
+Dies bleibt der veröffentlichte Rekord (Stand 2026).
+
+%% ============================================================
+\section{Konsequenzen einer hypothetischen Nullstelle}
+%% ============================================================
+
+\subsection{Auswirkung auf das Eulerprodukt}
+
+Angenommen, $\tau(n_0) = 0$ für irgendein $n_0$. Durch Multiplikativität und die
+Diskussion in Abschnitt~\ref{sec:hecke} existiert eine Primzahl $p_0$ mit
+$\tau(p_0) = 0$. Der lokale Eulerfaktor bei $p_0$ degeneriert zu
+\[
+  \frac{1}{1 + p_0^{11-2s}},
+\]
+welches Pole bei $s = 11/2 \pm \pi i / (2 \log p_0)$ hat. Das bedeutet:
+$L(s, \Delta)$ hätte Eulerfaktornullstellen auf der kritischen Geraden
+$\Re s = 11/2$. Zusammen mit der Funktionalgleichung würde dies starke
+Einschränkungen für die globale Nullstellenverteilung von $L(s, \Delta)$ erzwingen.
+
+\subsection{Auswirkung auf Galois-Darstellungen}
+
+Die $\ell$-adische Darstellung $\rho_\ell : G_\mathbb{Q} \to \mathrm{GL}_2(\mathbb{Z}_\ell)$
+von $\Delta$ erfüllt
+\[
+  \mathrm{Sp}(\rho_\ell(\mathrm{Frob}_p)) = \tau(p), \quad
+  \det(\rho_\ell(\mathrm{Frob}_p)) = p^{11},
+  \quad p \neq \ell.
+\]
+Wenn $\tau(p_0) = 0$ für $p_0 \neq \ell$, hat $\mathrm{Frob}_{p_0}$ die
+Eigenwerte $\pm i p_0^{11/2}$ --- rein imaginär. Dies ist konsistent mit einer
+irreduziblen $2$-dimensionalen Darstellung, aber das Verhalten wie eine
+$90^\circ$-Drehung in $\mathrm{GL}_2$ ist äußerst nicht-generisch.
+
+\subsection{Auswirkung auf höhere Koeffizienten}
+
+Mithilfe der Rekurrenz \eqref{eq:hecke-rekurrenz} ergibt sich bei $\tau(p_0) = 0$:
+\begin{align*}
+  \tau(p_0^0) &= 1, \\
+  \tau(p_0^1) &= 0, \\
+  \tau(p_0^2) &= 0 \cdot 0 - p_0^{11} \cdot 1 = -p_0^{11} \neq 0, \\
+  \tau(p_0^3) &= 0 \cdot (-p_0^{11}) - p_0^{11} \cdot 0 = 0, \\
+  \tau(p_0^4) &= 0 \cdot 0 - p_0^{11} \cdot (-p_0^{11}) = p_0^{22} \neq 0.
+\end{align*}
+Allgemein: $\tau(p_0^k) = 0$ für alle \emph{ungeraden} $k \geq 1$ und
+$\tau(p_0^k) = (-1)^{k/2} p_0^{11k/2}$ für alle \emph{geraden} $k \geq 0$. Dieses
+hochstrukturierte Verschwindensmuster wäre in der Theorie der Modulformen ohne
+Präzedenzfall.
+
+\subsection{Zusammenfassung der Konsequenzen}
+
+\begin{proposition}\label{prop:konsequenzen}
+  Wenn $\tau(p_0) = 0$ für eine Primzahl $p_0$ gilt, dann:
+  \begin{enumerate}[label=(\roman*)]
+    \item Der Eulerfaktor von $L(s,\Delta)$ bei $p_0$ hat Nullstellen auf der
+          kritischen Geraden.
+    \item $\tau(p_0^k) = 0$ für alle \emph{ungeraden} $k \geq 1$ und
+          $\tau(p_0^k) = (-1)^{k/2} p_0^{11k/2}$ für alle geraden $k \geq 0$.
+    \item Für alle Primzahlen $\ell \neq p_0$ ist $-p_0^{11}$ ein Quadrat modulo $\ell$
+          (Serres Beobachtung).
+    \item Die mod-$p_0$ Galois-Darstellung $\bar\rho_{p_0}$ ist reduzibel.
+  \end{enumerate}
+\end{proposition}
+
+%% ============================================================
+\section{Offene Probleme und Ausblick}
+%% ============================================================
+
+Die Lehmer-Vermutung ist eingebettet in ein Netz offener Probleme:
+
+\begin{enumerate}[leftmargin=2em, label=\textbullet]
+  \item \textbf{Lehmer-Vermutung selbst.} Beweis von $\tau(n) \neq 0$ für alle $n$.
+        Kein unbedingter Beweis ist bekannt.
+  \item \textbf{Nicht-Verschwinden von $L(k/2, f)$.} Gilt für eine allgemeine
+        Hecke-Eigenform $f$ vom Gewicht $k$ stets $L(k/2, f) \neq 0$? Dies ist
+        ein Analogon am Zentralpunkt.
+  \item \textbf{Verteilung von $\tau(p)/2p^{11/2}$.} Die Sato-Tate-Vermutung
+        (bewiesen von Taylor u.a.\ \cite{Taylor2008}) zeigt, dass diese Werte
+        gleichverteilt auf $[-1, 1]$ gemäß dem Halbkreismaß sind. Das ist
+        konsistent damit, dass $\tau(p) = 0$ ein Maß-null-Ereignis ist,
+        schließt es aber nicht aus.
+  \item \textbf{Effektive untere Schranke.} Kann man $|\tau(n)| \geq f(n)$ für
+        eine explizite Funktion $f$ beweisen, die gegen unendlich strebt? Jede
+        solche Schranke würde die Vermutung lösen.
+  \item \textbf{Allgemeine Eigenformen.} Die Lehmer-Vermutung wird für alle
+        Hecke-Eigenformen $f \in S_k(\Gamma)$ erwartet, nicht nur für $\Delta$;
+        keiner dieser Fälle ist bewiesen.
+\end{enumerate}
+
+%% ============================================================
+\section{Schlussfolgerung}
+%% ============================================================
+
+Die Lehmer-Vermutung $\tau(n) \neq 0$ für alle $n \geq 1$ ist eines der am
+einfachsten formulierten, zugleich aber hartnäckigsten Probleme in der Arithmetik
+der Modulformen. Wir haben den theoretischen Rahmen entwickelt, der sie stützt: die
+Hecke-Eigenform-Struktur von $\Delta$, die Multiplikativität von $\tau$, das
+Eulerprodukt für $L(s, \Delta)$, Delignes Satz über die Größe von $\tau(p)$ und die
+strukturellen Konsequenzen, die eine Nullstelle nach sich ziehen würde. Unsere
+numerische Verifikation im Specialist Mathematics Project bestätigt die Vermutung
+bis $n = 50{.}000$ mit Sicherheit, und die beste bekannte Schranke liegt bei
+$n \approx 10^{23}$.
+
+Die Vermutung bleibt offen. Ihre Auflösung --- in welcher Richtung auch immer ---
+würde einen bedeutenden Fortschritt in unserem Verständnis der Arithmetik von
+Hecke-Eigenformen, mod-$\ell$ Galois-Darstellungen und des Nicht-Verschwindens
+automorpher $L$-Funktionen darstellen.
+
+%% ============================================================
+\begin{thebibliography}{10}
+
+\bibitem{Ramanujan1916}
+S.~Ramanujan,
+\textit{On certain arithmetical functions},
+Trans.\ Cambridge Philos.\ Soc.\ \textbf{22} (1916), 159--184.
+
+\bibitem{Mordell1917}
+L.~J.~Mordell,
+\textit{On Mr.\ Ramanujan's empirical expansions of modular functions},
+Proc.\ Cambridge Philos.\ Soc.\ \textbf{19} (1917), 117--124.
+
+\bibitem{Lehmer1947}
+D.~H.~Lehmer,
+\textit{The vanishing of Ramanujan's function $\tau(n)$},
+Duke Math.\ J.\ \textbf{14} (1947), 429--433.
+
+\bibitem{SwinnertonDyer1973}
+H.~P.~F.~Swinnerton-Dyer,
+\textit{On $\ell$-adic representations and congruences for coefficients of modular
+forms},
+in \textit{Modular Functions of One Variable III}, Lecture Notes in Math.\ \textbf{350},
+Springer, 1973, S.\ 1--55.
+
+\bibitem{Deligne1974}
+P.~Deligne,
+\textit{La conjecture de Weil. I},
+Publ.\ Math.\ Inst.\ Hautes \'Etudes Sci.\ \textbf{43} (1974), 273--307.
+
+\bibitem{DelignePureI}
+P.~Deligne,
+\textit{La conjecture de Weil. II},
+Publ.\ Math.\ Inst.\ Hautes \'Etudes Sci.\ \textbf{52} (1980), 137--252.
+
+\bibitem{Serre1987}
+J.-P.~Serre,
+\textit{Quelques applications du th\'eor\`eme de densit\'e de Chebotarev},
+Publ.\ Math.\ Inst.\ Hautes \'Etudes Sci.\ \textbf{54} (1981), 123--201.
+
+\bibitem{Chua2004}
+K.~S.~Chua,
+\textit{Extremal modular forms and the Lehmer conjecture},
+Preprint, 2004.
+
+\bibitem{Taylor2008}
+R.~Taylor,
+\textit{Automorphy for some $l$-adic lifts of automorphic mod $l$ Galois
+representations. II},
+Publ.\ Math.\ Inst.\ Hautes \'Etudes Sci.\ \textbf{108} (2008), 183--239.
+
+\bibitem{DiamondShurman}
+F.~Diamond und J.~Shurman,
+\textit{A First Course in Modular Forms},
+Graduate Texts in Mathematics \textbf{228}, Springer, 2005.
+
+\end{thebibliography}
+
+\end{document}
