@@ -1,0 +1,751 @@
+%% paper66_informationstheorie_de.tex
+%% Paper 66: Informationstheorie und Kodierungstheorie (Deutsch)
+%% Autor: Michael Fuhrmann
+%% Projekt: Specialist Mathematics Project, Build 145
+%% Datum: 2026-03-12
+
+\documentclass{amsart}
+
+%% ---- Pakete ----
+\usepackage[ngerman]{babel}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+%% ---- Theorem-Umgebungen (Deutsch) ----
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\theoremstyle{remark}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\newtheorem{offenefrage}[theorem]{Offene Frage}
+
+%% ---- Operatoren ----
+\DeclareMathOperator{\Ent}{H}
+\DeclareMathOperator{\MI}{I}
+\DeclareMathOperator{\KL}{D_{KL}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\SNR}{\mathrm{SNR}}
+\newcommand{\wt}{\mathrm{wt}}
+\newcommand{\dist}{\mathrm{d}}
+
+%% ---- Titelblock ----
+\title{Informationstheorie und Kodierungstheorie:\\
+Shannons mathematisches Fundament und seine Grundlagen}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 145}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+%% ---- Abstract (VOR \maketitle!) ----
+\begin{abstract}
+Wir präsentieren eine strenge mathematische Darstellung der Informationstheorie
+und Kodierungstheorie, basierend auf Claude Shannons grundlegendem Werk
+\emph{A Mathematical Theory of Communication} (1948). Ausgehend von der
+axiomatischen Definition der Shannon-Entropie
+$H(X) = -\sum_i p_i \log_2 p_i$ entwickeln wir gegenseitige Information,
+die Datenverarbeitungsungleichung und Shannons zwei fundamentale Sätze: den
+Quellencodierungssatz (verlustlose Kompression) und den Kanalcodierungssatz
+(Übertragung über verrauschte Kanäle). Wir beweisen die Optimalität des
+Huffman-Codes, die Singleton-Schranke, die Hamming-Schranke sowie die
+kapazitätserreichende Eigenschaft von Polarcodes (Ar\i{}kan 2009). Ferner
+werden lineare Codes, Reed-Solomon-Codes, Turbo-Codes und LDPC-Codes behandelt.
+Den Abschluss bildet die algorithmische Informationstheorie, in der die
+Unberechenbarkeit der Kolmogorov-Komplexität $K(x)$ bewiesen wird. Alle
+Ergebnisse sind mit ihrem Beweisstand ausgezeichnet: bewiesene Sätze versus
+offene Vermutungen.
+\end{abstract}
+
+\maketitle
+
+%% ============================================================
+\section{Einleitung}
+%% ============================================================
+
+Im Jahr 1948 veröffentlichte Claude Elwood Shannon \emph{A Mathematical Theory
+of Communication}~\cite{Shannon1948} -- ein Werk, das gleichzeitig die
+Informationstheorie als mathematische Disziplin begründete und das
+Ingenieurswissen der digitalen Kommunikation auf eine exakte Basis stellte.
+Shannons zentraler Gedanke war, \emph{Information} als messbare Größe zu
+quantifizieren, unabhängig vom semantischen Inhalt der Nachrichten, und die
+fundamentalen Grenzen zuverlässiger Kommunikation über verrauschte Kanäle
+zu charakterisieren.
+
+Vor Shannon baute die Nachrichtentechnik auf Heuristiken und empirischem
+Entwurf. Shannon bewies, dass jeder Kommunikationskanal eine präzise Kapazität
+$C$ (gemessen in Bit pro Kanalnutzung) besitzt, und dass zuverlässige
+Kommunikation bei jeder Rate $R < C$ erreichbar ist, während Raten $R > C$
+grundsätzlich unmöglich sind. Dieses Resultat -- der Kanalcodierungssatz -- ist
+eines der tiefgründigsten der angewandten Mathematik.
+
+\subsection*{Überblick über dieses Paper}
+
+Das vorliegende Paper behandelt:
+\begin{enumerate}[label=(\arabic*)]
+  \item Shannon-Entropie und ihre Eigenschaften (bewiesen);
+  \item Gegenseitige Information und Datenverarbeitungsungleichung (bewiesen);
+  \item Quellencodierungssatz und Optimalität des Huffman-Codes (bewiesen);
+  \item Kanalkapazität und Shannon-Hartley-Formel für AWGN-Kanäle (bewiesen);
+  \item Kanalcodierungssatz und starke Umkehrung (bewiesen);
+  \item Fehlerkorrigierende Codes: Hamming- und Singleton-Schranke (bewiesen);
+  \item Lineare Codes, Hamming-Codes, Reed-Solomon-Codes;
+  \item Kapazitätserreichende Codes: Turbo, LDPC, Polar (Ar\i{}kan, bewiesen);
+  \item Algorithmische Informationstheorie und Kolmogorov-Komplexität
+        (teils bewiesen, teils offen).
+\end{enumerate}
+
+Alle Logarithmen sind zur Basis 2, sofern nicht anders angegeben; die
+Informationseinheit ist das \emph{Bit}.
+
+%% ============================================================
+\section{Entropie}
+%% ============================================================
+
+\subsection{Definition und grundlegende Eigenschaften}
+
+\begin{definition}[Shannon-Entropie]
+Sei $X$ eine diskrete Zufallsvariable mit Werten in einem endlichen Alphabet
+$\mathcal{X}$ und Wahrscheinlichkeitsverteilung $p(x) = \Pr[X = x]$.
+Die \emph{Shannon-Entropie} von $X$ ist
+\begin{equation}\label{eq:entropie}
+  H(X) \;=\; -\sum_{x \in \mathcal{X}} p(x)\log_2 p(x),
+\end{equation}
+wobei wir die Konvention $0 \log_2 0 = 0$ verwenden (durch Stetigkeit gerechtfertigt).
+Die Einheit ist \emph{Bit}.
+\end{definition}
+
+\begin{bemerkung}
+Äquivalent gilt $H(X) = \E[-\log_2 p(X)]$, d.\,h.\ die erwartete
+\emph{Überraschung} (Selbstinformation). Der \emph{Informationsgehalt} (Surprisal)
+eines Ereignisses $x$ ist $I(x) = -\log_2 p(x)$.
+\end{bemerkung}
+
+\begin{beispiel}
+Eine faire Münze ($p = 1/2$) hat $H = 1$ Bit. Eine verzerrte Münze mit $p = 0{,}9$
+hat $H = -0{,}9 \log_2 0{,}9 - 0{,}1 \log_2 0{,}1 \approx 0{,}469$ Bit.
+\end{beispiel}
+
+\begin{theorem}[Nicht-Negativität]\label{satz:nichtneg}
+$H(X) \geq 0$, mit Gleichheit genau dann, wenn $X$ deterministisch ist
+(d.\,h.\ $p(x^*)=1$ für ein bestimmtes $x^*$).
+\end{theorem}
+\begin{proof}
+Da $0 \leq p(x) \leq 1$, gilt $-\log_2 p(x) \geq 0$ für alle $x$ mit
+$p(x)>0$. Daher $H(X) \geq 0$. Gleichheit gilt genau dann, wenn
+$-p(x)\log_2 p(x)=0$ für alle $x$, d.\,h.\ $p(x) \in \{0,1\}$ für alle $x$.
+\end{proof}
+
+\begin{theorem}[Maximale Entropie bei Gleichverteilung]\label{satz:maxent}
+Unter allen Verteilungen auf einem Alphabet $\mathcal{X}$ der Größe $n$ wird
+die Entropie durch die Gleichverteilung $p(x) = 1/n$ maximiert, mit
+$H(X) = \log_2 n$.
+\end{theorem}
+\begin{proof}
+Nach der Log-Summen-Ungleichung (oder Jensen angewandt auf die konkave Funktion
+$-t\log_2 t$) gilt für jede Verteilung $p$ auf $\mathcal{X}$:
+\[
+  H(X) = -\sum_x p(x)\log_2 p(x) \leq \log_2 n,
+\]
+mit Gleichheit genau bei $p(x) = 1/n$ für alle $x$. Konkret:
+\[
+  \log_2 n - H(X) = \sum_x p(x)\log_2\!\frac{p(x)}{1/n} = \KL(p \,\|\, u) \geq 0,
+\]
+wobei $u$ die Gleichverteilung ist und $\KL \geq 0$ nach der Gibbs-Ungleichung
+(Nicht-Negativität der KL-Divergenz).
+\end{proof}
+
+\subsection{Verbundentropie und bedingte Entropie}
+
+\begin{definition}
+Für gemeinsam verteilte Zufallsvariablen $X, Y$ mit Verbundverteilung $p(x,y)$:
+\begin{align}
+  H(X,Y) &= -\sum_{x,y} p(x,y)\log_2 p(x,y), \\
+  H(X \mid Y) &= -\sum_{x,y} p(x,y)\log_2 p(x \mid y) = H(X,Y) - H(Y).
+\end{align}
+\end{definition}
+
+\begin{theorem}[Subadditivität der Entropie]\label{satz:subadditivitaet}
+$H(X,Y) \leq H(X) + H(Y)$, mit Gleichheit genau dann, wenn $X$ und $Y$
+unabhängig sind.
+\end{theorem}
+\begin{proof}
+$H(X) + H(Y) - H(X,Y) = \MI(X;Y) \geq 0$
+(gegenseitige Information ist nicht-negativ, bewiesen als Satz~\ref{satz:mi-nichtneg}).
+\end{proof}
+
+\begin{theorem}[Konditionierung verringert Entropie]\label{satz:kondred}
+$H(X \mid Y) \leq H(X)$, mit Gleichheit genau dann, wenn $X \perp Y$.
+\end{theorem}
+\begin{proof}
+$H(X) - H(X\mid Y) = \MI(X;Y) \geq 0$.
+\end{proof}
+
+%% ============================================================
+\section{Gegenseitige Information}
+%% ============================================================
+
+\subsection{Definition}
+
+\begin{definition}[Gegenseitige Information]
+Die \emph{gegenseitige Information} (mutual information) zweier diskreter
+Zufallsvariablen $X$ und $Y$ ist
+\begin{equation}\label{eq:mi}
+  \MI(X;Y) \;=\; H(X) + H(Y) - H(X,Y)
+  \;=\; \sum_{x,y} p(x,y)\log_2\frac{p(x,y)}{p(x)p(y)}.
+\end{equation}
+Äquivalent: $\MI(X;Y) = \KL(p_{XY} \,\|\, p_X \otimes p_Y)$.
+\end{definition}
+
+\begin{theorem}[Nicht-Negativität der gegenseitigen Information]\label{satz:mi-nichtneg}
+$\MI(X;Y) \geq 0$, mit Gleichheit genau dann, wenn $X$ und $Y$ unabhängig sind.
+\end{theorem}
+\begin{proof}
+$\MI(X;Y) = \KL(p_{XY}\|p_Xp_Y)$. Nach der Gibbs-Ungleichung (Jensen auf
+$-\log$):
+\[
+  \KL(p \| q) = \sum_x p(x)\log_2\frac{p(x)}{q(x)} \geq 0,
+\]
+mit Gleichheit genau dann, wenn $p = q$ überall. Daher $\MI(X;Y) \geq 0$, mit
+Gleichheit genau dann, wenn $p(x,y) = p(x)p(y)$ für alle $x,y$.
+\end{proof}
+
+\subsection{Datenverarbeitungsungleichung}
+
+\begin{theorem}[Datenverarbeitungsungleichung]\label{satz:dpu}
+Bildet $X \to Y \to Z$ eine Markov-Kette (d.\,h.\ $Z$ ist bedingt unabhängig
+von $X$ gegeben $Y$), so gilt
+\[
+  \MI(X;Z) \leq \MI(X;Y).
+\]
+\end{theorem}
+\begin{proof}
+Durch die Kettenregel der gegenseitigen Information:
+\begin{align*}
+  \MI(X;Y,Z) &= \MI(X;Y) + \MI(X;Z\mid Y), \\
+  \MI(X;Y,Z) &= \MI(X;Z) + \MI(X;Y\mid Z).
+\end{align*}
+Da $X \to Y \to Z$ eine Markov-Kette ist, gilt $\MI(X;Z \mid Y) = 0$. Also
+$\MI(X;Y) = \MI(X;Z) + \MI(X;Y \mid Z)$.
+Da $\MI(X;Y\mid Z) \geq 0$, folgt $\MI(X;Z) \leq \MI(X;Y)$.
+\end{proof}
+
+\begin{bemerkung}
+Die Datenverarbeitungsungleichung besagt, dass keine Nachbearbeitung von $Y$
+die Information über $X$ erhöhen kann. Sie ist grundlegend im maschinellen Lernen
+(keine deterministische Funktion der Merkmale kann die Information in den
+Merkmalen übersteigen) und in der Netzwerkinformationstheorie.
+\end{bemerkung}
+
+%% ============================================================
+\section{Quellencodierungssatz}
+%% ============================================================
+
+\subsection{Verlustlose Kompression}
+
+\begin{definition}[Präfixfreier Code]
+Ein \emph{präfixfreier} (instantaner) Code für $\mathcal{X}$ weist jedem
+$x \in \mathcal{X}$ ein binäres Codewort $C(x) \in \{0,1\}^*$ zu, sodass kein
+Codewort Präfix eines anderen ist. Die \emph{mittlere Codelänge} ist
+$\bar{L} = \sum_x p(x)\,|C(x)|$.
+\end{definition}
+
+\begin{theorem}[Quellencodierungssatz (Shannon 1948)]\label{satz:quellencodierung}
+Für jede diskrete Zufallsvariable $X$ mit Entropie $H(X)$ existiert ein
+präfixfreier Code mit mittlerer Codelänge $\bar{L}$, sodass
+\[
+  H(X) \;\leq\; \bar{L} \;<\; H(X) + 1.
+\]
+Kein präfixfreier Code kann $\bar{L} < H(X)$ erreichen.
+\end{theorem}
+\begin{proof}
+\textbf{Untere Schranke.} Nach der Kraft-Ungleichung erfüllt jeder präfixfreie
+Code $\sum_x 2^{-|C(x)|} \leq 1$. Sei $l_x = |C(x)|$. Dann:
+\begin{align*}
+  \bar{L} - H(X) &= \sum_x p(x)(l_x + \log_2 p(x)) \\
+  &= \sum_x p(x)\log_2\frac{p(x)}{2^{-l_x}}
+   = \KL\!\left(p \,\Big\|\, \{2^{-l_x}\}\right) \geq 0.
+\end{align*}
+
+\textbf{Obere Schranke.} Wähle $l_x = \lceil -\log_2 p(x)\rceil$. Dann gilt
+$l_x < -\log_2 p(x) + 1$, also $\sum_x 2^{-l_x} \leq \sum_x p(x) = 1$
+(Kraft erfüllt). Die mittlere Codelänge erfüllt
+\[
+  \bar{L} = \sum_x p(x)l_x < \sum_x p(x)(-\log_2 p(x) + 1) = H(X) + 1. \qedhere
+\]
+\end{proof}
+
+\subsection{Huffman-Codes}
+
+\begin{definition}[Huffman-Algorithmus (1952)]
+Gegeben Symbole mit Wahrscheinlichkeiten $p_1 \geq p_2 \geq \cdots \geq p_n$:
+\begin{enumerate}
+  \item Behandle jedes Symbol als Blattknoten mit Gewicht $p_i$.
+  \item Verschmelze wiederholt die zwei Knoten mit kleinstem Gewicht zu einem
+        neuen Elternknoten (Gewicht = Summe), beschrifte die Kinder mit 0 und 1.
+  \item Der entstehende Binärbaum definiert einen präfixfreien Code.
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[Optimalität des Huffman-Codes]\label{satz:huffman}
+Unter allen präfixfreien Codes minimiert der Huffman-Code die mittlere
+Codewortlänge $\bar{L}$.
+\end{theorem}
+\begin{proof}[Beweisschema]
+Durch vollständige Induktion über $n$. Induktionsanfang $n=2$: beide Symbole
+erhalten 1-Bit-Codes; optimal. Induktionsschritt: Sei $C^*$ ein beliebiger
+optimaler Code. Unter allen Symbolen mit minimaler Wahrscheinlichkeit haben
+mindestens zwei dieselbe maximale Codewortlänge (andernfalls ließe sich das
+längere Wort verkürzen und $\bar{L}$ reduzieren). O.\,B.\,d.\,A.\ bilden
+die zwei unwahrscheinlichsten Symbole $x_{n-1}, x_n$ in $C^*$ ein
+Geschwisterpaar. Zusammenfassen zu einem Meta-Symbol mit Wahrscheinlichkeit
+$p_{n-1}+p_n$ ergibt einen $(n-1)$-Symbol-Code $C'$ mit
+$\bar{L}(C^*) = \bar{L}(C') + (p_{n-1}+p_n)$. Nach Induktionsvoraussetzung
+minimiert Huffmans gieriges Zusammenfassen $\bar{L}(C')$, also auch
+$\bar{L}(C^*)$.
+\end{proof}
+
+%% ============================================================
+\section{Kanalkapazität}
+%% ============================================================
+
+\subsection{Diskrete gedächtnislose Kanäle}
+
+\begin{definition}[Diskreter gedächtnisloser Kanal]
+Ein \emph{diskreter gedächtnisloser Kanal} (DMC) ist durch das Eingangsalphabet
+$\mathcal{X}$, das Ausgangsalphabet $\mathcal{Y}$ und Übergangswahrscheinlichkeiten
+$p(y \mid x)$ gegeben. Gedächtnislos bedeutet: $p(y^n \mid x^n) =
+\prod_{i=1}^n p(y_i \mid x_i)$.
+\end{definition}
+
+\begin{definition}[Kanalkapazität]
+Die \emph{Kapazität} eines DMC ist
+\begin{equation}\label{eq:kapazitaet}
+  C \;=\; \max_{p(x)} \MI(X;Y),
+\end{equation}
+wobei das Maximum über alle Eingangsverteilungen $p(x)$ genommen wird.
+\end{definition}
+
+\begin{beispiel}[Binärer symmetrischer Kanal]
+Ein BSC mit Übergangswahrscheinlichkeit $\varepsilon \in [0,1/2)$ hat
+$C_{\mathrm{BSC}} = 1 - H_b(\varepsilon)$, wobei $H_b(\varepsilon) =
+-\varepsilon\log_2\varepsilon - (1-\varepsilon)\log_2(1-\varepsilon)$
+die binäre Entropiefunktion ist.
+\end{beispiel}
+
+\subsection{AWGN-Kanal und Shannon-Hartley-Theorem}
+
+\begin{definition}[AWGN-Kanal]
+Das \emph{additive weiße Gauß'sche Rauschen} (AWGN) Kanalmodell ist
+$Y = X + Z$, wobei $Z \sim \mathcal{N}(0, N_0/2)$ unabhängig vom Eingang $X$
+ist, der einer Leistungsschranke $\E[X^2] \leq P$ genügt.
+\end{definition}
+
+\begin{theorem}[Shannon-Hartley-Theorem]\label{satz:shannon-hartley}
+Die Kapazität des AWGN-Kanals mit Signalleistung $P$ und Rauschleistung $N$ ist
+\begin{equation}\label{eq:awgn}
+  C \;=\; \tfrac{1}{2}\log_2\!\left(1 + \tfrac{P}{N}\right)
+  \quad [\text{Bit pro Kanalnutzung}].
+\end{equation}
+Für eine Bandbreite $W$ (Hz) und Rauschleistungsdichte $N_0/2$ ergibt sich
+$C = W \log_2(1 + P/(N_0 W))$ Bit pro Sekunde.
+\end{theorem}
+\begin{proof}[Beweisschema]
+Die Entropie-Leistungs-Ungleichung besagt, dass die Gauß-Verteilung die
+differentielle Entropie $h(Y)$ unter Leistungsschranke maximiert. Mit
+$h(Z) = \frac{1}{2}\log_2(2\pi e N)$ und $h(Y) \leq \frac{1}{2}\log_2(2\pi
+e(P+N))$ folgt $\MI(X;Y) = h(Y) - h(Z) \leq \frac{1}{2}\log_2(1+P/N)$,
+angenommen von $X \sim \mathcal{N}(0,P)$.
+\end{proof}
+
+%% ============================================================
+\section{Kanalcodierungssatz}
+%% ============================================================
+
+\begin{theorem}[Kanalcodierungssatz (Shannon 1948)]\label{satz:kanalcodierung}
+Für einen DMC mit Kapazität $C$ gilt:
+\begin{enumerate}[label=(\alph*)]
+  \item \textbf{Erreichbarkeit.} Für jede Rate $R < C$ und jedes $\varepsilon > 0$
+        existieren Blockcodes der Länge $n$ (für genügend großes $n$) mit Rate $R$
+        und maximaler Fehlerwahrscheinlichkeit $P_e^{(n)} < \varepsilon$.
+  \item \textbf{Umkehrung.} Falls $R > C$, dann gilt für jede Folge von Codes
+        $P_e^{(n)} \to 1$ für $n \to \infty$.
+\end{enumerate}
+\end{theorem}
+\begin{proof}[Beweisschema (Zufällige Codierung)]
+\textbf{Erreichbarkeit.} Erzeuge ein Codebuch $\mathcal{C}$ mit $2^{nR}$
+Codewörtern $\mathbf{x}(m)$, $m \in [2^{nR}]$, jedes i.\,i.\,d.\ aus der
+kapazitätserreichenden Eingangsverteilung $p^*(x)$. Der Decoder verwendet
+\emph{typische Mengendekodierung}: erkläre $\hat{m}$, falls
+$(\mathbf{x}(\hat{m}), \mathbf{y})$ gemeinsam typisch und eindeutig ist.
+Nach dem asymptotischen Gleichverteilungssatz (AEP) ist die Wahrscheinlichkeit,
+dass das korrekte Codewort typisch ist, $\geq 1-\varepsilon$ für großes $n$.
+Die Wahrscheinlichkeit, dass ein falsches Codewort $m' \neq m$ gemeinsam typisch
+mit $\mathbf{y}$ ist, beträgt $\leq 2^{-n(I(X;Y)-\varepsilon)}$. Per Union Bound
+über $2^{nR}$ falsche Codewörter:
+\[
+  P_e \leq \varepsilon + 2^{nR} \cdot 2^{-n(C-\varepsilon)} \to 0 \quad \text{falls } R < C.
+\]
+
+\textbf{Umkehrung.} Durch Fano's Ungleichung: bei kleinem $P_e$ gilt
+$H(M \mid Y^n) \leq 1 + P_e \cdot nR$. Außerdem $\MI(M; Y^n) \leq nC$ (Kanalschranke).
+Da $nR = H(M) = \MI(M;Y^n) + H(M\mid Y^n)$, folgt $R \leq C + O(P_e)$,
+was $P_e \not\to 0$ erzwingt, wenn $R > C$.
+\end{proof}
+
+\begin{theorem}[Starke Umkehrung]\label{satz:starke-umkehrung}
+Für einen DMC mit Kapazität $C$ gilt: Falls $R > C$, so gilt
+$P_e^{(n)} \to 1$ exponentiell schnell.
+\end{theorem}
+\begin{proof}[Beweisschema]
+Mit der Methode der Typen oder Kugelpackungsexponenten erfüllt die
+Fehlerwahrscheinlichkeit $P_e^{(n)} \geq 1 - 2^{-n(E(R) - o(1))}$ für einen
+positiven Exponenten $E(R)>0$ bei $R>C$, was $P_e^{(n)} \to 1$ zeigt.
+\end{proof}
+
+%% ============================================================
+\section{Fehlerkorrigierende Codes}
+%% ============================================================
+
+\subsection{Hamming-Abstand und Grunddefinitionen}
+
+\begin{definition}[Hamming-Abstand]
+Für $\mathbf{u}, \mathbf{v} \in \{0,1\}^n$ ist der \emph{Hamming-Abstand}
+\[
+  \dist_H(\mathbf{u}, \mathbf{v}) = |\{i : u_i \neq v_i\}|.
+\]
+Das \emph{Hamming-Gewicht} von $\mathbf{v}$ ist $\wt(\mathbf{v}) =
+\dist_H(\mathbf{v}, \mathbf{0})$.
+\end{definition}
+
+\begin{definition}[$[n,k,d]$-Code]
+Ein \emph{binärer Blockcode} $\mathcal{C} \subseteq \{0,1\}^n$ mit
+$|\mathcal{C}| = 2^k$ und Minimaldistanz $d = \min_{\mathbf{c} \neq \mathbf{c}'}
+\dist_H(\mathbf{c}, \mathbf{c}')$ ist ein \emph{$[n,k,d]$-Code}. Er kann:
+\begin{itemize}
+  \item bis zu $d-1$ Fehler erkennen,
+  \item bis zu $\lfloor (d-1)/2 \rfloor$ Fehler korrigieren.
+\end{itemize}
+Die \emph{Rate} ist $R = k/n$. Die \emph{Redundanz} beträgt $n - k$ Bit.
+\end{definition}
+
+\subsection{Singleton-Schranke}
+
+\begin{theorem}[Singleton-Schranke]\label{satz:singleton}
+Jeder $[n,k,d]$-Code erfüllt
+\[
+  k \;\leq\; n - d + 1.
+\]
+\end{theorem}
+\begin{proof}
+Betrachte die $2^k$ Codewörter. Projiziere auf die ersten $k' = n-d+1$
+Koordinaten; die entstehenden Vektoren müssen alle verschieden sein (andernfalls
+stimmen zwei Codewörter in allen $k'$ Positionen überein, und da sie
+Abstand $\geq d$ haben, müssten sie sich in mindestens $d$ der verbleibenden
+$n-k'=d-1$ Positionen unterscheiden, was unmöglich ist). Daher
+$2^k \leq 2^{k'} = 2^{n-d+1}$.
+\end{proof}
+
+\begin{definition}[MDS-Codes]
+Codes, die $k = n - d + 1$ erreichen, heißen \emph{Maximum Distance Separable}
+(MDS). Reed-Solomon-Codes sind MDS.
+\end{definition}
+
+\subsection{Hamming-Schranke (Kugelpackungsschranke)}
+
+\begin{theorem}[Hamming-Schranke]\label{satz:hamming-schranke}
+Ein $[n,k,d]$-Code mit $d \geq 2t+1$ (der $t$ Fehler korrigiert) erfüllt
+\[
+  2^k \cdot \sum_{i=0}^{t}\binom{n}{i} \;\leq\; 2^n.
+\]
+\end{theorem}
+\begin{proof}
+Jedes Codewort $\mathbf{c}$ hat eine \emph{Hamming-Kugel} vom Radius $t$:
+$B(\mathbf{c}, t) = \{\mathbf{v} : \dist_H(\mathbf{v},\mathbf{c}) \leq t\}$
+mit $|B(\mathbf{c},t)| = \sum_{i=0}^t \binom{n}{i}$. Da $d \geq 2t+1$, sind
+diese Kugeln disjunkt und alle Teilmengen von $\{0,1\}^n$. Abzählen liefert
+die Schranke.
+\end{proof}
+
+\begin{definition}[Perfekter Code]
+Ein Code, der die Hamming-Schranke mit Gleichheit erfüllt, heißt
+\emph{perfekter Code}. Hamming-Codes (siehe Abschnitt~\ref{sec:linear-de})
+sind perfekte Codes.
+\end{definition}
+
+%% ============================================================
+\section{Lineare Codes}\label{sec:linear-de}
+%% ============================================================
+
+\subsection{Generatormatrix und Prüfmatrix}
+
+\begin{definition}[Linearer Code]
+Ein \emph{linearer $[n,k]$-Code} über $\mathbb{F}_2$ ist ein $k$-dimensionaler
+Unterraum von $\mathbb{F}_2^n$. Er wird beschrieben durch:
+\begin{itemize}
+  \item Eine \emph{Generatormatrix} $G \in \mathbb{F}_2^{k \times n}$: Codewörter
+        sind $\mathbf{c} = \mathbf{m} G$ für Nachrichten $\mathbf{m} \in \mathbb{F}_2^k$.
+  \item Eine \emph{Prüfmatrix} (Parity-Check Matrix) $H \in \mathbb{F}_2^{(n-k)
+        \times n}$ mit $H G^T = 0$: $\mathbf{c}$ ist ein Codewort genau dann, wenn
+        $H \mathbf{c}^T = \mathbf{0}$.
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Syndrom]
+Für ein empfangenes Wort $\mathbf{r}$ ist das \emph{Syndrom}
+$\mathbf{s} = H\mathbf{r}^T$. Falls $\mathbf{s} = \mathbf{0}$, wurde kein
+(erkennbarer) Fehler übertragen.
+\end{definition}
+
+\subsection{Hamming-Codes}
+
+\begin{definition}[Hamming-Code $[2^r-1, 2^r-r-1, 3]$]
+Für $r \geq 2$ hat der \emph{Hamming-Code} eine Prüfmatrix $H$, deren Spalten
+alle $2^r - 1$ von Null verschiedenen Binärvektoren der Länge $r$ sind. Parameter:
+$n = 2^r - 1$, $k = 2^r - r - 1$, $d = 3$.
+\end{definition}
+
+\begin{proposition}[Hamming-Codes sind perfekt]
+Hamming-Codes erfüllen die Hamming-Schranke mit Gleichheit und sind damit
+perfekte 1-Fehler-korrigierende Codes.
+\end{proposition}
+\begin{proof}
+Mit $t=1$: $2^k \cdot (1 + n) = 2^{2^r-r-1} \cdot 2^r = 2^{2^r-1} = 2^n$.
+\end{proof}
+
+\subsection{Reed-Solomon-Codes}
+
+\begin{definition}[Reed-Solomon-Code]
+Sei $q = p^m$ eine Primzahlpotenz und $\alpha_1,\ldots,\alpha_n$ seien $n$
+verschiedene Elemente von $\mathbb{F}_q$. Der \emph{Reed-Solomon-Code} der
+Dimension $k$ ist
+\[
+  \mathcal{C}_{RS} = \bigl\{(f(\alpha_1),\ldots,f(\alpha_n)) :
+  f \in \mathbb{F}_q[x],\; \deg f \leq k-1\bigr\}.
+\]
+Es handelt sich um einen $[n, k, n-k+1]$-Code über $\mathbb{F}_q$, also MDS.
+\end{definition}
+
+\begin{bemerkung}
+Reed-Solomon-Codes über $\mathbb{F}_{2^8}$ werden für die Fehlerkorrektur auf
+CDs/DVDs und in RAID-6-Speichersystemen eingesetzt. Effiziente Dekodierung bis
+zu $\lfloor(n-k)/2\rfloor$ Fehlern ist durch den Berlekamp-Massey- oder
+euklidischen Algorithmus möglich.
+\end{bemerkung}
+
+%% ============================================================
+\section{Kapazitätserreichende Codes}
+%% ============================================================
+
+\subsection{Turbo-Codes}
+
+\begin{definition}[Turbo-Code (Berrou--Glavieux--Thitimajshima, 1993)]
+Ein \emph{Turbo-Code} ist eine Parallelverkettung zweier rekursiver systematischer
+Faltungscodierer (RSC), getrennt durch einen Pseudo-Zufalls-Interleaver. Die
+Dekodierung erfolgt iterativ durch \emph{Belief Propagation} (Turbo-Dekodierung)
+zwischen den zwei Komponentendecodern.
+\end{definition}
+
+\begin{bemerkung}
+Turbo-Codes waren die ersten praxistauglichen Codes, die nahe an die
+Shannon-Kapazität für AWGN-Kanäle herankamen. Die kapazitätserreichende
+Eigenschaft im Grenzwert großer Blocklängen folgt aus der Dichteentwicklungs-Analyse.
+\end{bemerkung}
+
+\subsection{LDPC-Codes}
+
+\begin{definition}[LDPC-Code (Gallager, 1960/1963)]
+Ein \emph{Low-Density Parity-Check (LDPC)}-Code ist ein linearer Code, dessen
+Prüfmatrix $H$ dünn besetzt ist (die meisten Einträge sind Null). Gallagers
+ursprüngliche reguläre LDPC-Codes haben konstante Spaltengewicht $d_v$ und
+Zeilengewicht $d_c$.
+\end{definition}
+
+\begin{bemerkung}
+LDPC-Codes, dekodiert durch Belief Propagation auf dem Tanner-Graphen, können
+Raten beliebig nahe an der Shannon-Kapazität des AWGN-Kanals erreichen.
+Dies wurde von Richardson und Urbanke (2001) durch Dichteentwicklung gezeigt.
+\end{bemerkung}
+
+\subsection{Polarcodes und Ar\i{}kans Satz}
+
+\begin{definition}[Polarcode (Ar\i{}kan, 2009)]
+Sei $W$ ein binärer gedächtnisloser Kanal mit Kapazität $C(W)$. Polarcodes
+nutzen das Phänomen der \emph{Kanalpolarisierung}: Durch Anwenden von $n = 2^\ell$
+Kopien von $W$ unter der Polarisierungstransformation $G_n = B_n F^{\otimes \ell}$
+(mit $F = \begin{pmatrix}1&0\\1&1\end{pmatrix}$ und $B_n$ als Bitreihenfolgeumkehrung)
+entstehen $n$ synthetische Kanäle $W_n^{(i)}$, $i = 1, \ldots, n$, die sich zu
+entweder perfekten ($I(W_n^{(i)}) \to 1$) oder nutzlosen ($I(W_n^{(i)}) \to 0$)
+Kanälen polarisieren. Informationsbits werden nur auf den ``guten'' Kanälen gesendet;
+die restlichen werden eingefroren.
+\end{definition}
+
+\begin{theorem}[Kapazitätserreichende Eigenschaft von Polarcodes (Ar\i{}kan 2009)]
+\label{satz:polar}
+Für jeden binären gedächtnislosen symmetrischen Kanal $W$ mit Kapazität $C(W)$
+und jede Rate $R < C(W)$ erreichen Polarcodes der Blocklänge $n = 2^\ell$ eine
+Blockfehlerwahrscheinlichkeit
+\[
+  P_e \;\leq\; 2^{-n^\beta}
+\]
+für jedes $\beta < 1/2$ und hinreichend großes $n$, bei Codier- und
+Dekodierkomplexität $O(n \log n)$.
+\end{theorem}
+\begin{proof}[Beweisschema]
+Ar\i{}kans Kernidee ist das Polarisierungslemma: für $I_n = \frac{1}{n}\sum_i
+I(W_n^{(i)})$ gilt $I_n = C(W)$ für alle $n$ (Kapazitätserhaltung). Durch den
+Martingal-Konvergenzsatz konvergiert der Anteil der Kanäle mit $I(W_n^{(i)})
+> 1-\delta$ gegen $C(W)$, und der Anteil mit $I(W_n^{(i)}) < \delta$ gegen
+$1-C(W)$. Die Fehlerwahrscheinlichkeit auf jedem guten Kanal fällt wie
+$2^{-2^{\ell\beta}}$ durch die rekursive Struktur der sukzessiven Auslöschungsdekodierung,
+woraus die behauptete Schranke folgt. Details in \cite{Arikan2009}.
+\end{proof}
+
+\begin{bemerkung}
+Polarcodes sind die ersten provably kapazitätserreichenden Codes mit effizienter
+($O(n\log n)$) Kodierung und Dekodierung. Sie sind im 5G-NR-Standard für die
+Steuerkanal-Codierung eingesetzt.
+\end{bemerkung}
+
+%% ============================================================
+\section{Algorithmische Informationstheorie}
+%% ============================================================
+
+\subsection{Kolmogorov-Komplexität}
+
+\begin{definition}[Kolmogorov-Komplexität (Solomonoff 1960, Kolmogorov 1965, Chaitin 1969)]
+Sei $\mathcal{U}$ eine universelle Turing-Maschine. Die \emph{Kolmogorov-Komplexität}
+einer endlichen Binärzeichenkette $x$ ist
+\[
+  K(x) \;=\; \min\bigl\{|\pi| : \mathcal{U}(\pi) = x\bigr\},
+\]
+die Länge des kürzesten Programms $\pi$, das $\mathcal{U}$ veranlasst, $x$
+auszugeben.
+\end{definition}
+
+\begin{theorem}[Invarianz]\label{satz:invarianz}
+Bis auf eine nur von der Wahl der universellen Turing-Maschine abhängige additive
+Konstante ist $K(x)$ wohldefiniert (unabhängig von $\mathcal{U}$).
+\end{theorem}
+\begin{proof}
+Jede universelle Turing-Maschine $\mathcal{U}_1$ kann $\mathcal{U}_2$ mit einem
+festen Präfix (Interpreter) der Länge $c_{12}$ simulieren. Daher
+$K_1(x) \leq K_2(x) + c_{12}$, und symmetrisch $K_2(x) \leq K_1(x) + c_{21}$.
+\end{proof}
+
+\begin{theorem}[Unberechenbarkeit der Kolmogorov-Komplexität]\label{satz:kolmogorov-unberechenbar}
+Die Funktion $x \mapsto K(x)$ ist nicht berechenbar.
+\end{theorem}
+\begin{proof}
+Angenommen, $K$ wäre berechenbar. Ordne alle Binärzeichenketten $x_1, x_2, \ldots$
+lexikographisch und sei $n$ eine große ganze Zahl. Definiere die Zeichenkette
+$s$ = ``die erste Zeichenkette $x$ mit $K(x) > n$''. Diese Zeichenkette $s$ ist
+wohldefiniert (da $K$ unbeschränkt wächst) und berechenbar aus $n$. Das Programm,
+das $s$ berechnet, hat Länge $O(\log n)$, also $K(s) = O(\log n) \ll n$ für
+großes $n$. Andererseits gilt per Definition $K(s) > n$ -- ein Widerspruch.
+\end{proof}
+
+\subsection{Chaitins $\Omega$ und algorithmische Zufälligkeit}
+
+\begin{definition}[Chaitins $\Omega$]
+Für eine präfixfreie universelle Turing-Maschine ist die \emph{Haltwahrscheinlichkeit}
+\[
+  \Omega \;=\; \sum_{\mathcal{U}(\pi)\text{ hält}} 2^{-|\pi|}
+\]
+eine reelle Zahl in $(0,1)$, die \emph{algorithmisch zufällig} ist: ihre binäre
+Entwicklung ist inkomprimierbar in dem Sinne, dass
+$K(\Omega \upharpoonright n) \geq n - O(1)$.
+\end{definition}
+
+\begin{offenefrage}[Chaitins $\Omega$]
+Keine explizite geschlossene Darstellung von $\Omega$ ist bekannt. Kein Algorithmus
+kann mehr als endlich viele Bits von $\Omega$ berechnen; tatsächlich kodiert jedes
+Bit von $\Omega$ eine unabhängige ``orakulare'' Aussage über das Halteproblem.
+Ob weitere strukturelle Eigenschaften von $\Omega$ bestimmbar sind, bleibt offen.
+\end{offenefrage}
+
+\begin{theorem}[AIT und Shannon-Entropie (Brudno 1983)]
+Für eine ergodische stationäre Quelle $\mu$ gilt für fast jede Folge $x$:
+\[
+  \lim_{n\to\infty} \frac{K(x_{1:n})}{n} = H(\mu),
+\]
+wobei $H(\mu)$ die Entropierate der Quelle ist.
+\end{theorem}
+\begin{proof}
+Dies folgt aus Brudnos Theorem, das die Kolmogorov-Komplexitätsrate einzelner
+Folgen mit der maßtheoretischen Entropierate verknüpft; vgl.\ \cite{CoverThomas2006}.
+\end{proof}
+
+%% ============================================================
+\section{Literatur}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Shannon1948}
+C.~E. Shannon,
+\emph{A Mathematical Theory of Communication},
+Bell System Technical Journal \textbf{27} (1948), 379--423 und 623--656.
+
+\bibitem{Shannon1959}
+C.~E. Shannon,
+\emph{Coding Theorems for a Discrete Source with a Fidelity Criterion},
+IRE National Convention Record \textbf{4} (1959), 142--163.
+
+\bibitem{CoverThomas2006}
+T.~M. Cover und J.~A. Thomas,
+\emph{Elements of Information Theory}, 2.\ Aufl.,
+Wiley-Interscience, Hoboken, NJ, 2006.
+
+\bibitem{Gallager1963}
+R.~G. Gallager,
+\emph{Low-Density Parity-Check Codes},
+MIT Press, Cambridge, MA, 1963.
+
+\bibitem{Arikan2009}
+E.~Ar\i{}kan,
+\emph{Channel Polarization: A Method for Constructing Capacity-Achieving Codes
+for Symmetric Binary-Input Memoryless Channels},
+IEEE Transactions on Information Theory \textbf{55} (2009), Nr.~7, 3051--3073.
+
+\bibitem{Huffman1952}
+D.~A. Huffman,
+\emph{A Method for the Construction of Minimum-Redundancy Codes},
+Proceedings of the IRE \textbf{40} (1952), Nr.~9, 1098--1101.
+
+\bibitem{Kolmogorov1965}
+A.~N. Kolmogorow,
+\emph{Drei Ansätze zur mengentheoretischen Definition des Informationsbegriffs},
+Probleme der Informationsübertragung \textbf{1} (1965), Nr.~1, 1--7.
+
+\bibitem{RichardsonUrbanke2001}
+T.~J. Richardson und R.~L. Urbanke,
+\emph{The Capacity of Low-Density Parity-Check Codes under Message-Passing
+Decoding},
+IEEE Transactions on Information Theory \textbf{47} (2001), Nr.~2, 599--618.
+
+\bibitem{Berrou1993}
+C.~Berrou, A.~Glavieux und P.~Thitimajshima,
+\emph{Near Shannon Limit Error-Correcting Coding and Decoding: Turbo-Codes},
+Proc.\ IEEE ICC 1993, 1064--1070.
+
+\bibitem{Singleton1964}
+R.~C. Singleton,
+\emph{Maximum Distance $q$-nary Codes},
+IEEE Transactions on Information Theory \textbf{10} (1964), Nr.~2, 116--118.
+
+\end{thebibliography}
+
+\end{document}
