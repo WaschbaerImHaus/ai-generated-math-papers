@@ -713,3 +713,41 @@ Zusammen mit Batches 1–10 (Papers 1–39) bildet das den vollständigen Paper-
 
 ### Build-Nummer
 - src/build.txt: 148 → 149
+
+=== 2026-03-12 — Build 151 — Bug-Fixes Paper 39 DE (Langlands-Programm) ===
+
+2026-03-12 [Build 151]: Bug-Fixes in papers/batch10/paper39_langlands_programm_de.tex
+
+### Analyse aller gemeldeten Bugs
+
+**BUG-B10-P39-DE-LLC-HISTORY (HIGH):**
+Geprüft: Die Chronologie in Section 4 (lokale Langlands-Korrespondenz) ist korrekt.
+- GL₂(F): Kutzko (1980) — eigenständig, keine fehlerhafte Abhängigkeit
+- GL_n(F): Henniart (2000) und Harris–Taylor (2001) — unabhängig voneinander
+ERGEBNIS: Kein Fehler vorhanden, keine Änderung notwendig.
+
+**BUG-B10-P39-DE-MISSING-SECTIONS (HIGH):**
+Geprüft: Das DE Paper enthält bereits:
+- Section 7: "Die Langlands-Funktorialitätsvermutung" (entspricht EN Section 7)
+- Section 8: "Das p-adische Langlands-Programm" (entspricht EN Section 8)
+ERGEBNIS: Keine Abschnitte fehlen, keine Änderung notwendig.
+
+**BUG-B10-P39-DE-MISSING-BIBITEMS (MEDIUM):**
+Geprüft: Die Bibliography enthält bereits:
+- \bibitem{Henniart2000} — vorhanden in Zeilen 397–401
+- \bibitem{FrenkelBenZvi} — vorhanden in Zeilen 427–431
+ERGEBNIS: Keine fehlenden Bibitems, keine Änderung notwendig.
+
+**BUG-B10-P39-DE-GALOIS-L-INCOMPLETE (GERING) — BEHOBEN:**
+Definition "L-Funktion einer Galois-Darstellung" (Definition 2.3) war unvollständig:
+Das Eulerprodukt fehlte die Erklärung für verzweigte Primzahlen (schlechte Reduktion).
+BEHOBEN: Ergänzung nach der Formel:
+- Klarstellung dass das Produkt nur über unverzweigte p läuft
+- Hinweis auf lokale Euler-Faktoren L(s, ρ|_{W_{Qp}}) für verzweigte p
+- Verweis auf die Weil-Deligne-Gruppe WD(Qp) = W_{Qp} ⋉ ℂ mit Nilpotenz-Matrix N
+
+### Geänderte Dateien
+- papers/batch10/paper39_langlands_programm_de.tex: Definition 2.3 erweitert
+
+### Build-Nummer
+- src/build.txt: 150 → 151

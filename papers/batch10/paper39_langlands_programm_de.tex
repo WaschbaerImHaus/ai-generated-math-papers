@@ -133,8 +133,13 @@ Für eine Primzahl $p \nmid \ell\cdot\Delta(E)$ (gute Reduktion) gilt:
 Für $\rho : \GQ \to \GL_n(\Q_\ell)$, unverzweigt bei fast allen Primzahlen, ist
 die \emph{$L$-Funktion}
 \[
-  L(s, \rho) = \prod_p \det\!\bigl(1 - \rho(\Frob_p)\,p^{-s}\bigr)^{-1}.
+  L(s, \rho) = \prod_p \det\!\bigl(1 - \rho(\Frob_p)\,p^{-s}\bigr)^{-1},
 \]
+wobei das Produkt über die Primzahlen $p$ läuft, bei denen $\rho$ unverzweigt ist.
+An den \emph{verzweigten} Primzahlen (schlechte Reduktion) verwendet man den
+lokalen Euler-Faktor $L(s, \rho|_{W_{\Q_p}})$ der Weil--Deligne-Gruppe
+$\mathrm{WD}(\Q_p) = W_{\Q_p} \ltimes \C$, wobei die Trägheitsgruppe $I_p$
+durch die Nilpotent-Matrix $N$ kodiert wird.
 \end{definition}
 
 % ================================================================
