@@ -230,3 +230,47 @@
 - Numerische Verifikation: n≤50000, τ(n)≠0, 4330s Rechenzeit, 0 Deligne-Verletzungen
 - Eulerprodukt-Degeneration bei τ(p₀)=0 korrekt hergeleitet
 - Rekurrenz-Folge τ(p₀^k) für k gerade/ungerade korrekt ausgerechnet
+
+=== 2026-03-12 — Build 134 — Batch 11 vollständiges Audit (Papers 40–43) ===
+
+2026-03-12 [Build 134]: Vollständiges mathematisches und formales Audit aller 8 LaTeX-Papers in Batch 11
+
+### Geprüfte Dateien
+- papers/batch11/paper40_giuga_four_primes_en.tex
+- papers/batch11/paper40_giuga_vier_primfaktoren_de.tex
+- papers/batch11/paper41_erdos_straus_en.tex
+- papers/batch11/paper41_erdos_straus_de.tex
+- papers/batch11/paper42_kurepa_conjecture_en.tex
+- papers/batch11/paper42_kurepa_vermutung_de.tex
+- papers/batch11/paper43_lehmer_tau_en.tex
+- papers/batch11/paper43_lehmer_tau_de.tex
+
+### Durchgeführte Korrekturen
+
+**paper40 EN + DE (KRITISCH):**
+- \address{Specialist Mathematics Project, Build 131} → Build 133 (war veraltet)
+
+**paper43 EN (KRITISCH):**
+- Fehlendes \newtheorem{conjecture}[theorem]{Conjecture} hinzugefügt
+  (Umgebung wurde bei conj:lehmer verwendet, aber nicht definiert — LaTeX-Fehler)
+
+**paper43 EN + DE (MITTEL):**
+- \maketitle stand VOR \begin{abstract} — bei amsart falsche Reihenfolge
+  Korrigiert: abstract jetzt VOR maketitle (amsart-Standard)
+
+### Mathematisch verifiziert (numerisch)
+- Giuga-Identität n=1722: φ(1722)=480 = n-e3+e2-e1+1 ✓
+- τ(1)..τ(12): alle korrekt ✓
+- τ(100) = 37.534.859.200 ✓ (via τ(4)·τ(25) = -1472·(-25499225))
+- τ(1000) = -30.328.412.970.240.000 ✓ (via τ(8)·τ(125))
+- Kurepa: π(10^7)=664579, ungerade Primzahlen=664578 ✓
+- Erdős-Straus n≥2 korrekt, Diophantische Form 4abc=n(ab+ac+bc) korrekt
+
+### Ergebnis
+- Kritische Bugs behoben: 3
+- Mittlere Bugs behoben: 2
+- Keine mathematischen Fehler gefunden
+- Alle 8 Papers: DRUCKREIF nach Korrekturen
+
+### Neues Review-Dokument
+- reviews/review_batch11_2026_03_12.md erstellt
