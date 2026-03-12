@@ -1125,3 +1125,41 @@ viele Nullstellen auf der kritischen Linie liegen.
 - `papers/batch21/paper83_beal_vermutung_de.tex` — Deutsche Entsprechung
 
 ### Build-Nummer: 163 → 164
+
+=== 2026-03-12 — Build 164 — Batch 25: Papers 96–97 (EN + DE) ===
+
+2026-03-12 [Build 164]: 4 neue LaTeX-Papers in papers/batch25/
+
+### Neue Dateien
+- papers/batch25/paper96_grothendieck_standard_conjectures_en.tex
+  Grothendieck's Standard Conjectures on Algebraic Cycles (EN)
+  14 Abschnitte: Weil-Kohomologie, Zyklenäquivalenzen, Lefschetz-Operator,
+  Vermutungen A/B/C/D (alle als \conjecture), Implikationsdiagramm,
+  Bezug zu Weil-/Hodge-/Tate-Vermutungen, Motive, André, Jannsen, 18 Referenzen
+
+- papers/batch25/paper96_grothendieck_standard_vermutungen_de.tex
+  Grothendiecks Standardvermutungen (DE), identische mathematische Tiefe,
+  \vermutung-Umgebungen für alle vier Vermutungen A–D, 18 Referenzen
+
+- papers/batch25/paper97_kontsevich_integral_en.tex
+  The Kontsevich Integral and Vassiliev Invariants (EN)
+  14 Abschnitte: Vassiliev-Invarianten, Sehnendiagramme/4T/1T, Gewichtssysteme,
+  Kontsevich-Integral (analytische Formel), Drinfeld-Assoziator/KZ-Gleichung,
+  farbiges Jones-Polynom, Universalität, Vollständigkeitsvermutung,
+  Wheeling-Satz, LMO-Invariante, Chern-Simons, 16 Referenzen
+
+- papers/batch25/paper97_kontsevich_integral_de.tex
+  Das Kontsevich-Integral und Vassiliev-Invarianten (DE), alle unbewiesenen
+  Aussagen als \vermutung, 16 Referenzen
+
+### Mathematische Besonderheiten
+- Alle 4 Grothendieck-Standardvermutungen (A, B, C, D) als explizite
+  \conjecture/\vermutung-Blöcke mit vollständiger formaler Aussage
+- Kleimans Satz (D ⟹ A) mit Beweisidee
+- Jannsens Halbeinachheitssatz (unbedingt)
+- Andrés motivierte Zyklen (unbedingt, aber keine Vermutungen)
+- Kontsevich-Integral als iterated integral: vollständige analytische Formel
+- Drinfeld-Assoziator Φ_KZ: KZ-Gleichung und Eigenschaften
+- Vollständigkeitsvermutung und Unknoten-Vermutung als \vermutung
+- Wheeling-Theorem: BEWEIS (nicht Vermutung)
+- Volumen-Vermutung als \vermutung

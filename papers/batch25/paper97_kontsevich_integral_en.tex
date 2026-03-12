@@ -1,0 +1,852 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Ac}{\mathcal{A}}
+\newcommand{\Bc}{\mathcal{B}}
+\newcommand{\Cc}{\mathcal{C}}
+\newcommand{\At}{\widehat{\mathcal{A}}}
+\newcommand{\dr}{\,\mathrm{d}}
+\newcommand{\dbar}{\bar{\partial}}
+\newcommand{\KZ}{\mathrm{KZ}}
+\newcommand{\ord}{\mathrm{ord}}
+\newcommand{\deg}{\mathrm{deg}}
+\DeclareMathOperator{\deg}{deg}
+\DeclareMathOperator{\End}{End}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\STU}{STU}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{The Kontsevich Integral and Vassiliev Invariants:\\
+       Classification of Knots via Chord Diagrams}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 170}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Vassiliev (finite-type) knot invariants, introduced by Vassiliev in 1990 and
+reformulated combinatorially by Birman and Lin, are among the most powerful
+and structured invariants in low-dimensional topology.  The Kontsevich
+integral $Z(K)$, constructed by Maxim Kontsevich in 1993, is a universal
+Vassiliev invariant: it is a formal power series in the graded algebra $\mathcal{A}$
+of chord diagrams modulo the $4T$ and $1T$ relations, taking values such that
+every Vassiliev invariant factors through~$Z$.  In this paper we develop
+the full framework: chord diagrams and the $4T$/$1T$ relations; weight systems
+and their relation to Lie algebras; the Kontsevich integral as an iterated
+Chen iterated integral; the Drinfeld associator $\Phi_{\mathrm{KZ}}$ and its
+role in regularising the integral at crossings; the coloured Jones polynomial
+as a specialisation; the open conjecture that $Z$ is a complete invariant;
+the Wheeling theorem (Bar-Natan--Le--Thurston); and the Le--Murakami--Ohtsuki
+invariant.  All unproven statements are carefully labelled as conjectures.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+% -------------------------------------------------------
+\section{Introduction and Historical Overview}
+% -------------------------------------------------------
+
+The classification of knots --- the topological type of embeddings
+$K: S^1 \hookrightarrow S^3$ up to ambient isotopy --- is a central
+problem of low-dimensional topology.  Classical invariants such as the
+Alexander polynomial (1928) and the Jones polynomial (1984) distinguish
+many knots, but neither is a complete invariant.
+
+The discovery of the Jones polynomial~\cite{jones1985} triggered a revolution:
+Witten~\cite{witten1989} interpreted it via $3$-dimensional Chern-Simons
+gauge theory with gauge group $\mathrm{SU}(2)$, suggesting that a ``complete''
+knot invariant might arise from quantum field theory.  Simultaneously,
+Vassiliev~\cite{vassiliev1990} introduced finite-type invariants via the
+topology of discriminant spaces (spaces of singular knots).
+
+Kontsevich~\cite{kontsevich1993} unified these approaches by constructing
+the \emph{Kontsevich integral}: a single formal-power-series-valued invariant
+that contains all Vassiliev invariants as coefficients of its expansion.
+Kontsevich's construction draws on the theory of iterated integrals of Chen,
+on the Drinfeld associator from quantum groups, and on combinatorial structures
+of chord diagrams.
+
+\subsection*{Organisation of the paper}
+
+Section~\ref{sec:vassiliev} defines Vassiliev invariants via the
+Vassiliev resolution and singular knots.
+Section~\ref{sec:chord} introduces chord diagrams, the $4T$ and $1T$ relations,
+and the algebra $\Ac$ of chord diagrams.
+Section~\ref{sec:weight} develops weight systems and their Lie-algebraic
+construction.
+Section~\ref{sec:KI} constructs the Kontsevich integral via iterated integrals.
+Section~\ref{sec:convergence} addresses convergence and the Drinfeld associator.
+Section~\ref{sec:associator} treats the Knizhnik-Zamolodchikov associator $\Phi_{\mathrm{KZ}}$.
+Section~\ref{sec:jones} relates the Kontsevich integral to the coloured Jones polynomial.
+Section~\ref{sec:universality} proves the universality of the Kontsevich integral.
+Section~\ref{sec:completeness} discusses the completeness conjecture.
+Section~\ref{sec:barley} presents the wheeling theorem.
+Section~\ref{sec:LMO} introduces the Le-Murakami-Ohtsuki invariant.
+Section~\ref{sec:chern} connects the theory to Chern-Simons field theory.
+Section~\ref{sec:open} lists open problems.
+
+% -------------------------------------------------------
+\section{Vassiliev (Finite-Type) Invariants}\label{sec:vassiliev}
+% -------------------------------------------------------
+
+\begin{definition}[Knot invariant]
+A \emph{knot} is an ambient isotopy class of smooth embeddings $S^1 \to S^3$
+(or $\R^3$).  A \emph{knot invariant} is a map $v: \{\text{knots}\} \to \mathbf{k}$
+(where $\mathbf{k}$ is a commutative ring, typically $\Q$ or $\C$) invariant
+under ambient isotopy.
+\end{definition}
+
+\begin{definition}[Singular knots and the Vassiliev skein relation]
+A \emph{singular knot with $n$ double points} is a smooth immersion
+$K: S^1 \looparrowright S^3$ with exactly $n$ transverse self-intersections.
+Extend any knot invariant $v$ to singular knots by the \emph{Vassiliev
+(finite-difference) relation}:
+\[
+  v\!\left(\,\begin{tikzpicture}[baseline=-2pt,scale=0.35]
+    % crossing symbol
+  \end{tikzpicture}\,\right)
+  = v(K_+) - v(K_-),
+\]
+where $K_+$ (resp.\ $K_-$) is obtained by resolving the double point
+positively (resp.\ negatively).  More precisely:
+\[
+  v\Bigl(\,\raisebox{-3pt}{\includegraphics[height=12pt]{crossing}}\,\Bigr)
+  = v(K_+) - v(K_-).
+\]
+In symbolic notation, for a double point $\times$ we write
+$v(\times) = v(K_+) - v(K_-)$.
+\end{definition}
+
+Since the above requires a picture, we give the formal algebraic definition:
+
+\begin{definition}[Vassiliev skein relation, algebraic form]\label{def:vassiliev}
+Let $v: \{\text{knots}\} \to \mathbf{k}$ be a knot invariant.  Extend $v$ to
+singular knots inductively: for a singular knot $K_\times$ with a marked
+double point,
+\[
+  v(K_\times) \;:=\; v(K_+) - v(K_-),
+\]
+where $K_+, K_-$ are the two resolutions of the double point (positive and
+negative crossing).  Then $v$ is a \emph{Vassiliev invariant of type $\leq n$}
+(or \emph{finite-type invariant of order $n$}) if $v$ vanishes on all singular
+knots with more than $n$ double points:
+\[
+  v(K_\times) = 0 \quad \text{for all singular knots with } > n \text{ double points}.
+\]
+\end{definition}
+
+\begin{example}[Vassiliev invariants of small order]
+\begin{enumerate}[label=(\alph*)]
+  \item Every invariant of type $0$ is constant (i.e.\ detects only the unknot
+        from all knots if it's non-constant).
+  \item Every invariant of type $1$ is constant (since there are no
+        type-$1$ non-trivial invariants).
+  \item The first non-trivial Vassiliev invariant has type $2$; it is the
+        coefficient $a_2$ in the Conway polynomial $\nabla(K)(z) = \sum a_{2i} z^{2i}$.
+        Equivalently, $a_2(K) = \frac{1}{6}(J_2(K)|_{q=1})$ where $J_2$ is
+        the coloured Jones polynomial for the 2-dimensional representation.
+  \item The Casson invariant $\lambda(K)$ (for knots in homology spheres) is
+        a Vassiliev invariant of type $2$.
+\end{enumerate}
+\end{example}
+
+\begin{theorem}[Birman-Lin 1993, Vassiliev invariants and Taylor expansion]
+\label{thm:birmanlin}
+Vassiliev invariants of order $\leq n$ are precisely those knot invariants
+whose ``$n$-th derivative at the unknot'' is well-defined, where the
+derivative is taken via the Vassiliev skein relation.  They form a
+filtered vector space $\mathcal{V}_0 \subseteq \mathcal{V}_1 \subseteq
+\mathcal{V}_2 \subseteq \cdots$ with $\bigcup_n \mathcal{V}_n = \mathcal{V}$.
+\end{theorem}
+
+% -------------------------------------------------------
+\section{Chord Diagrams and the Algebra $\mathcal{A}$}\label{sec:chord}
+% -------------------------------------------------------
+
+\begin{definition}[Chord diagram]
+A \emph{chord diagram of order $n$} is an oriented circle (representing the
+domain $S^1$) with $n$ unordered pairs of distinct points connected by
+\emph{chords} (arcs in the interior of the disc).  Two chord diagrams are
+considered the same if they are related by an orientation-preserving
+diffeomorphism of the circle.  Let $\Ac_n$ denote the $\Q$-vector space
+spanned by chord diagrams of order $n$.
+\end{definition}
+
+\begin{definition}[$4T$ relation]
+The \emph{four-term relation ($4T$)} in $\Ac_n$ is:
+\[
+  D_1 - D_2 + D_3 - D_4 = 0,
+\]
+where $D_1, D_2, D_3, D_4$ are four chord diagrams that agree outside
+a fixed local region, and in that region differ by the four ways to connect
+two strands with one additional chord (while keeping all other chords fixed).
+More precisely, for two chords sharing an endpoint:
+\[
+  [ab] - [ac] + [bc] - [bd] = 0,
+\]
+in a region with strands $a, b, c, d$ from left to right.
+\end{definition}
+
+\begin{definition}[$1T$ relation (framing independence)]
+The \emph{one-term relation ($1T$)} says that any chord diagram containing
+an \emph{isolated chord} (a chord whose two endpoints are adjacent on the
+circle, with no other chord endpoints between them) equals zero.
+\end{definition}
+
+\begin{definition}[Chord diagram algebra $\mathcal{A}$]
+The \emph{chord diagram algebra} is the graded $\Q$-algebra:
+\[
+  \Ac = \bigoplus_{n=0}^\infty \Ac_n, \quad
+  \Ac_n = \frac{\Q[\text{chord diagrams of order } n]}{4T + 1T \text{ relations}}.
+\]
+The multiplication is given by connected sum of chord diagrams:
+$D \cdot D' = D \# D'$ (concatenation along the circle).
+\end{definition}
+
+\begin{theorem}[Dimensions of $\mathcal{A}_n$]
+The first few dimensions are:
+\[
+  \dim \Ac_0 = 1, \quad \dim \Ac_1 = 0, \quad \dim \Ac_2 = 1,
+  \quad \dim \Ac_3 = 1, \quad \dim \Ac_4 = 3, \quad \dim \Ac_5 = 4.
+\]
+The generating function $\sum_n (\dim \Ac_n) t^n$ is not yet understood in
+closed form; its growth is related to deep questions about Vassiliev invariants.
+\end{theorem}
+
+\begin{remark}[The $STU$ relation and Jacobi diagrams]
+An important extension replaces chord diagrams by \emph{Jacobi diagrams}
+(also called Chinese character diagrams or $3$-graphs): diagrams with
+univalent vertices on a circle and trivalent vertices in the interior.
+These satisfy the \emph{STU relation}:
+\[
+  S = T - U,
+\]
+and the resulting algebra $\mathcal{B}$ is isomorphic to $\Ac$ (the
+Poincar\'e-Birkhoff-Witt isomorphism for Jacobi diagrams).  Jacobi diagrams
+are more natural for Lie-algebraic weight systems.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Weight Systems and Lie Algebras}\label{sec:weight}
+% -------------------------------------------------------
+
+\begin{definition}[Weight system]
+A \emph{weight system of order $n$} is a linear map
+$W: \Ac_n \to \mathbf{k}$ (satisfying the $4T$ and $1T$ relations, i.e.\
+$W \in \Ac_n^* = \Hom(\Ac_n, \mathbf{k})$).  A weight system of all orders
+is a sequence $\{W_n\}$ with $W_n \in \Ac_n^*$ for each $n$, forming an
+element of $\Ac^* = \prod_n \Ac_n^*$.
+\end{definition}
+
+\begin{theorem}[Vassiliev invariants $\leftrightarrow$ weight systems,
+Vassiliev-Kontsevich]\label{thm:vs_ws}
+There is a canonical isomorphism of filtered vector spaces:
+\[
+  \frac{\mathcal{V}_n}{\mathcal{V}_{n-1}} \xrightarrow{\;\sim\;} \Ac_n^*.
+\]
+Specifically, given a Vassiliev invariant $v \in \mathcal{V}_n$, its
+``symbol'' is a well-defined element of $\Ac_n^*$, and every element of
+$\Ac_n^*$ arises this way.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The symbol of $v$ is defined by evaluating $v$ on a singular knot with
+$n$ double points and recording the resulting chord diagram.  The $4T$
+relation arises from isotopy moves on the knot, and the $1T$ relation
+corresponds to the framing condition.  Surjectivity follows from the
+construction of the Kontsevich integral.
+\end{proof}
+
+\begin{theorem}[Lie-algebraic weight systems, Bar-Natan 1995]
+\label{thm:lie_ws}
+Let $\mathfrak{g}$ be a metrised finite-dimensional Lie algebra (with
+invariant non-degenerate bilinear form $(\cdot,\cdot)$), and let $R$ be
+a finite-dimensional representation of $\mathfrak{g}$.  Define the
+weight system $W_{\mathfrak{g},R}: \Ac_n \to \mathbf{k}$ by:
+\[
+  W_{\mathfrak{g},R}(D) = \tr_R\!\left(\prod_{\text{chords } (i,j) \text{ of } D}
+  \Omega_{ij}\right),
+\]
+where $\Omega = \sum_a e_a \otimes e^a$ is the Casimir element ($\{e_a\}$
+a basis, $\{e^a\}$ the dual basis), and the product is taken in order along
+the circle.  Then $W_{\mathfrak{g},R}$ is a well-defined weight system.
+\end{theorem}
+
+\begin{example}[Weight systems from $\mathfrak{sl}_2$]
+For $\mathfrak{g} = \mathfrak{sl}_2(\C)$ with the 2-dimensional (standard)
+representation, the weight system gives the coefficients of the coloured
+Jones polynomial $J_2$.  For the $n$-dimensional representation, one obtains
+$J_n$ (the $n$-coloured Jones polynomial).
+\end{example}
+
+\begin{conjecture}[All weight systems are Lie-algebraic]\label{conj:all_lie}
+Every weight system arises from a finite-dimensional metrised Lie algebra
+and a representation thereof.  Equivalently, all Vassiliev invariants come
+from quantum groups.
+\end{conjecture}
+
+This conjecture is widely believed but remains open.
+
+% -------------------------------------------------------
+\section{The Kontsevich Integral}\label{sec:KI}
+% -------------------------------------------------------
+
+We now construct the Kontsevich integral.  Let $K \subset \R^2 \times \R$
+be an oriented knot in ``general position'' with respect to the height
+function $t: \R^3 \to \R$ (i.e.\ all critical points of $t|_K$ are
+non-degenerate).
+
+\begin{definition}[Kontsevich integral, analytic form]\label{def:KI}
+For a knot $K$ in general position with respect to the height function $t$,
+set $z = x + iy$ for the first two coordinates.  The \emph{Kontsevich integral}
+is:
+\[
+  Z(K) = \sum_{m=0}^\infty \frac{1}{(2\pi i)^m}
+  \int_{t_{\min} < t_1 < \cdots < t_m < t_{\max}}
+  \sum_{\substack{P = \{(z_j, z_j')\}_{j=1}^m \\ z_j(t_j), z_j'(t_j) \in K}}
+  (-1)^{\downarrow P} D_P \; \bigwedge_{j=1}^m \frac{d z_j - d z_j'}{z_j - z_j'},
+\]
+where:
+\begin{itemize}
+  \item The outer sum is over $m = 0, 1, 2, \ldots$
+  \item The inner sum is over all ways to choose $m$ horizontal chords
+        $(z_j(t_j), z_j'(t_j))$ with distinct heights $t_1 < \cdots < t_m$.
+  \item $(-1)^{\downarrow P}$ is $(-1)$ raised to the number of points in
+        $P$ that are on a strand of $K$ oriented downward.
+  \item $D_P$ is the chord diagram determined by the pairing $P$ (connecting
+        the preimages of $z_j$ and $z_j'$ on $S^1$ with chords).
+  \item The form $\bigwedge_{j=1}^m \frac{dz_j - dz_j'}{z_j - z_j'}$ is
+        integrated over the simplex
+        $t_{\min} < t_1 < \cdots < t_m < t_{\max}$.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Kontsevich 1993, invariance]\label{thm:KI_invariant}
+The Kontsevich integral $Z(K) \in \hat{\mathcal{A}} = \prod_{n \geq 0} \mathcal{A}_n$
+(the completed chord diagram algebra) is an invariant of framed knots.
+Modulo the framing correction, it is an invariant of unframed knots.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The proof uses the fact that:
+\begin{enumerate}[label=(\arabic*)]
+  \item $Z(K)$ is invariant under horizontal isotopies (diffeomorphisms of
+        the plane at each height $t$): this uses the fact that
+        $\frac{dz - dz'}{z - z'}$ is a closed $1$-form.
+  \item $Z(K)$ is invariant under the Reidemeister moves II and III (but
+        \emph{not} Reidemeister I, which changes the framing by $1$): this
+        requires a careful analysis near critical points, using the associator.
+  \item The framing correction uses the isolated chord diagram $\theta$
+        (the only chord diagram in $\Ac_1$ before modding out by $1T$).
+\end{enumerate}
+Full details in Kontsevich~\cite{kontsevich1993} and Bar-Natan~\cite{barnatan1995}.
+\end{proof}
+
+\begin{remark}[The Magnus expansion interpretation]
+The Kontsevich integral can also be interpreted as the holonomy of a flat
+connection on the configuration space $\mathrm{Conf}_n(\C)$ of $n$ points
+in the complex plane.  This connection is the \emph{Knizhnik-Zamolodchikov
+(KZ) connection}, which takes values in the algebra $\hat{\mathcal{A}}$.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Convergence and Regularisation}\label{sec:convergence}
+% -------------------------------------------------------
+
+The integral in Definition~\ref{def:KI} has logarithmic divergences near
+the critical points of $K$.  These must be regularised.
+
+\begin{definition}[Critical point contribution]
+Near a local maximum (resp.\ minimum) of $K$ at height $t_0$, the integral
+diverges as $\int \frac{dt}{t_0 - t} = -\log(t_0 - t)$.  Regularise by:
+\[
+  Z(K) = \lim_{\varepsilon \to 0} \left[
+    \text{(integral over } t_{\min}+\varepsilon < \cdots < t_{\max}-\varepsilon)
+    \cdot \exp\!\left(-\frac{1}{2} w(\varepsilon) \cdot \Phi\right)
+  \right],
+\]
+where $w(\varepsilon)$ counts the ``winding'' near critical points and
+$\Phi$ is the Drinfeld associator.
+\end{definition}
+
+\begin{theorem}[Le-Murakami 1996, convergence]\label{thm:convergence}
+After the regularisation above, the Kontsevich integral converges and
+defines a well-defined element of $\hat{\mathcal{A}}$ for any Morse knot
+$K$.
+\end{theorem}
+
+% -------------------------------------------------------
+\section{The Drinfeld Associator $\Phi_{\mathrm{KZ}}$}\label{sec:associator}
+% -------------------------------------------------------
+
+The Drinfeld associator is the key algebraic object governing the behaviour
+of the Kontsevich integral near crossings and critical points.
+
+\begin{definition}[KZ equation]
+The \emph{Knizhnik-Zamolodchikov (KZ) equation} for a function $G: \C\setminus\{0,1\} \to \hat{\mathcal{A}}$ is the differential equation:
+\[
+  \frac{dG}{dz} = \left(\frac{A}{z} + \frac{B}{z-1}\right) G,
+\]
+where $A, B$ are formal variables (generators of the algebra $\hat{\mathcal{A}}$
+associated to the chord diagrams on two strands).  Here $A$ corresponds to
+the chord at $0$ and $B$ to the chord at $1$.
+\end{definition}
+
+\begin{theorem}[Drinfeld 1990, Drinfeld associator]\label{thm:drinfeld}
+The KZ equation has a unique solution $G_0(z)$ that is asymptotically
+$z^A$ as $z \to 0^+$ (on the real axis), and a unique solution $G_1(z)$
+that is asymptotically $(1-z)^B$ as $z \to 1^-$.  The \emph{Drinfeld
+associator} (or \emph{KZ associator}) is:
+\[
+  \Phi_{\mathrm{KZ}} = G_0(z)^{-1} G_1(z) \in \hat{\mathcal{A}}.
+\]
+It is a group-like element in the completed Hopf algebra $\hat{\mathcal{A}}$:
+$\Delta(\Phi_{\mathrm{KZ}}) = \Phi_{\mathrm{KZ}} \otimes \Phi_{\mathrm{KZ}}$
+(in the appropriate coproduct sense).
+\end{theorem}
+
+\begin{proposition}[Properties of $\Phi_{\mathrm{KZ}}$]
+\begin{enumerate}[label=(\roman*)]
+  \item $\Phi_{\mathrm{KZ}}$ is an associator: it satisfies the pentagon
+        equation
+        $(\id \otimes \Delta) \Phi \cdot (\Delta \otimes \id) \Phi =
+         (\Phi \otimes 1)({\id \otimes \id \otimes \Delta)}\Phi)(1 \otimes \Phi)$
+        and the hexagon equations.
+  \item $\Phi_{\mathrm{KZ}}$ is group-like: $\Phi_{\mathrm{KZ}} = \exp(\sum_n c_n [\text{Lie element in degree } n])$, where the coefficients $c_n \in \Q$ involve multiple zeta values.
+  \item The lowest-degree term of $\log \Phi_{\mathrm{KZ}}$ in degree $3$
+        is $\frac{1}{24}[A, B]$ (related to $\zeta(3)$).
+  \item Drinfeld showed that any two associators over $\Q$ are conjugate
+        by a well-defined element.
+\end{enumerate}
+\end{proposition}
+
+\begin{remark}[Associator and multiple zeta values]
+The coefficients of $\Phi_{\mathrm{KZ}}$ in the basis of Jacobi diagrams
+are (regularised) multiple zeta values (MZVs):
+$\zeta(n_1, \ldots, n_k) = \sum_{m_1 > \cdots > m_k > 0} m_1^{-n_1} \cdots m_k^{-n_k}$.
+This is one of the deep connections between knot theory and number theory.
+\end{remark}
+
+% -------------------------------------------------------
+\section{The Coloured Jones Polynomial as a Vassiliev Invariant}\label{sec:jones}
+% -------------------------------------------------------
+
+\begin{definition}[Coloured Jones polynomial]
+For a knot $K$ and an integer $N \geq 1$, the \emph{$N$-coloured Jones
+polynomial} $J_N(K; q)$ is the quantum invariant associated to the
+$N$-dimensional irreducible representation $V_N$ of the quantum group
+$U_q(\mathfrak{sl}_2)$, normalised so that $J_N(\text{unknot}; q) = 1$.
+\end{definition}
+
+\begin{theorem}[Vassiliev invariants from the Jones polynomial]
+\label{thm:jones_vassiliev}
+The $N$-coloured Jones polynomial $J_N(K;e^h)$, expanded as a power series
+in $h$ (i.e.\ with $q = e^h$ and $h$ formal):
+\[
+  J_N(K; e^h) = \sum_{n=0}^\infty v_n^{(N)}(K) h^n,
+\]
+yields Vassiliev invariants $v_n^{(N)}$ of type $\leq n$ for each $n$.
+The weight system of $v_n^{(N)}$ is $W_{\mathfrak{sl}_2, V_N}$
+(the weight system from the $N$-dimensional representation of $\mathfrak{sl}_2$).
+\end{theorem}
+
+\begin{theorem}[Kontsevich integral specialises to coloured Jones]
+\label{thm:KI_jones}
+Let $W_{\mathfrak{sl}_2, V_N}: \hat{\mathcal{A}} \to \C[[h]]$ be the
+Lie-algebraic weight system.  Then:
+\[
+  W_{\mathfrak{sl}_2, V_N}(Z(K)) = J_N(K; e^h).
+\]
+That is, the coloured Jones polynomial is the specialisation of the
+Kontsevich integral under the weight system $W_{\mathfrak{sl}_2, V_N}$.
+\end{theorem}
+
+\begin{remark}[Volume conjecture and the coloured Jones polynomial]
+The \emph{volume conjecture} (Kashaev 1995, Murakami-Murakami 2001) states
+that for a hyperbolic knot $K$:
+\[
+  \lim_{N \to \infty} \frac{2\pi}{N} \log|J_N(K; e^{2\pi i/N})| = \mathrm{vol}(S^3 \setminus K),
+\]
+where $\mathrm{vol}$ denotes the hyperbolic volume.  This connects the
+Vassiliev/Kontsevich world to hyperbolic geometry.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Universality of the Kontsevich Integral}\label{sec:universality}
+% -------------------------------------------------------
+
+\begin{theorem}[Kontsevich, universality]\label{thm:universality}
+The Kontsevich integral $Z: \{\text{knots}\} \to \hat{\mathcal{A}}$ is the
+\emph{universal Vassiliev invariant}: every Vassiliev invariant factors
+through $Z$.  More precisely, for every weight system $W \in \hat{\mathcal{A}}^*$,
+the composite $W \circ Z: \{\text{knots}\} \to \mathbf{k}$ is a Vassiliev
+invariant, and every Vassiliev invariant arises in this way.
+\end{theorem}
+
+\begin{proof}
+By Theorem~\ref{thm:vs_ws}, Vassiliev invariants are classified by weight
+systems.  Given a weight system $W$, define $v_W = W \circ Z$.  Then
+$v_W$ is a Vassiliev invariant: its degree-$n$ part is $W_n \circ Z_n$,
+where $Z_n$ is the degree-$n$ part of $Z$.  Conversely, any $v \in \mathcal{V}_n$
+has a symbol $\bar{v} \in \Ac_n^*$, and one shows that $v = \bar{v} \circ Z_n$
+modulo lower-order terms (by induction on $n$, using that $Z_n$ spans $\Ac_n$
+over rational functions of $K$).
+\end{proof}
+
+\begin{corollary}
+The Kontsevich integral encodes \emph{all} quantum group invariants of knots
+(all coloured Jones polynomials, HOMFLY-PT polynomial, Kauffman polynomial, etc.)
+as specialisations.
+\end{corollary}
+
+% -------------------------------------------------------
+\section{The Completeness Conjecture}\label{sec:completeness}
+% -------------------------------------------------------
+
+\begin{conjecture}[Kontsevich integral separates knots]\label{conj:complete}
+The Kontsevich integral $Z: \{\text{knots}\} / \text{isotopy} \to \hat{\mathcal{A}}$
+is injective.  That is:
+\[
+  Z(K_1) = Z(K_2) \implies K_1 \text{ and } K_2 \text{ are isotopic.}
+\]
+\end{conjecture}
+
+\begin{remark}
+This would mean that Vassiliev invariants form a \emph{complete} system of
+knot invariants: they collectively distinguish all knots.  The conjecture
+is widely believed but completely open.  Even the weaker statement that
+Vassiliev invariants distinguish all knots from the unknot is unknown.
+\end{remark}
+
+\begin{proposition}[Evidence for Conjecture~\ref{conj:complete}]
+\begin{enumerate}[label=(\roman*)]
+  \item The Kontsevich integral distinguishes all \emph{prime} knots up to
+        at least 10 crossings (verified computationally by Bar-Natan~\cite{barnatan1995}).
+  \item $Z(K)$ distinguishes knots from their mirror images if $K$ is
+        chiral (e.g.\ the trefoil).
+  \item No two distinct knots with fewer than $10$ crossings have been found
+        with the same Kontsevich integral.
+  \item Partial converse: if $Z(K) = Z(\text{unknot})$ and $K$ is a knot
+        in a homology sphere, then $K$ has all Vassiliev invariants equal
+        to those of the unknot.
+\end{enumerate}
+\end{proposition}
+
+\begin{conjecture}[Vassiliev invariants detect the unknot]\label{conj:unknot}
+If all Vassiliev invariants of $K$ agree with those of the unknot, then
+$K$ is the unknot.
+\end{conjecture}
+
+This is a weaker form of Conjecture~\ref{conj:complete} and is also open.
+
+% -------------------------------------------------------
+\section{The Wheeling Theorem}\label{sec:barley}
+% -------------------------------------------------------
+
+The Wheeling theorem, proved by Bar-Natan, Le, and Thurston~\cite{barnatan2003},
+is one of the deepest results in the theory of Vassiliev invariants.
+
+\begin{definition}[The wheel $\omega$ and the wheeling map]
+In the algebra $\mathcal{B}$ of Jacobi diagrams, the \emph{wheel} $\omega_n$
+is the diagram consisting of a ``hub'' with $n$ spokes.  Specifically,
+$\omega_n$ has $n$ univalent vertices connected to a single trivalent vertex
+(the hub) by $n$ edges.  Define the element
+\[
+  \Omega = \sum_{n=0}^\infty \frac{b_{2n}}{n!} \omega_{2n}
+  \in \hat{\mathcal{B}},
+\]
+where $b_{2n}$ are the modified Bernoulli numbers ($\frac{t}{e^t-1} = \sum_n b_n t^n/n!$).
+The \emph{wheeling map} $\Phi_\Omega: \mathcal{B} \to \mathcal{A}$ is defined
+by inserting the wheels $\Omega$ at appropriate legs.
+\end{definition}
+
+\begin{theorem}[Wheeling theorem, Bar-Natan--Le--Thurston 2003]\label{thm:wheeling}
+The wheeling map
+\[
+  \Phi_\Omega: (\mathcal{B}, \cdot_{\text{disjoint}}) \to (\mathcal{A}, \cdot_{\text{connected sum}})
+\]
+is an isomorphism of graded algebras.  Here $\mathcal{B}$ carries the
+disjoint union product and $\mathcal{A}$ carries the connected sum product.
+\end{theorem}
+
+\begin{proof}[Proof idea]
+The proof proceeds by showing that $\Phi_\Omega$ is an algebra map using
+the combinatorics of the STU relation and the properties of Bernoulli numbers.
+The key step is an explicit formula relating the two products via a ``wheeling''
+operation that inserts the element $\Omega$ to correct for the difference
+between disjoint and connected-sum products.
+The full proof uses the language of props and operads, and occupies
+\cite{barnatan2003}.
+\end{proof}
+
+\begin{corollary}[Duflo isomorphism as a specialisation]
+The Wheeling theorem is a ``categorification'' of the Duflo isomorphism in Lie
+theory.  Specifically, applying the weight system $W_{\mathfrak{g}}$ for a
+Lie algebra $\mathfrak{g}$ to the Wheeling theorem recovers the Duflo
+isomorphism $\mathrm{Sym}(\mathfrak{g})^{\mathfrak{g}} \cong Z(U\mathfrak{g})$.
+\end{corollary}
+
+% -------------------------------------------------------
+\section{The Le-Murakami-Ohtsuki Invariant}\label{sec:LMO}
+% -------------------------------------------------------
+
+The Le-Murakami-Ohtsuki (LMO) invariant generalises the Kontsevich integral
+to $3$-manifolds.
+
+\begin{definition}[Surgery presentation and the LMO invariant]
+Any closed orientable $3$-manifold $M$ can be obtained by surgery on a link
+$L \subset S^3$.  The \emph{LMO invariant} $Z_{\mathrm{LMO}}(M) \in \hat{\mathcal{A}}$
+is defined by:
+\[
+  Z_{\mathrm{LMO}}(M) = \iota_n\left(Z(L) / \iota_n(Z(\bigcirc))^{\otimes n}\right)^{\otimes \sigma^\pm},
+\]
+where $n$ is the number of components of $L$, $\sigma^\pm$ is the signature
+of the linking matrix, $\bigcirc$ is the unknot, and $\iota_n$ is a specific
+map that ``deframes'' the invariant.  See Le-Murakami-Ohtsuki~\cite{lmo1998}
+for the precise definition.
+\end{definition}
+
+\begin{theorem}[Le-Murakami-Ohtsuki 1998]\label{thm:LMO}
+The LMO invariant $Z_{\mathrm{LMO}}(M)$ is a well-defined invariant of
+closed oriented $3$-manifolds.  It dominates all quantum invariants of
+$3$-manifolds in the sense that the Reshetikhin-Turaev invariants (for all
+quantum groups) are specialisations of $Z_{\mathrm{LMO}}$.
+\end{theorem}
+
+\begin{remark}
+The LMO invariant is conjectured to be a complete invariant of rational
+homology spheres (up to orientation-preserving diffeomorphism), but this
+is open.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Relation to Chern-Simons Theory}\label{sec:chern}
+% -------------------------------------------------------
+
+Witten~\cite{witten1989} proposed that all quantum invariants of knots and
+$3$-manifolds arise from the path integral:
+\[
+  Z_{\mathrm{CS}}(M, K) = \int_{\mathcal{A}} e^{\frac{ik}{4\pi} \int_M \tr\!(A \wedge dA + \tfrac{2}{3} A \wedge A \wedge A)} W_R(K) \,\mathcal{D}A,
+\]
+where $A$ is a gauge field (connection), $W_R(K) = \tr_R \mathrm{Hol}_A(K)$
+is the Wilson loop observable in representation $R$, and the integral is over
+all connections $\mathcal{A}$ modulo gauge equivalence.
+
+\begin{theorem}[Axiomatic reformulation, Reshetikhin-Turaev 1991]
+The Chern-Simons path integral, made rigorous via the Reshetikhin-Turaev
+construction~\cite{reshetikhin1991} using quantum groups at roots of unity,
+gives topological invariants of $3$-manifolds and knots therein.
+\end{theorem}
+
+\begin{proposition}[Kontsevich integral as perturbative Chern-Simons]
+The Kontsevich integral $Z(K)$ arises as the perturbative expansion of the
+Chern-Simons path integral around the trivial connection:
+\[
+  Z(K) = \sum_{n=0}^\infty \hbar^n \cdot [\text{Feynman diagram contribution of order } n].
+\]
+The Feynman diagrams are precisely Jacobi diagrams (the $3$-valent graphs
+correspond to $\tr([A,A] \cdot A)$ vertices, and propagators give the
+$1$-forms $\frac{dz-dz'}{z-z'}$).
+\end{proposition}
+
+\begin{remark}[Physical interpretation]
+The $4T$ relation in chord diagram algebra corresponds to the Jacobi identity
+for the Lie bracket in $\mathfrak{g} = \mathrm{Lie}(G)$, arising from the
+antisymmetry of the structure constants $f_{abc}$.  This is why Lie-algebraic
+weight systems are natural: the gauge field $A$ takes values in $\mathfrak{g}$.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Bar-Natan's Computations and Applications}\label{sec:barnatan}
+% -------------------------------------------------------
+
+\begin{theorem}[Bar-Natan 1995, generators of $\mathcal{A}$]
+\label{thm:generators}
+The chord diagram algebra $\mathcal{A}$ is a polynomial algebra:
+\[
+  \mathcal{A} \cong \Q[w_2, w_3, w_4, \ldots],
+\]
+where $w_n \in \mathcal{A}_n$ are the \emph{wheel elements}.  More precisely,
+$\mathcal{A}$ is a graded polynomial algebra on generators indexed by the
+wheel diagrams $w_n$ for $n \geq 2$.
+\end{theorem}
+
+\begin{remark}
+This is a theorem about $\mathcal{A}$ as an \emph{algebra} (with connected-sum
+product).  It implies that the graded Euler characteristic of $\mathcal{A}$
+is $\prod_{n \geq 2} (1 - t^n)^{-1}$, which equals the generating function
+for the number of partitions with parts $\geq 2$.
+\end{remark}
+
+\begin{example}[Explicit computation of $Z$ for the trefoil]
+For the left-hand trefoil knot $3_1$, the Kontsevich integral begins:
+\[
+  Z(3_1) = 1 + a_2 w_2 + a_3 w_3 + (a_{22} w_2^2 + a_4 w_4) + \cdots,
+\]
+where $a_2 = \frac{1}{2}$, $a_3 = \frac{1}{12}$, and higher coefficients
+involve multiple zeta values.  The coefficient $a_2$ recovers the Casson
+invariant of the trefoil.
+\end{example}
+
+% -------------------------------------------------------
+\section{Open Problems}\label{sec:open}
+% -------------------------------------------------------
+
+We collect the major open problems in this area:
+
+\begin{conjecture}[Completeness of Vassiliev invariants, Birman-Lin 1993]
+\label{conj:complete2}
+Vassiliev invariants collectively separate all knots.  That is, if two
+knots $K_1, K_2$ satisfy $v(K_1) = v(K_2)$ for all Vassiliev invariants
+$v$, then $K_1$ and $K_2$ are isotopic.
+\end{conjecture}
+
+\begin{conjecture}[Finiteness of the dimension of $\mathcal{A}_n$]
+\label{conj:finiteness}
+Although $\dim \mathcal{A}_n < \infty$ is known for each $n$, the precise
+growth of $\dim \mathcal{A}_n$ as $n \to \infty$ is unknown.  The conjecture
+is that $\sum_n \dim(\mathcal{A}_n) t^n$ has a natural boundary on the unit
+circle.
+\end{conjecture}
+
+\begin{conjecture}[All weight systems are Lie-algebraic, cf.\ Conjecture~\ref{conj:all_lie}]
+Every weight system arises from a metrised Lie algebra and a representation.
+This would imply that all Vassiliev invariants come from quantum groups.
+\end{conjecture}
+
+\begin{conjecture}[Volume conjecture, Kashaev-Murakami-Murakami]\label{conj:volume}
+For a hyperbolic knot $K$:
+\[
+  \lim_{N \to \infty} \frac{2\pi}{N} \log |J_N(K; e^{2\pi i/N})| = \mathrm{vol}(S^3 \setminus K).
+\]
+\end{conjecture}
+
+\begin{remark}[Relation to categorification]
+Khovanov homology~\cite{khovanov2000} is a categorification of the Jones
+polynomial: it provides a bigraded homology theory $\mathrm{Kh}^{i,j}(K)$
+such that $J_2(K;q) = \sum_{i,j} (-1)^i q^j \dim \mathrm{Kh}^{i,j}(K)$.
+There is no known categorification of the full Kontsevich integral,
+though partial categorifications (e.g.\ Khovanov-Rozansky homology) exist.
+This is a major open problem.
+\end{remark}
+
+\begin{thebibliography}{99}
+
+\bibitem{vassiliev1990}
+V.\ A.\ Vassiliev,
+\textit{Cohomology of knot spaces},
+in: Theory of Singularities and Its Applications (V.\ I.\ Arnold, ed.),
+Adv.\ Soviet Math.\ \textbf{1}, Amer.\ Math.\ Soc., 1990, pp.\ 23--69.
+
+\bibitem{kontsevich1993}
+M.\ Kontsevich,
+\textit{Vassiliev's knot invariants},
+in: I.\ M.\ Gel'fand Seminar, Adv.\ Soviet Math.\ \textbf{16}, Part 2,
+Amer.\ Math.\ Soc., Providence, RI, 1993, pp.\ 137--150.
+
+\bibitem{barnatan1995}
+D.\ Bar-Natan,
+\textit{On the Vassiliev knot invariants},
+Topology \textbf{34} (1995), 423--472.
+
+\bibitem{jones1985}
+V.\ F.\ R.\ Jones,
+\textit{A polynomial invariant for knots via von Neumann algebras},
+Bull.\ Amer.\ Math.\ Soc.\ \textbf{12} (1985), 103--111.
+
+\bibitem{witten1989}
+E.\ Witten,
+\textit{Quantum field theory and the Jones polynomial},
+Comm.\ Math.\ Phys.\ \textbf{121} (1989), 351--399.
+
+\bibitem{drinfeld1990}
+V.\ G.\ Drinfeld,
+\textit{Quasi-Hopf algebras},
+Leningrad Math.\ J.\ \textbf{1} (1990), 1419--1457.
+
+\bibitem{birmanlin1993}
+J.\ Birman, X.\ Lin,
+\textit{Knot polynomials and Vassiliev's invariants},
+Invent.\ Math.\ \textbf{111} (1993), 225--270.
+
+\bibitem{barnatan2003}
+D.\ Bar-Natan, S.\ Le, D.\ Thurston,
+\textit{Two applications of elementary knot theory to Lie algebras and Vassiliev invariants},
+Geom.\ Topol.\ \textbf{7} (2003), 1--31.
+
+\bibitem{lmo1998}
+T.\ Le, J.\ Murakami, T.\ Ohtsuki,
+\textit{On a universal perturbative invariant of $3$-manifolds},
+Topology \textbf{37} (1998), 539--574.
+
+\bibitem{reshetikhin1991}
+N.\ Reshetikhin, V.\ G.\ Turaev,
+\textit{Invariants of $3$-manifolds via link polynomials and quantum groups},
+Invent.\ Math.\ \textbf{103} (1991), 547--597.
+
+\bibitem{khovanov2000}
+M.\ Khovanov,
+\textit{A categorification of the Jones polynomial},
+Duke Math.\ J.\ \textbf{101} (2000), 359--426.
+
+\bibitem{leturc1997}
+T.\ Q.\ Le, J.\ Murakami,
+\textit{The universal Vassiliev-Kontsevich invariant for framed oriented links},
+Compositio Math.\ \textbf{102} (1996), 41--64.
+
+\bibitem{barnatan1998}
+D.\ Bar-Natan,
+\textit{Non-associative tangles},
+in: Geometric Topology (Proc.\ 1993 Georgia Internat.\ Topology Conf.),
+AMS/IP Studies in Adv.\ Math.\ \textbf{2}, Amer.\ Math.\ Soc., 1997, pp.\ 139--183.
+
+\bibitem{chmutov2012}
+S.\ Chmutov, S.\ Duzhin, J.\ Mostovoy,
+\textit{Introduction to Vassiliev Knot Invariants},
+Cambridge University Press, Cambridge, 2012.
+
+\bibitem{ohtsuki2002}
+T.\ Ohtsuki,
+\textit{Quantum Invariants: A Study of Knots, 3-Manifolds, and Their Sets},
+Series on Knots and Everything \textbf{29}, World Scientific, 2002.
+
+\bibitem{murakami2001}
+H.\ Murakami, J.\ Murakami,
+\textit{The colored Jones polynomials and the simplicial volume of a knot},
+Acta Math.\ \textbf{186} (2001), 85--104.
+
+\end{thebibliography}
+
+\end{document}
