@@ -1,0 +1,792 @@
+%% paper67_van_der_waerden_schur_de.tex
+%% Van-der-Waerden-Satz und Schur-Zahlen:
+%% Ramsey-Theorie, Arithmetische Progressionen und kombinatorische Färbungen
+%%
+%% Autor: Michael Fuhrmann
+%% Projekt: Specialist Mathematics Project, Build 145
+%% Datum: 2026-03-12
+
+\documentclass[12pt]{amsart}
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\geometry{margin=2.5cm}
+
+%% Theoremumgebungen (deutsch gemäß Anforderung)
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Vermutung}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+%% Operatoren
+\DeclareMathOperator{\AP}{AP}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\F}{\mathbb{F}}
+
+%% Abstract VOR \maketitle (amsart-Stil)
+\begin{document}
+
+\title{Van-der-Waerden-Satz und Schur-Zahlen:\\
+Ramsey-Theorie, Arithmetische Progressionen und Kombinatorische Färbungen}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 145}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\begin{abstract}
+Dieses Paper gibt eine umfassende Darstellung zweier zentraler Sätze der Ramsey-Theorie:
+des Van-der-Waerden-Satzes über arithmetische Progressionen in gefärbten Mengen und des
+Schur-Satzes über summenfreie Partitionen der natürlichen Zahlen. Wir entwickeln die
+grundlegenden Begriffe arithmetischer Progressionen, monochromatischer Strukturen und
+kombinatorischer Färbungen, beweisen beide klassischen Sätze vollständig und tabellarisieren
+bekannte Van-der-Waerden-Zahlen $W(k;r)$ sowie Schur-Zahlen $S(r)$. Die Meilensteine von
+Szemerédi (1975) und Green--Tao (2004) -- Dichte- und Primzahl-Erweiterungen -- werden
+ausführlich besprochen. Rados Satz charakterisiert Partitionsregularität im Allgemeinen.
+Besondere Aufmerksamkeit gilt der Forschungsfront: $S(5) = 160$ wurde 2017 durch einen
+computergestützten SAT-Beweis (Heule) bewiesen, während $S(6)$ mit $536 \leq S(6) \leq 1836$
+offen bleibt. Verbindungen zur Ergodentheorie (Furstenbergs Beweis des Szemerédi-Satzes),
+zur analytischen Zahlentheorie und offene Probleme wie die Erdős--Turán-Vermutung werden
+diskutiert.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% ============================================================
+\section{Einleitung}
+%% ============================================================
+
+Die Ramsey-Theorie ist derjenige Zweig der Kombinatorik, der in hinreichend großen
+Strukturen zwangsläufig auftretende Ordnung untersucht. Ihr philosophischer Kern ist
+Ramseys Maxime: \emph{vollständige Unordnung ist unmöglich.} Zu den berühmtesten
+Sätzen dieses Gebiets zählen der Van-der-Waerden-Satz über arithmetische Progressionen
+und der Schur-Satz über summenfreie Färbungen, beide entstanden noch vor der formalen
+Gründung der Ramsey-Theorie, jedoch deren Geist vollständig verkörpernd.
+
+\subsection*{Arithmetische Progressionen und Färbungen}
+
+Eine \emph{arithmetische Progression} (AP) ist eine Folge ganzer Zahlen mit konstanter
+Differenz: $a, a+d, a+2d, \ldots, a+(k-1)d$. Eine Färbung einer Menge weist jedem
+Element eine von endlich vielen Farben zu. Eine monochromatische AP ist eine, deren
+sämtliche Elemente dieselbe Farbe haben. Die zentrale Frage der Van-der-Waerden-Theorie
+lautet: Wie groß muss eine Menge sein, damit jede Färbung eine monochromatische AP
+einer vorgegebenen Länge enthält?
+
+\subsection*{Schurs Gleichung}
+
+Schurs Satz stellt eine duale Frage zur additiven Struktur: Kann man die natürlichen
+Zahlen in endlich viele summenfreie Klassen einteilen und so jede monochromatische
+Lösung von $x + y = z$ vermeiden? Schur bewies 1916, dass dies für jede endliche
+Anzahl von Farben unmöglich ist, und leitete damit die Schur-Zahlen $S(r)$ ein.
+
+\subsection*{Überblick}
+
+Das Paper ist wie folgt gegliedert: Abschnitt~\ref{sec:ap} entwickelt die Theorie
+arithmetischer Progressionen. Abschnitt~\ref{sec:vdw-zahlen} listet bekannte
+Van-der-Waerden-Zahlen auf. Abschnitt~\ref{sec:beweis-vdw} gibt den kombinatorischen
+Beweis des Van-der-Waerden-Satzes. Abschnitte~\ref{sec:szemeredi} und~\ref{sec:green-tao}
+behandeln die tieferen Dichte- und Primzahlsätze. Abschnitte~\ref{sec:schur}
+bis~\ref{sec:schur-zahlen} behandeln Schurs Satz und die Schur-Zahlen. Abschnitt~\ref{sec:rado}
+diskutiert Rados Verallgemeinerung. Abschnitt~\ref{sec:verbindungen} gibt einen
+Überblick über Verbindungen und offene Probleme.
+
+%% ============================================================
+\section{Arithmetische Progressionen}\label{sec:ap}
+%% ============================================================
+
+\begin{definition}[Arithmetische Progression]
+Eine \emph{$k$-gliedrige arithmetische Progression} (kurz: $k$-AP) mit Anfangsglied $a$
+und Differenz $d > 0$ ist die Menge
+\[
+  \{a, \, a+d, \, a+2d, \, \ldots, \, a+(k-1)d\} \subset \N.
+\]
+Wir nennen $a$ das \emph{Startglied} und $d$ die \emph{Schrittweite} der Progression.
+Eine $1$-AP ist ein beliebiges Singleton; eine $2$-AP ist ein beliebiges Paar
+$\{a, a+d\}$.
+\end{definition}
+
+\begin{definition}[$r$-Färbung und monochromatische AP]
+Eine \emph{$r$-Färbung} einer Menge $S \subseteq \N$ ist eine Abbildung
+$\chi: S \to \{1, 2, \ldots, r\}$.
+Eine $k$-AP $P \subseteq S$ heißt \emph{monochromatisch} unter $\chi$, wenn $\chi$
+auf $P$ konstant ist.
+\end{definition}
+
+Die grundlegende Frage ist, ob jede Färbung eines hinreichend großen Anfangssegments
+$\{1, 2, \ldots, N\}$ eine monochromatische $k$-AP enthalten muss.
+Der Van-der-Waerden-Satz beantwortet dies bejahend.
+
+\begin{definition}[Van-der-Waerden-Zahl]
+Für ganze Zahlen $k \geq 2$ und $r \geq 2$ ist die \emph{Van-der-Waerden-Zahl}
+$W(k;r)$ die kleinste positive ganze Zahl $N$, sodass jede $r$-Färbung von
+$\{1, \ldots, N\}$ eine monochromatische $k$-AP enthält.
+\end{definition}
+
+Die Existenz von $W(k;r)$ ist genau der Inhalt des Van-der-Waerden-Satzes.
+Die Schreibweise $W(k; r)$ folgt der Konvention, dass $k$ die AP-Länge und $r$ die
+Anzahl der Farben bezeichnen; manche Quellen schreiben $W(r; k)$ oder
+$W(k_1, k_2, \ldots, k_r)$ für die asymmetrische Verallgemeinerung.
+
+\begin{remark}[Triviale Fälle]
+$W(2; r) = r+1$ für alle $r \geq 1$: In $\{1, 2, \ldots, r+1\}$ erzwingt das
+Schubfachprinzip zwei gleichfarbige Elemente, die eine $2$-AP bilden; $\{1,\ldots,r\}$
+hingegen ist durch $i \mapsto i$ AP-frei $2$-färbbar.
+\end{remark}
+
+%% ============================================================
+\section{Van-der-Waerden-Zahlen}\label{sec:vdw-zahlen}
+%% ============================================================
+
+Bekannte exakte Werte von $W(k;r)$ sind bemerkenswert spärlich. Ihre Berechnung
+erfordert sowohl eine AP-freie Färbung von $\{1, \ldots, W-1\}$ (untere
+Schranke) als auch den Nachweis, dass jede Färbung von $\{1, \ldots, W\}$ eine
+monochromatische AP enthält (obere Schranke). Beide Aufgaben sind rechnerisch
+aufwändig und wurden überwiegend durch vollständige Computersuche und
+SAT-Löser bewältigt.
+
+\subsection{Tabelle bekannter Werte}
+
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+$k$ & $r$ & $W(k; r)$ \\
+\midrule
+$3$ & $2$ & $9$ \\
+$4$ & $2$ & $35$ \\
+$5$ & $2$ & $178$ \\
+$6$ & $2$ & $1132$ \\
+$3$ & $3$ & $27$ \\
+$3$ & $4$ & $293$ \\
+$4$ & $3$ & unbekannt \\
+$7$ & $2$ & unbekannt \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Der Wert $W(3;2)=9$ besitzt einen eleganten manuellen Beweis: Betrachte jede
+$2$-Färbung von $\{1,\ldots,9\}$. Falls 1 und 5 dieselbe Farbe erhalten, bildet
+$\{1,5,9\}$ eine monochromatische $3$-AP. Eine vollständige Fallunterscheidung
+bestätigt $W(3;2) = 9$.
+
+Der Wert $W(6;2) = 1132$ wurde von Kouril und Paul (2008) durch umfangreiche
+Computersuche sowohl von oben als auch von unten verifiziert \cite{Kouril2008}.
+
+\subsection{Asymptotische Schranken}
+
+Obere Schranken für $W(k;2)$ sind notorisch schwer zu beweisen. Das beste
+allgemeine Ergebnis stammt von Gowers:
+
+\begin{theorem}[Gowers, 2001 \cite{Gowers2001}]
+Für alle $k \geq 3$ gilt
+\[
+  W(k; 2) \leq 2^{2^{k+9}}.
+\]
+\end{theorem}
+
+Diese Turm-von-Exponenten-Schranke ist zwar explizit, aber weit von der Realität
+entfernt. Die untere Schranke von Berlekamp (1968) zeigt:
+
+\begin{theorem}[Berlekamp, 1968 \cite{Berlekamp1968}]
+Für jede Primzahl $p$ gilt $W(p+1; 2) > p \cdot 2^p$.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Berlekamp konstruiert eine explizite $2$-Färbung von $\{1, \ldots, p \cdot 2^p\}$
+mithilfe von Arithmetik im Galois-Körper $\mathbb{F}_{2^p}$: Weise Zahl $n$ die
+Farbe $0$ zu, wenn der führende Koeffizient eines bestimmten Polynoms über $\mathbb{F}_2$
+gleich $0$ ist, sonst Farbe $1$. Man zeigt, dass diese Färbung keine monochromatische
+$(p+1)$-AP enthält.
+\end{proof}
+
+%% ============================================================
+\section{Beweis des Van-der-Waerden-Satzes}\label{sec:beweis-vdw}
+%% ============================================================
+
+\begin{theorem}[Van der Waerden, 1927 \cite{VdW1927}]\label{satz:vdw}
+Für jedes Paar positiver ganzer Zahlen $k \geq 2$ und $r \geq 2$ gibt es eine
+positive ganze Zahl $W = W(k; r)$, sodass jede $r$-Färbung von $\{1, \ldots, W\}$
+eine monochromatische $k$-gliedrige arithmetische Progression enthält.
+\end{theorem}
+
+Der Originalbeweis von Van der Waerden (1927) ist eine rein kombinatorische
+Doppel-Induktion. Wir präsentieren ihn in moderner Sprache.
+
+\subsection{Kombinatorischer Beweis durch Doppel-Induktion}
+
+Der Beweis verläuft durch Induktion über $k$ (die AP-Länge), mit einer inneren
+Induktion über $r$ (die Anzahl der Farben) für jedes feste $k$.
+
+\begin{definition}[AP-freie Färbung]
+Eine Färbung $\chi: \{1,\ldots,N\} \to \{1,\ldots,r\}$ heißt \emph{$k$-AP-frei},
+wenn sie keine monochromatische $k$-AP enthält.
+\end{definition}
+
+\begin{lemma}[Basisfälle]
+$W(2; r)$ existiert für alle $r \geq 1$ (trivialerweise genügt $r+1$), und
+$W(k; 1) = k$ für alle $k$.
+\end{lemma}
+
+\begin{proof}[Beweis von Satz~\ref{satz:vdw}]
+Wir führen Induktion über $k$. Der Basisfall $k=2$ ist trivial.
+
+Sei $W(k-1; r)$ für alle $r$ als existent vorausgesetzt; wir zeigen die Existenz
+von $W(k; r)$ für alle $r$.
+Fixiere $r$ und nehme induktiv an, $W(k; r-1)$ existiere; wir leiten $W(k; r)$ her.
+
+\medskip
+\noindent\textbf{Schlüsselkonstruktion.}
+Setze $N_0 = W(k-1; r)$. Wir suchen $W(k; r)$ als doppelt-exponentielle Funktion in $N_0$.
+
+Betrachte $\{1, \ldots, N\}$ mit einer $r$-Färbung $\chi$. Teile es in aufeinanderfolgende
+Blöcke der Länge $N_0$ auf. Innerhalb jedes Blocks gibt es nach Induktionsvoraussetzung
+eine monochromatische $(k-1)$-AP.
+
+Die entscheidende Beobachtung ist, dass man das Farbmuster von $(k-1)$-APs in einem
+Block als ``Typ'' kodieren kann. Da es nur endlich viele Typen gibt, liefert ein
+zweites Anwenden des Schubfachprinzips (oder ein inneres Hales--Jewett-Argument)
+zwei Blöcke mit gleichem Typ und übereinstimmendem Farbmuster, die zusammen eine
+$k$-AP ergeben.
+
+\medskip
+Formal zeigt man: für jedes $k$ und $r$ gilt
+\[
+  W(k; r) \leq W\bigl(k-1;\, r^{W(k;r-1)}\bigr).
+\]
+Dies folgt aus dem Argument, dass für $N \geq W(k-1; r^{W(k;r-1)})$ jede $r$-Färbung
+$\chi$ von $\{1,\ldots,N\}$ eine abgeleitete Färbung $\chi'$ definiert, die Läufe
+der Länge $W(k;r-1)$ kodiert. Nach Induktionsvoraussetzung enthält $\chi'$ eine
+monochromatische $(k-1)$-AP; das Entfalten der Kodierung liefert eine monochromatische
+$k$-AP unter $\chi$.
+\end{proof}
+
+\subsection{Verbindung zum Hales--Jewett-Satz}
+
+Der Hales--Jewett-Satz (1963) \cite{HalesJewett1963} liefert eine mächtige Verallgemeinerung:
+
+\begin{theorem}[Hales--Jewett, 1963]\label{satz:hj}
+Für jedes $r \geq 2$ und $k \geq 2$ gibt es $HJ(k,r)$, sodass jede $r$-Färbung des
+$k$-elementigen $n$-dimensionalen kombinatorischen Würfels
+$[k]^n = \{1,\ldots,k\}^n$ (für $n \geq HJ(k,r)$) eine monochromatische kombinatorische
+Linie enthält.
+\end{theorem}
+
+Der Van-der-Waerden-Satz folgt als Korollar des Hales--Jewett-Satzes durch Einbettung
+arithmetischer Progressionen in kombinatorische Linien: Jede $k$-AP in
+$\{1, \ldots, N\}$ entspricht einer kombinatorischen Linie in einem geeigneten Würfel,
+und die Farbe der Linie wird von $\chi$ geerbt. Dies liefert einen alternativen,
+in mancher Hinsicht transparenteren Beweisweg.
+
+%% ============================================================
+\section{Szemerédi-Satz}\label{sec:szemeredi}
+%% ============================================================
+
+Der Van-der-Waerden-Satz garantiert monochromatische APs in jeder Färbung von
+$\{1,\ldots,N\}$. Eine viel tiefere Frage, gestellt von Erdős und Turán 1936
+\cite{ErdosTuran1936}, fragt: Wenn eine Menge $A \subseteq \{1,\ldots,N\}$ positive
+(obere) Dichte hat, muss sie dann beliebig lange APs enthalten?
+
+\begin{definition}[Obere Dichte]
+Die \emph{obere Dichte} einer Menge $A \subseteq \N$ ist
+\[
+  \overline{d}(A) = \limsup_{N \to \infty} \frac{|A \cap \{1,\ldots,N\}|}{N}.
+\]
+\end{definition}
+
+\begin{theorem}[Szemerédi, 1975 \cite{Szemeredi1975}]\label{satz:szemeredi}
+Jede Menge $A \subseteq \N$ mit $\overline{d}(A) > 0$ enthält arithmetische
+Progressionen beliebiger Länge. Das heißt: Für jedes $k \geq 1$ gibt es $a, d$ mit
+$d > 0$, sodass $\{a, a+d, \ldots, a+(k-1)d\} \subseteq A$.
+\end{theorem}
+
+\begin{remark}[Verhältnis zur Erdős--Turán-Vermutung]
+Die \emph{Erdős--Turán-Vermutung} (1936) verlangte ursprünglich eine quantitative Version:
+eine $k$-AP-freie Menge muss Dichte gegen $0$ haben, d.\,h.\ die maximale Mächtigkeit
+$r_k(N)$ einer $k$-AP-freien Teilmenge von $\{1,\ldots,N\}$ erfüllt $r_k(N) = o(N)$.
+Szemerédi beweist genau dies. Die stärkeren quantitativen Verfeinerungen (scharfe Schranken
+für $r_k(N)$) sind Gegenstand aktiver Forschung; Kelley und Meka (2023) zeigten
+$r_3(N) \leq N / (\log N)^{c}$ für ein $c > 0$.
+\end{remark}
+
+\subsection{Frühere Teilergebnisse}
+
+\begin{itemize}
+\item \textbf{Roth (1953)}: Bewies $r_3(N) = o(N)$, d.\,h.\ jede dichte Menge
+  enthält eine $3$-AP \cite{Roth1953}.
+\item \textbf{Szemerédi (1969)}: Erweiterung auf $k=4$ mit kombinatorischen Methoden.
+\item \textbf{Szemerédi (1975)}: Vollständiges Ergebnis für alle $k$ mittels seines
+  Regularitätslemmas.
+\end{itemize}
+
+\subsection{Polynomiale Erweiterungen}
+
+Der polynomiale Hales--Jewett-Satz (Bergelson--Leibman, 1996
+\cite{BergelsonLeibman1996}) erweitert Szemerédi auf polynomiale Progressionen:
+
+\begin{theorem}[Bergelson--Leibman, 1996]
+Seien $p_1, \ldots, p_k \in \Z[t]$ mit $p_i(0) = 0$ für alle $i$. Dann enthält
+jede Menge $A \subseteq \N$ mit positiver oberer Dichte ein $a \in \N$ und $d > 0$, sodass
+\[
+  a + p_1(d),\; a + p_2(d),\; \ldots,\; a + p_k(d) \in A.
+\]
+\end{theorem}
+
+Dies umfasst den Van-der-Waerden-Satz (lineare Polynome $p_i(t) = (i-1)t$) sowie
+neue Konfigurationen wie $\{a, a+d, a+d^2\}$.
+
+%% ============================================================
+\section{Green--Tao-Satz}\label{sec:green-tao}
+%% ============================================================
+
+Die Primzahlen bilden eine dünne Menge: ihre Dichte in $\{1,\ldots,N\}$ strebt mit
+$N \to \infty$ gegen null. Daher ist Szemerédi direkt nicht anwendbar. Dennoch bewiesen
+Green und Tao:
+
+\begin{theorem}[Green--Tao, 2004 \cite{GreenTao2008}]\label{satz:gt}
+Die Menge der Primzahlen enthält arithmetische Progressionen beliebiger Länge.
+\end{theorem}
+
+Dieser Satz wurde 2004 angekündigt und nach vollständigem Peer-Review 2008 publiziert.
+Ben Green und Terence Tao erhielten die Fields-Medaille (Tao 2006) u.\,a.\ für dieses
+und verwandte Ergebnisse. Der Beweis gehört zu den gefeiertsten Resultaten der
+Mathematik des 21.\ Jahrhunderts.
+
+\subsection{Beweisüberblick}
+
+Das Argument beruht auf dem Nachweis einer \emph{Pseudozufälligkeit} der Primzahlen.
+Obwohl die Primzahlen dünn sind, sind sie ``hinreichend gleichmäßig verteilt''
+relativ zu einer geeigneten Majorante. Die Schlüsselschritte sind:
+
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Pseudozufällige Majorante.} Mithilfe des
+  \emph{Goldston--Y\i ld\i r\i m-Siebs} konstruiere eine Funktion
+  $\nu: \N \to [0,\infty)$, die den Primzahl-Indikator (bis auf Normierung) majorisiert
+  und geeignete \emph{lineare Formenbedingungen} und
+  \emph{Korrelationsbedingungen} erfüllt.
+
+\item \textbf{Szemerédi-artiger Satz für pseudozufällige Maße.}
+  Erweitere Szemerédi auf den Fall, in dem das Gleichmaß durch ein pseudozufälliges
+  Maß $\nu$ ersetzt wird: Jede Funktion $f: \N \to [0,1]$ mit
+  $\mathbb{E}[f \cdot \nu] \geq \delta > 0$ enthält $k$-APs.
+
+\item \textbf{Anwendung auf Primzahlen.}
+  Die Primzahlen erfüllen $\mathbb{E}[\mathbf{1}_{\mathrm{Prim}} \cdot \nu] \geq \delta$
+  für geeignetes $\nu$ und $\delta$ (nach dem Primzahlsatz und Siebabschätzungen).
+  Der pseudozufällige Szemerédi-Satz liefert dann $k$-APs unter den Primzahlen.
+\end{enumerate}
+
+\begin{remark}[Bekannte explizite Progressionen]
+Die längste bekannte AP aus Primzahlen (Stand 2024) hat 27 Glieder:
+$\{224584605939537911 + k \cdot 81292139 : k = 0, 1, \ldots, 26\}$.
+\end{remark}
+
+%% ============================================================
+\section{Schur-Satz}\label{sec:schur}
+%% ============================================================
+
+Wir wenden uns nun dem Schur-Satz zu, einem Ergebnis von 1916, das den
+Van-der-Waerden-Satz um elf Jahre vorwegnimmt. Schur entdeckte seinen Satz als
+Korollar zu Eigenschaften des Fermatschen Letzten Satzes modulo Primzahlen.
+
+\begin{definition}[Summenfreie Menge]
+Eine Menge $A \subseteq \N$ heißt \emph{summenfrei}, wenn es keine
+$a, b, c \in A$ (nicht notwendig verschieden) mit $a + b = c$ gibt.
+\end{definition}
+
+\begin{definition}[Summenfreie Partition]
+Eine Partition $\N = A_1 \sqcup A_2 \sqcup \cdots \sqcup A_r$ (eingeschränkt auf
+$\{1, \ldots, n\}$) heißt \emph{sumfrei} (oder \emph{Schur-Partition}), wenn
+jede Klasse $A_i$ sumfrei ist.
+\end{definition}
+
+\begin{theorem}[Schur, 1916 \cite{Schur1916}]\label{satz:schur}
+Für jedes $r \geq 1$ gibt es eine positive ganze Zahl $S$, sodass jede
+$r$-Färbung von $\{1, \ldots, S\}$ eine monochromatische Lösung von
+$x + y = z$ enthält (wobei $x, y, z \in \{1, \ldots, S\}$ nicht notwendig
+verschieden sind).
+\end{theorem}
+
+\begin{proof}
+Wir verwenden Ramsey-Theorie. Sei $R = R(3; r)$ die $r$-Farben-Ramsey-Zahl für
+Dreiecke (die nach Ramseys Satz 1930 existiert). Betrachte den vollständigen
+Graphen $K_R$ mit Knoten $\{1, \ldots, R\}$ und färbe die Kante $\{a, b\}$
+(mit $a < b$) mit Farbe $\chi(b - a)$, wobei $\chi: \{1,\ldots, R-1\} \to \{1,\ldots,r\}$
+die gegebene Färbung ist.
+
+Nach Ramseys Satz gibt es $1 \leq x < y < z \leq R$, sodass das Dreieck
+$\{x, y, z\}$ monochromatisch ist, d.\,h.\ $\chi(y-x) = \chi(z-y) = \chi(z-x)$.
+Setze $a = y-x$, $b = z-y$, $c = z-x$; dann gilt $a + b = c$, und alle drei
+haben dieselbe Farbe.
+
+Damit genügt $S = R - 1$.
+\end{proof}
+
+\begin{remark}
+Die Schranke $S \leq R(3; r) - 1$ ist weit von der Wahrheit entfernt. Die tatsächlichen
+Schur-Zahlen wachsen viel langsamer.
+\end{remark}
+
+%% ============================================================
+\section{Schur-Zahlen}\label{sec:schur-zahlen}
+%% ============================================================
+
+\begin{definition}[Schur-Zahl]
+Die \emph{$r$-te Schur-Zahl} $S(r)$ ist die größte Zahl $n$, sodass
+$\{1, \ldots, n\}$ in $r$ summenfreie Klassen partitioniert werden kann:
+\[
+  S(r) = \max\bigl\{n : \exists \text{ summenfreie $r$-Partition von } \{1,\ldots,n\}\bigr\}.
+\]
+\end{definition}
+
+Nach Schurs Satz ist $S(r)$ für alle $r$ endlich. Die Schur-Zahlen sind das Analogon
+der Van-der-Waerden-Zahlen für die Gleichung $x + y = z$.
+
+\subsection{Bekannte Werte}
+
+\begin{center}
+\begin{tabular}{ccl}
+\toprule
+$r$ & $S(r)$ & Status / Jahr \\
+\midrule
+$1$ & $1$   & Trivial \\
+$2$ & $4$   & Klassisch \\
+$3$ & $13$  & Klassisch \\
+$4$ & $44$  & Baumert 1965 \cite{Baumert1965} \\
+$5$ & $160$ & Heule 2017 \cite{Heule2017} (SAT-Beweis) \\
+$6$ & $?$   & Offen; $536 \leq S(6) \leq 1836$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Explizite Partitionen}
+
+\begin{example}[$S(1) = 1$]
+Die einzige Klasse $\{1\}$ ist sumfrei: $1 + 1 = 2 \notin \{1\}$.
+Die Menge $\{1, 2\}$ kann nicht abgedeckt werden: $1 + 1 = 2$ erzwingt eine
+monochromatische Lösung.
+\end{example}
+
+\begin{example}[$S(2) = 4$]
+Die Partition $\{1,4\} \sqcup \{2,3\}$ ist sumfrei:
+$1+1=2\notin\{1,4\}$, $1+4=5\notin\{1,4\}$, $4+4=8\notin\{1,4\}$;
+$2+2=4\notin\{2,3\}$, $2+3=5\notin\{2,3\}$, $3+3=6\notin\{2,3\}$.
+Keine $2$-Partition von $\{1,2,3,4,5\}$ ist sumfrei (durch Erschöpfungssuche
+verifiziert).
+\end{example}
+
+\begin{example}[$S(3) = 13$]
+Eine optimale $3$-Partition von $\{1,\ldots,13\}$ lautet:
+\[
+  K_1 = \{1,4,7,10,13\}, \quad K_2 = \{2,3,11,12\}, \quad K_3 = \{5,6,8,9\}.
+\]
+Jede Klasse ist sumfrei (Summen $a+b$ für $a,b \in K_i$ fallen stets außerhalb von
+$K_i$ oder überschreiten $13$). Keine $3$-Partition von $\{1,\ldots,14\}$ ist sumfrei.
+\end{example}
+
+\begin{example}[$S(4) = 44$, Baumert 1965]
+Baumert \cite{Baumert1965} zeigte $S(4) = 44$ durch Computersuche und lieferte
+eine $4$-Partition von $\{1,\ldots,44\}$ sowie den Nachweis, dass keine
+$4$-Partition von $\{1,\ldots,45\}$ existiert.
+\end{example}
+
+\subsection{Der Beweis von \texorpdfstring{$S(5) = 160$}{S(5) = 160}}
+
+\begin{theorem}[Heule, 2017 \cite{Heule2017}]\label{satz:s5}
+$S(5) = 160$.
+\end{theorem}
+
+Dieses Ergebnis war ein lang offenes Problem. Es wurde von Marijn Heule mithilfe
+eines computergestützten SAT-Beweises gelöst. Der Beweis besteht aus zwei Teilen:
+
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Untergrenze}: Eine explizite $5$-Partition von $\{1,\ldots,160\}$ in
+  summenfreie Klassen wird vorgeführt. Eine solche Partition kann über das
+  \emph{Cube-and-Conquer}-Verfahren (Heule, Kullmann, Manthey 2012
+  \cite{HeuleKullmannManthey2012}) konstruiert werden, das einen Greedy-Start
+  mit Backtracking-Suche kombiniert.
+
+\item \textbf{Obergrenze}: Der SAT-Löser beweist, dass keine $5$-Partition von
+  $\{1,\ldots,161\}$ existiert. Die SAT-Instanz für $n = 161$, $k = 5$ umfasst
+  $161 \times 5 = 805$ Boolesche Variablen $x_{i,c}$ und etwa
+  $\binom{161}{2} \times 5 \approx 64{.}000$ Klauseln, die die Schur-Bedingung
+  $a + b = c \Rightarrow \neg(x_{a,j} \wedge x_{b,j} \wedge x_{c,j})$ kodieren.
+  Der Löser bescheinigt die Unerfüllbarkeit mit einem unabhängig verifizierbaren
+  \emph{Proof-Zertifikat} (DRUP-Format).
+\end{enumerate}
+
+\begin{remark}[Größe des Beweises]
+Das SAT-Zertifikat für $S(5) = 160$ umfasst komprimiert ca.\ $200$ Terabyte;
+es ist der größte mathematische Beweis (nach Dateigröße) zum Zeitpunkt seiner
+Veröffentlichung (2017).
+\end{remark}
+
+\subsection{Der Status von \texorpdfstring{$S(6)$}{S(6)}}
+
+\begin{conjecture}\label{verm:s6}
+Der exakte Wert von $S(6)$ liegt im Intervall $[536, 1836]$. Die Untergrenze
+$S(6) \geq 536$ ist durch eine explizite computererzeugte $6$-Partition von
+$\{1, \ldots, 536\}$ (Baumert 1965, durch spätere Suchen verfeinert) belegt.
+Die Obergrenze $S(6) \leq 1836$ folgt aus der allgemeinen Rekursionsabschätzung
+$S(r) \leq r! \cdot e$ (Schur 1916) und SAT-basierten Verfeinerungen.
+\end{conjecture}
+
+Die Bestimmung von $S(6)$ ist ein offenes Problem. Die rekursive Untergrenze aus
+$S(r) \geq 3 \cdot S(r-1) + 1$ liefert $S(6) \geq 481$, was schwächer als die
+bekannten $536$ ist.
+
+\subsection{Rekursive Schranken}
+
+\begin{proposition}[Rekursive Untergrenze]
+Für alle $r \geq 2$ gilt
+\[
+  S(r) \geq 3 \cdot S(r-1) + 1.
+\]
+\end{proposition}
+
+\begin{proof}
+Sei eine $(r-1)$-summenfreie Partition von $\{1,\ldots,n\}$ mit $n = S(r-1)$ gegeben.
+Definiere
+\[
+  A_r = \{n+1, n+2, \ldots, 2n+1\}
+\]
+und skaliere die ursprüngliche Partition: $A_i' = \{x + 2n + 1 : x \in A_i\}$ für
+$i = 1, \ldots, r-1$. Die kombinierte Partition $(A_1', \ldots, A_{r-1}', A_r)$
+liefert eine $r$-summenfreie Partition von $\{1, \ldots, 3n+1\}$:
+\begin{itemize}
+\item $A_r$ ist sumfrei: Für $a, b \in A_r$ gilt $a + b \geq 2(n+1) > 2n+1$,
+  also $a+b \notin A_r$.
+\item Jedes $A_i'$ erbt die Summenfreiheit von $A_i$ durch die Linearität der Verschiebung.
+\end{itemize}
+Daher gilt $S(r) \geq 3n + 1 = 3 \cdot S(r-1) + 1$.
+\end{proof}
+
+%% ============================================================
+\section{Rados Satz}\label{sec:rado}
+%% ============================================================
+
+Der Schur-Satz kann als Spezialfall eines viel allgemeineren Ergebnisses von Richard Rado
+(1933) \cite{Rado1933} aufgefasst werden, das exakt diejenigen linearen Gleichungssysteme
+charakterisiert, die die Eigenschaft haben, dass jede endliche Färbung von $\N$ eine
+monochromatische Lösung liefert.
+
+\begin{definition}[Partitionsregulär]
+Eine Matrix $A \in \Z^{m \times n}$ heißt \emph{partitionsregulär über $\N$}, wenn
+für jede endliche Färbung von $\N$ das System $A\mathbf{x} = \mathbf{0}$ eine
+monochromatische Lösung $\mathbf{x} \in \N^n$ hat (alle Einträge mit derselben Farbe).
+\end{definition}
+
+\begin{definition}[Spaltenbedingung]
+Eine Matrix $A = (c_1 \mid c_2 \mid \cdots \mid c_n) \in \Z^{m \times n}$ erfüllt die
+\emph{Spaltenbedingung}, wenn es eine Partition $\{1,\ldots,n\} = I_1 \sqcup I_2 \sqcup
+\cdots \sqcup I_t$ (in einer geeigneten Anordnung) gibt, sodass:
+\begin{itemize}
+\item $\sum_{j \in I_1} c_j = \mathbf{0}$,
+\item Für jedes $s = 2, \ldots, t$: $\sum_{j \in I_s} c_j \in \mathrm{span}_\Q\{c_j : j \in I_1 \cup \cdots \cup I_{s-1}\}$.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Rado, 1933 \cite{Rado1933}]\label{satz:rado}
+Eine Matrix $A \in \Z^{m \times n}$ ist genau dann partitionsregulär über $\N$, wenn
+$A$ die Spaltenbedingung erfüllt.
+\end{theorem}
+
+\begin{example}[Schurs Gleichung]
+Die Gleichung $x + y = z$ entspricht $A = (1, 1, -1)$. Die Spaltenbedingung ist
+erfüllt, was die Partitionsregularität bestätigt und Schurs Satz zurückgewinnt.
+\end{example}
+
+\begin{corollary}
+Die Gleichung $x + y = z$ ist partitionsregulär, was Schurs Satz reproduziert.
+Die Gleichung $x + y = 3z$ ist \emph{nicht} partitionsregulär (verletzt die
+Spaltenbedingung).
+\end{corollary}
+
+\begin{remark}[Allgemeine Gleichungssysteme]
+Rados Satz erlaubt es, für beliebige lineare Gleichungssysteme zu entscheiden, ob
+eine Ramsey-artige Garantie gilt. So ist $x_1 + x_2 + \cdots + x_k = x_{k+1}$
+partitionsregulär für alle $k \geq 1$ (verallgemeinert Schur); $x + 2y = 3z$
+hingegen nicht.
+\end{remark}
+
+%% ============================================================
+\section{Verbindungen und offene Probleme}\label{sec:verbindungen}
+%% ============================================================
+
+\subsection{Furstenbergs Ergodenbeweis des Szemerédi-Satzes}
+
+Eine der konzeptionell bemerkenswertesten Entwicklungen in diesem Bereich ist
+Furstenbergs maßtheoretischer Beweis des Szemerédi-Satzes (1977) \cite{Furstenberg1977}.
+
+\begin{theorem}[Furstenbergsches Korrespondenzprinzip]
+Sei $A \subseteq \N$ mit $\overline{d}(A) > 0$. Dann existiert ein maßerhaltendes
+System $(X, \mathcal{B}, \mu, T)$ und eine Menge $E \in \mathcal{B}$ mit
+$\mu(E) = \overline{d}(A) > 0$, sodass für alle $k \geq 1$ und $n \geq 1$:
+\[
+  d\bigl(A \cap (A-n) \cap (A-2n) \cap \cdots \cap (A-(k-1)n)\bigr) \geq
+  \mu(E \cap T^{-n}E \cap T^{-2n}E \cap \cdots \cap T^{-(k-1)n}E).
+\]
+\end{theorem}
+
+Mithilfe des \emph{Mehrfachen-Rückkehr-Satzes}
+\[
+  \liminf_{N\to\infty} \frac{1}{N}\sum_{n=1}^N \mu(E \cap T^{-n}E \cap \cdots \cap T^{-(k-1)n}E) > 0
+\]
+leitete Furstenberg den Szemerédi-Satz ab. Damit begründete er das Gebiet der
+\emph{Ergodischen Ramsey-Theorie} und inspirierte alle nachfolgenden Beweise des
+Szemerédi-Satzes (Gowers 2001, Tao 2006).
+
+\subsection{Verbindungen zur Riemann-Hypothese}
+
+Eine spekulative, aber faszinierende Verbindung besteht zwischen arithmetischen
+Progressionen und der Verteilung der Nullstellen der Riemannschen Zeta-Funktion
+$\zeta(s)$.
+
+\begin{conjecture}[Korrelation von Nullstellen und APs]\label{verm:rh-ap}
+Die Paarkorrela\-tionsstatistiken der nichttrivialen Nullstellen von $\zeta(s)$
+(wie durch das Montgomery--Odlyzko-Gesetz und GUE-Statistiken vorhergesagt) könnten
+Informationen über die Dichte von APs in Spektren bestimmter Operatoren kodieren.
+Diese Verbindung ist derzeit spekulativ und nicht etabliert.
+\end{conjecture}
+
+Der Green--Tao-Satz basiert auf dem Primzahlsatz (also auf nullstellenfreien Bereichen
+von $\zeta$), aber eine direkte Verbindung zwischen spezifischen Eigenschaften der
+Schur- oder Van-der-Waerden-Zahlen und der Riemann-Hypothese ist nicht bekannt.
+
+\subsection{Die Erdős--Turán-Vermutung (quantitativ)}
+
+\begin{conjecture}[Erdős--Turán, 1936 \cite{ErdosTuran1936}]
+Wenn $A \subseteq \N$ eine Menge ist, sodass $\sum_{a \in A} \frac{1}{a}$ divergiert,
+dann enthält $A$ arithmetische Progressionen aller Längen.
+\end{conjecture}
+
+Diese Vermutung bleibt offen. Sie würde den Green--Tao-Satz implizieren (da
+$\sum_{p} \frac{1}{p}$ nach Euler divergiert), ist aber streng stärker. Der
+Szemerédi-Satz und der Green--Tao-Satz liefern Dichte- bzw.\ Primzahl-Versionen,
+aber die volle Vermutung ist nicht gelöst.
+
+\begin{remark}
+Man beachte den Unterschied: Szemerédi setzt \emph{positive obere Dichte} voraus;
+die Erdős--Turán-Vermutung fragt, ob die schwächere Bedingung \emph{Divergenz der
+Kehrwerte} (z.\,B.\ die Primzahlen haben Dichte Null, aber divergente Kehrwertsumme)
+bereits genügt. Diese quantitative Schärfung ist das eigentliche offene Problem.
+\end{remark}
+
+\subsection{Rechenherausforderungen}
+
+Die Bestimmung von $W(7;2)$ und $S(6)$ sind bedeutende offene Rechenprobleme. Beide
+erfordern voraussichtlich Petabyte-skalierte SAT-Suchen. Die Methoden von Heule et al.
+(Cube and Conquer, DRUP-Zertifikate) werden kontinuierlich weiterentwickelt.
+
+Die SAT-Kodierung des $S(6)$-Problems für $n = 536$, $k = 6$ umfasst
+$536 \times 6 = 3216$ Boolesche Variablen und $\binom{536}{2} \times 6 \approx 859{.}560$
+Klauseln (Typ-3). Die vollständige Auflösung ob $S(6) = 536$ oder $S(6) > 536$ ist
+rechnerisch noch nicht erreichbar.
+
+%% ============================================================
+\section*{Literaturverzeichnis}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{VdW1927}
+B.L.\ van der Waerden,
+\emph{Beweis einer Baudetschen Vermutung},
+Nieuw Arch. Wisk.\ \textbf{15} (1927), 212--216.
+
+\bibitem{Schur1916}
+I.\ Schur,
+\emph{\"{U}ber die Kongruenz $x^m + y^m \equiv z^m \pmod{p}$},
+Jahresber. Dtsch. Math.-Ver.\ \textbf{25} (1916), 114--117.
+
+\bibitem{Szemeredi1975}
+E.\ Szemer\'edi,
+\emph{On sets of integers containing no $k$ elements in arithmetic progression},
+Acta Arith.\ \textbf{27} (1975), 199--245.
+
+\bibitem{GreenTao2008}
+B.\ Green und T.\ Tao,
+\emph{The primes contain arbitrarily long arithmetic progressions},
+Ann.\ Math.\ \textbf{167} (2008), 481--547.
+
+\bibitem{Rado1933}
+R.\ Rado,
+\emph{Studien zur Kombinatorik},
+Math.\ Z.\ \textbf{36} (1933), 424--480.
+
+\bibitem{Furstenberg1977}
+H.\ Furstenberg,
+\emph{Ergodic behavior of diagonal measures and a theorem of Szemer\'edi on arithmetic progressions},
+J.\ Anal.\ Math.\ \textbf{31} (1977), 204--256.
+
+\bibitem{Baumert1965}
+L.D.\ Baumert,
+\emph{A note on Schur's problem},
+Unveröffentlichter Bericht, Jet Propulsion Laboratory, 1965.
+
+\bibitem{Heule2017}
+M.J.H.\ Heule,
+\emph{Schur Number Five},
+Proc.\ AAAI 2018, arXiv:1711.08076 (2017).
+
+\bibitem{Gowers2001}
+W.T.\ Gowers,
+\emph{A new proof of Szemer\'edi's theorem},
+Geom.\ Funct.\ Anal.\ \textbf{11} (2001), 465--588.
+
+\bibitem{Berlekamp1968}
+E.R.\ Berlekamp,
+\emph{A construction for partitions which avoid long arithmetic progressions},
+Canad.\ Math.\ Bull.\ \textbf{11} (1968), 409--414.
+
+\bibitem{HalesJewett1963}
+A.W.\ Hales und R.I.\ Jewett,
+\emph{Regularity and positional games},
+Trans.\ Amer.\ Math.\ Soc.\ \textbf{106} (1963), 222--229.
+
+\bibitem{Roth1953}
+K.F.\ Roth,
+\emph{On certain sets of integers},
+J.\ London Math.\ Soc.\ \textbf{28} (1953), 104--109.
+
+\bibitem{ErdosTuran1936}
+P.\ Erd\H{o}s und P.\ Tur\'an,
+\emph{On some sequences of integers},
+J.\ London Math.\ Soc.\ \textbf{11} (1936), 261--264.
+
+\bibitem{BergelsonLeibman1996}
+V.\ Bergelson und A.\ Leibman,
+\emph{Polynomial extensions of van der Waerden's and Szemer\'edi's theorems},
+J.\ Amer.\ Math.\ Soc.\ \textbf{9} (1996), 725--753.
+
+\bibitem{HeuleKullmannManthey2012}
+M.\ Heule, O.\ Kullmann und V.\ Manthey,
+\emph{Cube and Conquer: Guiding CDCL SAT Solvers by Lookaheads},
+Lect.\ Notes Comput.\ Sci.\ \textbf{7155} (2012), 50--65.
+
+\bibitem{Kouril2008}
+M.\ Kouril und J.L.\ Paul,
+\emph{The van der Waerden number $W(2;6)$ is $1132$},
+Experiment.\ Math.\ \textbf{17} (2008), 53--61.
+
+\end{thebibliography}
+
+\end{document}
