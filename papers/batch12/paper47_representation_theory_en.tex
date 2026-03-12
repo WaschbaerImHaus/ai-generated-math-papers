@@ -1,0 +1,790 @@
+%% paper47_representation_theory_en.tex
+%% Paper 47: Representation Theory — From Group Algebras to the Langlands Program
+%% Author: Michael Fuhrmann
+%% Project: Specialist Mathematics, Build 135
+%% Date: 2026-03-12
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{Representation Theory:\\
+From Group Algebras to the Langlands Program}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 135}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Representation theory provides a systematic framework for understanding abstract
+groups through their concrete actions on vector spaces.  Beginning with the
+fundamental definitions of group homomorphisms into general linear groups, we
+develop the core machinery of the subject: Schur's Lemma, Maschke's Theorem on
+complete reducibility, and the rich orthogonality theory of characters.  We then
+examine the representation theory of the symmetric groups $S_n$ via Young tableaux
+and Specht modules, and pass to the continuous setting with the highest-weight
+classification of representations of $\mathrm{GL}_n$ and $\mathrm{SL}_n$.
+Applications range from Burnside's $pq$-theorem in pure group theory to molecular
+symmetry and crystallography in chemistry and physics.  We conclude with an
+introduction to Galois representations and the Langlands correspondence, one of
+the deepest conjectural frameworks in modern mathematics.
+\end{abstract}
+
+\tableofcontents
+
+%% ============================================================
+\section{Introduction}
+%% ============================================================
+
+Representation theory is the art of understanding abstract algebraic structures
+by letting them act on vector spaces.  A \emph{representation} of a group $G$ on
+a vector space $V$ is simply a group homomorphism
+\[
+    \rho \colon G \longrightarrow \mathrm{GL}(V),
+\]
+where $\mathrm{GL}(V)$ denotes the group of invertible linear endomorphisms of
+$V$.  By choosing a basis one may identify $\mathrm{GL}(V) \cong \mathrm{GL}(n,k)$
+for $n = \dim_k V$, so that $\rho$ associates to each group element $g \in G$ an
+invertible $n \times n$ matrix $\rho(g)$.
+
+The subject sits at a remarkable crossroads of algebra and linear algebra.
+On the one hand it interprets the often intractable combinatorics of a group in
+terms of the well-understood geometry of matrix multiplication.  On the other hand
+it provides the algebraic backbone for much of modern physics: the representations
+of the rotation group $\mathrm{SO}(3)$ and its double cover $\mathrm{SU}(2)$
+describe quantum-mechanical spin, while the representations of the Lorentz group
+and $\mathrm{SU}(3)$ classify elementary particles in the Standard Model.
+
+From a purely mathematical perspective the subject has driven enormous advances.
+Burnside's 1904 proof that every group of order $p^a q^b$ ($p$, $q$ prime) is
+solvable relies on character theory in an essential way that has resisted any
+purely group-theoretic proof to this day.  The classification of finite simple
+groups could not have been accomplished without the detailed study of modular
+representations.  And at the frontier, the Langlands program---formulated by
+Robert Langlands in a famous 1967 letter to André Weil---predicts deep
+correspondences between automorphic representations of reductive groups and Galois
+representations, unifying vast swaths of number theory, geometry, and analysis.
+
+\medskip
+
+\noindent\textbf{Overview.}  Section~\ref{sec:basic} introduces the basic
+definitions and the most important classes of examples.  Section~\ref{sec:schur}
+proves Schur's Lemma and draws its fundamental consequences.
+Section~\ref{sec:maschke} establishes complete reducibility over fields whose
+characteristic does not divide the group order.  Section~\ref{sec:characters}
+develops character theory including the two orthogonality relations.
+Section~\ref{sec:sn} treats the representation theory of the symmetric group via
+Young tableaux.  Section~\ref{sec:gln} covers the highest-weight theory for
+$\mathrm{GL}_n$ and $\mathrm{SL}_n$.  Section~\ref{sec:applications} collects
+three classical applications.  Section~\ref{sec:langlands} gives an introduction
+to Galois representations and the Langlands program.
+
+%% ============================================================
+\section{Group Representations}
+\label{sec:basic}
+%% ============================================================
+
+Throughout let $G$ be a group and $k$ a field.  Unless otherwise stated we take
+$k = \mathbb{C}$.
+
+\begin{definition}
+A \emph{representation} of $G$ over $k$ is a pair $(V,\rho)$ where $V$ is a
+$k$-vector space and $\rho \colon G \to \mathrm{GL}(V)$ is a group homomorphism.
+The \emph{dimension} (or \emph{degree}) of $(V,\rho)$ is $\dim_k V$.
+\end{definition}
+
+Equivalently a representation is a $k[G]$-module, where $k[G]$ denotes the
+\emph{group algebra} of $G$ over $k$: the free $k$-vector space on the elements
+of $G$ with multiplication extending that of $G$ by linearity.
+
+\begin{example}[Trivial representation]
+The \emph{trivial representation} is $\rho_{\mathrm{triv}} \colon G \to
+\mathrm{GL}(k)$, $g \mapsto 1$.  Every element acts as the identity.
+\end{example}
+
+\begin{example}[Regular representation]
+The \emph{regular representation} $(\mathbb{C}[G], \rho_{\mathrm{reg}})$ is
+defined by left multiplication:
+\[
+    \rho_{\mathrm{reg}}(g)(e_h) = e_{gh},
+\]
+where $\{e_h\}_{h \in G}$ is the standard basis of $\mathbb{C}[G]$.  Its
+dimension is $|G|$ and it contains every irreducible representation of $G$ with
+multiplicity equal to its own dimension.
+\end{example}
+
+\begin{example}[Permutation representation]
+If $G$ acts on a finite set $X = \{x_1,\ldots,x_n\}$, the \emph{permutation
+representation} $V = \mathbb{C}^X$ is defined by
+$\rho(g)(e_{x_i}) = e_{g \cdot x_i}$.  The regular representation is the special
+case $X = G$ with the left-multiplication action.
+\end{example}
+
+\begin{example}[Sign representation of $S_n$]
+The symmetric group $S_n$ has a one-dimensional representation
+$\mathrm{sgn} \colon S_n \to \{+1,-1\}$ sending each permutation to its sign.
+For $n \geq 2$ this is distinct from the trivial representation, providing our
+first example of a non-trivial irreducible representation.
+\end{example}
+
+\begin{definition}
+A \emph{subrepresentation} of $(V,\rho)$ is a $G$-stable subspace $W \subseteq V$,
+i.e.\ $\rho(g)W \subseteq W$ for all $g \in G$.  The representation $(V,\rho)$ is
+\emph{irreducible} if its only subrepresentations are $\{0\}$ and $V$ itself.
+\end{definition}
+
+\begin{definition}
+A \emph{morphism} (or \emph{$G$-equivariant map}, or \emph{intertwiner}) between
+representations $(V,\rho)$ and $(W,\sigma)$ is a linear map $T \colon V \to W$
+satisfying
+\[
+    T \circ \rho(g) = \sigma(g) \circ T \quad \text{for all } g \in G.
+\]
+Two representations are \emph{isomorphic} (or \emph{equivalent}) if there exists
+a bijective intertwiner between them.
+\end{definition}
+
+\begin{example}[Representations of $\mathbb{Z}/2\mathbb{Z}$]
+The group $\mathbb{Z}/2\mathbb{Z} = \{0,1\}$ has exactly two irreducible complex
+representations, both one-dimensional:
+\begin{itemize}
+  \item The trivial representation: $\rho(0) = (1)$, $\rho(1) = (1)$.
+  \item The sign representation: $\rho(0) = (1)$, $\rho(1) = (-1)$.
+\end{itemize}
+These exhaust all irreducible representations since the number of irreducibles
+equals the number of conjugacy classes, which is $2$ for an abelian group of
+order $2$.
+\end{example}
+
+%% ============================================================
+\section{Schur's Lemma}
+\label{sec:schur}
+%% ============================================================
+
+Schur's Lemma is the cornerstone of all subsequent structure theory.  It asserts
+that irreducible representations are as far from having non-trivial intertwiners
+as possible.
+
+\begin{theorem}[Schur's Lemma]
+\label{thm:schur}
+Let $(V,\rho)$ and $(W,\sigma)$ be irreducible representations of $G$ over a
+field $k$, and let $T \colon V \to W$ be a $G$-equivariant linear map.
+\begin{enumerate}[label=\textup{(\roman*)}]
+  \item Either $T = 0$ or $T$ is an isomorphism.
+  \item If $k$ is algebraically closed and $V = W$ (with $\rho = \sigma$), then
+        $T = \lambda \cdot \mathrm{id}_V$ for some scalar $\lambda \in k$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) The kernel $\ker T$ is a subrepresentation of $V$ and the image $\mathrm{im}\,T$
+is a subrepresentation of $W$.  Since $V$ is irreducible, $\ker T \in \{\{0\},V\}$.
+Since $W$ is irreducible, $\mathrm{im}\, T \in \{\{0\},W\}$.  If $\ker T = V$
+then $T = 0$.  Otherwise $\ker T = \{0\}$ and $\mathrm{im}\, T = W$, so $T$ is
+bijective.
+
+(ii) Since $k$ is algebraically closed, $T$ has an eigenvalue $\lambda \in k$.
+The map $T - \lambda\,\mathrm{id}_V$ is again $G$-equivariant and has a non-trivial
+kernel, hence by part (i) it must be the zero map, giving $T = \lambda\,\mathrm{id}_V$.
+\end{proof}
+
+\begin{corollary}
+\label{cor:schur_decomp}
+Let $G$ be a finite group and $k = \mathbb{C}$.  If $(V,\rho)$ and $(W,\sigma)$
+are non-isomorphic irreducible representations, then every $G$-equivariant map
+$T \colon V \to W$ is zero.  Consequently
+\[
+    \mathrm{Hom}_G(V,W) = \begin{cases} \mathbb{C} & \text{if } V \cong W, \\ 0 & \text{otherwise.} \end{cases}
+\]
+\end{corollary}
+
+\begin{corollary}
+Every irreducible complex representation of an abelian group is one-dimensional.
+\end{corollary}
+
+\begin{proof}
+For any $h \in G$, the map $\rho(h) \colon V \to V$ is $G$-equivariant (since $G$
+is abelian).  By Schur's Lemma, $\rho(h) = \lambda_h \cdot \mathrm{id}_V$.  But
+then every subspace of $V$ is $G$-stable.  Irreducibility forces $\dim V = 1$.
+\end{proof}
+
+\begin{remark}
+The algebraic closedness hypothesis in part (ii) is necessary.  Over $\mathbb{R}$
+the two-dimensional representation of $\mathrm{SO}(2)$ by rotation matrices is
+irreducible, yet its endomorphisms form a ring isomorphic to $\mathbb{C}$, not
+$\mathbb{R}$.
+\end{remark}
+
+%% ============================================================
+\section{Complete Reducibility: Maschke's Theorem}
+\label{sec:maschke}
+%% ============================================================
+
+\begin{theorem}[Maschke's Theorem]
+\label{thm:maschke}
+Let $G$ be a finite group and $k$ a field with $\mathrm{char}(k) = 0$ or
+$\mathrm{char}(k) \nmid |G|$.  Then every representation of $G$ over $k$ is
+\emph{completely reducible}: it decomposes as a direct sum of irreducible
+subrepresentations.
+\end{theorem}
+
+\begin{proof}
+It suffices to show that every subrepresentation has a $G$-stable complement.
+Let $(V,\rho)$ be a representation and $W \subseteq V$ a subrepresentation.
+Since $V$ is a finite-dimensional vector space over $k$, there exists a linear
+projection $\pi_0 \colon V \to W$ (with $\pi_0|_W = \mathrm{id}_W$), but $\pi_0$
+need not be $G$-equivariant.  We \emph{average} over the group to produce a
+$G$-equivariant projection:
+\[
+    \pi \coloneqq \frac{1}{|G|} \sum_{g \in G} \rho(g) \circ \pi_0 \circ \rho(g)^{-1}.
+\]
+The factor $1/|G|$ is well-defined since $|G|$ is invertible in $k$ by hypothesis.
+One checks:
+\begin{itemize}
+  \item $\pi$ is $G$-equivariant: $\rho(h) \circ \pi = \pi \circ \rho(h)$ for all $h \in G$.
+  \item $\pi|_W = \mathrm{id}_W$: for $w \in W$ and any $g$, we have $\rho(g)^{-1}w \in W$
+        (since $W$ is $G$-stable), hence $\pi_0(\rho(g)^{-1}w) = \rho(g)^{-1}w$,
+        and $\rho(g)\rho(g)^{-1}w = w$.
+  \item In particular $\pi \circ \pi = \pi$ (idempotent).
+\end{itemize}
+Therefore $V = W \oplus \ker\pi$ is a decomposition into $G$-stable subspaces.
+By Noetherian induction on $\dim V$, the process terminates and yields a
+decomposition into irreducibles.
+\end{proof}
+
+\begin{remark}
+The hypothesis $\mathrm{char}(k) \nmid |G|$ is sharp.  Over a field of
+characteristic $p$ dividing $|G|$, indecomposable but reducible representations
+can and do occur.  The modular representation theory of finite groups (Brauer
+theory) is the study of this more subtle situation.
+\end{remark}
+
+Under the hypotheses of Maschke's Theorem every representation $(V,\rho)$
+decomposes as
+\[
+    V \cong \bigoplus_{i} V_i^{\oplus m_i},
+\]
+where the $V_i$ are pairwise non-isomorphic irreducible representations and $m_i
+\geq 0$ are uniquely determined non-negative integers called the
+\emph{multiplicities}.  The multiplicities can be computed from the character
+theory developed in the next section.
+
+%% ============================================================
+\section{Characters}
+\label{sec:characters}
+%% ============================================================
+
+\begin{definition}
+The \emph{character} of a representation $(V,\rho)$ is the function
+\[
+    \chi_V \colon G \longrightarrow k, \quad \chi_V(g) = \mathrm{tr}(\rho(g)).
+\]
+\end{definition}
+
+Characters are \emph{class functions}: they are constant on conjugacy classes,
+since $\mathrm{tr}(ABA^{-1}) = \mathrm{tr}(B)$.  The vector space of class
+functions on $G$ is denoted $\mathrm{Cl}(G)$; it has dimension equal to the
+number $r$ of conjugacy classes.
+
+\begin{proposition}
+\label{prop:char_props}
+Let $(V,\rho)$ and $(W,\sigma)$ be representations.  Then:
+\begin{enumerate}[label=\textup{(\roman*)}]
+  \item $\chi_V(e) = \dim V$.
+  \item $\chi_V(g^{-1}) = \overline{\chi_V(g)}$ for $|G| < \infty$, $k = \mathbb{C}$.
+  \item $\chi_{V \oplus W} = \chi_V + \chi_W$.
+  \item $\chi_{V \otimes W} = \chi_V \cdot \chi_W$.
+\end{enumerate}
+\end{proposition}
+
+\begin{definition}[Inner product on class functions]
+For $k = \mathbb{C}$, the \emph{inner product} on class functions is
+\[
+    \langle \alpha, \beta \rangle_G \coloneqq \frac{1}{|G|} \sum_{g \in G} \alpha(g)\,\overline{\beta(g)}.
+\]
+\end{definition}
+
+\begin{theorem}[First Orthogonality Relation]
+\label{thm:orth1}
+Let $V_1,\ldots,V_r$ be the pairwise non-isomorphic irreducible representations
+of a finite group $G$ over $\mathbb{C}$.  Then
+\[
+    \langle \chi_{V_i}, \chi_{V_j} \rangle_G = \delta_{ij}.
+\]
+In other words, the irreducible characters form an \emph{orthonormal} family in
+$\mathrm{Cl}(G)$.
+\end{theorem}
+
+\begin{proof}
+By Schur's Lemma (Corollary~\ref{cor:schur_decomp}) applied to
+$\mathrm{Hom}_G(V_i, V_j)$, one computes
+\[
+    \langle \chi_{V_i}, \chi_{V_j} \rangle_G
+    = \frac{1}{|G|} \sum_{g \in G} \chi_{V_i}(g)\,\overline{\chi_{V_j}(g)}
+    = \dim_{\mathbb{C}} \mathrm{Hom}_G(V_i, V_j)
+    = \delta_{ij}. \qedhere
+\]
+\end{proof}
+
+\begin{theorem}[Second Orthogonality Relation]
+\label{thm:orth2}
+Let $C_1,\ldots,C_r$ be the conjugacy classes of $G$ and $g_s \in C_s$ any
+representative.  Then
+\[
+    \sum_{i=1}^{r} \chi_{V_i}(g_s)\,\overline{\chi_{V_i}(g_t)} = \frac{|G|}{|C_s|}\,\delta_{st}.
+\]
+\end{theorem}
+
+\begin{corollary}[Number of irreducibles]
+The number of irreducible representations of a finite group equals the number of
+its conjugacy classes.
+\end{corollary}
+
+\begin{corollary}[Decomposition formula]
+\label{cor:decomp}
+For any representation $(V,\rho)$ with character $\chi_V$, the multiplicity of
+the irreducible $V_i$ in $V$ is
+\[
+    m_i = \langle \chi_V, \chi_{V_i} \rangle_G.
+\]
+\end{corollary}
+
+\begin{example}[Character table of $S_3$]
+The symmetric group $S_3$ has order $6$ and three conjugacy classes:
+$C_1 = \{e\}$, $C_2 = \{(12),(13),(23)\}$, $C_3 = \{(123),(132)\}$.
+The three irreducible representations are: the trivial representation $\mathbf{1}$,
+the sign representation $\mathrm{sgn}$, and the standard $2$-dimensional
+representation $\mathrm{std}$.
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+ & $e$ & $(12)$ & $(123)$ \\
+\midrule
+$\chi_{\mathbf{1}}$ & $1$ & $1$ & $1$ \\
+$\chi_{\mathrm{sgn}}$ & $1$ & $-1$ & $1$ \\
+$\chi_{\mathrm{std}}$ & $2$ & $0$ & $-1$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+One verifies $\sum_i (\chi_{V_i}(e))^2 = 1 + 1 + 4 = 6 = |S_3|$, which is a
+necessary identity for the complete list of irreducibles.
+\end{example}
+
+\begin{theorem}[Burnside's dimension formula]
+\label{thm:burnside_dim}
+Let $G$ be a finite group with irreducible complex representations $V_1,\ldots,V_r$
+of dimensions $d_1,\ldots,d_r$.  Then
+\[
+    \sum_{i=1}^{r} d_i^2 = |G|.
+\]
+\end{theorem}
+
+%% ============================================================
+\section{Representations of $S_n$}
+\label{sec:sn}
+%% ============================================================
+
+The symmetric group $S_n$ is one of the most important groups in mathematics and
+physics, and its representation theory is completely governed by the combinatorics
+of \emph{partitions} and \emph{Young tableaux}.
+
+\begin{definition}
+A \emph{partition} of $n$ is a weakly decreasing sequence of positive integers
+$\lambda = (\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_k > 0)$ with
+$\lambda_1 + \cdots + \lambda_k = n$.  We write $\lambda \vdash n$.
+\end{definition}
+
+\begin{definition}
+The \emph{Young diagram} of $\lambda \vdash n$ consists of $n$ boxes arranged in
+rows from top to bottom, with $\lambda_i$ boxes in row $i$.  A \emph{Young
+tableau} of shape $\lambda$ is a filling of the boxes with the numbers $1,\ldots,n$;
+it is \emph{standard} if entries increase along each row from left to right and
+down each column from top to bottom.
+\end{definition}
+
+\begin{example}
+The partition $\lambda = (3,2) \vdash 5$ has Young diagram:
+\[
+\ytableaushort{{\phantom{1}}{\phantom{1}}{\phantom{1}},{\phantom{1}}{\phantom{1}}}
+\quad\leftrightarrow\quad
+\begin{array}{|c|c|c|}
+\hline
+\phantom{1} & \phantom{1} & \phantom{1} \\
+\hline
+\phantom{1} & \phantom{1} \\
+\cline{1-2}
+\end{array}
+\]
+The standard tableaux of this shape are those fillings with $\{1,2,3,4,5\}$
+in which rows and columns are increasing; there are $5$ of them.
+\end{example}
+
+\begin{definition}[Specht module]
+For $\lambda \vdash n$, the \emph{Specht module} $S^\lambda$ is a specific
+irreducible $\mathbb{C}[S_n]$-module constructed as follows.  Fix a Young tableau
+$T$ of shape $\lambda$.  Let
+\[
+    R(T) = \{\sigma \in S_n : \sigma \text{ preserves each row of } T\},
+\quad
+    C(T) = \{\sigma \in S_n : \sigma \text{ preserves each column of } T\}.
+\]
+Define the \emph{Young symmetrizer}
+\[
+    c_T = \underbrace{\left(\sum_{\sigma \in R(T)} \sigma\right)}_{a_T} \cdot
+          \underbrace{\left(\sum_{\tau \in C(T)} \mathrm{sgn}(\tau)\,\tau\right)}_{b_T}.
+\]
+Then $S^\lambda = \mathbb{C}[S_n] \cdot c_T$ is an irreducible $\mathbb{C}[S_n]$-module,
+independent of the choice of $T$ up to isomorphism.
+\end{definition}
+
+\begin{theorem}[Classification of irreducibles of $S_n$]
+\label{thm:sn_class}
+The modules $\{S^\lambda : \lambda \vdash n\}$ form a complete set of pairwise
+non-isomorphic irreducible complex representations of $S_n$.  The dimension of
+$S^\lambda$ equals the number of standard Young tableaux of shape $\lambda$,
+given by the \emph{hook-length formula}:
+\[
+    \dim S^\lambda = \frac{n!}{\prod_{\square \in \lambda} h(\square)},
+\]
+where $h(\square)$ denotes the \emph{hook length} at box $\square$ (the number
+of boxes directly to the right of or directly below $\square$, plus one for
+$\square$ itself).
+\end{theorem}
+
+\begin{example}[Frobenius formula]
+The character $\chi^\lambda$ of the Specht module $S^\lambda$ can be computed via
+the Frobenius character formula.  For a permutation $\sigma \in S_n$ with cycle
+type $\mu = (1^{m_1} 2^{m_2} \cdots)$,
+\[
+    \chi^\lambda(\sigma) = \langle s_\lambda, p_\mu \rangle,
+\]
+where $s_\lambda$ is the Schur polynomial, $p_\mu = \prod_i p_{\mu_i}$ is the
+power-sum symmetric function, and the inner product is the Hall inner product on
+symmetric functions.
+\end{example}
+
+\begin{example}[Irreducibles of $S_4$]
+The partitions of $4$ are $(4)$, $(3,1)$, $(2,2)$, $(2,1,1)$, $(1,1,1,1)$,
+giving $5$ irreducible representations of dimensions $1, 3, 2, 3, 1$ respectively.
+One checks $1^2 + 3^2 + 2^2 + 3^2 + 1^2 = 1+9+4+9+1 = 24 = 4!$ as required.
+\end{example}
+
+%% ============================================================
+\section{Representations of $\mathrm{GL}_n$ and $\mathrm{SL}_n$}
+\label{sec:gln}
+%% ============================================================
+
+The theory of representations of compact Lie groups, or more generally of
+reductive algebraic groups, is vastly richer than the finite-group case.  We
+sketch the highest-weight classification for $\mathrm{GL}_n(\mathbb{C})$ and
+$\mathrm{SL}_n(\mathbb{C})$.
+
+\begin{definition}
+A representation $(\rho, V)$ of $\mathrm{GL}_n(\mathbb{C})$ is
+\emph{polynomial} (resp.\ \emph{rational}) if each matrix coefficient
+$g \mapsto \langle v^*, \rho(g)v\rangle$ is a polynomial (resp.\ rational) function
+of the entries of $g$.
+\end{definition}
+
+The irreducible polynomial representations of $\mathrm{GL}_n$ are indexed by
+\emph{dominant weights}: sequences $\lambda = (\lambda_1 \geq \lambda_2 \geq
+\cdots \geq \lambda_n \geq 0)$ of non-negative integers.  These correspond
+precisely to partitions $\lambda$ with at most $n$ parts.
+
+\begin{theorem}[Highest-weight classification]
+\label{thm:hwt}
+For each dominant weight $\lambda = (\lambda_1 \geq \cdots \geq \lambda_n \geq 0)$
+there exists a unique (up to isomorphism) irreducible polynomial representation
+$V_\lambda$ of $\mathrm{GL}_n(\mathbb{C})$.  Every irreducible polynomial
+representation is of this form.  The representation $V_\lambda$ is precisely the
+Schur module associated to the partition $\lambda$.
+\end{theorem}
+
+\begin{theorem}[Weyl's Character Formula]
+\label{thm:weyl_char}
+Let $G = \mathrm{SL}_n(\mathbb{C})$ with maximal torus $T$ of diagonal matrices
+of determinant $1$.  For a dominant integral weight $\lambda$, the character of
+the irreducible representation $V_\lambda$ evaluated on $\mathrm{diag}(t_1,\ldots,t_n)
+\in T$ is
+\[
+    \chi_{V_\lambda}(t) = \frac{\sum_{w \in W} \epsilon(w)\, t^{w(\lambda+\rho)-\rho}}{\prod_{\alpha > 0}(1 - t^{-\alpha})},
+\]
+where $W = S_n$ is the Weyl group, $\epsilon(w) = \det(w)$, $\rho =
+\tfrac{1}{2}\sum_{\alpha > 0}\alpha$ is the Weyl vector (half the sum of positive
+roots), and the product runs over positive roots $\alpha$.
+\end{theorem}
+
+\begin{example}[Representations of $\mathrm{SL}_2$]
+For $G = \mathrm{SL}_2(\mathbb{C})$, the dominant weights are non-negative
+integers $n \geq 0$.  The irreducible representation $V_n$ of highest weight $n$
+has dimension $n+1$ and can be realized as the space of homogeneous polynomials
+of degree $n$ in two variables, with $\mathrm{SL}_2$ acting by substitution.
+The character is
+\[
+    \chi_{V_n}\!\left(\begin{smallmatrix}t & 0 \\ 0 & t^{-1}\end{smallmatrix}\right)
+    = t^n + t^{n-2} + \cdots + t^{-n} = \frac{t^{n+1} - t^{-(n+1)}}{t - t^{-1}}.
+\]
+These are the Chebyshev polynomials in disguise, and they coincide with the
+spin-$n/2$ representations of $\mathrm{SU}(2)$ in quantum mechanics.
+\end{example}
+
+\begin{proposition}[Schur functors]
+For a partition $\lambda \vdash d$ with at most $n$ parts, the Schur functor
+$\mathbb{S}^\lambda$ associates to any vector space $E$ of dimension $n$ the
+representation
+\[
+    \mathbb{S}^\lambda E \coloneqq (E^{\otimes d} \otimes S^\lambda)^{S_d},
+\]
+where $S^\lambda$ is the Specht module of $S_d$.  This gives the irreducible
+$\mathrm{GL}(E)$-module $V_\lambda$, establishing a canonical link between the
+representation theories of $S_d$ and $\mathrm{GL}_n$.
+\end{proposition}
+
+%% ============================================================
+\section{Applications}
+\label{sec:applications}
+%% ============================================================
+
+\subsection{Burnside's $pq$-Theorem}
+
+\begin{theorem}[Burnside, 1904]
+\label{thm:burnside_pq}
+Let $G$ be a finite group of order $p^a q^b$ where $p$ and $q$ are prime and
+$a, b \geq 0$.  Then $G$ is solvable.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The proof uses two character-theoretic lemmas.
+
+\begin{lemma}
+\label{lem:b1}
+If $\chi$ is an irreducible character of $G$ of degree $d$ and $C$ is a
+conjugacy class with $|C|$ coprime to $d$, then for any $g \in C$ either
+$\chi(g) = 0$ or $\rho(g)$ is a scalar matrix.
+\end{lemma}
+
+\begin{lemma}
+\label{lem:b2}
+A finite group is solvable if and only if every non-trivial irreducible character
+has degree divisible by some prime.
+\end{lemma}
+
+Using Sylow theory, one finds in $G$ a conjugacy class $C$ of size $p^s$ for some
+$s \geq 1$.  Lemma~\ref{lem:b1} forces each irreducible character of degree not
+divisible by $p$ to vanish on $C$ or to make $\rho(g)$ a scalar.  The column
+orthogonality relation then forces $G$ to have a normal subgroup, contradicting
+simplicity unless $G$ is abelian.  Inducting on $|G|$ yields solvability.
+\end{proof}
+
+\begin{remark}
+Burnside's original 1904 proof was the first use of character theory to prove a
+purely group-theoretic result.  A character-free proof was found by Goldschmidt
+and Bender only in the 1970s, and it is considerably more involved.  This
+illustrates the power of representation-theoretic methods.
+\end{remark}
+
+\subsection{Molecular Symmetry}
+
+In chemistry, the symmetry group of a molecule (such as the rotation group of a
+regular polyhedron) acts on the space of electron orbitals or vibrational modes.
+The decomposition of these (typically reducible) representations into irreducibles
+explains the degeneracy structure of energy levels and the selection rules for
+spectroscopic transitions.
+
+For example, the methane molecule $\mathrm{CH}_4$ has symmetry group $T_d \cong
+S_4$.  The $2p$ orbitals of the four hydrogen atoms form the $4$-dimensional
+permutation representation, which decomposes as $A_1 \oplus T_2$ (using
+standard spectroscopic notation), accounting for the observed bonding pattern.
+
+\subsection{Crystallography}
+
+The $230$ crystallographic space groups in three dimensions classify all possible
+periodic arrangements of atoms.  Each such group $\Gamma$ fits into a short exact
+sequence $1 \to \mathbb{Z}^3 \to \Gamma \to P \to 1$, where $P$ is a
+\emph{point group} (a finite subgroup of $\mathrm{O}(3)$).  The irreducible
+representations of $P$ classify the symmetry types of phonon modes at the
+$\Gamma$-point of the Brillouin zone, with direct applications to the
+interpretation of Raman and infrared spectra.
+
+%% ============================================================
+\section{Connection to the Langlands Program}
+\label{sec:langlands}
+%% ============================================================
+
+The Langlands program, initiated in Robert Langlands' 1967 letter to André Weil,
+is a vast web of conjectures and theorems predicting deep correspondences between
+three seemingly disparate objects:
+\begin{enumerate}
+  \item \textbf{Automorphic representations}: certain representations of adelic
+        groups $G(\mathbb{A}_{\mathbb{Q}})$ that generalize modular forms and
+        Dirichlet characters.
+  \item \textbf{Galois representations}: continuous homomorphisms $\rho \colon
+        \mathrm{Gal}(\bar{\mathbb{Q}}/\mathbb{Q}) \to {}^L G$ into the
+        Langlands dual group.
+  \item \textbf{L-functions}: meromorphic functions on $\mathbb{C}$ encoding
+        arithmetic information via Euler products and satisfying functional equations.
+\end{enumerate}
+
+\subsection{Galois Representations}
+
+Let $\ell$ be a prime.  An \emph{$\ell$-adic Galois representation} is a
+continuous homomorphism
+\[
+    \rho \colon \mathrm{Gal}(\bar{\mathbb{Q}}/\mathbb{Q}) \longrightarrow \mathrm{GL}_n(\mathbb{Z}_\ell),
+\]
+where $\mathbb{Z}_\ell$ carries the $\ell$-adic topology and the Galois group
+carries the Krull topology.  The representation theory developed in previous
+sections applies here with $G = \mathrm{Gal}(\bar{\mathbb{Q}}/\mathbb{Q})$, a
+profinite group.
+
+\begin{example}[Cyclotomic character]
+The \emph{cyclotomic character} $\chi_\ell \colon \mathrm{Gal}(\bar{\mathbb{Q}}/\mathbb{Q})
+\to \mathbb{Z}_\ell^\times$ is defined by $\sigma(\zeta_{\ell^n}) = \zeta_{\ell^n}^{\chi_\ell(\sigma)}$
+for all $\ell^n$-th roots of unity $\zeta_{\ell^n}$.  This is an irreducible
+one-dimensional Galois representation encoding the arithmetic of cyclotomic fields.
+\end{example}
+
+\begin{example}[Galois representation from an elliptic curve]
+Let $E/\mathbb{Q}$ be an elliptic curve.  The Tate module
+\[
+    T_\ell(E) = \varprojlim_n E[\ell^n](\bar{\mathbb{Q}}) \cong \mathbb{Z}_\ell^2
+\]
+carries a natural action of $\mathrm{Gal}(\bar{\mathbb{Q}}/\mathbb{Q})$, giving
+a two-dimensional $\ell$-adic representation
+$\rho_{E,\ell} \colon \mathrm{Gal}(\bar{\mathbb{Q}}/\mathbb{Q}) \to \mathrm{GL}_2(\mathbb{Z}_\ell)$.
+The L-function $L(E,s) = L(\rho_{E,\ell}, s)$ is the same L-function that appears
+in the Birch and Swinnerton-Dyer Conjecture.
+\end{example}
+
+\subsection{The Langlands Correspondence}
+
+\begin{conjecture}[Global Langlands Correspondence for $\mathrm{GL}_n$]
+\label{conj:langlands}
+There is a natural bijection between:
+\begin{enumerate}[label=\textup{(\roman*)}]
+  \item Cuspidal automorphic representations $\pi$ of $\mathrm{GL}_n(\mathbb{A}_{\mathbb{Q}})$.
+  \item Irreducible $n$-dimensional complex representations of the
+        Weil--Deligne group $W_{\mathbb{Q}}' = W_{\mathbb{Q}} \ltimes \mathbb{C}$
+        (or, conjecturally, of the Langlands group $\mathcal{L}_{\mathbb{Q}}$).
+\end{enumerate}
+Under this bijection, the L-function $L(s,\pi)$ on the automorphic side equals
+the Artin L-function $L(s,\rho)$ on the Galois side.
+\end{conjecture}
+
+\begin{remark}
+Conjecture~\ref{conj:langlands} remains open in general.  Major special cases
+have been established:
+\begin{itemize}
+  \item $n=1$: Class field theory (Kronecker--Weber, Artin reciprocity).
+  \item $G = \mathrm{GL}_2$, weight $2$ newforms: Taylor--Wiles (1995), as part of
+        the proof of Fermat's Last Theorem.
+  \item Function-field analogue: Drinfeld (1974, $n=2$) and Lafforgue (2002, general $n$).
+  \item Geometrical Langlands over complex curves: Frenkel--Ben-Zvi and others.
+\end{itemize}
+The recent work of V.\ Lafforgue on the ``automorphic to Galois'' direction over
+function fields, and of Scholze--Fargues using perfectoid geometry and the
+Fargues--Fontaine curve, represent the current frontier.
+\end{remark}
+
+\subsection{Modularity and Fermat's Last Theorem}
+
+The connection between representation theory and number theory becomes especially
+visible in the proof of Fermat's Last Theorem.  Suppose $a^p + b^p = c^p$ with
+$p \geq 5$ prime.  Frey (1986) associated to this hypothetical solution the
+elliptic curve $E_{a,b,c}$, and Ribet (1990) proved that the associated Galois
+representation $\rho_{E,p}$ would give rise to a weight-$2$ modular form of level
+$2$.  But there are no such forms (by exhaustion of small levels), a contradiction.
+The key step---that every semistable elliptic curve over $\mathbb{Q}$ is modular
+(i.e.\ its Galois representation comes from a modular form)---was proved by
+Wiles and Taylor--Wiles in 1995.  This modularity theorem is a landmark instance
+of the Langlands correspondence in dimension $n = 2$.
+
+%% ============================================================
+\section*{References}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Serre77}
+J.-P.\ Serre,
+\textit{Linear Representations of Finite Groups},
+Graduate Texts in Mathematics, vol.~42,
+Springer-Verlag, New York, 1977.
+
+\bibitem{FultonHarris91}
+W.\ Fulton and J.\ Harris,
+\textit{Representation Theory: A First Course},
+Graduate Texts in Mathematics, vol.~129,
+Springer-Verlag, New York, 1991.
+
+\bibitem{JamesLiebeck01}
+G.\ James and M.\ Liebeck,
+\textit{Representations and Characters of Groups},
+2nd ed., Cambridge University Press, Cambridge, 2001.
+
+\bibitem{BumpLie04}
+D.\ Bump,
+\textit{Lie Groups},
+Graduate Texts in Mathematics, vol.~225,
+Springer-Verlag, New York, 2004.
+
+\bibitem{GelfandManin03}
+S.\ I.\ Gelfand and Yu.\ I.\ Manin,
+\textit{Methods of Homological Algebra},
+2nd ed., Springer Monographs in Mathematics,
+Springer-Verlag, Berlin, 2003.
+
+\bibitem{Langlands70}
+R.\ P.\ Langlands,
+\textit{Problems in the Theory of Automorphic Forms},
+in: Lectures in Modern Analysis and Applications III,
+Lecture Notes in Mathematics, vol.~170,
+Springer-Verlag, Berlin, 1970, pp.~18--61.
+
+\bibitem{TaylorWiles95}
+R.\ Taylor and A.\ Wiles,
+Ring theoretic properties of certain Hecke algebras,
+\textit{Ann.\ of Math.} \textbf{141} (1995), 553--572.
+
+\bibitem{Lafforgue02}
+L.\ Lafforgue,
+Chtoucas de Drinfeld et correspondance de Langlands,
+\textit{Invent.\ Math.} \textbf{147} (2002), 1--241.
+
+\bibitem{BumpSchilling17}
+D.\ Bump and A.\ Schilling,
+\textit{Crystal Bases: Representations and Combinatorics},
+World Scientific, Singapore, 2017.
+
+\bibitem{Neukirch99}
+J.\ Neukirch, A.\ Schmidt and K.\ Wingberg,
+\textit{Cohomology of Number Fields},
+Grundlehren der mathematischen Wissenschaften, vol.~323,
+Springer-Verlag, Berlin, 1999.
+
+\end{thebibliography}
+
+\end{document}

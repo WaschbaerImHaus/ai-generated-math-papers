@@ -1,0 +1,840 @@
+% =============================================================================
+% paper46_galois_theory_en.tex
+% Paper 46: Galois Theory — From Field Extensions to the Insolvability of the Quintic
+% Specialist Mathematics Project — Build 135
+% Author: Michael Fuhrmann
+% Date: 2026-03-12
+% =============================================================================
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% ---------------------------------------------------------------------------
+% Theorem environments
+% ---------------------------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+% ---------------------------------------------------------------------------
+% Metadata
+% ---------------------------------------------------------------------------
+\title{Galois Theory:\\
+       From Field Extensions to the Insolvability of the Quintic}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 135}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\keywords{Galois theory, field extensions, splitting fields, Galois group,
+          fundamental theorem, solvability by radicals, Abel-Ruffini theorem,
+          Kronecker-Weber theorem, constructibility}
+
+\subjclass[2020]{12F10, 12F20, 11R32, 12E05}
+
+% ---------------------------------------------------------------------------
+% Macros
+% ---------------------------------------------------------------------------
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Gal}{\operatorname{Gal}}
+\newcommand{\Aut}{\operatorname{Aut}}
+\newcommand{\ord}{\operatorname{ord}}
+\newcommand{\lcm}{\operatorname{lcm}}
+\newcommand{\Fix}{\operatorname{Fix}}
+\newcommand{\chara}{\operatorname{char}}
+
+% =============================================================================
+\begin{document}
+% =============================================================================
+
+\begin{abstract}
+Galois theory is one of the most profound achievements in the history of
+mathematics. Developed by \'{E}variste Galois in 1832 and completed
+posthumously, it establishes a deep correspondence between the symmetry groups
+of polynomial roots and the arithmetic of field extensions. This paper presents
+a self-contained introduction to Galois theory, starting from the foundations
+of field extensions and algebraic closures, proceeding through splitting fields,
+separability, normality, and the Galois group, to the celebrated Fundamental
+Theorem of Galois Theory. We then apply this machinery to settle the classical
+problems of solvability by radicals—proving the Abel-Ruffini Theorem—and
+constructibility by compass and straightedge. The Kronecker-Weber Theorem on
+abelian extensions of $\Q$ is presented as a further landmark application.
+Throughout, concrete examples illustrate the abstract theory.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% =============================================================================
+\section{Introduction}
+% =============================================================================
+
+The problem of solving polynomial equations by radicals—\emph{closed-form
+formulas} involving the coefficients and nested radicals—occupied mathematicians
+for centuries. The Babylonians knew the quadratic formula around 2000 BCE;
+Cardano published the cubic formula in \emph{Ars Magna} (1545), and Ferrari
+derived a formula for degree four in the same decade. But degree five resisted
+all attacks until 1799, when Paolo Ruffini announced (with an incomplete proof)
+that no such formula could exist; Abel gave the first rigorous proof in 1824.
+
+The definitive explanation came from \'{E}variste Galois (1811--1832), who in
+a memoir written the night before his fatal duel created what we now call
+\emph{Galois theory}. Galois associated to every polynomial $f \in K[x]$ a
+group $\Gal(f/K)$ of symmetries of its roots, and proved:
+\[
+  f \text{ is solvable by radicals} \iff \Gal(f/K) \text{ is a solvable group.}
+\]
+Since the generic degree-five polynomial has Galois group $S_5$, and $A_5
+\trianglelefteq S_5$ is simple and non-abelian, $S_5$ is not solvable, whence
+no radical formula exists for degree five.
+
+The theory has grown far beyond its origin. Today Galois theory is central to
+algebraic number theory, the Langlands programme, and modern cryptography.
+
+\subsection*{Historical Timeline}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Year & Development \\
+\midrule
+$\sim$2000 BCE & Babylonian quadratic formula \\
+1545 & Cardano/Ferrari: cubic and quartic formulas (\emph{Ars Magna}) \\
+1799 & Ruffini: first (incomplete) proof that degree 5 is unsolvable \\
+1824 & Abel: rigorous proof of Abel-Ruffini \\
+1832 & Galois: group-theoretic criterion; memoir published posthumously \\
+1870 & Jordan: first book on group theory including Galois theory \\
+1801/1853 & Gauss/Kronecker-Weber: cyclotomic fields and abelian extensions \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% =============================================================================
+\section{Field Extensions}
+% =============================================================================
+
+\subsection{Basic Definitions}
+
+\begin{definition}
+A \emph{field extension} $L/K$ is an inclusion of fields $K \subseteq L$.
+The \emph{degree} $[L:K] = \dim_K L$ is the dimension of $L$ as a
+$K$-vector space. We say $L/K$ is \emph{finite} if $[L:K] < \infty$.
+\end{definition}
+
+\begin{theorem}[Tower Law]
+If $K \subseteq F \subseteq L$ are fields, then
+\[
+  [L:K] = [L:F] \cdot [F:K].
+\]
+\end{theorem}
+
+\begin{proof}
+Let $\{e_i\}$ be a basis of $F$ over $K$ and $\{f_j\}$ a basis of $L$ over
+$F$. One verifies that $\{e_i f_j\}$ is a $K$-basis of $L$, giving
+$[L:K] = |I| \cdot |J| = [F:K] \cdot [L:F]$.
+\end{proof}
+
+\subsection{Algebraic and Transcendental Elements}
+
+\begin{definition}
+An element $\alpha \in L$ is \emph{algebraic over $K$} if there exists a
+nonzero polynomial $f \in K[x]$ with $f(\alpha) = 0$. Otherwise $\alpha$ is
+\emph{transcendental over $K$}. The extension $L/K$ is \emph{algebraic} if
+every element of $L$ is algebraic over $K$.
+\end{definition}
+
+\begin{definition}
+The \emph{minimal polynomial} $\mathrm{min}_{K}(\alpha)$ of an algebraic
+element $\alpha$ over $K$ is the unique monic irreducible polynomial in $K[x]$
+that vanishes at $\alpha$.
+\end{definition}
+
+\begin{proposition}
+If $\alpha$ is algebraic over $K$ with minimal polynomial $p$ of degree $n$,
+then $K(\alpha) \cong K[x]/(p)$ and $[K(\alpha):K] = n$.
+\end{proposition}
+
+\begin{example}
+The minimal polynomial of $\sqrt{2}$ over $\Q$ is $x^2 - 2$, so
+$[\Q(\sqrt{2}):\Q] = 2$ and $\Q(\sqrt{2}) = \{a + b\sqrt{2} : a,b \in \Q\}$.
+Similarly, $\mathrm{min}_\Q(\sqrt[3]{2}) = x^3 - 2$, giving
+$[\Q(\sqrt[3]{2}):\Q] = 3$.
+\end{example}
+
+\begin{example}
+The algebraic closure $\overline{\Q}$ of $\Q$ is algebraic over $\Q$ but of
+infinite degree. The real numbers $\pi$ and $e$ are transcendental over $\Q$
+(Lindemann--Weierstrass).
+\end{example}
+
+\subsection{Simple and Compositum Extensions}
+
+\begin{definition}
+The \emph{compositum} $L_1 L_2$ of two extensions $L_1, L_2$ of $K$ inside
+a common overfield is the smallest subfield containing both $L_1$ and $L_2$.
+\end{definition}
+
+% =============================================================================
+\section{Splitting Fields and Algebraic Closure}
+% =============================================================================
+
+\subsection{Splitting Fields}
+
+\begin{definition}
+A \emph{splitting field} of $f \in K[x]$ is a field extension $L/K$ such that
+$f$ splits into linear factors over $L$, i.e.\ $f(x) = a \prod_{i=1}^n (x -
+\alpha_i)$ with $\alpha_i \in L$, and $L = K(\alpha_1,\dots,\alpha_n)$.
+\end{definition}
+
+\begin{theorem}[Existence and Uniqueness of Splitting Fields]
+\label{thm:splitfield}
+For every $f \in K[x]$ there exists a splitting field $L/K$. It is unique up
+to $K$-isomorphism, and $[L:K] \leq (\deg f)!$
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+\emph{Existence}: By induction on $\deg f$. If $f$ has no irreducible factor of
+degree $> 1$ in $K[x]$, then $K$ itself is the splitting field. Otherwise pick
+an irreducible factor $p \mid f$, set $K_1 = K[x]/(p)$, adjoin a root
+$\alpha_1$ of $p$, and continue with $f/(x-\alpha_1)$ over $K_1$.
+
+\emph{Uniqueness}: Any two splitting fields $L, L'$ are connected by a
+$K$-isomorphism, constructed by extending isomorphisms step by step along the
+roots.
+\end{proof}
+
+\begin{example}
+The splitting field of $x^3 - 2$ over $\Q$ is
+$\Q(\sqrt[3]{2}, \omega)$ where $\omega = e^{2\pi i/3}$ is a primitive cube
+root of unity. We have $[\Q(\sqrt[3]{2},\omega):\Q] = 6$.
+\end{example}
+
+\subsection{Algebraic Closure}
+
+\begin{definition}
+A field $\Omega$ is \emph{algebraically closed} if every non-constant polynomial
+in $\Omega[x]$ has a root in $\Omega$. The \emph{algebraic closure}
+$\overline{K}$ of $K$ is the smallest algebraically closed field containing $K$.
+\end{definition}
+
+\begin{theorem}[Existence of Algebraic Closure (Steinitz, 1910)]
+Every field $K$ has an algebraic closure $\overline{K}$, unique up to
+$K$-isomorphism.
+\end{theorem}
+
+% =============================================================================
+\section{Separability and Normality}
+% =============================================================================
+
+\subsection{Separable Extensions}
+
+\begin{definition}
+A polynomial $f \in K[x]$ is \emph{separable} if it has no repeated roots in
+$\overline{K}$, equivalently if $\gcd(f, f') = 1$ in $K[x]$. An algebraic
+element $\alpha$ over $K$ is separable if $\mathrm{min}_K(\alpha)$ is
+separable. An algebraic extension $L/K$ is \emph{separable} if every element
+of $L$ is separable over $K$.
+\end{definition}
+
+\begin{remark}
+Every algebraic extension of a field of characteristic $0$ (e.g.\ $\Q$) or of
+a finite field is separable. Non-separable extensions arise only in
+characteristic $p > 0$.
+\end{remark}
+
+\begin{theorem}[Primitive Element Theorem]
+If $L/K$ is a finite separable extension, then $L = K(\theta)$ for some
+$\theta \in L$.
+\end{theorem}
+
+\subsection{Normal Extensions}
+
+\begin{definition}
+A finite extension $L/K$ is \emph{normal} if it is the splitting field of some
+polynomial $f \in K[x]$. Equivalently, for every irreducible $p \in K[x]$:
+if $p$ has one root in $L$, then $p$ splits completely in $L$.
+\end{definition}
+
+\begin{example}
+$\Q(\sqrt[3]{2})/\Q$ is \emph{not} normal: $x^3 - 2$ has one root
+$\sqrt[3]{2} \in \Q(\sqrt[3]{2})$ but does not split completely there.
+Its splitting field $\Q(\sqrt[3]{2},\omega)$ is normal over $\Q$.
+\end{example}
+
+% =============================================================================
+\section{The Galois Group}
+% =============================================================================
+
+\begin{definition}
+Let $L/K$ be a field extension. The \emph{Galois group} is
+\[
+  \Gal(L/K) = \Aut_K(L) = \{\sigma: L \xrightarrow{\sim} L \mid \sigma|_K = \mathrm{id}_K\}.
+\]
+This is a group under composition.
+\end{definition}
+
+\begin{definition}
+A finite extension $L/K$ is a \emph{Galois extension} if it is both normal and
+separable. In this case $|\Gal(L/K)| = [L:K]$.
+\end{definition}
+
+\begin{example}[Cyclotomic Extension]
+Let $\zeta_n = e^{2\pi i/n}$. The extension $\Q(\zeta_n)/\Q$ is Galois with
+\[
+  \Gal(\Q(\zeta_n)/\Q) \cong (\Z/n\Z)^\times.
+\]
+Each automorphism $\sigma_k$ (with $\gcd(k,n)=1$) sends $\zeta_n \mapsto \zeta_n^k$.
+\end{example}
+
+\begin{example}[Galois Group of $x^3 - 2$]
+The splitting field $L = \Q(\sqrt[3]{2}, \omega)$ over $\Q$ has $[L:\Q] = 6$.
+The Galois group $\Gal(L/\Q) \cong S_3$, the symmetric group on three elements,
+acting by permuting the three roots $\{\sqrt[3]{2}, \omega\sqrt[3]{2},
+\omega^2\sqrt[3]{2}\}$.
+\end{example}
+
+\begin{example}[Galois Group of a Quadratic]
+For $f(x) = x^2 - d$ with $d \in \Q$ not a perfect square,
+$\Gal(\Q(\sqrt{d})/\Q) \cong \Z/2\Z$,
+generated by $\sqrt{d} \mapsto -\sqrt{d}$.
+\end{example}
+
+\subsection{Discriminant and Galois Group}
+
+\begin{theorem}
+Let $f \in K[x]$ be separable of degree $n$, with splitting field $L/K$.
+The Galois group $G = \Gal(L/K)$ embeds in $S_n$ via its action on the roots.
+If $\Delta = \prod_{i < j}(\alpha_i - \alpha_j)^2$ is the discriminant:
+\begin{enumerate}[label=(\roman*)]
+  \item $G \subseteq A_n$ if and only if $\sqrt{\Delta} \in K$.
+  \item For $n = 3$: $G \cong A_3 \cong \Z/3\Z$ iff $\sqrt{\Delta} \in K$;
+        otherwise $G \cong S_3$.
+  \item For $n = 2$: $G \cong \Z/2\Z$ iff $\Delta \notin K^{\times 2}$.
+\end{enumerate}
+\end{theorem}
+
+\subsection{Frobenius Endomorphism}
+
+\begin{definition}
+For a finite field $\F_{p^n} = \Gal(p^n)$, the \emph{Frobenius automorphism}
+is $\varphi: x \mapsto x^p$. Then
+\[
+  \Gal(\F_{p^n}/\F_p) = \langle \varphi \rangle \cong \Z/n\Z.
+\]
+\end{definition}
+
+% =============================================================================
+\section{The Fundamental Theorem of Galois Theory}
+% =============================================================================
+
+\begin{theorem}[Fundamental Theorem of Galois Theory]
+\label{thm:ftgt}
+Let $L/K$ be a finite Galois extension with Galois group $G = \Gal(L/K)$.
+There is an order-reversing bijection
+\[
+  \left\{\text{subgroups } H \leq G\right\}
+  \longleftrightarrow
+  \left\{\text{intermediate fields } K \subseteq F \subseteq L\right\}
+\]
+given by $H \mapsto L^H = \Fix(H) = \{x \in L : \sigma(x) = x\ \forall \sigma \in H\}$
+and $F \mapsto \Gal(L/F)$. Moreover:
+\begin{enumerate}[label=(\roman*)]
+  \item $[L:L^H] = |H|$ and $[L^H:K] = [G:H]$.
+  \item $H$ is normal in $G$ if and only if $L^H/K$ is a Galois extension, in
+        which case $\Gal(L^H/K) \cong G/H$.
+  \item The trivial subgroup $\{e\}$ corresponds to $L$, and $G$ itself
+        corresponds to $K$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The key tools are:
+\begin{itemize}
+  \item \emph{Artin's theorem}: If $G$ is a finite group of automorphisms of $L$
+        with fixed field $K = L^G$, then $[L:K] = |G|$ and $L/K$ is Galois with
+        group $G$.
+  \item \emph{Injectivity}: The map $H \mapsto L^H$ is injective because any
+        $\sigma \in H \setminus \{e\}$ moves some element of $L$ not fixed by all
+        of $H$.
+  \item \emph{Surjectivity}: For any intermediate field $F$, we have
+        $F = L^{\Gal(L/F)}$ by Artin applied to $\Gal(L/F)$ acting on $L$ with
+        fixed field containing $F$.
+  \item The order-reversal $[L:L^H] = |H|$ follows directly from Artin's theorem.
+\end{itemize}
+\end{proof}
+
+\begin{example}[Galois Correspondence for $\Q(\sqrt{2},\sqrt{3})$]
+Let $L = \Q(\sqrt{2},\sqrt{3})$. Then $[L:\Q] = 4$ and
+$G = \Gal(L/\Q) \cong \Z/2\Z \times \Z/2\Z = \{e, \sigma, \tau, \sigma\tau\}$
+where $\sigma(\sqrt{2}) = -\sqrt{2}$, $\sigma(\sqrt{3}) = \sqrt{3}$,
+$\tau(\sqrt{2}) = \sqrt{2}$, $\tau(\sqrt{3}) = -\sqrt{3}$.
+
+The subgroup lattice and corresponding field lattice:
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Subgroup $H$ & Fixed field $L^H$ \\
+\midrule
+$\{e\}$ & $L = \Q(\sqrt{2},\sqrt{3})$ \\
+$\{e, \sigma\}$ & $\Q(\sqrt{3})$ \\
+$\{e, \tau\}$ & $\Q(\sqrt{2})$ \\
+$\{e, \sigma\tau\}$ & $\Q(\sqrt{6})$ \\
+$G$ & $\Q$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+All subgroups are normal (since $G$ is abelian), corresponding to the fact that
+all intermediate extensions are Galois over $\Q$.
+\end{example}
+
+% =============================================================================
+\section{Solvability by Radicals}
+% =============================================================================
+
+\subsection{Radical Extensions}
+
+\begin{definition}
+An extension $L/K$ is a \emph{radical extension} if there exists a tower
+\[
+  K = K_0 \subset K_1 \subset \cdots \subset K_r = L
+\]
+with $K_{i+1} = K_i(\alpha_i)$ and $\alpha_i^{n_i} \in K_i$ for some
+$n_i \in \Z_{>0}$.
+A polynomial $f \in K[x]$ is \emph{solvable by radicals} if its splitting
+field is contained in a radical extension of $K$.
+\end{definition}
+
+\begin{definition}
+A group $G$ is \emph{solvable} if it has a subnormal series
+\[
+  \{e\} = G_r \trianglelefteq G_{r-1} \trianglelefteq \cdots \trianglelefteq G_0 = G
+\]
+with each factor $G_{i-1}/G_i$ abelian.
+\end{definition}
+
+\begin{example}[Solvable Groups of Small Order]
+$S_1, S_2, S_3, S_4$ are solvable:
+\begin{align*}
+  S_3 &\supset A_3 \cong \Z/3\Z \supset \{e\},
+  \quad \text{factors: } \Z/2\Z,\ \Z/3\Z \\
+  S_4 &\supset A_4 \supset V_4 \cong (\Z/2\Z)^2 \supset \Z/2\Z \supset \{e\},
+  \quad \text{all factors abelian.}
+\end{align*}
+\end{example}
+
+\subsection{The Main Theorem on Radical Solvability}
+
+\begin{theorem}[Galois, 1832]
+\label{thm:solvable}
+Let $K$ be a field of characteristic $0$ and $f \in K[x]$. Then $f$ is
+solvable by radicals over $K$ if and only if $\Gal(f/K)$ is a solvable group.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+($\Rightarrow$) If $L$ lies in a radical tower $K = K_0 \subset \cdots \subset
+K_r$, one can replace each step by a cyclic extension (after adjoining roots of
+unity), yielding a chain of Galois groups with cyclic---hence abelian---quotients,
+so $\Gal(L/K)$ is solvable.
+
+($\Leftarrow$) If $G = \Gal(L/K)$ is solvable with series
+$\{e\} = G_r \trianglelefteq \cdots \trianglelefteq G_0 = G$, the fixed fields
+$K_i = L^{G_i}$ form intermediate extensions with
+$\Gal(K_{i+1}/K_i) \cong G_i/G_{i+1}$ cyclic. By Kummer theory (after
+adjoining appropriate roots of unity), each cyclic extension of degree $n$ is
+of the form $K_i(\alpha_i)$ with $\alpha_i^n \in K_i$, thus radical.
+\end{proof}
+
+\subsection{Explicit Formulas for Degrees 2, 3, and 4}
+
+For completeness we record the classical radical formulas.
+
+\begin{example}[Degree 2]
+$x^2 + px + q = 0$ has solutions
+$x = \dfrac{-p \pm \sqrt{p^2 - 4q}}{2}$.
+The Galois group is trivial if $p^2 - 4q$ is a square in $K$, and $\Z/2\Z$
+otherwise; both are solvable.
+\end{example}
+
+\begin{example}[Degree 3: Cardano's Formula]
+For $x^3 + px + q = 0$ (depressed form), set $\Delta = -4p^3 - 27q^2$.
+The roots are
+\[
+  x_k = \omega^k \sqrt[3]{-\frac{q}{2} + \sqrt{-\frac{\Delta}{108}}}
+       + \omega^{-k} \sqrt[3]{-\frac{q}{2} - \sqrt{-\frac{\Delta}{108}}},
+  \quad k = 0,1,2,
+\]
+where $\omega = e^{2\pi i/3}$. The radical tower is
+$\Q \subset \Q(\omega) \subset \Q(\omega, u)$ where $u$ is a cube root.
+\end{example}
+
+\begin{example}[Degree 4: Ferrari's Method]
+Ferrari (1545) reduced the quartic to a cubic (\emph{resolvent}) via an
+auxiliary substitution. If $f(x) = x^4 + bx^2 + cx + d$, the resolvent cubic
+is $y^3 - by^2 - 4dy + (4bd - c^2)$. Solving the cubic by Cardano, one
+reduces to two quadratics, giving a radical tower of depth 4.
+\end{example}
+
+% =============================================================================
+\section{The Insolvability of the Quintic}
+% =============================================================================
+
+\subsection{Simplicity of $A_5$}
+
+\begin{theorem}[$A_5$ is Simple]
+\label{thm:a5simple}
+The alternating group $A_5$ of even permutations of $5$ elements is simple,
+i.e.\ it has no proper non-trivial normal subgroup.
+\end{theorem}
+
+\begin{proof}
+$|A_5| = 60$. The conjugacy classes in $A_5$ have sizes
+$1, 12, 12, 15, 20$. A normal subgroup $N \trianglelefteq A_5$ is a union of
+conjugacy classes containing the identity; so $|N|$ divides $60$ and must be
+a sum from $\{1, 12, 12, 15, 20\}$ including $1$. The only possible sums
+dividing $60$ are $1$ and $60$, so $N = \{e\}$ or $N = A_5$.
+\end{proof}
+
+\subsection{Insolvability of $S_5$}
+
+\begin{theorem}[$S_5$ is not solvable]
+\label{thm:s5notsolv}
+The symmetric group $S_5$ is not solvable.
+\end{theorem}
+
+\begin{proof}
+The only normal subgroups of $S_5$ are $\{e\}$, $A_5$, and $S_5$. The series
+$S_5 \supset A_5 \supset \{e\}$ has factor $A_5/\{e\} \cong A_5$, which is not
+abelian ($|A_5| = 60$, and simple non-trivial groups of order $> 1$ are not
+abelian unless cyclic). Hence $S_5$ is not solvable.
+\end{proof}
+
+\subsection{The Abel-Ruffini-Galois Theorem}
+
+\begin{theorem}[Abel-Ruffini, 1824; Galois, 1832]
+\label{thm:abelruffini}
+There is no general formula by radicals for the roots of a polynomial equation
+of degree $n \geq 5$ over $\Q$.
+\end{theorem}
+
+\begin{proof}
+It suffices to exhibit one polynomial of degree $5$ whose Galois group is $S_5$.
+Consider $f(x) = x^5 - x - 1 \in \Q[x]$. One can verify (using the
+discriminant and Dedekind's theorem on reduction modulo primes) that
+$\Gal(f/\Q) \cong S_5$. By Theorem~\ref{thm:solvable}, $f$ is solvable by
+radicals if and only if $S_5$ is solvable. But $S_5$ is not solvable
+(Theorem~\ref{thm:s5notsolv}). Hence $f$ has no expression of its roots in
+terms of radicals and the coefficients.
+
+Since the \emph{generic} degree-$n$ polynomial over $\Q(t_1,\dots,t_n)$ has
+Galois group $S_n$, and $S_n$ is not solvable for $n \geq 5$, no general
+radical formula exists for any degree $n \geq 5$.
+\end{proof}
+
+\begin{remark}
+The theorem does \emph{not} assert that no degree-5 polynomial has roots
+expressible by radicals. Many do: for instance $x^5 - 2$ is solvable
+(its Galois group is the Frobenius group $\Z/5\Z \rtimes \Z/4\Z$ of order 20,
+which is solvable). The assertion is that no \emph{universal formula} in the
+coefficients works.
+\end{remark}
+
+\begin{remark}
+Composition series by degree:
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+Degree & Galois group & Solvable? & Formula \\
+\midrule
+1 & $\{e\}$ & Yes & $x = -b/a$ \\
+2 & $\Z/2\Z$ & Yes & Quadratic formula \\
+3 & $\subseteq S_3$ & Yes & Cardano (1545) \\
+4 & $\subseteq S_4$ & Yes & Ferrari (1545) \\
+$\geq 5$ & can be $S_n$ & No & None in general \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{remark}
+
+% =============================================================================
+\section{The Kronecker-Weber Theorem}
+% =============================================================================
+
+\subsection{Cyclotomic Fields}
+
+\begin{definition}
+The $n$-th \emph{cyclotomic polynomial} is
+\[
+  \Phi_n(x) = \prod_{\substack{1 \leq k \leq n \\ \gcd(k,n) = 1}} (x - e^{2\pi i k/n})
+  \in \Z[x],
+\]
+of degree $\varphi(n) = |(\Z/n\Z)^\times|$. The $n$-th cyclotomic field is
+$\Q(\zeta_n)$ where $\zeta_n = e^{2\pi i/n}$.
+\end{definition}
+
+\begin{theorem}[Cyclotomic Galois Group]
+$\Q(\zeta_n)/\Q$ is a Galois extension of degree $\varphi(n)$, with
+$\Gal(\Q(\zeta_n)/\Q) \cong (\Z/n\Z)^\times$
+(abelian group).
+\end{theorem}
+
+\subsection{The Theorem}
+
+\begin{theorem}[Kronecker-Weber, 1853/1886]
+\label{thm:kronweber}
+Every finite abelian extension of $\Q$ is contained in a cyclotomic field.
+More precisely, if $L/\Q$ is a finite Galois extension with abelian Galois
+group, then $L \subseteq \Q(\zeta_n)$ for some $n \in \Z_{>0}$.
+\end{theorem}
+
+\begin{remark}
+Kronecker stated the theorem in 1853 but without complete proof. Weber gave
+an (almost complete) proof in 1886. The first complete proof is due to
+Hilbert (1896).
+\end{remark}
+
+\begin{proof}[Proof sketch via Local-Global Arguments]
+The modern proof proceeds in two stages:
+\begin{enumerate}
+  \item \emph{Local Kronecker-Weber}: Every finite abelian extension of $\Q_p$
+        (the $p$-adic rationals) is contained in a cyclotomic field over $\Q_p$
+        (proved using the structure of $\Q_p^\times$ via local class field theory
+        or direct arguments).
+  \item \emph{Global assembly}: A finite abelian extension $L/\Q$ is determined
+        by its completions at all primes. Using the local result at each prime
+        $p$ dividing $[L:\Q]$, one constructs an $n$ such that $L \subseteq
+        \Q(\zeta_n)$.
+\end{enumerate}
+\end{proof}
+
+\begin{example}
+The extension $\Q(\sqrt{d})/\Q$ for $d$ squarefree has Galois group $\Z/2\Z$
+(abelian). By Kronecker-Weber, $\Q(\sqrt{d}) \subseteq \Q(\zeta_n)$ for some
+$n$. Indeed: $\Q(\sqrt{d}) \subseteq \Q(\zeta_{|d|})$ (or $\Q(\zeta_{4|d|}$
+for $d \equiv 2,3 \pmod{4}$).
+\end{example}
+
+\begin{example}
+$\Q(i) = \Q(\sqrt{-1}) \subseteq \Q(\zeta_4)$ since $\zeta_4 = i$.
+\end{example}
+
+\begin{remark}
+Kronecker-Weber is the first major theorem of class field theory. Its
+generalization—the Artin reciprocity law—describes abelian extensions of any
+number field $K$ in terms of the idèle class group of $K$.
+\end{remark}
+
+% =============================================================================
+\section{Constructibility by Compass and Straightedge}
+% =============================================================================
+
+\subsection{Algebraic Criterion}
+
+\begin{definition}
+A real number $\alpha$ is \emph{constructible} if it can be obtained from $0$
+and $1$ by a finite sequence of field operations and square roots. Equivalently,
+$\alpha$ is constructible if and only if there exists a tower
+\[
+  \Q = F_0 \subset F_1 \subset \cdots \subset F_m
+\]
+with $[F_{i+1}:F_i] = 2$ for each $i$ and $\alpha \in F_m$.
+\end{definition}
+
+\begin{theorem}[Algebraic Criterion for Constructibility]
+\label{thm:constructible}
+A real number $\alpha$ is constructible if and only if $[\Q(\alpha):\Q]$ is a
+power of $2$.
+\end{theorem}
+
+\subsection{Classical Impossibility Results}
+
+\begin{corollary}[Doubling the Cube — Impossible]
+It is impossible to construct $\sqrt[3]{2}$ by compass and straightedge.
+\end{corollary}
+
+\begin{proof}
+$[\Q(\sqrt[3]{2}):\Q] = 3$, which is not a power of $2$.
+\end{proof}
+
+\begin{corollary}[Trisecting an Angle — Impossible in General]
+A general angle of $60°$ cannot be trisected by compass and straightedge.
+\end{corollary}
+
+\begin{proof}
+Trisecting $60°$ requires constructing $\cos 20°$, which satisfies
+$8x^3 - 6x - 1 = 0$ (irreducible over $\Q$, degree 3). Hence
+$[\Q(\cos 20°):\Q] = 3$, not a power of $2$.
+\end{proof}
+
+\begin{corollary}[Squaring the Circle — Impossible]
+The real number $\sqrt{\pi}$ is transcendental (Lindemann, 1882), hence not
+algebraic, and in particular not constructible.
+\end{corollary}
+
+\subsection{Gauss-Wantzel Theorem: Regular Polygons}
+
+\begin{definition}
+The \emph{Fermat primes} are primes of the form $F_k = 2^{2^k} + 1$.
+The known Fermat primes are $3, 5, 17, 257, 65537$ (for $k = 0,1,2,3,4$).
+\end{definition}
+
+\begin{theorem}[Gauss-Wantzel, 1801/1837]
+\label{thm:gausswantzel}
+A regular $n$-gon is constructible by compass and straightedge if and only if
+\[
+  n = 2^a \cdot p_1 \cdot p_2 \cdots p_k,
+\]
+where $a \geq 0$ and $p_1 < p_2 < \cdots < p_k$ are distinct Fermat primes.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Constructing a regular $n$-gon is equivalent to constructing $\zeta_n = e^{2\pi i/n}$,
+which lies in $\Q(\zeta_n)$ with $[\Q(\zeta_n):\Q] = \varphi(n)$.
+By Theorem~\ref{thm:constructible}, this is possible iff $\varphi(n)$ is a
+power of $2$. Elementary number theory shows $\varphi(n) = 2^a$ iff $n$ has
+the stated form.
+\end{proof}
+
+\begin{example}[Heptadecagon]
+Gauss (age 19, 1796) discovered that the regular 17-gon ($n = 17 = F_2$)
+is constructible, since $\varphi(17) = 16 = 2^4$. The explicit construction
+involves $\cos(2\pi/17)$, which can be expressed as
+\[
+  \cos\!\left(\frac{2\pi}{17}\right)
+  = \frac{-1 + \sqrt{17} + \sqrt{34 - 2\sqrt{17}}
+    + 2\sqrt{17 + 3\sqrt{17} - \sqrt{34-2\sqrt{17}} - 2\sqrt{34+2\sqrt{17}}}}{16}.
+\]
+This was so surprising to Gauss that it reportedly inspired him to pursue
+mathematics rather than philology.
+\end{example}
+
+\begin{example}
+The regular heptagon ($n = 7$) is \emph{not} constructible: $\varphi(7) = 6$
+is not a power of $2$.
+\end{example}
+
+% =============================================================================
+\section{Summary and Connections}
+% =============================================================================
+
+Galois theory ties together algebra, geometry, and arithmetic through a single
+unifying principle: \emph{symmetry governs solvability}. The main results
+established here form a coherent arc:
+
+\begin{enumerate}
+  \item Field extensions of degree $n$ correspond to polynomials of degree $n$
+        (§\ref{sec:fieldext} -- §\ref{sec:splitting}).
+  \item Galois extensions have a symmetry group (§\ref{sec:galoisgroup}).
+  \item The Fundamental Theorem creates a perfect duality between subgroups
+        and intermediate fields (Theorem~\ref{thm:ftgt}).
+  \item A polynomial is solvable by radicals iff its symmetry group is solvable
+        (Theorem~\ref{thm:solvable}).
+  \item $S_5$ is not solvable, proving the Abel-Ruffini Theorem
+        (Theorem~\ref{thm:abelruffini}).
+  \item Abelian extensions of $\Q$ are cyclotomic (Theorem~\ref{thm:kronweber}).
+  \item Constructibility reduces to degree being a power of 2
+        (Theorem~\ref{thm:constructible}, \ref{thm:gausswantzel}).
+\end{enumerate}
+
+\noindent\textbf{Further Directions.}
+Modern extensions of Galois theory include:
+\begin{itemize}
+  \item \emph{Inverse Galois Problem}: Is every finite group realizable as a
+        Galois group over $\Q$? (Open in general; solved for solvable groups
+        by Shafarevich.)
+  \item \emph{\'Etale cohomology and Grothendieck}: Generalisation to algebraic
+        geometry via the fundamental group $\pi_1^{\text{\'et}}(\mathrm{Spec}\,K)
+        = \Gal(\overline{K}/K)$.
+  \item \emph{Langlands Programme}: Deep conjectures relating Galois
+        representations $\rho: \Gal(\overline{\Q}/\Q) \to GL_n(\C)$ to
+        automorphic forms.
+  \item \emph{$p$-adic and Iwasawa Theory}: Galois groups of infinite towers of
+        number fields.
+\end{itemize}
+
+\addtocounter{section}{-1}
+\refstepcounter{section}
+\renewcommand{\thesection}{\Alph{section}}
+
+% =============================================================================
+\begin{thebibliography}{99}
+% =============================================================================
+
+\bibitem{galois1832}
+\'{E}.~Galois,
+\textit{M\'emoire sur les conditions de r\'esolubilit\'e des \'equations par
+radicaux},
+Manuscript (1832); first published in \textit{Journal de Math\'ematiques
+Pures et Appliqu\'ees} \textbf{11} (1846), 381--444.
+
+\bibitem{abel1824}
+N.H.~Abel,
+\textit{M\'emoire sur les \'equations alg\'ebriques o\`{u} on d\'emontre
+l'impossibilit\'e de la r\'esolution de l'\'equation g\'en\'erale du cinqui\`eme
+degr\'e},
+Christiania, 1824.
+
+\bibitem{ruffini1799}
+P.~Ruffini,
+\textit{Teoria generale delle equazioni},
+Bologna, 1799.
+
+\bibitem{lang2002}
+S.~Lang,
+\textit{Algebra}, 3rd ed.,
+Graduate Texts in Mathematics \textbf{211},
+Springer, New York, 2002.
+
+\bibitem{neukirch1999}
+J.~Neukirch,
+\textit{Algebraic Number Theory},
+Grundlehren der mathematischen Wissenschaften \textbf{322},
+Springer, Berlin, 1999.
+
+\bibitem{stewart2015}
+I.~Stewart,
+\textit{Galois Theory}, 4th ed.,
+CRC Press, Boca Raton, 2015.
+
+\bibitem{dummitfoote2004}
+D.S.~Dummit and R.M.~Foote,
+\textit{Abstract Algebra}, 3rd ed.,
+Wiley, Hoboken, 2004.
+
+\bibitem{cox2004}
+D.A.~Cox,
+\textit{Galois Theory},
+Wiley-Interscience, Hoboken, 2004.
+
+\bibitem{artin1944}
+E.~Artin,
+\textit{Galois Theory},
+Notre Dame Mathematical Lectures \textbf{2},
+University of Notre Dame Press, 1944.
+
+\bibitem{serre1979}
+J.-P.~Serre,
+\textit{Local Fields},
+Graduate Texts in Mathematics \textbf{67},
+Springer, New York, 1979.
+
+\end{thebibliography}
+
+\end{document}

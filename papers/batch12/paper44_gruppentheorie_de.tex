@@ -1,0 +1,740 @@
+% @file paper44_gruppentheorie_de.tex
+% @brief Paper 44 (DE): Gruppentheorie — Endliche Gruppen, Sylow-Theorie,
+%        Klassifikation und Anwendungen
+% @author Michael Fuhrmann
+% @date 2026-03-12
+% @build 135
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem-Umgebungen auf Deutsch
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+\title{Gruppentheorie: Endliche Gruppen, Sylow-Theorie,\\
+       Klassifikationss\"atze und Anwendungen}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 135}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{document}
+
+\begin{abstract}
+Die Gruppentheorie ist die mathematische Theorie der Symmetrie und ihrer algebraischen
+Abstraktion. Dieses Paper gibt eine umfassende Darstellung der endlichen Gruppentheorie.
+Ausgehend von den grundlegenden Definitionen und den drei Isomorphiesätzen werden zyklische
+und abelsche Gruppen untersucht, bis hin zum vollständigen Klassifikationssatz für endliche
+abelsche Gruppen. Gruppenoperationen, der Bahn-Stabilisator-Satz und das Burnside-Lemma
+werden vollständig entwickelt, gefolgt von den Sylow-Sätzen mit Beweisen. Auflösbare und
+nilpotente Gruppen werden im Zusammenhang mit Kompositionsreihen und dem Satz von
+Jordan--Hölder behandelt, mit Anwendungen auf die Unlösbarkeit des Quintikums
+(Abel--Ruffini). Die Theorie einfacher Gruppen wird diskutiert, einschließlich des Satzes
+von Feit--Thompson und der Klassifikation endlicher einfacher Gruppen (CFSG). Der
+abschließende Abschnitt gibt einen Überblick über Anwendungen in der Galois-Theorie,
+Kristallographie und Quantenmechanik.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+%% ============================================================
+\section{Einleitung}
+\label{sec:einleitung}
+%% ============================================================
+
+Der Begriff der \emph{Gruppe} entstand im frühen neunzehnten Jahrhundert durch die Arbeit
+von \'{E}variste Galois, der das einführte, was wir heute Permutationsgruppen nennen, um zu
+charakterisieren, welche Polynomgleichungen durch Radikale lösbar sind. Unabhängig davon
+definierte Arthur Cayley 1854 abstrakte Gruppen und erkannte, dass dieselbe algebraische
+Struktur Permutationen, ganzen Zahlen unter Addition, Symmetrien geometrischer Objekte und
+einer Vielzahl weiterer mathematischer Phänomene zugrunde liegt.
+
+Heute ist die Gruppentheorie ein Grundpfeiler der reinen Mathematik und der theoretischen
+Physik. Ihre Anwendungen umfassen:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Symmetrieanalyse}: Jede physikalische Symmetrie entspricht einer Gruppe;
+        Erhaltungsgrößen entstehen gemäß dem Noether-Theorem aus Symmetriegruppen der
+        Wirkung.
+  \item \textbf{Galois-Theorie}: Die Lösbarkeit einer Polynomgleichung durch Radikale ist
+        äquivalent zur Auflösbarkeit ihrer Galois-Gruppe.
+  \item \textbf{Kryptographie}: Das diskrete Logarithmusproblem in endlichen zyklischen
+        Gruppen und elliptischen Kurvengruppen bildet die Grundlage moderner
+        Public-Key-Kryptographie.
+  \item \textbf{Kristallographie}: Die 17 Wandgruppen und 230 Raumgruppen klassifizieren
+        alle möglichen Kristallsymmetrien in der Ebene und im dreidimensionalen Raum.
+  \item \textbf{Quantenmechanik}: Die Darstellungstheorie von Lie-Gruppen wie
+        $\mathrm{SU}(2)$ und $\mathrm{SO}(3)$ bestimmt die Struktur atomarer Spektren
+        und den Spin von Elementarteilchen.
+\end{itemize}
+
+Das Paper ist wie folgt gegliedert. Abschnitt~\ref{sec:definitionen} legt die grundlegenden
+Definitionen fest. Abschnitt~\ref{sec:isomorphie} präsentiert die drei Isomorphiesätze.
+Die Abschnitte~\ref{sec:zyklisch} und~\ref{sec:operationen} behandeln zyklische und abelsche
+Gruppen bzw.\ Gruppenoperationen mit Sylow-Theorie. Die
+Abschnitte~\ref{sec:aufloesbar} und~\ref{sec:einfach} befassen sich mit auflösbaren und
+nilpotenten Gruppen sowie einfachen Gruppen. Abschnitt~\ref{sec:anwendungen} gibt einen
+Überblick über die wichtigsten Anwendungen. Abschnitt~\ref{sec:schluss} schließt ab.
+
+%% ============================================================
+\section{Grunddefinitionen}
+\label{sec:definitionen}
+%% ============================================================
+
+\begin{definition}[Gruppe]
+Eine \emph{Gruppe} ist ein Paar $(G, \cdot)$, bestehend aus einer nichtleeren Menge $G$
+und einer binären Verknüpfung $\cdot : G \times G \to G$, die folgende Axiome erfüllt:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Assoziativität}: $(a \cdot b) \cdot c = a \cdot (b \cdot c)$ für alle
+        $a,b,c \in G$.
+  \item \textbf{Neutrales Element}: Es gibt ein $e \in G$ mit $e \cdot a = a \cdot e = a$
+        für alle $a \in G$.
+  \item \textbf{Inverse}: Für jedes $a \in G$ existiert ein $a^{-1} \in G$ mit
+        $a \cdot a^{-1} = a^{-1} \cdot a = e$.
+\end{enumerate}
+Gilt zusätzlich $a \cdot b = b \cdot a$ für alle $a, b \in G$, so heißt die Gruppe
+\emph{abelsch} (oder \emph{kommutativ}). Die \emph{Ordnung} $|G|$ ist die Mächtigkeit
+von~$G$.
+\end{definition}
+
+\begin{example}
+Die ganzen Zahlen $(\mathbb{Z}, +)$ bilden eine unendliche abelsche Gruppe; der
+Einheitskreis $\mathrm{U}(1) = \{z \in \mathbb{C} : |z| = 1\}$ unter Multiplikation ist
+eine unendliche abelsche Gruppe; die symmetrische Gruppe $S_n$ aller Permutationen von
+$\{1, \ldots, n\}$ unter Komposition ist eine endliche Gruppe der Ordnung~$n!$.
+\end{example}
+
+\begin{definition}[Untergruppe]
+Eine nichtleere Teilmenge $H \subseteq G$ heißt \emph{Untergruppe} von $G$, geschrieben
+$H \leq G$, wenn $H$ selbst eine Gruppe unter der eingeschränkten Verknüpfung von $G$ ist.
+Äquivalent gilt $H \leq G$ genau dann, wenn für alle $a, b \in H$ gilt: $ab^{-1} \in H$.
+\end{definition}
+
+\begin{definition}[Nebenklasse und Index]
+Für $H \leq G$ und $a \in G$ ist die \emph{linke Nebenklasse} von $H$ bezüglich $a$
+die Menge $aH = \{ah : h \in H\}$. Die Anzahl der verschiedenen linken Nebenklassen
+heißt \emph{Index} $[G : H]$.
+\end{definition}
+
+\begin{theorem}[Lagrange, 1771]
+\label{thm:lagrange}
+Sei $G$ eine endliche Gruppe und $H \leq G$. Dann teilt $|H|$ die Ordnung $|G|$, und es
+gilt:
+\[
+  |G| = |H| \cdot [G : H].
+\]
+\end{theorem}
+
+\begin{proof}
+Die linken Nebenklassen von $H$ zerlegen $G$ in $[G:H]$ disjunkte Teilmengen, jede
+von Mächtigkeit $|H|$. Abzählen ergibt $|G| = [G:H] \cdot |H|$.
+\end{proof}
+
+\begin{corollary}
+Die Ordnung jedes Elements $a \in G$ teilt $|G|$.
+\end{corollary}
+
+\begin{definition}[Normalteiler und Quotientengruppe]
+Eine Untergruppe $N \leq G$ heißt \emph{Normalteiler}, geschrieben $N \trianglelefteq G$,
+wenn $gNg^{-1} = N$ für alle $g \in G$. Ist $N \trianglelefteq G$, so bildet die Menge
+der Nebenklassen $G/N = \{gN : g \in G\}$ unter der Verknüpfung $(aN)(bN) = (ab)N$
+eine Gruppe, die \emph{Quotientengruppe} (oder \emph{Faktorgruppe}) $G$ nach $N$.
+\end{definition}
+
+\begin{definition}[Homomorphismus und Isomorphismus]
+Eine Abbildung $\varphi : G \to H$ zwischen Gruppen heißt \emph{Homomorphismus}, wenn
+$\varphi(ab) = \varphi(a)\varphi(b)$ für alle $a,b \in G$. Der \emph{Kern} von $\varphi$
+ist $\ker\varphi = \{g \in G : \varphi(g) = e_H\}$ und das \emph{Bild} ist
+$\mathrm{Im}\,\varphi = \{\varphi(g) : g \in G\}$.
+Ein bijektiver Homomorphismus heißt \emph{Isomorphismus}; wir schreiben $G \cong H$,
+wenn ein Isomorphismus zwischen $G$ und $H$ existiert.
+\end{definition}
+
+\begin{proposition}
+Ist $\varphi : G \to H$ ein Homomorphismus, so gilt $\ker\varphi \trianglelefteq G$
+und $\mathrm{Im}\,\varphi \leq H$.
+\end{proposition}
+
+%% ============================================================
+\section{Die Isomorphiesätze}
+\label{sec:isomorphie}
+%% ============================================================
+
+Die drei Isomorphiesätze gehören zu den nützlichsten Strukturresultaten der Gruppentheorie.
+Sie wurden in ihrer modernen Form von Emmy Noether im Jahr 1927 formuliert.
+
+\begin{theorem}[Erster Isomorphiesatz (Homomorphiesatz)]
+\label{thm:erster_iso}
+Sei $\varphi : G \to H$ ein Gruppenhomomorphismus. Dann gilt $\ker\varphi \trianglelefteq G$
+und
+\[
+  G / \ker\varphi \;\cong\; \mathrm{Im}\,\varphi.
+\]
+Der Isomorphismus ist explizit gegeben durch $g\ker\varphi \mapsto \varphi(g)$.
+\end{theorem}
+
+\begin{proof}
+Wir wissen bereits, dass $K := \ker\varphi \trianglelefteq G$. Definiere
+$\tilde\varphi : G/K \to H$ durch $\tilde\varphi(gK) = \varphi(g)$.
+\textit{Wohldefiniertheit}: Ist $gK = g'K$, dann $g'^{-1}g \in K$, also
+$\varphi(g'^{-1}g) = e_H$, woraus $\varphi(g) = \varphi(g')$ folgt.
+\textit{Homomorphismus}: $\tilde\varphi((gK)(g'K)) = \varphi(gg') = \varphi(g)\varphi(g')$.
+\textit{Injektivität}: $\tilde\varphi(gK) = e_H$ impliziert $g \in K$, also
+$gK = K = e_{G/K}$.
+\textit{Surjektivität} auf $\mathrm{Im}\,\varphi$ folgt aus der Definition.
+\end{proof}
+
+\begin{remark}
+Der erste Isomorphiesatz reduziert die Klassifikation homomorpher Bilder von $G$ auf die
+Klassifikation der Normalteiler von $G$.
+\end{remark}
+
+\begin{theorem}[Zweiter Isomorphiesatz]
+\label{thm:zweiter_iso}
+Sei $H \leq G$ und $N \trianglelefteq G$. Dann ist $HN = \{hn : h \in H,\, n \in N\}$
+eine Untergruppe von $G$, $H \cap N \trianglelefteq H$, und es gilt:
+\[
+  H / (H \cap N) \;\cong\; HN / N.
+\]
+\end{theorem}
+
+\begin{proof}
+Man verifiziert, dass $HN$ mittels der Normalteiler-Eigenschaft von $N$ eine Untergruppe
+ist. Die natürliche Abbildung $\varphi : H \to HN/N$ definiert durch $\varphi(h) = hN$ ist
+ein surjektiver Homomorphismus mit Kern $H \cap N$. Das Ergebnis folgt aus
+Satz~\ref{thm:erster_iso}.
+\end{proof}
+
+\begin{theorem}[Dritter Isomorphiesatz]
+\label{thm:dritter_iso}
+Sei $N \trianglelefteq G$ und $K \trianglelefteq G$ mit $K \leq N$. Dann gilt
+$N/K \trianglelefteq G/K$ und:
+\[
+  (G/K) / (N/K) \;\cong\; G/N.
+\]
+\end{theorem}
+
+\begin{proof}
+Die Abbildung $\varphi : G/K \to G/N$ definiert durch $\varphi(gK) = gN$ ist ein
+wohldefinierter surjektiver Homomorphismus mit Kern $N/K$. Anwendung von
+Satz~\ref{thm:erster_iso} liefert das Ergebnis.
+\end{proof}
+
+\begin{corollary}[Korrespondenzsatz]
+Sei $N \trianglelefteq G$. Es gibt eine bijektive, inklusionserhaltende Entsprechung
+zwischen den Untergruppen von $G/N$ und den Untergruppen von $G$, die $N$ enthalten.
+Diese Entsprechung bewahrt die Normalteiler-Eigenschaft.
+\end{corollary}
+
+%% ============================================================
+\section{Zyklische und abelsche Gruppen}
+\label{sec:zyklisch}
+%% ============================================================
+
+\begin{definition}[Zyklische Gruppe]
+Eine Gruppe $G$ heißt \emph{zyklisch}, wenn ein $g \in G$ existiert, sodass jedes Element
+von $G$ eine Potenz von $g$ ist: $G = \langle g \rangle = \{g^k : k \in \mathbb{Z}\}$.
+\end{definition}
+
+\begin{theorem}
+Jede zyklische Gruppe ist abelsch. Darüber hinaus gilt:
+\begin{enumerate}[label=(\roman*)]
+  \item Jede unendliche zyklische Gruppe ist isomorph zu $(\mathbb{Z}, +)$.
+  \item Jede endliche zyklische Gruppe der Ordnung $n$ ist isomorph zu
+        $\mathbb{Z}/n\mathbb{Z}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}
+Jede Untergruppe einer zyklischen Gruppe ist zyklisch. Hat $G = \langle g \rangle$ die
+Ordnung $n$, so sind die Untergruppen von $G$ genau die $\langle g^d \rangle$ für $d \mid n$,
+und jede hat Ordnung $n/d$. Insbesondere besitzt $G$ für jeden Teiler $d$ von $n$ genau eine
+Untergruppe der Ordnung $d$.
+\end{theorem}
+
+\begin{theorem}[Hauptsatz über endliche abelsche Gruppen]
+\label{thm:hsuag}
+Jede endliche abelsche Gruppe $G$ ist isomorph zu einem direkten Produkt zyklischer Gruppen
+von Primzahlpotenzordnung:
+\[
+  G \;\cong\; \mathbb{Z}_{p_1^{a_1}} \times \mathbb{Z}_{p_2^{a_2}} \times \cdots
+              \times \mathbb{Z}_{p_k^{a_k}},
+\]
+wobei $p_1^{a_1} p_2^{a_2} \cdots p_k^{a_k} = |G|$. Diese Zerlegung ist eindeutig bis auf
+die Reihenfolge der Faktoren (Elementarteilerzerlegung).
+\end{theorem}
+
+\begin{example}
+Die abelschen Gruppen der Ordnung $72 = 2^3 \cdot 3^2$ sind bis auf Isomorphie:
+\begin{align*}
+  &\mathbb{Z}_8 \times \mathbb{Z}_9,\quad
+   \mathbb{Z}_4 \times \mathbb{Z}_2 \times \mathbb{Z}_9,\quad
+   \mathbb{Z}_2^3 \times \mathbb{Z}_9,\\
+  &\mathbb{Z}_8 \times \mathbb{Z}_3 \times \mathbb{Z}_3,\quad
+   \mathbb{Z}_4 \times \mathbb{Z}_2 \times \mathbb{Z}_3 \times \mathbb{Z}_3,\quad
+   \mathbb{Z}_2^3 \times \mathbb{Z}_3^2.
+\end{align*}
+Es gibt genau 6 nicht-isomorphe abelsche Gruppen der Ordnung 72.
+\end{example}
+
+\begin{theorem}[Chinesischer Restsatz für Gruppen]
+Ist $\gcd(m,n) = 1$, so gilt $\mathbb{Z}_{mn} \cong \mathbb{Z}_m \times \mathbb{Z}_n$.
+\end{theorem}
+
+%% ============================================================
+\section{Gruppenoperationen und Sylow-Theorie}
+\label{sec:operationen}
+%% ============================================================
+
+\subsection{Gruppenoperationen}
+
+\begin{definition}[Gruppenoperation]
+Eine \emph{(linke) Operation} einer Gruppe $G$ auf einer Menge $X$ ist eine Abbildung
+$G \times X \to X$, $(g,x) \mapsto g \cdot x$, die folgende Axiome erfüllt:
+\begin{enumerate}[label=(\roman*)]
+  \item $e \cdot x = x$ für alle $x \in X$,
+  \item $(gh) \cdot x = g \cdot (h \cdot x)$ für alle $g,h \in G$, $x \in X$.
+\end{enumerate}
+\end{definition}
+
+\begin{definition}[Bahn und Stabilisator]
+Für $x \in X$ ist die \emph{Bahn} (oder \emph{Orbit}) von $x$ die Menge
+$G \cdot x = \{g \cdot x : g \in G\}$, und der \emph{Stabilisator} (oder \emph{Isotropiegruppe})
+von $x$ ist $G_x = \{g \in G : g \cdot x = x\} \leq G$.
+\end{definition}
+
+\begin{theorem}[Bahn-Stabilisator-Satz]
+\label{thm:bahn_stab}
+Sei $G$ eine endliche Gruppe, die auf $X$ operiert, und sei $x \in X$. Dann gilt:
+\[
+  |G \cdot x| \cdot |G_x| = |G|.
+\]
+\end{theorem}
+
+\begin{theorem}[Burnside-Lemma, 1897]
+\label{thm:burnside}
+Sei $G$ eine endliche Gruppe, die auf einer endlichen Menge $X$ operiert. Die Anzahl
+der verschiedenen Bahnen ist:
+\[
+  |X/G| = \frac{1}{|G|} \sum_{g \in G} |X^g|,
+\]
+wobei $X^g = \{x \in X : g \cdot x = x\}$ die Menge der Fixpunkte von $g$ bezeichnet.
+\end{theorem}
+
+\begin{example}[Halskettenzählung]
+Wir zählen die Anzahl verschiedener Halsketten mit 6 Perlen, von denen jede in einer von
+$c$ Farben gefärbt ist, wobei Drehungen als äquivalent betrachtet werden. Die
+Drehgruppe $G = \mathbb{Z}_6$ operiert auf der Menge $X$ aller gefärbten Folgen
+($|X| = c^6$). Nach dem Burnside-Lemma ist die Anzahl verschiedener Halsketten:
+\[
+  N(c) = \frac{1}{6}\bigl(c^6 + c^3 + 2c^2 + 2c\bigr).
+\]
+Für $c = 2$ ergibt sich $N(2) = \tfrac{1}{6}(64 + 8 + 8 + 4) = 14$.
+\end{example}
+
+\subsection{Sylow-Theorie}
+
+Die Sylow-Sätze, bewiesen von Ludwig Sylow im Jahr 1872, sind das wichtigste Werkzeug
+zum Verständnis der Untergruppenstruktur endlicher Gruppen.
+
+\begin{definition}[Sylow-$p$-Untergruppe]
+Sei $G$ eine endliche Gruppe und $p$ eine Primzahl mit $p^k \mid |G|$, aber
+$p^{k+1} \nmid |G|$. Eine Untergruppe $P \leq G$ mit $|P| = p^k$ heißt
+\emph{Sylow-$p$-Untergruppe} von $G$. Wir schreiben $n_p(G)$ für die Anzahl der
+Sylow-$p$-Untergruppen.
+\end{definition}
+
+\begin{theorem}[Erster Sylow-Satz]
+\label{thm:sylow1}
+Sei $G$ eine endliche Gruppe, $p$ eine Primzahl und $p^k \mid |G|$. Dann besitzt $G$
+eine Untergruppe der Ordnung $p^k$. Insbesondere existieren Sylow-$p$-Untergruppen.
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+Durch Induktion über $|G|$. Falls $p \nmid [G:Z(G)]$, dann gilt $p \mid |Z(G)|$, und
+der Satz von Cauchy liefert ein Element der Ordnung $p$ im Zentrum. Im allgemeinen Fall
+verwendet man die Klassengleichung
+$|G| = |Z(G)| + \sum [G:C_G(x)]$ und wendet Induktion auf eine echte Untergruppe an.
+\end{proof}
+
+\begin{theorem}[Zweiter Sylow-Satz]
+\label{thm:sylow2}
+Je zwei Sylow-$p$-Untergruppen von $G$ sind konjugiert: Für beliebige
+Sylow-$p$-Untergruppen $P$ und $Q$ gibt es ein $g \in G$ mit $Q = gPg^{-1}$.
+\end{theorem}
+
+\begin{theorem}[Dritter Sylow-Satz]
+\label{thm:sylow3}
+Die Anzahl $n_p = n_p(G)$ der Sylow-$p$-Untergruppen erfüllt:
+\begin{enumerate}[label=(\roman*)]
+  \item $n_p \equiv 1 \pmod{p}$,
+  \item $n_p \mid [G : P] = |G|/p^k$.
+\end{enumerate}
+Insbesondere gilt $n_p = 1$ genau dann, wenn die eindeutige Sylow-$p$-Untergruppe ein
+Normalteiler in $G$ ist.
+\end{theorem}
+
+\begin{example}[Gruppen der Ordnung 15]
+Sei $|G| = 15 = 3 \cdot 5$. Dann gilt $n_3 \mid 5$ und $n_3 \equiv 1 \pmod{3}$, also
+$n_3 = 1$. Analog gilt $n_5 = 1$. Beide Sylow-Untergruppen sind Normalteiler, daher
+$G \cong \mathbb{Z}_3 \times \mathbb{Z}_5 \cong \mathbb{Z}_{15}$. Es gibt genau eine
+Gruppe der Ordnung 15, und sie ist zyklisch.
+\end{example}
+
+\begin{corollary}[Satz von Cauchy]
+Ist $p$ eine Primzahl und $p \mid |G|$, so enthält $G$ ein Element der Ordnung $p$.
+\end{corollary}
+
+%% ============================================================
+\section{Auflösbare und nilpotente Gruppen}
+\label{sec:aufloesbar}
+%% ============================================================
+
+\subsection{Kompositionsreihen und Jordan--Hölder}
+
+\begin{definition}[Kompositionsreihe]
+Eine \emph{Kompositionsreihe} für $G$ ist eine Kette von Untergruppen
+\[
+  1 = G_0 \trianglelefteq G_1 \trianglelefteq \cdots \trianglelefteq G_n = G,
+\]
+sodass jeder Quotient $G_{i+1}/G_i$ einfach ist (nichttrivial und ohne echte Normalteiler).
+Die Quotienten $G_{i+1}/G_i$ heißen \emph{Kompositionsfaktoren}.
+\end{definition}
+
+\begin{theorem}[Satz von Jordan--Hölder]
+\label{thm:jordan_hoelder}
+Besitzt $G$ eine Kompositionsreihe, so haben je zwei Kompositionsreihen von $G$ dieselbe
+Länge, und ihre Kompositionsfaktoren stimmen bis auf Permutation und Isomorphismus überein.
+\end{theorem}
+
+\subsection{Auflösbare Gruppen}
+
+\begin{definition}[Ableitung und Auflösbarkeit]
+Die \emph{Ableitung} (oder \emph{Kommutatorenreihe}) von $G$ ist
+\[
+  G = G^{(0)} \geq G^{(1)} \geq G^{(2)} \geq \cdots,
+  \quad G^{(i+1)} = [G^{(i)}, G^{(i)}],
+\]
+wobei $[H, K]$ die von allen Kommutatoren $[h,k] = hkh^{-1}k^{-1}$ erzeugte Untergruppe
+bezeichnet. Die Gruppe $G$ heißt \emph{auflösbar}, wenn $G^{(n)} = 1$ für ein $n$ gilt.
+\end{definition}
+
+\begin{theorem}
+Eine endliche Gruppe $G$ ist genau dann auflösbar, wenn alle Kompositionsfaktoren in einer
+beliebigen Kompositionsreihe von $G$ zyklisch von Primzahlordnung sind.
+\end{theorem}
+
+\begin{theorem}[Satz von Abel--Ruffini, 1824]
+\label{thm:abel_ruffini}
+Für $n \geq 5$ ist die symmetrische Gruppe $S_n$ \emph{nicht} auflösbar (da $A_n$ einfach
+und nicht-abelsch ist). Folglich kann eine generische Polynomgleichung vom Grad $\geq 5$
+nicht durch Radikale gelöst werden.
+\end{theorem}
+
+\begin{proof}[Zusammenhang mit der Galois-Theorie]
+Ein Polynom $f \in \mathbb{Q}[x]$ ist genau dann durch Radikale lösbar, wenn seine
+Galois-Gruppe $\mathrm{Gal}(f)$ auflösbar ist. Für das allgemeine Polynom vom Grad
+$n \geq 5$ gilt $\mathrm{Gal}(f) \cong S_n$, das die einfache, nicht-abelsche Untergruppe
+$A_n$ enthält. Daher ist $S_n$ für $n \geq 5$ nicht auflösbar.
+\end{proof}
+
+\subsection{Nilpotente Gruppen}
+
+\begin{definition}[Untere Zentralreihe und Nilpotenz]
+Die \emph{untere Zentralreihe} von $G$ ist
+\[
+  G = \gamma_1(G) \geq \gamma_2(G) \geq \cdots,
+  \quad \gamma_{i+1}(G) = [G, \gamma_i(G)].
+\]
+$G$ heißt \emph{nilpotent} von \emph{Klasse} $c$, wenn $\gamma_{c+1}(G) = 1$, aber
+$\gamma_c(G) \neq 1$.
+\end{definition}
+
+\begin{theorem}
+Jede nilpotente Gruppe ist auflösbar. Eine endliche Gruppe ist genau dann nilpotent,
+wenn sie das direkte Produkt ihrer Sylow-$p$-Untergruppen ist. Insbesondere ist jede
+endliche $p$-Gruppe (Gruppe von Primzahlpotenzordnung) nilpotent.
+\end{theorem}
+
+%% ============================================================
+\section{Einfache Gruppen}
+\label{sec:einfach}
+%% ============================================================
+
+\begin{definition}[Einfache Gruppe]
+Eine Gruppe $G$ mit $|G| > 1$ heißt \emph{einfach}, wenn ihre einzigen Normalteiler $1$
+und $G$ selbst sind.
+\end{definition}
+
+\begin{theorem}[$A_n$ ist einfach für $n \geq 5$]
+\label{thm:an_einfach}
+Die alternierende Gruppe $A_n$ ist für alle $n \geq 5$ einfach.
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+Jeder nichttriviale Normalteiler von $A_n$ muss einen $3$-Zyklus enthalten
+(unter Verwendung der Tatsache, dass $A_n$ von $3$-Zyklen erzeugt wird, und mithilfe
+von Konjugationsklassen-Argumenten). Jeder Normalteiler, der einen $3$-Zyklus enthält,
+enthält alle $3$-Zyklen und stimmt daher mit $A_n$ überein.
+\end{proof}
+
+\subsection{Projektiv-spezielle lineare Gruppen}
+
+\begin{definition}
+Für eine Primzahlpotenz $q = p^r$ und $n \geq 1$ ist die \emph{projektiv-spezielle
+lineare Gruppe} $\mathrm{PSL}(n, q)$ der Quotient
+$\mathrm{SL}(n, q) / Z(\mathrm{SL}(n,q))$, wobei $\mathrm{SL}(n,q)$ die Gruppe der
+$n \times n$-Matrizen über $\mathbb{F}_q$ mit Determinante $1$ ist.
+\end{definition}
+
+\begin{theorem}
+Für $n \geq 2$ und $q$ eine Primzahlpotenz ist $\mathrm{PSL}(n, q)$ einfach, außer für
+$\mathrm{PSL}(2, 2) \cong S_3$ und $\mathrm{PSL}(2, 3) \cong A_4$.
+Die Gruppen $\mathrm{PSL}(2, q)$ für Primzahlpotenzen $q \geq 4$ bilden unendliche
+Familien nicht-abelscher einfacher Gruppen.
+\end{theorem}
+
+\subsection{Satz von Feit--Thompson und CFSG}
+
+\begin{theorem}[Satz von Feit--Thompson, 1963]
+\label{thm:feit_thompson}
+Jede endliche Gruppe ungerader Ordnung ist auflösbar.
+\end{theorem}
+
+\begin{remark}
+Der Satz von Feit--Thompson füllt einen ganzen Band des \emph{Pacific Journal of
+Mathematics} (255 Seiten). Sein Beweis ist ein Meisterwerk der Darstellungstheorie,
+Charaktertheorie und kombinatorischen Gruppentheorie. Als unmittelbare Konsequenz
+hat jede nicht-abelsche endliche einfache Gruppe gerade Ordnung.
+\end{remark}
+
+\begin{theorem}[Klassifikation endlicher einfacher Gruppen (CFSG), 2004]
+\label{thm:cfsg}
+Jede endliche einfache Gruppe gehört zu einer der folgenden Familien:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Zyklische Gruppen} $\mathbb{Z}_p$ für Primzahlen $p$.
+  \item \textbf{Alternierende Gruppen} $A_n$ für $n \geq 5$.
+  \item \textbf{Gruppen vom Lie-Typ}: 16 unendliche Familien, einschließlich
+        $\mathrm{PSL}(n,q)$, $\mathrm{PSp}(2n,q)$, $\mathrm{P}\Omega^{\pm}(n,q)$,
+        $G_2(q)$, $F_4(q)$, $E_6(q)$, $E_7(q)$, $E_8(q)$ und verdrehte Varianten
+        ${}^2A_n(q)$, ${}^2D_n(q)$, ${}^3D_4(q)$, ${}^2G_2(q)$, ${}^2F_4(q)$,
+        ${}^2E_6(q)$, ${}^2B_2(q)$.
+  \item \textbf{26 sporadische Gruppen}: darunter die Monstergruppe $\mathbb{M}$
+        (Ordnung $\approx 8 \times 10^{53}$), die Babymonster und die 20 Mitglieder
+        der ``Glücklichen Familie'', die mit der Monstergruppe durch Moonshine
+        verwandt sind.
+\end{enumerate}
+\end{theorem}
+
+\begin{remark}
+Der Beweis der CFSG wurde um 1983 mit wesentlichen Beiträgen von Gorenstein, Lyons,
+Solomon, Aschbacher, Smith und vielen anderen abgeschlossen. Ein überarbeiteter und
+vollständiger Beweis, die ``Klassifikation zweiter Generation'', wurde 2004 in einer
+12-bändigen Reihe fertiggestellt. Der Beweis umfasst über 10.000 Seiten in Hunderten
+von Zeitschriftenartikeln.
+\end{remark}
+
+\begin{theorem}[Monstergruppe]
+Die \emph{Monstergruppe} $\mathbb{M}$ ist die größte sporadische einfache Gruppe.
+Ihre Ordnung beträgt:
+\begin{align*}
+  |\mathbb{M}| &= 2^{46} \cdot 3^{20} \cdot 5^9 \cdot 7^6 \cdot 11^2 \cdot 13^3
+                  \cdot 17 \cdot 19 \cdot 23 \cdot 29 \cdot 31 \cdot 41 \cdot 47
+                  \cdot 59 \cdot 71\\
+               &\approx 8{,}08 \times 10^{53}.
+\end{align*}
+\end{theorem}
+
+%% ============================================================
+\section{Anwendungen}
+\label{sec:anwendungen}
+%% ============================================================
+
+\subsection{Galois-Theorie}
+
+Gruppentheorie und Körpertheorie sind durch die Galois-Theorie verknüpft, eines der
+schönsten Kapitel der Mathematik.
+
+\begin{theorem}[Hauptsatz der Galois-Theorie]
+\label{thm:galois_hauptsatz}
+Sei $L/K$ eine endliche galoissche Erweiterung mit Galois-Gruppe $\mathrm{Gal}(L/K)$.
+Es gibt eine inklusionsumkehrende Bijektion zwischen Zwischenkörpern
+$K \subseteq F \subseteq L$ und Untergruppen $H \leq \mathrm{Gal}(L/K)$:
+\[
+  F \;\longleftrightarrow\; H = \mathrm{Gal}(L/F), \quad
+  [L : F] = |H|, \quad [F : K] = [\mathrm{Gal}(L/K) : H].
+\]
+Dabei ist $F/K$ genau dann galoisch, wenn $H \trianglelefteq \mathrm{Gal}(L/K)$;
+in diesem Fall gilt $\mathrm{Gal}(F/K) \cong \mathrm{Gal}(L/K)/H$.
+\end{theorem}
+
+\begin{example}
+Der Zerfällungskörper von $x^4 - 2$ über $\mathbb{Q}$ ist $L = \mathbb{Q}(\sqrt[4]{2},i)$
+mit $\mathrm{Gal}(L/\mathbb{Q}) \cong D_4$ (Diedergruppe der Ordnung 8). Der
+Untergruppenverband von $D_4$ entspricht bijektiv den 10 Zwischenkörpern zwischen
+$\mathbb{Q}$ und $L$.
+\end{example}
+
+\subsection{Kristallographische Gruppen}
+
+\begin{definition}
+Eine \emph{Raumgruppe} ist eine diskrete Untergruppe $\Gamma$ der euklidischen Gruppe
+$\mathrm{E}(3)$, sodass der Quotient $\mathbb{R}^3/\Gamma$ kompakt ist. Die
+\emph{Punktgruppe} ist das Bild von $\Gamma$ in $\mathrm{O}(3)$.
+\end{definition}
+
+\begin{theorem}[Kristallographische Einschränkung]
+In Dimension 2 kann eine kristallographische Gruppe (Wandgruppe) nur Drehsymmetrien der
+Ordnung $2, 3, 4$ oder $6$ enthalten. Es gibt genau $17$ Wandgruppen und genau
+$230$ Raumgruppen in drei Dimensionen.
+\end{theorem}
+
+\begin{remark}
+Die 230 Raumgruppen, unabhängig von Fedorov (1891) und Schönflies (1891) klassifiziert,
+bilden die mathematische Grundlage der Kristallographie. Moderne Kristallstrukturbestimmung
+mittels Röntgenbeugung nutzt diese Klassifikation auf jeder Stufe.
+\end{remark}
+
+\subsection{Quantenmechanik: \texorpdfstring{$\mathrm{SU}(2)$}{SU(2)} und
+            \texorpdfstring{$\mathrm{SO}(3)$}{SO(3)}}
+
+\begin{definition}
+Die \emph{spezielle unitäre Gruppe}
+$\mathrm{SU}(2) = \{A \in \mathrm{M}_{2}(\mathbb{C}) : A^\dagger A = I,\, \det A = 1\}$
+und die \emph{Drehgruppe}
+$\mathrm{SO}(3) = \{R \in \mathrm{M}_3(\mathbb{R}) : R^T R = I,\, \det R = 1\}$
+sind Lie-Gruppen, die durch die doppelte Überlagerung $\mathrm{SU}(2) \twoheadrightarrow
+\mathrm{SO}(3)$ mit Kern $\{\pm I\}$ verknüpft sind.
+\end{definition}
+
+\begin{theorem}
+Die irreduziblen komplexen Darstellungen von $\mathrm{SU}(2)$ sind durch nicht-negative
+Halbganzzahlen $j \in \{0, \frac{1}{2}, 1, \frac{3}{2}, 2, \ldots\}$ parametrisiert
+und haben Dimension $2j+1$. Die Darstellungen steigen genau dann zu $\mathrm{SO}(3)$
+ab, wenn $j$ eine ganze Zahl ist.
+\end{theorem}
+
+\begin{remark}
+In der Quantenmechanik ist $j$ die \emph{Spin}-Quantenzahl. Elektronen, Protonen und
+Neutronen sind Spin-$\frac{1}{2}$-Teilchen und transformieren unter der 2-dimensionalen
+Darstellung von $\mathrm{SU}(2)$. Photonen sind Spin-$1$-Teilchen und transformieren
+unter $\mathrm{SO}(3)$. Die Wigner-$3j$-Symbole beim Drehimpulskoppeln sind die
+Clebsch--Gordan-Koeffizienten der Zerlegung
+$j_1 \otimes j_2 = |j_1 - j_2| \oplus \cdots \oplus (j_1 + j_2)$.
+\end{remark}
+
+\subsection{Kryptographie: Gruppen des diskreten Logarithmus}
+
+\begin{definition}
+Sei $G = \langle g \rangle$ eine endliche zyklische Gruppe der Ordnung $n$.
+Das \emph{diskrete Logarithmusproblem (DLP)} lautet: Gegeben $h \in G$, finde
+$x \in \mathbb{Z}$ mit $g^x = h$.
+\end{definition}
+
+\begin{remark}
+Für geeignet gewählte Gruppen (z.\,B.\ Untergruppen von Primzahlordnung in
+$(\mathbb{Z}/p\mathbb{Z})^*$ oder Punkte auf elliptischen Kurven über endlichen Körpern)
+ist kein polynomieller klassischer Algorithmus für das DLP bekannt. Diese Schwierigkeit
+bildet die Sicherheitsgrundlage für Protokolle wie Diffie--Hellman-Schlüsselaustausch,
+ElGamal-Verschlüsselung und ECDSA-Signaturen. Shors Quantenalgorithmus löst das DLP in
+polynomieller Zeit auf einem Quantencomputer, was den Übergang zur Post-Quanten-Kryptographie
+motiviert.
+\end{remark}
+
+%% ============================================================
+\section{Schluss}
+\label{sec:schluss}
+%% ============================================================
+
+Wir haben den Kern der endlichen Gruppentheorie durchlaufen: von den grundlegenden Axiomen
+über die Isomorphiesätze und die Klassifikation endlicher abelscher Gruppen bis hin zu den
+mächtigen Werkzeugen der Sylow-Theorie und den Strukturresultaten über auflösbare und
+nilpotente Gruppen. Der Satz von Jordan--Hölder zeigt, dass Kompositionsfaktoren ein
+gruppentheoretisches Invariante sind, und der Satz von Abel--Ruffini zeigt, wie die
+Auflösbarkeit von Gruppen direkt in die Lösbarkeit von Gleichungen durch Radikale
+übersetzt.
+
+Die Klassifikation endlicher einfacher Gruppen (CFSG), eine der größten kollektiven
+Leistungen in der Geschichte der Mathematik, liefert eine vollständige Liste der
+``Atome'', aus denen alle endlichen Gruppen aufgebaut sind. Der Satz von Feit--Thompson,
+dass jede endliche Gruppe ungerader Ordnung auflösbar ist, ist eine tiefe Voraussetzung
+für die CFSG.
+
+Anwendungen der Gruppentheorie durchziehen Mathematik und Physik. Die Galois-Theorie
+nutzt Gruppentheorie, um antike Fragen über Polynomgleichungen zu beantworten.
+Kristallographische Gruppen regeln die Struktur aller bekannten Kristalle. Die
+Darstellungstheorie von $\mathrm{SU}(2)$ und $\mathrm{SO}(3)$ bildet die Grundlage der
+Quantentheorie des Drehimpulses und des Spins. Zyklische Gruppen und ihre Analoga bilden
+das Rückgrat der modernen Public-Key-Kryptographie.
+
+Offene Richtungen umfassen die Monstrous-Moonshine-Vermutungen, die die Monstergruppe mit
+Modulformen verbinden (Borcherds' Beweis der Conway--Norton-Vermutung, 1992), die
+Baum--Connes-Vermutung, die gruppen-$K$-Theorie mit Analysis verknüpft, und das
+Langlands-Programm, das gruppen-, zahlen- und geometrie-theoretische Strukturen durch
+die Darstellungstheorie reduktiver Gruppen vereint.
+
+%% ============================================================
+\section*{Literatur}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Artin2011}
+M.~Artin, \emph{Algebra}, 2.~Aufl., Pearson, 2011.
+
+\bibitem{Dummit2004}
+D.~S.~Dummit und R.~M.~Foote, \emph{Abstract Algebra}, 3.~Aufl.,
+Wiley, Hoboken, NJ, 2004.
+
+\bibitem{Rotman2012}
+J.~J.~Rotman, \emph{Advanced Modern Algebra}, 3.~Aufl., American Mathematical
+Society, Providence, RI, 2010.
+
+\bibitem{FeitThompson1963}
+W.~Feit und J.~G.~Thompson, ``Solvability of groups of odd order'',
+\emph{Pacific J.\ Math.}\ \textbf{13} (1963), Nr.~3, 775--1029.
+
+\bibitem{Sylow1872}
+L.~Sylow, ``Théorèmes sur les groupes de substitutions'',
+\emph{Math.\ Ann.}\ \textbf{5} (1872), 584--594.
+
+\bibitem{Gorenstein1982}
+D.~Gorenstein, \emph{Finite Simple Groups: An Introduction to Their
+Classification}, Plenum Press, New York, 1982.
+
+\bibitem{Lang2002}
+S.~Lang, \emph{Algebra}, 3.~Aufl., Springer, New York, 2002.
+
+\bibitem{Hall1959}
+M.~Hall, \emph{The Theory of Groups}, Macmillan, New York, 1959.
+
+\bibitem{Serre1977}
+J.-P.~Serre, \emph{Linear Representations of Finite Groups}, Springer,
+New York, 1977.
+
+\bibitem{Aschbacher2004}
+M.~Aschbacher, R.~Lyons, S.~D.~Smith und R.~Solomon,
+\emph{The Classification of Finite Simple Groups: Groups of Characteristic 2 Type},
+Amer.\ Math.\ Soc., 2011.
+
+\end{thebibliography}
+
+\end{document}

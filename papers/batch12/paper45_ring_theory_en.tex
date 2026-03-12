@@ -1,0 +1,811 @@
+% ============================================================
+% Paper 45: Ring Theory and Commutative Algebra
+% Author: Michael Fuhrmann
+% Project: Specialist Mathematics, Build 135
+% Date: 2026-03-12
+% ============================================================
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% ---- Theorem environments ----
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+% ---- Operators ----
+\DeclareMathOperator{\Spec}{Spec}
+\DeclareMathOperator{\Ann}{Ann}
+\DeclareMathOperator{\rad}{rad}
+\DeclareMathOperator{\Nil}{Nil}
+\DeclareMathOperator{\Jac}{Jac}
+\DeclareMathOperator{\lcm}{lcm}
+\DeclareMathOperator{\ht}{ht}
+\DeclareMathOperator{\codim}{codim}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\chr}{char}
+\DeclareMathOperator{\Frac}{Frac}
+\DeclareMathOperator{\Cl}{Cl}
+
+\title{Ring Theory and Commutative Algebra\\
+\large Ideals, Factorization, Noetherian Rings, and Gröbner Bases}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 135}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{document}
+
+\begin{abstract}
+This paper presents a self-contained introduction to ring theory and commutative
+algebra, covering the central objects and theorems of modern algebra.
+Starting from the axiomatic definition of a ring, we develop the theory of ideals
+and quotient rings, establish the isomorphism theorems, and study polynomial rings
+with their irreducibility criteria. The hierarchy of special ring classes---Euclidean
+domains, principal ideal domains (PIDs), and unique factorization domains (UFDs)---is
+carefully developed. We then treat Noetherian and Artinian rings, including the
+Hilbert basis theorem and Nakayama's lemma. Localization and its application to
+Dedekind rings provide the bridge to algebraic number theory. The paper concludes
+with an introduction to Gröbner bases and the Buchberger algorithm as a
+computational tool. All results are accompanied by proofs or proof sketches and
+are illustrated with concrete examples. The exposition is based on the
+implementations in \texttt{ring\_theory.py} and \texttt{commutative\_algebra.py}
+of the Specialist Mathematics project.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ============================================================
+\section{Introduction}
+% ============================================================
+
+Rings are the fundamental algebraic structures that generalize the arithmetic of
+integers. Wherever addition and multiplication interact---in number theory, geometry,
+combinatorics, or mathematical physics---ring-theoretic methods provide the
+unifying framework.
+
+The historical development of ring theory was driven by concrete problems.
+Gauss studied $\mathbb{Z}[i]$ to prove his two-squares theorem. Kummer introduced
+``ideal numbers'' to salvage unique factorization in cyclotomic fields. Dedekind
+formalized the modern notion of an ideal and proved that rings of algebraic integers
+are what we now call Dedekind domains---where unique factorization holds at the
+level of ideals even when it fails for elements.
+
+In the twentieth century, Emmy Noether~\cite{Noether1921} revolutionized the subject
+by shifting focus from explicit calculations to structural principles. Her ascending
+chain condition, the Noetherian property, turned out to be the exact hypothesis
+needed to make algebra work cleanly. At the same time, Hilbert's basis theorem
+showed that polynomial rings inherit this good behavior, laying the foundation for
+modern algebraic geometry.
+
+Today, commutative algebra---the study of commutative rings and their modules---forms
+the technical core of algebraic geometry, algebraic number theory, and parts of
+combinatorics. The language of Spec, localization, and sheaves connects pure algebra
+to geometry in a way that has been decisive since Grothendieck's reformulation in the
+1950s and 1960s.
+
+This paper covers the following topics:
+\begin{enumerate}[label=(\roman*)]
+  \item Basic definitions and examples of rings and fields;
+  \item Ideals, quotient rings, and the Chinese remainder theorem;
+  \item Ring homomorphisms and the isomorphism theorems;
+  \item Polynomial rings, Gauss's lemma, and Eisenstein's criterion;
+  \item The hierarchy UFD $\supset$ PID $\supset$ Euclidean domain;
+  \item Noetherian and Artinian rings, the Hilbert basis theorem, Nakayama's lemma;
+  \item Localization and Dedekind rings;
+  \item Gröbner bases and the Buchberger algorithm.
+\end{enumerate}
+
+\medskip
+
+\noindent\textbf{Notation.} Throughout, all rings are assumed to have a multiplicative
+identity $1$, and ring homomorphisms are required to map $1$ to $1$.
+We write $\mathbb{Z}$, $\mathbb{Q}$, $\mathbb{R}$, $\mathbb{C}$ for the integers,
+rationals, reals, and complex numbers, and $\mathbb{F}_p = \mathbb{Z}/p\mathbb{Z}$
+for the field with $p$ elements.
+
+% ============================================================
+\section{Ring Basics}
+% ============================================================
+
+\begin{definition}[Ring]
+A \emph{ring} is a set $R$ together with two binary operations $+$ (addition) and
+$\cdot$ (multiplication) satisfying:
+\begin{enumerate}[label=(\roman*)]
+  \item $(R,+)$ is an abelian group with identity element $0$;
+  \item $(R,\cdot)$ is a monoid with identity element $1$;
+  \item Multiplication distributes over addition: $a(b+c) = ab + ac$ and
+        $(a+b)c = ac + bc$ for all $a,b,c \in R$.
+\end{enumerate}
+The ring is \emph{commutative} if $ab = ba$ for all $a,b \in R$.
+\end{definition}
+
+\begin{example}\label{ex:rings}
+The following are the most important examples:
+\begin{enumerate}[label=(\alph*)]
+  \item $\mathbb{Z}$, $\mathbb{Q}$, $\mathbb{R}$, $\mathbb{C}$ with ordinary
+        addition and multiplication;
+  \item $\mathbb{Z}/n\mathbb{Z}$ (integers modulo $n$) for any $n \geq 1$;
+  \item The polynomial ring $R[x_1,\ldots,x_n]$ over any ring $R$;
+  \item The matrix ring $M_n(R)$---noncommutative for $n \geq 2$;
+  \item The ring of continuous functions $C([0,1])$ with pointwise operations;
+  \item Quadratic integer rings $\mathbb{Z}[\sqrt{d}] = \{a + b\sqrt{d} \mid a,b \in \mathbb{Z}\}$
+        for squarefree $d \in \mathbb{Z}$.
+\end{enumerate}
+\end{example}
+
+\begin{definition}[Special ring classes]
+Let $R$ be a commutative ring with $1 \neq 0$.
+\begin{itemize}
+  \item $R$ is a \emph{domain} (or \emph{integral domain}) if $ab = 0$ implies
+        $a = 0$ or $b = 0$.
+  \item $R$ is a \emph{field} if every nonzero element has a multiplicative inverse.
+  \item The \emph{group of units} is $R^\times = \{u \in R \mid \exists v: uv = 1\}$.
+  \item The \emph{characteristic} $\chr(R)$ is the smallest positive integer $n$ with
+        $n \cdot 1 = 0$, or $0$ if no such $n$ exists.
+\end{itemize}
+\end{definition}
+
+\begin{proposition}\label{prop:field-domain}
+Every field is an integral domain. Conversely, every finite integral domain is a field.
+\end{proposition}
+
+\begin{proof}
+If $F$ is a field and $ab = 0$ with $a \neq 0$, then $b = a^{-1}(ab) = 0$.
+For the converse, let $R$ be a finite domain and $a \in R \setminus \{0\}$.
+The map $x \mapsto ax$ is injective (as $R$ is a domain) and the domain $R$ is
+finite, so this map is surjective. In particular, $ax = 1$ has a solution.
+\end{proof}
+
+\begin{example}[Units and zero divisors]
+In $\mathbb{Z}/12\mathbb{Z}$: the units are $\{1,5,7,11\}$ (elements coprime to
+$12$), and $2 \cdot 6 = 0$ so $2$ is a zero divisor.
+In $\mathbb{Z}[i]$ (Gaussian integers): $(\mathbb{Z}[i])^\times = \{\pm 1, \pm i\}$.
+\end{example}
+
+\begin{theorem}[Wedderburn's little theorem]
+Every finite division ring is commutative (hence a field).
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+One uses the class equation for the multiplicative group and properties of
+cyclotomic polynomials to show that the center of the division ring must
+equal the whole ring. See \cite[Thm.~13.1]{Lang2002}.
+\end{proof}
+
+% ============================================================
+\section{Ideals and Quotient Rings}
+% ============================================================
+
+\begin{definition}[Ideal]
+A subset $I \subseteq R$ is a \emph{(two-sided) ideal} if:
+\begin{enumerate}[label=(\roman*)]
+  \item $(I,+)$ is a subgroup of $(R,+)$;
+  \item $rI \subseteq I$ and $Ir \subseteq I$ for all $r \in R$
+        (in the commutative case these two conditions coincide).
+\end{enumerate}
+For $a_1,\ldots,a_n \in R$, the ideal \emph{generated} by these elements is
+\[
+  (a_1,\ldots,a_n) = \Bigl\{\sum_{i=1}^{n} r_i a_i \,\Big|\, r_i \in R\Bigr\}.
+\]
+An ideal of the form $(a) = aR$ is called a \emph{principal ideal}.
+\end{definition}
+
+\begin{definition}[Prime and maximal ideals]
+Let $R$ be a commutative ring and $\mathfrak{p}, \mathfrak{m} \subsetneq R$ ideals.
+\begin{itemize}
+  \item $\mathfrak{p}$ is a \emph{prime ideal} if $ab \in \mathfrak{p}$ implies
+        $a \in \mathfrak{p}$ or $b \in \mathfrak{p}$.
+  \item $\mathfrak{m}$ is a \emph{maximal ideal} if there is no ideal $I$ with
+        $\mathfrak{m} \subsetneq I \subsetneq R$.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Characterization via quotient rings]
+Let $I$ be an ideal in a commutative ring $R$.
+\begin{enumerate}[label=(\roman*)]
+  \item $I$ is prime if and only if $R/I$ is an integral domain.
+  \item $I$ is maximal if and only if $R/I$ is a field.
+  \item Every maximal ideal is prime (since every field is an integral domain).
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) $ab + I = (a+I)(b+I) = 0$ in $R/I$ iff $ab \in I$. The domain condition in $R/I$
+says exactly that this implies $a \in I$ or $b \in I$.
+(ii) $R/I$ is a field iff every nonzero element $a + I$ is a unit, i.e., there exists
+$b$ with $ab - 1 \in I$. This is equivalent to $I$ being maximal: for any $r \notin I$,
+the ideal $(I,r) = R$ gives $ar + j = 1$ for some $a \in R, j \in I$.
+\end{proof}
+
+\begin{example}\label{ex:ideals-Z}
+In $\mathbb{Z}$: the prime ideals are $(0)$ and $(p)$ for primes $p$.
+The maximal ideals are exactly the $(p)$. The ideal $(6) = (2)(3)$ is neither prime
+nor maximal: $\mathbb{Z}/(6) \cong \mathbb{Z}/2 \times \mathbb{Z}/3$ is not a domain.
+\end{example}
+
+\begin{theorem}[Chinese Remainder Theorem]\label{thm:crt}
+Let $R$ be a commutative ring and $I_1,\ldots,I_k$ pairwise coprime ideals
+(meaning $I_i + I_j = R$ for $i \neq j$). Then the natural map
+\[
+  R \,\Big/\, \bigcap_{i=1}^k I_i \;\xrightarrow{\;\sim\;}\; \prod_{i=1}^k R/I_i
+\]
+is a ring isomorphism.
+\end{theorem}
+
+\begin{proof}
+The map $\varphi\colon R \to \prod R/I_i$ given by $r \mapsto (r + I_i)_i$ is a
+ring homomorphism with kernel $\bigcap I_i$.
+Surjectivity (and hence bijectivity after passing to the quotient) follows from the
+coprimality assumption by an inductive argument: for each $j$, there exist $e_j \in R$
+with $e_j \equiv 1 \pmod{I_j}$ and $e_j \equiv 0 \pmod{I_i}$ for $i \neq j$.
+These elements $e_j$ are the ``idempotents'' that allow us to hit any target
+$(a_1,\ldots,a_k)$ by taking $r = \sum_j a_j e_j$.
+\end{proof}
+
+\begin{corollary}
+$\mathbb{Z}/n\mathbb{Z} \cong \prod_{p^k \| n} \mathbb{Z}/p^k\mathbb{Z}$
+(product over prime power factors of $n$).
+\end{corollary}
+
+The \emph{prime spectrum} $\Spec(R)$ is the set of all prime ideals of $R$,
+endowed with the \emph{Zariski topology}: closed sets are of the form
+$V(I) = \{\mathfrak{p} \in \Spec(R) \mid I \subseteq \mathfrak{p}\}$.
+For $R = \mathbb{Z}/n\mathbb{Z}$, the prime ideals correspond exactly to the
+prime divisors of $n$ (plus the zero ideal when $n = p$ is prime).
+
+% ============================================================
+\section{Ring Homomorphisms and Isomorphism Theorems}
+% ============================================================
+
+\begin{definition}[Ring homomorphism]
+A map $\varphi\colon R \to S$ between rings is a \emph{ring homomorphism} if
+\[
+  \varphi(a+b) = \varphi(a) + \varphi(b),\quad
+  \varphi(ab) = \varphi(a)\varphi(b),\quad
+  \varphi(1_R) = 1_S.
+\]
+The \emph{kernel} is $\ker\varphi = \{r \in R \mid \varphi(r) = 0\}$, an ideal of $R$.
+The \emph{image} is $\operatorname{Im}(\varphi)$, a subring of $S$.
+\end{definition}
+
+\begin{theorem}[First Isomorphism Theorem for Rings]
+Let $\varphi\colon R \to S$ be a ring homomorphism. Then
+\[
+  R/\ker\varphi \;\cong\; \operatorname{Im}(\varphi).
+\]
+\end{theorem}
+
+\begin{proof}
+The map $\bar\varphi\colon R/\ker\varphi \to \operatorname{Im}(\varphi)$ defined by
+$\bar\varphi(r + \ker\varphi) = \varphi(r)$ is well defined (independent of
+representative), a ring homomorphism, injective (since $\ker\bar\varphi = 0$),
+and surjective onto $\operatorname{Im}(\varphi)$ by definition.
+\end{proof}
+
+\begin{theorem}[Second and Third Isomorphism Theorems]
+Let $R$ be a ring, $I \subseteq J$ ideals of $R$, and $I, J$ ideals of $R$.
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Second:} If $S$ is a subring and $I$ is an ideal of $R$, then
+        $S + I$ is a subring, $S \cap I$ is an ideal of $S$, and
+        $S/(S \cap I) \cong (S+I)/I$.
+  \item \textbf{Third:} $J/I$ is an ideal of $R/I$ and
+        $(R/I)/(J/I) \cong R/J$.
+  \item \textbf{Correspondence theorem:} There is a bijection between
+        ideals of $R/I$ and ideals of $R$ containing $I$.
+\end{enumerate}
+\end{theorem}
+
+\begin{example}
+The evaluation homomorphism $\varphi\colon \mathbb{R}[x] \to \mathbb{C}$ defined by
+$\varphi(f) = f(i)$ has kernel $(x^2 + 1)$ and image $\mathbb{C}$, giving
+$\mathbb{R}[x]/(x^2+1) \cong \mathbb{C}$.
+\end{example}
+
+\begin{definition}[Nilradical and Jacobson radical]
+For a commutative ring $R$:
+\begin{itemize}
+  \item The \emph{nilradical} is $\Nil(R) = \{r \in R \mid r^n = 0 \text{ for some } n\} = \bigcap_{\mathfrak{p} \in \Spec(R)} \mathfrak{p}$.
+  \item The \emph{Jacobson radical} is $\Jac(R) = \bigcap_{\mathfrak{m} \text{ maximal}} \mathfrak{m}$.
+\end{itemize}
+\end{definition}
+
+% ============================================================
+\section{Polynomial Rings}
+% ============================================================
+
+\begin{definition}[Polynomial ring]
+For a commutative ring $R$, the \emph{polynomial ring} $R[x]$ consists of all formal
+sums $f = \sum_{k=0}^n a_k x^k$ with $a_k \in R$, subject to the usual addition and
+convolution multiplication. More generally, $R[x_1,\ldots,x_n]$ denotes polynomials
+in $n$ variables.
+\end{definition}
+
+\begin{theorem}[Gauss's Lemma]
+Let $R$ be a UFD with fraction field $K = \Frac(R)$.
+A polynomial $f \in R[x]$ of degree $\geq 1$ is irreducible in $R[x]$ if and only if
+$f$ is \emph{primitive} (the gcd of its coefficients is $1$) and irreducible in $K[x]$.
+Consequently, $R[x]$ is a UFD whenever $R$ is.
+\end{theorem}
+
+\begin{proof}
+The key step is the ``Gauss product formula'': if $f, g \in R[x]$ are primitive,
+so is $fg$. This is proved by assuming otherwise and reducing modulo a prime divisor
+of a coefficient of $fg$ to obtain a contradiction in $(R/(p))[x]$, which is a domain
+when $p$ is prime. From this one deduces that content is multiplicative, and the
+equivalence of irreducibility in $R[x]$ versus $K[x]$ follows.
+See \cite[IV, \S2]{Lang2002}.
+\end{proof}
+
+\begin{theorem}[Eisenstein's Criterion]\label{thm:eisenstein}
+Let $R$ be a UFD, $\mathfrak{p}$ a prime ideal, and
+$f = a_n x^n + \cdots + a_1 x + a_0 \in R[x]$ with $n \geq 1$.
+Suppose:
+\begin{enumerate}[label=(\roman*)]
+  \item $a_n \notin \mathfrak{p}$,
+  \item $a_0, a_1, \ldots, a_{n-1} \in \mathfrak{p}$,
+  \item $a_0 \notin \mathfrak{p}^2$.
+\end{enumerate}
+Then $f$ is irreducible in $\Frac(R)[x]$.
+\end{theorem}
+
+\begin{proof}
+Suppose $f = gh$ with $g, h \in R[x]$ of positive degree. Reducing modulo $\mathfrak{p}$
+gives $\bar{f} = a_n x^n = \bar{g}\bar{h}$ in $(R/\mathfrak{p})[x]$, a domain.
+So $\bar{g} = cx^r$ and $\bar{h} = dx^s$ for some $r + s = n$, $r, s \geq 1$.
+Then $\mathfrak{p} \mid g(0)$ and $\mathfrak{p} \mid h(0)$, hence
+$\mathfrak{p}^2 \mid g(0)h(0) = a_0$, contradicting (iii).
+\end{proof}
+
+\begin{example}
+\begin{enumerate}[label=(\alph*)]
+  \item $x^p - p$ is irreducible over $\mathbb{Q}$ by Eisenstein with $\mathfrak{p}=(p)$.
+  \item The $p$-th cyclotomic polynomial $\Phi_p(x) = x^{p-1} + \cdots + x + 1$ is
+        irreducible: substitute $x \mapsto x+1$ and apply Eisenstein with the prime $p$.
+\end{enumerate}
+\end{example}
+
+\begin{theorem}
+For a commutative ring $R$, the polynomial ring $R[x]$ satisfies:
+\begin{itemize}
+  \item If $R$ is a domain, so is $R[x]$.
+  \item $\chr(R[x]) = \chr(R)$.
+  \item $(R[x])^\times = R^\times$ (if $R$ is a domain).
+  \item $\mathbb{F}_q[x]$ (for $q = p^n$ a prime power) is a Euclidean domain,
+        hence a PID and a UFD.
+\end{itemize}
+\end{theorem}
+
+% ============================================================
+\section{Unique Factorization: UFDs, PIDs, and Euclidean Domains}
+% ============================================================
+
+\begin{definition}[Divisibility and irreducibles]
+In an integral domain $R$:
+\begin{itemize}
+  \item $a$ \emph{divides} $b$ (written $a \mid b$) if $b = ac$ for some $c \in R$.
+  \item $p \in R$ is \emph{irreducible} if $p = ab$ implies $a$ or $b$ is a unit.
+  \item $p \in R$ is \emph{prime} if $(p)$ is a prime ideal, i.e., $p \mid ab$ implies
+        $p \mid a$ or $p \mid b$.
+  \item Every prime is irreducible; in a UFD, the converse holds.
+\end{itemize}
+\end{definition}
+
+\begin{definition}[UFD, PID, Euclidean domain]
+\begin{itemize}
+  \item A domain $R$ is a \emph{unique factorization domain} (UFD) if every nonzero
+        nonunit has a unique factorization into irreducibles (up to order and units).
+  \item $R$ is a \emph{principal ideal domain} (PID) if every ideal is principal.
+  \item $R$ is a \emph{Euclidean domain} if there exists a function
+        $\delta\colon R \setminus \{0\} \to \mathbb{N}_0$ such that for all
+        $a \in R$, $b \in R \setminus \{0\}$ there exist $q, r \in R$ with
+        $a = qb + r$ and either $r = 0$ or $\delta(r) < \delta(b)$.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Hierarchy of ring classes]\label{thm:hierarchy}
+The following implications hold and none is reversible:
+\[
+  \text{Euclidean domain} \;\Rightarrow\; \text{PID} \;\Rightarrow\; \text{UFD}
+  \;\Rightarrow\; \text{Integral domain}.
+\]
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+\textit{Euclidean $\Rightarrow$ PID:} Let $I \neq 0$ be an ideal and $b \in I$
+with $\delta(b)$ minimal. Then for any $a \in I$ write $a = qb + r$. Since
+$r = a - qb \in I$ and $\delta(b)$ is minimal, $r = 0$, so $a \in (b)$.
+
+\textit{PID $\Rightarrow$ UFD:} In a PID, every irreducible is prime (since
+$(p)$ is maximal, hence prime). Existence of factorizations follows from
+the ascending chain condition (all PIDs are Noetherian). Uniqueness follows from
+the prime property.
+
+\textit{UFD $\Rightarrow$ Domain:} By definition.
+
+Counterexamples to converses: $\mathbb{Z}[\sqrt{-5}]$ is a UFD? No: $6 = 2 \cdot 3 =
+(1+\sqrt{-5})(1-\sqrt{-5})$---two distinct factorizations, so it is not a UFD.
+The ring $\mathbb{Z}[x]$ is a UFD but not a PID (the ideal $(2,x)$ is not principal).
+The ring $k[x,y]$ is a UFD but not a PID for any field $k$.
+There exist PIDs that are not Euclidean (e.g., $\mathbb{Z}[(1+\sqrt{-19})/2]$).
+\end{proof}
+
+\begin{example}[Euclidean domains]
+\begin{enumerate}[label=(\alph*)]
+  \item $\mathbb{Z}$ with $\delta(n) = |n|$;
+  \item $k[x]$ for any field $k$ with $\delta(f) = \deg(f)$;
+  \item The Gaussian integers $\mathbb{Z}[i]$ with $\delta(a+bi) = a^2 + b^2$
+        (the norm). The Euclidean algorithm allows us to write $\gcd(m,n)$ in
+        $\mathbb{Z}[i]$ explicitly. Two-square theorem: $p = a^2 + b^2$ for a prime
+        $p$ iff $p = 2$ or $p \equiv 1 \pmod 4$.
+\end{enumerate}
+\end{example}
+
+\begin{theorem}[Unique factorization in $\mathbb{Z}[i]$]
+The Gaussian integers form a Euclidean domain (hence a PID and UFD). The units are
+$\{\pm 1, \pm i\}$. The Gaussian primes are:
+\begin{itemize}
+  \item $(1+i)$ (lying over $2$);
+  \item $p \in \mathbb{Z}$ prime with $p \equiv 3 \pmod 4$ (remain prime in $\mathbb{Z}[i]$);
+  \item $a + bi$ with $a^2 + b^2 = p$ for primes $p \equiv 1 \pmod 4$.
+\end{itemize}
+\end{theorem}
+
+% ============================================================
+\section{Noetherian and Artinian Rings}
+% ============================================================
+
+\begin{definition}[Chain conditions]
+A commutative ring $R$ is \emph{Noetherian} if it satisfies the \emph{ascending
+chain condition} (ACC) on ideals: every chain $I_1 \subseteq I_2 \subseteq \cdots$
+of ideals eventually stabilizes ($I_n = I_{n+1} = \cdots$ for some $n$).
+
+Equivalently, $R$ is Noetherian iff every ideal is finitely generated.
+
+$R$ is \emph{Artinian} if it satisfies the \emph{descending chain condition} (DCC):
+every chain $I_1 \supseteq I_2 \supseteq \cdots$ stabilizes.
+\end{definition}
+
+\begin{theorem}[Hilbert Basis Theorem]\label{thm:hilbert-basis}
+If $R$ is a Noetherian ring, then the polynomial ring $R[x]$ is also Noetherian.
+\end{theorem}
+
+\begin{proof}
+Let $I \subseteq R[x]$ be an ideal. We show $I$ is finitely generated.
+For each $n \geq 0$, let $J_n = \{a \in R \mid \text{there exists } f \in I
+\text{ of degree } n \text{ with leading coeff.\ } a\} \cup \{0\}$.
+Each $J_n$ is an ideal of $R$, and $J_0 \subseteq J_1 \subseteq J_2 \subseteq \cdots$
+(multiplying by $x$ raises degree). Since $R$ is Noetherian, this chain stabilizes:
+$J_N = J_{N+1} = \cdots$ for some $N$. Each $J_n$ is finitely generated: pick
+generators $a_{n,1},\ldots,a_{n,k_n} \in J_n$ and corresponding polynomials
+$f_{n,j} \in I$ of degree $n$ with leading coefficient $a_{n,j}$.
+The finite set $\{f_{n,j}\}_{n \leq N, j \leq k_n}$ generates $I$ (by a
+degree-induction argument). Hence $I$ is finitely generated.
+\end{proof}
+
+\begin{corollary}
+For any field $k$, the polynomial ring $k[x_1,\ldots,x_n]$ is Noetherian.
+Hence every ideal in $k[x_1,\ldots,x_n]$ has a finite generating set (a
+\emph{Gröbner basis}, see Section~\ref{sec:groebner}).
+\end{corollary}
+
+\begin{theorem}[Nakayama's Lemma]\label{thm:nakayama}
+Let $R$ be a local ring with maximal ideal $\mathfrak{m}$, and let $M$ be a
+finitely generated $R$-module. If $M = \mathfrak{m}M$, then $M = 0$.
+
+More generally: if $N \subseteq M$ is a submodule and $M = N + \mathfrak{m}M$,
+then $M = N$.
+\end{theorem}
+
+\begin{proof}
+Let $m_1,\ldots,m_k$ generate $M$. Since $M = \mathfrak{m}M$, we can write
+$m_i = \sum_{j=1}^k a_{ij} m_j$ with $a_{ij} \in \mathfrak{m}$.
+In matrix form, $(I - A)\mathbf{m} = 0$ where $A = (a_{ij})$.
+The matrix $I - A$ has entries $\delta_{ij} - a_{ij}$; since $a_{ij} \in \mathfrak{m}$,
+the diagonal entries $1 - a_{ii}$ are units (the only nonunits in a local ring lie
+in $\mathfrak{m}$). Hence $\det(I-A)$ is a unit, so $I-A$ is invertible, giving $\mathbf{m} = 0$.
+\end{proof}
+
+\begin{corollary}
+Let $R$ be local with maximal ideal $\mathfrak{m}$ and $M$ finitely generated.
+Then $m_1,\ldots,m_k \in M$ generate $M$ iff their images in $M/\mathfrak{m}M$ generate
+$M/\mathfrak{m}M$ as an $R/\mathfrak{m}$-vector space.
+\end{corollary}
+
+\begin{theorem}[Hopkins--Levitzki]
+A Noetherian Artinian ring $R$ has a composition series as a module over itself.
+Moreover: $R$ is Artinian if and only if $R$ is Noetherian of Krull dimension $0$.
+\end{theorem}
+
+The \emph{Krull dimension} $\dim(R)$ of a ring $R$ is the supremum of lengths of
+chains of prime ideals $\mathfrak{p}_0 \subsetneq \mathfrak{p}_1 \subsetneq \cdots \subsetneq \mathfrak{p}_n$.
+For fields, $\dim = 0$; for $\mathbb{Z}$ and $k[x]$, $\dim = 1$; for $k[x_1,\ldots,x_n]$, $\dim = n$.
+
+% ============================================================
+\section{Localization}
+% ============================================================
+
+\begin{definition}[Localization]
+Let $R$ be a commutative ring and $S \subseteq R$ a \emph{multiplicative set}
+(closed under multiplication, containing $1$). The \emph{localization}
+$S^{-1}R$ is the set of equivalence classes of pairs $(a, s) \in R \times S$,
+where $(a,s) \sim (a',s')$ iff $\exists t \in S: t(as' - a's) = 0$, with operations
+\[
+  \frac{a}{s} + \frac{a'}{s'} = \frac{as' + a's}{ss'}, \qquad
+  \frac{a}{s} \cdot \frac{a'}{s'} = \frac{aa'}{ss'}.
+\]
+There is a natural ring homomorphism $\iota\colon R \to S^{-1}R$, $r \mapsto r/1$.
+\end{definition}
+
+\begin{example}[Key instances]
+\begin{enumerate}[label=(\alph*)]
+  \item $S = R \setminus \{0\}$: $S^{-1}R = \Frac(R)$ is the fraction field of a domain.
+  \item $S = R \setminus \mathfrak{p}$ for a prime ideal $\mathfrak{p}$:
+        $R_\mathfrak{p} = S^{-1}R$ is the \emph{localization at} $\mathfrak{p}$,
+        a local ring with maximal ideal $\mathfrak{p}R_\mathfrak{p}$.
+  \item $S = \{1, f, f^2, \ldots\}$ for $f \in R$: $R_f = S^{-1}R$ inverts $f$.
+\end{enumerate}
+\end{example}
+
+\begin{theorem}[Universal property of localization]
+The map $\iota\colon R \to S^{-1}R$ is initial among ring homomorphisms $\varphi\colon R \to T$
+such that $\varphi(s)$ is a unit in $T$ for all $s \in S$. That is, any such $\varphi$
+factors uniquely through $\iota$.
+\end{theorem}
+
+\begin{theorem}[Ideals in localizations]
+There is a bijection between:
+\begin{itemize}
+  \item Prime ideals of $S^{-1}R$, and
+  \item Prime ideals $\mathfrak{p}$ of $R$ with $\mathfrak{p} \cap S = \emptyset$.
+\end{itemize}
+Under this bijection, $\mathfrak{p} \leftrightarrow S^{-1}\mathfrak{p}$.
+\end{theorem}
+
+\begin{definition}[Dedekind domain]
+An integral domain $R$ is a \emph{Dedekind domain} if:
+\begin{enumerate}[label=(\roman*)]
+  \item $R$ is Noetherian,
+  \item $R$ is integrally closed in $\Frac(R)$,
+  \item Every nonzero prime ideal of $R$ is maximal (i.e., $\dim R \leq 1$).
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[Unique ideal factorization in Dedekind domains]
+In a Dedekind domain $R$, every nonzero ideal factors uniquely (up to order) into
+prime ideals:
+\[
+  I = \mathfrak{p}_1^{e_1} \cdots \mathfrak{p}_r^{e_r}.
+\]
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The key steps are: (1) every ideal contains a product of prime ideals (using
+Noetherian induction); (2) for each prime $\mathfrak{p}$, the localization $R_\mathfrak{p}$
+is a DVR (discrete valuation ring), i.e., a PID with a unique maximal ideal; and
+(3) the factorization is assembled from the local data. See \cite{Neukirch1999}.
+\end{proof}
+
+\begin{example}[Rings of integers as Dedekind domains]
+The ring of integers $\mathcal{O}_K$ of a number field $K = \mathbb{Q}(\sqrt{d})$ is
+a Dedekind domain. Its integral closure in $K$ is:
+\[
+  \mathcal{O}_K = \begin{cases}
+    \mathbb{Z}\!\left[\tfrac{1+\sqrt{d}}{2}\right] & \text{if } d \equiv 1 \pmod 4, \\
+    \mathbb{Z}[\sqrt{d}] & \text{if } d \equiv 2 \text{ or } 3 \pmod 4.
+  \end{cases}
+\]
+The \emph{class group} $\Cl(\mathcal{O}_K)$ measures the failure of $\mathcal{O}_K$
+to be a PID. One has $h(d) = |\Cl(\mathcal{O}_K)| = 1$ iff $\mathcal{O}_K$ is a PID.
+The Stark--Heegner theorem classifies all imaginary quadratic fields with $h = 1$:
+$d \in \{-1, -2, -3, -7, -11, -19, -43, -67, -163\}$.
+\end{example}
+
+% ============================================================
+\section{Noether Normalization and Integral Extensions}
+% ============================================================
+
+\begin{definition}[Integral element]
+Let $R \subseteq S$ be a ring extension. An element $s \in S$ is \emph{integral over $R$}
+if it satisfies a monic polynomial equation $s^n + a_{n-1}s^{n-1} + \cdots + a_0 = 0$
+with $a_i \in R$. The \emph{integral closure} of $R$ in $S$ is the subring
+$\bar{R} = \{s \in S \mid s \text{ integral over } R\}$.
+$R$ is \emph{integrally closed} if $\bar{R} = R$ (within $\Frac(R)$).
+\end{definition}
+
+\begin{theorem}[Noether Normalization Lemma]
+Let $k$ be a field and $A = k[x_1,\ldots,x_n]/I$ a finitely generated $k$-algebra
+($I$ an ideal). Then there exist algebraically independent elements
+$y_1,\ldots,y_d \in A$ such that $A$ is a finite (hence integral) extension of
+$k[y_1,\ldots,y_d]$. Here $d = \dim A$ is the Krull dimension of $A$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+By induction on $n$. If $I = 0$ then $A = k[x_1,\ldots,x_n]$ and $y_i = x_i$ works.
+Otherwise pick $f \in I$, $f \neq 0$. Make a change of variables $x_i' = x_i - x_1^{c^{i-1}}$
+(for suitable $c$) to ensure $f$ becomes monic in $x_1$ after this substitution.
+Then $x_1$ is integral over the smaller ring $k[x_2',\ldots,x_n']$, and one proceeds
+by induction. See \cite[Thm.~5.10]{AtiyahMacdonald1969}.
+\end{proof}
+
+\begin{corollary}
+For an affine variety $V \subseteq \mathbb{A}^n_k$ defined by an ideal $I \subseteq k[x_1,\ldots,x_n]$:
+\[
+  \dim V = \dim k[V] = \dim k[x_1,\ldots,x_n]/I.
+\]
+In particular, $\dim \mathbb{A}^n_k = n$ and $\dim$ of a hyperfläche $V(f) = n-1$.
+\end{corollary}
+
+% ============================================================
+\section{Gröbner Bases}\label{sec:groebner}
+% ============================================================
+
+Gröbner bases, introduced by Bruno Buchberger in 1965~\cite{Buchberger1970},
+provide a canonical set of generators for polynomial ideals and transform many
+ideal-membership and algebraic-variety problems into algorithmic computations.
+
+\begin{definition}[Monomial order]
+A \emph{monomial order} on $k[x_1,\ldots,x_n]$ is a total ordering $\prec$ on
+monomials $x^\alpha = x_1^{\alpha_1}\cdots x_n^{\alpha_n}$ that is compatible with
+multiplication and has $1 \prec x^\alpha$ for all $\alpha \neq 0$.
+
+Standard examples: \emph{lexicographic} (lex), \emph{graded reverse lexicographic} (grevlex),
+and \emph{graded lexicographic} (grlex).
+\end{definition}
+
+\begin{definition}[Division algorithm and Gröbner basis]
+Fix a monomial order $\prec$. For $f \in k[x_1,\ldots,x_n]$, write $\operatorname{LT}(f)$
+for the \emph{leading term} (highest monomial times its coefficient).
+A set $G = \{g_1,\ldots,g_s\} \subseteq I$ is a \emph{Gröbner basis} for the ideal
+$I$ if
+\[
+  \langle \operatorname{LT}(g_1), \ldots, \operatorname{LT}(g_s) \rangle
+  = \langle \operatorname{LT}(f) \mid f \in I \rangle.
+\]
+Equivalently, every element of $I$ reduces to $0$ modulo $G$.
+\end{definition}
+
+\begin{theorem}[Buchberger's Criterion]
+$G = \{g_1,\ldots,g_s\}$ is a Gröbner basis for $I = (G)$ iff for all $i \neq j$,
+the \emph{S-polynomial}
+\[
+  S(g_i, g_j) = \frac{\operatorname{lcm}(\operatorname{LM}(g_i), \operatorname{LM}(g_j))}{\operatorname{LT}(g_i)} g_i
+  - \frac{\operatorname{lcm}(\operatorname{LM}(g_i), \operatorname{LM}(g_j))}{\operatorname{LT}(g_j)} g_j
+\]
+reduces to $0$ modulo $G$.
+\end{theorem}
+
+\begin{algorithm}[Buchberger's Algorithm]
+\textbf{Input:} $F = \{f_1,\ldots,f_s\}$; \textbf{Output:} Gröbner basis $G$ for $(F)$.
+\begin{enumerate}
+  \item Set $G := F$.
+  \item For all pairs $\{g_i, g_j\} \subseteq G$, compute $r = \overline{S(g_i,g_j)}^G$
+        (remainder on division by $G$).
+  \item If $r \neq 0$, add $r$ to $G$ and repeat.
+  \item Return $G$.
+\end{enumerate}
+The algorithm terminates because the leading term ideal strictly increases at each step,
+and $k[x_1,\ldots,x_n]$ is Noetherian.
+\end{algorithm}
+
+\begin{theorem}[Applications of Gröbner bases]
+Given a Gröbner basis $G$ for $I$:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Ideal membership:} $f \in I$ iff $\overline{f}^G = 0$.
+  \item \textbf{Solving systems:} Eliminate variables by computing Gröbner bases
+        with lex order; the last variable satisfies a univariate polynomial.
+  \item \textbf{Dimension:} $\dim k[x_1,\ldots,x_n]/I$ equals the Krull dimension
+        computed from the leading monomial ideal.
+  \item \textbf{Hilbert function:} The number of monomials \emph{not} in
+        $\langle \operatorname{LT}(I) \rangle$ of degree $\leq d$ gives the
+        Hilbert function of $k[x_1,\ldots,x_n]/I$.
+\end{enumerate}
+\end{theorem}
+
+\begin{example}
+Consider $I = (x^2 + y - 1,\; y^2 - x) \subseteq \mathbb{Q}[x,y]$ with lex order $x \succ y$.
+Computing the Gröbner basis:
+\[
+  G = \{y^4 - y^2 + y - 1 + y^2,\; x - y^2\} \quad\text{(schematically)}.
+\]
+The lex basis exhibits $y$ satisfying a univariate polynomial, allowing solution
+of the system $\{x^2 + y = 1, y^2 = x\}$ by back-substitution.
+\end{example}
+
+% ============================================================
+\section{References}
+% ============================================================
+
+\begin{thebibliography}{10}
+
+\bibitem{AtiyahMacdonald1969}
+M.~F. Atiyah and I.~G. Macdonald.
+\newblock \textit{Introduction to Commutative Algebra}.
+\newblock Addison-Wesley, Reading, MA, 1969.
+\newblock The classic concise introduction; covers localization, Noetherian rings, and
+dimension theory.
+
+\bibitem{Lang2002}
+S.~Lang.
+\newblock \textit{Algebra}, revised 3rd ed.
+\newblock Springer, New York, 2002.
+\newblock Comprehensive reference; Gauss's lemma, Eisenstein criterion, UFDs, and
+field theory.
+
+\bibitem{Matsumura1989}
+H.~Matsumura.
+\newblock \textit{Commutative Ring Theory}.
+\newblock Cambridge Studies in Advanced Mathematics, vol.~8.
+\newblock Cambridge University Press, Cambridge, 1989.
+\newblock Advanced treatment of Noetherian/Artinian rings, dimension, flatness.
+
+\bibitem{Neukirch1999}
+J.~Neukirch.
+\newblock \textit{Algebraic Number Theory}.
+\newblock Grundlehren der mathematischen Wissenschaften, vol.~322.
+\newblock Springer, Berlin, 1999.
+\newblock Dedekind domains, ideal factorization, class groups from a number-theoretic
+perspective.
+
+\bibitem{Eisenbud1995}
+D.~Eisenbud.
+\newblock \textit{Commutative Algebra with a View toward Algebraic Geometry}.
+\newblock Graduate Texts in Mathematics, vol.~150.
+\newblock Springer, New York, 1995.
+\newblock Thorough modern treatment connecting commutative algebra and geometry;
+Gröbner bases in Chapter~15.
+
+\bibitem{CoxLittleOShea2015}
+D.~Cox, J.~Little, and D.~O'Shea.
+\newblock \textit{Ideals, Varieties, and Algorithms}, 4th ed.
+\newblock Undergraduate Texts in Mathematics.
+\newblock Springer, New York, 2015.
+\newblock Accessible introduction to Gröbner bases, Buchberger's algorithm, and
+computational algebraic geometry.
+
+\bibitem{Buchberger1970}
+B.~Buchberger.
+\newblock Ein algorithmisches Kriterium für die Lösbarkeit eines algebraischen
+Gleichungssystems.
+\newblock \textit{Aequationes Mathematicae}, 4(3):374--383, 1970.
+\newblock Original paper introducing the Buchberger algorithm.
+
+\bibitem{Noether1921}
+E.~Noether.
+\newblock Idealtheorie in Ringbereichen.
+\newblock \textit{Mathematische Annalen}, 83(1--2):24--66, 1921.
+\newblock Foundational paper establishing the axiomatic theory of ideals and the
+ascending chain condition.
+
+\bibitem{Hungerford1980}
+T.~W. Hungerford.
+\newblock \textit{Algebra}.
+\newblock Graduate Texts in Mathematics, vol.~73.
+\newblock Springer, New York, 1980.
+\newblock Good reference for isomorphism theorems, polynomial rings, and modules.
+
+\bibitem{Dummit2004}
+D.~S. Dummit and R.~M. Foote.
+\newblock \textit{Abstract Algebra}, 3rd ed.
+\newblock Wiley, Hoboken, NJ, 2004.
+\newblock Standard graduate textbook; comprehensive coverage of ring theory including
+Noetherian rings and UFDs.
+
+\end{thebibliography}
+
+\end{document}

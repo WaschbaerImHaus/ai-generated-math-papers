@@ -1,0 +1,722 @@
+% @file paper44_group_theory_en.tex
+% @brief Paper 44 (EN): Group Theory — Finite Groups, Sylow Theory,
+%        Classification, and Applications
+% @author Michael Fuhrmann
+% @date 2026-03-12
+% @build 135
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{Group Theory: Finite Groups, Sylow Theory,\\
+       Classification Theorems, and Applications}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 135}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{document}
+
+\begin{abstract}
+Group theory is the mathematical study of symmetry and its algebraic abstraction.
+This paper provides a comprehensive treatment of finite group theory, beginning with
+the fundamental definitions and the three classical isomorphism theorems. We examine
+cyclic and abelian groups, culminating in the complete classification of finite abelian
+groups via the Fundamental Theorem. Group actions, the orbit-stabilizer theorem, and
+Burnside's lemma are developed in full, followed by the Sylow theorems with complete
+proofs. Solvable and nilpotent groups are treated in connection with composition series
+and the Jordan--H\"{o}lder theorem, with applications to the insolubility of the quintic
+(Abel--Ruffini). The theory of simple groups is discussed, including the Feit--Thompson
+theorem and the Classification of Finite Simple Groups (CFSG). The final section surveys
+applications in Galois theory, crystallography, and quantum mechanics.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+%% ============================================================
+\section{Introduction}
+\label{sec:introduction}
+%% ============================================================
+
+The concept of a \emph{group} emerged in the early nineteenth century through the work
+of \'{E}variste Galois, who introduced what we now call permutation groups in order to
+characterise which polynomial equations are solvable by radicals. Independently,
+Arthur Cayley defined abstract groups in 1854, recognising that the same algebraic
+structure underlies permutations, integers under addition, symmetries of geometric
+objects, and a vast range of other mathematical phenomena.
+
+Today group theory is a cornerstone of pure mathematics and theoretical physics.
+Its applications span:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Symmetry analysis}: every physical symmetry corresponds to a group;
+        conservation laws arise via Noether's theorem from symmetry groups of the action.
+  \item \textbf{Galois theory}: the solvability of a polynomial equation by radicals is
+        equivalent to the solvability of its Galois group.
+  \item \textbf{Cryptography}: the discrete logarithm problem in finite cyclic groups and
+        elliptic curve groups underpins modern public-key cryptography.
+  \item \textbf{Crystallography}: the 17 wallpaper groups and 230 space groups classify
+        all possible crystal symmetries in the plane and in three-dimensional space.
+  \item \textbf{Quantum mechanics}: the representation theory of Lie groups such as
+        $\mathrm{SU}(2)$ and $\mathrm{SO}(3)$ determines the structure of atomic spectra
+        and the spin of elementary particles.
+\end{itemize}
+
+This paper is structured as follows. Section~\ref{sec:definitions} lays down the
+fundamental definitions. Section~\ref{sec:isomorphism} presents the three isomorphism
+theorems. Sections~\ref{sec:cyclic} and~\ref{sec:actions} treat cyclic/abelian groups
+and group actions with Sylow theory, respectively. Sections~\ref{sec:solvable}
+and~\ref{sec:simple} address solvable/nilpotent groups and simple groups.
+Section~\ref{sec:applications} surveys the most important applications.
+Section~\ref{sec:conclusion} concludes.
+
+%% ============================================================
+\section{Fundamental Definitions}
+\label{sec:definitions}
+%% ============================================================
+
+\begin{definition}[Group]
+A \emph{group} is a pair $(G, \cdot)$ consisting of a non-empty set $G$ together with
+a binary operation $\cdot : G \times G \to G$ satisfying:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Associativity}: $(a \cdot b) \cdot c = a \cdot (b \cdot c)$ for all
+        $a,b,c \in G$.
+  \item \textbf{Identity}: There exists $e \in G$ such that $e \cdot a = a \cdot e = a$
+        for all $a \in G$.
+  \item \textbf{Inverses}: For every $a \in G$ there exists $a^{-1} \in G$ such that
+        $a \cdot a^{-1} = a^{-1} \cdot a = e$.
+\end{enumerate}
+If additionally $a \cdot b = b \cdot a$ for all $a, b \in G$, the group is called
+\emph{abelian} (or \emph{commutative}). The \emph{order} $|G|$ is the cardinality of $G$.
+\end{definition}
+
+\begin{example}
+The integers $(\mathbb{Z}, +)$ form an infinite abelian group; the unit circle
+$\mathrm{U}(1) = \{z \in \mathbb{C} : |z| = 1\}$ under multiplication is an infinite
+abelian group; the symmetric group $S_n$ of all permutations of $\{1, \ldots, n\}$
+under composition is a finite group of order $n!$.
+\end{example}
+
+\begin{definition}[Subgroup]
+A non-empty subset $H \subseteq G$ is a \emph{subgroup} of $G$, written $H \leq G$,
+if $H$ is itself a group under the restriction of the operation of $G$. Equivalently,
+$H \leq G$ if and only if for all $a, b \in H$ we have $ab^{-1} \in H$.
+\end{definition}
+
+\begin{definition}[Coset and Index]
+For $H \leq G$ and $a \in G$, the \emph{left coset} of $H$ with respect to $a$ is
+$aH = \{ah : h \in H\}$. The number of distinct left cosets is the \emph{index}
+$[G : H]$.
+\end{definition}
+
+\begin{theorem}[Lagrange, 1771]
+\label{thm:lagrange}
+Let $G$ be a finite group and $H \leq G$. Then $|H|$ divides $|G|$, and
+\[
+  |G| = |H| \cdot [G : H].
+\]
+\end{theorem}
+
+\begin{proof}
+The left cosets of $H$ partition $G$ into $[G:H]$ disjoint sets each of size $|H|$.
+Counting gives $|G| = [G:H] \cdot |H|$.
+\end{proof}
+
+\begin{corollary}
+The order of any element $a \in G$ divides $|G|$.
+\end{corollary}
+
+\begin{definition}[Normal Subgroup and Quotient Group]
+A subgroup $N \leq G$ is \emph{normal}, written $N \trianglelefteq G$, if
+$gNg^{-1} = N$ for all $g \in G$. If $N \trianglelefteq G$, the set of cosets
+$G/N = \{gN : g \in G\}$ forms a group under $(aN)(bN) = (ab)N$, called the
+\emph{quotient group} (or \emph{factor group}) of $G$ by $N$.
+\end{definition}
+
+\begin{definition}[Homomorphism and Isomorphism]
+A map $\varphi : G \to H$ between groups is a \emph{homomorphism} if
+$\varphi(ab) = \varphi(a)\varphi(b)$ for all $a,b \in G$. The \emph{kernel}
+of $\varphi$ is $\ker\varphi = \{g \in G : \varphi(g) = e_H\}$ and the
+\emph{image} is $\mathrm{im}\,\varphi = \{\varphi(g) : g \in G\}$.
+A bijective homomorphism is an \emph{isomorphism}; we write $G \cong H$ if
+an isomorphism between $G$ and $H$ exists.
+\end{definition}
+
+\begin{proposition}
+If $\varphi : G \to H$ is a homomorphism, then $\ker\varphi \trianglelefteq G$
+and $\mathrm{im}\,\varphi \leq H$.
+\end{proposition}
+
+%% ============================================================
+\section{The Isomorphism Theorems}
+\label{sec:isomorphism}
+%% ============================================================
+
+The three isomorphism theorems are among the most useful structural results in group
+theory. They were first stated in their modern form by Emmy Noether in 1927.
+
+\begin{theorem}[First Isomorphism Theorem]
+\label{thm:first_iso}
+Let $\varphi : G \to H$ be a group homomorphism. Then $\ker\varphi \trianglelefteq G$
+and
+\[
+  G / \ker\varphi \;\cong\; \mathrm{im}\,\varphi.
+\]
+The isomorphism is given explicitly by $g\ker\varphi \mapsto \varphi(g)$.
+\end{theorem}
+
+\begin{proof}
+We already know $K := \ker\varphi \trianglelefteq G$.
+Define $\tilde\varphi : G/K \to H$ by $\tilde\varphi(gK) = \varphi(g)$.
+This is well-defined: if $gK = g'K$ then $g'^{-1}g \in K$, so
+$\varphi(g'^{-1}g) = e_H$, giving $\varphi(g) = \varphi(g')$.
+It is a homomorphism since $\tilde\varphi((gK)(g'K)) = \varphi(gg') = \varphi(g)\varphi(g')$.
+It is injective: $\tilde\varphi(gK) = e_H$ implies $g \in K$, i.e.\ $gK = K = e_{G/K}$.
+It is surjective onto $\mathrm{im}\,\varphi$ by construction.
+\end{proof}
+
+\begin{remark}
+The First Isomorphism Theorem is also called the \emph{Homomorphism Theorem}
+(German: \emph{Homomorphiesatz}). It reduces the classification of homomorphic images of
+$G$ to the classification of normal subgroups of $G$.
+\end{remark}
+
+\begin{theorem}[Second Isomorphism Theorem]
+\label{thm:second_iso}
+Let $H \leq G$ and $N \trianglelefteq G$. Then $HN = \{hn : h \in H,\, n \in N\}$
+is a subgroup of $G$, $H \cap N \trianglelefteq H$, and
+\[
+  H / (H \cap N) \;\cong\; HN / N.
+\]
+\end{theorem}
+
+\begin{proof}
+One verifies that $HN$ is a subgroup using normality of $N$. The natural map
+$\varphi : H \to HN/N$ defined by $\varphi(h) = hN$ is a surjective homomorphism
+with kernel $H \cap N$. The result follows from Theorem~\ref{thm:first_iso}.
+\end{proof}
+
+\begin{theorem}[Third Isomorphism Theorem]
+\label{thm:third_iso}
+Let $N \trianglelefteq G$ and $K \trianglelefteq G$ with $K \leq N$. Then
+$N/K \trianglelefteq G/K$ and
+\[
+  (G/K) / (N/K) \;\cong\; G/N.
+\]
+\end{theorem}
+
+\begin{proof}
+The map $\varphi : G/K \to G/N$ defined by $\varphi(gK) = gN$ is a well-defined
+surjective homomorphism with kernel $N/K$. Apply Theorem~\ref{thm:first_iso}.
+\end{proof}
+
+\begin{corollary}[Correspondence Theorem]
+Let $N \trianglelefteq G$. There is a bijective, inclusion-preserving correspondence
+between subgroups of $G/N$ and subgroups of $G$ containing $N$. This correspondence
+preserves normality.
+\end{corollary}
+
+%% ============================================================
+\section{Cyclic Groups and Abelian Groups}
+\label{sec:cyclic}
+%% ============================================================
+
+\begin{definition}[Cyclic Group]
+A group $G$ is \emph{cyclic} if there exists $g \in G$ such that every element of
+$G$ is a power of $g$: $G = \langle g \rangle = \{g^k : k \in \mathbb{Z}\}$.
+\end{definition}
+
+\begin{theorem}
+Every cyclic group is abelian. Moreover:
+\begin{enumerate}[label=(\roman*)]
+  \item Every infinite cyclic group is isomorphic to $(\mathbb{Z}, +)$.
+  \item Every finite cyclic group of order $n$ is isomorphic to $\mathbb{Z}/n\mathbb{Z}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}
+Every subgroup of a cyclic group is cyclic. If $G = \langle g \rangle$ has order $n$,
+then the subgroups of $G$ are exactly $\langle g^d \rangle$ for $d \mid n$, and each
+subgroup has order $n/d$. In particular, $G$ has exactly one subgroup of each order
+dividing $n$.
+\end{theorem}
+
+\begin{theorem}[Fundamental Theorem of Finite Abelian Groups]
+\label{thm:ftfag}
+Every finite abelian group $G$ is isomorphic to a direct product of cyclic groups of
+prime-power order:
+\[
+  G \;\cong\; \mathbb{Z}_{p_1^{a_1}} \times \mathbb{Z}_{p_2^{a_2}} \times \cdots
+              \times \mathbb{Z}_{p_k^{a_k}},
+\]
+where $p_1^{a_1} p_2^{a_2} \cdots p_k^{a_k} = |G|$.
+This decomposition is unique up to the ordering of the factors (invariant factor
+decomposition).
+\end{theorem}
+
+\begin{example}
+Up to isomorphism, the abelian groups of order $72 = 2^3 \cdot 3^2$ are:
+\begin{align*}
+  &\mathbb{Z}_8 \times \mathbb{Z}_9,\quad
+   \mathbb{Z}_4 \times \mathbb{Z}_2 \times \mathbb{Z}_9,\quad
+   \mathbb{Z}_2^3 \times \mathbb{Z}_9,\\
+  &\mathbb{Z}_8 \times \mathbb{Z}_3 \times \mathbb{Z}_3,\quad
+   \mathbb{Z}_4 \times \mathbb{Z}_2 \times \mathbb{Z}_3 \times \mathbb{Z}_3,\quad
+   \mathbb{Z}_2^3 \times \mathbb{Z}_3^2.
+\end{align*}
+There are exactly 6 non-isomorphic abelian groups of order 72.
+\end{example}
+
+\begin{theorem}[Chinese Remainder Theorem for Groups]
+If $\gcd(m,n) = 1$, then $\mathbb{Z}_{mn} \cong \mathbb{Z}_m \times \mathbb{Z}_n$.
+\end{theorem}
+
+%% ============================================================
+\section{Group Actions and Sylow Theory}
+\label{sec:actions}
+%% ============================================================
+
+\subsection{Group Actions}
+
+\begin{definition}[Group Action]
+A \emph{(left) action} of a group $G$ on a set $X$ is a map
+$G \times X \to X$, $(g,x) \mapsto g \cdot x$, satisfying:
+\begin{enumerate}[label=(\roman*)]
+  \item $e \cdot x = x$ for all $x \in X$,
+  \item $(gh) \cdot x = g \cdot (h \cdot x)$ for all $g,h \in G$, $x \in X$.
+\end{enumerate}
+\end{definition}
+
+\begin{definition}[Orbit and Stabilizer]
+For $x \in X$, the \emph{orbit} of $x$ is $G \cdot x = \{g \cdot x : g \in G\}$,
+and the \emph{stabilizer} (or isotropy group) of $x$ is
+$G_x = \{g \in G : g \cdot x = x\} \leq G$.
+\end{definition}
+
+\begin{theorem}[Orbit-Stabilizer Theorem]
+\label{thm:orbit_stab}
+For any group action of a finite group $G$ on $X$ and any $x \in X$,
+\[
+  |G \cdot x| \cdot |G_x| = |G|.
+\]
+\end{theorem}
+
+\begin{theorem}[Burnside's Lemma, 1897]
+\label{thm:burnside}
+Let $G$ act on a finite set $X$. The number of distinct orbits is
+\[
+  |X/G| = \frac{1}{|G|} \sum_{g \in G} |X^g|,
+\]
+where $X^g = \{x \in X : g \cdot x = x\}$ denotes the set of fixed points of $g$.
+\end{theorem}
+
+\begin{example}[Necklace Counting]
+We count the number of distinct necklaces with 6 beads each coloured one of $c$
+colours, where rotations are considered equivalent. The rotation group $G = \mathbb{Z}_6$
+acts on the set $X$ of all coloured sequences ($|X| = c^6$).
+By Burnside's lemma the number of distinct necklaces is
+\[
+  N(c) = \frac{1}{6}\bigl(c^6 + c^3 + 2c^2 + 2c\bigr).
+\]
+For $c = 2$ this gives $N(2) = \tfrac{1}{6}(64 + 8 + 8 + 4) = 14$.
+\end{example}
+
+\subsection{Sylow Theory}
+
+The Sylow theorems, proved by Ludwig Sylow in 1872, are the primary tool for understanding
+the subgroup structure of finite groups.
+
+\begin{definition}[Sylow $p$-Subgroup]
+Let $G$ be a finite group and $p$ a prime with $p^k \mid |G|$ but $p^{k+1} \nmid |G|$.
+A subgroup $P \leq G$ with $|P| = p^k$ is called a \emph{Sylow $p$-subgroup} of $G$.
+We write $n_p(G)$ for the number of Sylow $p$-subgroups.
+\end{definition}
+
+\begin{theorem}[Sylow's First Theorem]
+\label{thm:sylow1}
+Let $G$ be a finite group, $p$ a prime, and $p^k \mid |G|$. Then $G$ contains a
+subgroup of order $p^k$. In particular, Sylow $p$-subgroups exist.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+By induction on $|G|$. If $p \nmid [G:Z(G)]$, then $p \mid |Z(G)|$ and Cauchy's theorem
+gives an element of order $p$ in the centre. Proceed inductively. In the general case,
+use the class equation $|G| = |Z(G)| + \sum [G:C_G(x)]$ and apply induction to a
+proper subgroup.
+\end{proof}
+
+\begin{theorem}[Sylow's Second Theorem]
+\label{thm:sylow2}
+All Sylow $p$-subgroups of $G$ are conjugate: for any two Sylow $p$-subgroups $P$
+and $Q$ there exists $g \in G$ with $Q = gPg^{-1}$.
+\end{theorem}
+
+\begin{theorem}[Sylow's Third Theorem]
+\label{thm:sylow3}
+The number $n_p = n_p(G)$ of Sylow $p$-subgroups satisfies:
+\begin{enumerate}[label=(\roman*)]
+  \item $n_p \equiv 1 \pmod{p}$,
+  \item $n_p \mid [G : P] = |G|/p^k$.
+\end{enumerate}
+In particular $n_p = 1$ if and only if the unique Sylow $p$-subgroup is normal in $G$.
+\end{theorem}
+
+\begin{example}[Groups of Order 15]
+Let $|G| = 15 = 3 \cdot 5$. Then $n_3 \mid 5$ and $n_3 \equiv 1 \pmod{3}$, so
+$n_3 = 1$. Similarly $n_5 = 1$. Both Sylow subgroups are normal, so
+$G \cong \mathbb{Z}_3 \times \mathbb{Z}_5 \cong \mathbb{Z}_{15}$. There is only one
+group of order 15, and it is cyclic.
+\end{example}
+
+\begin{corollary}[Cauchy's Theorem]
+If $p$ is a prime and $p \mid |G|$, then $G$ contains an element of order $p$.
+\end{corollary}
+
+%% ============================================================
+\section{Solvable and Nilpotent Groups}
+\label{sec:solvable}
+%% ============================================================
+
+\subsection{Composition Series and Jordan--H\"{o}lder}
+
+\begin{definition}[Composition Series]
+A \emph{composition series} for $G$ is a chain of subgroups
+\[
+  1 = G_0 \trianglelefteq G_1 \trianglelefteq \cdots \trianglelefteq G_n = G
+\]
+such that each quotient $G_{i+1}/G_i$ is simple (non-trivial with no proper normal
+subgroups). The quotients $G_{i+1}/G_i$ are the \emph{composition factors}.
+\end{definition}
+
+\begin{theorem}[Jordan--H\"{o}lder Theorem]
+\label{thm:jordan_holder}
+If $G$ has a composition series, then any two composition series of $G$ have the same
+length, and their composition factors are the same up to permutation and isomorphism.
+\end{theorem}
+
+\subsection{Solvable Groups}
+
+\begin{definition}[Derived Series and Solvability]
+The \emph{derived series} (or commutator series) of $G$ is
+\[
+  G = G^{(0)} \geq G^{(1)} \geq G^{(2)} \geq \cdots,
+  \quad G^{(i+1)} = [G^{(i)}, G^{(i)}],
+\]
+where $[H, K]$ denotes the subgroup generated by all commutators $[h,k] = hkh^{-1}k^{-1}$.
+The group $G$ is \emph{solvable} (or \emph{soluble}) if $G^{(n)} = 1$ for some $n$.
+\end{definition}
+
+\begin{theorem}
+A finite group $G$ is solvable if and only if all composition factors in any composition
+series of $G$ are cyclic of prime order.
+\end{theorem}
+
+\begin{theorem}[Abel--Ruffini Theorem, 1824]
+\label{thm:abel_ruffini}
+For $n \geq 5$, the symmetric group $S_n$ is \emph{not} solvable (since
+$A_n$ is simple and non-abelian). Consequently, a generic polynomial equation of
+degree $\geq 5$ cannot be solved by radicals.
+\end{theorem}
+
+\begin{proof}[Connection to Galois theory]
+A polynomial $f \in \mathbb{Q}[x]$ is solvable by radicals if and only if its Galois
+group $\mathrm{Gal}(f)$ is solvable. For the general polynomial of degree $n \geq 5$,
+$\mathrm{Gal}(f) \cong S_n$, which contains the simple non-abelian subgroup $A_n$.
+Hence $S_n$ is not solvable for $n \geq 5$.
+\end{proof}
+
+\subsection{Nilpotent Groups}
+
+\begin{definition}[Lower Central Series and Nilpotency]
+The \emph{lower central series} of $G$ is
+\[
+  G = \gamma_1(G) \geq \gamma_2(G) \geq \cdots,
+  \quad \gamma_{i+1}(G) = [G, \gamma_i(G)].
+\]
+$G$ is \emph{nilpotent} of \emph{class} $c$ if $\gamma_{c+1}(G) = 1$ but
+$\gamma_c(G) \neq 1$.
+\end{definition}
+
+\begin{theorem}
+Every nilpotent group is solvable. A finite group is nilpotent if and only if it is
+the direct product of its Sylow $p$-subgroups. In particular, every finite $p$-group
+(group of prime power order) is nilpotent.
+\end{theorem}
+
+%% ============================================================
+\section{Simple Groups}
+\label{sec:simple}
+%% ============================================================
+
+\begin{definition}[Simple Group]
+A group $G$ with $|G| > 1$ is \emph{simple} if its only normal subgroups are $1$ and
+$G$ itself.
+\end{definition}
+
+\begin{theorem}[$A_n$ is Simple for $n \geq 5$]
+\label{thm:an_simple}
+The alternating group $A_n$ is simple for all $n \geq 5$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Every non-trivial normal subgroup of $A_n$ must contain a $3$-cycle (using the fact
+that $A_n$ is generated by $3$-cycles and conjugacy class arguments). Any normal
+subgroup containing one $3$-cycle contains all $3$-cycles, hence equals $A_n$.
+\end{proof}
+
+\subsection{The Projective Special Linear Groups}
+
+\begin{definition}
+For a prime power $q = p^r$ and $n \geq 1$, the \emph{projective special linear group}
+$\mathrm{PSL}(n, q)$ is the quotient $\mathrm{SL}(n, q) / Z(\mathrm{SL}(n,q))$, where
+$\mathrm{SL}(n,q)$ is the group of $n \times n$ matrices over $\mathbb{F}_q$ with
+determinant~1.
+\end{definition}
+
+\begin{theorem}
+For $n \geq 2$ and $q$ a prime power, $\mathrm{PSL}(n, q)$ is simple, except for
+$\mathrm{PSL}(2, 2) \cong S_3$ and $\mathrm{PSL}(2, 3) \cong A_4$.
+The groups $\mathrm{PSL}(2, q)$ for prime powers $q \geq 4$ are infinite families of
+non-abelian simple groups.
+\end{theorem}
+
+\subsection{The Feit--Thompson Theorem and CFSG}
+
+\begin{theorem}[Feit--Thompson Theorem, 1963]
+\label{thm:feit_thompson}
+Every finite group of odd order is solvable.
+\end{theorem}
+
+\begin{remark}
+The Feit--Thompson theorem occupies an entire volume of the \emph{Pacific Journal of
+Mathematics} (255 pages). Its proof is a tour de force of representation theory,
+character theory, and combinatorial group theory. As an immediate consequence, every
+non-abelian finite simple group has even order.
+\end{remark}
+
+\begin{theorem}[Classification of Finite Simple Groups (CFSG), 2004]
+\label{thm:cfsg}
+Every finite simple group belongs to one of the following families:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Cyclic groups} $\mathbb{Z}_p$ for prime $p$.
+  \item \textbf{Alternating groups} $A_n$ for $n \geq 5$.
+  \item \textbf{Groups of Lie type}: 16 infinite families, including
+        $\mathrm{PSL}(n,q)$, $\mathrm{PSp}(2n,q)$, $\mathrm{P}\Omega^{\pm}(n,q)$,
+        $G_2(q)$, $F_4(q)$, $E_6(q)$, $E_7(q)$, $E_8(q)$, and the twisted variants
+        ${}^2A_n(q)$, ${}^2D_n(q)$, ${}^3D_4(q)$, ${}^2G_2(q)$, ${}^2F_4(q)$,
+        ${}^2E_6(q)$, ${}^2B_2(q)$.
+  \item \textbf{26 sporadic groups}: including the Monster group $\mathbb{M}$
+        (order $\approx 8 \times 10^{53}$), the Baby Monster, and the 20
+        ``Happy Family'' members related to the Monster via moonshine.
+\end{enumerate}
+\end{theorem}
+
+\begin{remark}
+The proof of the CFSG was completed around 1983 with major contributions by Gorenstein,
+Lyons, Solomon, Aschbacher, Smith, and many others. A revised and complete proof,
+the ``second generation'' classification, was finished in 2004 in a 12-volume series.
+The proof spans over 10,000 pages across hundreds of journal articles.
+\end{remark}
+
+\begin{theorem}[Monster Group]
+The \emph{Monster group} $\mathbb{M}$ is the largest sporadic simple group. Its order is
+\begin{align*}
+  |\mathbb{M}| &= 2^{46} \cdot 3^{20} \cdot 5^9 \cdot 7^6 \cdot 11^2 \cdot 13^3
+                  \cdot 17 \cdot 19 \cdot 23 \cdot 29 \cdot 31 \cdot 41 \cdot 47
+                  \cdot 59 \cdot 71\\
+               &\approx 8.08 \times 10^{53}.
+\end{align*}
+\end{theorem}
+
+%% ============================================================
+\section{Applications}
+\label{sec:applications}
+%% ============================================================
+
+\subsection{Galois Theory}
+
+Group theory and field theory are linked through Galois theory, one of the most beautiful
+chapters of mathematics.
+
+\begin{theorem}[Fundamental Theorem of Galois Theory]
+\label{thm:galois_fund}
+Let $L/K$ be a finite Galois extension with Galois group $\mathrm{Gal}(L/K)$. There
+is an inclusion-reversing bijection between intermediate fields $K \subseteq F \subseteq L$
+and subgroups $H \leq \mathrm{Gal}(L/K)$:
+\[
+  F \;\longleftrightarrow\; H = \mathrm{Gal}(L/F), \quad
+  [L : F] = |H|, \quad [F : K] = [\mathrm{Gal}(L/K) : H].
+\]
+Moreover, $F/K$ is Galois if and only if $H \trianglelefteq \mathrm{Gal}(L/K)$, in
+which case $\mathrm{Gal}(F/K) \cong \mathrm{Gal}(L/K)/H$.
+\end{theorem}
+
+\begin{example}
+The splitting field of $x^4 - 2$ over $\mathbb{Q}$ is $L = \mathbb{Q}(\sqrt[4]{2},i)$,
+with $\mathrm{Gal}(L/\mathbb{Q}) \cong D_4$ (dihedral group of order 8). The subgroup
+lattice of $D_4$ corresponds bijectively to the 10 intermediate fields between
+$\mathbb{Q}$ and $L$.
+\end{example}
+
+\subsection{Crystallographic Groups}
+
+\begin{definition}
+A \emph{space group} is a discrete subgroup $\Gamma$ of the Euclidean group
+$\mathrm{E}(3)$ such that the quotient $\mathbb{R}^3/\Gamma$ is compact. The
+\emph{point group} is the image of $\Gamma$ in $\mathrm{O}(3)$.
+\end{definition}
+
+\begin{theorem}[Crystallographic Restriction Theorem]
+In dimension 2, a crystallographic group (wallpaper group) can contain only rotational
+symmetries of order $2, 3, 4$, or $6$. There are exactly $17$ wallpaper groups and
+exactly $230$ space groups in three dimensions.
+\end{theorem}
+
+\begin{remark}
+The 230 space groups, classified independently by Fedorov (1891) and Sch\"{o}nflies
+(1891), form the mathematical foundation of crystallography. Modern crystal structure
+determination via X-ray diffraction exploits this classification at every step.
+\end{remark}
+
+\subsection{Quantum Mechanics: \texorpdfstring{$\mathrm{SU}(2)$}{SU(2)} and
+            \texorpdfstring{$\mathrm{SO}(3)$}{SO(3)}}
+
+\begin{definition}
+The \emph{special unitary group}
+$\mathrm{SU}(2) = \{A \in \mathrm{M}_{2}(\mathbb{C}) : A^\dagger A = I,\, \det A = 1\}$
+and the \emph{rotation group}
+$\mathrm{SO}(3) = \{R \in \mathrm{M}_3(\mathbb{R}) : R^T R = I,\, \det R = 1\}$
+are Lie groups related by the double cover $\mathrm{SU}(2) \twoheadrightarrow \mathrm{SO}(3)$
+with kernel $\{\pm I\}$.
+\end{definition}
+
+\begin{theorem}
+The irreducible complex representations of $\mathrm{SU}(2)$ are parametrised by
+non-negative half-integers $j \in \{0, \frac{1}{2}, 1, \frac{3}{2}, 2, \ldots\}$
+and have dimension $2j+1$. The representations descend to $\mathrm{SO}(3)$ if and only
+if $j$ is an integer.
+\end{theorem}
+
+\begin{remark}
+In quantum mechanics, $j$ is the \emph{spin} quantum number. Electrons, protons, and
+neutrons are spin-$\frac{1}{2}$ particles, transforming under the $2$-dimensional
+representation of $\mathrm{SU}(2)$. Photons are spin-$1$ particles, transforming under
+$\mathrm{SO}(3)$. The Wigner $3j$-symbols that appear in angular momentum coupling are
+the Clebsch--Gordan coefficients for the decomposition
+$j_1 \otimes j_2 = |j_1 - j_2| \oplus \cdots \oplus (j_1 + j_2)$.
+\end{remark}
+
+\subsection{Cryptography: Discrete Logarithm Groups}
+
+\begin{definition}
+Let $G = \langle g \rangle$ be a finite cyclic group of order $n$. The
+\emph{discrete logarithm problem (DLP)} is: given $h \in G$, find $x \in \mathbb{Z}$
+with $g^x = h$.
+\end{definition}
+
+\begin{remark}
+For carefully chosen groups (e.g.\ prime-order subgroups of $(\mathbb{Z}/p\mathbb{Z})^*$
+or points on elliptic curves over finite fields), no polynomial-time classical algorithm
+for the DLP is known. This hardness assumption underlies the security of protocols such
+as Diffie--Hellman key exchange, ElGamal encryption, and ECDSA signatures. Shor's quantum
+algorithm solves the DLP in polynomial time on a quantum computer, motivating the
+transition to post-quantum cryptography.
+\end{remark}
+
+%% ============================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%% ============================================================
+
+We have surveyed the core of finite group theory: from the basic axioms through the
+isomorphism theorems and the classification of finite abelian groups, to the powerful
+tools of Sylow theory and the structural results on solvable and nilpotent groups. The
+Jordan--H\"{o}lder theorem asserts that composition factors are a group-theoretic
+invariant, and the Abel--Ruffini theorem shows how solvability of groups translates
+directly into solvability of equations by radicals.
+
+The Classification of Finite Simple Groups (CFSG), one of the greatest collective
+achievements in the history of mathematics, provides a complete list of the
+``atoms'' from which all finite groups are built. The Feit--Thompson theorem, that
+every odd-order finite group is solvable, is a deep prerequisite for the CFSG.
+
+Applications of group theory permeate mathematics and physics. Galois theory uses group
+theory to answer ancient questions about polynomial equations. Crystallographic groups
+govern the structure of all known crystals. The representation theory of $\mathrm{SU}(2)$
+and $\mathrm{SO}(3)$ underpins the quantum theory of angular momentum and spin. Cyclic
+groups and their analogues form the backbone of modern public-key cryptography.
+
+Open directions include the moonshine conjectures connecting the Monster group to modular
+forms (Borcherds' proof of the Conway--Norton moonshine conjecture, 1992), the Baum--
+Connes conjecture relating group $K$-theory to analysis, and the Langlands programme,
+which unifies group-theoretic, number-theoretic, and geometric structures through the
+representation theory of reductive groups.
+
+%% ============================================================
+\section*{References}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Artin2011}
+M.~Artin, \emph{Algebra}, 2nd ed., Pearson, 2011.
+
+\bibitem{Dummit2004}
+D.~S.~Dummit and R.~M.~Foote, \emph{Abstract Algebra}, 3rd ed.,
+Wiley, Hoboken, NJ, 2004.
+
+\bibitem{Rotman2012}
+J.~J.~Rotman, \emph{Advanced Modern Algebra}, 3rd ed., American Mathematical
+Society, Providence, RI, 2010.
+
+\bibitem{FeitThompson1963}
+W.~Feit and J.~G.~Thompson, ``Solvability of groups of odd order,''
+\emph{Pacific J.\ Math.}\ \textbf{13} (1963), no.~3, 775--1029.
+
+\bibitem{Sylow1872}
+L.~Sylow, ``Th\'{e}or\`{e}mes sur les groupes de substitutions,''
+\emph{Math.\ Ann.}\ \textbf{5} (1872), 584--594.
+
+\bibitem{Gorenstein1982}
+D.~Gorenstein, \emph{Finite Simple Groups: An Introduction to Their
+Classification}, Plenum Press, New York, 1982.
+
+\bibitem{Conway1985}
+J.~H.~Conway and N.~J.~A.~Sloane, \emph{Sphere Packings, Lattices and Groups},
+Springer, New York, 1988.
+
+\bibitem{Hall1959}
+M.~Hall, \emph{The Theory of Groups}, Macmillan, New York, 1959.
+
+\bibitem{Serre1977}
+J.-P.~Serre, \emph{Linear Representations of Finite Groups}, Springer, New York,
+1977.
+
+\bibitem{Aschbacher2004}
+M.~Aschbacher, R.~Lyons, S.~D.~Smith, and R.~Solomon,
+\emph{The Classification of Finite Simple Groups: Groups of Characteristic 2 Type},
+Amer.\ Math.\ Soc., 2011.
+
+\end{thebibliography}
+
+\end{document}
