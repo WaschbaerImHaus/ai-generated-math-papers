@@ -1,0 +1,591 @@
+%%
+%% paper77_conway_knoten_de.tex
+%% Autor: Michael Fuhrmann
+%% Projekt: Specialist Mathematics Project
+%% Thema: Conway's Knoten und das Schnittigkeitsproblem in der Knotentheorie
+%% Sprache: Deutsch
+%% Erstellt: 2026-03-12
+%% Letzte Änderung: 2026-03-12
+%% Build: 164
+%%
+%% Beschreibung:
+%%   Deutschsprachige Version von Paper 77. Der Conway-Knoten (11 Kreuzungen)
+%%   war jahrzehntelang das einzige primäre Knoten mit ≤ 12 Kreuzungen,
+%%   dessen glatte Konkordanzklasse unbekannt war. Lisa Piccirillo bewies
+%%   2020, dass der Conway-Knoten NICHT glatt scheibig ist. Die topologische
+%%   Schnittigkeit bleibt offen.
+%%
+
+\documentclass[12pt,a4paper]{amsart}
+
+%% Pakete für Mathematik, Layout, Encoding und Links
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem-Umgebungen (englisch für Nummerierung)
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+
+%% Deutsche Theorem-Umgebungen
+\newtheorem{satz}[theorem]{Satz}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{vermutung}[theorem]{Vermutung}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{definition_de}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+
+\theoremstyle{remark}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+
+%% Mathematische Operatoren
+\DeclareMathOperator{\Arf}{Arf}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\rank}{rank}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+
+%% Hyperref-Konfiguration
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue,
+    pdftitle={Conway-Knoten und das Schnittigkeitsproblem in der Knotentheorie},
+    pdfauthor={Michael Fuhrmann}
+}
+
+%% -------------------------------------------------------------------------
+%% Abstract VOR \maketitle
+%% -------------------------------------------------------------------------
+\begin{abstract}
+Der Conway-Knoten $C$, ein Knoten mit 11 Kreuzungen entdeckt von John Horton
+Conway, ist das Mutant des Kinoshita-Terasaka-Knotens. Jahrzehntelang war
+er der einzige primäre Knoten mit höchstens 12 Kreuzungen, dessen glatte
+Konkordanzklasse unbekannt war. Im Jahr 2020 löste Lisa Piccirillo~\cite{Piccirillo2020}
+dieses Problem: Sie bewies, dass $C$ \emph{nicht} glatt scheibig ist,
+mit einer bemerkenswerten Konstruktion — einem Knoten $K'$ mit demselben
+Null-Chirurgie-Ergebnis wie $C$, aber nichtverschwinden\-dem Rasmussen
+$s$-Invariant.
+
+Wir präsentieren die Konkordanzgruppe $\mathcal{C}$, die Unterscheidung
+zwischen topologischer und glatter Schnittigkeit, die relevanten
+Konkordanzinvarianten (Arf-Invariante, Rasmussen $s$-Invariante,
+Heegaard-Floer $\tau$-Invariante), Piccirillo's Beweis im Detail und
+die verbleibenden offenen Fragen — insbesondere, ob der Conway-Knoten
+topologisch scheibig ist.
+\end{abstract}
+
+\title{Conway-Knoten und das Schnittigkeitsproblem\\
+in der Knotentheorie}
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 165}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\maketitle
+
+%% -------------------------------------------------------------------------
+\section{Einleitung}
+%% -------------------------------------------------------------------------
+
+Knotenkonkordanz ist eines der zentralen Themen der niedrig-dimensionalen
+Topologie. Zwei orientierte Knoten $K_0, K_1 \subset S^3$ sind
+\emph{glatt konkordant}, falls eine glatt eingebettete Fläche
+$A \cong S^1 \times [0,1]$ in $S^3 \times [0,1]$ existiert mit
+$\partial A = K_1 \times \{1\} \cup (-K_0) \times \{0\}$. Konkordanzklassen
+bilden eine Gruppe $\mathcal{C}$ unter Zusammenheftung $\#$, die
+\emph{glatte Konkordanzgruppe}.
+
+Ein Knoten ist \emph{scheibig} (engl.\ \emph{slice}), wenn er konkordant
+zum trivialen Knoten ist, äquivalent wenn er eine glatt eingebettete Scheibe
+$D^2 \hookrightarrow B^4$ berandet. Der Unterschied zwischen
+\emph{topologisch scheibig} und \emph{glatt scheibig} ist eine der
+tiefgreifendsten Manifestationen des Unterschieds zwischen topologischer und
+glatter Kategorie in Dimension 4.
+
+Der \emph{Conway-Knoten} $C$ (bezeichnet $11n34$ in der Rolfsen-Tabelle~\cite{Rolfsen1976})
+ist das Mutant des Kinoshita-Terasaka-Knotens $KT$ ($11n42$), erhalten durch
+Ausschneiden entlang einer Conway-Sphäre und Wiederverkleben mit einer
+$180°$-Rotation. Der Conway-Knoten erfüllt alle bekannten notwendigen
+Bedingungen für glatte Schnittigkeit: seine Arf-Invariante verschwindet,
+sein Alexanderpolynom erfüllt die Fox-Milnor-Faktorisierung, und er ist
+algebraisch scheibig. Dennoch blieb seine glatte Konkordanzklasse
+jahrzehntelang unbekannt.
+
+In einem wegweisenden Paper~\cite{Piccirillo2020} bewies Lisa Piccirillo (2020):
+
+\begin{satz}[Piccirillo 2020~\cite{Piccirillo2020}]
+\label{satz:Piccirillo}
+Der Conway-Knoten ist nicht glatt scheibig.
+\end{satz}
+
+%% -------------------------------------------------------------------------
+\section{Konkordanz und Schnittigkeit}
+%% -------------------------------------------------------------------------
+
+\subsection{Die Konkordanzgruppe}
+
+\begin{definition_de}[Knotenkonkordanz]
+Zwei orientierte Knoten $K_0, K_1 \subset S^3$ sind \emph{glatt konkordant},
+$K_0 \sim K_1$, falls eine glatte eigentliche Einbettung
+$f \colon S^1 \times [0,1] \hookrightarrow S^3 \times [0,1]$
+existiert mit $f(S^1 \times \{i\}) = K_i$ für $i = 0, 1$.
+\end{definition_de}
+
+\begin{satz}[Fox-Milnor~\cite{FoxMilnor1966}]
+Die Konkordanzklassen orientierter Knoten in $S^3$ bilden eine abelsche
+Gruppe $\mathcal{C}$ unter $\#$, die \emph{glatte Konkordanzgruppe}.
+Das neutrale Element ist die Klasse des trivialen Knotens. Das Inverse von
+$[K]$ ist $[-K]$ (das Spiegelbild mit umgekehrter Orientierung).
+\end{satz}
+
+\subsection{Topologisch vs.\ glatt scheibig}
+
+\begin{definition_de}[Topologisch und glatt scheibig]
+Ein Knoten $K \subset S^3$ ist:
+\begin{enumerate}[label=\roman*)]
+\item \emph{glatt scheibig}, falls er eine glatt eingebettete Scheibe
+      $D^2 \hookrightarrow B^4$ berandet;
+\item \emph{topologisch scheibig}, falls er eine lokal flache topologisch
+      eingebettete Scheibe $D^2 \hookrightarrow B^4$ berandet.
+\end{enumerate}
+Jeder glatt scheibige Knoten ist topologisch scheibig. Die Umkehrung gilt
+nicht: es gibt topologisch, aber nicht glatt scheibige Knoten.
+\end{definition_de}
+
+%% -------------------------------------------------------------------------
+\section{Der Conway-Knoten und sein Mutant}
+%% -------------------------------------------------------------------------
+
+\subsection{Conway-Sphären und Mutation}
+
+\begin{definition_de}[Conway-Sphäre und Mutation]
+Eine \emph{Conway-Sphäre} in $S^3 \setminus K$ ist eine eingebettete
+$2$-Sphäre, die $K$ in genau 4 Punkten trifft und $K$ in zwei $2$-Tangles
+zerlegt. Das \emph{Mutant} $K^m$ von $K$ entsteht durch Ausschneiden entlang
+der Conway-Sphäre und Wiederverkleben mittels einer Involution (Rotation um
+$180°$ um eine waagrechte oder senkrechte Achse).
+\end{definition_de}
+
+\begin{satz}
+Folgende Konkordanzinvarianten sind unter Mutation erhalten:
+\begin{enumerate}[label=\roman*)]
+\item Alexanderpolynom $\Delta_K(t)$;
+\item Signatur $\sigma(K)$;
+\item Arf-Invariante $\Arf(K)$;
+\item Determinante $\det(K) = |\Delta_K(-1)|$.
+\end{enumerate}
+\end{satz}
+
+Da der Kinoshita-Terasaka-Knoten $KT$ scheibig ist (er berandet eine
+Bandscheibe in $B^4$~\cite{KinoshitaTerasaka1957}), verschwinden all diese
+Invarianten für $KT$ und damit auch für sein Mutant $C$.
+
+\begin{proposition}
+Der Conway-Knoten $C$ ist algebraisch scheibig: Im Witt-Ring von $\Q(t)$
+verschwindet die Witt-Klasse seiner Seifert-Paarung.
+\end{proposition}
+
+%% -------------------------------------------------------------------------
+\section{Konkordanzinvarianten}
+%% -------------------------------------------------------------------------
+
+\subsection{Die Arf-Invariante}
+
+\begin{definition_de}[Arf-Invariante]
+Die \emph{Arf-Invariante} von $K$ ist $\Arf(K) \in \Z/2\Z$,
+berechenbar als $\Delta_K(-1) \pmod{8}/2$ (für ungerades $\Delta_K(-1)$)
+oder via die Goeritz-Matrix modulo 8.
+\end{definition_de}
+
+\begin{satz}[Robertello 1965~\cite{Robertello1965}]
+Wenn $K$ scheibig ist, dann $\Arf(K) = 0$.
+\end{satz}
+
+Für den Conway-Knoten: $\Arf(C) = 0$, diese Obstruktion verschwindet also.
+
+\subsection{Das Alexanderpolynom und die Fox-Milnor-Bedingung}
+
+\begin{satz}[Fox-Milnor~\cite{FoxMilnor1966}]
+Falls $K$ scheibig ist, gilt $\Delta_K(t) = f(t) \cdot f(t^{-1})$
+für ein $f(t) \in \Z[t, t^{-1}]$.
+\end{satz}
+
+Das Alexanderpolynom des Conway-Knotens erfüllt diese Bedingung.
+
+\subsection{Die Rasmussen $s$-Invariante}
+
+\begin{definition_de}[$s$-Invariante~\cite{Rasmussen2010}]
+Die \emph{Rasmussen $s$-Invariante} ist eine Knotenkonkordanzinvariante
+$s \colon \mathcal{K} \to 2\Z$, die aus der Khovanov-Homologie gewonnen wird.
+Sie ist ein Gruppenhomomorphismus auf $\mathcal{C}$ und erfüllt:
+\begin{enumerate}[label=\roman*)]
+\item $s(K) = 0$ falls $K$ scheibig ist;
+\item $|s(K)| \leq 2g_4(K)$, wobei $g_4$ das glatte 4-Kugel-Geschlecht ist;
+\item $s(T(p,q)) = (p-1)(q-1)$ für Torusknoten.
+\end{enumerate}
+\end{definition_de}
+
+\begin{satz}[Rasmussen 2010~\cite{Rasmussen2010}]
+$s(K)/2$ ist eine untere Schranke für das glatte 4-Kugel-Geschlecht $g_4(K)$:
+\[
+    |s(K)|/2 \leq g_4(K).
+\]
+Insbesondere ist $s(K) = 0$ notwendig dafür, dass $K$ glatt scheibig ist.
+\end{satz}
+
+Die $s$-Invariante ist im Allgemeinen \emph{nicht} mutationsinvariant.
+Piccirillo's entscheidende Beobachtung war, dass der Conway-Knoten einen
+„Begleitknoten" mit nichtverschwindender $s$-Invariante besitzt.
+
+\subsection{Die Heegaard-Floer $\tau$-Invariante}
+
+\begin{definition_de}[$\tau$-Invariante~\cite{OzsvathSzabo2003}]
+Die Ozsváth-Szabó \emph{$\tau$-Invariante} ist ein Konkordanzhomomorphismus
+$\tau \colon \mathcal{C} \to \Z$, definiert via der Knoten-Floer-Homologie
+$\widehat{HFK}(K)$. Es gilt:
+\begin{enumerate}[label=\roman*)]
+\item $\tau(K) = 0$ für scheibige Knoten;
+\item $|\tau(K)| \leq g_4(K)$;
+\item $\tau(T(p,q)) = (p-1)(q-1)/2$.
+\end{enumerate}
+\end{definition_de}
+
+\begin{proposition}
+$\tau(C) = 0$.
+\end{proposition}
+
+\begin{proof}
+Dies folgt aus der Mutationsinvarianz von $\tau$ (Ozsváth-Szabó~\cite{OzsvathSzabo2004})
+und $\tau(KT) = 0$ (da $KT$ scheibig ist).
+\end{proof}
+
+%% -------------------------------------------------------------------------
+\section{Piccirillo's Beweis}
+%% -------------------------------------------------------------------------
+
+Wir präsentieren die Hauptideen von Piccirillo's Beweis~\cite{Piccirillo2020},
+dass der Conway-Knoten nicht glatt scheibig ist.
+
+\subsection{Die Schlüsselkonstruktion}
+
+\begin{definition_de}[Null-Chirurgie]
+Die \emph{Null-Chirurgie} $S^3_0(K)$ ist die 3-Mannigfaltigkeit, die aus
+$S^3$ durch Dehn-Chirurgie entlang $K$ mit Rahmungskoeffizient 0 entsteht.
+\end{definition_de}
+
+\begin{lemma}[Piccirillo~\cite{Piccirillo2020}]
+\label{lem:Piccirillo}
+Sei $K'$ der Knoten, der aus $C$ durch eine spezifische Modifikation
+mittels des Kirby-Diagramms einer exotischen $B^4$ entsteht. Dann:
+\begin{enumerate}[label=\roman*)]
+\item $S^3_0(K') \cong S^3_0(C)$ (als orientierte 3-Mannigfaltigkeiten);
+\item $s(K') \neq 0$ (explizit: $s(K') = -2$).
+\end{enumerate}
+\end{lemma}
+
+Die Konstruktion von $K'$ nutzt folgende Strategie: Man beginnt mit der
+Spur $X_C = B^4 \cup_C h^2$ (die 4-Mannigfaltigkeit mit Rand $S^3_0(C)$,
+erhalten durch Ankleben eines 2-Henkels entlang $C$ mit Rahmung 0).
+Piccirillo findet einen anderen 2-Henkel $h'^2$ entlang $K'$ mit derselben
+Rahmung, sodass $X_{K'} \cong X_C$ (diffeomorphe 4-Mannigfaltigkeiten).
+Dies ist ein rein kombinatorisches Kirby-Kalkül-Argument.
+
+\subsection{Freedman's Satz}
+
+\begin{satz}[Freedman 1982~\cite{Freedman1982}]
+Ein Knoten $K \subset S^3$ mit verschwindender Arf-Invariante ist
+topologisch scheibig. Insbesondere ist jeder Knoten mit trivialem
+Alexanderpolynom ($\Delta_K(t) = 1$) topologisch scheibig.
+\end{satz}
+
+\subsection{Beweis von Satz~\ref{satz:Piccirillo}}
+
+\begin{proof}[Beweis: $C$ ist nicht glatt scheibig]
+\textbf{Schritt 1:} Piccirillo konstruiert den Knoten $K'$ aus
+Lemma~\ref{lem:Piccirillo} explizit mittels Kirby-Kalkül auf dem
+Kirby-Diagramm von $X_C$.
+
+\textbf{Schritt 2:} Sie berechnet $s(K') = -2 \neq 0$ durch Berechnung
+der Khovanov-Homologie von $K'$ (mittels des KnotTheory-Pakets in
+\textit{Mathematica}). Dies zeigt insbesondere, dass $K'$ nicht glatt
+scheibig ist.
+
+\textbf{Schritt 3:} Angenommen zur Widerlegung, $C$ wäre glatt scheibig
+und berandete eine glatte Scheibe $D \subset B^4$.
+
+\textbf{Schritt 4:} Da $S^3_0(K') \cong S^3_0(C)$, gibt es einen
+Diffeomorphismus $\phi \colon X_{K'} \to X_C$ der 4-Mannigfaltigkeitsspuren.
+
+\textbf{Schritt 5:} Mit der glatten Scheibe $D$ für $C$ konstruiert man
+eine glatte Scheibe für $K'$: Die Spur $X_C$ bettet sich in $B^4$ ein
+(da $C$ angenommenermaßen scheibig ist); Zurückziehen via $\phi$ liefert
+eine glatte Scheibe für $K'$ in $B^4$.
+
+\textbf{Schritt 6:} Aber $K'$ ist nicht glatt scheibig ($s(K') = -2 \neq 0$).
+Widerspruch.
+
+Also ist $C$ nicht glatt scheibig. \qed
+\end{proof}
+
+\begin{bemerkung}
+Der Beweis verwendet keine tiefe Eichtheorie oder Floer-Homologie — nur:
+(1) eine Kirby-Kalkül-Berechnung (Konstruktion von $K'$),
+(2) eine kombinatorische Berechnung ($s(K') \neq 0$),
+(3) Freedman's topologischen Satz.
+Dies macht den Beweis so elegant und unerwartet.
+\end{bemerkung}
+
+%% -------------------------------------------------------------------------
+\section{Das 4-Kugel-Geschlecht und Bandknoten}
+%% -------------------------------------------------------------------------
+
+\begin{definition_de}[4-Kugel-Geschlecht und Bandknoten]
+Das \emph{glatte 4-Kugel-Geschlecht} von $K$ ist
+\[
+    g_4(K) = \min\{ g(F) \mid F \subset B^4 \text{ glatt, } \partial F = K \}.
+\]
+$K$ ist scheibig genau dann wenn $g_4(K) = 0$.
+
+$K$ ist ein \emph{Bandknoten} (engl.\ \emph{ribbon knot}), falls er eine
+Bandscheibe berandet (eine immergierte Scheibe in $S^3$ mit nur
+Bandsingularitäten). Jeder Bandknoten ist glatt scheibig.
+\end{definition_de}
+
+\begin{vermutung}[Band-Scheiben-Vermutung]
+\label{verm:ribbon-slice}
+Jeder glatt scheibige Knoten ist ein Bandknoten.
+\end{vermutung}
+
+Der Kinoshita-Terasaka-Knoten $KT$ ist ein Bandknoten (und damit scheibig);
+der Conway-Knoten $C$ ist nicht scheibig (Piccirillo) und damit kein Bandknoten.
+
+\begin{satz}[Piccirillo 2020]
+$g_4(C) \geq 1$.
+\end{satz}
+
+Der genaue Wert $g_4(C)$ ist nicht bekannt; es wird vermutet, dass $g_4(C) = 1$.
+
+%% -------------------------------------------------------------------------
+\section{Topologische Schnittigkeit des Conway-Knotens}
+%% -------------------------------------------------------------------------
+
+Die Frage nach der \emph{topologischen} Schnittigkeit des Conway-Knotens
+ist wesentlich subtiler.
+
+\begin{proposition}
+Der Conway-Knoten erfüllt alle klassischen notwendigen Bedingungen für
+topologische Schnittigkeit:
+\begin{enumerate}[label=\roman*)]
+\item $\Arf(C) = 0$;
+\item $\Delta_C(t) = f(t) \cdot f(t^{-1})$ (Fox-Milnor-Bedingung);
+\item $\sigma_\omega(C) = 0$ für alle $\omega \in S^1$ (Levine-Tristram-Signaturen verschwinden);
+\item $C$ ist algebraisch scheibig (Witt-Klasse in $W(\Q(t))$ ist null).
+\end{enumerate}
+\end{proposition}
+
+\begin{vermutung}[Topologische Schnittigkeit des Conway-Knotens]
+\label{verm:Conway-top}
+Der Conway-Knoten $C$ ist topologisch scheibig.
+\end{vermutung}
+
+Diese Vermutung ist (Stand 2026) offen. Das Haupthindernis: Freedman's
+Satz gilt unmittelbar nur für Knoten mit trivialem Alexanderpolynom
+($\pi_1 \cong \Z$), was für $C$ nicht gilt.
+
+\begin{vermutung}[Topologische vs.\ glatte Konkordanz]
+Der Conway-Knoten hat ein nichttriviales Bild in der topologischen
+Konkordanzgruppe $\mathcal{C}^{\mathrm{top}}$, d.h.\ er ist topologisch
+nicht konkordant zum trivialen Knoten.
+\end{vermutung}
+
+Falls diese Vermutung zutrifft, wäre $C$ ein neues Beispiel eines Knotens,
+der algebraisch scheibig aussieht, aber nicht einmal topologisch scheibig ist.
+
+%% -------------------------------------------------------------------------
+\section{Bandkonkordanz}
+%% -------------------------------------------------------------------------
+
+\begin{definition_de}[Bandkonkordanz]
+Eine Konkordanz $A \colon K_0 \to K_1$ ist \emph{Band-Konkordanz}, falls
+die Projektion $A \subset S^3 \times [0,1] \to [0,1]$ nur Sattelpunkte
+als kritische Punkte hat (keine lokalen Maxima).
+\end{definition_de}
+
+\begin{satz}[Gordon 1981~\cite{Gordon1981}]
+Bandkonkordanz definiert eine Halbordnung auf der Menge der Knoten.
+\end{satz}
+
+\begin{vermutung}[Gordon 1981~\cite{Gordon1981}]
+\label{verm:Gordon}
+Bandkonkordanz ist eine Halbordnung: Falls $K_0$ und $K_1$ in beiden
+Richtungen band-konkordant sind, dann $K_0 = K_1$.
+\end{vermutung}
+
+Kürzlicher Fortschritt: Agol~\cite{Agol2022} bewies, dass Bandkonkordanz
+eine Ordnung auf Homotopieklassen von 3-Mannigfaltigkeiten induziert.
+
+%% -------------------------------------------------------------------------
+\section{Weitere Invarianten und Methoden}
+%% -------------------------------------------------------------------------
+
+\subsection{Heegaard-Floer-Homologie-Obstruktionen}
+
+Die Knoten-Floer-Homologie $\widehat{HFK}(K)$ liefert die $\tau$-Invariante
+und die $d$-Invarianten der Chirurgie-Mannigfaltigkeiten.
+Für den Conway-Knoten gilt $\tau(C) = 0$ (rechnerisch verifiziert,
+folgt aus Mutationsinvarianz von $\tau$).
+
+\begin{bemerkung}
+Die $s$-Invariante ist vermutlich ebenfalls mutationsinvariant, was
+$s(C) = s(KT) = 0$ ergeben würde. Dies ist konsistent mit Piccirillo's
+Resultat (sie verwendet nur $s(K') \neq 0$ für den Hilfsknoten $K'$,
+nicht $s(C)$).
+\end{bemerkung}
+
+\subsection{Satelliten-Konkordanzinvarianten}
+
+Für ein Muster $P$ in einem Volltorus und Begleitknoten $K$ gilt für den
+Satelliten $P(K)$:
+\[
+    \tau(P(K)) = w(P) \cdot \tau(K) + \tau(P(U)),
+\]
+wobei $w(P)$ die Windungszahl ist. Diese Satellitenformeln erlauben die
+Gewinnung von Konkordanzinformation aus einfacheren Invarianten.
+
+%% -------------------------------------------------------------------------
+\section{Offene Probleme}
+%% -------------------------------------------------------------------------
+
+\begin{vermutung}[Topologische Schnittigkeit von $C$]
+Der Conway-Knoten ist topologisch scheibig.
+\end{vermutung}
+
+\begin{vermutung}[Band-Scheiben-Vermutung, Verm.~\ref{verm:ribbon-slice}]
+Jeder glatt scheibige Knoten ist ein Bandknoten.
+\end{vermutung}
+
+\begin{vermutung}[Gordon's Vermutung, Verm.~\ref{verm:Gordon}]
+Bandkonkordanz ist eine Halbordnung (injektiv bis auf Knotenäquivalenz).
+\end{vermutung}
+
+\begin{vermutung}[Glattes 4-Kugel-Geschlecht von $C$]
+$g_4(C) = 1$.
+\end{vermutung}
+
+\begin{vermutung}[Mutation und $s$-Invariante]
+Die Rasmussen $s$-Invariante ist unter Mutation erhalten.
+\end{vermutung}
+
+\begin{vermutung}[Glatte Konkordanzgruppe]
+$\mathcal{C}$ enthält einen $\Z^\infty$-Summanden und $\Z/2\Z$-Torsion,
+aber ihre vollständige Struktur (insbesondere, ob sie ungerade Torsion
+enthält) ist unbekannt.
+\end{vermutung}
+
+%% -------------------------------------------------------------------------
+\section{Zusammenfassung}
+%% -------------------------------------------------------------------------
+
+Die Geschichte des Conway-Knotens illustriert, wie die Lücke zwischen
+glatter und topologischer Kategorie in Dimension 4 durch konkrete
+Knotentheorie erforscht werden kann. Die Auflösung seiner glatten
+Schnittigkeit durch Piccirillo 2020 ist ein Triumph cleveren Kirby-Kalküls
+kombiniert mit modernen Konkordanzinvarianten. Die zentrale offene Frage
+— ob $C$ topologisch scheibig ist — erfordert gänzlich andere Methoden,
+da alle klassischen algebraischen Obstruktionen verschwinden und Freedman's
+geometrische Techniken nicht direkt anwendbar sind.
+
+\begin{thebibliography}{99}
+
+\bibitem{Piccirillo2020}
+L.~Piccirillo,
+\textit{The Conway knot is not slice},
+Ann.\ of Math.\ \textbf{191} (2020), 581--591.
+
+\bibitem{Conway1970}
+J.~H.~Conway,
+\textit{An enumeration of knots and links, and some of their algebraic
+properties},
+in: J.~Leech (Hrsg.), \textit{Computational Problems in Abstract Algebra},
+Pergamon Press, Oxford, 1970, 329--358.
+
+\bibitem{KinoshitaTerasaka1957}
+S.~Kinoshita, H.~Terasaka,
+\textit{On unions of knots},
+Osaka Math.\ J.\ \textbf{9} (1957), 131--153.
+
+\bibitem{FoxMilnor1966}
+R.~H.~Fox, J.~W.~Milnor,
+\textit{Singularities of 2-spheres in 4-space and cobordism of knots},
+Osaka J.\ Math.\ \textbf{3} (1966), 257--267.
+
+\bibitem{Rasmussen2010}
+J.~Rasmussen,
+\textit{Khovanov homology and the slice genus},
+Invent.\ Math.\ \textbf{182} (2010), 419--447.
+
+\bibitem{OzsvathSzabo2003}
+P.~Ozsváth, Z.~Szabó,
+\textit{Knot Floer homology and the four-ball genus},
+Geom.\ Topol.\ \textbf{7} (2003), 615--639.
+
+\bibitem{OzsvathSzabo2004}
+P.~Ozsváth, Z.~Szabó,
+\textit{Knot Floer homology and integer surgeries},
+Algebr.\ Geom.\ Topol.\ \textbf{8} (2008), 101--153.
+
+\bibitem{Freedman1982}
+M.~H.~Freedman,
+\textit{The topology of four-dimensional manifolds},
+J.\ Differential Geom.\ \textbf{17} (1982), 357--453.
+
+\bibitem{KronheimerMrowka1993}
+P.~B.~Kronheimer, T.~S.~Mrowka,
+\textit{Gauge theory for embedded surfaces, I},
+Topology \textbf{32} (1993), 773--826.
+
+\bibitem{Levine1969}
+J.~P.~Levine,
+\textit{Knot cobordism groups in codimension two},
+Comment.\ Math.\ Helv.\ \textbf{44} (1969), 229--244.
+
+\bibitem{Robertello1965}
+R.~A.~Robertello,
+\textit{An invariant of knot cobordism},
+Comm.\ Pure Appl.\ Math.\ \textbf{18} (1965), 543--555.
+
+\bibitem{Gordon1981}
+C.~McA.~Gordon,
+\textit{Some aspects of classical knot theory},
+in: \textit{Knot Theory}, Lecture Notes in Math.\ \textbf{685},
+Springer, Berlin, 1978, 1--60.
+
+\bibitem{Agol2022}
+I.~Agol,
+\textit{Ribbon concordance of knots is a partial order},
+Ann.\ of Math.\ \textbf{196} (2022), 675--698.
+
+\bibitem{Hedden2009}
+M.~Hedden,
+\textit{Notions of positivity and the Ozsváth-Szabó concordance invariant},
+J.\ Knot Theory Ramifications \textbf{19} (2010), 617--629.
+
+\bibitem{Rolfsen1976}
+D.~Rolfsen,
+\textit{Knots and Links},
+Publish or Perish, Berkeley, 1976.
+
+\end{thebibliography}
+
+\end{document}

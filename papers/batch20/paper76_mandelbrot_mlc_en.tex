@@ -1,0 +1,638 @@
+%%
+%% paper76_mandelbrot_mlc_en.tex
+%% Autor: Michael Fuhrmann
+%% Projekt: Specialist Mathematics Project
+%% Thema: The Mandelbrot Set — Local Connectivity and the MLC Conjecture
+%% Sprache: Englisch
+%% Erstellt: 2026-03-12
+%% Letzte Änderung: 2026-03-12
+%% Build: 164
+%%
+%% Beschreibung:
+%%   Dieses Paper behandelt die Mandelbrot-Menge M im Parameterraum
+%%   der quadratischen Familie f_c(z) = z^2 + c, ihre globale Zusammenhängigkeit
+%%   (Beweis von Douady-Hubbard 1982), die Vermutung der lokalen Zusammenhängigkeit
+%%   (MLC), Resultate von Yoccoz, Thurston's topologisches Modell sowie
+%%   offene Probleme in der holomorphen Dynamik.
+%%
+
+\documentclass[12pt,a4paper]{amsart}
+
+%% Pakete für Mathematik, Layout, Encoding und Links
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem-Umgebungen (englisch)
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+%% Mathematische Operatoren
+\DeclareMathOperator{\diam}{diam}
+\DeclareMathOperator{\dist}{dist}
+\DeclareMathOperator{\Int}{Int}
+\DeclareMathOperator{\Crit}{Crit}
+
+%% Hyperref-Konfiguration
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue,
+    pdftitle={The Mandelbrot Set: Local Connectivity and the MLC Conjecture},
+    pdfauthor={Michael Fuhrmann}
+}
+
+%% -------------------------------------------------------------------------
+%% Abstract VOR \maketitle
+%% -------------------------------------------------------------------------
+\begin{abstract}
+We present a comprehensive treatment of the Mandelbrot set $\mathcal{M}$,
+the canonical parameter space for the quadratic family $f_c(z) = z^2 + c$.
+After reviewing the foundational notions of filled Julia sets and the
+characterisation of $\mathcal{M}$ via non-escape of the critical orbit,
+we give a detailed account of the Douady--Hubbard proof (1982) that
+$\mathcal{M}$ is connected, via the Böttcher coordinate and the
+conformal map $\Phi_{\mathcal{M}} \colon \widehat{\mathbb{C}} \setminus \mathcal{M}
+\to \widehat{\mathbb{C}} \setminus \overline{\mathbb{D}}$.
+We then formulate the \emph{MLC conjecture} — that $\mathcal{M}$ is
+locally connected — and survey its profound implications: the density of
+hyperbolic maps in the quadratic family, and Thurston's topological
+characterisation of $\mathcal{M}$ via abstract Mandelbrot sets.
+Yoccoz's theorem (MLC at all at most finitely renormalisable parameters),
+the Fatou--Shishikura inequality, and the structure of satellite and
+primitive components are discussed. We conclude with a list of open problems.
+\end{abstract}
+
+\title{The Mandelbrot Set: Local Connectivity and the MLC Conjecture}
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 165}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\maketitle
+
+%% -------------------------------------------------------------------------
+\section{Introduction}
+%% -------------------------------------------------------------------------
+
+The \emph{Mandelbrot set} $\mathcal{M}$, introduced by Benoit Mandelbrot in
+1980~\cite{Mandelbrot1980} and rigorously analysed by Douady and Hubbard
+beginning in 1982~\cite{DouadyHubbard1982}, is the most celebrated object
+in holomorphic dynamics. It parametrises the quadratic family
+\[
+    f_c(z) = z^2 + c, \quad c \in \mathbb{C},
+\]
+by marking those parameters for which the dynamical behaviour of $f_c$ is
+``bounded.'' Despite its elementary definition, $\mathcal{M}$ encodes
+an extraordinary wealth of complex-analytic structure. Its global
+connectivity was established in the very first paper of Douady and Hubbard,
+yet one of the most fundamental questions — whether $\mathcal{M}$ is
+\emph{locally} connected — remains open after more than four decades.
+
+This \emph{MLC conjecture} (``$\mathcal{M}$ is Locally Connected'') is not
+merely a topological curiosity. It is equivalent to the \emph{density of
+hyperbolicity} in the quadratic family: the statement that every $c \in \mathcal{M}$
+can be approximated by hyperbolic parameters. Moreover, MLC would yield a
+complete topological model of $\mathcal{M}$ via Thurston's theory of
+laminations, reducing the combinatorial description of the set to a
+purely combinatorial object: the \emph{Mandelbrot lamination}.
+
+The present paper surveys the main results and open problems in this circle
+of ideas. We assume familiarity with one complex variable and basic notions
+of holomorphic dynamics; proofs of central theorems are sketched with
+references to the original literature.
+
+%% -------------------------------------------------------------------------
+\section{The Quadratic Family and Julia Sets}
+%% -------------------------------------------------------------------------
+
+\subsection{Basic Definitions}
+
+\begin{definition}[Filled Julia Set]
+For $c \in \mathbb{C}$, the \emph{filled Julia set} of $f_c$ is
+\[
+    K_c = \{ z \in \mathbb{C} \mid \sup_{n \geq 0} |f_c^n(z)| < \infty \},
+\]
+and the \emph{Julia set} is $J_c = \partial K_c$.
+\end{definition}
+
+Since $f_c$ is a polynomial of degree 2, the complement
+$\mathbb{C} \setminus K_c$ is the \emph{basin of infinity}
+$\mathcal{A}_\infty(c)$. The Julia set $J_c$ is the boundary between
+bounded and unbounded orbits. A fundamental dichotomy holds:
+
+\begin{theorem}[Fatou--Julia Dichotomy]
+For every $c \in \mathbb{C}$, either
+\begin{enumerate}[label=\roman*)]
+\item $K_c$ is connected and $J_c$ is a connected, perfect, nowhere
+      dense subset of $\mathbb{C}$, or
+\item $K_c$ is a Cantor set (totally disconnected).
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+By the Riemann mapping theorem and the Böttcher coordinate, if $0 \in K_c$
+(i.e.\ the critical point does not escape), then $K_c$ is full and connected.
+If $0 \notin K_c$ (the critical orbit escapes), Böttcher's theorem
+globalises to give a biholomorphism from $\mathbb{C} \setminus K_c$ to
+$\mathbb{C} \setminus \overline{\mathbb{D}}$ with prescribed asymptotics,
+showing $K_c$ is a Cantor set by Sullivan's no-wandering-domains theorem
+(applicable in the polynomial case via direct arguments).
+\end{proof}
+
+\subsection{The Mandelbrot Set as Parameter Space}
+
+\begin{definition}[Mandelbrot Set]
+\[
+    \mathcal{M} = \{ c \in \mathbb{C} \mid f_c^n(0) \not\to \infty \text{ as } n \to \infty \}
+              = \{ c \in \mathbb{C} \mid K_c \text{ is connected} \}.
+\]
+\end{definition}
+
+The equivalence in the definition is the content of the Fatou--Julia
+dichotomy applied to the critical point $0$, which is the unique finite
+critical point of $f_c$.
+
+\begin{proposition}
+$\mathcal{M}$ is compact, and $\mathcal{M} \subset \overline{D}(0, 2)$.
+\end{proposition}
+
+\begin{proof}
+If $|c| > 2$, then $|f_c(0)| = |c| > 2$ and a standard estimate shows
+$|f_c^n(0)| \to \infty$. Compactness follows from the continuity of
+$c \mapsto f_c^n(0)$ and the definition as an intersection of closed sets.
+\end{proof}
+
+%% -------------------------------------------------------------------------
+\section{The Böttcher Coordinate and Green's Function}
+%% -------------------------------------------------------------------------
+
+\begin{theorem}[Böttcher Coordinate]
+For each $c \in \mathbb{C}$, there exists a unique conformal map
+\[
+    \phi_c \colon \mathcal{A}_\infty(c) \to \mathbb{C} \setminus \overline{\mathbb{D}}
+\]
+satisfying $\phi_c(f_c(z)) = \phi_c(z)^2$ and $\phi_c(z)/z \to 1$ as $z \to \infty$.
+\end{theorem}
+
+The \emph{Green's function} of $K_c$ is
+\[
+    G_c(z) = \log|\phi_c(z)| = \lim_{n\to\infty} \frac{1}{2^n} \log|f_c^n(z)|,
+\]
+which extends continuously to $\mathbb{C}$ by setting $G_c = 0$ on $K_c$.
+
+\begin{definition}[External Rays]
+For $\theta \in \mathbb{R}/\mathbb{Z}$, the \emph{external ray of angle
+$\theta$} for $K_c$ is
+\[
+    \mathcal{R}_c(\theta) = \phi_c^{-1}\bigl(\{ r e^{2\pi i \theta} \mid r > 1 \}\bigr).
+\]
+An external ray \emph{lands} at a point $\gamma_c(\theta) \in J_c$ if
+$\phi_c^{-1}(r e^{2\pi i \theta}) \to \gamma_c(\theta)$ as $r \to 1^+$.
+\end{definition}
+
+The dynamics of $f_c$ on rays is particularly clean: $f_c$ maps the ray of
+angle $\theta$ to the ray of angle $2\theta \pmod 1$.
+
+%% -------------------------------------------------------------------------
+\section{Connectivity of the Mandelbrot Set}
+%% -------------------------------------------------------------------------
+
+\subsection{The Douady--Hubbard Conformal Map}
+
+The global parameter-space analogue of the Böttcher coordinate is:
+
+\begin{theorem}[Douady--Hubbard 1982~\cite{DouadyHubbard1982}]
+\label{thm:DH-connected}
+There exists a biholomorphism
+\[
+    \Phi_{\mathcal{M}} \colon \widehat{\mathbb{C}} \setminus \mathcal{M}
+    \longrightarrow \widehat{\mathbb{C}} \setminus \overline{\mathbb{D}}
+\]
+satisfying $\Phi_{\mathcal{M}}(c)/c \to 1$ as $c \to \infty$, given
+explicitly by $\Phi_{\mathcal{M}}(c) = \phi_c(c)$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+For $c \notin \mathcal{M}$, the critical value $c$ itself lies in the
+basin of infinity of $f_c$, so $\phi_c(c)$ is well-defined. One must
+verify that $c \mapsto \phi_c(c)$ is holomorphic in $c$ on
+$\mathbb{C} \setminus \mathcal{M}$, injective, and has the correct
+boundary behaviour. Holomorphicity follows from the implicit function
+theorem applied to the Böttcher functional equation. Injectivity is the
+key point: it uses the fact that $f_c$ has a unique critical point $0$
+and a careful analysis of the dependence of the Böttcher coordinate on
+the parameter. The map extends to a homeomorphism of the boundaries by
+Carathéodory's theorem, since $\mathcal{M}$ is compact and full.
+\end{proof}
+
+\begin{corollary}[Connectivity of $\mathcal{M}$]
+The Mandelbrot set $\mathcal{M}$ is connected.
+\end{corollary}
+
+\begin{proof}
+The existence of a conformal map from the complement of $\mathcal{M}$ to
+the complement of $\overline{\mathbb{D}}$ implies, by Riemann's theory
+of simply-connected domains, that $\mathcal{M}$ is connected and
+full (i.e.\ $\mathbb{C} \setminus \mathcal{M}$ is connected).
+\end{proof}
+
+\subsection{External Rays of the Mandelbrot Set}
+
+The conformal map $\Phi_{\mathcal{M}}$ defines external rays for $\mathcal{M}$:
+\[
+    \mathcal{R}_{\mathcal{M}}(\theta) = \Phi_{\mathcal{M}}^{-1}\bigl(\{ r e^{2\pi i \theta} \mid r > 1 \}\bigr).
+\]
+A ray $\mathcal{R}_{\mathcal{M}}(\theta)$ \emph{lands} at $c_0 \in \partial \mathcal{M}$
+if $\Phi_{\mathcal{M}}^{-1}(r e^{2\pi i\theta}) \to c_0$ as $r \to 1^+$.
+
+\begin{theorem}[Landing of Rational Rays]
+Every external ray $\mathcal{R}_{\mathcal{M}}(\theta)$ with $\theta \in \mathbb{Q}/\mathbb{Z}$
+lands at a Misiurewicz point or at the root of a hyperbolic component.
+\end{theorem}
+
+This is a consequence of the Douady--Hubbard theory and the classification
+of periodic points on $\partial\mathcal{M}$.
+
+%% -------------------------------------------------------------------------
+\section{Hyperbolic Components and Internal Structure}
+%% -------------------------------------------------------------------------
+
+\begin{definition}[Hyperbolic Map]
+$f_c$ is \emph{hyperbolic} if every critical orbit converges to an
+attracting cycle. The \emph{main cardioid} $\mathcal{H}_0$ and the
+\emph{period-2 bulb} $\mathcal{H}_2$ are the largest hyperbolic
+components of $\mathcal{M}$.
+\end{definition}
+
+\begin{theorem}[Parametrisation of Hyperbolic Components]
+Every hyperbolic component $\mathcal{H}$ of $\mathcal{M}$ is simply
+connected, and there exists a biholomorphism
+$\lambda_{\mathcal{H}} \colon \mathcal{H} \to \mathbb{D}$,
+the \emph{multiplier map}, sending $c$ to the multiplier $\lambda$ of the
+attracting cycle of $f_c$.
+\end{theorem}
+
+\begin{proof}
+For the main cardioid $\mathcal{H}_0$, $f_c$ has an attracting fixed point
+$z_c$ with multiplier $\lambda = f_c'(z_c) = 2z_c$. Solving $z^2+c=z$ gives
+$z_c = (1 - \sqrt{1-4c})/2$, so the multiplier map is
+$c = \lambda/2 - \lambda^2/4$, a biholomorphism from $\mathcal{H}_0$ to
+$\mathbb{D}$. The general case follows by the same implicit-function-theorem
+argument applied to the multiplier of the attracting cycle.
+\end{proof}
+
+%% -------------------------------------------------------------------------
+\section{The MLC Conjecture}
+%% -------------------------------------------------------------------------
+
+\subsection{Statement and Equivalent Formulations}
+
+\begin{conjecture}[MLC — Mandelbrot Locally Connected]
+\label{conj:MLC}
+The Mandelbrot set $\mathcal{M}$ is locally connected, i.e.\ for every
+$c_0 \in \mathcal{M}$ and every neighbourhood $U$ of $c_0$, there
+exists a connected neighbourhood $V \subseteq U$ of $c_0$ with
+$V \cap \mathcal{M}$ connected.
+\end{conjecture}
+
+Local connectivity of $\mathcal{M}$ is equivalent to the following:
+
+\begin{theorem}[MLC Equivalences]
+The following statements are equivalent:
+\begin{enumerate}[label=\roman*)]
+\item $\mathcal{M}$ is locally connected (MLC).
+\item The conformal map $\Phi_{\mathcal{M}}^{-1} \colon \mathbb{D}^c \to \mathcal{M}^c$
+      extends continuously to the boundary: $\Phi_{\mathcal{M}}^{-1}$ extends
+      to a continuous surjection $\overline{\mathbb{D}^c} \to \overline{\mathcal{M}^c}$,
+      hence a Carathéodory loop $\mathbb{S}^1 \to \partial\mathcal{M}$.
+\item Every external ray of $\mathcal{M}$ lands, and the landing map
+      $\theta \mapsto \gamma_{\mathcal{M}}(\theta)$ is continuous.
+\item The combinatorial model $\mathcal{M}_{\mathrm{comb}}$ (Thurston's
+      abstract Mandelbrot set) is homeomorphic to $\mathcal{M}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Proof of equivalences (sketch)]
+The equivalence of (i), (ii), (iii) is standard in complex analysis:
+for a compact connected set $K$ with connected complement, local connectivity
+is equivalent to the Carathéodory extension property
+(Carathéodory's theorem applied to the Riemann map of $\mathbb{C} \setminus K$).
+The equivalence with (iv) is the content of Thurston's work on
+topological polynomials and laminations~\cite{Thurston1985}.
+\end{proof}
+
+\subsection{Density of Hyperbolicity}
+
+\begin{conjecture}[Density of Hyperbolicity]
+\label{conj:hyp-density}
+Hyperbolic maps are dense in the quadratic family: for every
+$c_0 \in \mathcal{M}$ and every $\varepsilon > 0$, there exists
+$c \in \mathcal{M}$ with $|c - c_0| < \varepsilon$ and $f_c$ hyperbolic.
+\end{conjecture}
+
+\begin{theorem}[MLC implies Density of Hyperbolicity]
+Conjecture~\ref{conj:MLC} implies Conjecture~\ref{conj:hyp-density}.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Assuming MLC, the impression of every external ray of $\mathcal{M}$ is a
+single point. The boundaries of hyperbolic components are dense in
+$\partial \mathcal{M}$ (a consequence of the parametrisation of
+hyperbolic components and the rational-ray landing theorem). Every point
+in $\partial \mathcal{M}$ is then a limit of roots of hyperbolic components.
+Interior points of $\mathcal{M}$ that are not in any hyperbolic component
+would, assuming MLC, form a nowhere-dense set (since the Mandelbrot set
+has no ``wandering'' Fatou components, by Sullivan's theorem). Together
+this gives density of hyperbolic parameters.
+\end{proof}
+
+%% -------------------------------------------------------------------------
+\section{Thurston's Topological Model}
+%% -------------------------------------------------------------------------
+
+\subsection{Laminations}
+
+\begin{definition}[Quadratic Invariant Lamination]
+A \emph{quadratic invariant lamination} (QIL) is a closed collection
+$\mathcal{L}$ of chords of $\overline{\mathbb{D}}$ (``leaves'') such that:
+\begin{enumerate}[label=\roman*)]
+\item Leaves do not cross in $\mathbb{D}$.
+\item $\mathcal{L}$ is invariant under $z \mapsto z^2$ on $\partial \mathbb{D}$.
+\item The forward image of each leaf is a leaf.
+\end{enumerate}
+The \emph{Mandelbrot lamination} $\mathcal{L}_{\mathcal{M}}$ is the
+QIL encoding the combinatorics of $\mathcal{M}$.
+\end{definition}
+
+\begin{theorem}[Thurston~\cite{Thurston1985}]
+The quotient $\partial \mathbb{D} / \sim_{\mathcal{L}_{\mathcal{M}}}$,
+where $\theta_1 \sim \theta_2$ iff $\theta_1$ and $\theta_2$ are
+endpoints of a leaf of $\mathcal{L}_{\mathcal{M}}$ or in the same
+``gap,'' is a topological model $\mathcal{M}_{\mathrm{comb}}$
+homeomorphic to a locally connected copy of the Mandelbrot set.
+If MLC holds, then $\mathcal{M}_{\mathrm{comb}} \cong \mathcal{M}$.
+\end{theorem}
+
+%% -------------------------------------------------------------------------
+\section{Yoccoz's Theorem}
+%% -------------------------------------------------------------------------
+
+The most significant partial result towards MLC is due to Jean-Christophe
+Yoccoz (1990, unpublished; see~\cite{HubbardSchleicher1994,Milnor2000}):
+
+\begin{theorem}[Yoccoz~\cite{HubbardSchleicher1994}]
+\label{thm:Yoccoz}
+Let $c_0 \in \mathcal{M}$ be a parameter that is neither in the closure
+of a hyperbolic component nor infinitely renormalisable. Then $\mathcal{M}$
+is locally connected at $c_0$.
+\end{theorem}
+
+\begin{proof}[Proof strategy]
+Yoccoz introduces the \emph{Yoccoz puzzle}, a sequence of nested
+topological discs $P^0 \supset P^1 \supset \cdots$ in the dynamical plane
+of $f_{c_0}$, cut along external rays landing at preimages of the $\alpha$
+fixed point. The \emph{Yoccoz inequality}
+\[
+    \mathrm{mod}(P^{n+1} \setminus \overline{P^{n+2}}) \geq
+    \mathrm{mod}(P^n \setminus \overline{P^{n+1}})
+\]
+shows that the moduli are bounded below, which forces the puzzle pieces
+to shrink to a point. The corresponding pieces in the \emph{parameter puzzle}
+then also shrink, proving local connectivity of $\mathcal{M}$ at $c_0$.
+The finiteness of renormalisation is precisely the hypothesis that prevents
+the puzzle from degenerating.
+\end{proof}
+
+\begin{corollary}
+MLC holds for all Misiurewicz points and for all $c_0$ with non-recurrent
+critical point (i.e.\ $0 \notin \omega(0)$ under $f_{c_0}$).
+\end{corollary}
+
+%% -------------------------------------------------------------------------
+\section{Renormalisation and Infinitely Renormalisable Parameters}
+%% -------------------------------------------------------------------------
+
+\begin{definition}[Renormalisable Map]
+$f_c$ is \emph{$n$-renormalisable} if there exists a topological disc
+$U \ni 0$ such that $f_c^n \colon U \to f_c^n(U)$ is a polynomial-like
+map of degree 2 with connected Julia set. $f_c$ is \emph{infinitely
+renormalisable} if it is $n$-renormalisable for infinitely many $n$.
+\end{definition}
+
+Yoccoz's theorem leaves open the case of infinitely renormalisable
+parameters. For these, no general proof of MLC is known. Partial results
+include:
+
+\begin{theorem}[Lyubich 1997~\cite{Lyubich1997}]
+For parameters of \emph{bounded combinatorial type} (i.e.\ the renormalisation
+periods are bounded), MLC holds.
+\end{theorem}
+
+\begin{theorem}[Kahn--Lyubich 2009~\cite{KahnLyubich2009}]
+The Julia set $J_c$ is locally connected for every $c \in \mathcal{M}$
+that is at most finitely renormalisable.
+\end{theorem}
+
+The infinitely renormalisable Feigenbaum parameter $c_{\mathrm{Feig}} \approx -1.4011552$
+is the primary obstruction: MLC at this parameter would follow from
+bounds on the conformal moduli of the Feigenbaum fixed point, a problem
+still unresolved in full generality.
+
+%% -------------------------------------------------------------------------
+\section{The Fatou--Shishikura Inequality}
+%% -------------------------------------------------------------------------
+
+\begin{theorem}[Fatou--Shishikura Inequality~\cite{Shishikura1987}]
+For any rational map $f$ of degree $d \geq 2$, the number of
+non-repelling cycles satisfies
+\[
+    \#\{\text{non-repelling cycles}\} \leq 2d - 2.
+\]
+\end{theorem}
+
+\begin{proof}[Proof for degree 2]
+For $f_c$ with $d=2$, we have $2d-2 = 2$ critical points counted with
+multiplicity (one finite critical point $0$ of multiplicity 1, and one at
+$\infty$). Shishikura's proof uses quasiconformal deformation theory: one
+shows that each non-repelling cycle ``absorbs'' at least one critical orbit
+via a holomorphic motion argument, and distinct non-repelling cycles absorb
+distinct critical orbits. For $f_c$ this gives at most 1 finite non-repelling
+cycle, consistent with the structure of $\mathcal{M}$.
+\end{proof}
+
+\begin{corollary}
+Every $f_c$ has at most one attracting or indifferent cycle. In particular,
+if $c \in \mathcal{M}$ and $f_c$ has an attracting cycle, then $K_c$ is
+a Jordan curve and $f_c$ is hyperbolic.
+\end{corollary}
+
+%% -------------------------------------------------------------------------
+\section{Structural Results on \texorpdfstring{$\partial\mathcal{M}$}{∂M}}
+%% -------------------------------------------------------------------------
+
+\subsection{Misiurewicz Points}
+
+\begin{definition}[Misiurewicz Point]
+$c_0 \in \partial \mathcal{M}$ is a \emph{Misiurewicz point} if $0$ is
+strictly pre-periodic under $f_{c_0}$: $f_{c_0}^{m+k}(0) = f_{c_0}^m(0)$
+for some $m \geq 1$, $k \geq 1$.
+\end{definition}
+
+\begin{theorem}
+Misiurewicz points are dense in $\partial \mathcal{M}$.
+\end{theorem}
+
+\subsection{Parabolic Implosion}
+
+At parabolic parameters (where $f_c$ has a parabolic cycle with multiplier
+$e^{2\pi i p/q}$), the Julia set $J_c$ undergoes a dramatic change:
+infinitely many tiny copies of $J_c$ implode into the Fatou component,
+a phenomenon known as \emph{parabolic implosion}~\cite{LavaursRousseau1993}.
+This gives the characteristic ``antenna'' structure near parabolic points
+in $\partial\mathcal{M}$.
+
+\subsection{Hausdorff Dimension of $\partial \mathcal{M}$}
+
+\begin{theorem}[Shishikura 1998~\cite{Shishikura1998}]
+The Hausdorff dimension of the boundary of the Mandelbrot set equals 2:
+\[
+    \dim_H(\partial \mathcal{M}) = 2.
+\]
+\end{theorem}
+
+%% -------------------------------------------------------------------------
+\section{Open Problems}
+%% -------------------------------------------------------------------------
+
+We collect the most important open problems in the area.
+
+\begin{conjecture}[MLC, Douady~\cite{DouadyHubbard1982}]
+\label{conj:MLC2}
+The Mandelbrot set is locally connected.
+\end{conjecture}
+
+\begin{conjecture}[Density of Hyperbolicity]
+\label{conj:DHyp}
+Hyperbolic parameters are dense in $\mathcal{M}$.
+\end{conjecture}
+
+\begin{conjecture}[MLC at the Feigenbaum Point]
+The Mandelbrot set is locally connected at the Feigenbaum parameter
+$c_{\mathrm{Feig}} \approx -1.4011552$. Equivalently, the conformal
+moduli of the Feigenbaum polynomial-like restriction grow without bound.
+\end{conjecture}
+
+\begin{conjecture}[Siegel Discs on $\partial\mathcal{M}$]
+For every $c$ on the boundary of a Siegel disc component, $J_c$ is a
+Jordan curve.
+\end{conjecture}
+
+\begin{remark}
+Conjecture~\ref{conj:MLC2} implies Conjecture~\ref{conj:DHyp}, but the
+converse is not known. Avila--Lyubich--de Melo have made substantial
+progress on renormalisation, but MLC at infinitely renormalisable points
+of unbounded type remains the central open problem in holomorphic dynamics.
+\end{remark}
+
+%% -------------------------------------------------------------------------
+\section{Conclusion}
+%% -------------------------------------------------------------------------
+
+The Mandelbrot set is simultaneously a parameter space, a combinatorial
+encyclopedia of all quadratic dynamics, and a concrete object revealing the
+deepest features of holomorphic iteration. Its connectivity
+(Douady--Hubbard) is fully established; its local connectivity (MLC) is the
+grand open problem of the field. Yoccoz's puzzle technique resolved MLC for
+all at-most-finitely-renormalisable parameters, reducing the problem to
+the infinitely renormalisable case. The equivalence with density of
+hyperbolicity shows that MLC is not merely a topological statement but
+a structural assertion about the entire quadratic family. Its resolution
+would complete our understanding of quadratic dynamics in a manner parallel
+to what the Riemann Hypothesis would achieve for the distribution of primes.
+
+\begin{thebibliography}{99}
+
+\bibitem{Mandelbrot1980}
+B.~Mandelbrot,
+\textit{Fractal aspects of the iteration of $z \mapsto \lambda z(1-z)$ for
+complex $\lambda$ and $z$},
+Ann.\ N.Y.\ Acad.\ Sci.\ \textbf{357} (1980), 249--259.
+
+\bibitem{DouadyHubbard1982}
+A.~Douady, J.~H.~Hubbard,
+\textit{Itération des polynômes quadratiques complexes},
+C.\ R.\ Acad.\ Sci.\ Paris \textbf{294} (1982), 123--126.
+
+\bibitem{DouadyHubbard1984}
+A.~Douady, J.~H.~Hubbard,
+\textit{Étude dynamique des polynômes complexes, I, II},
+Publications Mathématiques d'Orsay \textbf{84-02}, \textbf{85-04},
+Université de Paris-Sud, Orsay, 1984--1985.
+
+\bibitem{Thurston1985}
+W.~P.~Thurston,
+\textit{On the combinatorics and dynamics of iterated rational maps},
+Preprint, Princeton University, 1985. Published in: D.~Schleicher (ed.),
+\textit{Complex Dynamics: Families and Friends}, A.~K.~Peters, 2009, 3--137.
+
+\bibitem{Milnor2000}
+J.~Milnor,
+\textit{Local connectivity of Julia sets: expository lectures},
+in: \textit{The Mandelbrot Set, Theme and Variations},
+London Math.\ Soc.\ Lecture Note Ser.\ \textbf{274},
+Cambridge Univ.\ Press, 2000, 67--116.
+
+\bibitem{HubbardSchleicher1994}
+J.~H.~Hubbard, D.~Schleicher,
+\textit{The spider algorithm},
+in: \textit{Complex Dynamical Systems: The Mathematics Behind the
+Mandelbrot and Julia Sets}, Proc.\ Sympos.\ Appl.\ Math.\ \textbf{49},
+Amer.\ Math.\ Soc., 1994, 155--180.
+
+\bibitem{Lyubich1997}
+M.~Lyubich,
+\textit{Dynamics of quadratic polynomials, I–II},
+Acta Math.\ \textbf{178} (1997), 185--247 and 247--297.
+
+\bibitem{KahnLyubich2009}
+J.~Kahn, M.~Lyubich,
+\textit{The quasi-additivity law in conformal geometry},
+Ann.\ of Math.\ \textbf{169} (2009), 561--593.
+
+\bibitem{Shishikura1987}
+M.~Shishikura,
+\textit{On the quasiconformal surgery of rational functions},
+Ann.\ Sci.\ École Norm.\ Sup.\ \textbf{20} (1987), 1--29.
+
+\bibitem{Shishikura1998}
+M.~Shishikura,
+\textit{The Hausdorff dimension of the boundary of the Mandelbrot set
+and Julia sets},
+Ann.\ of Math.\ \textbf{147} (1998), 225--267.
+
+\bibitem{LavaursRousseau1993}
+P.~Lavaurs,
+\textit{Systèmes dynamiques holomorphes: explosion de points périodiques
+paraboliques},
+Thèse, Université Paris-Sud, Orsay, 1989.
+
+\bibitem{AvilaLyubich2008}
+A.~Avila, M.~Lyubich,
+\textit{Feigenbaum Julia sets of positive area},
+Preprint arXiv:math/0602458, 2006.
+
+\end{thebibliography}
+
+\end{document}
