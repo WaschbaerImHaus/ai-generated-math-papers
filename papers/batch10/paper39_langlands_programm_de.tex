@@ -1,0 +1,364 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+
+% -------------------------------------------------------
+% Eigene Befehle
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Zp}{\mathbb{Z}_p}
+\newcommand{\Qp}{\mathbb{Q}_p}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\GL}{\mathrm{GL}}
+\newcommand{\SL}{\mathrm{SL}}
+\newcommand{\GQ}{\mathrm{Gal}(\bar{\Q}/\Q)}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\Frob}{\mathrm{Frob}}
+\newcommand{\Art}{\mathrm{Art}}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\Hom}{Hom}
+\DeclareMathOperator{\tr}{Sp}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Das Langlands-Programm:\\
+       $L$-Funktionen, automorphe Darstellungen\\
+       und die globale Korrespondenz}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 120}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Das Langlands-Programm, das Robert Langlands 1967 in einem Brief an André Weil
+initiierte, schlägt ein umfangreiches Netz von Vermutungen vor, das Zahlentheorie,
+automorphe Formen und Darstellungstheorie verbindet.  Im Kern steht die
+\emph{Langlands-Korrespondenz}: eine (vermutete) Bijektion zwischen
+$n$-dimensionalen Darstellungen der absoluten Galois-Gruppe $\GQ$ und
+automorphen Darstellungen von $\GL_n(\mathbb{A}_\Q)$.  Dieses Paper entwickelt
+die notwendigen Grundlagen (Galois-Darstellungen, $L$-Funktionen, automorphe
+Formen, lokale Langlands-Korrespondenz) und präsentiert die wichtigsten bekannten
+Fälle und Anwendungen, einschließlich Wiles' Beweis des Großen Fermatschen Satzes
+als herausragendes Beispiel des Programms.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Motivation: Von der quadratischen Reziprozität zu Langlands}
+% ================================================================
+
+Das Langlands-Programm verallgemeinert eine lange Kette von Reziprozitätsgesetzen:
+
+\begin{itemize}
+  \item \textbf{Quadratische Reziprozität} (Gauß 1796): Für verschiedene ungerade Primzahlen $p, q$:
+    $\bigl(\frac{p}{q}\bigr)\bigl(\frac{q}{p}\bigr) = (-1)^{\frac{p-1}{2}\cdot\frac{q-1}{2}}$.
+  \item \textbf{Klassenkörpertheorie} (Artin 1927): Jede abelsche Erweiterung $L/K$
+    entspricht einer offenen Untergruppe der Idèlenklassengruppe $\mathbb{A}_K^\times/K^\times$.
+    Die Artin-Abbildung $\Art_{L/K}$ identifiziert Galois-Gruppen mit Quotienten dieser Gruppe.
+  \item \textbf{Langlands}: Nicht-abelsche Erweiterungen entsprechen automorphen
+    Darstellungen von $\GL_n$ statt $\GL_1$.
+\end{itemize}
+
+Die Schlüsselerkenntnis: Die Arithmetik von Zahlkörpern (Galois-Gruppen) und
+die Analysis automorpher Formen (harmonische Analysis auf Adèlen-Gruppen)
+sind im Grunde dasselbe Thema.
+
+% ================================================================
+\section{Galois-Darstellungen}
+% ================================================================
+
+\begin{definition}[$\ell$-adische Galois-Darstellung]
+\label{def:galois_darst}
+Eine \emph{stetige $\ell$-adische Galois-Darstellung} vom Grad $n$ ist ein
+stetiger Gruppenhomomorphismus
+\[
+  \rho : \GQ \longrightarrow \GL_n(\bar{\Q}_\ell)
+\]
+(oder nach $\GL_n(\Zp)$, $\GL_n(\Qp)$ etc.) wobei $\bar{\Q}_\ell$ die
+$\ell$-adische Topologie trägt.  $\rho$ ist \emph{unverzweigt bei $p$},
+falls $\rho|_{I_p} = 1$ für die Trägheitsgruppe $I_p \subset \GQ$.
+\end{definition}
+
+\begin{example}[Zyklotomischer Charakter]
+Der \emph{zyklotomische Charakter} $\chi_\ell : \GQ \to \Z_\ell^\times$ ist definiert durch
+$\sigma(\zeta_{\ell^n}) = \zeta_{\ell^n}^{\chi_\ell(\sigma)}$ für alle $\ell^n$-ten
+Einheitswurzeln.  Dies ist eine 1-dimensionale Darstellung.
+\end{example}
+
+\begin{example}[Tate-Modul einer elliptischen Kurve]
+Sei $E/\Q$ eine elliptische Kurve.  Das \emph{$\ell$-adische Tate-Modul} ist
+\[
+  T_\ell(E) = \varprojlim_n E[\ell^n](\bar\Q) \;\cong\; \Z_\ell^2.
+\]
+Die Galois-Wirkung auf den $\ell$-Potenz-Torsionspunkten liefert eine
+2-dimensionale Darstellung $\rho_{E,\ell} : \GQ \to \GL_2(\Z_\ell)$.
+Für eine Primzahl $p \nmid \ell\cdot\Delta(E)$ (gute Reduktion) gilt:
+\[
+  \tr(\rho_{E,\ell}(\Frob_p)) = a_p(E) = p + 1 - |E(\F_p)|.
+\]
+\end{example}
+
+\begin{definition}[$L$-Funktion einer Galois-Darstellung]
+\label{def:galois_l}
+Für $\rho : \GQ \to \GL_n(\Q_\ell)$, unverzweigt bei fast allen Primzahlen, ist
+die \emph{$L$-Funktion}
+\[
+  L(s, \rho) = \prod_p \det\!\bigl(1 - \rho(\Frob_p)\,p^{-s}\bigr)^{-1}.
+\]
+\end{definition}
+
+% ================================================================
+\section{Automorphe Darstellungen}
+% ================================================================
+
+\begin{definition}[Adèlen-Ring]
+\label{def:adelen}
+Der \emph{Adèlen-Ring} von $\Q$ ist das eingeschränkte Produkt
+\[
+  \mathbb{A} = \mathbb{A}_\Q = \R \times \prod_p{}' \Q_p
+  = \bigl\{(x_\infty, x_2, x_3, \ldots) : x_p \in \Z_p \text{ für fast alle } p\bigr\}.
+\]
+Es ist ein lokal-kompakter Ring.  Die diagonale Einbettung $\Q \hookrightarrow \mathbb{A}$
+macht $\Q$ zu einem diskreten kocompakten Teilring.
+\end{definition}
+
+\begin{definition}[Automorphe Darstellung]
+\label{def:automorphe_darst}
+Eine \emph{automorphe Darstellung} von $\GL_n(\mathbb{A})$ ist eine irreduzible
+zulässige Darstellung $\pi = \otimes'_v \pi_v$ (eingeschränktes Tensorprodukt über
+alle Stellen $v$), die im Raum $L^2(\GL_n(\Q) \backslash \GL_n(\mathbb{A}), \omega)$
+für einen zentralen Charakter $\omega$ vorkommt.  Eine \emph{kuspformige} automorphe
+Darstellung hat verschwindende konstante Terme entlang aller echten parabolischen
+Untergruppen.
+\end{definition}
+
+\begin{example}[Klassische Modulformen als automorphe Darstellungen]
+Eine normierte Hecke-Eigenform $f \in S_k(\Gamma_0(N), \chi)$ entspricht
+einer kuspformen automorphen Darstellung $\pi_f$ von $\GL_2(\mathbb{A})$.
+Die $L$-Funktion von $\pi_f$ ist $L(s, f) = \sum_{n \ge 1} a_n n^{-s}$.
+\end{example}
+
+% ================================================================
+\section{Die lokale Langlands-Korrespondenz}
+% ================================================================
+
+\begin{theorem}[Lokale Langlands-Korrespondenz für $\GL_n$]
+\label{thm:lokale_langlands}
+Sei $F$ eine endliche Erweiterung von $\Q_p$.  Es gibt eine kanonische Bijektion
+\[
+  \mathrm{LLC}_F :
+  \left\{\parbox{5.5cm}{\centering $n$-dim.\ irreduzible Darstellungen
+  der Weil-Deligne-Gruppe $\mathrm{WD}(F)$}\right\}
+  \;\longleftrightarrow\;
+  \left\{\parbox{5.5cm}{\centering irreduzible zulässige Darstellungen von $\GL_n(F)$}\right\}
+\]
+mit Kompatibilität der $L$- und $\varepsilon$-Faktoren.
+\end{theorem}
+
+\begin{proof}[Status]
+Für $\GL_1(F)$: Klassenkörpertheorie. \quad
+Für $\GL_2(F)$: Kutzko (1980), Henniart (1993). \quad
+Für $\GL_n(F)$ allgemein: Harris--Taylor (2001), Henniart (2000).
+\end{proof}
+
+% ================================================================
+\section{Die globale Langlands-Korrespondenz}
+% ================================================================
+
+\begin{conjecture}[Globale Langlands-Korrespondenz für $\GL_n$]
+\label{conj:globale_langlands}
+Es gibt eine kanonische Bijektion (\emph{Langlands-Korrespondenz})
+\[
+  \mathcal{L} :
+  \left\{\parbox{5.5cm}{\centering irreduzible $n$-dim.\ $\ell$-adische Darstellungen $\rho$
+  von $\GQ$ (halbeinfach, geometrisch)}\right\}
+  \;\longleftrightarrow\;
+  \left\{\parbox{5.5cm}{\centering kuspiforme automorphe Darstellungen $\pi$
+  von $\GL_n(\mathbb{A})$}\right\}
+\]
+mit $L(s, \rho) = L(s, \pi)$.
+\end{conjecture}
+
+\begin{theorem}[Langlands--Tunnell: lösbares Bild]
+\label{thm:langlands_tunnell}
+Sei $\rho : \GQ \to \GL_2(\C)$ stetig mit lösbarem Bild.  Dann ist $L(s, \rho)$
+die $L$-Funktion einer automorphen Form auf $\GL_2(\A)$.
+\end{theorem}
+
+% ================================================================
+\section{Shimura--Taniyama--Wiles: Ein expliziter Fall}
+% ================================================================
+
+\begin{theorem}[Shimura--Taniyama--Wiles--BCDT]
+\label{thm:stw}
+Jede elliptische Kurve $E/\Q$ ist \emph{modular}: Es gibt eine Hecke-Eigenform
+$f_E \in S_2(\Gamma_0(N))$ (für den Führer $N$ von $E$) mit $L(s, E) = L(s, f_E)$.
+\end{theorem}
+
+\begin{proof}[Beweisidee (Wiles 1995)]
+\begin{enumerate}[label=\arabic*.]
+  \item \emph{Restdarstellung}: $\bar\rho_{E,3} : \GQ \to \GL_2(\F_3)$ ist
+    modular nach Langlands--Tunnell (da $\GL_2(\F_3)$ lösbar).
+  \item \emph{Deformationstheorie}: Der universelle Deformationsring $R$
+    und die Hecke-Algebra $T$ sind isomorph ($R = T$, Wiles' Hauptsatz).
+  \item \emph{Schluss}: Jede Deformation von $\bar\rho$ (also auch $\rho_{E,3}$
+    selbst) kommt von einer Modulform.
+\end{enumerate}
+Wiles bewies den halbstabilen Fall; Taylor--Wiles ergänzten;
+BCDT (2001) vollendeten den allgemeinen Fall.
+\end{proof}
+
+\begin{corollary}[Großer Fermatscher Satz (Wiles 1995)]
+Die Gleichung $x^n + y^n = z^n$ hat für $n \ge 3$ keine Lösung in positiven
+ganzen Zahlen.
+\end{corollary}
+
+\begin{proof}[Beweisidee]
+Ribet (1990): Eine hypothetische Lösung $(a,b,c)$ würde eine nicht-modulare
+elliptische Kurve (Frey-Kurve) liefern — Widerspruch zum Modularity-Theorem.
+\end{proof}
+
+% ================================================================
+\section{Fontaine-Mazur-Vermutung}
+% ================================================================
+
+\begin{conjecture}[Fontaine--Mazur, 1995]
+\label{conj:fontaine_mazur}
+Eine irreduzible $n$-dimensionale $p$-adische Darstellung $\rho : \GQ \to \GL_n(\Q_p)$
+stammt aus der algebraischen Geometrie (d.\,h.\ ist Unterdarstellung der étalen
+Kohomologie einer glatten projektiven Varietät über $\Q$) genau dann, wenn sie
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{geometrisch} ist (unverzweigt außerhalb endlich vieler Primzahlen und
+    de Rham bei $p$ im Sinne der $p$-adischen Hodge-Theorie),
+  \item \emph{ungerade} ist ($n=2$: komplexe Konjugation hat Eigenwerte $\pm 1$).
+\end{enumerate}
+Solche geometrischen Darstellungen sollen kuspformen automorphen Darstellungen
+entsprechen.
+\end{conjecture}
+
+% ================================================================
+\section{Bekannte Fälle und offene Probleme}
+% ================================================================
+
+\begin{remark}[Übersicht bekannter Fälle]
+\begin{center}
+\begin{tabular}{l|l|l}
+\textbf{Fall} & \textbf{Gruppen} & \textbf{Status} \\
+\hline
+$n = 1$ (abelsch) & $\GL_1$ & Bewiesen (Klassenkörpertheorie) \\
+$n = 2$, lösbares Bild & $\GL_2$ & Bewiesen (Langlands--Tunnell) \\
+Elliptische Kurven über $\Q$ & $\GL_2$ & Bewiesen (Wiles + BCDT) \\
+Lokale LLC für $\GL_n$ & $\GL_n(F)$, $F/\Q_p$ & Bewiesen (Harris--Taylor, Henniart) \\
+Basiswechsel $\GL_n$ & $\GL_n$ & Bewiesen (Arthur--Clozel) \\
+$\text{Sym}^m$ für $m \le 4$ & $\GL_2 \to \GL_{m+1}$ & Bewiesen (Kim--Shahidi) \\
+$p$-adische LLC für $\GL_2(\Q_p)$ & $\GL_2$ & Bewiesen (Colmez) \\
+Geometrische Langlands (Char.\,0) & Kurven über $\C$ & Bewiesen (Gaitsgory et al. 2024) \\
+\hline
+Globale LLC für $\GL_n$ ($n \ge 2$) & $\GL_n$ & \textbf{OFFEN} \\
+Fontaine--Mazur (allgemein) & $\GL_n$ & Teilweise bewiesen \\
+Nicht-abelsche Artin-Vermutung & allg.\ $G$ & \textbf{OFFEN} \\
+\end{tabular}
+\end{center}
+\end{remark}
+
+\begin{remark}[Geometrische Langlands 2024]
+Im Jahr 2024 vollendete ein Team um Gaitsgory den Beweis der
+\emph{geometrischen Langlands-Vermutung} für Kurven über algebraisch
+abgeschlossenen Körpern der Charakteristik 0 (de Rham-Setting).
+Dies ist ein großer Fortschritt, wenngleich der arithmetische Fall
+(Zahlkörper) offen bleibt.
+\end{remark}
+
+% ================================================================
+\section{Das große Bild}
+% ================================================================
+
+\begin{remark}[Wörterbuch]
+Das Langlands-Programm schafft ein Wörterbuch:
+\begin{center}
+\begin{tabular}{l|l}
+\textbf{Zahlentheorie / Geometrie} & \textbf{Automorphe Formen / Darstellungstheorie} \\
+\hline
+Galois-Gruppe $\GQ$ & Algebraische Gruppe $G$ über $\A$ \\
+$n$-dim.\ Galois-Darstellung & Automorphe Darstellung von $\GL_n(\A)$ \\
+Hasse-Weil-$L$-Funktion & Automorphe $L$-Funktion \\
+Verzweigung bei $p$ & Lokale Darstellung $\pi_p$ \\
+Frobenius bei $p$ & Hecke-Eigenwert $\lambda_p$ \\
+Elliptische Kurve & Gewicht-2-Spitzenform \\
+\end{tabular}
+\end{center}
+Die Vereinigung dieser beiden Welten — Arithmetik und Analysis — ist
+das tiefste Thema der modernen Mathematik.
+\end{remark}
+
+\begin{thebibliography}{99}
+
+\bibitem{Langlands1970}
+R.~P.~Langlands,
+\textit{Problems in the theory of automorphic forms},
+in: Lectures in Modern Analysis and Applications III,
+Lecture Notes in Math.\ \textbf{170}, Springer, 1970, 18--61.
+
+\bibitem{HarrisTaylor2001}
+M.~Harris und R.~Taylor,
+\textit{The geometry and cohomology of some simple Shimura varieties},
+Ann.\ of Math.\ Studies \textbf{151}, Princeton Univ.\ Press, 2001.
+
+\bibitem{Wiles1995}
+A.~Wiles,
+\textit{Modular elliptic curves and Fermat's Last Theorem},
+Ann.\ of Math.\ (2) \textbf{141} (1995), 443--551.
+
+\bibitem{BCDT2001}
+C.~Breuil, B.~Conrad, F.~Diamond, R.~Taylor,
+\textit{On the modularity of elliptic curves over $\Q$: wild 3-adic exercises},
+J.\ Amer.\ Math.\ Soc.\ \textbf{14} (2001), 843--939.
+
+\bibitem{Ribet1990}
+K.~Ribet,
+\textit{On modular representations of $\Gal(\bar\Q/\Q)$ arising from modular forms},
+Invent.\ Math.\ \textbf{100} (1990), 431--476.
+
+\bibitem{ArthurClozel1989}
+J.~Arthur und L.~Clozel,
+\textit{Simple Algebras, Base Change, and the Advanced Theory of the Trace Formula},
+Ann.\ of Math.\ Studies \textbf{120}, Princeton Univ.\ Press, 1989.
+
+\bibitem{Colmez2010}
+P.~Colmez,
+\textit{Repr\'esentations de $\GL_2(\Q_p)$ et $(\varphi,\Gamma)$-modules},
+Ast\'erisque \textbf{330} (2010), 281--509.
+
+\end{thebibliography}
+
+\end{document}

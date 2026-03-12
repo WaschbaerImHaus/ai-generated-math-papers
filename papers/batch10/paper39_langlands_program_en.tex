@@ -1,0 +1,531 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Zp}{\mathbb{Z}_p}
+\newcommand{\Qp}{\mathbb{Q}_p}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\GL}{\mathrm{GL}}
+\newcommand{\SL}{\mathrm{SL}}
+\newcommand{\GQ}{\mathrm{Gal}(\bar{\Q}/\Q)}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\Frob}{\mathrm{Frob}}
+\newcommand{\WD}{\mathrm{WD}}
+\newcommand{\WF}{\mathrm{WF}}
+\newcommand{\rec}{\mathrm{rec}}
+\newcommand{\Ind}{\mathrm{Ind}}
+\newcommand{\Art}{\mathrm{Art}}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\Hom}{Hom}
+\DeclareMathOperator{\End}{End}
+\DeclareMathOperator{\Aut}{Aut}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\nr}{N}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{The Langlands Programme:\\
+       $L$-functions, Automorphic Representations,\\
+       and the Global Correspondence}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 120}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+The Langlands programme, initiated by Robert Langlands in a 1967 letter to
+André Weil, proposes a vast web of conjectures relating number theory,
+automorphic forms, and representation theory.  At its heart is the
+\emph{Langlands correspondence}: a (conjectural) bijection between
+$n$-dimensional representations of the absolute Galois group
+$\GQ$ (or more generally of the Weil group) and automorphic representations
+of $\GL_n(\mathbb{A}_\Q)$.  This paper develops the necessary background
+(Galois representations, $L$-functions, automorphic forms, the local
+Langlands correspondence) and presents the major known cases and applications,
+including Wiles' proof of Fermat's Last Theorem as a landmark instance of
+the programme.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Motivation: From Quadratic Reciprocity to Langlands}
+% ================================================================
+
+The Langlands programme generalises a long chain of reciprocity laws:
+
+\begin{itemize}
+  \item \textbf{Quadratic reciprocity} (Gauss 1796): For distinct odd primes $p, q$,
+    $\bigl(\frac{p}{q}\bigr)\bigl(\frac{q}{p}\bigr) = (-1)^{\frac{p-1}{2}\cdot\frac{q-1}{2}}$.
+  \item \textbf{Class field theory} (Artin 1927): Every abelian extension $L/K$
+    corresponds to an open subgroup of the idèle class group $\mathbb{A}_K^\times/K^\times$.
+    The Artin map $\Art_{L/K}$ identifies Galois groups with quotients of this group.
+  \item \textbf{Langlands}: Non-abelian extensions correspond to automorphic
+    representations of $\GL_n$ rather than of $\GL_1$.
+\end{itemize}
+
+The key insight: the arithmetic of number fields (Galois groups) and the
+analysis of automorphic forms (harmonic analysis on adèle groups) are
+secretly the same subject.
+
+% ================================================================
+\section{Galois Representations}
+% ================================================================
+
+\begin{definition}[Galois representation]
+\label{def:galois_rep}
+A \emph{(continuous) $\ell$-adic Galois representation} of degree $n$ is a
+continuous group homomorphism
+\[
+  \rho : \GQ \longrightarrow \GL_n(\bar{\Q}_\ell)
+\]
+(or into $\GL_n(\Zp)$, $\GL_n(\Qp)$, etc.) where $\bar{\Q}_\ell$ carries
+the $\ell$-adic topology.  Such $\rho$ is \emph{unramified at $p$} if
+$\rho|_{I_p} = 1$ for the inertia group $I_p \subset \GQ$.
+\end{definition}
+
+\begin{example}[Cyclotomic character]
+The \emph{cyclotomic character} $\chi_\ell : \GQ \to \Z_\ell^\times$ is defined by
+$\sigma(\zeta_{\ell^n}) = \zeta_{\ell^n}^{\chi_\ell(\sigma)}$ for all $\ell^n$-th
+roots of unity.  This is a 1-dimensional representation.
+\end{example}
+
+\begin{example}[Tate module of an elliptic curve]
+Let $E/\Q$ be an elliptic curve.  The \emph{$\ell$-adic Tate module} is
+\[
+  T_\ell(E) = \varprojlim_n E[\ell^n](\bar\Q) \;\cong\; \Z_\ell^2.
+\]
+The Galois action on $\ell$-power torsion gives a 2-dimensional representation
+\[
+  \rho_{E,\ell} : \GQ \longrightarrow \GL_2(\Z_\ell) \hookrightarrow \GL_2(\Q_\ell).
+\]
+For a prime $p \nmid \ell\cdot\Delta(E)$ (good reduction), $\rho_{E,\ell}$
+is unramified at $p$ and
+\[
+  \tr(\rho_{E,\ell}(\Frob_p)) = a_p(E) = p + 1 - |E(\F_p)|.
+\]
+\end{example}
+
+\begin{definition}[$L$-function of a Galois representation]
+\label{def:galois_l}
+For $\rho : \GQ \to \GL_n(\Q_\ell)$ unramified at all but finitely many primes,
+the \emph{$L$-function} is
+\[
+  L(s, \rho) = \prod_p \det\!\bigl(1 - \rho(\Frob_p)\,p^{-s}\bigr)^{-1},
+\]
+where the product runs over primes $p$ where $\rho$ is unramified.
+At ramified primes, one uses the \emph{local Euler factor}
+$L(s, \rho|_{W_{\Q_p}})$ from the Weil--Deligne group.
+\end{definition}
+
+\begin{example}[$L$-function of an elliptic curve]
+For $E/\Q$: $L(s, E) = L(s, \rho_{E,\ell})$.  By Wiles' theorem (Shimura--Taniyama),
+this equals the $L$-function of a weight-$2$ cusp form $f_E$.  The Riemann
+hypothesis for $L(s,E)$ (i.e.\ zeroes on $\Re(s) = 1$) follows from
+Deligne's theorem on the Ramanujan conjecture.
+\end{example}
+
+% ================================================================
+\section{Automorphic Representations}
+% ================================================================
+
+\begin{definition}[Adèle ring]
+\label{def:adeles}
+The \emph{adèle ring} of $\Q$ is the restricted product
+\[
+  \mathbb{A} = \mathbb{A}_\Q = \R \times \prod_p{}' \Q_p
+  = \bigl\{(x_\infty, x_2, x_3, x_5, \ldots) : x_p \in \Z_p \text{ for almost all } p\bigr\}.
+\]
+It is a locally compact ring.  The diagonal embedding $\Q \hookrightarrow \mathbb{A}$
+(as constant sequences) makes $\Q$ a discrete cocompact subring.
+\end{definition}
+
+\begin{definition}[Automorphic representation]
+\label{def:automorphic_rep}
+An \emph{automorphic representation} of $\GL_n(\mathbb{A})$ is an irreducible
+admissible representation $\pi = \otimes'_v \pi_v$ (restricted tensor product over
+all places $v$: the primes $p$ and $v = \infty$) that occurs in the space
+$L^2(\GL_n(\Q) \backslash \GL_n(\mathbb{A}), \omega)$ for some central character $\omega$.
+
+A \emph{cuspidal} automorphic representation is one for which all constant
+terms along proper parabolic subgroups vanish.
+\end{definition}
+
+\begin{remark}
+The decomposition $\pi = \otimes'_v \pi_v$ (tensor product of local representations)
+is a fundamental structural theorem (Flath's theorem).  Each local factor $\pi_p$
+is an irreducible admissible representation of $\GL_n(\Q_p)$.
+\end{remark}
+
+\begin{example}[Classical modular forms as automorphic representations]
+A normalised Hecke eigenform $f \in S_k(\Gamma_0(N), \chi)$ (weight $k$,
+level $N$, nebentypus $\chi$) corresponds to a cuspidal automorphic
+representation $\pi_f$ of $\GL_2(\mathbb{A})$ via
+\[
+  f(z) \leftrightarrow \phi_f : g \mapsto f\!\left(\frac{ai+b}{ci+d}\right)
+  (ci+d)^{-k}, \quad g = \begin{pmatrix} a & b \\ c & d \end{pmatrix}.
+\]
+The $L$-function of $\pi_f$ is $L(s, f) = \sum_{n \ge 1} a_n n^{-s}$.
+\end{example}
+
+\begin{definition}[$L$-function of an automorphic representation]
+\label{def:automorphic_l}
+The \emph{(standard) $L$-function} of $\pi = \otimes_v \pi_v$ is
+\[
+  L(s, \pi) = \prod_v L(s, \pi_v),
+\]
+where $L(s, \pi_p) = \det(1 - A_p p^{-s})^{-1}$ (for unramified $\pi_p$,
+with $A_p \in \GL_n(\C)$ the Satake parameter).
+These $L$-functions are known (by work of Godement--Jacquet) to have analytic
+continuation and functional equation.
+\end{definition}
+
+% ================================================================
+\section{The Local Langlands Correspondence}
+% ================================================================
+
+\begin{definition}[Weil--Deligne group]
+\label{def:weil_deligne}
+For a $p$-adic field $F$ (e.g.\ $F = \Q_p$), the \emph{Weil group} $W_F$ is
+the dense subgroup of $\Gal(\bar{F}/F)$ consisting of elements whose image
+in $\Gal(\bar{\F}_p/\F_p)$ is an integral power of Frobenius.
+The \emph{Weil--Deligne group} $\WD(F)$ is the semi-direct product
+$W_F \ltimes \C$ with $w \cdot n \cdot w^{-1} = \|w\|\cdot n$
+(where $\|w\| = q^{-v(w)}$ for the Frobenius valuation $v$).
+\end{definition}
+
+\begin{theorem}[Local Langlands for $\GL_n$]
+\label{thm:local_langlands}
+Let $F$ be a finite extension of $\Q_p$.  There is a canonical bijection
+\[
+  \mathrm{LLC}_F :
+  \left\{\parbox{5cm}{\centering $n$-dim.\ irreducible representations of $\WD(F)$}\right\}
+  \;\longleftrightarrow\;
+  \left\{\parbox{5cm}{\centering irreducible admissible representations of $\GL_n(F)$}\right\}
+\]
+satisfying:
+\begin{enumerate}[label=(\roman*)]
+  \item $L(s, \pi) = L(s, \mathrm{LLC}_F(\pi))$ (compatibility of $L$-factors),
+  \item $\varepsilon(s, \pi, \psi) = \varepsilon(s, \mathrm{LLC}_F(\pi), \psi)$ (compatibility of $\varepsilon$-factors),
+  \item $\mathrm{LLC}_F(\chi \circ \det \otimes \pi) = (\chi \circ \Art_F) \otimes \mathrm{LLC}_F(\pi)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Status]
+For $\GL_1(F) = F^\times$: Class field theory (Artin map $\Art_F : F^\times \to W_F^{ab}$). \\
+For $\GL_2(F)$: Proved by Kutzko (1980) building on Henniart (1993). \\
+For $\GL_n(F)$ (general): Proved by Harris--Taylor (2001) and independently
+by Henniart (2000).
+\end{proof}
+
+% ================================================================
+\section{The Global Langlands Correspondence}
+% ================================================================
+
+\begin{conjecture}[Global Langlands, $n = 1$ case]
+\label{conj:gl1}
+For $n = 1$: Artin's abelian class field theory gives a bijection between
+continuous characters $\chi : \GQ \to \C^\times$ (= 1-dim.\ Galois reps.)
+and Hecke characters (automorphic forms of $\GL_1(\A)$):
+\[
+  \chi \leftrightarrow \omega_\chi \in \mathrm{Aut}(\GL_1(\A)).
+\]
+This is the abelian case — fully proved by class field theory.
+\end{conjecture}
+
+\begin{conjecture}[Global Langlands for $\GL_n$]
+\label{conj:global_langlands}
+There is a canonical bijection (the \emph{Langlands correspondence})
+\[
+  \mathcal{L} :
+  \left\{\parbox{5.5cm}{\centering irreducible $n$-dim.\ $\ell$-adic representations $\rho$ of $\GQ$
+  (semisimple, geometric)}\right\}
+  \;\longleftrightarrow\;
+  \left\{\parbox{5.5cm}{\centering cuspidal automorphic representations
+  $\pi$ of $\GL_n(\mathbb{A})$}\right\}
+\]
+such that $L(s, \rho) = L(s, \pi)$ (equality of $L$-functions).
+\end{conjecture}
+
+\begin{remark}
+The correspondence is expected to preserve:
+\begin{itemize}
+  \item Local $L$-factors: $L(s, \rho_p) = L(s, \pi_p)$ for all primes $p$.
+  \item Functional equation: both $L$-functions satisfy the same $\Gamma$-factor.
+  \item Local Langlands at each place.
+\end{itemize}
+\end{remark}
+
+\begin{theorem}[Langlands--Tunnell, $n = 2$, solvable image]
+\label{thm:langlands_tunnell}
+If $\rho : \GQ \to \GL_2(\C)$ is continuous with solvable image, then
+$L(s, \rho)$ is the $L$-function of an automorphic form on $\GL_2(\A)$.
+\end{theorem}
+
+This theorem was crucial in Wiles' proof of Fermat's Last Theorem.
+
+% ================================================================
+\section{Shimura--Taniyama--Wiles: An Explicit Case}
+% ================================================================
+
+\begin{theorem}[Shimura--Taniyama--Wiles--Breuil--Conrad--Diamond--Taylor]
+\label{thm:stw}
+Every elliptic curve $E/\Q$ is \emph{modular}: there exists a Hecke eigenform
+$f_E \in S_2(\Gamma_0(N))$ (for the conductor $N$ of $E$) such that
+\[
+  L(s, E) = L(s, f_E).
+\]
+Equivalently, the 2-dimensional Galois representation $\rho_{E,\ell}$ corresponds
+to the automorphic representation $\pi_{f_E}$ under the Langlands correspondence.
+\end{theorem}
+
+\begin{proof}[History and proof sketch]
+\textbf{Strategy (Wiles 1995):}
+\begin{enumerate}[label=\arabic*.]
+  \item \emph{Residual representation:} The mod-$\ell$ representation
+    $\bar\rho_{E,\ell} : \GQ \to \GL_2(\F_\ell)$ is modular by Langlands--Tunnell
+    (for $\ell = 3$, using solvability of $\GL_2(\F_3)$).
+  \item \emph{Deformation theory:} Mazur's deformation theory parametrises
+    liftings of $\bar\rho$ by a universal deformation ring $R$.  Wiles proves
+    $R \cong T$ where $T$ is the Hecke algebra — the \emph{$R = T$ theorem}.
+  \item \emph{$R = T$:} Using a \emph{numerical criterion} (Wiles) and the
+    Horizontal Iwasawa theory, the surjection $R \twoheadrightarrow T$ is shown
+    to be an isomorphism.
+  \item \emph{Conclusion:} Every $E$ with semistable reduction was handled by
+    Wiles; Taylor--Wiles completed the semistable case; BCDT (2001) completed
+    the general case.
+\end{enumerate}
+\end{proof}
+
+\begin{corollary}[Fermat's Last Theorem (Wiles 1995)]
+The equation $x^n + y^n = z^n$ has no solution in positive integers for $n \ge 3$.
+\end{corollary}
+
+\begin{proof}[Proof sketch]
+Ribet (1990) proved: if a solution $(a, b, c)$ exists, the \emph{Frey curve}
+$E: y^2 = x(x - a^n)(x + b^n)$ would be a non-modular elliptic curve
+(contradicting the Shimura--Taniyama conjecture).  Since $E$ is modular
+(Wiles' theorem), no solution exists.
+\end{proof}
+
+% ================================================================
+\section{The Fontaine--Mazur Conjecture}
+% ================================================================
+
+\begin{conjecture}[Fontaine--Mazur, 1995]
+\label{conj:fontaine_mazur}
+An irreducible $n$-dimensional $p$-adic representation $\rho : \GQ \to \GL_n(\Q_p)$
+comes from algebraic geometry (i.e.\ is a sub-representation of the étale
+cohomology of a smooth projective variety over $\Q$) if and only if it is:
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{Geometric}: unramified outside a finite set of primes and de Rham
+    at $p$ (in the sense of $p$-adic Hodge theory),
+  \item \emph{Odd}: the complex conjugation acts with eigenvalues $\pm 1$ (for $n=2$).
+\end{enumerate}
+Such geometric representations should correspond to cuspidal automorphic representations
+(under the Langlands correspondence).
+\end{conjecture}
+
+\begin{remark}
+This conjecture is the precise form of the global Langlands programme for
+$p$-adic representations.  Wiles' theorem proves a special case
+(weight-$2$ representations from elliptic curves).  The $p$-adic Langlands
+programme (Colmez, Breuil, Emerton, Kisin) proves further cases.
+\end{remark}
+
+% ================================================================
+\section{The Langlands Functoriality Conjecture}
+% ================================================================
+
+\begin{conjecture}[Langlands Functoriality]
+\label{conj:functoriality}
+Let $G$ and $H$ be reductive groups over $\Q$, and ${}^L G$, ${}^L H$ be
+their \emph{Langlands dual groups}.  For any $L$-group homomorphism
+$\phi : {}^L H \to {}^L G$, there exists a natural \emph{transfer map}
+(or \emph{functorial lift}) on automorphic representations:
+\[
+  \text{Aut}(H) \ni \pi \;\longmapsto\; \phi_* \pi \in \text{Aut}(G),
+\]
+preserving $L$-functions: $L(s, \pi, r \circ \phi) = L(s, \phi_*\pi, r)$
+for any finite-dimensional representation $r$ of ${}^L G$.
+\end{conjecture}
+
+\begin{example}[Base change for $\GL_n$]
+The \emph{base change lift} $\pi \mapsto \mathrm{BC}_{L/K}(\pi)$ for cyclic
+extensions $L/K$ was proved by Langlands ($n=2$, 1980) and Arthur--Clozel ($n$ general, 1989).
+This gives: if $\pi$ is an automorphic representation of $\GL_n(\mathbb{A}_K)$,
+then there exists a functorial lift to $\GL_n(\mathbb{A}_L)$.
+\end{example}
+
+\begin{example}[Symmetric power lifts]
+The $m$-th symmetric power lift $\text{Sym}^m : \GL_2 \to \GL_{m+1}$ would
+map $\pi_f$ (modular form of weight 2) to an automorphic representation of
+$\GL_{m+1}$.  Known: $m = 2, 3, 4$ (Kim--Shahidi 2002).  Open for $m \ge 5$.
+\end{example}
+
+% ================================================================
+\section{The $p$-adic Langlands Programme}
+% ================================================================
+
+\begin{remark}[Motivation]
+The classical Langlands correspondence works over $\C$ (or $\bar\Q_\ell$).
+The \emph{$p$-adic Langlands programme} seeks to replace $\GL_n(\Q_\ell)$ by
+$\GL_n(\Q_p)$ and complex representations by $p$-adic ones, motivated by:
+\begin{itemize}
+  \item Kisin's work on potentially semi-stable deformation rings.
+  \item Colmez's $p$-adic Local Langlands for $\GL_2(\Q_p)$ (2010).
+  \item Emerton's completed cohomology approach.
+\end{itemize}
+\end{remark}
+
+\begin{theorem}[$p$-adic Local Langlands for $\GL_2(\Q_p)$, Colmez 2010]
+\label{thm:colmez}
+There is a canonical bijection (the \emph{$p$-adic local Langlands correspondence})
+\[
+  \mathrm{LLC}_p^{\mathrm{p-adic}} :
+  \left\{\parbox{5cm}{\centering 2-dim.\ irreducible $p$-adic representations
+  of $\Gal(\bar\Q_p/\Q_p)$}\right\}
+  \;\longleftrightarrow\;
+  \left\{\parbox{5cm}{\centering admissible unitary Banach space representations of $\GL_2(\Q_p)$}\right\}
+\]
+compatible with the classical local Langlands via reduction mod $p$.
+\end{theorem}
+
+% ================================================================
+\section{Known Cases and Open Problems}
+% ================================================================
+
+\begin{remark}[Summary of known cases]
+\begin{center}
+\begin{tabular}{l|l|l}
+\textbf{Case} & \textbf{Groups} & \textbf{Status} \\
+\hline
+$n = 1$ (abelian) & $\GL_1$ & Proved (class field theory) \\
+$n = 2$, solvable image & $\GL_2$ & Proved (Langlands--Tunnell) \\
+Elliptic curves over $\Q$ & $\GL_2$ & Proved (Wiles + BCDT) \\
+Local LLC for $\GL_n$ & $\GL_n(F)$, $F/\Q_p$ & Proved (Harris--Taylor, Henniart) \\
+Base change $\GL_n$ & $\GL_n$ & Proved (Arthur--Clozel) \\
+$\text{Sym}^m$ for $m \le 4$ & $\GL_2 \to \GL_{m+1}$ & Proved (Kim--Shahidi) \\
+$p$-adic LLC for $\GL_2(\Q_p)$ & $\GL_2$ & Proved (Colmez) \\
+\hline
+Global LLC for $\GL_n$ ($n \ge 2$) & $\GL_n$ & \textbf{OPEN} \\
+Fontaine--Mazur (general) & $\GL_n$ & Partial (Wiles $n=2$, $k=2$) \\
+Non-abelian Artin conjecture & general $G$ & \textbf{OPEN} \\
+Geometric Langlands & curves over $\C$ & Recent progress (2024) \\
+\end{tabular}
+\end{center}
+\end{remark}
+
+\begin{remark}[Geometric Langlands 2024]
+In 2024, a team led by Gaitsgory completed the proof of the
+\emph{geometric Langlands conjecture} for curves over algebraically closed
+fields of characteristic 0, in the de Rham setting.  This is a major advance
+in the programme, though the arithmetic (number field) case remains open.
+\end{remark}
+
+% ================================================================
+\section{Summary}
+% ================================================================
+
+\begin{remark}[The Big Picture]
+The Langlands programme creates a dictionary:
+\begin{center}
+\begin{tabular}{l|l}
+\textbf{Number Theory / Geometry} & \textbf{Automorphic Forms / Representation Theory} \\
+\hline
+Galois group $\GQ$ & Algebraic group $G$ over $\A$ \\
+$n$-dim.\ Galois representation & Automorphic representation of $\GL_n(\A)$ \\
+Zeta/Hasse--Weil $L$-function & Automorphic $L$-function \\
+Ramification at $p$ & Local representation $\pi_p$ \\
+Frobenius at $p$ & Hecke eigenvalue $\lambda_p$ \\
+Fermat curve / elliptic curve & Weight-2 cusp form \\
+\end{tabular}
+\end{center}
+The unification of these two worlds — arithmetic and analytic — is the
+deepest theme in modern mathematics.
+\end{remark}
+
+\begin{thebibliography}{99}
+
+\bibitem{Langlands1970}
+R.~P.~Langlands,
+\textit{Problems in the theory of automorphic forms},
+in: Lectures in Modern Analysis and Applications III,
+Lecture Notes in Math.\ \textbf{170}, Springer, 1970, 18--61.
+
+\bibitem{HarrisTaylor2001}
+M.~Harris and R.~Taylor,
+\textit{The geometry and cohomology of some simple Shimura varieties},
+Ann.\ of Math.\ Studies \textbf{151}, Princeton Univ.\ Press, 2001.
+
+\bibitem{Henniart2000}
+G.~Henniart,
+\textit{Une preuve simple des conjectures de Langlands pour $\GL(n)$ sur un corps $p$-adique},
+Invent.\ Math.\ \textbf{139} (2000), 439--455.
+
+\bibitem{Wiles1995}
+A.~Wiles,
+\textit{Modular elliptic curves and Fermat's Last Theorem},
+Ann.\ of Math.\ (2) \textbf{141} (1995), 443--551.
+
+\bibitem{BCDT2001}
+C.~Breuil, B.~Conrad, F.~Diamond, R.~Taylor,
+\textit{On the modularity of elliptic curves over $\Q$: wild 3-adic exercises},
+J.\ Amer.\ Math.\ Soc.\ \textbf{14} (2001), 843--939.
+
+\bibitem{ArthurClozel1989}
+J.~Arthur and L.~Clozel,
+\textit{Simple Algebras, Base Change, and the Advanced Theory of the Trace Formula},
+Ann.\ of Math.\ Studies \textbf{120}, Princeton Univ.\ Press, 1989.
+
+\bibitem{Colmez2010}
+P.~Colmez,
+\textit{Repr\'esentations de $\GL_2(\Q_p)$ et $(\varphi,\Gamma)$-modules},
+Ast\'erisque \textbf{330} (2010), 281--509.
+
+\bibitem{Ribet1990}
+K.~Ribet,
+\textit{On modular representations of $\Gal(\bar\Q/\Q)$ arising from modular forms},
+Invent.\ Math.\ \textbf{100} (1990), 431--476.
+
+\bibitem{FrenkelBenZvi}
+E.~Frenkel,
+\textit{Langlands Correspondence for Loop Groups},
+Cambridge Univ.\ Press, 2007.
+
+\end{thebibliography}
+
+\end{document}
