@@ -426,3 +426,33 @@ _(keine bekannten offenen Features mehr)_
 - [x] `WaringGoldbachGeneral.vinogradov_three_primes_check()` — Vinogradov/Helfgott
 - [x] Goldbach-Vermutung korrekt als CONJECTURE markiert
 - [x] 111 Tests in tests/test_mahler_perfect_waring.py
+
+### Graceful Trees (src/graceful_trees.py) — Build 129
+- [x] `GracefulTreeConjecture.is_graceful(tree, labeling)` — Labeling-Prüfung
+- [x] `GracefulTreeConjecture.find_graceful_labeling(tree)` — Backtracking (n≤10)
+- [x] `GracefulTreeConjecture.generate_all_trees(n)` — Nicht-isomorphe Bäume
+- [x] `GracefulTreeConjecture.graceful_path(n)` — Explizit: Pfade P_n
+- [x] `GracefulTreeConjecture.graceful_star(k)` — Explizit: Sterne K_{1,k}
+- [x] `GracefulTreeConjecture.graceful_caterpillar(...)` — Caterpillar-Bäume
+- [x] `GracefulTreeConjecture.graceful_wheel(n)` — Wheel-Graphen
+- [x] `GracefulTreeConjecture.is_caterpillar(tree)` — Caterpillar-Prüfung
+- [x] `GracefulTreeConjecture.count_graceful_trees(max_n)` — Statistik
+- [x] `GracefulTreeConjecture.verify_known_classes()` — Verifikation bekannter Klassen
+- [x] 106 Tests in tests/test_graceful_ramsey.py
+
+### Ramsey-Zahlen (src/ramsey_numbers.py) — Build 129
+- [x] `RamseyNumbers.get(s,t)` — Lookup bekannter exakter Werte
+- [x] `RamseyNumbers.get_bounds(s,t)` — Schranken (lower, upper)
+- [x] `RamseyNumbers.has_clique(graph, size)` — Clique-Prüfung
+- [x] `RamseyNumbers.has_independent_set(graph, size)` — I-Menge-Prüfung
+- [x] `RamseyNumbers.is_ramsey_witness(graph, s, t)` — Untergrenzen-Zeugnis
+- [x] `RamseyNumbers.build_paley_graph(q)` — Paley-Graph P(q) für q≡1(mod 4)
+- [x] `RamseyNumbers.build_r55_lower_bound_witness()` — P(29): Zeuge R(5,5)>29
+- [x] `RamseyNumbers.verify_r33_equals_6()` — R(3,3)=6 vollständige Verifikation
+- [x] `RamseyNumbers.verify_via_sat(s,t,n)` — SAT-basierte Verifikation
+- [x] `RamseyBounds.upper_binomial(s,t)` — C(s+t-2,s-1)
+- [x] `RamseyBounds.lower_erdos(k)` — floor(2^{k/2})
+- [x] `RamseyBounds.upper_sah_2023(k)` — (4-ε)^k
+- [x] `RamseyBounds.upper_spencer_1975(k)` — c·k·2^{k/2}/sqrt(ln k)
+- [x] `RamseyBounds.diagonal_bounds(k_max)` — Übersichtstabelle
+- [x] `RamseyBounds.multiplicity(s,t,n)` — Goodman-Formel
