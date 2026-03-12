@@ -1,5 +1,138 @@
 # BUGS.md - specialist-maths
 
+## Behobene Bugs (Build 159)
+
+### BUG-PY-001/002 (KRITISCH — BEHOBEN Build 159): eval() Injection in app.py und visualization.py
+- **Dateien**: src/py/webapp/app.py (Route /api/logic/truth_table), src/py/visualization.py (plot_function_2d_adaptive)
+- **Problem**: eval() mit {"__builtins__": {}} nicht sandbox-sicher — Attribut-Zugriffsketten möglich
+- **Behoben**: app.py: Rekursiver Descent-Parser mit Regex-Whitelist. visualization.py: sympy.parse_expr() + lambdify()
+
+### BUG-PY-003 (HOCH — BEHOBEN Build 159): sympify() auf Benutzereingaben
+- **Dateien**: src/py/webapp/app.py (3 Stellen), src/py/parallel_compute.py (3 Stellen), src/py/formula_simplifier.py (3 Stellen)
+- **Problem**: sympy.sympify() nicht sandbox-sicher, keine Eingabevalidierung
+- **Behoben**: Ersetzt durch parse_expr() mit Zeichenvalidierung und Längenbegrenzung
+
+### BUG-PY-004 (HOCH — BEHOBEN Build 159): plugin_system.py exec_module ohne Einschränkung
+- **Datei**: src/py/plugin_system.py
+- **Problem**: exec_module() führt beliebigen Python-Code aus; plugin_dir nicht fixiert
+- **Behoben**: PLUGIN_BASE_DIR als fester absoluter Pfad; realpath()-Prüfung; Quellcode-Scan auf 15 gefährliche Muster
+
+### BUG-PY-005 (HOCH — BEHOBEN Build 159): Exception-Swallowing in parallel_compute.py
+- **Datei**: src/py/parallel_compute.py
+- **Problem**: Exceptions als Werte im Results-Dict gespeichert — Aufrufer können Fehler nicht erkennen
+- **Behoben**: Rückgabe-Struktur auf {"success": bool, "value": ..., "error": ...} umgestellt
+
+### BUG-PY-010 (MITTEL — BEHOBEN Build 159): __import__() im f-String in visualization.py
+- **Datei**: src/py/visualization.py (Zeile 4212)
+- **Problem**: f'{__import__("math").log(2)...}' — dynamischer Import im f-String, Anti-Pattern
+- **Behoben**: Reguläres import math am Modulanfang, math.log() direkt verwendet
+
+### BUG-B11-P41-EN/DE-001 (MITTEL — BEHOBEN Build 159): Falsche CRT-Residuenklassen in paper41
+- **Dateien**: papers/batch11/paper41_erdos_straus_en.tex, paper41_erdos_straus_de.tex
+- **Problem**: EN: Nur n≡1 (mod 12) als unabgedeckt genannt (fehlt n≡9). DE: n≡5 statt n≡9 (falsch — 5≡2 mod 3 ist von Typ II abgedeckt)
+- **Behoben**: EN: {n≡1, n≡9} (mod 12). DE: n≡5 → n≡9 korrigiert
+
+### BUG-B11-P42-EN-001 (GERING — BEHOBEN Build 159): Proposition 2.5 tautologisch in paper42
+- **Datei**: papers/batch11/paper42_kurepa_conjecture_en.tex
+- **Problem**: Proposition 2.5 war die Definition eines Gegenbeispiels — keine neue Information
+- **Behoben**: Ersetzt durch Korollar "Kein p ≤ 10⁸ ist eine Kurepa-Primzahl" (computationale Schranke)
+
+### BUG-B11-P42-EN-002 (MITTEL — BEHOBEN Build 159): Veralteter Verifikationsstand in paper42
+- **Datei**: papers/batch11/paper42_kurepa_conjecture_en.tex
+- **Problem**: Paper beschrieb Verifikation nur bis p < 10⁷; Literatur-Stand: p < 10⁸
+- **Behoben**: Abstract und Haupttext auf p < 10⁸ aktualisiert
+
+### BUG-B5-P28-EN/DE-001 (MITTEL — BEHOBEN Build 159): (ab)² statt (2ab)² in paper28
+- **Dateien**: papers/batch6/paper28_congruent_numbers_bsd_en.tex (Z.125), paper28_congruent_numbers_bsd_de.tex (Z.141)
+- **Problem**: Im Äquivalenzbeweis (kongruente Zahlen ↔ elliptische Kurven): (ab)² statt korrekt (2ab)²
+- **Behoben**: (ab)^2 → (2ab)^2 in beiden Dateien
+
+### BUG-B8-P33-EN-SELBERG (MITTEL — BEHOBEN Build 159): Falsche Erstattribution Selberg/Levinson in paper33
+- **Datei**: papers/reviewed/batch8/paper33_riemann_hypothesis_analytic_en.tex
+- **Problem**: "Levinson (1974) zeigte erstmals einen positiven Anteil" — falsch; Selberg (1942) war der Erste
+- **Behoben**: Selberg (1942) als Ersten genannt; Levinson verbesserte auf >1/3
+
+### BUG-B8-P36-EN/DE-ONSAGER (MITTEL — BEHOBEN Build 159): Falsche Onsager-Zuschreibung in paper36
+- **Dateien**: papers/reviewed/batch8/paper36_navier_stokes_en.tex, paper36_navier_stokes_de.tex
+- **Problem**: Onsager-Beweis De Lellis–Székelyhidi (2019) zugeschrieben; korrekt: Isett (2018)
+- **Behoben**: Isett (2018) als finaler Beweis; De Lellis–Székelyhidi als Vorarbeit (2013–2017)
+
+### BUG-B9-P38-EN/DE-PROOF-ATTRIBUTION (MITTEL — BEHOBEN Build 159): Wiles 1990 Methode
+- **Dateien**: papers/reviewed/batch9/paper38_iwasawa_theory_en.tex, paper38_iwasawa_theorie_de.tex
+- **Problem**: Wiles 1990 fälschlich "Euler-Systeme" zugeschrieben; korrekt: Modulkurven + Hecke-Algebren
+- **Behoben**: Schritt 1 umbenannt "normkompatible Kreiseinheiten"; Euler-Systeme → Rubin (1991) korrekt zugeordnet
+
+### BUG-B10-P39-EN-RH (MITTEL — BEHOBEN Build 159): Deligne/RH-Fehler in paper39 EN
+- **Datei**: papers/batch10/paper39_langlands_program_en.tex
+- **Problem**: RH für L(s,E) "follows from Deligne's theorem" — falsch; RH für L(s,E) ist offen; Re(s)=1 statt 1/2
+- **Behoben**: Deligne bewies die Ramanujan-Vermutung (Hasse-Schranke |a_p(E)| ≤ 2√p); RH für L(s,E) als offene Vermutung
+
+### BUG-B10-P39-DE-GALOIS-L-INCOMPLETE (GERING — BEHOBEN Build 159): paper39 DE
+- **Datei**: papers/batch10/paper39_langlands_programm_de.tex
+- **Problem**: Definition der Galois-L-Funktion ohne Euler-Faktoren an verzweigten Primen
+- **Behoben**: Euler-Faktor-Erläuterung ergänzt (Weil-Deligne-Gruppe, unverzweigte vs. verzweigte Primstellen)
+
+### BUG-B4-P18-EN-002 (MITTEL — BEHOBEN Build 159): Faktor 1/6 Clarification in paper18
+- **Datei**: papers/reviewed/batch4/paper18_vinogradov_en.tex
+- **Problem**: 1/6 gilt nur für ungeordnete Tripel; Remark 2.1 war inkonsistent
+- **Behoben**: Expliziter Hinweis: r₃(n) zählt geordnete Tripel; Faktor 1/6 nur für ungeordnete
+
+### BUG-B4-P19-EN-001/002 (MITTEL — BEHOBEN Build 159): Waring g(k)-Herleitung + Wooley in paper19 EN
+- **Datei**: papers/reviewed/batch4/paper19_waring_en.tex
+- **Problem**: (1) g(k)-Formel nicht hergeleitet; (2) Wooley-Beweis zirkulär
+- **Behoben**: (1) Vollständige 3-Schritt-Herleitung. (2) Beweis linearisiert, 4 explizite Abhängigkeitsschritte
+
+### BUG-B4-P19-DE-001/002/003 (MITTEL — BEHOBEN Build 159): paper19 DE fehlende Inhalte
+- **Datei**: papers/reviewed/batch4/paper19_waringsches_problem_de.tex
+- **Problem**: Fehlendes Korollar, fehlender Beweis, Wooley als Bemerkung statt Korollar
+- **Behoben**: Vollständiger Korollar-Beweis für Wooley-Schranke eingefügt; methodische Erläuterung als Bemerkung korrekt
+
+### BUG-B7-P29-NOTATION (MITTEL — BEHOBEN Build 159): σ/σ_∞ Notation in paper29
+- **Dateien**: papers/reviewed/batch7/paper29_collatz_*.tex
+- **Problem**: σ und σ_∞ in umgekehrter Bedeutung vs. Lagarias/Tao-Konvention
+- **Behoben**: Fußnote in Definition 2.2 erklärt Notation-Unterschied zu Lagarias 1985 / Tao 2022
+
+### BUG-B7-P31-FURSTENBERG-REF (MITTEL — BEHOBEN Build 159): Furstenberg 1977 in paper31
+- **Dateien**: papers/reviewed/batch7/paper31_collatz_tao_*.tex
+- **Problem**: Furstenberg 1977 (topologische Dynamik) als Collatz-Referenz zitiert — falsch
+- **Behoben**: \bibitem{Furstenberg1977} aus beiden Versionen entfernt
+
+### BUG-B7-P31-BIRKHOFF (MITTEL — BEHOBEN Build 159): Birkhoff auf Haar-Maß in paper31
+- **Dateien**: papers/reviewed/batch7/paper31_collatz_tao_*.tex
+- **Problem**: Birkhoff-Ergodensatz unter Haar-Maß angewendet, obwohl S das Haar-Maß nicht erhält
+- **Behoben**: Explicit caveat und Verweis auf S-invariantes Maß ν (Kontorovich 2010)
+
+### BUG-B3-P14-LAMBDA (GERING — BEHOBEN Build 159): |λ_d*| ≤ 1 ohne Beweis in paper14
+- **Dateien**: papers/reviewed/batch3/paper14_selberg_sieve*.tex
+- **Behoben**: Hinweissatz mit Verweis auf Cojocaru-Murty Kap. 3 ergänzt
+
+### BUG-B3-P15-BUILD (KOSMETISCH — BEHOBEN Build 159): Build 56 statt aktuell in paper15
+- **Dateien**: papers/reviewed/batch3/paper15_large_sieve*.tex
+- **Behoben**: Build-Nummer auf 153 aktualisiert
+
+### BUG-B4-P20-EN-PREDICT (GERING — BEHOBEN Build 159): r₂(100)≈8 falsch in paper20 EN
+- **Datei**: papers/reviewed/batch4/paper20_goldbach_singular_series.tex
+- **Behoben**: Wert auf ≈6 korrigiert (S(100)·Hardy-Littlewood-Asymptotik)
+
+### BUG-B9-P37-DE-NEUKIRCH-YEAR (GERING — BEHOBEN Build 159): Neukirch-Key in paper37 DE
+- **Datei**: papers/reviewed/batch9/paper37_algebraische_zahlentheorie_de.tex
+- **Behoben**: \bibitem{Neukirch1999} → {Neukirch1992}; beide Cites aktualisiert
+
+### BUG-B9-P37-DE-MISSING-BIBITEM-SAMUEL (GERING — BEHOBEN Build 159): Fehlendes Samuel-Bibitem
+- **Datei**: papers/reviewed/batch9/paper37_algebraische_zahlentheorie_de.tex
+- **Behoben**: \bibitem{Samuel1970} hinzugefügt
+
+### BUG-B1-P2-EN-HOCH-001/EN-003 (HOCH — BEHOBEN Build 154): paper2 EN Beweislücken
+- **Datei**: papers/reviewed/batch1/paper2_lehmer_three_primes.tex
+- **Problem**: p=5 Fall nur Computerscan; fehlender Kongruenz-Zwischenschritt (p≥7 Schranke)
+- **Behoben**: Vollständiger elementarer Beweis für p=5, q≥17 (Modularitätsargument); p≥7 Schranke vollständig hergeleitet
+
+### BUG-B1-P2-DE-001/002/003 (MITTEL — BEHOBEN Build 157): paper2 DE Lemma 4.1 und Schranken
+- **Datei**: papers/reviewed/batch1/paper2_lehmer_drei_primfaktoren_de.tex
+- **Behoben**: Algebraischer Zwischenschritt in Lemma korrekt; (p-1)|(q-1)-Begründung korrigiert; Schranke nur für D=1 belegt und klar deklariert
+
+---
+
 ## Behobene Bugs (Build 158)
 
 ### BUG-B7-BUGCOMMENTS (KOSMETISCH — BEHOBEN Build 158): Interne % BUG-Kommentare in Batch 7

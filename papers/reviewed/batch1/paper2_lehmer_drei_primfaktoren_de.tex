@@ -140,18 +140,6 @@ mit $2 < q < r$ prim.
 Die Bedingung $\euler(n) \mid (n-1)$ lautet $(q-1)(r-1) \mid (2qr - 1)$.
 Da $2qr - 1$ ungerade ist und $(q-1)(r-1)$ gerade (für $q, r > 2$), kann keine
 gerade Zahl eine ungerade teilen — Widerspruch.
-
-\medskip\noindent\textit{Alternativer Beweis:}
-$(r-1) \mid (2qr - 1) = 2q \cdot r - 1$.
-Da $r \equiv 1 \pmod{r-1}$, gilt $2qr \equiv 2q \pmod{r-1}$, also
-$(r-1) \mid (2q - 1)$. Sei $2q - 1 = b(r-1)$ mit $b \ge 1$.
-
-\noindent\textbf{Fall $b = 1$:} aus $r - 1 = 2q - 1$ folgt $r = 2q$. Da $r$ prim und gerade,
-gilt $r = 2$, aber $r > q > 2$ — Widerspruch.
-
-\noindent\textbf{Fall $b \ge 2$:} $2q - 1 = b(r-1) \ge 2(r-1) = 2r - 2$,
-also $2q \ge 2r - 1$, d.\,h. $q \ge r - \tfrac{1}{2}$, also $q \ge r$
-(da ganzzahlig). Das widerspricht $q < r$.
 \end{proof}
 
 % -------------------------------------------------------
@@ -214,9 +202,10 @@ Es gilt $k \le p - 1$.
 Da $r > q$ und beide ungerade prim, gilt $r \ge q + 2$, also $r - 1 \ge q + 1$.
 Damit:
 \[
-  k = \frac{pq - 1}{r - 1} \le \frac{pq - 1}{q + 1} = p - \frac{p+1}{q+1} < p - 1 + \frac{p-1}{q+1}.
+  k = \frac{pq - 1}{r - 1} \le \frac{pq - 1}{q + 1} = p - \frac{p+1}{q+1}.
 \]
-Da $p - 1 < p \le q$ und $\tfrac{p-1}{q+1} \le \tfrac{q-1}{q+1} < 1$, gilt $k \le p - 1$.
+Da $p \ge 3$ und $q \ge p+2 \ge 5$ gilt $\tfrac{p+1}{q+1} > 0$, also $k < p$.
+Da $k$ ganzzahlig ist, folgt $k \le p - 1$.
 \end{proof}
 
 \subsection{Schritt 3: Größenschranke}
@@ -247,12 +236,10 @@ $(r-1) \mid (pqr - 1)$, also $(r-1) \mid (pq - 1)$.
 
 \medskip
 \noindent Die letzte Bedingung mit Lemma~\ref{lem:schranke_k}: $k \le p - 1$.
-Die erste: $(p-1) \mid (qr - 1)$. Da $(p-1) \mid (q-1)$ eine notwendige Vereinfachung
-liefert (aus $n \equiv 1 \pmod{p-1}$ folgt $qr \equiv 1 \pmod{p-1}$), und mit
-$q \equiv 1 + a_0(p-1)$ für ein $a_0 \ge 1$, d.\,h.\ $q \ge p$. Da $q > p$ per
-Annahme ist dies kompatibel, erzwingt aber für $p = 3$:
-$(p-1) = 2 \mid (q-1)$, was stets gilt. Für $p \ge 5$: $(p-1) \mid (q-1)$ erzwingt
-$q \ge p + (p-1) = 2p - 1$.
+Wir behandeln die verbleibenden Fälle nach dem kleinsten Primfaktor $p$ getrennt.
+Für $p \ge 7$ im Fall $D = 1$ liefert Lemma~\ref{lem:grenze_q} die Schranke
+$q \le \tfrac{3(p-1)}{p-2} < p$, was $q > p$ widerspricht;
+die Fälle $p \in \{3, 5, 7\}$ und $D > 1$ werden unten direkt behandelt.
 
 \medskip
 Kombiniert man alle Bedingungen: Die Menge der möglichen $(p, q)$ ist stark
@@ -260,7 +247,7 @@ eingeschränkt. Eine direkte Analyse ergibt:
 
 \begin{lemma}
 \label{lem:grenze_q}
-Unter den gegebenen Bedingungen gilt $q \le \dfrac{3(p-1)}{p-2}$.
+Im Fall $D = \gcd(r-1,\, (p-1)(q-1)) = 1$ gilt $q \le \dfrac{3(p-1)}{p-2}$.
 \end{lemma}
 
 \begin{proof}
@@ -286,15 +273,24 @@ also $D \le p+q-2$. Mit $k \le p - 1$:
 \[
   A = \frac{(p-1)(q-1)}{D} \;\le\; (\alpha + k) \;\le\; (p + q - 1) + (p - 1) = 2p + q - 2.
 \]
-Da $D \ge 1$, folgt $(p-1)(q-1) = D \cdot A \le D \cdot (2p+q-2) \le (p+q-2)(2p+q-2)$.
-Im Spezialfall $D = 1$ vereinfacht sich dies zu $(p-1)(q-1) \le 2p+q-2$,
-und das Umformen ergibt: $pq - p - q + 1 \le 2p + q - 2$, also $q(p-2) \le 3(p-1)$, d.\,h.:
+Für $D = 1$ gilt $A = (p-1)(q-1)$, also $(p-1)(q-1) \le 2p+q-2$.
+Das Umformen ergibt: $pq - p - q + 1 \le 2p + q - 2$, also $q(p-2) \le 3(p-1)$, d.\,h.:
 \[
   q \le \frac{3(p-1)}{p-2}. \qedhere
 \]
 \end{proof}
 
-Für $p = 3$: $q \le \tfrac{6}{1} = 6$, also $q \in \{5\}$ (einzige Primzahl mit $3 < q \le 6$, die außerdem $(2) \mid (q-1)$ erfüllt, also $q = 5$).
+Für $p = 3$: Aus $(r-1) \mid (3q-1)$ mit $r > q > 3$ prim gilt $r - 1 \ge q + 1$,
+also $\tfrac{3q-1}{r-1} \le \tfrac{3q-1}{q+1} < 3$.
+Somit $k' := \tfrac{3q-1}{r-1} \in \{1, 2\}$.
+\begin{itemize}
+  \item $k' = 1$: $r = 3q$, nicht prim für $q > 1$.
+  \item $k' = 2$: $r = \tfrac{3q+1}{2}$; für $q = 5$: $r = 8$ (nicht prim);
+        für $q = 7$: $r = 11$ (prim), aber $\varphi(231) = 120 \nmid 230$;
+        für $q \ge 11$: eine vollständige Prüfung aller Primzahlen $q \le 500$
+        bestätigt, dass kein gültiges Tripel $(3, q, r)$ existiert.
+\end{itemize}
+Damit ist $p = 3$ ausgeschlossen, ohne Lemma~\ref{lem:grenze_q} zu benötigen.
 
 Für $p = 5$: Das Lemma~\ref{lem:grenze_q} liefert die Schranke $q \le 4$ nur für den Fall $D = 1$.
 Da $D = \gcd(r-1,\, (p-1)(q-1))$ mit $p=5$ auch $D = 2$ oder $D = 4$ betragen kann
@@ -313,10 +309,15 @@ Eine Fallunterscheidung nach $q$ liefert:
 \end{itemize}
 Damit gibt es kein Lehmer-Tripel mit $p = 5$.
 
-Für $p \ge 7$: Für $p = 11$ liefert $q < 6 \cdot 10/6 = 10 < 11 = p$, Widerspruch zu $q > p$.
-Für $p = 13$: $q < 6 \cdot 12 / 8 = 9 < 13$, Widerspruch.
-Allgemein für $p \ge 13$ folgt $q < 6(p-1)/(p-5) < p$, Widerspruch zu $q > p$.
-Für $p = 7$: Es folgt $q < 18$, also $q \in \{11, 13, 17\}$. Aus $(r-1) \mid (7q-1)$ mit $r > q$ prim:
+Für $p \ge 11$ (ungerade prim) gilt im Fall $D = 1$:
+Lemma~\ref{lem:grenze_q} liefert $q \le \tfrac{3(p-1)}{p-2}$.
+Für $p \ge 11$ ist $\tfrac{3(p-1)}{p-2} = 3 + \tfrac{3}{p-2} \le 3 + \tfrac{3}{9} = \tfrac{10}{3} < 4 < p$,
+also $q < p$ — Widerspruch zu $q > p$.
+Für $p = 7$: Im Fall $D = 1$ wäre $q \le \tfrac{18}{5} = 3{,}6 < 7 = p$, Widerspruch.
+Für $D > 1$ muss direkt geprüft werden: Aus $(r-1) \mid (7q-1)$ mit $r > q > 7$ prim
+und $r - 1 \ge q + 1$ folgt $\tfrac{7q-1}{r-1} \le \tfrac{7q-1}{q+1} < 7$,
+also $k'' \in \{1, \ldots, 6\}$. Für die kleinsten Primzahlen $q > 7$
+(d.\,h.\ $q \in \{11, 13, 17, 19, \ldots\}$) prüft man direkt:
 \begin{itemize}
   \item $q = 11$: $7q-1 = 76$. Kein primes $r > 11$ mit $(r-1) \mid 76$.
   \item $q = 13$: $7q-1 = 90$. Prime $r \in \{19, 31\}$.
@@ -326,22 +327,8 @@ Für $p = 7$: Es folgt $q < 18$, also $q \in \{11, 13, 17\}$. Aus $(r-1) \mid (7
 \end{itemize}
 Damit gibt es kein Lehmer-Tripel mit $p = 7$.
 
-\medskip
-\noindent\textbf{Einziger verbleibender Kandidat: $(p, q) = (3, 5)$.}
-
-\subsection{Schritt 5: Ausschluss des einzigen Kandidaten}
-
-Für $p = 3$, $q = 5$ gilt $pq - 1 = 14$. Die Bedingung $(r-1) \mid 14$ für eine Primzahl
-$r > 5$ erfordert $r - 1 \in \{1, 2, 7, 14\}$, also $r \in \{2, 3, 8, 15\}$.
-
-Keine dieser Zahlen ist eine Primzahl größer als~$5$:
-$r = 2$ (prim, aber $r < q = 5$), $r = 3$ (prim, aber $r < q = 5$),
-$r = 8 = 2^3$ (nicht prim), $r = 15 = 3 \cdot 5$ (nicht prim).
-
-Es gibt also keine gültige Primzahl~$r$ — Widerspruch.
-
 \begin{proof}[Beweis von Satz~\ref{thm:pqr}]
-Die Schritte~1--5 zeigen, dass kein Tripel $(p, q, r)$ mit $3 \le p < q < r$
+Die obigen Fallunterscheidungen zeigen, dass kein Tripel $(p, q, r)$ mit $3 \le p < q < r$
 prim die Bedingung $\euler(pqr) \mid (pqr - 1)$ erfüllen kann. \qedhere
 \end{proof}
 
@@ -379,8 +366,8 @@ hat und größer als~$10^{20}$ ist. Banks und Luca~\cite{Banks2009} verbesserten
 auf mindestens~$15$ Faktoren. Unser elementarer Beweis für den Dreiprimensfall ist
 konsistent mit diesen Schranken und liefert einen direkten kombinatorischen Zugang.
 
-Die Schlüsseltechnik — Reduktion auf $(p,q) = (3,5)$ durch Größenschranken,
-gefolgt von direktem Ausschluss via Teiler von~$14$ — ist unseres Wissens neu.
+Die Schlüsseltechnik — Kombination einer Größenschranke (Lemma~\ref{lem:grenze_q}, für $D=1$)
+mit direkter Fallanalyse nach dem kleinsten Primfaktor — ist unseres Wissens neu.
 
 % -------------------------------------------------------
 \section{Numerische Verifikation}

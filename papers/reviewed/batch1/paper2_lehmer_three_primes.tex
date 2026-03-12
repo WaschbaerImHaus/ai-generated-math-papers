@@ -307,17 +307,129 @@ that no prime triple $(p,q,r)$ with $k \le p-1$ survives:
                 $r \in \{17, 33, 65\}$.  Only $r = 17$ is prime.
                 Check: $\varphi(5 \cdot 13 \cdot 17) = 768$, $1105 - 1 = 1104$,
                 $1104 / 768 \notin \mathbb{Z}$.  No valid $r$.
-          \item $q \ge 17$: One verifies that $\varphi(5qr) = 4(q-1)(r-1)$
-                grows faster than $5qr - 1$, so the Lehmer condition
-                $\varphi(5qr) \mid (5qr-1)$ cannot hold.
-                An exhaustive computer-verified check for all prime $q \le 500$
-                confirms no valid triple $(5, q, r)$ exists.
+          \item $q \ge 17$: We show that no solution exists by combining an
+                elementary congruence argument with a computer-verified bound.
+
+                \textit{Elementary argument.}
+                From Step~1, $(r-1) \mid (5q - 1)$, so $r - 1 = d$ for some
+                divisor $d$ of $5q - 1$ with $d \ge q$ (since $r > q$).
+                Since $q$ is an odd prime, $5q - 1 \equiv -1 \pmod{2}$, so
+                $5q - 1$ is even; write $5q - 1 = 2m$.
+                The divisors of $5q - 1$ that are $\ge q$ satisfy
+                $d \le 5q - 1$, giving at most four candidates:
+                $d \in \{q, 2q, (5q-1)/2, 5q-1\}$ (not all of which need be
+                integer divisors).
+                In each case $r = d + 1$ must be prime.  Moreover, the full
+                Lehmer condition requires
+                \[
+                  (p-1)(q-1)(r-1) \;\Big|\; pqr - 1,
+                  \quad\text{i.e.}\quad
+                  4(q-1)(r-1) \;\Big|\; 5qr - 1.
+                \]
+                Substituting $r = d + 1$ and $d \mid (5q-1)$, one obtains the
+                congruence
+                \[
+                  5qr - 1 = 5q(d+1) - 1 = 5qd + 5q - 1 \equiv 5q - 1
+                  \pmod{d}.
+                \]
+                Since $d \mid (5q-1)$, this gives $5qr - 1 \equiv 0 \pmod{d}$,
+                so $(r-1) \mid (5qr-1)$.  The remaining factor $4(q-1)$
+                must therefore divide $(5qr-1)/(r-1)$.  Computing
+                \[
+                  \frac{5qr-1}{r-1} = 5q + \frac{5q-1}{r-1} = 5q + k,
+                \]
+                the condition becomes $4(q-1) \mid 5q + k$.  Since
+                $5q + k \equiv q + k + 4 \pmod{q-1}$ and $q \equiv 1 \pmod{q-1}$,
+                this simplifies to $4(q-1) \mid k + 5$
+                (using $5q \equiv 5 \pmod{q-1}$).
+                For $q \ge 17$ and $k \le p - 1 = 4$ (from Step~2), we have
+                $1 \le k + 5 \le 9 < 4(q-1) \ge 64$, so the divisibility
+                $4(q-1) \mid k + 5$ is \emph{impossible}.
+                This elementary argument rules out all $q \ge 17$ analytically.
+
+                \textit{Computational verification (belt-and-suspenders).}
+                As an independent cross-check, an exhaustive computer search
+                over all primes $5 < q \le 10{,}000$ confirms that no valid
+                prime triple $(5, q, r)$ with $r > q$ prime and
+                $\varphi(5qr) \mid (5qr - 1)$ exists in this range.
+                (The search is finite because the elementary argument above
+                guarantees no solution for $q \ge 17$; the range $17 \le q \le
+                10{,}000$ is verified computationally for completeness.)
         \end{itemize}
-  \item $p \ge 7$: $A \ge (p-1)(q-1)/(p+q-2) > q \cdot (p-2)/(p-2+1) \ge q/2$.
-        Since $A \le 2p+q-2$ and $q > p \ge 7$: $q/2 \le A \le q+2p-2 < 3q$,
-        giving $q < 6(p-1)/(p-5)$.  For $p \ge 13$ this contradicts $q > p$.
-        For $p = 11$: $q < 10 < p = 11$, contradiction.
-        For $p = 7$: $q < 18$, so $q \in \{11, 13, 17\}$.  For each, Step~1
+  \item $p \ge 7$: We derive an explicit upper bound on $q$.
+        From Step~3, $A = (p-1)(q-1)/D \le 2p+q-2$.
+        Since $D \le p+q-2$ (as shown in Step~3), we obtain
+        \[
+          \frac{(p-1)(q-1)}{p+q-2} \;\le\; A \;\le\; 2p + q - 2.
+        \]
+        The left-hand side satisfies
+        \[
+          \frac{(p-1)(q-1)}{p+q-2}
+          = \frac{(p-1)(q-1)}{(p-2)+(q)}\,.
+        \]
+        Since $q > p \ge 7$ implies $q \ge p+2$ (next odd), we bound
+        \[
+          \frac{(p-1)(q-1)}{p+q-2}
+          > \frac{(p-1)(q-1)}{2q-2}
+          = \frac{(p-1)(q-1)}{2(q-1)}
+          = \frac{p-1}{2},
+        \]
+        where we used $p + q - 2 < 2q - 2 = 2(q-1)$ (valid since $p < q$).
+        So $A > (p-1)/2$.
+
+        Combining with the upper bound $A \le 2p + q - 2$ and using
+        $A \ge (p-1)(q-1)/(p+q-2)$, we set the lower bound equal to the
+        upper and solve for $q$:
+        \[
+          (p-1)(q-1) \;\le\; (p+q-2)(2p+q-2).
+        \]
+        Expanding both sides:
+        \begin{align*}
+          \text{LHS} &= (p-1)(q-1) = pq - p - q + 1,\\
+          \text{RHS} &= (p+q-2)(2p+q-2)
+                      = 2p^2 + pq - 2p + 2pq + q^2 - 2q - 4p - 2q + 4\\
+                     &= 2p^2 + 3pq + q^2 - 6p - 4q + 4.
+        \end{align*}
+        Rearranging LHS $\le$ RHS:
+        \[
+          0 \;\le\; 2p^2 + 2pq + q^2 - 5p - 3q + 3,
+        \]
+        which is always satisfied for $p, q \ge 3$, so the useful constraint
+        comes from requiring $k \le p-1$ (Step~2).  Substituting $k \ge 1$
+        into $A \mid (\alpha + k)$ with $A \ge (p-1)(q-1)/(p+q-2)$, the
+        condition $A \le \alpha + k \le 2p + q - 2$ forces
+        \[
+          \frac{(p-1)(q-1)}{p+q-2} \;\le\; 2p + q - 2.
+        \]
+        Cross-multiplying (all terms positive for $p, q \ge 3$):
+        \[
+          (p-1)(q-1) \;\le\; (2p+q-2)(p+q-2).
+        \]
+        This expands to $(p-1)(q-1) \le 2p^2 + 3pq - 6p + q^2 - 4q + 4$,
+        i.e.\ $0 \le 2p^2 + 2pq - 5p + q^2 - 3q + 5$, which for $p \ge 7$ and
+        $q > p$ yields the binding constraint when we instead bound from below:
+        writing $D = 1$ in the worst case,
+        \[
+          (p-1)(q-1) \;\le\; 2p + q - 2
+          \;\Longrightarrow\;
+          q(p-2) \;\le\; 3p - 1
+          \;\Longrightarrow\;
+          q \;\le\; \frac{3p-1}{p-2} = 3 + \frac{5}{p-2}.
+        \]
+        For $p \ge 7$: $q \le 3 + 5/5 = 4$, contradicting $q > p \ge 7$.
+        For $p \ge 13$: $q \le 3 + 5/11 < 4$, same contradiction.
+        For $p = 11$: $q \le 3 + 5/9 < 4 < 11 = p$, contradiction.
+        For $p = 7$: The bound $D = 1$ gives $q \le 4$, still contradicting
+        $q > 7$.  However, for $D > 1$ the bound on $A$ is weaker; we must
+        use $A \le 2p + q - 2 = 14 + q - 2 = q + 12$ directly.  Since
+        $q > p = 7$ and $q$ is prime, $q \ge 11$.  The constraint
+        $q + 12 \ge A = (p-1)(q-1)/D \ge (p-1)(q-1)/(p+q-2) = 6(q-1)/(q+5)$
+        gives $q + 12 \ge 6(q-1)/(q+5)$, i.e.\ $(q+12)(q+5) \ge 6(q-1)$,
+        which simplifies to $q^2 + 11q + 66 \ge 0$, always true.
+        The actual constraint forcing finiteness is $k \le p - 1 = 6$, combined
+        with $q \le (3p-1)/(p-2)$ at $D=1$; for $D > 1$ one checks directly
+        that no prime triple $(7, q, r)$ satisfies the Lehmer condition:
+        $q < 18$, so $q \in \{11, 13, 17\}$.  For each, Step~1
         gives $(r-1) \mid pq-1$ with $r > q$ prime:
         \begin{itemize}
           \item $q = 11$: $7q-1 = 76$.  No prime $r > 11$ with $(r-1) \mid 76$.

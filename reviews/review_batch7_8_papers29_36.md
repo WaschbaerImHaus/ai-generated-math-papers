@@ -1,324 +1,306 @@
-# Mathematisches Audit — Batch 7 & 8 (Papers 29–36)
-## Collatz-Vermutung und Millennium-Probleme
-### Build 11 — 2026-03-12
+# Vollständiger mathematischer Audit — Batch 7 & 8 (Papers 29–36)
+
+**Datum:** 2026-03-12
+**Build:** 15
+**Gutachter:** Claude Opus (automatisierter mathematischer Peer-Review)
+**Fokus:** Collatz-Vermutung (Papers 29–32), Riemannsche Hypothese (33), ABC-Vermutung (34), BSD-Vermutung (35), Navier-Stokes (36)
 
 ---
 
-## BATCH 7 — Collatz-Vermutung (Papers 29–32)
+## Zusammenfassung
+
+| Paper | Titel | Sprache | Urteil | Offene Fehler |
+|-------|-------|---------|--------|----------------|
+| 29 | Collatz-Grundlagen | EN | ⚠️ ÜBERARBEITUNG | BUG-B7-P29-CIRCULAR-PROP4, BUG-B7-P29-NOTATION |
+| 29 | Collatz-Grundlagen | DE | ⚠️ ÜBERARBEITUNG | Gleiche Fehler wie EN |
+| 30 | Collatz p-adisch | EN | ⚠️ ÜBERARBEITUNG | BUG-B7-P30-CONCLUSION |
+| 30 | Collatz p-adisch | DE | ⚠️ ÜBERARBEITUNG | BUG-B7-P30-CONCLUSION |
+| 31 | Tao probabilistisch | EN | ⚠️ ÜBERARBEITUNG | BUG-B7-P31-FURSTENBERG-REF, BUG-B7-P31-BIRKHOFF |
+| 31 | Tao probabilistisch | DE | ⚠️ ÜBERARBEITUNG | Gleiche Fehler wie EN |
+| 32 | Collatz ergodisch | EN | ⚠️ ÜBERARBEITUNG | BUG-B7-P32-CONCLUSION |
+| 32 | Collatz ergodisch | DE | ⚠️ ÜBERARBEITUNG | BUG-B7-P32-CONCLUSION |
+| 33 | Riemannsche Hypothese | EN | ⚠️ ÜBERARBEITUNG | BUG-B8-P33-EN-SELBERG |
+| 33 | Riemannsche Hypothese | DE | ✅ DRUCKREIF | keine |
+| 34 | ABC-Vermutung | EN | ✅ DRUCKREIF | keine |
+| 34 | ABC-Vermutung | DE | ✅ DRUCKREIF | keine |
+| 35 | BSD-Vermutung | EN | ✅ DRUCKREIF | keine |
+| 35 | BSD-Vermutung | DE | ✅ DRUCKREIF | keine |
+| 36 | Navier-Stokes | EN | ⚠️ ÜBERARBEITUNG | BUG-B8-P36-EN-ONSAGER |
+| 36 | Navier-Stokes | DE | ⚠️ ÜBERARBEITUNG | BUG-B8-P36-DE-ONSAGER |
+
+**Druckreif:** 4 von 16
+**Überarbeitung nötig:** 12 von 16
 
 ---
 
-### Paper 29 (EN): Collatz Conjecture — Introduction and Survey
-
-**Hauptbehauptung:** Einführung in die Collatz-Vermutung T(n): Überblick über Iterationsverhalten, Heuristiken, Dichteresultate (Tao 2022) und offene Fragen. Die Vermutung selbst gilt explizit als UNBEWIESEN.
-
-**Status der Hauptvermutung:** OFFEN — korrekt deklariert, keine falschen Beweisansprüche.
-
-**Mathematische Korrektheit:** ⚠️
-
-**Fehler:**
-- [MITTEL] Proposition 4.1, Beweis (ca. Zeile 210–230): Der Beweis der Dichteaussage über Orbits enthält eine zirkuläre Begründung — „Assuming the conjecture holds, the density of…" wird als Zwischenschritt eines Proposition-Beweises verwendet. Die Aussage selbst ist korrekt formuliert als Proposition (nicht Theorem), aber der Beweis setzt die Hauptvermutung voraus, ohne dies explizit als Konditional-Satz in der Behauptung zu formulieren. Empfehlung: Proposition entweder zu „Proposition 4.1 (conditional on Collatz conjecture)" umbenennen oder bedingte Logik in den Beweis explizit einführen.
-- [GERING] Remark 4.4 (heuristische Faktorberechnung): Erst wird Faktor 1 berechnet (für nicht-2er-Teilungen), dann korrigiert auf (3/4)^{1/2}. Diese Darstellung ist inkonsistent und suggeriert einen Rechenfehler, obwohl es eine schrittweise Verfeinerung sein soll. Empfehlung: Darstellung klarer als iterative Verbesserung kennzeichnen.
-- [GERING] Tao 2022 korrekt formuliert als logarithmische Dichte 1 für „almost bounded" — keine Übertreibung.
-
-**Urteil:** ÜBERARBEITUNG NOTWENDIG (Proposition 4.1 Beweis konditionalisieren)
+## Strukturierte Mängelliste
 
 ---
 
-### Paper 29 (DE): Collatz-Vermutung — Einführung und Überblick
+### BUG-B7-P30-CONCLUSION — BESTÄTIGT (aus vorherigem Audit)
 
-**Hauptbehauptung:** Äquivalente deutsche Version von Paper 29 EN. Gleiche Themenabdeckung, gleiche Propositions und Theoreme.
+- **Paper-ID:** Paper 30
+- **Sprache:** EN + DE
+- **Schwere:** HOCH (inhaltlicher Widerspruch)
+- **Zeile:** EN: 381 / DE: 390
+- **Beschreibung:** Die Zusammenfassung schreibt:
+  - EN: „$T$ is not measure-preserving with respect to Haar measure, but $S$ is ergodic."
+  - DE: „$T$ ist nicht maßerhaltend bezüglich des Haar-Maßes, aber $S$ ist ergodisch."
 
-**Status der Hauptvermutung:** OFFEN — korrekt deklariert.
-
-**Mathematische Korrektheit:** ⚠️
-
-**Fehler:**
-- [MITTEL] Satz 4.1 (äquivalent zu Proposition 4.1 EN): Identische zirkuläre Begründung wie in EN-Version. Beweis setzt Vermutung voraus ohne konditionalen Vorbehalt im Satzstatement.
-- [GERING] Bemerkung 4.4: Identische inkonsistente Faktordarstellung wie EN.
-- EN/DE-Parität: gut.
-
-**Urteil:** ÜBERARBEITUNG NOTWENDIG (identisch zu EN)
-
----
-
-### Paper 30 (EN): Collatz Conjecture — p-adic Approach
-
-**Hauptbehauptung:** Analyse der Collatz-Funktion T und der Syracuse-Funktion S im Rahmen der 2-adischen ganzen Zahlen Z₂. Fixpunkte, Zyklen, Dichte von Orbits, Ergodizitätsfrage für S auf Z₂ mit Haar-Maß.
-
-**Status der Hauptvermutung:** OFFEN — korrekt deklariert. S Ergodizität korrekt als Conjecture (im Haupttext) behandelt.
-
-**Mathematische Korrektheit:** ⚠️
-
-**Fehler:**
-- [HOCH] Conclusion (Zeile 381): „but S is ergodic" wird als etablierte Tatsache geschrieben, obwohl im Textkörper (Section 4) korrekt als unbewiesen/Conjecture deklariert. Dies widerspricht dem eigenen Textkörper und könnte als Beweisanspruch missgedeutet werden.
-- [INFORMATION] Frühere kritische Fehler BUG-B7-P30-001 bis -004 (T vs. S Fixpunkt-Verwechslung, fehlender Beweis c_{k+1} ∈ Z₂, fehlende Beweisskizze für Perioden aller Ordnungen, Ergodizität als Theorem) wurden in früheren Review-Runden behoben.
-- [GERING] Fixpunkt -1/2 ∉ Z₂ korrekt behandelt. Unterschied T vs. S bei x=-1 (Remark 3.3) korrekt.
-
-**Urteil:** ÜBERARBEITUNG NOTWENDIG (Conclusion Zeile 381 korrigieren)
+  Dies stellt Ergodizität als **etablierte Tatsache** dar. Im Textkörper (Section 4, Zeile 347–363 EN, insb. BUG-B7-P30-EN/DE-004) ist Ergodizität korrekt als **Vermutung/unbewiesen** deklariert. Direkter Widerspruch zwischen Body und Conclusion.
+- **Korrektur:**
+  - EN: „but $S$ is ergodic" → „but $S$ is conjectured to be ergodic (see Conjecture 4.X)"
+  - DE: „aber $S$ ist ergodisch" → „aber $S$ wird als ergodisch vermutet (siehe Vermutung 4.X)"
 
 ---
 
-### Paper 30 (DE): Collatz-Vermutung — p-adischer Ansatz
+### BUG-B7-P32-CONCLUSION — BESTÄTIGT (aus vorherigem Audit)
 
-**Hauptbehauptung:** Äquivalente deutsche Version von Paper 30 EN. Gleiche mathematische Inhalte.
+- **Paper-ID:** Paper 32
+- **Sprache:** EN + DE
+- **Schwere:** HOCH (inhaltlicher Widerspruch)
+- **Zeile:** EN: 371 / DE: 377–378
+- **Beschreibung:** Die Zusammenfassung listet:
+  - EN: „The Syracuse map $S$ is ergodic and mixing with exponential decay of correlations."
+  - DE: „Die Syrakus-Abbildung $S$ ist ergodisch und mischend mit exponentiellem Abfall von Korrelationen."
 
-**Status der Hauptvermutung:** OFFEN — korrekt deklariert im Textkörper.
+  Im Textkörper sind alle drei Eigenschaften korrekt als **bedingt/unbewiesen** markiert:
+  - Theorem 3.3 (Zeile 135–145): Ergodensatz explizit als „conditional" bezeichnet
+  - Remark 5.4 (Zeile 202–207): Spektrale Lücke als „key unproved claim" markiert
+  - Theorem 4.2 (Zeile 271): Als Conjecture herabgestuft (BUG-B7-P32-EN/DE-004 behoben)
 
-**Mathematische Korrektheit:** ⚠️
-
-**Fehler:**
-- [HOCH] Zusammenfassung (Zeile 390): „aber S ist ergodisch" als Faktum geschrieben, obwohl im Textkörper korrekt als unbewiesene Vermutung behandelt. Identisches Problem wie EN Zeile 381.
-- EN/DE-Parität: gut.
-
-**Urteil:** ÜBERARBEITUNG NOTWENDIG (Zusammenfassung Zeile 390 korrigieren)
-
----
-
-### Paper 31 (EN): Tao's Probabilistic Approach to the Collatz Conjecture
-
-**Hauptbehauptung:** Darstellung von Taos 2022-Ergebnis: Die Menge der Startwerte, deren Collatz-Orbit „almost bounded" ist, hat logarithmische Dichte 1 in den positiven ganzen Zahlen. Explizite und korrekte Abgrenzung von Taos Resultat gegenüber einem vollständigen Beweis der Collatz-Vermutung.
-
-**Status der Hauptvermutung:** OFFEN — korrekt und präzise deklariert. Section 5 expliziert klar die verbleibende Lücke zwischen Taos Ergebnis und vollem Beweis.
-
-**Mathematische Korrektheit:** ⚠️
-
-**Fehler:**
-- [MITTEL] Lemma 5.3 (Furstenberg-Referenz): Zitiert Furstenberg 1977 für ein „Korrespondenzprinzip" im Collatz-Kontext. Furstenberg 1977 ist jedoch der Ergodic-Theorem-Beweis von Szemerédi's Theorem über arithmetische Progressionen — nicht ein Collatz-Korrespondenzprinzip. Die Anwendung ist mathematisch ungenau. Korrekte Referenz für das verwendete Prinzip wäre entweder Tao 2022 direkt oder eine eigene Herleitung.
-- [INFORMATION] BUG-B7-P31-EN-001 (informeller Beweis nicht markiert) wurde in früherer Review-Runde behoben.
-- Tao-Resultat selbst korrekt: „logarithmische Dichte 1 für almost bounded orbits" — nicht als vollständiger Beweis dargestellt.
-
-**Urteil:** ÜBERARBEITUNG NOTWENDIG (Lemma 5.3 Referenz korrigieren)
+  Die Conclusion ignoriert alle diese Einschränkungen und präsentiert die Ergebnisse als bewiesen.
+- **Korrektur:**
+  - EN: „$S$ is ergodic and mixing" → „$S$ is conjectured to be ergodic and mixing (conditional on the unproved spectral gap; see Remark 5.4)"
+  - DE: analog
 
 ---
 
-### Paper 31 (DE): Taos probabilistischer Ansatz zur Collatz-Vermutung
+### BUG-B7-P29-CIRCULAR-PROP4 — BESTÄTIGT (aus vorherigem Audit)
 
-**Hauptbehauptung:** Äquivalente deutsche Version. Taos Ergebnis korrekt dargestellt, Lücke zum vollen Beweis klar.
+- **Paper-ID:** Paper 29
+- **Sprache:** EN + DE
+- **Schwere:** MITTEL (logischer Fehler im Beweis)
+- **Zeile:** EN: 184–199 / DE: 190–206
+- **Beschreibung:** Proposition 4.4 (prop:pos_density) behauptet **unbedingt**: „The set $A_M$ has natural density 1." Der Beweis beginnt jedoch mit:
+  - EN (Zeile 192): „Every positive integer eventually reaches a power of 2 under the conjecture (if true). Assuming the conjecture, all integers are in $A_M$."
 
-**Status der Hauptvermutung:** OFFEN — korrekt deklariert.
+  Der Beweis mischt bedingtes Reasoning (unter Annahme der Collatz-Vermutung) mit einer scheinbar unbedingten Schlussfolgerung über ergodische Abschätzungen (Zeile 197: „by ergodic-theoretic estimates (see Terras1976)"). Das Statement der Proposition ist unbedingt formuliert, aber der Beweis stützt sich teils auf die Vermutung.
 
-**Mathematische Korrektheit:** ⚠️
-
-**Fehler:**
-- [MITTEL] Lemma 5.3 (Furstenberg-Referenz): Identisches Zitierproblem wie EN. Furstenberg 1977 falsch kontextualisiert.
-- EN/DE-Parität: ausgezeichnet.
-
-**Urteil:** ÜBERARBEITUNG NOTWENDIG (Lemma 5.3 Referenz korrigieren, identisch zu EN)
-
----
-
-### Paper 32 (EN): Collatz Conjecture — Ergodic Theory Approach
-
-**Hauptbehauptung:** Analyse der Collatz-Syracuse-Dynamik mit Methoden der Ergodentheorie: invariante Maße auf Z₂ (Haar-Maß), Birkhoff-Ergodensatz-Anwendung, Transfer-Operator L_S, Mischungseigenschaft, Hausdorff-Dimension von Orbits. Ergodizität und Spektrallücke werden korrekt (im Textkörper) als bedingte/unbewiesen deklariert.
-
-**Status der Hauptvermutung:** OFFEN — im Textkörper korrekt behandelt.
-
-**Mathematische Korrektheit:** ⚠️
-
-**Fehler:**
-- [HOCH] Conclusion (Zeilen 371–373): „The Syracuse map S is ergodic and mixing with exponential decay of correlations" als bewiesene Tatsache aufgelistet, obwohl alles im Textkörper korrekt als bedingt/unbewiesen markiert. Direkter Widerspruch zum eigenen Textkörper.
-- [INFORMATION] Frühere Fehler BUG-B7-P32-001 bis -004 (Eindeutigkeit von ν, zirkuläre Begründung, Spektralradius nicht rigoros, Hausdorff-Dimension als Theorem) in früherer Runde behoben.
-- Spektrallücke des Transfer-Operators L_S im Textkörper korrekt als unbewiesene Behauptung markiert.
-- Krylov-Bogolyubov-Theorem (Existenz invarianter Maße) korrekt angewendet.
-- Bedford-McMullen-Maße und symbolische Dynamik korrekt beschrieben.
-
-**Urteil:** ÜBERARBEITUNG NOTWENDIG (Conclusion Zeilen 371–373 korrigieren)
+  **Präzisierung:** Der zweite Teil des Beweises (Rückwärtsiterations-Baum, Terras-Abschätzung) ist tatsächlich unbedingt gültig. Das Problem ist die **verwirrende Beweisstruktur**: Zeilen 192–193 suggerieren, der Beweis benötige die Vermutung, obwohl der eigentliche Beweis (Zeilen 194–198) davon unabhängig ist.
+- **Korrektur:** Den bedingten Teil (Zeilen 192–193) entfernen oder als separate Motivation kennzeichnen. Der Beweis via Rückwärtsbaum/Terras ist eigenständig und sollte allein stehen.
 
 ---
 
-### Paper 32 (DE): Collatz-Vermutung — Ergodischer Ansatz
+### BUG-B7-P31-FURSTENBERG-REF — BESTÄTIGT (aus vorherigem Audit)
 
-**Hauptbehauptung:** Äquivalente deutsche Version. Identische mathematische Inhalte.
+- **Paper-ID:** Paper 31
+- **Sprache:** EN + DE
+- **Schwere:** MITTEL (mathematisch ungenaue Referenz)
+- **Zeile:** EN: 269–276 / DE: 276–283
+- **Beschreibung:** Lemma 5.6 (lem:furstenberg) ist als **Lemma** deklariert, enthält aber:
+  - Keine präzise mathematische Aussage
+  - Keinen Beweis
+  - Nur eine vage Beschreibung: „provides a structural result connecting combinatorial properties of the Collatz orbit with the ergodic structure"
 
-**Status der Hauptvermutung:** OFFEN — im Textkörper korrekt.
+  Furstenberg 1977 beweist das Korrespondenzprinzip für Szemerédi-artige Aussagen über arithmetische Progressionen — es ist **kein** Collatz-spezifisches Werkzeug. Die Anwendung auf Collatz-Dichteaussagen ist nicht offensichtlich und wird nicht hergeleitet.
 
-**Mathematische Korrektheit:** ⚠️
-
-**Fehler:**
-- [HOCH] Zusammenfassung (Zeilen 379–380): „Die Syracuse-Abbildung S ist ergodisch und mischend mit exponentiellem Korrelationsabfall" als Tatsache. Identisches Problem wie EN.
-- EN/DE-Parität: sehr gut.
-
-**Urteil:** ÜBERARBEITUNG NOTWENDIG (Zusammenfassung Zeilen 379–380 korrigieren)
-
----
-
-## BATCH 8 — Millennium-Probleme (Papers 33–36)
+  Zum Vergleich: Paper 32 (Zeile 211–214) formuliert dasselbe Prinzip korrekt als allgemeines Theorem mit präziser mathematischer Aussage.
+- **Korrektur:** Entweder (a) das Lemma durch eine präzise Formulierung mit Beweis/Beweisskizze ersetzen, oder (b) auf Paper 32, Theorem 5.1 (thm:furstenberg) verweisen, oder (c) als Remark mit korrekter Beschreibung umwandeln.
 
 ---
 
-### Paper 33 (EN): The Riemann Hypothesis — An Analytic Survey
+### BUG-B7-P29-NOTATION — NEU
 
-**Hauptbehauptung:** Überblick über die Riemann-Hypothese (RH): ζ-Funktion, Nullstellen, nullstellenfreie Gebiete (de la Vallée Poussin 1899, Korobov-Vinogradov 1958), Hardy 1914 (unendlich viele Nullstellen auf kritischer Geraden), Levinson 1/3, Conrey 2/5, Platt-Trudgian 2021 (numerische Verifikation bis 3·10^{12}). RH als offenes Millennium-Problem.
+- **Paper-ID:** Paper 29
+- **Sprache:** EN + DE
+- **Schwere:** MITTEL (Konventionsbruch, Verwechslungsgefahr)
+- **Zeile:** EN: 88–91 / DE: 88–91
+- **Beschreibung:** Definition 2.3 verwendet:
+  - $\sigma(n)$ für die **totale** Stoppzeit (smallest $k$ with $T^k(n) = 1$)
+  - $\sigma_\infty(n)$ für die (einfache) **Stoppzeit** (smallest $k$ with $T^k(n) < n$)
 
-**Status der Hauptvermutung:** OFFEN — korrekt und unmissverständlich deklariert. Kein Beweisanspruch.
+  Die Standardkonvention (Lagarias 1985, Terras 1976, Tao 2022) ist **umgekehrt**:
+  - $\sigma(n)$ = Stoppzeit (first $k$ with $T^k(n) < n$)
+  - $\sigma_\infty(n)$ = totale Stoppzeit (first $k$ with $T^k(n) = 1$)
 
-**Mathematische Korrektheit:** ✅
-
-**Fehler:**
-- Keine mathematischen Fehler gefunden.
-- Alle zitierten Resultate korrekt: Hardy (1914), Levinson (1/3), Conrey (2/5), Platt-Trudgian (2021, 3·10^12 Nullstellen), Korobov-Vinogradov-Gebiet korrekt.
-- Explizite Formeln (Riemann-von Mangoldt) korrekt dargestellt.
-- RH als Millennium-Problem des Clay-Instituts korrekt referenziert.
-
-**Urteil:** DRUCKREIF
-
----
-
-### Paper 33 (DE): Die Riemann-Hypothese — eine analytische Übersicht
-
-**Hauptbehauptung:** Äquivalente deutsche Version. Identische mathematische Inhalte und Quellenangaben.
-
-**Status der Hauptvermutung:** OFFEN — korrekt deklariert.
-
-**Mathematische Korrektheit:** ✅
-
-**Fehler:**
-- Keine mathematischen Fehler gefunden.
-- Ausgezeichnete EN/DE-Parität.
-- Alle Fachbegriffe korrekt ins Deutsche übersetzt.
-
-**Urteil:** DRUCKREIF
+  Der Index $\infty$ soll andeuten, dass man „bis zum Ende" (bis 1) iteriert — nicht „bis erstmals absteigend". Die Papers 30–32 verwenden implizit die gleiche (vertauschte) Notation.
+- **Korrektur:** $\sigma(n)$ und $\sigma_\infty(n)$ tauschen, um mit der Standardliteratur konsistent zu sein.
 
 ---
 
-### Paper 34 (EN): The abc Conjecture
+### BUG-B7-P31-BIRKHOFF — NEU
 
-**Hauptbehauptung:** Einführung in die abc-Vermutung: Radikal rad(abc), Qualitäten bekannter Tripel, Mason-Stothers-Theorem (Funktionenkörperanalogon bewiesen), Konsequenzen (Fermat, Roth, Mordell). Mochizukis IUT-Beweis: veröffentlicht in PRIMS 2021, Konsens nicht erreicht, Scholze-Stix-Einwand 2018 nicht aufgelöst.
+- **Paper-ID:** Paper 31
+- **Sprache:** EN + DE
+- **Schwere:** MITTEL (mathematische Inkorrektheit)
+- **Zeile:** EN: 252–267 (Definition 5.8 / thm:ergodic_conv) / DE: 258–274
+- **Beschreibung:** Theorem 5.8 wendet Birkhoffs Ergodensatz auf das System $(\mathbb{Z}_2^{\text{odd}}, \mu, S)$ an, wobei $\mu$ das Haar-Maß ist. Birkhoffs Ergodensatz erfordert jedoch, dass die Transformation $S$ **maßerhaltend** bezüglich $\mu$ ist.
 
-**Status der Hauptvermutung:** OFFEN — korrekt und präzise deklariert. abc-Vermutung ausdrücklich als unbewiesen. Mochizukis Anspruch korrekt als „claimed proof; published PRIMS 2021; consensus not achieved; Scholze-Stix objection unresolved" dargestellt.
+  Paper 30 (Zeile 381) und Paper 32 (Zeile 369) stellen explizit fest, dass $T$ (und damit auch $S$) **nicht** maßerhaltend bezüglich des Haar-Maßes ist. Die direkte Anwendung von Birkhoff auf $(Z_2^{\text{odd}}, \mu_{\text{Haar}}, S)$ ist daher **ungültig**.
 
-**Mathematische Korrektheit:** ✅
-
-**Fehler:**
-- Keine mathematischen Fehler gefunden.
-- Mason-Stothers korrekt als bewiesenes Funktionenkörper-Analogon.
-- Scholze-Stix-Einwand korrekt als von der Mehrheit der Gemeinschaft als stichhaltig betrachtet beschrieben.
-- Qualitätsbeispiele (Brocard, Beukers) korrekt.
-
-**Urteil:** DRUCKREIF
+  Paper 32 löst dieses Problem korrekt, indem es ein S-invariantes Maß $\nu$ postuliert (Theorem 3.3, Zeile 136) und Birkhoff auf $(\mathbb{Z}_2^{\text{odd}}, \nu, S)$ anwendet. Paper 31 versäumt diese Unterscheidung.
+- **Korrektur:** Das Maß in der Anwendung von Birkhoff von $\mu$ (Haar) auf ein $S$-invariantes Maß $\nu$ ändern (wie in Paper 32), oder explizit erklären, welches Maß gemeint ist.
 
 ---
 
-### Paper 34 (DE): Die abc-Vermutung
+### BUG-B8-P33-EN-SELBERG — NEU
 
-**Hauptbehauptung:** Äquivalente deutsche Version. Mochizukis Situation und Scholze-Stix korrekt und vollständig wiedergegeben.
+- **Paper-ID:** Paper 33
+- **Sprache:** EN
+- **Schwere:** MITTEL (historischer Fehler)
+- **Zeile:** EN: 244–246
+- **Beschreibung:** Der Text nach dem Selberg-Theorem (Theorem zur Nullstellenanzahl auf der kritischen Geraden) schreibt:
 
-**Status der Hauptvermutung:** OFFEN — korrekt deklariert.
+  > „this shows a positive proportion of zeros [...] lie on the critical line, but the proportion was only shown to be positive by Levinson in 1974."
 
-**Mathematische Korrektheit:** ✅
+  Dies ist **historisch falsch**. Selberg (1942) zeigte bereits einen **positiven Anteil** der Nullstellen auf der kritischen Geraden ($N_0(T) \geq A \cdot T \log T$ impliziert positiven Anteil, da $N(T) \sim \frac{T}{2\pi} \log \frac{T}{2\pi}$). Levinsons Beitrag (1974) war die **quantitative Verbesserung** auf $\geq 1/3$, nicht das erstmalige Zeigen eines positiven Anteils.
 
-**Fehler:**
-- Keine mathematischen Fehler gefunden.
-- Ausgezeichnete EN/DE-Parität.
-
-**Urteil:** DRUCKREIF
-
----
-
-### Paper 35 (EN): The Birch and Swinnerton-Dyer Conjecture
-
-**Hauptbehauptung:** BSD-Vermutung: Rang r der Mordell-Weil-Gruppe E(Q) ≅ Z^r ⊕ T entspricht der Ordnung der Nullstelle von L(E,s) bei s=1. Starke BSD-Formel mit allen 5 Invarianten. Teilresultate: Coates-Wiles (1977, CM, Rang 0), Kolyvagin (1989, Rang 0 allgemein), Gross-Zagier+Kolyvagin (1986–1989, Rang 1), Skinner-Urban (2014, erste Teilbarkeit), Wei Zhang (2014, p-Umkehrung).
-
-**Status der Hauptvermutung:** OFFEN — korrekt deklariert. BSD als Millennium-Problem korrekt referenziert. Kein Beweisanspruch für den vollen Satz.
-
-**Mathematische Korrektheit:** ✅
-
-**Fehler:**
-- Keine mathematischen Fehler gefunden.
-- Mordell-Weil-Struktur korrekt. Sha (Shafarevich-Tate-Gruppe) endlich nur für Rang 0,1 bekannt — korrekt.
-- Starke BSD-Formel mit Ω, c_v, |Sha|, |T|², R vollständig und korrekt.
-- Alle Teilresultate (Kolyvagin, Gross-Zagier, Skinner-Urban, Wei Zhang) korrekt attributiert.
-
-**Urteil:** DRUCKREIF
+  Die DE-Version hat diesen Fehler **nicht** — dort fehlt der problematische Brückensatz, und der Text springt direkt von Selberg zu Levinson.
+- **Korrektur:** EN-Satz ändern zu: „Combined with (eq), this shows a positive proportion of zeros lie on the critical line. Levinson (1974) improved this to the explicit bound of at least $1/3$."
 
 ---
 
-### Paper 35 (DE): Die Birch-und-Swinnerton-Dyer-Vermutung
+### BUG-B8-P36-EN-ONSAGER — NEU
 
-**Hauptbehauptung:** Äquivalente deutsche Version. Identische mathematische Inhalte.
+- **Paper-ID:** Paper 36
+- **Sprache:** EN
+- **Schwere:** MITTEL (Zuschreibungsfehler)
+- **Zeile:** EN: 339
+- **Beschreibung:** Der Text schreibt:
 
-**Status der Hauptvermutung:** OFFEN — korrekt deklariert.
+  > „De Lellis and Székelyhidi (2019) proved the Onsager conjecture"
 
-**Mathematische Korrektheit:** ✅
+  Die **scharfe Onsager-Vermutung** (Existenz energiedissipierender $C^{1/3-\varepsilon}$-Lösungen) wurde von **Philip Isett (2018)** bewiesen, aufbauend auf der Methode von De Lellis und Székelyhidi (konvexe Integration). De Lellis und Székelyhidi lieferten die grundlegende Methodik (2009–2013) und publizierten 2019 eine **Übersichtsarbeit**, nicht den endgültigen Beweis der scharfen Vermutung.
 
-**Fehler:**
-- Keine mathematischen Fehler gefunden.
-- Ausgezeichnete EN/DE-Parität.
-
-**Urteil:** DRUCKREIF
-
----
-
-### Paper 36 (EN): The Navier-Stokes Existence and Smoothness Problem
-
-**Hauptbehauptung:** Navier-Stokes-Problem: Existenz und Glattheit globaler Lösungen. Leray 1934 (globale schwache Lösungen), Ladyzhenskaya 1969 (2D vollständig gelöst), CKN 1982 (parabolische Hausdorff-Dimension ≤ 1 der singulären Menge), Tao 2016 (Blow-up für gemitteltes NS — explizit vom echten NS unterschieden), Buckmaster-Vicol 2019 (nicht-eindeutige schwache Lösungen bei niedrigerer Regularität), Onsager-Vermutung (De Lellis-Székelyhidi 2019).
-
-**Status der Hauptvermutung:** OFFEN — korrekt deklariert. Existenz/Eindeutigkeit glatter Lösungen als Millennium-Problem explizit als offen behandelt. Kein Beweisanspruch.
-
-**Mathematische Korrektheit:** ✅
-
-**Fehler:**
-- Keine mathematischen Fehler gefunden.
-- Taos 2016-Ergebnis für gemitteltes NS korrekt und explizit vom echten NS-Problem abgegrenzt — dies ist ein kritischer Punkt, der hier korrekt behandelt wird.
-- CKN-Theorem (Caffarelli-Kohn-Nirenberg) korrekt mit parabolischer Hausdorff-Dimension ≤ 1.
-- 2D-Vollständigkeit (Ladyzhenskaya) korrekt.
-- Buckmaster-Vicol korrekt als Nicht-Eindeutigkeit bei H^s, s<1/2 (nicht bei regulären Lösungen).
-
-**Urteil:** DRUCKREIF
+  Die vollständige Geschichte: Nash–Kuiper (1954) → De Lellis–Székelyhidi (2009, 2013, h-Prinzip) → Buckmaster–De Lellis–Székelyhidi–Vicol (2015, Dissipation) → Isett (2018, scharfe $C^{1/3-\varepsilon}$) → Isett korrigiert von Brue–De Lellis (2020).
+- **Korrektur:**
+  - EN: „De Lellis and Székelyhidi (2019)" → „Isett (2018), building on the convex integration framework of De Lellis and Székelyhidi"
+  - Bibitem entsprechend anpassen.
 
 ---
 
-### Paper 36 (DE): Das Navier-Stokes-Existenz-und-Glattheitsproblem
+### BUG-B8-P36-DE-ONSAGER — NEU
 
-**Hauptbehauptung:** Äquivalente deutsche Version. Identische mathematische Inhalte.
-
-**Status der Hauptvermutung:** OFFEN — korrekt deklariert.
-
-**Mathematische Korrektheit:** ✅
-
-**Fehler:**
-- Keine mathematischen Fehler gefunden.
-- Ausgezeichnete EN/DE-Parität.
-
-**Urteil:** DRUCKREIF
+- **Paper-ID:** Paper 36
+- **Sprache:** DE
+- **Schwere:** MITTEL (Zuschreibungsfehler)
+- **Zeile:** DE: 350
+- **Beschreibung:** Identischer Fehler wie BUG-B8-P36-EN-ONSAGER.
+- **Korrektur:** Analog zu EN.
 
 ---
 
-## ZUSAMMENFASSUNG
+### BUG-B7-P30-BUGCOMMENTS — NEU (alle Batch-7-Papers)
 
-### Gesamtübersicht
-
-| Paper | Titel (Kurzform) | EN | DE | Neue Bugs |
-|---|---|---|---|---|
-| 29 | Collatz Einführung | ⚠️ ÜBERARB. | ⚠️ ÜBERARB. | BUG-B7-P29-CIRCULAR-PROP4 |
-| 30 | Collatz p-adisch | ⚠️ ÜBERARB. | ⚠️ ÜBERARB. | BUG-B7-P30-CONCLUSION |
-| 31 | Collatz Tao | ⚠️ ÜBERARB. | ⚠️ ÜBERARB. | BUG-B7-P31-FURSTENBERG-REF |
-| 32 | Collatz Ergodisch | ⚠️ ÜBERARB. | ⚠️ ÜBERARB. | BUG-B7-P32-CONCLUSION |
-| 33 | Riemann-Hypothese | ✅ DRUCKREIF | ✅ DRUCKREIF | keine |
-| 34 | abc-Vermutung | ✅ DRUCKREIF | ✅ DRUCKREIF | keine |
-| 35 | BSD-Vermutung | ✅ DRUCKREIF | ✅ DRUCKREIF | keine |
-| 36 | Navier-Stokes | ✅ DRUCKREIF | ✅ DRUCKREIF | keine |
-
-### Kritischer Befund: Kein falscher Beweisanspruch
-
-**KEIN Paper aus Batch 7 oder 8 behauptet fälschlicherweise, die behandelte Vermutung bewiesen zu haben.**
-
-- Collatz-Vermutung (Papers 29–32): Durchgehend als offen deklariert.
-- Riemann-Hypothese (Paper 33): Korrekt als Millennium-Problem offen.
-- abc-Vermutung (Paper 34): Mochizukis Anspruch korrekt als kontrovers und nicht konsensfähig beschrieben.
-- BSD-Vermutung (Paper 35): Korrekt als offen; Teilresultate korrekt abgegrenzt.
-- Navier-Stokes (Paper 36): Korrekt als offen; Taos gemitteltes NS korrekt vom echten Problem unterschieden.
-
-### Neue Bug-IDs
-
-| Bug-ID | Schwere | Paper | Beschreibung |
-|---|---|---|---|
-| BUG-B7-P29-CIRCULAR-PROP4 | Mittel | 29 EN+DE | Prop. 4.1: zirkulärer Beweis, setzt Conjecture voraus |
-| BUG-B7-P30-CONCLUSION | Hoch | 30 EN+DE | Conclusion: „S ist ergodisch" als Fakt statt Vermutung |
-| BUG-B7-P31-FURSTENBERG-REF | Mittel | 31 EN+DE | Lemma 5.3: Furstenberg 1977 falsch kontextualisiert |
-| BUG-B7-P32-CONCLUSION | Hoch | 32 EN+DE | Conclusion: „S ergodisch und mischend" als Fakt statt Vermutung |
+- **Paper-ID:** Papers 29–32
+- **Sprache:** EN + DE
+- **Schwere:** KOSMETISCH (redaktionell)
+- **Zeile:** Diverse (siehe Grep-Ergebnisse oben)
+- **Beschreibung:** Alle vier Collatz-Papers enthalten interne BUG-Kommentare wie `% BUG-B7-P30-EN/DE-001 behoben: ...` im LaTeX-Quelltext. Diese sind interne Entwicklungsnotizen und dürfen nicht in publizierbaren Dokumenten erscheinen. Betroffen:
+  - Paper 30 EN: 4 BUG-Kommentare (Zeilen 203, 223, 288, 347)
+  - Paper 30 DE: 4 BUG-Kommentare (Zeilen 209, 229, 298, 354)
+  - Paper 31 EN: 1 BUG-Kommentar (Zeile 171)
+  - Paper 31 DE: 1 BUG-Kommentar (Zeile 175)
+  - Paper 32 EN: 4 BUG-Kommentare (Zeilen 133, 134, 181, 271)
+  - Paper 32 DE: 4 BUG-Kommentare (Zeilen 136, 137, 184, 274)
+  - Paper 34 EN: 1 BUG-Kommentar (Zeile 301)
+  - Paper 34 DE: 1 BUG-Kommentar (Zeile 308)
+- **Korrektur:** Alle `% BUG-...`-Kommentare vor Publikation entfernen.
 
 ---
 
-*Gutachter: Mathematischer Peer-Review-Dienst | Build 11 | 2026-03-12*
+## Detailprüfung nach Themengebiet
+
+### Collatz-Papers (29–32)
+
+**Korrekt umgesetzt:**
+- Collatz-Funktion und Syracuse-Funktion korrekt definiert (Paper 29)
+- 2-adische Erweiterung mathematisch korrekt (Paper 30)
+- Fixpunkte und Zyklen korrekt behandelt (Papers 29, 30)
+- Tao-Resultat (2022, logarithmische Dichte) korrekt dargestellt und korrekt als Teilergebnis eingeordnet (Paper 31)
+- Birkhoffs Ergodensatz in Paper 32 korrekt als bedingt deklariert
+- Exponentieller Korrelationsabfall als unbewiesen markiert (Paper 32, Remark 5.4)
+- Bedford-McMullen-Maße und symbolische Dynamik korrekt formuliert (Paper 32)
+- Markov-Ketten-Approximation mathematisch korrekt (Paper 32)
+- Frühere Bugs (BUG-B7-P30-001 bis -004, BUG-B7-P32-001 bis -004, BUG-B7-P31-001) korrekt behoben
+
+**Verbleibende Probleme:**
+- Conclusions beider Papers 30 und 32 widersprechen dem Textkörper (HOCH)
+- Proposition 4.4 in Paper 29 mit verwirrender Beweisstruktur (MITTEL)
+- Furstenberg-Referenz in Paper 31 inhaltsleer (MITTEL)
+- Birkhoff-Anwendung in Paper 31 auf falsches Maß (MITTEL)
+- Notation $\sigma$/$\sigma_\infty$ vertauscht (MITTEL)
+
+### Riemannsche Hypothese (Paper 33)
+
+**Korrekt umgesetzt:**
+- RH korrekt als offenes Problem markiert
+- Funktionalgleichung, Euler-Produkt, Hadamard-Produktformel korrekt
+- Nullstellenfreie Regionen (de la Vallée-Poussin, Vinogradov–Korobov) korrekt
+- Explizite Formeln korrekt
+- Levinson 1/3, Conrey 2/5 korrekt
+- Numerische Verifikation (Odlyzko, Platt) korrekt dargestellt
+- GRH korrekt als Verallgemeinerung eingeführt
+
+**Verbleibendes Problem:**
+- EN: Selberg-Zuschreibung falsch (nur EN, DE ist korrekt) (MITTEL)
+
+### ABC-Vermutung (Paper 34)
+
+**Korrekt umgesetzt:**
+- ABC-Vermutung korrekt formuliert (Radikal, Qualität)
+- Explizit als OFFEN klassifiziert (Remark, Zeile 302–316)
+- Mochizuki/IUT-Status korrekt: publiziert in PRIMS 2021, aber nicht akzeptiert
+- Scholze-Stix-Einwand korrekt und namentlich dokumentiert
+- Mason-Stothers (Polynomfall) als bewiesenes Analogon korrekt
+- Konsequenzen (Fermat, Mordell, Szpiro) korrekt als bedingt markiert
+- ABC-Tripel-Tabelle korrekt
+
+**Keine Fehler gefunden.** ✅
+
+### BSD-Vermutung (Paper 35)
+
+**Korrekt umgesetzt:**
+- Mordell-Weil-Theorem korrekt formuliert ($E(\mathbb{Q}) \cong \mathbb{Z}^r \oplus T$)
+- Schwache und starke BSD korrekt unterschieden
+- Coates-Wiles (1977, Rang 0), Gross-Zagier (1986, Heegner-Punkte), Kolyvagin (1989, Euler-Systeme) korrekt
+- Sha-Gruppe korrekt als endlich vermutet
+- Iwasawa-theoretischer Zugang korrekt skizziert
+- BSD als offenes Millennium-Problem markiert
+- Numerische Daten (Cremona, LMFDB) korrekt referenziert
+
+**Keine Fehler gefunden.** ✅
+
+### Navier-Stokes (Paper 36)
+
+**Korrekt umgesetzt:**
+- Millennium-Problem-Formulierung korrekt (globale Existenz und Regularität starker Lösungen in 3D)
+- Schwache Lösungen (Leray 1934) vs. starke Lösungen korrekt unterschieden
+- Sobolev-Räume korrekt verwendet
+- CKN-Partialregularität (1982) korrekt dargestellt
+- Buckmaster-Vicol (2019) Nicht-Eindeutigkeit korrekt
+- Stochastische Navier-Stokes korrekt erwähnt
+- Energieungleichung korrekt
+
+**Verbleibendes Problem:**
+- Onsager-Zuschreibung falsch: Isett (2018), nicht De Lellis-Székelyhidi (2019) (MITTEL)
+
+---
+
+## Statistik der Befunde
+
+| Schwere | Anzahl | Anteil |
+|---------|--------|--------|
+| KRITISCH | 0 | 0% |
+| HOCH | 2 (bestätigt) | 18% |
+| MITTEL | 6 (2 bestätigt, 4 neu) | 55% |
+| GERING | 0 | 0% |
+| KOSMETISCH | 1 (neu) | 9% |
+
+**Bestätigte alte Bugs:** 4 von 4 (alle weiterhin offen)
+**Neue Bugs:** 5 (BUG-B7-P29-NOTATION, BUG-B7-P31-BIRKHOFF, BUG-B8-P33-EN-SELBERG, BUG-B8-P36-EN-ONSAGER, BUG-B8-P36-DE-ONSAGER, BUG-B7-P30-BUGCOMMENTS)
+
+---
+
+*Audit durchgeführt am 2026-03-12 — Build 15*

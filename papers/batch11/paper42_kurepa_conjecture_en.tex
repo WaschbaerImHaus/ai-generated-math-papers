@@ -58,6 +58,8 @@ elementary properties of the left factorial function, the crucial connection to
 Wilson's theorem, probabilistic heuristics suggesting why the conjecture is
 simultaneously plausible and hard to prove, known equivalences, and an account
 of computational evidence.
+The conjecture has been computationally verified for all primes $p < 10^8$
+in the literature.
 In particular, the Specialist Mathematics Project (Build 131) verified the
 conjecture for all $664{,}578$ primes up to $10^7$ in a computation lasting
 approximately $8{,}396$ seconds, finding zero violations.
@@ -223,12 +225,16 @@ Each $k! \equiv 0 \pmod{2}$ for $k \geq 2$, so $!n \equiv 1+1+0 = 2 \equiv 0
 \pmod{2}$.
 \end{proof}
 
-\begin{proposition}
-For $n \geq 4$, $3 \mid !n$ if and only if $3 \mid !n$.
-More concretely, $!4 = 10 \not\equiv 0 \pmod 3$, $!5 = 34 \not\equiv 0
-\pmod 3$, etc.
-The exact residues modulo small primes exhibit no simple pattern.
-\end{proposition}
+\begin{corollary}[Computational bound]
+No prime $p \leq 10^8$ is a Kurepa prime.
+That is, $p \nmid !p$ holds for every odd prime $p \leq 10^8$.
+\end{corollary}
+\begin{proof}
+This follows from the computational verifications listed in
+Section~\ref{sec:computation}: the conjecture has been checked for all primes
+up to $10^8$ (various authors after 2010; see the historical table in
+Section~\ref{sec:computation}), finding no counterexample.
+\end{proof}
 
 % ---------------------------------------------------------------
 \section{The Kurepa Conjecture}
@@ -385,8 +391,8 @@ Kurepa primes should exist.
 \subsection{The paradox}
 
 The heuristic conclusion stands in stark contrast to Conjecture~\ref{conj:kurepa}
-and to the computational evidence: despite searching through the first
-$664{,}578$ primes up to $10^7$, no Kurepa prime has been found.
+and to the computational evidence: no Kurepa prime has been found among
+all primes up to $10^8$ (see Section~\ref{sec:computation}).
 
 This situation is not unprecedented in number theory.
 A similar tension arises with Skewes' number (where $\pi(x) > \mathrm{Li}(x)$
