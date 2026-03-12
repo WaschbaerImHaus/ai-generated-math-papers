@@ -1505,3 +1505,11 @@ Paper 87 – Bateman-Horn:
 - Kontsevich vollständig: OFFEN; Vassiliev trennen alle Knoten: OFFEN
 - Knotenisotopie entscheidbar: BEWIESEN (Haken/Waldhausen/Thurston)
 - j₃(3₁)=1/4, j₃(3₁*)=-1/4: Chiralität des Kleeblatts BEWIESEN via Ord-3-Vassiliev
+
+2026-03-12 BUILD 172 — Batch 24 Gruppe B Review (Papers 92–95)
+- src/py/gruppe_b_batch24_verification.py erstellt
+- Loewner-Ungleichung numerisch verifiziert: sys²/Area = 2/√3 für hexagonalen Torus
+- Quillen-Suslin algebraisch verifiziert: 4 Testfälle, alle bestanden
+- reviews/research_batch24_gruppe_b_2026_03_12.md erstellt
+- LaTeX-Bug in paper95 (EN) behoben: \end{conjecture}\end{theorem} → \end{theorem}
+- Klassifikation: 7 Theoreme BEWIESEN, 5 Aussagen OFFEN
