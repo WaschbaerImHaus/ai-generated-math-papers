@@ -1,0 +1,826 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen (Deutsch)
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{vermutung}[theorem]{Vermutung}
+
+% -------------------------------------------------------
+% Abkürzungen
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Ric}{\mathrm{Ric}}
+\newcommand{\Rm}{\mathrm{Rm}}
+\newcommand{\vol}{\mathrm{vol}}
+\newcommand{\diam}{\mathrm{diam}}
+\newcommand{\inj}{\mathrm{inj}}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\divop}{div}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Ricci-Fluss und die Poincaré-Vermutung:\\
+       Hamiltons Programm, Perelmans Beweis\\
+       und der Geometrisierungssatz}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 147}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Der Ricci-Fluss, 1982 von Richard Hamilton eingeführt, ist eine geometrische
+Evolutionsgleichung
+\[
+  \frac{\partial g}{\partial t} = -2\,\Ric(g),
+\]
+die eine Riemannsche Metrik in Richtung ihrer Ricci-Krümmung deformiert.
+Hamilton nutzte ihn, um zu beweisen, dass jede kompakte Drei-Mannigfaltigkeit
+mit positiver Ricci-Krümmung diffeomorph zu einem sphärischen Raumformular
+ist, und begann ein Programm zur Beweisführung von Thurstons
+Geometrisierungsvermutung.  In den Jahren 2002--2003 vollendete Grigori
+Perelman dieses Programm, indem er die $\mathcal{F}$- und
+$\mathcal{W}$-Entropiefunktionale, das reduzierte Volumen und die Technik
+des Ricci-Flusses mit Chirurgie einführte.  Als Korollar erhielt er die
+Poincaré-Vermutung: Jede einfach zusammenhängende, geschlossene, orientierbare
+Drei-Mannigfaltigkeit ist homöomorph zu $S^3$.  Beide Resultate sind
+vollständig bewiesene Sätze.  Wir geben einen Überblick über die
+wesentlichen Definitionen, Schlüsselabschätzungen, das Chirurgieverfahren
+und die logische Struktur von Perelmans Argument, und stellen die
+dreidimensionale Situation dem vierdimensionalen Fall gegenüber, in dem die
+glatte Poincaré-Vermutung offen bleibt.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung}
+% ================================================================
+
+Die Poincaré-Vermutung, 1904 von Henri Poincaré formuliert, fragt, ob jede
+einfach zusammenhängende, geschlossene $3$-Mannigfaltigkeit homöomorph zur
+Drei-Sphäre $S^3$ ist.  Fast ein Jahrhundert lang widerstand sie allen
+Beweisversuchen und wurde zum berühmtesten offenen Problem der Topologie.
+
+Richard Hamilton~\cite{Hamilton1982} schlug 1982 eine Strategie vor, die auf
+\emph{geometrischer Analysis} basiert: Deformiere eine beliebige Riemannsche
+Metrik durch den \emph{Ricci-Fluss}, bis sie gegen eine runde Metrik
+konvergiert.  In den folgenden zwei Jahrzehnten entwickelte er tiefe
+Abschätzungen, klassifizierte Singularitäten und bewies mehrere grundlegende
+Sätze.  Das Problem der Singularitäten in Dimension drei und höher schien
+jedoch einen vollständigen Beweis zu verhindern.
+
+Im Oktober 2002 stellte Grigori Perelman den ersten von drei Preprints auf
+dem arXiv ein~\cite{Perelman2002,Perelman2003a,Perelman2003b}, der Hamiltons
+Programm vervollständigte.  Perelman führte völlig neue monotone Größen ein
+($\mathcal{F}$-Entropie, $\mathcal{W}$-Entropie, reduziertes Volumen),
+bewies den $\kappa$-Nicht-Kollaps-Satz und konstruierte einen kanonischen
+Ricci-Fluss mit Chirurgie, der alle endlichzeitigen Singularitäten übersteht.
+Daraus leitete er sowohl die \emph{Geometrisierungsvermutung} (Thurston 1982)
+als auch, als Spezialfall, die Poincaré-Vermutung ab.
+
+Perelman wurde 2006 für diese Arbeit mit der Fields-Medaille ausgezeichnet;
+er lehnte sie ab.  Vollständige, begutachtete Darstellungen lieferten
+anschließend Morgan--Tian~\cite{MorganTian2007} und Cao--Zhu~\cite{CaoZhu2006}.
+
+\subsection*{Gliederung}
+Abschnitt~\ref{sec:riem} rekapituliert die Riemannsche Geometrie.
+Abschnitt~\ref{sec:rf} definiert den Ricci-Fluss und den normierten Ricci-Fluss.
+Abschnitt~\ref{sec:hamilton} stellt Hamiltons wichtigste Ergebnisse vor.
+Abschnitt~\ref{sec:chirurgie} führt den Ricci-Fluss mit Chirurgie ein.
+Abschnitt~\ref{sec:perelman} beschreibt Perelmans Entropiefunktionale
+und Monotonieergebnisse.
+Abschnitt~\ref{sec:poincare} formuliert und beweist (durch Referenz)
+die Poincaré-Vermutung.
+Abschnitt~\ref{sec:geom} behandelt den Geometrisierungssatz.
+Abschnitt~\ref{sec:4d} diskutiert den vierdimensionalen Fall.
+Abschnitt~\ref{sec:anwendungen} erwähnt weitere Anwendungen.
+
+
+% ================================================================
+\section{Riemannsche Geometrie -- Grundlagen}
+\label{sec:riem}
+% ================================================================
+
+Sei $(M,g)$ eine glatte Riemannsche Mannigfaltigkeit der Dimension $n$.
+
+\begin{definition}[Riemann-Krümmungstensor]
+Der \emph{Riemann-Krümmungstensor} $\Rm$ ist der $(1,3)$-Tensor
+\[
+  \Rm(X,Y)Z = \nabla_X\nabla_Y Z - \nabla_Y\nabla_X Z - \nabla_{[X,Y]}Z,
+\]
+wobei $\nabla$ die Levi-Civita-Ableitung bezeichnet.  In lokalen
+Koordinaten schreibt man $R^l{}_{ijk}$ für seine Komponenten.
+\end{definition}
+
+\begin{definition}[Ricci-Tensor]
+Der \emph{Ricci-Tensor} ist die Kontraktion
+\[
+  R_{ij} = R^k{}_{ikj} = g^{kl}R_{kilj}.
+\]
+Er ist ein symmetrischer $(0,2)$-Tensor und misst grob, wie stark das Volumen
+einer kleinen geodätischen Kugel vom euklidischen Volumen abweicht.
+\end{definition}
+
+\begin{definition}[Skalare Krümmung]
+Die \emph{skalare Krümmung} ist die volle Spur
+\[
+  R = g^{ij}R_{ij} = \tr_g \Ric.
+\]
+\end{definition}
+
+\begin{definition}[Schnittkrümmung]
+Für eine Zweiebenenschicht $\sigma = \mathrm{span}\{X,Y\} \subset T_pM$:
+\[
+  K(\sigma) = \frac{g(\Rm(X,Y)Y,X)}{g(X,X)g(Y,Y)-g(X,Y)^2}.
+\]
+\end{definition}
+
+\begin{definition}[Einstein-Mannigfaltigkeit]
+$(M,g)$ heißt \emph{Einstein}, falls $\Ric = \lambda g$ für eine Konstante
+$\lambda \in \R$.  Auf einer kompakten Einstein-Drei-Mannigfaltigkeit gilt
+$\lambda > 0$, $= 0$ oder $< 0$ entsprechend positiver, verschwindender
+oder negativer skalarer Krümmung.
+\end{definition}
+
+\begin{bemerkung}
+In Dimension drei ist der volle Riemann-Krümmungstensor vollständig durch den
+Ricci-Tensor bestimmt:
+\[
+  R_{ijkl} = g_{ik}R_{jl} - g_{il}R_{jk} - g_{jk}R_{il} + g_{jl}R_{ik}
+             - \tfrac{1}{2}R(g_{ik}g_{jl} - g_{il}g_{jk}).
+\]
+Diese algebraische Tatsache spielt in Hamiltons Analysis eine Schlüsselrolle.
+\end{bemerkung}
+
+\begin{definition}[Gradient, Laplace-Operator, Divergenz]
+Für eine Funktion $f$ und einen $(0,2)$-Tensor $T$:
+\begin{align*}
+  (\nabla f)^i &= g^{ij}\partial_j f, \\
+  \Delta f &= g^{ij}\nabla_i\nabla_j f, \\
+  (\divop T)_j &= g^{ik}\nabla_i T_{kj}.
+\end{align*}
+\end{definition}
+
+
+% ================================================================
+\section{Der Ricci-Fluss}
+\label{sec:rf}
+% ================================================================
+
+\begin{definition}[Ricci-Fluss]
+Sei $M$ eine kompakte glatte Mannigfaltigkeit und $g_0$ eine Riemannsche
+Metrik auf $M$.  Der \emph{Ricci-Fluss} ist die einparametrige Familie von
+Metriken $g(t)$, die
+\begin{equation}
+  \label{eq:rf}
+  \frac{\partial}{\partial t} g(t) = -2\,\Ric(g(t)), \qquad g(0) = g_0
+\end{equation}
+erfüllt.
+\end{definition}
+
+Der Faktor $2$ ist konventionell; er stellt sicher, dass der Fluss auf dem
+flachen Raum mit der Wärmeleitungsgleichung übereinstimmt.
+
+\begin{bemerkung}[Heuristik]
+Der Ricci-Fluss ist eine Art nichtlineare Wärmeleitungsgleichung für die Metrik.
+Wo die Krümmung positiv ist (die Mannigfaltigkeit ist „zu stark gekrümmt"),
+zieht sich die Metrik zusammen; wo die Krümmung negativ ist, dehnt sie sich aus.
+Auf diese Weise tendiert der Fluss dazu, die Krümmung zu homogenisieren.
+\end{bemerkung}
+
+\begin{theorem}[Kurzfristige Existenz und Eindeutigkeit; DeTurck 1983]
+\label{thm:ste}
+Für jede glatte kompakte Riemannsche Mannigfaltigkeit $(M,g_0)$ existiert
+$T > 0$ und eine eindeutige glatte Lösung $g(t)$ von~\eqref{eq:rf} auf
+$[0,T)$.
+\end{theorem}
+
+\begin{proof}[Beweissskizze]
+Die Ricci-Fluss-Gleichung ist wegen der Diffeomorphismeninvarianz nicht
+strikt parabolisch.  DeTurcks Trick besteht darin,~\eqref{eq:rf} mit einer
+zeitabhängigen Familie von Diffeomorphismen $\varphi_t$ zu koppeln, sodass
+der zurückgeholte Fluss $\tilde g(t) = \varphi_t^* g(t)$ eine strikt
+parabolische Gleichung erfüllt.  Die Standardtheorie parabolischer PDGlen
+liefert dann kurzfristige Existenz und Eindeutigkeit von $\tilde g(t)$,
+woraus man $g(t)$ zurückgewinnt.
+\end{proof}
+
+\subsection{Evolutionsgleichungen}
+
+Unter dem Ricci-Fluss entwickeln sich die geometrischen Größen wie folgt:
+\begin{align}
+  \frac{\partial}{\partial t} R_{ij} &= \Delta R_{ij} + 2 R_{kijl}R^{kl}
+     - 2 R_{ik}R^k{}_j + \nabla_i\nabla_j R, \label{eq:ric-ev} \\
+  \frac{\partial}{\partial t} R &= \Delta R + 2|\Ric|^2. \label{eq:scal-ev}
+\end{align}
+Gleichung~\eqref{eq:scal-ev} impliziert via Maximumprinzip, dass
+$R(x,t) \geq R_{\min}(0)$ für alle $t \geq 0$, d.\,h.\ das Infimum von $R$
+ist monoton wachsend.
+
+\subsection{Normierter Ricci-Fluss}
+
+Um Konvergenz bei Mannigfaltigkeiten mit nicht-verschwindender
+Euler-Charakteristik zu untersuchen, ist es zweckmäßig, die Metrik so
+umzuskalieren, dass das Volumen erhalten bleibt.  Sei
+$r(t) = \frac{\int_M R\,d\mu}{\vol(M,g(t))}$ die mittlere skalare Krümmung.
+Der \emph{normierte Ricci-Fluss} lautet:
+\begin{equation}
+  \label{eq:nrf}
+  \frac{\partial}{\partial t} g = -2\Ric + \frac{2}{n} r\, g.
+\end{equation}
+In Dimension $3$ ist der normierte Fluss äquivalent zum unnormierten Fluss
+bis auf eine Zeitumparametrisierung und eine homothetische Umskalierung.
+
+\subsection{Ricci-Solitone}
+
+\begin{definition}[Ricci-Soliton]
+Eine Riemannsche Metrik $g$ heißt \emph{Ricci-Soliton}, falls
+\[
+  \Ric + \nabla^2 f = \lambda g
+\]
+für eine glatte Funktion $f$ (das \emph{Potential}) und eine Konstante
+$\lambda \in \R$.  Das Soliton heißt \emph{schrumpfend} ($\lambda > 0$),
+\emph{stationär} ($\lambda = 0$) oder \emph{expandierend} ($\lambda < 0$).
+\end{definition}
+
+Ein Ricci-Soliton ist ein Fixpunkt des normierten Ricci-Flusses modulo
+Diffeomorphismen und Skalierung.  Die runde Sphäre $S^n$ mit der
+Standardmetrik ist ein schrumpfendes Ricci-Soliton mit $f = \mathrm{const}$
+(eine Ricci--Einstein-Metrik).  Das Gauß-Soliton auf $\R^n$ ist ein
+stationäres Soliton mit $f(x) = |x|^2/4$.
+
+
+% ================================================================
+\section{Hamiltons Ergebnisse}
+\label{sec:hamilton}
+% ================================================================
+
+\begin{theorem}[Hamilton 1982]
+\label{thm:hamilton82}
+Sei $(M^3, g_0)$ eine kompakte Drei-Mannigfaltigkeit mit positiver
+Ricci-Krümmung, $\Ric(g_0) > 0$.  Dann existiert der normierte Ricci-Fluss
+für alle Zeiten, und die Metrik $g(t)$ konvergiert im $C^\infty$-Sinn gegen
+eine Metrik konstanter positiver Schnittkrümmung für $t\to\infty$.
+Insbesondere ist $M$ diffeomorph zu einem sphärischen Raumformular
+$S^3/\Gamma$.
+\end{theorem}
+
+\begin{proof}[Strategie]
+Hamilton analysierte die Entwicklung des Krümmungstensors mithilfe des
+Maximumprinzips.  Die Schlüsselschritte sind:
+\begin{enumerate}[label=(\roman*)]
+  \item Zeige, dass $\Ric > 0$ unter dem Fluss erhalten bleibt
+    (Pinching-Lemma).
+  \item Beweise die \emph{Pinching-Abschätzung}: Falls $\Ric \geq \delta R\,g$
+    zur Zeit $t = 0$, verbessert sich diese untere Schranke im Laufe der Zeit.
+  \item Nutze die Harnack-Ungleichung für die Krümmung, um räumliche
+    Variationen zu kontrollieren.
+  \item Leite exponentielle Konvergenz gegen eine Metrik konstanter
+    Krümmung via normierten Fluss ab.
+\end{enumerate}
+Die Annahme positiver Ricci-Krümmung ist wesentlich; sie verhindert die
+Bildung langer dünner „Hälse" ($S^2 \times \R$), die sonst die Konvergenz
+blockieren würden.
+\end{proof}
+
+\begin{korollar}
+Jede kompakte Drei-Mannigfaltigkeit mit positiver Ricci-Krümmung hat eine
+endliche Fundamentalgruppe.
+\end{korollar}
+
+\subsection{Hamiltons Entropie}
+
+Hamilton führte das \emph{Entropiefunktional}
+\[
+  \mathcal{E}(g) = \int_M R \log R\, d\mu
+\]
+ein und zeigte, dass es auf Flächen unter dem normierten Ricci-Fluss monoton
+wächst -- eine Rolle, die Perelmans $\mathcal{W}$-Entropie
+(Abschnitt~\ref{sec:perelman}) verallgemeinert.
+
+\subsection{Singularitätenanalyse}
+
+In Dimension $\geq 3$ kann der Ricci-Fluss endlichzeitige Singularitäten
+entwickeln.  Hamilton klassifizierte sie in:
+\begin{itemize}
+  \item \textbf{Typ I}: $|\Rm|(x,t) \leq \frac{C}{T-t}$ für $t \nearrow T$.
+    Dazu gehört das runde Kollabieren einer Sphäre.
+  \item \textbf{Typ II}: $|\Rm|$ wächst schneller als $(T-t)^{-1}$.
+    Dazu gehört das Zigarren-Soliton.
+  \item \textbf{Typ III}: Singularitäten für $t \to +\infty$ auf unsterblichen
+    Lösungen.
+\end{itemize}
+Für Drei-Mannigfaltigkeiten mit positiver Ricci-Krümmung treten nur
+Typ-I-Singularitäten auf (rundes Kollabieren), die durch
+Satz~\ref{thm:hamilton82} aufgelöst werden.  Im allgemeinen Fall ohne
+Positivität der Ricci-Krümmung können Hals-Einschnürungs-Singularitäten
+(Typ I) entstehen; diese erfordern Chirurgie.
+
+
+% ================================================================
+\section{Ricci-Fluss mit Chirurgie}
+\label{sec:chirurgie}
+% ================================================================
+
+\subsection{Hals-Einschnürungs-Singularitäten}
+
+Die wichtigste endlichzeitige Singularität in Dimension drei ist die
+\emph{Halseinschnürung} (neck-pinch): Eine Region diffeomorph zu
+$S^2 \times (-1,1)$ entwickelt unbeschränkte Krümmung, wenn der
+$S^2$-Faktor kollabiert.
+
+\begin{definition}[$\varepsilon$-Hals]
+Ein \emph{$\varepsilon$-Hals} in $(M,g)$ um $x$ ist eine Region
+$U \subset M$ mit einem Diffeomorphismus $\psi: S^2 \times (-\varepsilon^{-1},
+\varepsilon^{-1}) \to U$, sodass
+\[
+  \bigl\|\, r^{-2}\,\psi^*g - g_{S^2} \oplus ds^2 \,\bigr\|_{C^{[\varepsilon^{-1}]}} < \varepsilon,
+\]
+wobei $r$ der Radius des $S^2$-Faktors ist.
+\end{definition}
+
+\subsection{Kanonischer-Nachbarschafts-Satz}
+
+Perelmans \emph{Satz über kanonische Nachbarschaften} besagt: Jedes $(x,t)$
+mit hinreichend großer Krümmung $|\Rm|(x,t) \geq r^{-2}$ hat eine
+Nachbarschaft (nach Umskalierung mit $|\Rm|(x,t)$), die $\varepsilon$-nah an
+einem Standardmodell liegt:
+\begin{itemize}
+  \item ein starker $\varepsilon$-Hals,
+  \item eine $\varepsilon$-Kappe (Topologie eines Halbraums oder
+    Projektiv\-ebenen-Caps), oder
+  \item eine kompakte $\varepsilon$-runde Mannigfaltigkeit.
+\end{itemize}
+
+\subsection{Chirurgieverfahren}
+
+Zur Singularitätszeit $T$ führt man Chirurgie an allen Hälsen durch:
+\begin{enumerate}
+  \item Schneide $M$ entlang des Halses $S^2$ auf.
+  \item Verschließe jede entstehende Randkomponente $S^2$ mit einer
+    Standard-Halbkugel (\emph{Standardkappe}).
+  \item Starte den Fluss mit der modifizierten Metrik $g^+(T)$ neu.
+\end{enumerate}
+
+\begin{theorem}[Perelman 2003; Existenz des chirurgischen Flusses]
+\label{thm:chirurgie}
+Es gibt Konstanten $r, \delta, \kappa > 0$, die nur von der Anfangsmetrik
+abhängen, sodass der Ricci-Fluss mit $(r,\delta)$-Abschnitt für alle Zeiten
+$t \in [0,\infty)$ existiert, mit nur endlich vielen Chirurgien auf jedem
+endlichen Zeitintervall.
+\end{theorem}
+
+Ein entscheidender Punkt ist, dass die Chirurgien auf einer sorgfältig
+gewählten Skala $h$ durchgeführt werden, die mit der Krümmungsskala $r$
+vergleichbar ist, sodass die geometrische Qualität der Metrik nach der
+Chirurgie kontrolliert ist.
+
+
+% ================================================================
+\section{Perelmans Beweis: Entropie, Nicht-Kollaps und reduziertes Volumen}
+\label{sec:perelman}
+% ================================================================
+
+\subsection{Das $\mathcal{F}$-Entropiefunktional}
+
+\begin{definition}[Perelmans $\mathcal{F}$-Funktional]
+Sei $f: M \to \R$ eine glatte Funktion mit $\int_M e^{-f}\,d\mu = 1$.
+Definiere
+\begin{equation}
+  \mathcal{F}(g,f) = \int_M \bigl(R + |\nabla f|^2\bigr) e^{-f}\,d\mu.
+\end{equation}
+\end{definition}
+
+\begin{theorem}[Monotonie von $\mathcal{F}$; Perelman 2002]
+\label{thm:F-mono}
+Unter dem \emph{modifizierten Ricci-Fluss}
+\[
+  \partial_t g_{ij} = -2 R_{ij}, \qquad
+  \partial_t f = -\Delta f - R + |\nabla f|^2,
+\]
+ist das $\mathcal{F}$-Funktional monoton wachsend:
+\begin{equation}
+  \frac{d}{dt}\mathcal{F}(g(t),f(t))
+  = 2\int_M \bigl|R_{ij} + \nabla_i\nabla_j f\bigr|^2 e^{-f}\,d\mu \geq 0.
+\end{equation}
+Gleichheit gilt genau dann, wenn $(g,f)$ ein Gradient-stationäres
+Ricci-Soliton ist.
+\end{theorem}
+
+\begin{proof}[Skizze]
+Direkte Rechnung mithilfe der Evolutionsgleichungen für $g$, $d\mu$, $R$
+und $|\nabla f|^2$.  Partielle Integration eliminiert Randterme auf einer
+kompakten Mannigfaltigkeit.
+\end{proof}
+
+\subsection{Das $\mathcal{W}$-Entropiefunktional}
+
+\begin{definition}[Perelmans $\mathcal{W}$-Funktional]
+Für $\tau > 0$ und $(g, f)$ mit $\int_M (4\pi\tau)^{-n/2}e^{-f}\,d\mu = 1$:
+\begin{equation}
+  \mathcal{W}(g,f,\tau)
+  = \int_M \bigl[\tau(R + |\nabla f|^2) + f - n\bigr]
+    (4\pi\tau)^{-n/2}e^{-f}\,d\mu.
+\end{equation}
+\end{definition}
+
+\begin{definition}[Perelmans $\mu$-Entropie]
+\[
+  \mu(g,\tau) = \inf \bigl\{\mathcal{W}(g,f,\tau) :
+    \int_M (4\pi\tau)^{-n/2}e^{-f}\,d\mu = 1 \bigr\}.
+\]
+\end{definition}
+
+\begin{theorem}[Monotonie von $\mathcal{W}$; Perelman 2002]
+\label{thm:W-mono}
+Unter dem Ricci-Fluss gekoppelt mit
+\[
+  \partial_t f = -\Delta f - R + \frac{n}{2\tau}, \qquad
+  \frac{d\tau}{dt} = -1,
+\]
+ist das $\mathcal{W}$-Funktional monoton wachsend.  Insbesondere ist
+$t \mapsto \mu(g(t), T-t)$ für $t < T$ monoton wachsend.
+\end{theorem}
+
+\subsection{$\kappa$-Nicht-Kollaps}
+
+\begin{theorem}[$\kappa$-Nicht-Kollaps-Satz; Perelman 2002]
+\label{thm:kappa}
+Sei $(M,g(t))$ ein Ricci-Fluss auf $[0,T]$.  Für jedes $\rho > 0$ existiert
+$\kappa > 0$ (abhängig von $\rho$, $T$ und $g(0)$), sodass gilt: Falls
+$|\Rm|(x,t) \leq \rho^{-2}$ auf der Kugel $B(x,t,\rho)$, dann
+\[
+  \vol_t B(x,t,\rho) \geq \kappa \rho^n.
+\]
+\end{theorem}
+
+\begin{proof}[Strategie]
+Die untere Schranke für das $\mathcal{W}$-Entropiefunktional liefert eine
+untere Schranke für $\mu(g(t),\rho^2)$.  Eine kollabierende Kugel würde
+$\mathcal{W}$ sehr negativ machen, was dem Monotonieresultat~\ref{thm:W-mono}
+widerspricht.
+\end{proof}
+
+Der $\kappa$-Nicht-Kollaps-Satz ist das zentrale Hilfsmittel: Er verhindert
+die Entstehung zigarrenartiger Singularitäten, die zuvor Hamiltons Programm
+blockierten, und stellt sicher, dass Regionen hoher Krümmung die
+kanonische Nachbarschaftsstruktur aufweisen, die für die Chirurgie
+erforderlich ist.
+
+\subsection{Reduziertes Volumen und reduzierte Länge}
+
+Perelman definierte die \emph{$\mathcal{L}$-Geodäte} und die
+\emph{reduzierte Länge}:
+\begin{equation}
+  l(q,\tau) = \frac{1}{2\sqrt{\tau}}
+    \inf_\gamma \int_0^\tau \sqrt{s}\bigl(R(\gamma(s)) + |\dot\gamma(s)|^2\bigr)ds,
+\end{equation}
+wobei das Infimum über alle Kurven $\gamma$ von $(p,0)$ nach $(q,\tau)$
+(rückwärts in der Zeit durchlaufen) genommen wird.  Das
+\emph{reduzierte Volumen} ist
+\begin{equation}
+  \tilde V(\tau) = \int_M (4\pi\tau)^{-n/2} e^{-l(q,\tau)}\,d\vol_{g(\tau)}.
+\end{equation}
+
+\begin{theorem}[Monotonie des reduzierten Volumens; Perelman 2002]
+Unter dem Ricci-Fluss ist $\tilde V(\tau)$ monoton fallend in $\tau$,
+und $\tilde V(\tau) \leq 1$.  Falls $\tilde V(\tau_0) = 1$ für ein
+$\tau_0 > 0$, dann ist $(M,g)$ isometrisch zum euklidischen Raum.
+\end{theorem}
+
+
+% ================================================================
+\section{Die Poincaré-Vermutung}
+\label{sec:poincare}
+% ================================================================
+
+\begin{theorem}[Poincaré-Vermutung; Perelman 2003]
+\label{thm:poincare}
+Jede einfach zusammenhängende, geschlossene (kompakt, ohne Rand),
+orientierbare Drei-Mannigfaltigkeit ist homöomorph zur Drei-Sphäre $S^3$.
+\end{theorem}
+
+\begin{proof}[Beweis via Ricci-Fluss mit Chirurgie]
+Sei $M$ eine einfach zusammenhängende, geschlossene Drei-Mannigfaltigkeit.
+Versehe $M$ mit einer beliebigen glatten Metrik $g_0$ und starte den
+Ricci-Fluss mit Chirurgie (Satz~\ref{thm:chirurgie}).
+
+\medskip
+\textbf{Schritt 1: Der Fluss erlischt in endlicher Zeit.}
+Da $\pi_1(M) = 0$, ist insbesondere $\pi_2(M) = 0$ (nach Hurewicz), und die
+$3$-Mannigfaltigkeit ist prim.  Perelman~\cite{Perelman2003b} (und unabhängig
+Colding--Minicozzi) zeigte, dass für einfach zusammenhängende geschlossene
+$3$-Mannigfaltigkeiten der Ricci-Fluss mit Chirurgie in endlicher Zeit
+$T < \infty$ erlischt: Die Mannigfaltigkeit wird nach endlich vielen
+Chirurgien vollständig zerlegt, wobei jedes Stück rund kollabiert.
+
+\medskip
+\textbf{Schritt 2: Keine nicht-triviale Topologie überlebt.}
+Kurz vor dem Erlöschen ist die Metrik $\varepsilon$-nah an einer runden
+Metrik auf $S^3$ oder einem sphärischen Raumformular $S^3/\Gamma$.
+Da $\pi_1(M) = 0$, kann kein nicht-triviales $\Gamma$ auftreten, sodass
+nur $S^3$ möglich ist.
+
+\medskip
+\textbf{Schritt 3: Schlussfolgerung.}
+Alle Chirurgien ersetzen $M$ durch eine topologisch äquivalente Mannigfaltigkeit
+(nach der kanonischen Nachbarschaftsstruktur werden Chirurgien entlang
+$S^2$-Hälsen durchgeführt und Standardkappen angesetzt, die topologische
+Bälle sind).  Daher ist die ursprüngliche Mannigfaltigkeit $M$ homöomorph
+zu $S^3$.
+\end{proof}
+
+\begin{bemerkung}
+Die vollständige Verifikation von Perelmans Argument wurde von
+Morgan--Tian~\cite{MorganTian2007} und Cao--Zhu~\cite{CaoZhu2006} unabhängig
+voneinander durchgeführt.  Beide bestätigten alle Details des Beweises.
+In der mathematischen Gemeinschaft besteht nun vollständiger Konsens darüber,
+dass Satz~\ref{thm:poincare} bewiesen ist.
+\end{bemerkung}
+
+\begin{bemerkung}[Historischer Kontext]
+Die Poincaré-Vermutung war eines der sieben Millennium-Probleme des Clay
+Mathematics Institute (CMI), die jeweils mit einem Preis von
+\$1{.}000{.}000 ausgezeichnet sind.  Perelman erhielt den Preis 2010, lehnte
+ihn jedoch ab -- ebenso wie die Fields-Medaille 2006.
+\end{bemerkung}
+
+
+% ================================================================
+\section{Die Geometrisierungsvermutung}
+\label{sec:geom}
+% ================================================================
+
+\begin{definition}[Thurstons acht Geometrien]
+\label{def:geom}
+Eine dreidimensionale Geometrie $(X,G)$ besteht aus einer einfach
+zusammenhängenden Drei-Mannigfaltigkeit $X$ und einer transitiven
+Isometriegruppe $G$, deren Stabilisator eines Punktes kompakt ist.
+Es gibt genau acht solche maximale Geometrien:
+\[
+  S^3,\quad \R^3,\quad H^3,\quad S^2\times\R,\quad H^2\times\R,\quad
+  \widetilde{\mathrm{SL}_2(\R)},\quad \mathrm{Nil},\quad \mathrm{Sol}.
+\]
+\end{definition}
+
+\begin{definition}[Geometrische Zerlegung]
+Eine geschlossene, orientierbare Drei-Mannigfaltigkeit $M$ heißt
+\emph{geometrisch}, wenn sie auf einer der acht Geometrien modelliert ist.
+Die \emph{JSJ-Zerlegung} zerschneidet $M$ entlang inkompressibler Tori in
+atoroidale Stücke; zusammen mit der Prim-Zerlegung entlang $S^2$ erhält man
+die \emph{Geometrisierung}.
+\end{definition}
+
+\begin{theorem}[Geometrisierungssatz; Thurston 1982, Perelman 2003]
+\label{thm:geom}
+Jede geschlossene, orientierbare Drei-Mannigfaltigkeit lässt sich entlang
+endlich vieler disjunkter, inkompressibler Tori und Sphären in Stücke
+zerlegen, von denen jedes eine vollständige, lokal homogene Riemannsche
+Metrik besitzt, die auf einer der acht Thurstonischen Geometrien modelliert
+ist.
+\end{theorem}
+
+\begin{proof}[Beweis via Ricci-Fluss mit Chirurgie]
+Perelmans Ricci-Fluss mit Chirurgie liefert eine kanonische Zerlegung von
+$M$ in prim Stücke.  Für die atoroidalen (hyperbolischen) Stücke bewies
+Perelman die \emph{Dick-Dünn-Zerlegung}: Nach Umskalierung konvergiert der
+dicke Teil gegen eine hyperbolische Mannigfaltigkeit (mittels Hamiltons
+Kompaktheitssatz und den $\kappa$-Nicht-Kollaps-Abschätzungen), während der
+dünne Teil eine Graph-Mannigfaltigkeit ist (und daher eine der
+Seifert-gefaserten Geometrien trägt).  Der Graph-Mannigfaltigkeiten-Fall
+wurde separat mithilfe von Ergebnissen von Shioya--Yamaguchi behandelt.
+Zusammen liefern diese den vollständigen Geometrisierungssatz.
+\end{proof}
+
+\begin{korollar}
+Die Poincaré-Vermutung (Satz~\ref{thm:poincare}) folgt aus dem
+Geometrisierungssatz: Die einzige Geometrie, die mit einer einfach
+zusammenhängenden geschlossenen Drei-Mannigfaltigkeit kompatibel ist, ist die
+sphärische Geometrie $S^3$, also $M \cong S^3$.
+\end{korollar}
+
+\begin{bemerkung}
+Der Geometrisierungssatz wurde erstmals 1982 von William
+Thurston~\cite{Thurston1982} vermutet, basierend auf seinen tiefen Arbeiten
+über hyperbolische Drei-Mannigfaltigkeiten (wofür er 1982 die Fields-Medaille
+erhielt).  Thurston bewies die Vermutung für Haken-Mannigfaltigkeiten; der
+allgemeine Fall erforderte Perelmans Ricci-Fluss-Methoden.
+\end{bemerkung}
+
+
+% ================================================================
+\section{Der vierdimensionale Fall}
+\label{sec:4d}
+% ================================================================
+
+Die Situation in Dimension vier unterscheidet sich grundlegend von Dimension
+drei.
+
+\subsection{Topologische Poincaré-Vermutung in Dimension 4}
+
+\begin{theorem}[Freedman 1982]
+\label{thm:freedman}
+Jede einfach zusammenhängende, geschlossene topologische Vier-Mannigfaltigkeit
+mit dem Homotopietyp von $S^4$ ist homöomorph zu $S^4$.
+\end{theorem}
+
+Freedmans Beweis~\cite{Freedman1982} verwendet die Technik der
+\emph{Casson-Henkel} und ist spezifisch für Dimension vier.  Er beruht auf
+dem Whitney-Trick, der topologisch in Dimension vier, aber nicht glatt
+funktioniert.  Freedman erhielt 1986 die Fields-Medaille für diese Arbeit.
+
+\subsection{Glatte Poincaré-Vermutung in Dimension 4 -- offenes Problem}
+
+\begin{vermutung}[Glatte vierdimensionale Poincaré-Vermutung]
+\label{verm:s4d}
+Jede glatte Mannigfaltigkeit, die homöomorph zu $S^4$ ist, ist auch
+diffeomorph zu $S^4$.
+\end{vermutung}
+
+Dies bleibt eines der wichtigsten offenen Probleme der geometrischen
+Topologie.  Im Gegensatz zur topologischen Aussage
+(Satz~\ref{thm:freedman}) ist das glatte Problem vollständig offen.
+
+\begin{bemerkung}
+In allen anderen Dimensionen $n \neq 4$ ist die glatte Poincaré-Vermutung
+entschieden:
+\begin{itemize}
+  \item $n \leq 2$: klassisch (trivial für $n=1$).
+  \item $n = 3$: Perelmans Satz (Satz~\ref{thm:poincare}).
+  \item $n \geq 5$: Smale (1961) bewies, dass jede einfach zusammenhängende,
+    geschlossene $n$-Mannigfaltigkeit, die homotopieäquivalent zu $S^n$ ist,
+    für $n \geq 5$ diffeomorph zu $S^n$ ist
+    (der $h$-Kobordismussatz).
+\end{itemize}
+Dimension vier ist außergewöhnlich, weil der Whitney-Trick topologisch, aber
+nicht glatt funktioniert.  Donaldsonsche Eichtheorie und Seiberg--Witten-Theorie
+haben Hindernisse geliefert: Auf $\R^4$ existieren exotische glatte Strukturen
+(auf $\R^n$ für $n \neq 4$ nicht), und viele einfach zusammenhängende
+$4$-Mannigfaltigkeiten tragen unendlich viele verschiedene glatte Strukturen.
+Für $S^4$ selbst wurde weder eine exotische glatte Struktur gefunden noch
+ausgeschlossen.
+\end{bemerkung}
+
+\subsection{Ricci-Fluss in Dimension 4}
+
+Der Ricci-Fluss in Dimension vier stößt auf neue Herausforderungen:
+\begin{itemize}
+  \item Der Weyl-Krümmungstensor verschwindet in Dimension vier nicht, sodass
+    der Riemann-Tensor nicht allein durch $\Ric$ bestimmt wird.
+  \item Neue Singularitätstypen (z.\,B.\ Orbifold-Singularitäten) treten auf.
+  \item Hamiltons Singularitätenklassifikation ist weniger vollständig.
+\end{itemize}
+Fortschritte umfassen Arbeiten von Chen--Zhu und Brendle über
+Vier-Mannigfaltigkeiten mit punktweise $\frac{1}{4}$-gepinnter
+Schnittkrümmung.
+
+
+% ================================================================
+\section{Anwendungen und Verallgemeinerungen}
+\label{sec:anwendungen}
+% ================================================================
+
+\subsection{Mittlerer Krümmungsfluss}
+
+Der \emph{mittlere Krümmungsfluss} (Mean Curvature Flow, MCF) bewegt eine
+Hyperfläche $\Sigma_t \subset \R^{n+1}$ in Richtung ihres mittleren
+Krümmungsvektors:
+\[
+  \frac{d}{dt}\mathbf{x} = H\,\mathbf{n},
+\]
+wobei $H$ die mittlere Krümmung und $\mathbf{n}$ die innere Einheitsnormale ist.
+Analog zum Ricci-Fluss entwickelt der MCF Singularitäten
+(Halseinschnürungen), die durch Chirurgie aufgelöst werden können.
+Andrews, Brendle, Huisken und Ilmanen entwickelten einen MCF mit Chirurgie
+analog zu Perelmans Konstruktion.
+
+\subsection{Kähler--Ricci-Fluss}
+
+Auf einer Kähler-Mannigfaltigkeit $(M, J, g)$ repräsentiert die
+Ricci-Form $\rho = -\frac{i}{2\pi}\partial\bar\partial\log\det(g_{i\bar j})$
+die erste Chern-Klasse.  Der \emph{Kähler--Ricci-Fluss} lautet:
+\[
+  \frac{\partial \omega}{\partial t} = -\Ric(\omega) + \lambda\omega, \qquad \lambda \in \{-1, 0, 1\},
+\]
+und wird bei der Suche nach kanonischen Kähler-Metriken (Calabi--Yau,
+Kähler--Einstein) eingesetzt.  Die Yau--Tian--Donaldson-Vermutung (bewiesen
+von Chen, Donaldson und Sun 2015) besagt, dass K-Stabilität äquivalent zur
+Existenz einer Kähler--Einstein-Metrik ist, wobei der Kähler--Ricci-Fluss
+eine zentrale Rolle spielt.
+
+\subsection{Harmonischer Kartenfluss und Yang--Mills-Fluss}
+
+Die für den Ricci-Fluss entwickelten Techniken haben Analoga in:
+\begin{itemize}
+  \item \textbf{Harmonischer Kartenfluss}: $\partial_t u = \tau(u)$, wobei
+    $\tau$ das Spannungsfeld ist.  Eells--Sampson (1964) bewiesen
+    Langzeitexistenz, wenn das Ziel nicht-positive Krümmung hat.
+  \item \textbf{Yang--Mills-Fluss}: Gradientenfluss des Yang--Mills-Energie\-funktionals.
+    Donaldson nutzte ihn zum Beweis des Donaldson--Uhlenbeck--Yau-Satzes über
+    stabile Bündel.
+\end{itemize}
+
+\subsection{Thurstons Programm und niedrigdimensionale Topologie}
+
+Der Geometrisierungssatz löst die \emph{virtuelle Haken-Vermutung} (bewiesen
+von Agol 2012) und die \emph{virtuelle Faserungsvermutung}, die beide nun
+Sätze sind.  Die Klassifikation von Drei-Mannigfaltigkeiten ist damit
+im Prinzip vollständig: Jede geschlossene orientierbare Drei-Mannigfaltigkeit
+lässt sich anhand der acht Modellgeometrien verstehen.
+
+
+% ================================================================
+\section*{Danksagung}
+% ================================================================
+
+Dieses Paper ist Teil des \emph{Specialist Mathematics Project}, einer
+systematischen Untersuchung fortgeschrittener Mathematik von Algebra und
+Analysis bis zu den Millennium-Problemen.  Die Darstellung folgt den
+Ausführungen in Morgan--Tian~\cite{MorganTian2007},
+Cao--Zhu~\cite{CaoZhu2006} und Kleiner--Lott~\cite{KleinerLott2008}.
+
+
+% ================================================================
+\begin{thebibliography}{99}
+% ================================================================
+
+\bibitem{Hamilton1982}
+R.~S.~Hamilton,
+\textit{Three-manifolds with positive Ricci curvature},
+J.\ Differential Geom.\ \textbf{17} (1982), Nr.~2, 255--306.
+
+\bibitem{Perelman2002}
+G.~Perelman,
+\textit{The entropy formula for the Ricci flow and its geometric applications},
+arXiv:math/0211159 (2002).
+
+\bibitem{Perelman2003a}
+G.~Perelman,
+\textit{Ricci flow with surgery on three-manifolds},
+arXiv:math/0303109 (2003).
+
+\bibitem{Perelman2003b}
+G.~Perelman,
+\textit{Finite extinction time for the solutions to the Ricci flow on certain three-manifolds},
+arXiv:math/0307245 (2003).
+
+\bibitem{MorganTian2007}
+J.~Morgan und G.~Tian,
+\textit{Ricci Flow and the Poincar\'{e} Conjecture},
+Clay Mathematics Monographs, Bd.~3, AMS, Providence, 2007.
+
+\bibitem{CaoZhu2006}
+H.-D.~Cao und X.-P.~Zhu,
+\textit{A complete proof of the Poincar\'{e} and geometrization conjectures ---
+application of the Hamilton-Perelman theory of the Ricci flow},
+Asian J.\ Math.\ \textbf{10} (2006), Nr.~2, 165--492.
+
+\bibitem{KleinerLott2008}
+B.~Kleiner und J.~Lott,
+\textit{Notes on Perelman's papers},
+Geom.\ Topol.\ \textbf{12} (2008), 2587--2855.
+
+\bibitem{Thurston1982}
+W.~P.~Thurston,
+\textit{Three-dimensional manifolds, Kleinian groups and hyperbolic geometry},
+Bull.\ Amer.\ Math.\ Soc.\ \textbf{6} (1982), 357--381.
+
+\bibitem{Freedman1982}
+M.~H.~Freedman,
+\textit{The topology of four-dimensional manifolds},
+J.\ Differential Geom.\ \textbf{17} (1982), 357--453.
+
+\bibitem{Chow2004}
+B.~Chow und D.~Knopf,
+\textit{The Ricci Flow: An Introduction},
+Mathematical Surveys and Monographs, Bd.~110, AMS, Providence, 2004.
+
+\end{thebibliography}
+
+\end{document}
