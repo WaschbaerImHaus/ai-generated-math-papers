@@ -1,0 +1,803 @@
+% =============================================================================
+% paper54_symplektische_geometrie_de.tex
+% Symplektische Geometrie: Von der klassischen Mechanik zur Floer-Homologie
+% Autor: Michael Fuhrmann
+% Build: 139
+% Datum: 2026-03-12
+% =============================================================================
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+\title{Symplektische Geometrie:\\
+Von der klassischen Mechanik zur Floer-Homologie}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 139}
+\email{specialist-maths@localhost}
+\date{\today}
+
+% =============================================================================
+% ZUSAMMENFASSUNG  (muss VOR \maketitle stehen, amsart-Standard!)
+% =============================================================================
+\begin{abstract}
+Die symplektische Geometrie ist das mathematische Fundament der klassischen
+Hamiltonschen Mechanik und hat sich zu einem der dynamischsten Gebiete der
+modernen Mathematik entwickelt, mit tiefen Verbindungen zur Topologie, Algebra
+und theoretischen Physik.  Ausgehend vom Standard-Symplektischen Vektorraum
+$(\mathbb{R}^{2n}, \omega_{\mathrm{std}})$ entwickeln wir die Theorie
+symplektischer Mannigfaltigkeiten, beweisen den Satz von Darboux (jede
+symplektische Mannigfaltigkeit ist lokal äquivalent zur Standardform), und
+leiten die Hamiltonschen Bewegungsgleichungen her.  Anschließend behandeln wir
+den Satz von Liouville (Phasenraumvolumenerhaltung, bewiesen) sowie das
+Wiederkehrsatz von Poincar\'{e} (bewiesen).  Lagrangesche Untermannigfaltig\-keiten,
+die Arnold-Vermutung (offen im allgemeinen Fall; für Tori bewiesen),
+Momentabbildungen und die Marsden--Weinstein-Reduktion werden ausführlich
+behandelt.  Das Herzstück bilden Gromovs Non-Squeezing-Theorem (1985, bewiesen)
+sowie eine Einführung in die Floer-Homologie.  Anwendungen umfassen integrable
+Systeme, KAM-Theorie und geometrische Quantisierung.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+% =============================================================================
+\section{Einleitung}
+% =============================================================================
+
+Die symplektische Geometrie hat ihre Wurzeln im neunzehnten Jahrhundert als
+geometrische Sprache der klassischen Mechanik.  Das Wort \emph{symplektisch}
+wurde von Hermann Weyl in seiner Monographie \emph{The Classical Groups} (1939)
+als griechische Übersetzung des lateinischen \emph{complex} geprägt; es
+beschreibt die verschränkte Struktur von Orts- und Impulskoordinaten im
+Phasenraum.
+
+Das zentrale mathematische Objekt ist eine geschlossene, nicht-entartete
+Differentialform $\omega$ zweiten Grades auf einer glatten, geraddimensionalen
+Mannigfaltigkeit $M$.  Trotz seiner Einfachheit codiert dieses Axiom eine
+enorme Menge an Geometrie und Dynamik.  Im Gegensatz zur Riemannschen Geometrie,
+die eine reiche lokale Struktur besitzt (Krümmung), zeigt der Satz von Darboux,
+dass symplektische Geometrie \emph{lokal flach} ist: Jede symplektische
+Mannigfaltigkeit sieht in der Nähe jedes Punktes gleich aus.  Alle
+interessanten Phänomene sind daher \emph{globaler} Natur, und genau dies macht
+das Gebiet zugleich herausfordernd und schön.
+
+\subsection*{Historischer Überblick}
+
+Die Wurzeln der symplektischen Geometrie liegen in den Arbeiten von Lagrange
+und Hamilton zur analytischen Mechanik (1788--1835).  Jacobi erkannte die
+Invarianz der Poisson-Klammer unter kanonischen Transformationen.  Poincar\'{e}s
+Wiederkehrsatz (1890) war das erste rein topologische Ergebnis auf dem Gebiet.
+Die moderne Ära beginnt mit der Entdeckung der \emph{symplektischen Starrheit}
+durch Eliashberg und Gromov: Trotz der Abwesenheit lokaler Invarianten gibt es
+überraschende globale Hindernisse für symplektische Einbettungen --- am
+eindrucksvollsten verkörpert durch Gromovs Non-Squeezing-Theorem (1985).
+
+\subsection*{Aufbau des Artikels}
+
+Abschnitt~\ref{sec:mannigfaltigkeiten} führt symplektische Mannigfaltigkeiten
+und ihre kanonischen Beispiele ein.  Der Satz von Darboux wird in
+Abschnitt~\ref{sec:darboux} formuliert und bewiesen.  Die Hamiltonsche Mechanik
+behandelt Abschnitt~\ref{sec:hamilton}.  Symplektomorphismen, Liouville- und
+Poincar\'{e}-Satz folgen in Abschnitt~\ref{sec:symplekto}.  Lagrangesche
+Untermannigfaltigkeiten und die Arnold-Vermutung sind Gegenstand von
+Abschnitt~\ref{sec:lagrange}.  Momentabbildungen und Reduktion behandelt
+Abschnitt~\ref{sec:moment}.  Gromovs Non-Squeezing-Theorem ist
+Abschnitt~\ref{sec:gromov}.  Floer-Homologie wird in Abschnitt~\ref{sec:floer}
+eingeführt.  Anwendungen beschließen den Artikel in
+Abschnitt~\ref{sec:anwendungen}.
+
+% =============================================================================
+\section{Symplektische Mannigfaltigkeiten}
+\label{sec:mannigfaltigkeiten}
+% =============================================================================
+
+\begin{definition}
+Eine \emph{symplektische Mannigfaltigkeit} ist ein Paar $(M, \omega)$, wobei
+$M$ eine glatte Mannigfaltigkeit (ohne Rand) ist und $\omega \in \Omega^{2}(M)$
+eine Differentialform zweiten Grades mit folgenden Eigenschaften:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Nicht-Entartung:}  $\omega_p(u,v) = 0$ für alle $v \in T_p M$
+        impliziert $u = 0$.
+  \item \textbf{Geschlossenheit:}  $d\omega = 0$.
+\end{enumerate}
+\end{definition}
+
+Die Nicht-Entartung erzwingt eine gerade Dimension von $M$, sagen wir
+$\dim M = 2n$.  Die $n$-te äußere Potenz $\omega^n := \omega \wedge \cdots
+\wedge \omega$ ($n$ Faktoren) ist dann eine nirgends verschwindende
+Volumenform, sodass jede symplektische Mannigfaltigkeit orientierbar ist.
+
+\subsection{Die Standard-Symplektikform auf \texorpdfstring{$\mathbb{R}^{2n}$}{R2n}}
+
+Wir wählen Koordinaten $(q_1, \ldots, q_n, p_1, \ldots, p_n)$ auf
+$\mathbb{R}^{2n}$.  Die \emph{Standard-Symplektikform} lautet
+\begin{equation}\label{eq:omega_std}
+  \omega_{\mathrm{std}} = \sum_{i=1}^{n} dq_i \wedge dp_i.
+\end{equation}
+In Matrixdarstellung für Vektoren $u, v \in \mathbb{R}^{2n}$:
+\begin{equation}
+  \omega_{\mathrm{std}}(u, v) = u^{\top} J\, v, \qquad
+  J = \begin{pmatrix} 0 & I_n \\ -I_n & 0 \end{pmatrix}.
+\end{equation}
+Man verifiziert $d\omega_{\mathrm{std}} = 0$ (konstante Koeffizienten) und
+$\det J = 1 \neq 0$ (nicht-entartet).
+
+\subsection{Kotangentialbündel}
+
+Sei $Q$ eine glatte $n$-Mannigfaltigkeit (Konfigurationsraum).  Das
+Kotangentialbündel $T^*Q$ trägt eine kanonische 1-Form $\lambda$ (\emph{Liouville-Form},
+auch \emph{tautologische Form} genannt): Ist $\pi: T^*Q \to Q$ die Projektion
+und $\alpha \in T^*Q$, so setzt man
+\[
+  \lambda_\alpha(v) := \alpha\bigl(d\pi_\alpha(v)\bigr), \quad v \in T_\alpha(T^*Q).
+\]
+Die Form $\omega := -d\lambda$ ist die kanonische Symplektikform auf $T^*Q$.
+In lokalen Koordinaten $(q^i, p_i)$:
+\[
+  \lambda = \sum_i p_i \, dq^i, \qquad \omega = \sum_i dq^i \wedge dp_i.
+\]
+Kotangentialbündel sind die prototypischen symplektischen Mannigfaltigkeiten;
+sie liefern den Phasenraum für jedes mechanische System mit Konfigurationsraum~$Q$.
+
+\subsection{Weitere Beispiele}
+
+\begin{beispiel}[Flächen]
+Jede orientierte Fläche $\Sigma$ mit einer Flächenform $\sigma$ (nirgends
+verschwindende 2-Form) ist eine symplektische Mannigfaltigkeit $(\Sigma,
+\sigma)$, da $d\sigma = 0$ aus Dimensionsgründen automatisch gilt.
+\end{beispiel}
+
+\begin{beispiel}[Kähler-Mannigfaltigkeiten]
+Eine Kähler-Mannigfaltigkeit $(M, g, J, \omega)$ ist gleichzeitig Riemannsch,
+komplex und symplektisch.  Die Symplektikform $\omega(u,v) = g(Ju, v)$ ist
+geschlossen dank der Kähler-Identität.  Der komplexe projektive Raum
+$\mathbb{CP}^n$ mit der Fubini--Study-Form ist das wichtigste Beispiel.
+\end{beispiel}
+
+\begin{beispiel}[Koadjungierte Orbiten]
+Sei $G$ eine Lie-Gruppe mit Lie-Algebra $\mathfrak{g}$ und $\mu \in
+\mathfrak{g}^*$.  Die koadjungierte Bahn $\mathcal{O}_\mu = \{\mathrm{Ad}^*_g
+\mu : g \in G\}$ trägt die Kirillov--Kostant--Souriau (KKS)-Symplektikform:
+\[
+  \omega_\mu(\xi_M, \eta_M) = \mu([\xi, \eta]), \quad \xi, \eta \in \mathfrak{g}.
+\]
+\end{beispiel}
+
+% =============================================================================
+\section{Der Satz von Darboux}
+\label{sec:darboux}
+% =============================================================================
+
+Eines der grundlegendsten Ergebnisse der symplektischen Geometrie unterscheidet
+sie scharf von der Riemannschen Geometrie: Es gibt keine lokalen Invarianten.
+
+\begin{theorem}[Darboux, 1882]\label{thm:darboux}
+Sei $(M, \omega)$ eine $2n$-dimensionale symplektische Mannigfaltigkeit und
+$p \in M$.  Dann existiert eine Umgebung $U \ni p$ und lokale Koordinaten
+$(q_1, \ldots, q_n, p_1, \ldots, p_n)$ auf $U$, sodass
+\[
+  \omega\big|_U = \sum_{i=1}^{n} dq_i \wedge dp_i.
+\]
+Solche Koordinaten heißen \emph{Darboux-Koordinaten} oder \emph{kanonische
+Koordinaten}.
+\end{theorem}
+
+\begin{proof}
+Wir folgen der \emph{Moser-Pfad-Methode}.  Nach einer linearen Koordinaten-
+transformation dürfen wir annehmen, dass wir auf einer offenen Teilmenge
+$U \subset \mathbb{R}^{2n}$ mit $p = 0$ arbeiten und
+$\omega_0 := \omega_p = \omega_{\mathrm{std},0}$ gilt.
+
+Definiere eine glatte Familie von 2-Formen
+\[
+  \omega_t = (1-t)\,\omega_{\mathrm{std}} + t\,\omega, \quad t \in [0,1].
+\]
+Da $\omega_{\mathrm{std}}$ und $\omega$ im Ursprung übereinstimmen, ist $\omega_t$
+auf einer (eventuell verkleinerten) Umgebung $U$ für alle $t \in [0,1]$
+nicht-entartet.  Jede Form $\omega_t$ ist geschlossen:
+\[
+  d\omega_t = (1-t)\,d\omega_{\mathrm{std}} + t\,d\omega = 0.
+\]
+
+Wir suchen ein zeitabhängiges Vektorfeld $X_t$ auf $U$, dessen Fluss
+$\varphi_t$ die Bedingung $\varphi_t^* \omega_t = \omega_{\mathrm{std}}$
+erfüllt.  Differentiation nach $t$ liefert:
+\[
+  0 = \frac{d}{dt}(\varphi_t^* \omega_t) = \varphi_t^*\!\left(
+    \mathcal{L}_{X_t}\omega_t + \dot{\omega}_t \right),
+\]
+also benötigen wir $\mathcal{L}_{X_t}\omega_t + \dot{\omega}_t = 0$, d.\,h.,
+\begin{equation}\label{eq:moser}
+  \iota_{X_t} \omega_t + \tau = 0, \quad \tau := \dot{\omega}_t = \omega -
+  \omega_{\mathrm{std}}.
+\end{equation}
+Die Form $\tau = \omega - \omega_{\mathrm{std}}$ ist geschlossen; nach dem
+Lemma von Poincar\'{e} auf einer sternförmigen Umgebung gilt $\tau = d\sigma$
+für eine 1-Form $\sigma$, die so gewählt werden kann, dass $\sigma_0 = 0$
+(da $\tau_0 = 0$).  Gleichung~\eqref{eq:moser} lautet dann
+$\iota_{X_t}\omega_t = -\sigma$, was eine eindeutige Lösung $X_t$ hat, weil
+$\omega_t$ nicht-entartet ist.  Der Fluss $\varphi_1$ von $X_t$ ist die
+gesuchte Darboux-Koordinatenabbildung.
+\end{proof}
+
+\begin{bemerkung}
+Der Satz von Darboux hat kein Analogon in der Riemannschen Geometrie: Nicht
+jede Riemannsche Mannigfaltigkeit ist lokal flach (Krümmung verhindert dies).
+In der symplektischen Geometrie übernimmt die Geschlossenheit von $\omega$
+die Rolle der Bedingung „Krümmung null".
+\end{bemerkung}
+
+\begin{korollar}
+Die einzige lokale Invariante einer symplektischen Mannigfaltigkeit ist ihre
+Dimension.
+\end{korollar}
+
+% =============================================================================
+\section{Hamiltonsche Mechanik}
+\label{sec:hamilton}
+% =============================================================================
+
+\subsection{Das Hamiltonsche Vektorfeld}
+
+Sei $(M, \omega)$ eine symplektische Mannigfaltigkeit.  Zu einer glatten
+Funktion $H: M \to \mathbb{R}$ (\emph{Hamilton-Funktion} oder
+\emph{Hamiltonian}) garantiert die Nicht-Entartung von $\omega$ die Existenz
+eines eindeutigen Vektorfeldes $X_H$ mit
+\begin{equation}\label{eq:ham_vf}
+  \iota_{X_H}\omega = dH, \quad \text{d.\,h.,} \quad
+  \omega(X_H, \cdot) = dH(\cdot).
+\end{equation}
+Das Vektorfeld $X_H$ heißt \emph{Hamiltonsches Vektorfeld} von $H$.
+
+\subsection{Hamiltonsche Gleichungen}
+
+In Darboux-Koordinaten $(q_i, p_i)$ liefert Gleichung~\eqref{eq:ham_vf} die
+berühmten \emph{Hamiltonschen Bewegungsgleichungen}:
+\begin{equation}\label{eq:hamilton}
+  \dot{q}_i = \frac{\partial H}{\partial p_i}, \qquad
+  \dot{p}_i = -\frac{\partial H}{\partial q_i}, \quad i = 1, \ldots, n.
+\end{equation}
+Sie beschreiben die Zeitentwicklung eines mechanischen Systems mit $n$
+Freiheitsgraden.
+
+\subsection{Energieerhaltung}
+
+\begin{proposition}
+Der Hamiltonian $H$ ist entlang des Flusses von $X_H$ konstant.
+\end{proposition}
+\begin{proof}
+$\dot{H} = dH(X_H) = \omega(X_H, X_H) = 0$, wegen der Antisymmetrie von $\omega$.
+\end{proof}
+
+\subsection{Die Poisson-Klammer}
+
+Die \emph{Poisson-Klammer} zweier glatter Funktionen $f, g \in C^\infty(M)$
+ist definiert als
+\begin{equation}\label{eq:poisson}
+  \{f, g\} := \omega(X_f, X_g) = \sum_{i=1}^{n}
+  \left(\frac{\partial f}{\partial q_i}\frac{\partial g}{\partial p_i}
+  - \frac{\partial f}{\partial p_i}\frac{\partial g}{\partial q_i}\right).
+\end{equation}
+
+\begin{proposition}
+$(C^\infty(M), \{\cdot,\cdot\})$ ist eine Lie-Algebra.  Insbesondere gelten:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Antisymmetrie:} $\{f,g\} = -\{g,f\}$.
+  \item \textbf{Jacobi-Identität:} $\{f,\{g,h\}\} + \{g,\{h,f\}\} + \{h,\{f,g\}\} = 0$.
+  \item \textbf{Leibniz-Regel:} $\{fg, h\} = f\{g,h\} + g\{f,h\}$.
+\end{enumerate}
+\end{proposition}
+
+\subsection{Beispiel: Harmonischer Oszillator}
+
+Der harmonische Oszillator mit $n = 1$ hat den Hamiltonian
+\[
+  H(q, p) = \frac{p^2 + \omega^2 q^2}{2}.
+\]
+Die Hamiltonschen Gleichungen lauten $\dot{q} = p$ und $\dot{p} = -\omega^2 q$,
+was auf kreisförmige Bahnen im Phasenraum $(q, p)$ mit Radius
+$r = \sqrt{2H/\omega^2}$ führt.  Die Periode $T = 2\pi/\omega$ ist
+amplitudenunabhängig --- eine direkte Folge der Linearität der Gleichungen.
+
+\subsection{Beispiel: Kepler-Problem}
+
+Das Kepler-Problem (Gravitationszweikörperproblem) hat den Hamiltonian
+\[
+  H(q, p) = \frac{|p|^2}{2} - \frac{GM}{|q|}.
+\]
+Das System ist integrabel: Energie $H$ und Drehimpuls $L$ sind unabhängige,
+in Involution stehende Erhaltungsgrößen.  Der Runge-Lenz-Vektor liefert eine
+verborgene Symmetrie (Kegelschnittbahnen).
+
+% =============================================================================
+\section{Symplektomorphismen}
+\label{sec:symplekto}
+% =============================================================================
+
+\begin{definition}
+Ein \emph{Symplektomorphismus} zwischen symplektischen Mannigfaltigkeiten
+$(M_1, \omega_1)$ und $(M_2, \omega_2)$ ist ein Diffeomorphismus
+$\varphi: M_1 \to M_2$ mit $\varphi^* \omega_2 = \omega_1$.
+\end{definition}
+
+Der Fluss $\varphi_t$ jedes Hamiltonschen Vektorfeldes $X_H$ besteht aus
+Symplektomorphismen.  Dies folgt aus
+$\frac{d}{dt}\varphi_t^*\omega = \varphi_t^*(\mathcal{L}_{X_H}\omega) = 0$,
+da $\mathcal{L}_{X_H}\omega = \iota_{X_H}d\omega + d(\iota_{X_H}\omega)
+= 0 + d(dH) = 0$.
+
+\subsection{Der Satz von Liouville}
+
+\begin{theorem}[Liouville, 1838]\label{thm:liouville}
+Jeder Hamiltonsche Fluss erhält die symplektische Volumenform $\omega^n$.
+Äquivalent: Das Phasenraumvolumen jeder messbaren Menge bleibt unter dem
+Hamiltonschen Fluss erhalten.
+\end{theorem}
+
+\begin{proof}
+Da $\varphi_t^*\omega = \omega$, gilt
+\[
+  \varphi_t^*(\omega^n) = (\varphi_t^*\omega)^n = \omega^n.
+\]
+Das Volumen einer Borelmenge $A \subset M$ unter dem Fluss ist
+\[
+  \mathrm{Vol}(\varphi_t(A)) = \int_{\varphi_t(A)} \omega^n
+  = \int_A \varphi_t^*\omega^n = \int_A \omega^n = \mathrm{Vol}(A). \qedhere
+\]
+\end{proof}
+
+\begin{bemerkung}
+Dies ist der berühmte Liouville-Satz der statistischen Mechanik.  Er impliziert,
+dass die Zustandsdichte im Phasenraum erhalten ist --- die Grundlage des
+mikrokanonischen Ensembles.
+\end{bemerkung}
+
+\subsection{Der Wiederkehrsatz von Poincar\'{e}}
+
+\begin{theorem}[Poincar\'{e}, 1890]\label{thm:poincare}
+Sei $\varphi: M \to M$ eine volumenerhaltende Abbildung auf einem Maßraum
+$(M, \mu)$ mit endlichem Gesamtmaß.  Dann kehrt für jede messbare Menge
+$A$ mit $\mu(A) > 0$ fast jeder Punkt $x \in A$ nach $A$ zurück: Es existiert
+$N \geq 1$ mit $\varphi^N(x) \in A$.
+\end{theorem}
+
+\begin{proof}
+Angenommen, die Menge $A_0 = \{x \in A : \varphi^k(x) \notin A \text{ für alle }
+k \geq 1\}$ hätte positives Maß.  Dann wären die Mengen $A_0, \varphi^{-1}(A_0),
+\varphi^{-2}(A_0), \ldots$ paarweise disjunkt und hätten alle dasselbe Maß
+$\mu(A_0) > 0$.  Ihr Gesamtmaß wäre $\sum_{k=0}^\infty \mu(A_0) = \infty$,
+ein Widerspruch zu $\mu(M) < \infty$.
+\end{proof}
+
+% =============================================================================
+\section{Lagrangesche Untermannigfaltigkeiten}
+\label{sec:lagrange}
+% =============================================================================
+
+\begin{definition}
+Eine Untermannigfaltigkeit $L \subset (M^{2n}, \omega)$ heißt
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{isotrop}, falls $\omega|_L = 0$ und $\dim L \leq n$,
+  \item \emph{Lagrangesch}, falls $\omega|_L = 0$ und $\dim L = n$.
+\end{enumerate}
+\end{definition}
+
+Lagrangesche Untermannigfaltigkeiten sind die maximal isotropen Untermannig\-
+faltigkeiten; sie haben die größtmögliche Dimension, die mit der Isotropie\-
+bedingung verträglich ist.
+
+\begin{beispiel}[Nullschnitt]
+Im Kotangentialbündel $T^*Q$ ist der Nullschnitt $Q \subset T^*Q$ (alle
+Impulse null) eine Lagrangesche Untermannigfaltigkeit.  Es gilt
+$\omega|_Q = d\lambda|_Q = 0$, da $\lambda = p\,dq$ auf dem Nullschnitt
+verschwindet.
+\end{beispiel}
+
+\begin{beispiel}[Graph einer geschlossenen 1-Form]
+Ist $\alpha \in \Omega^1(Q)$ geschlossen ($d\alpha = 0$), so ist der Graph
+$\Gamma_\alpha = \{(q, \alpha_q) : q \in Q\} \subset T^*Q$
+eine Lagrangesche Untermannigfaltigkeit.  Insbesondere sind Graphen exakter
+Formen $\alpha = df$ (für $f \in C^\infty(Q)$) stets Lagrangesch.
+\end{beispiel}
+
+\subsection{Die Arnold-Vermutung}
+
+Ein zentrales offenes Problem der symplektischen Topologie betrifft die
+Mindestanzahl der Fixpunkte Hamiltonscher Diffeomorphismen.
+
+\begin{vermutung}[Arnold, 1965]\label{conj:arnold}
+Sei $(M, \omega)$ eine geschlossene symplektische Mannigfaltigkeit und
+$\varphi \in \mathrm{Ham}(M, \omega)$ ein Hamiltonscher Diffeomorphismus.
+Dann hat $\varphi$ mindestens so viele Fixpunkte, wie eine glatte Funktion
+auf $M$ kritische Punkte hat, d.\,h.,
+\[
+  \#\mathrm{Fix}(\varphi) \geq \sum_{k=0}^{2n} \beta_k(M),
+\]
+wobei $\beta_k = \dim H_k(M; \mathbb{Z}/2)$ die Betti-Zahlen von $M$ sind.
+\end{vermutung}
+
+\begin{bemerkung}
+Diese Vermutung ist im \textbf{allgemeinen Fall offen}.  Bewiesene Spezialfälle:
+\begin{itemize}
+  \item \textit{Tori:} Conley und Zehnder bewiesen die Arnold-Vermutung für
+    $M = \mathbb{T}^{2n}$ im Jahr 1983.  Ein Hamiltonscher Diffeomorphismus
+    des $2n$-Torus hat mindestens $2n+1$ Fixpunkte (und mindestens $2^{2n}$
+    nicht-ausgeartete).
+  \item \textit{Flächen:} Für alle geschlossenen Flächen bewiesen.
+  \item \textit{Floer-Homologie:} Floer (1989) bewies die Vermutung für
+    monotone Mannigfaltigkeiten.
+\end{itemize}
+Der allgemeine Fall für beliebige geschlossene symplektische Mannigfaltigkeiten
+bleibt offen.
+\end{bemerkung}
+
+% =============================================================================
+\section{Momentabbildungen}
+\label{sec:moment}
+% =============================================================================
+
+\subsection{Gruppenoperationen und Momentabbildungen}
+
+Sei $G$ eine Lie-Gruppe, die auf $(M, \omega)$ durch Symplektomorphismen
+operiert (\emph{symplektische Operation}).  Für $\xi \in \mathfrak{g}$ sei
+$\xi_M$ das fundamentale Vektorfeld: $\xi_M(x) = \frac{d}{dt}\big|_{t=0}
+\exp(t\xi) \cdot x$.
+
+\begin{definition}
+Die symplektische Operation von $G$ auf $(M, \omega)$ heißt \emph{Hamiltonsch},
+wenn eine Abbildung $\mu: M \to \mathfrak{g}^*$ (\emph{Momentabbildung}) mit
+folgenden Eigenschaften existiert:
+\begin{enumerate}[label=(\roman*)]
+  \item $\iota_{\xi_M}\omega = d\langle \mu, \xi \rangle$ für alle
+        $\xi \in \mathfrak{g}$ (d.\,h., $\xi_M = X_{\langle\mu,\xi\rangle}$),
+  \item $\mu$ ist äquivariant: $\mu(g \cdot x) = \mathrm{Ad}^*_g \mu(x)$.
+\end{enumerate}
+\end{definition}
+
+\begin{beispiel}[$G = S^1$ auf $\mathbb{C}^n$]
+Die $S^1$-Operation $e^{i\theta}(z_1, \ldots, z_n) = (e^{i\theta}z_1, \ldots,
+e^{i\theta}z_n)$ auf $(\mathbb{C}^n, \frac{i}{2}\sum dz_k \wedge d\bar{z}_k)$
+hat die Momentabbildung $\mu(z) = -\frac{1}{2}|z|^2$.
+\end{beispiel}
+
+\subsection{Marsden--Weinstein-Reduktion}
+
+\begin{theorem}[Marsden--Weinstein, 1974]\label{thm:mw}
+Sei $G$ Hamiltonsch auf $(M, \omega)$ mit Momentabbildung $\mu: M \to
+\mathfrak{g}^*$.  Sei $\lambda \in \mathfrak{g}^*$ ein regulärer Wert von
+$\mu$, und die Isotropiegruppe $G_\lambda := \{g \in G : \mathrm{Ad}^*_g
+\lambda = \lambda\}$ operiere frei und eigentlich auf $\mu^{-1}(\lambda)$.
+Dann trägt der \emph{reduzierte Raum}
+\[
+  M_\lambda := \mu^{-1}(\lambda) / G_\lambda
+\]
+eine eindeutige Symplektikform $\omega_\lambda$, charakterisiert durch
+$\pi^* \omega_\lambda = \iota^* \omega$, wobei $\iota: \mu^{-1}(\lambda)
+\hookrightarrow M$ und $\pi: \mu^{-1}(\lambda) \twoheadrightarrow M_\lambda$.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Der Tangentialraum von $\mu^{-1}(\lambda)$ in $x$ ist $\ker d\mu_x =
+(\mathfrak{g} \cdot x)^{\omega}$ --- das symplektische Komplement der
+$G$-Bahn durch $x$.  Der Quotient nach $G_\lambda$ entfernt die entarteten
+Richtungen, und man verifiziert, dass $\omega_\lambda$ wohldefiniert, geschlossen
+und nicht-entartet ist.
+\end{proof}
+
+\begin{bemerkung}
+Die Marsden--Weinstein-Reduktion ist das symplektische Analogon des Quotientierens
+nach einer Symmetriegruppe.  Sie findet breite Anwendung in der mathematischen
+Physik, z.\,B. wird ein mechanisches System durch Rotationssymmetrie auf ein
+effektives eindimensionales Problem im Radialkoordinaten reduziert.
+\end{bemerkung}
+
+\subsection{Der Konvexitätssatz}
+
+\begin{theorem}[Atiyah 1982; Guillemin--Sternberg 1982]
+Ist $(M, \omega)$ kompakt und zusammenhängend und operiert ein Torus $T$ auf
+$M$ mit Momentabbildung $\mu: M \to \mathfrak{t}^*$, so ist das Bild $\mu(M)$
+ein konvexes Polytop (das \emph{Momentpolytop}).
+\end{theorem}
+
+% =============================================================================
+\section{Gromovs Non-Squeezing-Theorem}
+\label{sec:gromov}
+% =============================================================================
+
+Gromovs Non-Squeezing-Theorem (1985) war ein Meilenstein: Es zeigte, dass
+symplektische Geometrie sich grundlegend von volumenerhaltender Geometrie
+unterscheidet.
+
+\begin{theorem}[Gromov, 1985]\label{thm:gromov}
+Sei $B^{2n}(r) = \{(q,p) \in \mathbb{R}^{2n} : |q|^2 + |p|^2 < r^2\}$
+der $2n$-dimensionale Ball vom Radius $r$ und
+$Z^{2n}(R) = \{(q,p) \in \mathbb{R}^{2n} : q_1^2 + p_1^2 < R^2\}$
+der symplektische Zylinder vom Radius $R$ (Zylinder im ersten symplektischen
+Faktor $\mathbb{R}^2$).  Eine symplektische Einbettung
+$\varphi: B^{2n}(r) \hookrightarrow Z^{2n}(R)$ existiert genau dann, wenn
+$r \leq R$.
+\end{theorem}
+
+\begin{bemerkung}
+Im Gegensatz dazu existiert eine \emph{volumenerhaltende} Einbettung
+$B^{2n}(r) \hookrightarrow Z^{2n}(R)$ für beliebig kleines $R > 0$, solange
+das Volumen passt (Dacorogna--Moser).  Das Non-Squeezing-Theorem enthüllt also
+eine echte symplektische Obstruktion, die weit über Volumen hinausgeht.
+\end{bemerkung}
+
+\begin{proof}[Beweisidee]
+Das Schlüsselkonzept ist die \emph{symplektische Weite} (Gromov-Weite):
+\[
+  w(M, \omega) := \sup\bigl\{\pi r^2 : B^{2n}(r) \xhookrightarrow{\text{symp}} M\bigr\}.
+\]
+Man zeigt:
+\begin{enumerate}[label=(\roman*)]
+  \item Die Weite ist eine symplektische Invariante.
+  \item $w(B^{2n}(r)) = \pi r^2$.
+  \item $w(Z^{2n}(R)) = \pi R^2$.
+\end{enumerate}
+Der entscheidende Schritt (ii) benutzt Gromovs Theorie der
+\emph{pseudo-holomorphen Kurven} (auch: $J$-holomorphe Kurven): Man zeigt,
+dass jedes symplektische Bild von $B^{2n}(r)$ eine $J$-holomorphe Scheibe
+enthält, die einen generischen $\mathbb{R}^2$-Schnitt schneidet.  Die Fläche
+dieser Scheibe (durch den Stokesschen Satz aus der $J$-holomorphen Gleichung)
+beträgt mindestens $\pi r^2$.  Da der Zylinder $Z^{2n}(R)$ die 2D-Breite
+$\pi R^2$ hat, folgt $r \leq R$.
+\end{proof}
+
+Das Non-Squeezing-Theorem begründete den Begriff der \emph{symplektischen
+Kapazität}:
+
+\begin{definition}
+Eine \emph{symplektische Kapazität} auf $2n$-dimensionalen symplektischen
+Mannigfaltigkeiten ist eine Funktion $c$ mit Werten in $[0, \infty]$, die
+erfüllt:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Monotonie:} $(M_1, \omega_1) \xhookrightarrow{\text{symp}}
+    (M_2, \omega_2) \Rightarrow c(M_1) \leq c(M_2)$.
+  \item \textbf{Konformität:} $c(M, \lambda\omega) = \lambda\, c(M,\omega)$.
+  \item \textbf{Normierung:} $c(B^{2n}(1)) = \pi = c(Z^{2n}(1))$.
+\end{enumerate}
+\end{definition}
+
+% =============================================================================
+\section{Floer-Homologie}
+\label{sec:floer}
+% =============================================================================
+
+Die Floer-Homologie, eingeführt von Andreas Floer in den Jahren 1988--1989,
+ist eine unendlichdimensionale Morse-Theorie auf dem Schleifenraum einer
+symplektischen Mannigfaltigkeit.  Sie wurde gezielt entwickelt, um die
+Arnold-Vermutung anzugehen.
+
+\subsection{Das Wirkungsfunktional}
+
+Sei $(M, \omega)$ eine geschlossene symplektische Mannigfaltigkeit und
+$H: S^1 \times M \to \mathbb{R}$ ein zeitabhängiger Hamiltonian.  Das
+\emph{symplektische Wirkungsfunktional} auf dem Raum $\mathcal{L}M$ der
+zusammenziehbaren Schleifen $x: S^1 \to M$ lautet
+\begin{equation}\label{eq:wirkung}
+  \mathcal{A}_H(x) = -\int_{D^2} \bar{x}^*\omega + \int_0^1 H(t, x(t))\,dt,
+\end{equation}
+wobei $\bar{x}: D^2 \to M$ eine beliebige $x$ berändernde Scheibe ist.  Die
+kritischen Punkte von $\mathcal{A}_H$ sind genau die 1-periodischen Orbiten
+von $X_H$.
+
+\subsection{Der Floer-Kettenkomplex}
+
+Sei $J = J(t)$ eine $\omega$-kompatible fast-komplexe Struktur.  Der
+\emph{Floer-Kettenkomplex} wird (über $\mathbb{Z}/2$) von den 1-periodischen
+Orbiten $x$ von $X_H$ erzeugt; die Graduierung wird durch den
+\emph{Conley--Zehnder-Index} $\mu_{\mathrm{CZ}}(x)$ gegeben.
+
+Der Randoperator $\partial: CF_k \to CF_{k-1}$ zählt starre $J$-holomorphe
+Zylinder (Floer-Trajektorien) zwischen Orbiten benachbarten Indexes:
+Abbildungen $u: \mathbb{R} \times S^1 \to M$, die der \emph{Floer-Gleichung}
+genügen:
+\begin{equation}\label{eq:floer}
+  \frac{\partial u}{\partial s} + J(t, u)\frac{\partial u}{\partial t} =
+  \nabla H(t, u),
+\end{equation}
+mit $\lim_{s \to \pm\infty} u(s,\cdot) = x^\pm(\cdot)$.
+
+\begin{theorem}[Floer, 1989]\label{thm:floer}
+Es gilt $\partial^2 = 0$, so dass $(CF_*, \partial)$ ein Kettenkomplex ist.
+Seine Homologie
+\[
+  HF_*(M, H) := H_*(CF_*, \partial)
+\]
+ist unabhängig von der Wahl von $H$ und $J$ und isomorph zur singulären
+Homologie von $M$:
+\[
+  HF_*(M) \cong H_*(M; \mathbb{Z}/2).
+\]
+\end{theorem}
+
+\subsection{Partieller Beweis der Arnold-Vermutung}
+
+\begin{theorem}[Floer, 1989 — monotoner Fall]\label{thm:arnold_floer}
+Sei $(M, \omega)$ eine monotone geschlossene symplektische Mannigfaltigkeit
+(d.\,h. $[\omega] = \lambda c_1(TM)$ für ein $\lambda > 0$).  Dann hat jeder
+nicht-ausgeartete Hamiltonsche Diffeomorphismus $\varphi \in \mathrm{Ham}(M)$
+mindestens $\sum_k \beta_k(M)$ Fixpunkte.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Die nicht-ausgearteten Fixpunkte von $\varphi$ entsprechen den
+nicht-ausgearteten 1-periodischen Orbiten von $H$, also den Erzeugern des
+Floer-Komplexes.  Das Euler-Charakteristik-Argument liefert
+\[
+  \#\mathrm{Fix}(\varphi) \geq \mathrm{rang}\, HF_*(M) = \mathrm{rang}\, H_*(M)
+  = \sum_k \beta_k(M).  \qedhere
+\]
+\end{proof}
+
+\begin{bemerkung}
+Die allgemeine Arnold-Vermutung (für beliebige geschlossene symplektische
+Mannigfaltigkeiten, nicht nur monotone) bleibt \textbf{offen}.  Partielle
+Ergebnisse existieren für viele Klassen (Kähler, Calabi--Yau usw.), aber ein
+vollständiger Beweis wurde bislang nicht erbracht.
+\end{bemerkung}
+
+% =============================================================================
+\section{Anwendungen}
+\label{sec:anwendungen}
+% =============================================================================
+
+\subsection{Integrable Systeme}
+
+Ein Hamiltonsches System mit $n$ Freiheitsgraden heißt \emph{(Liouville-)
+integrabel}, wenn es $n$ funktional unabhängige, paarweise in Involution
+stehende Erhaltungsgrößen $F_1 = H, F_2, \ldots, F_n$ besitzt:
+\[
+  \{F_i, F_j\} = 0, \quad i \neq j.
+\]
+Der Satz von Liouville--Arnold garantiert dann, dass die gemeinsamen
+Niveaumengen $\{F_1 = c_1, \ldots, F_n = c_n\}$ (wenn kompakt und
+zusammenhängend) diffeomorph zu $n$-Tori $\mathbb{T}^n$ sind und die
+Bewegung auf jedem Torus quasiperiodisch verläuft.
+
+\begin{beispiel}
+Das Kepler-Problem in $\mathbb{R}^3$ ist integrabel: Die unabhängigen,
+in Involution stehenden Integrale sind Energie $H$ und die Drehimpuls-
+komponenten.  Der Runge-Lenz-Vektor liefert eine verborgene Symmetrie
+(Keplerbahnen als Kegelschnitte).
+\end{beispiel}
+
+\subsection{KAM-Theorie}
+
+Der Satz von Kolmogorov--Arnold--Moser (KAM) behandelt die Stabilität
+integrabler Systeme unter kleinen Störungen.
+
+\begin{theorem}[KAM; Kolmogorov 1954, Arnold 1963, Moser 1962]
+Sei $H_\varepsilon = H_0 + \varepsilon H_1$ eine kleine Störung eines
+integrablen Systems.  Dann bleiben für genügend kleines $\varepsilon$ ein
+Maß von invarianten Tori erhalten --- jene mit \emph{diophantischen}
+Frequenzvektoren $\omega = (\omega_1, \ldots, \omega_n)$, die
+\[
+  |k \cdot \omega| \geq \frac{c}{|k|^\tau}, \quad \forall k \in \mathbb{Z}^n
+  \setminus \{0\},
+\]
+für gewisse $c > 0$, $\tau > n-1$ erfüllen.  Die zerstörten Tori entsprechen
+Resonanzen.
+\end{theorem}
+
+\subsection{Geometrische Quantisierung}
+
+Die geometrische Quantisierung versucht, aus einer symplektischen Mannigfaltigkeit
+$(M, \omega)$ eine Quantentheorie zu konstruieren:
+\begin{enumerate}[label=(\arabic*)]
+  \item \textbf{Vor-Quantisierung:} Konstruiere ein hermitesches Geradenbündel
+    $\mathcal{L} \to M$ mit Zusammenhang $\nabla$, dessen Krümmung
+    $\frac{i}{\hbar}\omega$ ist.  Dies erfordert die \emph{Integralitätsbedingung}
+    $[\omega/2\pi\hbar] \in H^2(M; \mathbb{Z})$.
+  \item \textbf{Polarisation:} Wähle eine Lagrangesche Distribution (Polarisation),
+    um den Raum der Schnitte auf einen ``halbdimensionalen'' Hilbertraum zu
+    reduzieren.
+  \item \textbf{Quantisierungsabbildung:} Weise jeder Funktion $f \in C^\infty(M)$
+    einen selbstadjungierten Operator $\hat{f}$ zu, der $[\hat{f}, \hat{g}]
+    = -i\hbar \widehat{\{f,g\}}$ erfüllt.
+\end{enumerate}
+
+Der Hilbertraum des harmonischen Oszillators ($n = 1$) hat so die Basis
+$\{|0\rangle, |1\rangle, |2\rangle, \ldots\}$ mit Energien
+$E_k = \hbar\omega(k + \frac{1}{2})$ --- exakt der Quantenoszillator.
+
+\subsection{Spiegelsymmetrie}
+
+Die Vermutung der homologischen Spiegelsymmetrie (Kontsevich, 1994) postuliert
+eine tiefe Dualität zwischen der symplektischen Geometrie einer Calabi--Yau-Mann\-
+igfaltigkeit $X$ (codiert in ihrer Fukaya-Kategorie, deren Objekte Lagrangesche
+Untermannigfaltigkeiten sind) und der komplexen Geometrie einer Spiegel-Mannig\-
+faltigkeit $\hat{X}$ (codiert in ihrer derivierten Kategorie kohärenter Garben).
+Floer-Homologiegruppen zwischen Lagrangeschen Untermannigfaltigkeiten
+entsprechen Ext-Gruppen kohärenter Garben.  Dies ist ein aktives Forschungsgebiet
+an der Grenze zwischen symplektischer und algebraischer Geometrie.
+
+% =============================================================================
+\section*{Schluss}
+% =============================================================================
+
+Die symplektische Geometrie bietet den mathematischen Rahmen für die Hamiltonsche
+Mechanik und hat sich zu einer tiefen Theorie mit weitreichenden Konsequenzen
+entwickelt.  Die hier vorgestellten Hauptresultate --- Darbouxs Satz (lokale
+Trivialität), Liouvillesatz (Volumenerhaltung) und Gromovs Non-Squeezing-Theorem
+(symplektische Starrheit) --- illustrieren gemeinsam die Dualität zwischen
+lokaler Flexibilität und globalen Schranken, die das Gebiet charakterisiert.
+Die Floer-Homologie, aufbauend auf der Morse-Theorie, liefert leistungsstarke
+algebraische Werkzeuge zum Studium globaler Eigenschaften symplektischer
+Mannigfaltigkeiten und beweist die Arnold-Vermutung partiell --- eines der
+zentralen offenen Probleme des Gebiets.
+
+% =============================================================================
+\begin{thebibliography}{99}
+% =============================================================================
+
+\bibitem{Arnold}
+W.~I.~Arnold.
+\newblock {\em Mathematische Methoden der klassischen Mechanik}.
+\newblock Springer, 2.~Aufl., 1989.
+
+\bibitem{CannasDS}
+A.~Cannas da Silva.
+\newblock {\em Lectures on Symplectic Geometry}.
+\newblock Springer Lecture Notes in Mathematics 1764, 2001.
+
+\bibitem{McDuffSalamon}
+D.~McDuff und D.~Salamon.
+\newblock {\em Introduction to Symplectic Topology}.
+\newblock Oxford University Press, 3.~Aufl., 2017.
+
+\bibitem{Gromov85}
+M.~Gromov.
+\newblock Pseudo holomorphic curves in symplectic manifolds.
+\newblock {\em Inventiones Mathematicae}, 82:307--347, 1985.
+
+\bibitem{Floer89}
+A.~Floer.
+\newblock Symplectic fixed points and holomorphic spheres.
+\newblock {\em Communications in Mathematical Physics}, 120:575--611, 1989.
+
+\bibitem{MarsdenWeinstein}
+J.~Marsden und A.~Weinstein.
+\newblock Reduction of symplectic manifolds with symmetry.
+\newblock {\em Reports on Mathematical Physics}, 5(1):121--130, 1974.
+
+\bibitem{ConleyZehnder}
+C.~Conley und E.~Zehnder.
+\newblock The Birkhoff--Lewis fixed point theorem and a conjecture of V.~I.~Arnold.
+\newblock {\em Inventiones Mathematicae}, 73:33--49, 1983.
+
+\bibitem{Darboux}
+G.~Darboux.
+\newblock Sur le probl\`{e}me de Pfaff.
+\newblock {\em Bulletin des Sciences Math\'{e}matiques}, 6:14--36, 49--68, 1882.
+
+\bibitem{MoserPath}
+J.~Moser.
+\newblock On the volume elements on a manifold.
+\newblock {\em Transactions of the American Mathematical Society}, 120:286--294, 1965.
+
+\end{thebibliography}
+
+\end{document}
