@@ -1563,3 +1563,9 @@ Bugfixes Verifikationsskript:
 - Hakimi: prüft negative Grade nach Subtraktion (return None wenn deg_u<=0)
 - Sieb-basiertes σ für OPN-Suche (10^6 in 2.5s)
 - Bateman-Horn-Formel: C_f/2 für n>0 (Faktor 1/2 korrekt)
+2026-03-12 22:25:22 Build 174: Forschungsdatei gruppe_b_offene_probleme_topologie.md erstellt
+  - MLC/Mandelbrot: Dudko-Lyubich 2023, Yoccoz-Puzzle-Versagen, Buff-Chéritat, offene Teilprobleme
+  - Conway-Knoten: Piccirillo 2020, Spur-Äquivalenz, Konkordanz-Invarianten
+  - Whitehead-Asphärizität: D(2)-Problem, gescheiterte CAT(0)-Methoden, LOTs
+  - Jones/Volumen-Vermutung: Kronheimer-Mrowka, Garoufalidis-Zagier 2024, Resurgenz
+  - 16 Webrecherchen durchgeführt
