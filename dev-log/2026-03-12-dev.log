@@ -1369,3 +1369,27 @@ Alle unbewiesenen Aussagen korrekt als conjecture/vermutung deklariert.
 ### Build 171 — Abschluss
 - build.txt auf 171 gesetzt
 - Dokumentation (FEATURES.md, BUGS.md) aktualisiert
+
+=== 2026-03-12 — Build 172 — Batch 19 Gruppe B Verifikation ===
+
+2026-03-12 [Build 172]: Mathematische Verifikation Batch 19 (4 Vermutungen)
+
+### Neue Dateien
+- src/py/gruppe_b_batch19_verification.py: Python-Verifikationsskript (4 Vermutungen)
+  - FreimanPFRAnalysis: Verdopplungskonstanten, Sanders-Schranke, F₂ⁿ-Unterraum
+  - FranklUnionClosedAnalysis: Exhaustive Prüfung, Gilmer-Schranke, spezifische Familien
+  - LonelyRunnerVerification: n=4..8, exakte rationale Arithmetik, Gegenbeispielsuche
+  - GracefulTreeVerification: alle Bäume ≤10 Knoten via Backtracking
+- reviews/research_batch19_gruppe_b_2026_03_12.md: Ausführliches Review-Dokument
+
+### Ergebnisse
+- Paper 72 (PFR): OFFEN über ℤ | BEWIESEN über F₂ⁿ (GGMT 2023)
+- Paper 73 (Frankl UC): OFFEN, Gilmer 2022 → 0.382·|F|, Ziel 0.5
+- Paper 74 (Lonely Runner): n≤7 BEWIESEN (Tao 2018), n≥8 OFFEN
+- Paper 75 (Graceful Trees): OFFEN, 201 Bäume bis n=10 vollständig verifiziert
+
+### Computational Evidence
+- Lonely Runner n=4..8: 115 Läufer, alle Instanzen verifiziert
+- Graceful Trees n=1..10: 201/201 graceful (kein Gegenbeispiel)
+- Frankl UC: 120 Familien auf Grundmenge ≤3 ohne Verletzung
+- Freiman PFR: Sanders-Schranke vs. PFR-Ziel demonstriert (K=3: exp(1456) vs. 9)
