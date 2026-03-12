@@ -5,6 +5,90 @@ _(keine bekannten Bugs)_
 
 ## Behobene Bugs
 
+### Build 118 (Mittel-Bugs)
+
+### BUG-B4-P18-DE-002 (Build 118): paper18 DE — Simplex-Fallunterscheidung unvollständig (NEU)
+- **Datei**: papers/batch4/paper18_vinogradov_drei_primzahlen_de.tex
+- **Problem**: Simplex-Fallunterscheidung war unvollständig; Substitution u_i=t_i-2 fehlte
+- **Behoben**: Substitution u_i=t_i-2 eingefügt, zeigt n≤N-Formel exakt
+
+### BUG-B4-P19-EN-001 (Build 118): paper19 EN — Querverweis "Paper 17, Theorem 6.1"
+- **Datei**: papers/batch4/paper19_waring_problem.tex
+- **Problem**: Querverweis "Paper 17, Theorem 6.1" — FALSE POSITIVE: Theorem 6.1 ist korrekt
+- **Behoben**: Fußnote zur Klarstellung eingefügt (kein inhaltlicher Fehler)
+
+### BUG-B4-P20-EN-001 (Build 118): paper20 EN — GRH-Beweisskizze ohne q-Abhängigkeit (NEU)
+- **Datei**: papers/batch4/paper20_goldbach_singular_series.tex
+- **Problem**: GRH-Beweisskizze: Fehlerterm ohne q-Abhängigkeit angegeben
+- **Behoben**: O(√N(log N)²/φ(q)) pro Hauptbogen explizit ergänzt
+
+### BUG-B5-P23-EN/DE-001 (Build 118): paper23 EN+DE — Beitrag bei s=0 falsch als "Pol von Γ"
+- **Datei**: papers/batch5/paper23_explicit_formula_pnt_en.tex + _de.tex
+- **Problem**: Beitrag bei s=0 als "Pol von Γ" beschrieben — falsch, da ζ(0)=-1/2≠0
+- **Behoben**: "Residuum des 1/s-Faktors bei s=0" (korrekter Ursprung)
+
+### BUG-B5-P23-EN/DE-002 (Build 118): paper23 EN — PNT-Beweis "fourth-order pole of ζ^4" falsch
+- **Datei**: papers/batch5/paper23_explicit_formula_pnt_en.tex
+- **Problem**: "fourth-order pole of ζ^4" falsch — ζ hat 4-fache Nullstelle, keinen Pol
+- **Behoben**: "zero of order 4m, contributing (3-4m)·∞ → -∞"
+
+### BUG-B7-P30-EN/DE-001 (Build 118): paper30 EN+DE — -1 als Fixpunkt vs. 2-Zyklus
+- **Datei**: papers/batch7/paper30_collatz_p_adic_en.tex + paper30_collatz_p_adisch_de.tex
+- **Problem**: -1 als Fixpunkt von S vs. 2-Zyklus unter T unklar dargestellt
+- **Behoben**: Erklärende Remark-Box eingefügt
+
+### BUG-B7-P30-EN/DE-003 (Build 118): paper30 EN+DE — "Orbits aller Perioden" unbewiesen
+- **Datei**: papers/batch7/paper30_collatz_p_adic_en.tex + paper30_collatz_p_adisch_de.tex
+- **Problem**: Aussage "Orbits aller Perioden" ohne Beweis
+- **Behoben**: Beweisskizze (CRT+Hensel-Lift) + Lagarias-Zitat ergänzt
+
+### BUG-B7-P30-EN/DE-004 (Build 118): paper30 EN+DE — Ergodizität von S unbewiesen
+- **Datei**: papers/batch7/paper30_collatz_p_adic_en.tex + paper30_collatz_p_adisch_de.tex
+- **Problem**: Ergodizität von S als Theorem behauptet ohne Beweis
+- **Behoben**: Theorem → Conjecture umklassifiziert + Status-Remark
+
+### BUG-B7-P32-EN/DE-001 (Build 118): paper32 EN+DE — ν-Eindeutigkeit unbegründet
+- **Datei**: papers/batch7/paper32_collatz_ergodic_en.tex + paper32_collatz_ergodisch_de.tex
+- **Problem**: Eindeutigkeit des invarianten Maßes ν unbegründet
+- **Behoben**: Krylov-Bogolyubov statt "unique ergodicity of shift" als Begründung
+
+### BUG-B7-P32-EN/DE-002 (Build 118): paper32 EN+DE — Mixing-Proof zirkulär
+- **Datei**: papers/batch7/paper32_collatz_ergodic_en.tex + paper32_collatz_ergodisch_de.tex
+- **Problem**: Mixing-Beweis enthielt zirkuläre Argumentation
+- **Behoben**: Bedingter Beweis, Abhängigkeitskette explizit dargestellt
+
+### BUG-B7-P32-EN/DE-003 (Build 118): paper32 EN+DE — Spektralradius Transfer-Operator nicht rigoros
+- **Datei**: papers/batch7/paper32_collatz_ergodic_en.tex + paper32_collatz_ergodisch_de.tex
+- **Problem**: Argument zum Spektralradius des Transfer-Operators nicht rigoros
+- **Behoben**: Als informal markiert + erklärende Remark
+
+### Build 117 (Kritische/Hohe Bugs)
+
+### BUG-B5-P24-EN/DE-002 (Build 117): paper24 EN+DE — Weil "bewies" Weil-Vermutungen falsch
+- **Datei**: papers/batch5/paper24_rh_approaches_en.tex + paper24_rh_approaches_de.tex
+- **Problem**: "Weil (1940) proved Weil conjectures" — falsch. Weil VERMUTETE (1949), bewies nur Kurvenfall (1940); Deligne BEWIES allgemeinen Fall (1974)
+- **Behoben**: Historische Attribuierung korrigiert: Vermutung 1949, Kurvenfall-Beweis 1940 (Weil), allgemeiner Beweis 1974 (Deligne)
+
+### BUG-B7-P30-EN/DE-002 (Build 117): paper30 EN+DE — Syracuse Repr. Theorem c_{k+1} ∈ Z₂ unbewiesen
+- **Datei**: papers/batch7/paper30_collatz_p_adic_en.tex + paper30_collatz_p_adisch_de.tex
+- **Problem**: Im Induktionsbeweis des Syracuse Repr. Theorem: c_{k+1} ∈ Z₂ nicht explizit nachgewiesen
+- **Behoben**: 2-adisches Bewertungsargument ergänzt
+
+### BUG-B7-P31-EN/DE-001 (Build 117): paper31 EN+DE — Key Estimate zu informell
+- **Datei**: papers/batch7/paper31_tao_probabilistic_collatz_en.tex + paper31_tao_probabilistischer_ansatz_de.tex
+- **Problem**: Proof Sketch zu informell; ξ ∉ Z/log₂3 irreführend (falsche Formulierung der irrationalen Bedingung)
+- **Behoben**: Als "[informal — kein rigoroser Beweis]" deklariert; Bedingung auf ‖ξ‖_{R/Z}>0 korrigiert
+
+### BUG-B7-P32-EN/DE-004 (Build 117): paper32 EN+DE — Hausdorff-Dim Theorem falsch klassifiziert
+- **Datei**: papers/batch7/paper32_collatz_ergodic_en.tex + paper32_collatz_ergodisch_de.tex
+- **Problem**: Hausdorff-Dim Theorem: logdens 0 ⟹ dim<1 gilt NICHT allgemein — Satz zu stark
+- **Behoben**: Theorem → Conjecture umklassifiziert + erklärende Remark
+
+### BUG-B8-P34-STATUS (Build 117): paper34 EN+DE — abc-Vermutung Status unklar
+- **Datei**: papers/batch8/paper34_abc_conjecture_en.tex + paper34_abc_vermutung_de.tex
+- **Problem**: abc-Vermutung als "disputed" statt klar als "OFFEN" dargestellt; Scholze-Stix-Einwand unzureichend erläutert
+- **Behoben**: Explizite Remark-Box eingefügt: abc OFFEN, Scholze-Stix von Mehrheit der führenden Zahlentheoretiker anerkannt
+
 ### BUG-B8-P33-EN-001: paper33 EN — Fehlende fontenc/inputenc-Pakete
 - **Datei**: papers/batch8/paper33_riemann_hypothesis_analytic_en.tex
 - **Problem**: `\usepackage[T1]{fontenc}` und `\usepackage[utf8]{inputenc}` fehlten im EN-Paper (DE hatte sie)

@@ -329,6 +329,11 @@ Several barriers prevent naive approaches from succeeding:
 \textbf{Barrier 1: Explicit formulas are insufficient.}
 The explicit formula expresses $\pi(x)$ in terms of zeros, but to use it
 to \emph{determine} where zeros lie requires independent information.
+A fundamental conceptual point: the explicit formula encodes the zeros as
+\emph{causes} of the oscillations in $\pi(x)$, not as \emph{consequences}.
+The zeros are primary; $\pi(x)$ is derived from them.  Therefore one cannot
+``read off'' the location of zeros from $\pi(x)$ without already knowing them —
+the formula runs in the direction zeros $\to \pi(x)$, not $\pi(x) \to$ zeros.
 
 \textbf{Barrier 2: Zero-free region methods.}
 Classical methods (Mertens, de la Vall\'ee~Poussin) give zero-free regions
@@ -382,6 +387,16 @@ This analogy is deeply suggestive but so far has not yielded a proof.
     connects RH to adeles and $p$-adic numbers.
   \item \textit{Supersymmetry:} Certain supersymmetric quantum mechanics
     models have spectra with RH-like properties (Bender et al.\ 1998).
+  \item \textit{PT-symmetric quantum mechanics:} Bender, Berry, and Mandilara (2002)
+    proposed that RH could follow if the operator
+    $H = -(d/dx)^2 + x^2(ix)^\varepsilon$ (for small $\varepsilon > 0$)
+    has entirely real eigenvalues.  In PT-symmetric quantum mechanics,
+    $\mathcal{PT}$-invariance (parity $\times$ time-reversal) can replace
+    Hermiticity as a condition for real spectra.  The proposal is that a
+    suitable PT-symmetric operator realises the Hilbert--P\'olya conjecture
+    with $H\psi = E\psi$ having $E = \tfrac{1}{4} + \gamma^2$ for each
+    non-trivial zero $\tfrac{1}{2} + i\gamma$.  This approach remains
+    speculative; no such operator has been rigorously constructed.
 \end{itemize}
 \end{remark}
 

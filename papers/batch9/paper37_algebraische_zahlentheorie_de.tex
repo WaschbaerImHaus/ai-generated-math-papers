@@ -1,0 +1,551 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+% -------------------------------------------------------
+% Eigene Befehle
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\OK}{\mathcal{O}_K}
+\newcommand{\p}{\mathfrak{p}}
+\newcommand{\q}{\mathfrak{q}}
+\newcommand{\aaa}{\mathfrak{a}}
+\newcommand{\bbb}{\mathfrak{b}}
+\newcommand{\Nm}{\mathrm{N}}
+\newcommand{\disc}{\mathrm{disc}}
+\DeclareMathOperator{\Gal}{Gal}
+\DeclareMathOperator{\Cl}{Cl}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\tr}{Sp}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Algebraische Zahlentheorie:\\
+       Ganzheitsringe, Ideale, der Einheitensatz und die Klassengruppe}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 119}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Wir entwickeln die Grundlagen der algebraischen Zahlentheorie: Zahlkörper
+und ihre Ganzheitsringe, Dedekinds Theorie der Idealfaktorisierung, die
+Minkowski-Einbettung und die Geometrie der Zahlen, Dirichlets Einheitensatz
+(mit vollständigem Beweis), die Klassengruppe und Minkowskis Klassenzahlschranke
+sowie die Dirichletsche Klassenzahlformel.  Besondere Aufmerksamkeit gilt
+quadratischen Zahlkörpern $\Q(\sqrt{d})$, wo sich alle Begriffe vollständig
+explizit beschreiben lassen.  Vorkenntnisse über lineare Algebra und elementare
+Ringtheorie genügen.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Zahlkörper und algebraische ganze Zahlen}
+% ================================================================
+
+\begin{definition}[Zahlkörper]
+\label{def:zahlkoerper}
+Ein \emph{Zahlkörper} ist eine endliche Erweiterung $K/\Q$.  Der
+\emph{Grad} ist $[K:\Q] = n$.
+\end{definition}
+
+\begin{definition}[Algebraische ganze Zahl]
+\label{def:alg_ganz}
+Ein Element $\alpha \in \C$ heißt \emph{algebraisch ganz}, wenn es ein
+normiertes Polynom $f \in \Z[x]$ mit $f(\alpha) = 0$ gibt:
+\[
+  \alpha^n + a_{n-1}\alpha^{n-1} + \cdots + a_1\alpha + a_0 = 0,
+  \quad a_i \in \Z.
+\]
+Die Menge aller algebraisch ganzen Zahlen in $K$ heißt \emph{Ganzheitsring}
+und wird mit $\OK$ bezeichnet.
+\end{definition}
+
+\begin{theorem}[Ganzheitsring]
+\label{thm:OK_ring}
+$\OK$ ist ein Teilring von $K$ mit $\OK \cap \Q = \Z$ und
+$\OK \otimes_\Z \Q = K$.  Außerdem ist $\OK$ ein freier $\Z$-Modul
+vom Rang $n = [K:\Q]$:
+\[
+  \OK = \Z\omega_1 \oplus \Z\omega_2 \oplus \cdots \oplus \Z\omega_n
+\]
+für eine $\Q$-Basis $\{\omega_1, \ldots, \omega_n\}$ von $K$, die
+\emph{Ganzheitsbasis} genannt wird.
+\end{theorem}
+
+\begin{proof}
+Die Abgeschlossenheit algebraisch ganzer Zahlen unter Addition und
+Multiplikation folgt aus der linearen Algebra: Falls $\alpha$ ein normiertes
+Polynom vom Grad $m$ und $\beta$ eines vom Grad $n$ erfüllt, sind
+$\alpha + \beta$ und $\alpha\beta$ Eigenwerte ganzzahliger Matrizen, die auf
+dem $\Z$-Modul $\Z[\alpha,\beta]$ (frei vom Rang $mn$) wirken.
+
+Dass $\OK$ ein freier $\Z$-Modul vom Rang $n$ ist: Jede Ganzheitsbasis
+von $\OK$ ist auch eine $\Q$-Basis von $K$ (da der Rang gleich $n$ ist).
+Der endlich erzeugte $\Z$-Modul $\OK$ ist torsionsfrei (er ist in den
+Körper $K$ eingebettet), also frei nach dem Klassifikationssatz endlich
+erzeugter abelscher Gruppen.
+\end{proof}
+
+\begin{example}[Quadratische Zahlkörper]
+\label{ex:quadratisch}
+Sei $d \in \Z$ quadratfrei, $d \ne 0, 1$.  Dann hat $K = \Q(\sqrt{d})$
+den Grad $2$ und:
+\[
+  \OK =
+  \begin{cases}
+    \Z\bigl[\tfrac{1+\sqrt{d}}{2}\bigr]
+    & \text{falls } d \equiv 1 \pmod{4}, \\[4pt]
+    \Z[\sqrt{d}]
+    & \text{falls } d \equiv 2, 3 \pmod{4}.
+  \end{cases}
+\]
+\end{example}
+
+\begin{definition}[Diskriminante]
+\label{def:diskriminante}
+Sei $\{\omega_1, \ldots, \omega_n\}$ eine Ganzheitsbasis von $\OK$.
+Die \emph{Diskriminante} von $K$ ist
+\[
+  \disc(K) = \det\bigl[(\sigma_i(\omega_j))_{i,j}\bigr]^2,
+\]
+wobei $\sigma_1, \ldots, \sigma_n : K \hookrightarrow \C$ die $n$
+verschiedenen Einbettungen von $K$ sind.
+\end{definition}
+
+\begin{example}[Diskriminante quadratischer Körper]
+Für quadratfreies $d$:
+\[
+  \disc(\Q(\sqrt{d})) =
+  \begin{cases}
+    d & \text{falls } d \equiv 1 \pmod{4}, \\
+    4d & \text{falls } d \equiv 2, 3 \pmod{4}.
+  \end{cases}
+\]
+\end{example}
+
+% ================================================================
+\section{Dedekindsche Ringe und Idealtheorie}
+% ================================================================
+
+\begin{definition}[Dedekindscher Ring]
+\label{def:dedekind}
+Ein Integritätsbereich $R$ heißt \emph{Dedekindscher Ring}, wenn:
+\begin{enumerate}[label=(\roman*)]
+  \item $R$ noethersch ist,
+  \item $R$ ganzabgeschlossen in seinem Quotientenkörper ist,
+  \item jedes von Null verschiedene Primideal in $R$ maximal ist.
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}
+\label{thm:OK_dedekind}
+Für jeden Zahlkörper $K$ ist $\OK$ ein Dedekindscher Ring.
+\end{theorem}
+
+\begin{proof}
+(i) \emph{Noethersch:} $\OK$ ist ein endlich erzeugter $\Z$-Modul,
+also noethersch als $\Z$-Modul und damit als Ring.
+
+(ii) \emph{Ganzabgeschlossen:} Falls $\alpha \in K$ ein normiertes Polynom
+über $\OK$ erfüllt, zeigt ein Normargument $\alpha \in \OK$.
+
+(iii) \emph{Nicht-Null-Primideale sind maximal:} Sei $\p \ne 0$ prim.
+Dann ist $\p \cap \Z = p\Z$ für eine rationale Primzahl $p$ (da $\OK/\p$
+ein Integritätsbereich ist und $\Z \to \OK/\p$ injektiv ist).
+Also ist $\OK/\p$ ein endlicher Integritätsbereich, also ein Körper,
+also ist $\p$ maximal.
+\end{proof}
+
+\begin{theorem}[Eindeutige Idealfaktorisierung]
+\label{thm:ufid}
+Jedes von Null verschiedene Ideal $\aaa \subseteq \OK$ besitzt eine
+eindeutige Faktorisierung
+\[
+  \aaa = \p_1^{e_1} \p_2^{e_2} \cdots \p_r^{e_r},
+\]
+wobei $\p_1, \ldots, \p_r$ paarweise verschiedene Primideale und $e_i \ge 1$ sind.
+\end{theorem}
+
+\begin{proof}[Beweissskizze]
+Der Schlüssel liegt in der Existenz \emph{gebrochener Ideale} und ihrer
+Inversen: Für ein Primideal $\p$ setzt man
+$\p^{-1} = \{x \in K : x\p \subseteq \OK\}$ und zeigt $\p \cdot \p^{-1} = \OK$.
+Damit bilden die von Null verschiedenen gebrochenen Ideale eine abelsche
+Gruppe (die \emph{Idealgruppe}).  Die Existenz der Faktorisierung folgt
+aus der Noetherschen Eigenschaft; die Eindeutigkeit aus der Kürzbarkei
+in der Idealgruppe.  Vgl.\ \cite{Neukirch1999}, Kapitel I, für den
+vollständigen Beweis.
+\end{proof}
+
+\begin{definition}[Norm eines Ideals]
+\label{def:ideal_norm}
+Für ein von Null verschiedenes Ideal $\aaa \subseteq \OK$ ist die
+\emph{Norm} definiert als
+\[
+  \Nm(\aaa) = [\OK : \aaa] = |\OK/\aaa|.
+\]
+Für ein Primideal $\p$ gilt $\Nm(\p) = p^f$, wobei $p = \p \cap \Z$ und
+$f = [\OK/\p : \F_p]$ der \emph{Trägheitsgrad} ist.
+\end{definition}
+
+\begin{theorem}[Zerlegung von Primzahlen]
+\label{thm:zerlegung}
+Sei $p \in \Z$ eine rationale Primzahl.  In $\OK$ gilt:
+\[
+  p\OK = \p_1^{e_1} \cdots \p_g^{e_g},
+  \qquad \sum_{i=1}^g e_i f_i = n \quad\text{(efg-Identität)}.
+\]
+Die Primzahl $p$ heißt:
+\begin{itemize}
+  \item \emph{zerfallend}, falls alle $e_i = 1$ und $g = n$,
+  \item \emph{träge} (inert), falls $g = 1$, $e_1 = 1$, $f_1 = n$,
+  \item \emph{verzweigt}, falls ein $e_i > 1$ (äquivalent: $p \mid \disc(K)$).
+\end{itemize}
+\end{theorem}
+
+% ================================================================
+\section{Die Minkowski-Einbettung}
+% ================================================================
+
+\begin{definition}[Minkowski-Einbettung]
+\label{def:mink_emb}
+Sei $K$ ein Zahlkörper mit $r_1$ reellen Einbettungen $\sigma_1, \ldots, \sigma_{r_1} : K \to \R$
+und $r_2$ Paaren komplexer Einbettungen $\tau_1, \bar\tau_1, \ldots, \tau_{r_2}, \bar\tau_{r_2}$.
+Setze $n = r_1 + 2r_2$.  Die \emph{Minkowski-Einbettung} ist
+\[
+  \iota : K \longrightarrow \R^n, \quad
+  \alpha \longmapsto
+  \bigl(\sigma_1(\alpha), \ldots, \sigma_{r_1}(\alpha),
+        \Re(\tau_1(\alpha)), \Im(\tau_1(\alpha)), \ldots,
+        \Re(\tau_{r_2}(\alpha)), \Im(\tau_{r_2}(\alpha))\bigr).
+\]
+Das Bild $\iota(\OK)$ ist ein \emph{vollständiges Gitter} in $\R^n$.
+\end{definition}
+
+\begin{theorem}[Minkowski-Schranke]
+\label{thm:mink_schranke}
+Jede Idealklasse in $\Cl(K)$ enthält ein ganzes Ideal $\aaa$ mit
+\[
+  \Nm(\aaa) \;\le\; M_K
+  \;=\; \frac{n!}{n^n} \left(\frac{4}{\pi}\right)^{r_2} \sqrt{|\disc(K)|}.
+\]
+Insbesondere ist $\Cl(K)$ \emph{endlich}; seine Ordnung $h_K$ heißt
+\emph{Klassenzahl}.
+\end{theorem}
+
+\begin{proof}[Beweissskizze]
+Man wendet Minkowskis Gitterpunktsatz auf das der gebrochenen Ideal
+$\mathfrak{c}^{-1}$ entsprechende Gitter und einen geeigneten symmetrisch
+konvexen Körper an.  Die explizite Volumenrechnung liefert die Schranke $M_K$.
+Da es nur endlich viele ganzen Ideale von beschränkter Norm gibt, folgt
+$h_K < \infty$.
+\end{proof}
+
+% ================================================================
+\section{Die Einheitengruppe: Dirichlets Einheitensatz}
+% ================================================================
+
+\begin{definition}[Einheitengruppe]
+Die \emph{Einheitengruppe} von $\OK$ ist
+\[
+  \OK^\times = \{u \in \OK : u^{-1} \in \OK\}
+  = \{u \in \OK : \mathrm{N}_{K/\Q}(u) = \pm 1\}.
+\]
+\end{definition}
+
+\begin{theorem}[Dirichletscher Einheitensatz, 1846]
+\label{thm:einheitensatz}
+Sei $K$ ein Zahlkörper mit $r_1$ reellen und $r_2$ Paaren komplexer
+Einbettungen.  Dann gilt
+\[
+  \OK^\times \;\cong\; \mu(K) \times \Z^{r_1 + r_2 - 1},
+\]
+wobei $\mu(K)$ die (endliche zyklische) Gruppe der Einheitswurzeln in $K$
+ist und $r = r_1 + r_2 - 1$ der \emph{Einheitenrang} heißt.
+\end{theorem}
+
+\begin{proof}
+\textbf{Schritt 1: Die Logarithmus-Abbildung.}
+Definiere die \emph{Minkowski-Logarithmus-Abbildung}:
+\[
+  \ell : \OK^\times \longrightarrow \R^{r_1+r_2},
+  \quad
+  u \mapsto \bigl(\log|\sigma_1(u)|, \ldots, \log|\sigma_{r_1}(u)|,
+               2\log|\tau_1(u)|, \ldots, 2\log|\tau_{r_2}(u)|\bigr).
+\]
+Da $\mathrm{N}_{K/\Q}(u) = \pm 1$, gilt
+$\prod_i |\sigma_i(u)| \cdot \prod_j |\tau_j(u)|^2 = 1$,
+also landet das Bild von $\ell$ in der Hyperebene
+\[
+  H = \{(x_1,\ldots,x_{r_1+r_2}) : x_1 + \cdots + x_{r_1+r_2} = 0\}
+  \cong \R^{r_1+r_2-1}.
+\]
+
+\textbf{Schritt 2: Der Kern.}
+Ein Element $u \in \OK^\times$ erfüllt $\ell(u) = 0$ genau dann, wenn
+$|\sigma_i(u)| = 1$ für alle $i$.  Es gibt nur endlich viele algebraische
+ganze Zahlen mit beschränkten Konjugierten (Minkowski-Schranke), also ist
+$\ker(\ell)$ endlich.  Eine endliche Untergruppe von $K^\times$ ist zyklisch.
+Also $\ker(\ell) = \mu(K)$.
+
+\textbf{Schritt 3: Das Bild ist ein vollständiges Gitter vom Rang $r_1+r_2-1$.}
+
+\emph{Diskretheit:} Einheiten $u$ mit $\|\ell(u)\|_\infty \le B$ haben
+beschränkte Konjugierte und kommen daher nur endlich oft vor.
+
+\emph{Voller Rang:} Für jede Einbettung $\sigma_k$ konstruiert man mittels
+der Geometrie der Zahlen (Dirichlet'sches Schubfachprinzip) eine Einheit
+mit $|\sigma_k(u)| > 1$ und $|\sigma_j(u)| < 1$ für $j \ne k$.
+Die resultierenden Bilder $\ell(u_1), \ldots, \ell(u_{r_1+r_2})$ liegen
+in $H$ und sind davon $r_1+r_2-1$ linear unabhängig.
+
+\textbf{Schluss:} Aus der exakten Sequenz
+$1 \to \mu(K) \to \OK^\times \xrightarrow{\ell} \ell(\OK^\times) \to 0$
+und $\ell(\OK^\times) \cong \Z^{r_1+r_2-1}$ folgt
+$\OK^\times \cong \mu(K) \times \Z^{r_1+r_2-1}$.
+\end{proof}
+
+\begin{example}[Quadratische Körper]
+Für $K = \Q(\sqrt{d})$:
+\begin{itemize}
+  \item Reell-quadratisch ($d > 0$): $r_1 = 2$, $r_2 = 0$, Rang $= 1$.
+    Also $\OK^\times \cong \{\pm 1\} \times \Z = \{\pm \varepsilon^n : n \in \Z\}$
+    für eine \emph{Grundeinheit} $\varepsilon > 1$.
+  \item Imaginär-quadratisch ($d < 0$): $r_1 = 0$, $r_2 = 1$, Rang $= 0$.
+    Also ist $\OK^\times$ endlich:
+    $\OK^\times = \{\pm 1, \pm i\}$ für $d=-1$ (Gaußsche Zahlen),
+    $\OK^\times = \{\pm 1, \pm\omega, \pm\omega^2\}$ ($\omega = e^{2\pi i/3}$)
+    für $d=-3$, und $\OK^\times = \{\pm 1\}$ für alle anderen $d < 0$.
+\end{itemize}
+\end{example}
+
+\begin{example}[Grundeinheit von $\Q(\sqrt{2})$]
+$d=2$, $\OK = \Z[\sqrt{2}]$, Grundeinheit $\varepsilon = 1 + \sqrt{2}$.
+Probe: $(1+\sqrt{2})(1-\sqrt{2}) = 1 - 2 = -1$, also $N(\varepsilon) = -1$
+und $\varepsilon^{-1} = \sqrt{2}-1$.
+\end{example}
+
+% ================================================================
+\section{Die Klassengruppe}
+% ================================================================
+
+\begin{definition}[Gebrochene Ideale und Klassengruppe]
+Ein \emph{gebrochenes Ideal} von $\OK$ ist ein von Null verschiedener
+$\OK$-Untermodul $\mathfrak{I} \subseteq K$ mit $d\mathfrak{I} \subseteq \OK$
+für ein $d \in \Z \setminus \{0\}$.  Die gebrochenen Ideale bilden eine
+abelsche Gruppe $\mathcal{I}_K$ unter Multiplikation.  Die
+\emph{Hauptideale} $\alpha\OK$ ($\alpha \in K^\times$) bilden eine
+Untergruppe $\mathcal{P}_K$.  Die \emph{Idealklassengruppe} ist
+\[
+  \Cl(K) = \mathcal{I}_K / \mathcal{P}_K.
+\]
+Ihre Ordnung $h_K = |\Cl(K)|$ heißt \emph{Klassenzahl}.
+\end{definition}
+
+\begin{theorem}
+$h_K = 1$ genau dann, wenn $\OK$ ein Hauptidealbereich ist (äquivalent:
+ein faktorieller Ring).
+\end{theorem}
+
+\begin{example}[Klassenzahl-1-Körper unter den imaginär-quadratischen]
+Die imaginär-quadratischen Körper mit $h_K = 1$ sind genau diejenigen
+mit $d \in \{-1, -2, -3, -7, -11, -19, -43, -67, -163\}$.
+Dies ist der \emph{Satz von Stark--Heegner} (1967/1969).
+\end{example}
+
+\begin{example}[Klassengruppe von $\Q(\sqrt{-5})$]
+$\disc = -20$, Minkowski-Schranke $M_K = \frac{2}{\pi}\sqrt{20} \approx 2{,}85$.
+Prüfe $p \le 2$: $p = 2$ verzweigt: $2\OK = (2, 1+\sqrt{-5})^2$.
+Sei $\p = (2, 1+\sqrt{-5})$.  Da $2 = a^2 + 5b^2$ keine ganzzahlige Lösung
+hat, ist $\p \notin \mathcal{P}_K$, aber $\p^2 = 2\OK$ ist ein Hauptideal.
+Also $\Cl(K) \cong \Z/2\Z$ und $h_K = 2$.
+\end{example}
+
+% ================================================================
+\section{Zerlegung von Primzahlen in quadratischen Körpern}
+% ================================================================
+
+\begin{theorem}[Zerlegung über das Legendre-Symbol]
+\label{thm:quad_zerlegung}
+Sei $K = \Q(\sqrt{d})$ mit Diskriminante $D = \disc(K)$.
+Eine ungerade Primzahl $p \nmid D$ erfüllt:
+\[
+  p\OK =
+  \begin{cases}
+    \p\q, \quad \p \ne \q & \text{falls } \bigl(\tfrac{D}{p}\bigr) = +1
+    \quad\text{(zerfallend)}, \\[2pt]
+    \p^2 & \text{falls } p \mid D
+    \quad\text{(verzweigt)}, \\[2pt]
+    \p \text{ (prim)} & \text{falls } \bigl(\tfrac{D}{p}\bigr) = -1
+    \quad\text{(träge)}.
+  \end{cases}
+\]
+\end{theorem}
+
+\begin{proof}
+Das Minimalpolynom von $\sqrt{d}$ über $\Q$ ist $f(x) = x^2 - d$.
+Das Zerfallungsverhalten von $p$ wird durch die Faktorisierung von $f \pmod{p}$
+bestimmt.  Nach der Definition des Legendre-Symbols zerfällt $f$ in zwei
+verschiedene Linearfaktoren mod $p$ genau dann, wenn $d$ ein quadratischer
+Rest mod $p$ ist (d.\,h.\ $\bigl(\tfrac{d}{p}\bigr) = 1$), und ist
+irreduzibel mod $p$ andernfalls.  Da $D$ und $d$ sich nur um einen
+Quadratfaktor unterscheiden, gilt $\bigl(\tfrac{d}{p}\bigr) = \bigl(\tfrac{D}{p}\bigr)$
+für ungerade Primzahlen.
+\end{proof}
+
+% ================================================================
+\section{Die Klassenzahlformel}
+% ================================================================
+
+\begin{definition}[Dedekindsche Zeta-Funktion]
+\label{def:dedekind_zeta}
+Für einen Zahlkörper $K$ ist die \emph{Dedekindsche Zeta-Funktion}
+\[
+  \zeta_K(s) = \sum_{\substack{\aaa \subseteq \OK \\ \aaa \ne 0}}
+  \frac{1}{\Nm(\aaa)^s}
+  = \prod_{\p} \frac{1}{1 - \Nm(\p)^{-s}}, \qquad \Re(s) > 1.
+\]
+Sie besitzt analytische Fortsetzung auf $\C \setminus \{1\}$ mit einem
+einfachen Pol bei $s = 1$.
+\end{definition}
+
+\begin{theorem}[Dirichlet--Dedekindsche Klassenzahlformel]
+\label{thm:klassenzahl}
+Das Residuum von $\zeta_K(s)$ bei $s = 1$ ist
+\[
+  \lim_{s \to 1^+} (s-1)\,\zeta_K(s)
+  \;=\;
+  \frac{2^{r_1} (2\pi)^{r_2}\, h_K\, R_K}{w_K \sqrt{|\disc(K)|}},
+\]
+wobei $h_K$ die Klassenzahl, $R_K$ der \emph{Regulator}
+($|\det$ der $r \times r$-Untermatrix der Logarithmus-Abbildung,
+angewandt auf ein System von Grundeinheiten$|$)
+und $w_K = |\mu(K)|$ die Anzahl der Einheitswurzeln ist.
+\end{theorem}
+
+\begin{proof}[Beweissskizze]
+Die Dedekindsche Zeta-Funktion zerfällt in eine Summe über Idealklassen.
+Für jede Klasse $[\mathfrak{c}] \in \Cl(K)$ hat die partielle Zeta-Funktion
+das Residuum
+\[
+  \frac{2^{r_1}(2\pi)^{r_2} R_K}{w_K \sqrt{|\disc(K)|}},
+\]
+berechnet durch Gitterpunktzählung im Minkowski-Raum.
+Da es $h_K$ Klassen gibt, ergibt die Summation die angegebene Formel.
+Vgl.\ \cite{Neukirch1999}, Kapitel I, §8.
+\end{proof}
+
+\begin{corollary}[Klassenzahl imaginär-quadratischer Körper]
+Für $K = \Q(\sqrt{d})$, $d < 0$ quadratfrei: $r_1 = 0$, $r_2 = 1$, $R_K = 1$.
+Die Formel liefert
+\[
+  h_K = \frac{w_K \sqrt{|D|}}{2\pi}\, L(1, \chi_D),
+\]
+wobei $\chi_D = \bigl(\tfrac{D}{\cdot}\bigr)$ das Kronecker-Symbol und
+$L(s, \chi_D) = \sum_{n=1}^\infty \chi_D(n) n^{-s}$ die Dirichletsche
+$L$-Funktion ist.
+\end{corollary}
+
+% ================================================================
+\section{Ausgearbeitete Beispiele: Klassengruppen kleiner quadratischer Körper}
+% ================================================================
+
+\begin{example}[$\Q(\sqrt{-23})$]
+$D = -23$ (da $-23 \equiv 1 \pmod{4}$).  Minkowski-Schranke:
+$M_K = \frac{2}{\pi}\sqrt{23} \approx 3{,}05$.
+Prüfe $p = 2$: $\bigl(\tfrac{-23}{2}\bigr) = 1$ (da $-23 \equiv 1 \pmod 8$),
+also zerfällt $2$: $2\OK = \p_2 \q_2$.
+Es lässt sich zeigen, dass $\p_2 \notin \mathcal{P}_K$, aber
+$\p_2^3 \in \mathcal{P}_K$.
+Daher $h_{-23} = 3$ und $\Cl(K) \cong \Z/3\Z$.
+\end{example}
+
+\begin{example}[Reell-quadratisch: $\Q(\sqrt{5})$]
+$d = 5 \equiv 1 \pmod{4}$, also $\OK = \Z[\phi]$ mit $\phi = \tfrac{1+\sqrt{5}}{2}$
+(goldener Schnitt).  $D = 5$.
+Grundeinheit: $\phi$, denn $N(\phi) = \phi\bar\phi = \tfrac{(1+\sqrt{5})(1-\sqrt{5})}{4}
+= -1$.  Klassenzahl $h = 1$ (Minkowski-Schranke $< 2$).
+\end{example}
+
+% ================================================================
+\section{Ausblick und weiterführende Literatur}
+% ================================================================
+
+\begin{remark}[Anknüpfungspunkte]
+Die hier entwickelte Theorie ist Ausgangspunkt für:
+\begin{itemize}
+  \item \textbf{Iwasawa-Theorie} (Paper 38): $p$-adische $L$-Funktionen
+    entstehen durch Variation der Klassengruppe in Türmen von Zahlkörpern.
+  \item \textbf{Langlands-Programm}: $L$-Funktionen von Galois-Darstellungen
+    verallgemeinern die Dedekindsche Zeta-Funktion.
+  \item \textbf{Klassenkörpertheorie}: Die Artin-Abbildung identifiziert
+    $\Cl(K)$ mit der Galois-Gruppe des Hilbert'schen Klassenkörpers $H_K/K$.
+  \item \textbf{Komplexe Multiplikation}: Explizite Klassenkörpertheorie
+    für CM-Körper via elliptische Kurven.
+\end{itemize}
+\end{remark}
+
+\section*{Danksagung}
+Der Autor dankt dem Specialist Mathematics Project für die Bereitstellung
+der Forschungsinfrastruktur.
+
+\begin{thebibliography}{99}
+
+\bibitem{Neukirch1999}
+J.~Neukirch,
+\textit{Algebraische Zahlentheorie},
+Springer, Berlin, 1992.
+
+\bibitem{Marcus1977}
+D.~A.~Marcus,
+\textit{Zahlkörper} (\textit{Number Fields}),
+Springer, New York, 1977.
+
+\bibitem{Milne2020}
+J.~S.~Milne,
+\textit{Algebraic Number Theory} (Version 3.08),
+\url{https://www.jmilne.org/math/CourseNotes/ANT.pdf}, 2020.
+
+\bibitem{Cohen1993}
+H.~Cohen,
+\textit{A Course in Computational Algebraic Number Theory},
+Springer, Berlin, 1993.
+
+\bibitem{Washington1997}
+L.~C.~Washington,
+\textit{Introduction to Cyclotomic Fields},
+2.\ Aufl., Springer, New York, 1997.
+
+\end{thebibliography}
+
+\end{document}

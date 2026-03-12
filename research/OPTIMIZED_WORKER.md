@@ -1,5 +1,5 @@
 # OPTIMIZED_WORKER.md - Mathematik-Spezialist
-## Aktualisiert: 2026-03-11 (Build 83)
+## Aktualisiert: 2026-03-12 (Build 119)
 
 ## Was ich über dieses Projekt weiß
 
@@ -10,10 +10,10 @@ Jedes Modul enthält Algorithmen mit ausführlicher mathematischer Dokumentation
 sodass der Code auch als Lernmaterial dient. Das Fernziel ist die Untersuchung
 der Millennium-Probleme (insbesondere Riemann-Hypothese und Goldbach-Vermutung).
 
-### Implementierter Stack (Build 83)
+### Implementierter Stack (Build 119)
 - **Python 3.13** mit sympy 1.14, numpy 2.2, scipy 1.17, matplotlib 3.10, pytest 9.0, mpmath, numba
 - **93+ Python-Module**, 7000+ Tests (pytest-xdist: -n auto)
-- **Papers**: 20 Papers (Batches 1–4) alle DRUCKREIF, Batches 5+6 in Arbeit (Papers 21–28)
+- **Papers**: 36 Papers reviewed (Batches 1–8, alle in papers/reviewed/), 4 neue Papers in papers/batch9/ (Paper 37–38 EN+DE)
 
 | Modul | Kernfunktionen |
 |-------|---------------|
@@ -144,13 +144,85 @@ Strukturelle Analogie: Yang-Mills Wirkung ~ kinetische Energie in NS.
 **3-SAT ↔ Riemann-Hypothese**: Könnten NP-harte Probleme einen Zusammenhang mit
 analytischen Nullstellenproblemen haben? Freie Spekulation, aber interessant für Forschung.
 
-### Nächste Entwicklungsschritte (Build 84+)
-1. **algebraic_number_theory.py**: Dedekind-Ringe, Ideale, Klassenzahlen (Build 84)
-2. **ergodic_theory.py**: Collatz-Tao-Ansatz, Furstenberg-Korrespondenz (Build 85)
-3. **galois_theory.py**: Galois-Gruppen, Abel-Ruffini, Kronecker-Weber (Build 86)
-4. **Papers Batch 5** (21–24): Riemann-Hypothese-Serie
-5. **Papers Batch 6** (25–28): Elliptische Kurven + BSD
-6. **Papers Batch 7** (29–32): Collatz-Vermutung (Tao-Ansatz)
-7. **Papers Batch 8** (33–36): Modulformen + Shimura-Taniyama-Wiles
-8. Galois-Darstellungen: ρ: Gal(Q̄/Q) → GL_n(ℤ_p) für Langlands-Programm
-9. Ricci-Fluss (Perelmans Technik) für P4-Annäherung
+### Papers-Stand (Build 119)
+| Batch | Papers | Thema | Status |
+|-------|--------|-------|--------|
+| 1–3 | 1–16 | Giuga/Lehmer/Wilson/Sieb | DRUCKREIF (reviewed/) |
+| 4 | 17–20 | Kreismethode/Goldbach/Vinogradov/Waring | DRUCKREIF (reviewed/) |
+| 5 | 21–24 | Riemann-Hypothese | DRUCKREIF (reviewed/) |
+| 6 | 25–28 | Elliptische Kurven + BSD | DRUCKREIF (reviewed/) |
+| 7 | 29–32 | Collatz-Vermutung (Tao-Ansatz) | DRUCKREIF (reviewed/) |
+| 8 | 33–36 | Modulformen + abc + BSD + NS | DRUCKREIF (reviewed/) |
+| 9 | 37–38 | Alg. Zahlentheorie + Iwasawa | NEU (batch9/) |
+
+### Review-Erkenntnisse: Häufigste Fehlertypen (Builds 46–118)
+1. **Historische Fehler** (häufigster Typ): Falsche Attribuierung von Sätzen
+   - Beispiel: Weil 1940/1949 vs. Deligne 1974 (BUG-B5-P24)
+   - Beispiel: Leray 1934 (schwache Lösungen) vs. Ladyzhenskaya 1969 (glatte Lösungen)
+   - Beispiel: Kolyvagin 1989 vs. 1990
+   - **Regel**: Immer drei Daten prüfen: (1) Vermutung, (2) Teilbeweis, (3) vollständiger Beweis
+
+2. **Undeklarierte Beweislücken** (zweithäufigster Typ): Informelle Argumentationen
+   ohne "[informal]"-Deklaration
+   - Beispiel: Ergodizität von S (Collatz) als Theorem statt Conjecture (BUG-B7-P32)
+   - Beispiel: Hausdorff-Dimension Theorem zu stark (BUG-B7-P32)
+   - Beispiel: Key Estimate zu informell (BUG-B7-P31)
+   - **Regel**: Unbewiesen = Conjecture oder "[informal — nicht rigoros]"
+
+3. **Falsche Theorem-Klassifikation**: Conjectures als Theorems markiert
+   - Beispiel: Ergodizität von S (BUG-B7-P32-EN/DE-004)
+   - Beispiel: Hausdorff-Dim Theorem (BUG-B7-P32-EN/DE-004)
+   - **Regel**: Rigoros bewiesen? → Theorem. Noch offen? → Conjecture/Vermutung.
+
+4. **Fehlende Randbedingungen**: Fehlerterme ohne Parameterabhängigkeit
+   - Beispiel: GRH-Fehlerterm ohne q-Abhängigkeit (BUG-B4-P20)
+   - **Regel**: Fehlerterme immer alle Parameter explizit nennen.
+
+5. **Notation/Konsistenz**: Inkonsistente Euler-Produkte, Vorzeichenfehler
+   - Beispiel: L(E,s) = ∏L_p^{-1} vs. ∏L_p (BUG-B6, BUG-B8)
+
+### Mathematische Erkenntnisse (Build 117–119)
+
+#### Weil/Deligne-Unterscheidung (fundamental!)
+- **Weil 1940**: Bewies Riemann-Hypothese für Kurven über endlichen Körpern
+  (1-dimensionaler Fall der Weil-Vermutungen)
+- **Weil 1949**: FORMULIERTE die allgemeinen Weil-Vermutungen für Varietäten
+- **Deligne 1974**: BEWIES die allgemeinen Weil-Vermutungen (Fields-Medaille)
+- Merksatz: Weil(Beweis) < Weil(Vermutung) in der Zeit; Deligne schließt ab.
+
+#### Hausdorff-Dimension und logarithmische Dichte (wichtige Einschränkung)
+- "logdens(M) = 0 ⟹ dim_H(M) < 1" gilt NICHT allgemein
+- Die natürliche Dichte 0 erzwingt nur dim_H ≤ 1, nicht strikt < 1
+- Korrekte Aussage: Nur als Conjecture formulierbar, nicht als Theorem
+- Beispiel: Die Cantor-Menge hat Hausdorff-Dim log2/log3 ≈ 0.63, aber das folgt
+  nicht aus Dichte-Argumenten allein.
+
+#### Syracuse Repr. Theorem: c_{k+1} ∈ Z₂ (2-adische Bewertung)
+- Im Induktionsbeweis: c_{k+1} = (3^{k+1}·n₀ + Σ_{j=0}^k 3^j·2^{m_j}) / 2^{m_{k+1}}
+- 2-adische Bewertung: v₂(Zähler) = v₂(2^{m_{k+1}}) = m_{k+1} > 0
+- Also v₂(c_{k+1}) ≥ 0, d.h. c_{k+1} ∈ Z₂ — das war der fehlende Schritt.
+
+#### PNT und Mertens-Argument (ζ^4-Analyse)
+- ζ(σ)³ · |ζ(σ+it)|⁴ · |ζ(σ+2it)| ≥ 1 (Mertens-Ungleichung)
+- ζ hat bei s=1 einen einfachen Pol, also hat ζ^4 bei s=1 einen Pol 4. Ordnung
+- Wenn ζ(1+it)=0 hätte (Ordnung m): ζ^4 hätte eine Nullstelle der Ordnung 4m
+- Asymptotisch: ζ(σ)³ ·(σ-1)^{4m} → 0 für σ→1+, Widerspruch zu ≥1
+- **FEHLER-KORRREKTUR**: "fourth-order pole of ζ^4" ist FALSCH.
+  ζ(s) hat bei s≠1 keine Pole; ζ^4 hat eine Nullstelle der Ordnung 4m bei s=1+it.
+  Korrekt: "zero of order 4m, contributing (3-4m)·∞ → -∞"
+
+#### abc-Vermutung: Status (Build 117–119)
+- **Status**: OFFEN. Mochizukis IUT-Theorie (2012) ist disputed.
+- **Scholze-Stix-Einwand (2018)**: Identifiziert einen fundamentalen Fehler
+  (Theta-Link vermischt Ringstrukturen) — von der **MEHRHEIT** der führenden
+  Zahlentheoretiker als stichhaltig angesehen (Scholze, Stix, Conrad, de Jong,
+  Venkatesh, und andere).
+- Mochizuki bestreitet den Einwand; das Impasse besteht seit 2018.
+- **Formulierungsregel**: Immer "von der Mehrheit anerkannt", nie nur "some" oder "many".
+
+### Nächste Entwicklungsschritte (Build 120+)
+1. **Batch 9 Review**: Papers 37–38 nach Fertigstellung prüfen
+2. **Langlands-Programm**: Galois-Darstellungen ρ: Gal(Q̄/Q) → GL_n(ℤ_p)
+3. **Weitere Vermutungen**: aus vermutungen.md (Grad "Leicht" zuerst)
+4. **iwasawa_theory.py**: Python-Modul zur Iwasawa-Algebra und μ/λ-Invarianten
+5. **Ricci-Fluss** (Perelmans Technik) für P4-Annäherung

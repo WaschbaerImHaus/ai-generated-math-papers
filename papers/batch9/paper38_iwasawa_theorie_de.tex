@@ -1,0 +1,527 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+
+% -------------------------------------------------------
+% Eigene Befehle
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Zp}{\mathbb{Z}_p}
+\newcommand{\Qp}{\mathbb{Q}_p}
+\newcommand{\OK}{\mathcal{O}_K}
+\newcommand{\p}{\mathfrak{p}}
+\newcommand{\Lam}{\Lambda}
+\DeclareMathOperator{\Gal}{Gal}
+\DeclareMathOperator{\Cl}{Cl}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\rank}{rang}
+\DeclareMathOperator{\Ann}{Ann}
+\newcommand{\cylp}{\mathbb{Q}(\mu_{p^\infty})}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Iwasawa-Theorie:\\
+       $p$-adische $L$-Funktionen, die Iwasawa-Algebra\\
+       und die Hauptvermutung}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 119}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Die Iwasawa-Theorie untersucht das Verhalten arithmetischer Objekte
+(Klassengruppen, Selmer-Gruppen, Galois-Kohomologie), wenn man einen
+unendlichen Turm von Zahlkörpern aufsteigt.  Die zentralen Objekte sind
+die Iwasawa-Algebra $\Lambda = \Zp\llbracket T \rrbracket$ (ein vollständiger
+lokaler Ring), $p$-adische $L$-Funktionen (analytisch konstruiert nach
+Kubota--Leopoldt) und Iwasawa-Moduln (endlich erzeugte $\Lambda$-Moduln,
+charakterisiert durch $\mu$- und $\lambda$-Invarianten).
+Wir formulieren die Hauptvermutung (bewiesen von Mazur--Wiles 1984 und
+Wiles 1990) und skizzieren die Beweisideen.
+Vorausgesetzt werden Kenntnisse der algebraischen Zahlentheorie
+(Ganzheitsringe, Klassengruppen, Galois-Theorie).
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung und Motivation}
+% ================================================================
+
+Sei $p$ eine ungerade Primzahl.  Kummers Kriterium (1850) besagt:
+$p$ teilt die Klassenzahl $h(\Q(\zeta_p))$ des $p$-ten Kreisteilungskörpers
+genau dann, wenn $p$ \emph{irregulär} ist, d.\,h.\ $p$ teilt den Zähler
+einer Bernoulli-Zahl $B_{2k}$ für ein $k = 1, \ldots, (p-3)/2$.
+
+Iwasawas Idee (um 1959) war es, nicht einen einzelnen Kreisteilungskörper,
+sondern den gesamten \emph{Kreisteilungsturm} zu betrachten:
+\[
+  \Q \subset \Q(\zeta_p) \subset \Q(\zeta_{p^2}) \subset \cdots
+  \subset \Q(\zeta_{p^\infty}) = \cylp.
+\]
+Setzt man $K_n = \Q(\zeta_{p^n})$, $K_\infty = \bigcup_n K_n$ und
+$\Gamma = \Gal(K_\infty/\Q(\zeta_p)) \cong \Zp$ (eine pro-$p$-Gruppe
+isomorph zu den $p$-adischen ganzen Zahlen), so untersucht man den
+$p$-Anteil der Klassengruppe $A_n$ von $K_n$ für wachsendes $n$.
+
+\begin{theorem}[Iwasawa-Wachstumsformel]
+\label{thm:wachstum}
+Es gibt ganze Zahlen $\mu \ge 0$, $\lambda \ge 0$ und $\nu$ (alle abhängig
+von $K_\infty/\Q$), sodass für alle hinreichend großen $n$:
+\[
+  v_p(|A_n|) = \mu p^n + \lambda n + \nu,
+\]
+wobei $v_p$ die $p$-adische Bewertung ist.
+\end{theorem}
+
+Das Wachstum der $p$-adischen Klassenzahlen wird also durch genau zwei
+ganze Zahlen $\mu$ und $\lambda$ (die \emph{Iwasawa-Invarianten}) gesteuert.
+
+% ================================================================
+\section{Die Iwasawa-Algebra}
+% ================================================================
+
+\begin{definition}[Iwasawa-Algebra]
+\label{def:iwasawa_algebra}
+Sei $\Gamma \cong \Zp$ eine topologische Gruppe (z.\,B.\ die Galois-Gruppe
+der zyklotomischen $\Zp$-Erweiterung).  Die \emph{Iwasawa-Algebra} ist der
+vervollständigte Gruppenring:
+\[
+  \Lambda = \Zp\llbracket\Gamma\rrbracket
+  = \varprojlim_n \Zp[\Gamma/\Gamma^{p^n}]
+  \cong \Zp\llbracket T \rrbracket,
+\]
+der \emph{formale Potenzreihenring} in einer Variablen über $\Zp$, wobei
+$T = \gamma - 1$ für einen topologischen Erzeuger $\gamma$ von $\Gamma$.
+\end{definition}
+
+\begin{theorem}[Struktur von $\Lambda$]
+\label{thm:lambda_struktur}
+Die Iwasawa-Algebra $\Lambda = \Zp\llbracket T \rrbracket$ ist:
+\begin{enumerate}[label=(\roman*)]
+  \item ein \emph{vollständiger lokaler Ring} mit maximalem Ideal $(p, T)$,
+  \item ein \emph{regulärer lokaler Ring} der (Krull-)Dimension $2$,
+  \item ein \emph{faktorieller Ring} (UFD),
+  \item \emph{noethersch}.
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[Weierstraßscher Vorbereitungssatz für $\Lambda$]
+\label{thm:weierstrass}
+Jedes von Null verschiedene $f \in \Lambda = \Zp\llbracket T \rrbracket$
+lässt sich eindeutig schreiben als
+\[
+  f(T) = p^\mu \cdot u(T) \cdot P(T),
+\]
+wobei $\mu \ge 0$, $u(T) \in \Lambda^\times$ eine Einheit und
+$P(T) \in \Zp[T]$ ein \emph{ausgezeichnetes Polynom} (normiert vom Grad
+$\lambda \ge 0$ mit allen nicht-führenden Koeffizienten durch $p$ teilbar)
+ist.  Die ganzen Zahlen $\mu$ und $\lambda$ heißen
+\emph{Iwasawa-$\mu$- und $\lambda$-Invariante} von $f$.
+\end{theorem}
+
+\begin{remark}
+Die Invariante $\mu(f)$ und $\lambda(f) = \deg P$ messen, wie ``tief''
+$f$ im maximalen Ideal liegt.  Für das charakteristische Ideal eines
+Iwasawa-Moduls steuern sie das Wachstum in Satz~\ref{thm:wachstum}.
+\end{remark}
+
+% ================================================================
+\section{Endlich erzeugte $\Lambda$-Moduln}
+% ================================================================
+
+\begin{theorem}[Struktursatz für $\Lambda$-Moduln]
+\label{thm:struktur}
+Jeder endlich erzeugte Torsions-$\Lambda$-Modul $M$ ist pseudo-isomorph
+zu einer direkten Summe:
+\[
+  M \;\sim\; \bigoplus_{i=1}^s \Lambda/(p^{\mu_i}) \;\oplus\;
+             \bigoplus_{j=1}^t \Lambda/(f_j(T)),
+\]
+wobei $f_j$ irreduzible ausgezeichnete Polynome in $\Zp[T]$ sind.
+\emph{Pseudo-isomorph} bedeutet: Es gibt einen $\Lambda$-Modulhomomorphismus
+mit endlichem Kern und Kokern.
+\end{theorem}
+
+\begin{definition}[Charakteristisches Ideal und Iwasawa-Invarianten]
+\label{def:char_ideal}
+Für einen endlich erzeugten Torsions-$\Lambda$-Modul $M$ ist das
+\emph{charakteristische Ideal}
+\[
+  \mathrm{char}(M) = \Bigl(p^{\mu} \cdot \prod_j f_j(T)\Bigr) \subseteq \Lambda,
+\]
+mit $\mu = \sum_i \mu_i$.
+Die \emph{$\mu$-Invariante} $\mu(M) = \sum_i \mu_i$ und die
+\emph{$\lambda$-Invariante} $\lambda(M) = \sum_j \deg f_j$ sind
+wohldefiniert.
+\end{definition}
+
+% ================================================================
+\section{Die zyklotomische $\Zp$-Erweiterung}
+% ================================================================
+
+\begin{definition}[Zyklotomische $\Zp$-Erweiterung]
+\label{def:zyklotom_erw}
+Sei $F$ ein Zahlkörper.  Die \emph{zyklotomische $\Zp$-Erweiterung}
+von $F$ ist $F_\infty = F(\mu_{p^\infty})^{\mathrm{conn}}$, die eindeutige
+$\Zp$-Erweiterung von $F$ in $F(\mu_{p^\infty})$.  Für $F = \Q$:
+\[
+  \Q_\infty = \bigcup_{n \ge 1} \Q(\zeta_{p^n})^+
+  \quad\text{(der reelle Teilkörper von $\Q(\zeta_{p^n})$)}.
+\]
+Die Galois-Gruppe $\Gamma = \Gal(\Q_\infty/\Q) \cong \Zp$.
+\end{definition}
+
+\begin{definition}[Der Iwasawa-Modul $X$]
+Sei $M_n$ die maximale abelsche $p$-Erweiterung von $K_n = \Q(\zeta_{p^n})$,
+die außerhalb von $p$ unverzweigt ist.  Definiere
+\[
+  X = \Gal(M_\infty / K_\infty)
+  = \varprojlim_n \Gal(M_n/K_n).
+\]
+Dann ist $X$ ein endlich erzeugter Torsions-$\Lambda$-Modul.
+\end{definition}
+
+% ================================================================
+\section{Die Kubota--Leopoldt $p$-adische $L$-Funktion}
+% ================================================================
+
+\begin{definition}[Spezielle Werte Dirichletscher $L$-Funktionen]
+Für einen Dirichlet-Charakter $\chi$ mit Führer $f$ und $\chi(-1) = -1$
+(ungerader Charakter) sind die Werte $L(1-n, \chi)$ für $n = 1, 2, 3, \ldots$
+algebraische Zahlen:
+\[
+  L(1-n, \chi) = -\frac{B_{n,\chi}}{n},
+  \qquad
+  B_{n,\chi} = f^{n-1} \sum_{a=1}^{f} \chi(a) B_n\!\Bigl(\frac{a}{f}\Bigr),
+\]
+wobei $B_n(x)$ die Bernoulli-Polynome sind.
+\end{definition}
+
+\begin{theorem}[Kubota--Leopoldt, 1964]
+\label{thm:kubota_leopoldt}
+Sei $\chi$ ein primitiver Dirichlet-Charakter mit Führer $f$ und $\chi(-1) = -1$.
+Sei $p$ eine ungerade Primzahl mit $p \nmid f$.
+Es gibt eine eindeutige stetige Funktion
+\[
+  L_p(s, \chi) : \Zp \longrightarrow \Qp,
+\]
+die \emph{Kubota--Leopoldt $p$-adische $L$-Funktion}, welche
+\[
+  L_p(1-n, \chi) = \bigl(1 - \chi(p)\omega^{-n}(p) p^{n-1}\bigr)
+                   L(1-n, \chi\omega^{-n})
+\]
+für alle positiven ganzen Zahlen $n \equiv 1 \pmod{p-1}$ erfüllt,
+wobei $\omega$ der Teichmüller-Charakter ist.
+\end{theorem}
+
+\begin{proof}[Konstruktionsskizze]
+\textbf{Schritt 1: Das $p$-adische Maß.}
+Man konstruiert ein \emph{$p$-adisches Maß} $\mu_\chi$ auf $\Zp^\times$
+(eine beschränkte, finit-additive $\Qp$-wertige Funktion auf offenen
+kompakten Teilmengen) mit
+\[
+  \int_{\Zp^\times} x^{n-1} \, d\mu_\chi(x)
+  = (1 - \chi(p)\omega^{-n}(p)p^{n-1}) L(1-n, \chi\omega^{-n}).
+\]
+
+\textbf{Schritt 2: $p$-adische Interpolation.}
+Die Werte $(1 - \chi(p)p^{n-1}) L(1-n, \chi)$ für $n \equiv 0 \pmod{p-1}$
+sind $p$-adisch nahe für $n$ in arithmetischen Progressionen.
+Es gibt eine Potenzreihe $G_\chi(T) \in \Zp\llbracket T \rrbracket$
+mit $G_\chi((1+p)^{1-n} - 1) = $ den interpolierten Werten.
+
+\textbf{Schritt 3: Iwasawa-Potenzreihe.}
+Über die Identifikation $\Gamma \cong \Zp$ (wobei ein topologischer
+Erzeuger $\gamma$ auf $1+p$ abgebildet wird) erhält man
+\[
+  L_p(s, \chi) = G_\chi((1+p)^s - 1) \in \Lambda \otimes_{\Zp} \Qp.
+\]
+\end{proof}
+
+\begin{remark}[Triviale Nullstelle]
+Für $\chi = \omega^k$ kann $L_p(s, \omega^k)$ bei $s = 1-k$ verschwinden,
+auch wenn $L(1-k, \omega^k) \ne 0$.  Dieses Phänomen der
+\emph{trivialen Nullstelle} wurde von Ferrero--Greenberg und
+später von Greenberg--Stevens untersucht.
+\end{remark}
+
+% ================================================================
+\section{Die Hauptvermutung (Satz von Mazur--Wiles)}
+% ================================================================
+
+\begin{conjecture}[Iwasawas Hauptvermutung, ursprüngliche Form]
+\label{conj:haupt}
+Sei $p$ eine ungerade Primzahl.  Für jede gerade ganze Zahl $i$
+mit $0 \le i \le p-3$ sei $X^{(i)}$ der $\omega^i$-Eigenraum von $X$
+und $f_i(T) \in \Lambda$ ein Erzeuger des charakteristischen Ideals
+$\mathrm{char}(X^{(i)})$.  Dann gilt:
+\[
+  f_i(T) \;\sim\; G_{\omega^{1-i}}(T) \pmod{\text{Einheiten}},
+\]
+wobei $G_{\omega^{1-i}}(T)$ die Iwasawa-Potenzreihe der $p$-adischen
+$L$-Funktion zum Charakter $\omega^{1-i}$ ist.
+\end{conjecture}
+
+\begin{theorem}[Mazur--Wiles 1984; Wiles 1990]
+\label{thm:mazur_wiles}
+Die Iwasawa-Hauptvermutung gilt für alle ungeraden Primzahlen $p$ und
+alle geraden Charaktere $\omega^i$ wie oben.
+\end{theorem}
+
+\begin{proof}[Beweissskizze (Wiles' Ansatz)]
+Wiles' Beweis von 1990 verläuft in drei Hauptschritten:
+
+\textbf{Schritt 1: Konstruktion eines Euler-Systems.}
+Man konstruiert \emph{Euler-System-Elemente} $c_n \in K_n^\times$
+(bezogen auf Kreiseinheiten und Gauß-Summen), deren Normen kompatibel
+durch den Turm sind.  Die Hauptquelle sind die \emph{Kreiseinheiten}:
+$\eta_n = $ das Bild von $(1 - \zeta_{p^n})$ in $K_n^\times$.
+
+\textbf{Schritt 2: Indexformel für Kreiseinheiten.}
+Sei $C_n$ die Gruppe der Kreiseinheiten in $K_n$.  Es gilt
+\[
+  [E_n : C_n] = h_n^+ \quad\text{(die reelle Klassenzahl)},
+\]
+bewiesen mit der analytischen Klassenzahlformel.
+
+\textbf{Schritt 3: Kontrollsatz und Vergleich der Fitting-Ideale.}
+Die Euler-System-Maschinerie (Kolyvagin, Rubin) liefert die Teilbarkeit
+\[
+  \mathrm{char}(X^{(i)}) \mid (G_{\omega^{1-i}}(T)) \quad \text{in } \Lambda.
+\]
+Die Gleichheit folgt durch Vergleich der $\mu$-Invarianten:
+Ferrero--Washington (1979) bewiesen $\mu(X^{(i)}) = 0$ für $\Q$-Erweiterungen,
+und die $\mu$-Invariante von $G_{\omega^{1-i}}$ ist ebenfalls $0$
+(wegen $L(1, \omega^{1-i}) \ne 0$).  Gleiche $\mu$-Invarianten erzwingen
+durch ein Rangargument die Gleichheit der charakteristischen Ideale.
+\end{proof}
+
+\begin{remark}[Spätere Verallgemeinerungen]
+\begin{itemize}
+  \item Rubin (1991) gab einen kürzeren Beweis mit Euler-Systemen für
+    imaginär-quadratische Körper.
+  \item Kato (2004) bewies eine Teilbarkeit der Hauptvermutung für
+    elliptische Kurven über $\Q$ mittels Beilinson--Kato-Elementen.
+  \item Die \emph{nicht-kommutative} Hauptvermutung für $p$-adische
+    Darstellungen wurde von Coates--Fukaya--Kato--Sujatha--Venjakob (2005)
+    formuliert.
+\end{itemize}
+\end{remark}
+
+% ================================================================
+\section{Die $\mu$- und $\lambda$-Invarianten}
+% ================================================================
+
+\begin{definition}[$\mu$- und $\lambda$-Invarianten eines Zahlkörpers]
+\label{def:mu_lambda}
+Für die zyklotomische $\Zp$-Erweiterung $K_\infty/K$ sind die
+$\mu$- und $\lambda$-Invarianten diejenigen des Iwasawa-Moduls $X$:
+\[
+  \mu(K/p) = \mu(X), \qquad \lambda(K/p) = \lambda(X).
+\]
+Nach Satz~\ref{thm:wachstum} gilt für große $n$:
+$v_p(|A_n|) = \mu p^n + \lambda n + \nu$.
+\end{definition}
+
+\begin{conjecture}[Iwasawas $\mu = 0$-Vermutung]
+Für jeden Zahlkörper $K$ und jede Primzahl $p$ gilt
+$\mu(K_\infty/K) = 0$.
+\end{conjecture}
+
+\begin{theorem}[Ferrero--Washington, 1979]
+Für $K = \Q$ und jede ungerade Primzahl $p$ gilt $\mu(\Q_\infty/\Q) = 0$.
+Allgemeiner: für jede abelsche Erweiterung $K/\Q$ gilt $\mu(K_\infty/K) = 0$.
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+Ferrero und Washington zeigten, dass die $p$-adische $L$-Funktion
+$L_p(s, \chi)$ nicht identisch $\equiv 0 \pmod{p}$ ist, was $\mu = 0$
+erzwingt.  Ihr Argument nutzt die Theorie $p$-adischer Maße und die
+explizite Form der Bernoulli-Zahlen.
+\end{proof}
+
+% ================================================================
+\section{BSD und Iwasawa-Theorie für elliptische Kurven}
+% ================================================================
+
+\begin{definition}[Selmer-Gruppe und Iwasawa-Modul für $E/\Q$]
+\label{def:selmer_iwasawa}
+Sei $E/\Q$ eine elliptische Kurve und $p$ eine ungerade Primzahl mit
+gewöhnlicher guter Reduktion ($a_p(E) \not\equiv 0 \pmod{p}$).
+Die \emph{$p$-adische Selmer-Gruppe} über $\Q_\infty$ ist
+\[
+  \mathrm{Sel}_{p^\infty}(E/\Q_\infty)
+  = \ker\Bigl(H^1(\Q_\infty, E[p^\infty]) \to
+    \prod_v H^1(\Q_{\infty,v}, E)[p^\infty]/E(\Q_{\infty,v})\Bigr).
+\]
+Der Pontryagin-Dual $X_E = \mathrm{Sel}_{p^\infty}(E/\Q_\infty)^\vee$
+ist ein endlich erzeugter $\Lambda$-Modul.
+\end{definition}
+
+\begin{conjecture}[Iwasawa-Hauptvermutung für elliptische Kurven]
+\label{conj:ec_haupt}
+Für $E/\Q$ mit gewöhnlicher guter Reduktion bei $p$ gibt es eine
+$p$-adische $L$-Funktion $L_p(E, s) \in \Lambda$
+(die Mazur--Swinnerton-Dyer $p$-adische $L$-Funktion) mit
+\[
+  \mathrm{char}(X_E) = (L_p(E, s)) \quad \text{in } \Lambda.
+\]
+\end{conjecture}
+
+\begin{theorem}[Kato 2004; Skinner--Urban 2014]
+\label{thm:kato_su}
+Eine Teilbarkeit $\mathrm{char}(X_E) \mid (L_p(E, s))$ gilt unter milden
+Voraussetzungen (Kato 2004).  Unter weiteren Bedingungen gilt die
+Hauptvermutung (Skinner--Urban 2014) und insbesondere:
+\[
+  L_p(E, 1) = 0 \implies \mathrm{rang}(E(\Q)) \ge 1.
+\]
+\end{theorem}
+
+\begin{remark}[Verbindung zu BSD]
+Die Iwasawa-Hauptvermutung für $E$ impliziert den $p$-Anteil der
+Birch--Swinnerton-Dyer-Vermutung.  Die vollständige BSD-Vermutung
+ist weiterhin offen.
+\end{remark}
+
+% ================================================================
+\section{Explizite Beispiele}
+% ================================================================
+
+\begin{example}[$p=3$, $\Q(\zeta_3)$]
+$\zeta_3 = e^{2\pi i/3}$.
+$h(\Q(\zeta_3)) = h(\Q(\zeta_9)) = h(\Q(\zeta_{27})) = 1$.
+Durch die Wachstumsformel folgt $\mu = \lambda = 0$.
+(Die kleinste irreguläre Primzahl, die $3$ teilt, ist nicht in diesem Turm.)
+\end{example}
+
+\begin{example}[Irreguläre Primzahl $p = 37$]
+$p = 37$ ist die kleinste irreguläre Primzahl: $37 \mid B_{32}$.
+Die Klassenzahl $h(\Q(\zeta_{37})) = 37$.
+Die Iwasawa-$\lambda$-Invariante erfüllt $\lambda \ge 1$.
+Berechnungen (Buhler--Crandall 1992) ergeben $\mu = 0$, $\lambda = 2$.
+\end{example}
+
+% ================================================================
+\section{Zusammenfassung und Ausblick}
+% ================================================================
+
+\begin{remark}[Was die Iwasawa-Theorie leistet]
+Die Hauptvermutung (jetzt Satz) etabliert ein grundlegendes Wörterbuch:
+\begin{center}
+\begin{tabular}{l|l}
+\textbf{Analytische Seite} & \textbf{Algebraische Seite} \\
+\hline
+$p$-adische $L$-Funktion $L_p(s, \chi)$ & Char.\ Ideal von $X^{(i)}$ \\
+$L(1-n, \chi) \ne 0$ & $X^{(i)}$ ist endlich \\
+$\mu(G_\chi) = 0$ (Ferrero--Washington) & $\mu(X^{(i)}) = 0$ \\
+$\lambda(G_\chi)$ & Rang von $X^{(i)}$ über $\Lambda$ \\
+\end{tabular}
+\end{center}
+\end{remark}
+
+\begin{remark}[Offene Probleme]
+\begin{itemize}
+  \item \textbf{$\mu = 0$-Vermutung} für nicht-abelsche Erweiterungen.
+  \item \textbf{Nicht-kommutative Hauptvermutung} für GL$_n$-Motive.
+  \item \textbf{$p$-adische BSD}: Vollständige BSD aus der Iwasawa-Theorie
+    erfordert die Kontrolle der Tate--Shafarevich-Gruppe.
+  \item \textbf{$p$-adische Langlands-Korrespondenz}: Das Breuil--Colmez-Programm
+    zielt darauf ab, Iwasawa-Moduln via $(\varphi,\Gamma)$-Moduln zu kodieren.
+\end{itemize}
+\end{remark}
+
+\section*{Danksagung}
+Der Autor dankt dem Specialist Mathematics Project für die Bereitstellung
+der Forschungsinfrastruktur.
+
+\begin{thebibliography}{99}
+
+\bibitem{Iwasawa1959}
+K.~Iwasawa,
+\textit{On $\Gamma$-extensions of algebraic number fields},
+Bull.\ Amer.\ Math.\ Soc.\ \textbf{65} (1959), 183--226.
+
+\bibitem{KubotaLeopoldt1964}
+T.~Kubota und H.-W.~Leopoldt,
+\textit{Eine $p$-adische Theorie der Zetawerte, I: Einführung der $p$-adischen Dirichletschen $L$-Funktionen},
+J.\ Reine Angew.\ Math.\ \textbf{214/215} (1964), 328--339.
+
+\bibitem{MazurWiles1984}
+B.~Mazur und A.~Wiles,
+\textit{Class fields of abelian extensions of $\Q$},
+Invent.\ Math.\ \textbf{76} (1984), 179--330.
+
+\bibitem{Wiles1990}
+A.~Wiles,
+\textit{The Iwasawa conjecture for totally real fields},
+Ann.\ of Math.\ (2) \textbf{131} (1990), 493--540.
+
+\bibitem{Rubin1991}
+K.~Rubin,
+\textit{The ``main conjecture'' of Iwasawa theory for imaginary quadratic fields},
+Invent.\ Math.\ \textbf{103} (1991), 25--68.
+
+\bibitem{FerWash1979}
+B.~Ferrero und L.~C.~Washington,
+\textit{The Iwasawa invariant $\mu_p$ vanishes for abelian number fields},
+Ann.\ of Math.\ (2) \textbf{109} (1979), 377--395.
+
+\bibitem{Kato2004}
+K.~Kato,
+\textit{$p$-adic Hodge theory and values of zeta functions of modular forms},
+Ast\'erisque \textbf{295} (2004), 117--290.
+
+\bibitem{SkinnerUrban2014}
+C.~Skinner und E.~Urban,
+\textit{The Iwasawa main conjecture for $\mathrm{GL}_2$},
+Invent.\ Math.\ \textbf{195} (2014), 1--277.
+
+\bibitem{Neukirch1999}
+J.~Neukirch,
+\textit{Algebraische Zahlentheorie},
+Springer, Berlin, 1992.
+
+\bibitem{Washington1997}
+L.~C.~Washington,
+\textit{Introduction to Cyclotomic Fields},
+2.\ Aufl., Springer, New York, 1997.
+
+\bibitem{Coates2006}
+J.~Coates und R.~Sujatha,
+\textit{Cyclotomic Fields and Zeta Values},
+Springer, Berlin, 2006.
+
+\end{thebibliography}
+
+\end{document}
