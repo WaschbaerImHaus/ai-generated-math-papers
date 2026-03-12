@@ -639,3 +639,80 @@
 - **Datei**: tests/test_config.py
 - **Problem**: TestMetadata::test_author_value prüfte auf 'Kurt Ingwer' statt 'Michael Fuhrmann'
 - **Behoben**: Test korrigiert auf korrekten Autor 'Michael Fuhrmann'
+
+---
+
+## Build 174–175: Externe Review Build 22 — Batches 19–25 (Papers 72–97)
+
+### BUG-B25-P96-EN-001 [KRITISCH] (Build 174): Paper 96 EN — Doppelte \Hom-Definition
+- **Datei**: papers/batch25/paper96_grothendieck_standard_conjectures_en.tex
+- **Problem**: `\newcommand{\Hom}` zweimal definiert → LaTeX kompiliert nicht
+- **Behoben**: Beide Definitionen entfernt (\Hom in amsmath bereits verfügbar)
+
+### BUG-B25-P96-EN-002 [KRITISCH] (Build 174): Paper 96 EN — `H^^{2d-i}` Syntaxfehler
+- **Datei**: papers/batch25/paper96_grothendieck_standard_conjectures_en.tex
+- **Problem**: `H^^{2d-i}` → doppeltes Caret ist TeX-Steuerzeichen
+- **Behoben**: Korrigiert zu `H^{2d-i}`
+
+### BUG-B20-P77-EN-001 [HOCH] (Build 174): Paper 77 — Freedmans Satz falsch zitiert
+- **Datei**: papers/batch20/paper77_conway_knot_sliceness_en.tex + _de.tex
+- **Problem**: "Arf=0 → topologisch scheibig" ist FALSCH. Freedman (1982): Δ_K(t)=1 → topologisch scheibig
+- **Behoben**: Korrekte Formulierung Δ_K(t)=1 eingefügt
+
+### BUG-B20-P77-EN-002 [MITTEL] (Build 174): Paper 77 — Rolfsen→Hoste-Thistlethwaite
+- **Problem**: Conway-Knoten (11 Kreuzungen) in Rolfsen-Tabelle → falsch, nur bis 10 Kreuzungen
+- **Behoben**: "Hoste-Thistlethwaite-Tabelle" korrekt
+
+### BUG-B20-P77-EN-003 [GERING] (Build 174): Paper 77 — Torusknoten als falsches Beispiel
+- **Problem**: T(2,2k+1) als topologisch-aber-nicht-glatt-scheibig → FALSCH (nicht topologisch scheibig)
+- **Behoben**: Whitehead-Dopplungs-Beispiel stattdessen
+
+### BUG-B21-P81-EN-001 [HOCH] (Build 174): Paper 81 EN — Falscher k=4-Beweis
+- **Problem**: "4-chromatische Graphen können nicht planar sein (5-Farben-Satz)" FALSCH
+- **Behoben**: Diracs Satz (δ(G)≥3 → K₄-Unterteilung) + Wagner-Struktursatz
+
+### BUG-B21-P81-EN-003 [MITTEL] (Build 174): Paper 81 EN — "but wait"-Entwurfsnotiz
+- **Behoben**: Entfernt, durch korrektes Argument ersetzt
+
+### BUG-B21-P81-EN-002/004/005 [MITTEL/GERING] (Build 174): Paper 81 EN
+- **Behoben**: Wagner-Stärkebehauptung korrigiert; vertex-transitive→vertex-critical; Mader k=5: 2^{5-2}+1=9
+
+### BUG-B19-P73-EN-003 [MITTEL] (Build 175): Paper 73 — Chase-Lovett-Schranke falsch
+- **Problem**: "~50%" angegeben statt korrekt (3−√5)/2 ≈ 38,2%
+- **Behoben**: Gilmer (2022) 38,2% korrekt
+
+### BUG-B19-P73-EN-002 [GERING] (Build 175): Paper 73 — Knill-Schranke 50→46
+- **Behoben**: Knill 1994: 46 Mengen, nicht 50
+
+### BUG-B20-P78-EN-002 [GERING] (Build 175): Paper 78 — "wait"-Entwurfsrest
+- **Behoben**: Dunce-Hat korrekt beschrieben
+
+### BUG-B20-P78-EN-003 [GERING] (Build 175): Paper 78 — Bridson-de la Harpe→Haefliger
+- **Behoben**: Koautor korrigiert
+
+### BUG-B21-P80-EN-001 [MITTEL] (Build 175): Paper 80 — Pinchuk Grad 10³→25
+- **Behoben**: Grad 25 (Pinchuk 1994, Math. Z. 217)
+
+### BUG-B21-P80-DE-001 [MITTEL] (Build 175): Paper 80 DE — Fehlende Sections
+- **Behoben**: "Weitere algebraische Äquivalenzen" + "Offene Probleme" aus EN übersetzt
+
+### BUG-B21-P83-EN-001..004 [MITTEL/GERING] (Build 175): Paper 83 EN
+- **Behoben**: Entwurfsnotizen entfernt; Genus-Formel korrigiert; Tabellenfehler behoben; PSS: 27→16
+
+### BUG-B24-P92-DE-002 [MITTEL] (Build 175): Paper 92 DE — Minimum-Genus-Sektion
+- **Behoben**: Aus EN übersetzt und ergänzt
+
+### BUG-B24-P93-DE-002 [MITTEL] (Build 175): Paper 93 DE — Babenko-Bibitem fehlt
+- **Behoben**: Aus EN kopiert
+
+### BUG-B24-P94-DE-001 [MITTEL] (Build 175): Paper 94 DE — ℙ⁵-Tabellenzeile fehlt
+- **Behoben**: Aus EN ergänzt
+
+### BUG-B21-P81-DE-001 [GERING] (Build 175): Paper 81 DE — Gerards-Seymour-Section fehlt
+- **Behoben**: Section 9 "Ungerade Hadwiger-Vermutung" aus EN übersetzt
+
+### KOSMETISCH (Build 175): Globale Tippfehler-Korrekturen
+- "Beweissskizze"→"Beweisskizze", "Beweissstrategie"→"Beweisstrategie" (alle DE-Papers Batch 19-21)
+- "Summenmengenmtheorie"→"Summenmengentheorie" (P72 DE)
+- "Knospfe"→"Knospe" (P76 DE), "Kelllers"→"Kellers" (P80 DE), "Computerssuche"→"Computersuche" (P83 DE)
+- Bibitem-Schlüssel-Korrekturen: AkbulutKirby1979, Rotman2007, BergerPansu2003, EvansGriffith1981 (P92-94)
