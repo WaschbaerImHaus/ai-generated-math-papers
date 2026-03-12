@@ -541,3 +541,68 @@ BUG-6 [NIEDRIG] paper53_differentialgeometrie_de.tex:
 - Zwegers 2002 als Beweis von Mock-Theta → Harmonic Maass Forms korrekt dargestellt
 - Abstract VOR \maketitle, DE: \newtheorem{theorem}{Satz}[section]
 - Autor: Michael Fuhrmann, Build 142 in \address
+
+=== 2026-03-12 — Build 144 — Batch 16 Audit (Papers 60–63, EN + DE) ===
+
+2026-03-12 [Build 144]: Vollständiges mathematisches und formales Audit aller 8 LaTeX-Papers in Batch 16 durchgeführt.
+
+### Geprüfte Dateien
+- papers/batch16/paper60_hecke_operators_en.tex
+- papers/batch16/paper60_hecke_operatoren_de.tex
+- papers/batch16/paper61_theta_functions_en.tex
+- papers/batch16/paper61_theta_funktionen_de.tex
+- papers/batch16/paper62_automorphic_forms_en.tex
+- papers/batch16/paper62_automorphe_formen_de.tex
+- papers/batch16/paper63_galois_representations_en.tex
+- papers/batch16/paper63_galois_darstellungen_de.tex
+
+### Behobene Fehler (8 total)
+
+BUG-1 [NIEDRIG] paper61_theta_functions_en.tex:
+  \address{Specialist Mathematics Project, Build 142} → Build 143 (veraltet)
+  BEHOBEN: Build 142 → Build 143
+
+BUG-2 [NIEDRIG] paper61_theta_funktionen_de.tex:
+  Gleicher veralteter Build-Nummer-Fehler wie EN-Version.
+  BEHOBEN: Build 142 → Build 143
+
+BUG-3 [MITTEL] paper62_automorphic_forms_en.tex:
+  \documentclass[12pt]{amsart} — fehlendes a4paper-Option.
+  BEHOBEN: → \documentclass[12pt,a4paper]{amsart}
+
+BUG-4 [MITTEL] paper62_automorphe_formen_de.tex:
+  \documentclass[12pt]{amsart} — fehlendes a4paper-Option.
+  BEHOBEN: → \documentclass[12pt,a4paper]{amsart}
+
+BUG-5 [HOCH] paper62_automorphe_formen_de.tex:
+  \newtheorem{conjecture}{Vermutung}[section] — eigenständiger Zähler statt gemeinsamer.
+  BEHOBEN: → \newtheorem{conjecture}[theorem]{Vermutung}
+
+BUG-6 [HOCH] paper63_galois_representations_en.tex:
+  Fehlende \theoremstyle-Wechsel: definition, example, remark alle im theorem-Stil
+  (fettgedruckt kursiv statt aufrecht).
+  BEHOBEN: \theoremstyle{definition} vor definition+example, \theoremstyle{remark} vor remark.
+
+BUG-7 [HOCH] paper63_galois_darstellungen_de.tex:
+  Gleicher \theoremstyle-Fehler wie EN-Version.
+  BEHOBEN: \theoremstyle{definition} vor definition+beispiel, \theoremstyle{remark} vor bemerkung.
+
+BUG-8 [MITTEL] paper62_automorphe_formen_de.tex:
+  Tippfehler "kusipidale" (4×) und "nichts-holomorphe" im Text.
+  BEHOBEN: "kusipidale" → "kuspidale" (replace_all), "nichts-holomorphe" → "nicht-holomorphe"
+
+### Mathematische Korrektheit: ALLE Deklarationen korrekt
+- Hecke (paper60): Hecke-Operatoren, Petersson, Ramanujan-Petersson GL(2) — alle Theorem
+  Ramanujan-Petersson GL(n≥3): korrekt als Conjecture (offen)
+- Theta-Funktionen (paper61): Jacobi-Dreifachprodukt, Transformationsformeln, Zwegers 2002 — alle Theorem
+  Mock-Theta (Ramanujan): korrekt als bewiesen via Zwegers dargestellt
+- Automorphe Formen (paper62): Spektralzerlegung Langlands, Selberg 1/4-Vermutung — korrekt als Conjecture
+  Atkin-Lehner, Neue Formen: korrekt als Theorem
+- Galois-Darstellungen (paper63): Modularitäts-Theorem (Taylor-Wiles 1995), Khare-Wintenberger 2009 — Theorem
+  Fontaine-Mazur-Vermutung: korrekt als Conjecture (offen)
+
+### Review-Bericht
+- reviews/review_batch16_2026_03_12.md erstellt
+
+### Build-Nummer
+- src/build.txt: 143 → 144

@@ -6,7 +6,7 @@
 % Datum: 2026-03-12
 % =============================================================================
 
-\documentclass[12pt]{amsart}
+\documentclass[12pt,a4paper]{amsart}
 
 \usepackage{amsmath, amssymb, amsthm}
 \usepackage{mathtools}
@@ -24,7 +24,7 @@
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{korollar}[theorem]{Korollar}
-\newtheorem{conjecture}{Vermutung}[section]
+\newtheorem{conjecture}[theorem]{Vermutung}
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{beispiel}[theorem]{Beispiel}
@@ -304,7 +304,7 @@ Fourier-Entwicklung
 u(x+iy) = \sum_{n \neq 0} a_n\, \sqrt{y}\, K_{ir}(2\pi|n|y)\, e^{2\pi i n x},
 \]
 wobei $K_{ir}$ die modifizierte Besselfunktion zweiter Art (Macdonald-Funktion) ist.
-Das klassische Beispiel ist die \emph{nichts-holomorphe Eisenstein-Reihe}
+Das klassische Beispiel ist die \emph{nicht-holomorphe Eisenstein-Reihe}
 $E(z,s) = \sum_{\gamma \in \Gamma_\infty \backslash \Gamma} \im(\gamma z)^s$,
 die eine Eigenfunktion von $\Delta$ mit Eigenwert $s(1-s)$ ist.
 
@@ -551,13 +551,13 @@ $\hat\phi(t) = \inner{\phi}{E(\cdot, \frac{1}{2}+it)}$.
 \subsection{Multiplizitäts-Eins-Satz}
 
 \begin{theorem}[Multiplizitäts-Eins — bewiesen, Pjatezki-Shapiro 1979]
-Jede irreduzible kusipidale automorphe Darstellung $\pi$ von $\GL(n,\AA)$
+Jede irreduzible kuspidale automorphe Darstellung $\pi$ von $\GL(n,\AA)$
 tritt im kuspidalen Spektrum $L^2_{\mathrm{cusp}}(\GL(n,\QQ) \backslash \GL(n,\AA))$
 mit Multiplizität genau eins auf.
 \end{theorem}
 
 Dies ist ein fundamentales Strukturergebnis: Im Gegensatz zu kompakten Quotienten
-oder allgemeinen reduktiven Gruppen ist das kusipidale Spektrum von $\GL(n)$ multiplizitätsfrei.
+oder allgemeinen reduktiven Gruppen ist das kuspidale Spektrum von $\GL(n)$ multiplizitätsfrei.
 
 % =============================================================================
 \section{Anwendungen}
@@ -569,7 +569,7 @@ oder allgemeinen reduktiven Gruppen ist das kusipidale Spektrum von $\GL(n)$ mul
 \begin{theorem}[Voronoi-Summation — bewiesen]
 \label{satz:voronoi}
 Sei $f : \RR_{>0} \to \CC$ eine glatte Funktion mit kompaktem Träger und
-$\pi$ eine kusipidale automorphe Darstellung von $\GL(2,\AA)$ mit Fourier-Koeffizienten
+$\pi$ eine kuspidale automorphe Darstellung von $\GL(2,\AA)$ mit Fourier-Koeffizienten
 $a(n)$ (für $n \geq 1$). Für $(a, q) = 1$ gilt:
 \[
 \sum_{n=1}^\infty a(n)\, e\!\left(\frac{an}{q}\right)\, f(n)
@@ -640,7 +640,7 @@ symmetrischen Potenz-Lifts von $\GL(2)$ nach $\GL(n)$:
 
 \begin{theorem}[Symmetrische Potenz-Lifts — teilweise bewiesen]
 \label{satz:sym_lift}
-Sei $\pi$ eine kusipidale automorphe Darstellung von $\GL(2,\AA)$, die nicht vom
+Sei $\pi$ eine kuspidale automorphe Darstellung von $\GL(2,\AA)$, die nicht vom
 diedralen, tetraedrischen oder oktaedrischen Typ ist. Dann gilt:
 \begin{enumerate}[label=(\roman*)]
 \item $\mathrm{Sym}^2 \pi$ existiert als automorphe Darstellung von $\GL(3,\AA)$
