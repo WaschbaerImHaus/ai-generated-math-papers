@@ -364,3 +364,60 @@
 - Haselgrove 1958: Pólya-Vermutung widerlegt, explizites Gegenbeispiel 906316571 ✓
 
 - src/build.txt: 136 → 137
+
+=== 2026-03-12 — Build 138 — Batch 13 Audit: Papers 48–51 (EN + DE) ===
+
+2026-03-12 [Build 138]: Vollständiges mathematisches und formales Audit aller 8 LaTeX-Papers in Batch 13
+
+### Geprüfte Dateien
+- papers/batch13/paper48_additive_number_theory_en.tex
+- papers/batch13/paper48_additive_zahlentheorie_de.tex
+- papers/batch13/paper49_mertens_function_en.tex
+- papers/batch13/paper49_mertens_funktion_de.tex
+- papers/batch13/paper50_algorithmic_number_theory_en.tex
+- papers/batch13/paper50_algorithmische_zahlentheorie_de.tex
+- papers/batch13/paper51_twin_primes_andrica_en.tex
+- papers/batch13/paper51_zwillingsprimzahlen_andrica_de.tex
+
+### Gefundene und behobene Bugs (7 total)
+
+BUG-1 [KRITISCH] paper49_mertens_function_en.tex:
+  \maketitle stand vor \begin{abstract} — in amsart muss Abstract VOR \maketitle stehen.
+  BEHOBEN: Abstract auf korrekte Position vor \maketitle verschoben.
+
+BUG-2 [KRITISCH] paper49_mertens_funktion_de.tex:
+  Gleicher Fehler wie EN-Version.
+  BEHOBEN: Abstract auf korrekte Position vor \maketitle verschoben.
+
+BUG-3 [MITTEL] paper49_mertens_function_en.tex:
+  Theorem-Label "Haselgrove, 1960" falsch — korrekt ist 1958 (Mathematika 5, 1958).
+  BEHOBEN: "1960" → "1958".
+
+BUG-4 [HOCH] paper50_algorithmic_number_theory_en.tex:
+  Kein \begin{abstract} vorhanden.
+  BEHOBEN: Abstract eingefügt (vor \maketitle, amsart-konform).
+
+BUG-5 [HOCH] paper50_algorithmische_zahlentheorie_de.tex:
+  Kein \begin{abstract} vorhanden.
+  BEHOBEN: Deutschen Abstract eingefügt.
+
+BUG-6 [HOCH] paper51_twin_primes_andrica_en.tex:
+  Kein \begin{abstract} vorhanden.
+  BEHOBEN: Abstract eingefügt.
+
+BUG-7 [HOCH] paper51_zwillingsprimzahlen_andrica_de.tex:
+  Kein \begin{abstract} vorhanden.
+  BEHOBEN: Deutschen Abstract eingefügt.
+
+### Mathematische Korrektheit: KEINE weiteren Fehler gefunden
+- Alle Theorem/Conjecture-Deklarationen korrekt
+- Paper 48: Goldbach stark (Conj.), schwache/Helfgott (Theorem), Waring/Hilbert (Theorem), Freiman (Theorem), Erdős-Turán (Conj.) — alle korrekt
+- Paper 49: Mertens' 3 Sätze (Theorem), Mertens-Vermutung (Conj. + FALSE), Odlyzko-te Riele (Theorem), Pólya (Conj. + FALSE), RH-Äquivalenz (Theorem) — alle korrekt
+- Paper 50: AKS (Theorem/Proved), Faktorisierung-in-P (Conj./Open), Reziprozität (Theorem), RSA/DLP (Conj./Open) — alle korrekt
+- Paper 51: Zhang/Maynard (Theorem), Zwilling/Andrica/Cramér/Legendre/Polignac (Conj./Open) — alle korrekt
+
+### Review-Bericht
+- reviews/review_batch13_2026_03_12.md erstellt
+
+### Build-Nummer
+- src/build.txt: 137 → 138
