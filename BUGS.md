@@ -1,5 +1,32 @@
 # BUGS.md - specialist-maths
 
+## Behobene Bugs (Build 153)
+
+### BUG-B11-P40-EN/DE-001 (KRITISCH — BEHOBEN Build 153): Falsche "Giuga-Identität"
+- **Dateien**: papers/batch11/paper40_giuga_four_primes_en.tex,
+  papers/batch11/paper40_giuga_vier_primfaktoren_de.tex
+- **Problem**: EN-Theorem 4.1 behauptete e₄ - e₃ + e₂ - e₁ + 1 = 0 als
+  Äquivalenzbedingung. Das ist algebraisch unmöglich, da die linke Seite
+  gleich φ(n) = ∏(pᵢ-1) ≥ 16 > 0 ist.
+- **Behebung**: Theorem 4.1 in "Totient Identity" umstrukturiert.
+  Korrekte Aussage: φ(n) = n - e₃ + e₂ - e₁ + 1 > 0.
+  Das korrekte Kriterium ist das System (G1)-(G4). DE-Version war bereits
+  korrekt formuliert; Abstract, Einleitung und Zusammenfassung beider
+  Versionen bereinigt.
+
+### BUG-B11-P40-EN/DE-002 (KRITISCH — BEHOBEN Build 153): Falsche Schranke p₄² ≤ p₁p₂p₃
+- **Dateien**: papers/batch11/paper40_giuga_four_primes_en.tex (Theorem 5.3,
+  Corollary 5.4), papers/batch11/paper40_giuga_vier_primfaktoren_de.tex
+  (Satz 5.2, Korollar 5.3)
+- **Problem**: Beide Dateien behaupteten p₄² ≤ p₁p₂p₃. Gegenbeispiel:
+  n = 1722 = 2·3·7·41 ist eine Giuga-Zahl mit p₄ = 41, p₁p₂p₃ = 42,
+  also p₄² = 1681 >> 42. Außerdem war der Beweis falsch:
+  aus pᵢ | n/pᵢ - 1 folgt nur pᵢ ≤ n/pᵢ - 1, NICHT pᵢ(pᵢ+1) ≤ n/pᵢ.
+- **Behebung**: Falsches Theorem + Korollar in beiden Dateien ersetzt.
+  Korrekte lineare Schranken aus (G2)-(G4): p₄ ≤ p₁p₂p₃-1 etc.
+  Neues Korollar: n < (p₁p₂p₃)². Erklärende Bemerkung über die
+  Nichtexistenz der Quadratschranke hinzugefügt.
+
 ## Offene Bugs
 
 ### BUG-B1-P2-EN-HOCH-001: paper2 EN — Schritt 4 (p≥7) Abschätzung nicht rigoros

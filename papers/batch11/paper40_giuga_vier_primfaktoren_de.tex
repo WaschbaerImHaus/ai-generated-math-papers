@@ -58,11 +58,15 @@ durch elementare Methoden ausgeschlossen wurde.
 Die vorliegende Arbeit untersucht den \textbf{Vier-Prim-Fall} eingehend.
 Für $n = p_1 p_2 p_3 p_4$ mit $p_1 < p_2 < p_3 < p_4$ prim leiten wir das
 vollständige Divisibilitätssystem her, das jedes solche $n$ erfüllen müsste,
-analysieren die entstehenden arithmetischen Bedingungen und beweisen mehrere
-notwendige Einschränkungen, darunter die Schranke $p_4^2 \le p_1 p_2 p_3$.
-Darüber hinaus berichten wir über eine computergestützte Suche über alle
-Produkte $n = p_1 p_2 p_3 p_4 \le 10^{15}$, bei der keine Giuga-Pseudoprimzahl
-gefunden wurde.  Der Vier-Prim-Fall von Giugas Vermutung bleibt \emph{offen}.
+und analysieren die entstehenden arithmetischen Bedingungen.  Wir beweisen die
+Totient-Identität $\varphi(n) = n - e_3 + e_2 - e_1 + 1 > 0$ und zeigen
+damit, dass der Ausdruck $e_4 - e_3 + e_2 - e_1 + 1 = 0$ für kein Produkt
+vier verschiedener Primzahlen erfüllbar ist.  Ferner etablieren wir die scharfe
+Schranke $p_4 \le p_1 p_2 p_3 - 1$ sowie die Größenschranke
+$n < (p_1 p_2 p_3)^2$.  Darüber hinaus berichten wir über eine
+computergestützte Suche über alle Produkte $n = p_1 p_2 p_3 p_4 \le 10^{15}$,
+bei der keine Giuga-Pseudoprimzahl gefunden wurde.
+Der Vier-Prim-Fall von Giugas Vermutung bleibt \emph{offen}.
 \end{abstract}
 
 \maketitle
@@ -145,7 +149,8 @@ Unsere Beiträge sind:
 \begin{enumerate}
   \item Vollständige Herleitung des Giuga-Gleichungssystems für vier Faktoren
         (Abschnitt~\ref{sec:system}).
-  \item Die Giuga-Identität, eine äquivalente Diophantische Gleichung
+  \item Die Totient-Identität $\varphi(n) = n - e_3 + e_2 - e_1 + 1$ und
+        warum der Ausdruck $e_4 - e_3 + e_2 - e_1 + 1 = 0$ unmöglich ist
         (Abschnitt~\ref{sec:identitaet}).
   \item Mehrere beweisbare arithmetische Einschränkungen
         (Abschnitt~\ref{sec:schranken}).
@@ -389,41 +394,42 @@ Für eine Vier-Prim-Giuga-Pseudoprimzahl $n = p_1 p_2 p_3 p_4$ gilt
 \]
 \end{corollary}
 
-\subsection{Obere Schranke durch Quadrat}
+\subsection{Obere Schranken durch das Produkt}
 
 \begin{theorem}
-\label{satz:quadratschranke}
-Für jede potenzielle Vier-Prim-Giuga-Pseudoprimzahl $n = p_1 p_2 p_3 p_4$ gilt
-\[
-  p_4^2 \le p_1 p_2 p_3.
-\]
+\label{satz:obere-schranken}
+Für jede potenzielle Vier-Prim-Giuga-Pseudoprimzahl $n = p_1 p_2 p_3 p_4$ gelten
+gleichzeitig:
+\begin{align*}
+  p_4 &\le p_1 p_2 p_3 - 1, \\
+  p_3 &\le p_1 p_2 p_4 - 1, \\
+  p_2 &\le p_1 p_3 p_4 - 1.
+\end{align*}
 \end{theorem}
 
 \begin{proof}
-Aus Bedingung~\eqref{eq:G4}: $p_4 \mid p_1 p_2 p_3 - 1$, also
-$p_4 \le p_1 p_2 p_3 - 1 < p_1 p_2 p_3$.
-Ebenso liefert Bedingung~\eqref{eq:G3} für $p_3$:
-$p_3 \mid p_1 p_2 p_4 - 1$, also $p_3 \le p_1 p_2 p_4 - 1$.
-
-Wir zeigen nun $p_4^2 \le p_1 p_2 p_3$.  Aus Bedingung~\eqref{eq:G4}
-und $p_4 > p_3 > p_2 > p_1$ folgt:
-$p_4 \le p_1 p_2 p_3 - 1 < p_1 p_2 p_3$.
-
-Da alle $p_i$ Primzahlen sind, gilt $p_1 \ge 2$, $p_2 \ge 3$, $p_3 \ge 5$.
-Also $p_1 p_2 p_3 \ge 30$.  Ferner gilt für jedes $i$ aus $p_i \mid n/p_i - 1$
-und der Positivität:
-$p_i \cdot (p_i + 1) \le n/p_i$, also $p_i^2 + p_i \le n/p_i$, d.h.\
-$p_i^3 + p_i^2 \le n$.  Daraus: $p_i^3 \le n = p_1 p_2 p_3 p_4$, also
-$p_i^2 \le n/p_i = \prod_{j \ne i} p_j$.
-
-Für $i = 4$: $p_4^2 \le p_1 p_2 p_3$.
+Jede Giuga-Bedingung $p_i \mid n/p_i - 1$ mit $n/p_i - 1 \ge 1$ liefert
+$p_i \le n/p_i - 1$.  Einsetzen von $n/p_4 = p_1 p_2 p_3$, $n/p_3 = p_1 p_2 p_4$
+und $n/p_2 = p_1 p_3 p_4$ ergibt die drei Ungleichungen direkt.
 \end{proof}
 
+\begin{remark}
+\label{bem:keine-quadratschranke}
+Man könnte vermuten, dass $p_4^2 \le p_1 p_2 p_3$ aus den Giuga-Bedingungen
+folgt, aber dies ist im Allgemeinen falsch.  Zum Beispiel ist $n = 1722 =
+2 \cdot 3 \cdot 7 \cdot 41$ eine Giuga-Zahl mit $p_4 = 41$ und
+$p_1 p_2 p_3 = 42$, also $p_4^2 = 1681 \gg 42 = p_1 p_2 p_3$.  Die korrekte
+obere Schranke aus Bedingung~\eqref{eq:G4} lautet nur $p_4 \le p_1 p_2 p_3 - 1$.
+\end{remark}
+
 \begin{corollary}
-\label{kor:p4wachstum}
-Aus $p_4^2 \le p_1 p_2 p_3 \le p_3^3$ (da $p_1, p_2 \le p_3$) folgt
-$p_4 \le p_3^{3/2}$.  Der größte Primfaktor $p_4$ wächst also höchstens
-wie die $\tfrac{3}{2}$-Potenz von $p_3$.
+\label{kor:groesseschranke}
+Für jede potenzielle Vier-Prim-Giuga-Pseudoprimzahl $n = p_1 p_2 p_3 p_4$ gilt
+\[
+  n \;=\; p_1 p_2 p_3 \cdot p_4 \;\le\; p_1 p_2 p_3 \cdot (p_1 p_2 p_3 - 1)
+  \;<\; (p_1 p_2 p_3)^2.
+\]
+Insbesondere ist $p_1 p_2 p_3 > \sqrt{n}$.
 \end{corollary}
 
 \subsection{Einschränkung durch den kleinsten Primfaktor}
@@ -690,8 +696,10 @@ Vermutung aus dem Jahr 1950 durchgeführt.  Unsere Hauptresultate sind:
   \item Die Totient-Identität $\varphi(n) = n - e_3 + e_2 - e_1 + 1$
         (Satz~\ref{satz:totient}), die die algebraische Struktur des Problems
         beleuchtet.
-  \item Mehrere notwendige arithmetische Einschränkungen, darunter die Schranke
-        $p_4^2 \le p_1 p_2 p_3$ (Satz~\ref{satz:quadratschranke}).
+  \item Mehrere notwendige arithmetische Einschränkungen, darunter die scharfe
+        Schranke $p_4 \le p_1 p_2 p_3 - 1$ (Satz~\ref{satz:p4schranke})
+        und die Größenschranke $n < (p_1 p_2 p_3)^2$
+        (Korollar~\ref{kor:groesseschranke}).
   \item Paritäts- und Kongruenzanalysen, einschließlich der automatischen
         Erfüllung der geraden-Faktor-Bedingung (Satz~\ref{satz:p1auto}).
   \item Computergestützte Nicht-Existenz für $n \le 10^{15}$

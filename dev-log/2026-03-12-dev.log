@@ -798,3 +798,43 @@ BEHOBEN: Ergänzung nach der Formel:
 
 ### Build-Nummer
 - src/build.txt: 150 → 151
+
+=== 2026-03-12 — Build 153 — CRITICAL Bug Fixes Paper 40 (EN + DE) ===
+
+2026-03-12 [Build 153]: Kritische mathematische Korrekturen in Paper 40 (Giuga 4 Primfaktoren)
+
+### Behobene kritische Fehler
+
+**BUG-B11-P40-EN/DE-001 (CRITICAL) — Falsche "Giuga-Identität":**
+- FEHLER: Theorem 4.1 behauptete e₄ - e₃ + e₂ - e₁ + 1 = 0 als
+  Äquivalenzbedingung für Vier-Prim-Giuga-Pseudoprimzahlen.
+- BEWEIS DER FALSCHHEIT: f(1) = ∏(1-pᵢ) = (-1)^4 ∏(pᵢ-1) = φ(n) > 0
+  Das linke Glied ist φ(n) ≠ 0 für alle n > 1.
+- KORREKTUR EN: Theorem 4.1 in "Totient Identity for Four Factors" umgeschrieben.
+  Satz: φ(n) = n - e₃ + e₂ - e₁ + 1 > 0 (algebraisch korrekt).
+  Bemerkung: Die Gleichung = 0 ist algebraisch unmöglich.
+  Das korrekte Kriterium ist das System (G1)-(G4) von Divisibilitätsbedingungen.
+- KORREKTUR DE: Satz 4.1 (satz:totient) war bereits korrekt formuliert;
+  Abstract und Einleitung entsprechend bereinigt.
+
+**BUG-B11-P40-EN/DE-002 (CRITICAL) — Falsche Schranke p₄² ≤ p₁p₂p₃:**
+- FEHLER EN (Theorem 5.3 + Corollary 5.4): Behauptete p₄² ≤ p₁p₂p₃ mit
+  falschem Beweis: pᵢ(pᵢ+1) ≤ n/pᵢ folgt NICHT aus pᵢ | n/pᵢ - 1.
+  Gegenbeispiel: n = 1722 = 2·3·7·41, p₄ = 41, p₁p₂p₃ = 42,
+  also p₄² = 1681 >> 42 = p₁p₂p₃. Die Schranke ist faktisch falsch.
+- FEHLER DE (Satz 5.2 "Obere Schranke durch Quadrat" + Korollar 5.3):
+  Identischer falscher Beweis und falsche Schlussfolgerung.
+- KORREKTUR EN: Theorem "Upper Bounds" auf die korrekte lineare Schranke
+  p₄ ≤ p₁p₂p₃ - 1 reduziert (direkt aus Bedingung G4). Falsches Korollar
+  p₄ ≤ p₃^{3/2} entfernt. Neues Korollar: n < (p₁p₂p₃)² (korrekt).
+  Erklärende Bemerkung zur Nichtexistenz der Quadratschranke hinzugefügt.
+- KORREKTUR DE: Satz 5.2 in "Obere Schranken durch das Produkt" umbenannt.
+  Satz enthält nur die drei korrekt bewiesenen linearen Schranken.
+  Entsprechende Bemerkung und korrektes Korollar hinzugefügt.
+
+### Geänderte Dateien
+- papers/batch11/paper40_giuga_four_primes_en.tex (Abstract, Einleitung, 
+  Section 4, Section 5.2, Conclusion bereinigt)
+- papers/batch11/paper40_giuga_vier_primfaktoren_de.tex (Abstract, Einleitung,
+  Section 5.2, Zusammenfassung bereinigt)
+- src/build.txt: 152 → 153
