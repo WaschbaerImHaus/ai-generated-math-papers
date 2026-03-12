@@ -115,10 +115,10 @@
 - **Problem**: Conclusion: "but S is ergodic" (EN) / "aber S ist ergodisch" (DE) als bewiesene Aussage; im Textkörper korrekt als Vermutung
 - **Behoben**: → "is conjectured to be ergodic" (EN) / "wird vermutet, ergodisch zu sein" (DE)
 
-### BUG-B7-P32-CONCLUSION (Build 122): paper32 EN+DE — "S ergodisch und mischend" als Tatsache
+### BUG-B7-P32-CONCLUSION (Build 122/150): paper32 EN+DE — "S ergodisch und mischend" als Tatsache
 - **Dateien**: papers/reviewed/batch7/paper32_collatz_ergodic_en.tex + paper32_collatz_ergodisch_de.tex
 - **Problem**: Conclusion: "S is ergodic and mixing..." als bewiesene Aussage; alle diese Eigenschaften sind unbewiesen
-- **Behoben**: → "is conjectured to be ergodic and mixing..." (EN+DE)
+- **Behoben (Build 150)**: Konjunktur-Formulierung + "numerical evidence strongly supports this" hinzugefügt (EN+DE)
 
 ### BUG-B7-P31-FURSTENBERG-REF (Build 122): paper31 EN+DE — Falsche Furstenberg-Referenz
 - **Dateien**: papers/reviewed/batch7/paper31_tao_probabilistic_collatz_en.tex + paper31_tao_probabilistischer_ansatz_de.tex
