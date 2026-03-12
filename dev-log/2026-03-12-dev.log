@@ -514,3 +514,30 @@ BUG-6 [NIEDRIG] paper53_differentialgeometrie_de.tex:
 
 ### Build-Nummer
 - src/build.txt: 141 → 142
+
+=== 2026-03-12 14:30 — Build 143 — Paper 61: Theta-Funktionen (EN + DE) ===
+
+2026-03-12 [Build 143]: Zwei vollständige LaTeX-Papers zu Theta-Funktionen
+
+### Neue Dateien
+- papers/batch16/paper61_theta_functions_en.tex (EN, ~9 Seiten, 11 Sections)
+- papers/batch16/paper61_theta_funktionen_de.tex (DE, ~9 Seiten, 11 Sections)
+
+### Inhalt beider Papers
+1. Einleitung/Introduction: Theta-Funktionen als Brücken zwischen Analysis, ZT, Geometrie
+2. Jacobi-Theta-Funktionen ϑ₁,ϑ₂,ϑ₃,ϑ₄ — q-Reihen, Konvergenz, Dreifachprodukt (BEWIESEN)
+3. Transformationsformeln — S: ϑ₃(0|-1/τ)=√(-iτ)·ϑ₃(0|τ), T: ϑ₃→ϑ₄ (BEWIESEN)
+4. Dedekind-Eta η(τ) — Transformationsformeln, Δ=η²⁴ (BEWIESEN)
+5. Theta als Modulformen — ϑ₃²∈M₁(Γ₀(4),χ_{-4}), Gewicht-Berechnung (BEWIESEN)
+6. Quadratische Formen — r_k(n), r₂(n) Jacobi, r₄(n) Vierquadrate (BEWIESEN)
+7. Poisson+ζ — Funktionalgleichung θ(t)=t^{-1/2}θ(1/t) → ξ(s)=ξ(1-s) (BEWIESEN)
+8. Siegel-Theta — Θ_Λ für Gitter Λ⊂ℝⁿ, E₈-Gitter-Beispiel
+9. Elliptische Kurven — Weierstraß ℘ via ϑ₁, j-Invariante via ϑ₂ϑ₃ϑ₄
+10. Ramanujan — Rogers-Ramanujan (BEWIESEN), Mock-Theta+Zwegers 2002 (BEWIESEN)
+11. Literatur — 11 Quellen (Jacobi 1829, Mumford, Whittaker-Watson, Zwegers 2002, ...)
+
+### Korrektheit
+- Alle bewiesenen Sätze explizit markiert (BEWIESEN)
+- Zwegers 2002 als Beweis von Mock-Theta → Harmonic Maass Forms korrekt dargestellt
+- Abstract VOR \maketitle, DE: \newtheorem{theorem}{Satz}[section]
+- Autor: Michael Fuhrmann, Build 142 in \address

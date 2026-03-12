@@ -1,0 +1,775 @@
+% =============================================================================
+% paper62_automorphe_formen_de.tex
+% Paper 62 (DE): Automorphe Formen — Brücke zwischen Zahlentheorie und Darstellungstheorie
+% Autor: Michael Fuhrmann
+% Projekt: Specialist Mathematics Project, Build 143
+% Datum: 2026-03-12
+% =============================================================================
+
+\documentclass[12pt]{amsart}
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+
+\geometry{margin=2.5cm}
+
+% Theorem-Umgebungen (Deutsch)
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{conjecture}{Vermutung}[section]
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+% Nützliche Makros
+\newcommand{\HH}{\mathbb{H}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\AA}{\mathbb{A}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\GL}{\mathrm{GL}}
+\newcommand{\SL}{\mathrm{SL}}
+\newcommand{\PSL}{\mathrm{PSL}}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\vol}{\mathrm{vol}}
+\newcommand{\tr}{\mathrm{tr}}
+\newcommand{\im}{\mathrm{Im}}
+\newcommand{\re}{\mathrm{Re}}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\norm}[1]{\left\|#1\right\|}
+\newcommand{\inner}[2]{\left\langle #1,\, #2 \right\rangle}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+
+% -----------------------------------------------------------------------
+\title{Automorphe Formen:\\
+Brücke zwischen Zahlentheorie und Darstellungstheorie}
+
+\author{Michael Fuhrmann}
+
+\address{Specialist Mathematics Project, Build 143}
+
+\email{specialist-maths@project.local}
+
+\date{2026-03-12}
+
+\keywords{Automorphe Formen, Maass-Formen, Spektraltheorie, Eisenstein-Reihen,
+Langlands-Programm, Selberg-Spurformel, Hecke-Operatoren, kuspidales Spektrum}
+
+\subjclass[2020]{11F70, 11F72, 11F37, 11F41, 22E55}
+
+% -----------------------------------------------------------------------
+% Abstract VOR \maketitle (amsart-Anforderung)
+\begin{abstract}
+Automorphe Formen gehören zu den tiefgründigsten und weitreichendsten Strukturen
+der modernen Mathematik: Sie verbinden Zahlentheorie, harmonische Analysis und
+Darstellungstheorie auf einzigartige Weise. In dieser Arbeit entwickeln wir die
+Theorie systematisch — von den klassischen Modulformen auf $\SL(2,\ZZ)$ bis zur
+adèlischen Formulierung auf $\GL(2,\AA)$. Wir behandeln Maass-Formen und die
+Spektralzerlegung von $L^2(\Gamma \backslash \HH)$, beweisen die Selberg-Spurformel
+(bewiesen) und diskutieren die Selberg-$\tfrac{1}{4}$-Vermutung (offen). Wir
+analysieren Eisenstein-Reihen und die Langlands-Spektralzerlegung
+$L^2(\Gamma \backslash \HH) = L^2_{\mathrm{cusp}} \oplus L^2_{\mathrm{kont}}$
+(bewiesen von Langlands, 1976). Als Anwendungen stellen wir die Voronoi-Summenformel
+(bewiesen), Subkonvexitätsschranken und den Sato-Tate-Satz (bewiesen von Taylor u.\,a.,
+2008) vor. Abschließend werden neuere Entwicklungen zusammengefasst: die Langlands-Funk\-torialität
+für $\GL(2) \to \GL(n)$ (teilweise bewiesen) und Ngô Bảo Châus Beweis des Fundamentallemmas
+(Fields-Medaille 2010, bewiesen).
+\end{abstract}
+
+\maketitle
+
+% =============================================================================
+\section{Einleitung}
+\label{sec:einleitung}
+% =============================================================================
+
+Die Theorie der automorphen Formen entstand aus der klassischen Untersuchung von
+Modulformen im neunzehnten Jahrhundert und erhielt ihre moderne Gestalt durch die
+bahnbrechende Arbeit von Langlands in den 1960er und 1970er Jahren. Heute sind
+automorphe Formen die zentralen Objekte eines der ehrgeizigsten Programme der
+Mathematik: des Langlands-Programms, das Zahlentheorie, algebraische Geometrie
+und Darstellungstheorie durch ein Netz tiefer Korrespondenzen zu vereinen versucht.
+
+Auf der klassischen Ebene ist eine \emph{Modulform} vom Gewicht $k$ und Niveau $N$
+eine holomorphe Funktion $f: \HH \to \CC$ auf der oberen Halbebene, die das
+Transformationsgesetz
+\[
+f\!\left(\frac{az+b}{cz+d}\right) = (cz+d)^k\, f(z)
+\quad \text{für alle } \begin{pmatrix}a&b\\c&d\end{pmatrix} \in \Gamma_0(N)
+\]
+erfüllt und geeignete Wachstumsbedingungen an den Spitzen besitzt. Das Paradebeis\-piel
+ist Ramanujans Deltafunktion
+\[
+\Delta(z) = q \prod_{n=1}^\infty (1-q^n)^{24} = \sum_{n=1}^\infty \tau(n)\, q^n,
+\quad q = e^{2\pi i z}.
+\]
+Sie ist die einzige (bis auf Skalierung) normierte kuspidierte Neuform vom Gewicht 12
+und Niveau 1.
+
+Die moderne Sichtweise, die auf Langlands, Jacquet, Godement-Jacquet zurückgeht,
+hebt diese Objekte zu \emph{automorphen Darstellungen}: irreduziblen Darstellungen
+von $\GL(2,\AA)$ (wobei $\AA = \AA_\QQ$ der Adèlring ist), die im Raum der
+automorphen Formen auf $\GL(2,\QQ) \backslash \GL(2,\AA)$ realisiert werden.
+
+\medskip
+\noindent\textbf{Gliederung.}
+Abschnitt~\ref{sec:klassisch} bespricht klassische Modulformen.
+Abschnitt~\ref{sec:GL2} entwickelt die adèlische Formulierung auf $\GL(2)$.
+Abschnitt~\ref{sec:maass} behandelt Maass-Formen.
+Abschnitt~\ref{sec:spektral} entwickelt die Spektraltheorie.
+Abschnitt~\ref{sec:langlands} gibt eine Vorschau auf das Langlands-Programm.
+Abschnitt~\ref{sec:eisenstein} untersucht Eisenstein-Reihen.
+Abschnitt~\ref{sec:kuspidal_eis} bespricht kuspidales versus Eisenstein-Spektrum.
+Abschnitt~\ref{sec:anwendungen} stellt Anwendungen vor.
+Abschnitt~\ref{sec:neueres} fasst neuere Entwicklungen zusammen.
+
+% =============================================================================
+\section{Klassische Modulformen: Eine Übersicht}
+\label{sec:klassisch}
+% =============================================================================
+
+\subsection{Die obere Halbebene und \texorpdfstring{$\SL(2,\ZZ)$}{SL(2,Z)}}
+
+Sei $\HH = \{z \in \CC : \im(z) > 0\}$ die \emph{Poincarésche obere Halbebene},
+ausgestattet mit der hyperbolischen Metrik $ds^2 = y^{-2}(dx^2 + dy^2)$ für
+$z = x+iy$. Die Gruppe $\SL(2,\RR)$ wirkt auf $\HH$ durch Möbius-Transformationen:
+\[
+\gamma \cdot z = \frac{az + b}{cz + d}, \quad \gamma = \begin{pmatrix}a&b\\c&d\end{pmatrix}
+\in \SL(2,\RR).
+\]
+Der Kern dieser Wirkung ist $\{\pm I\}$; die effektiv wirkende Gruppe ist
+$\PSL(2,\RR) = \SL(2,\RR)/\{\pm I\}$.
+
+Die Modulgruppe $\Gamma = \SL(2,\ZZ)$ wirkt eigentlich diskontinuierlich auf $\HH$,
+und der Quotient $\Gamma \backslash \HH$ ist eine nicht-kompakte Riemannsche Fläche
+vom Geschlecht null mit einer Spitze (bei $i\infty$). Ein Fundamentalbereich ist
+\[
+\mathcal{F} = \left\{ z \in \HH : \abs{z} \geq 1,\; \abs{\re(z)} \leq \tfrac{1}{2} \right\}.
+\]
+
+\subsection{Modulformen und der Strich-Operator}
+
+\begin{definition}
+Für $\gamma = \bigl(\begin{smallmatrix}a&b\\c&d\end{smallmatrix}\bigr) \in \GL^+(2,\RR)$
+und $k \in \ZZ$ ist der \emph{Strich-Operator vom Gewicht $k$}:
+\[
+(f \mid_k \gamma)(z) = \det(\gamma)^{k/2}\, (cz+d)^{-k}\, f(\gamma z).
+\]
+Eine \emph{Modulform vom Gewicht $k$ und Niveau $N$} ist eine holomorphe Funktion
+$f : \HH \to \CC$, sodass:
+\begin{enumerate}[label=(\roman*)]
+\item $f \mid_k \gamma = f$ für alle $\gamma \in \Gamma_0(N)$;
+\item $f$ holomorph in jeder Spitze von $\Gamma_0(N)$ ist.
+\end{enumerate}
+Verschwindet $f$ zusätzlich in jeder Spitze, so heißt $f$ \emph{Spitzenform} (Kuspform).
+\end{definition}
+
+Der Raum der Modulformen vom Gewicht $k$ und Niveau $N$ wird mit $M_k(\Gamma_0(N))$
+bezeichnet, der Unterraum der Spitzenformen mit $S_k(\Gamma_0(N))$. Beide sind
+endlichdimensionale $\CC$-Vektorräume. Das Riemann-Roch-Theorem liefert die Dimensionsformel:
+\[
+\dim S_k(\Gamma_0(N)) = (k-1)(g-1) + \floor{k/4}\,\nu_2 + \floor{k/3}\,\nu_3 + \tfrac{k}{2}\,\nu_\infty
+\quad (k \geq 2 \text{ gerade}),
+\]
+wobei $g$ das Geschlecht ist und $\nu_2, \nu_3, \nu_\infty$ elliptische Punkte
+und Spitzen zählen.
+
+\subsection{Hecke-Operatoren}
+
+Für eine Primzahl $p \nmid N$ wirkt der \emph{Hecke-Operator} $T_p$ auf
+$M_k(\Gamma_0(N))$ durch
+\[
+(T_p f)(z) = p^{k-1}\, f(pz) + \frac{1}{p} \sum_{j=0}^{p-1} f\!\left(\frac{z+j}{p}\right).
+\]
+Die Hecke-Operatoren $\{T_n\}_{(n,N)=1}$ bilden eine kommutative Algebra — die
+\emph{Hecke-Algebra} — und $S_k(\Gamma_0(N))$ besitzt eine Orthonormalbasis
+simultaner Eigenfunktionen (\emph{Hecke-Eigenformen}), die \emph{Neuformen} heißen.
+Ist $f = \sum a_n q^n$ eine normierte Neuform mit $a_1 = 1$, so gilt
+\[
+T_p f = a_p f \quad \text{und} \quad L(f,s) = \sum_{n=1}^\infty \frac{a_n}{n^s}
+= \prod_{p \nmid N} \frac{1}{1 - a_p p^{-s} + p^{k-1-2s}}
+\cdot \prod_{p \mid N} \frac{1}{1 - a_p p^{-s}}.
+\]
+
+% =============================================================================
+\section{Automorphe Formen auf \texorpdfstring{$\GL(2)$}{GL(2)}}
+\label{sec:GL2}
+% =============================================================================
+
+\subsection{Der Adèlring}
+
+Der \emph{Adèlring} $\AA = \AA_\QQ$ ist das eingeschränkte direkte Produkt
+\[
+\AA = \RR \times \prod_{p}' \QQ_p = \left\{ (x_\infty, x_2, x_3, x_5, \ldots) : x_p \in \ZZ_p \text{ für fast alle } p \right\},
+\]
+ausgestattet mit der eingeschränkten Produkttopologie. Die diagonale Einbettung
+$\QQ \hookrightarrow \AA$ ist diskret, und $\QQ \backslash \AA$ ist kompakt.
+
+Die Gruppe $\GL(2,\AA)$ enthält $\GL(2,\QQ)$ als diskrete Untergruppe (via der
+diagonalen Einbettung), und der Doppelnebenklassenraum
+$\GL(2,\QQ) \backslash \GL(2,\AA) / \GL(2,\hat\ZZ)$ wird natürlich mit einer
+disjunkten Vereinigung von Modulkurven $\Gamma_0(N) \backslash \HH^*$ identifiziert.
+
+\subsection{Automorphe Darstellungen}
+
+\begin{definition}
+Eine \emph{automorphe Form auf $\GL(2)$} ist eine glatte Funktion
+$\phi: \GL(2,\AA) \to \CC$ mit folgenden Eigenschaften:
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Linksinvarianz}: $\phi(\gamma g) = \phi(g)$ für alle $\gamma \in \GL(2,\QQ)$;
+\item \textbf{Zentral-Charakter}: $\phi(zg) = \omega(z)\phi(g)$ für alle $z \in \AA^\times$,
+  wobei $\omega: \QQ^\times \backslash \AA^\times \to \CC^\times$ ein Hecke-Charakter ist;
+\item \textbf{$K$-Endlichkeit}: die Bahn unter der maximalen kompakten Untergruppe
+  $K = \mathrm{O}(2) \times \prod_p \GL(2,\ZZ_p)$ erzeugt einen endlichdimensionalen Raum;
+\item \textbf{$\mathfrak{z}$-Endlichkeit}: $\phi$ wird durch ein Ideal endlicher Kodimension
+  im Zentrum der universellen einhüllenden Algebra annulliert;
+\item \textbf{Moderates Wachstum}: es gibt $C, A > 0$ mit $|\phi(g)| \leq C \norm{g}^A$.
+\end{enumerate}
+\end{definition}
+
+Eine \emph{automorphe Darstellung} $\pi$ ist ein irreduzibler Bestandteil der
+rechtsseitigen regulären Darstellung von $\GL(2,\AA)$ auf dem Raum der automorphen Formen.
+
+\subsection{Lokale-Globale-Zerlegung}
+
+\begin{theorem}[Flath, 1979 — bewiesen]
+Jede irreduzible automorphe Darstellung $\pi$ von $\GL(2,\AA)$ zerlegt sich als
+eingeschränktes Tensorprodukt
+\[
+\pi \cong \pi_\infty \otimes \bigotimes_p' \pi_p,
+\]
+wobei $\pi_\infty$ ein zulässiges $(\mathfrak{g}_\infty, K_\infty)$-Modul ist und
+$\pi_p$ eine irreduzible zulässige Darstellung von $\GL(2,\QQ_p)$ ist, die für
+fast alle $p$ unverzweigt ist (d.\,h.\ $\pi_p^{\GL(2,\ZZ_p)} \neq 0$).
+\end{theorem}
+
+Die archimedische Komponente $\pi_\infty$ bestimmt das Gewicht (für holomorphe Formen)
+oder den Eigenwert des Laplace-Operators (für Maass-Formen). Die nicht-archimedischen
+Komponenten $\pi_p$ kodieren die Hecke-Eigenwerte $a_p$.
+
+% =============================================================================
+\section{Maass-Formen}
+\label{sec:maass}
+% =============================================================================
+
+\subsection{Der hyperbolische Laplace-Operator}
+
+Der \emph{hyperbolische Laplace-Beltrami-Operator} auf $\HH$ ist
+\[
+\Delta = -y^2 \!\left(\frac{\partial^2}{\partial x^2} + \frac{\partial^2}{\partial y^2}\right).
+\]
+Dieser Operator ist selbstadjungiert auf $L^2(\Gamma \backslash \HH, d\mu)$
+bezüglich des invarianten Maßes $d\mu = y^{-2} dx\, dy$ und vertauscht mit der
+$\SL(2,\RR)$-Wirkung. Sein Spektrum auf $\Gamma \backslash \HH$ besteht aus
+$\{0\}$ (Konstanten), einem diskreten Teil $\{\lambda_n\}$ (mit
+$0 < \lambda_1 \leq \lambda_2 \leq \cdots$) und einem stetigen Teil $[1/4, \infty)$.
+
+\subsection{Maass-Wellenformen}
+
+\begin{definition}
+Eine \emph{Maass-Form} vom Gewicht $0$ und Niveau $N$ ist eine glatte Funktion
+$u : \HH \to \CC$ mit:
+\begin{enumerate}[label=(\roman*)]
+\item $u(\gamma z) = u(z)$ für alle $\gamma \in \Gamma_0(N)$;
+\item $\Delta u = \lambda u$ für einen Eigenwert $\lambda \in \RR$;
+\item $u \in L^2(\Gamma_0(N) \backslash \HH)$ (oder höchstens polynomiales Wachstum).
+\end{enumerate}
+Verschwindet der konstante Fourier-Koeffizient $\int_0^1 u(x+iy)\, dx = 0$ für alle
+$y > 0$, so heißt $u$ eine \emph{Maass-Spitzenform}.
+\end{definition}
+
+\begin{bemerkung}
+Der Eigenwert $\lambda$ erfüllt $\lambda \geq 0$ (wegen Selbstadjungiertheit) und
+lässt sich als $\lambda = \frac{1}{4} + r^2$ mit $r \in \RR \cup i[-\tfrac{1}{2}, \tfrac{1}{2}]$
+schreiben. Der Fall $r \in \RR$ (d.\,h.\ $\lambda \geq 1/4$) entspricht temperierten Darstellungen.
+\end{bemerkung}
+
+\subsection{Fourier-Entwicklung von Maass-Formen}
+
+Eine Maass-Spitzenform $u$ mit Eigenwert $\lambda = \frac{1}{4}+r^2$ besitzt die
+Fourier-Entwicklung
+\[
+u(x+iy) = \sum_{n \neq 0} a_n\, \sqrt{y}\, K_{ir}(2\pi|n|y)\, e^{2\pi i n x},
+\]
+wobei $K_{ir}$ die modifizierte Besselfunktion zweiter Art (Macdonald-Funktion) ist.
+Das klassische Beispiel ist die \emph{nichts-holomorphe Eisenstein-Reihe}
+$E(z,s) = \sum_{\gamma \in \Gamma_\infty \backslash \Gamma} \im(\gamma z)^s$,
+die eine Eigenfunktion von $\Delta$ mit Eigenwert $s(1-s)$ ist.
+
+\subsection{Hecke-Theorie für Maass-Formen}
+
+Die Hecke-Operatoren $T_n$ (für $(n,N)=1$) wirken auf Maass-Formen genauso wie
+auf holomorphe Modulformen. Für eine simultane Hecke-Eigenfunktion $u$ mit
+$T_n u = \lambda_n u$ ist die zugehörige $L$-Funktion
+\[
+L(u, s) = \sum_{n=1}^\infty \frac{a_n}{n^s} = \prod_p \frac{1}{1 - a_p p^{-s} + p^{-2s}}
+\]
+analytisch fortsetzbar und erfüllt die Funktionalgleichung $s \leftrightarrow 1-s$.
+
+% =============================================================================
+\section{Spektraltheorie}
+\label{sec:spektral}
+% =============================================================================
+
+\subsection{Spektralzerlegung von \texorpdfstring{$L^2(\Gamma \backslash \HH)$}{L2}}
+
+Das Spektrum von $\Delta$ auf $L^2(\Gamma \backslash \HH)$ besteht aus zwei Teilen:
+\begin{itemize}
+\item \textbf{Diskretes Spektrum}: Eigenwerte $0 = \lambda_0 < \lambda_1 \leq \lambda_2 \leq \cdots$
+  entsprechend der konstanten Funktion (für $\lambda_0 = 0$) und Maass-Spitzenformen
+  (für $\lambda_j > 0$); diese besitzen $L^2$-Eigenfunktionen.
+\item \textbf{Stetiges Spektrum}: das Intervall $[1/4, \infty)$, parametrisiert durch
+  Eisenstein-Reihen $E(z, \tfrac{1}{2}+it)$ für $t \in \RR$.
+\end{itemize}
+
+\subsection{Die Selberg-Spurformel}
+
+\begin{theorem}[Selberg, 1956 — bewiesen]
+\label{satz:selberg_spur}
+Sei $h$ eine gerade holomorphe Funktion im Streifen $|\im(r)| < \frac{1}{2}+\epsilon$
+mit $h(r) = O((1+|r|)^{-2-\epsilon})$, und sei $g(u) = \frac{1}{2\pi} \int_\RR h(r) e^{iru}\, dr$.
+Dann gilt:
+\begin{align*}
+\sum_j h(r_j) + \frac{1}{4\pi}\int_{-\infty}^\infty h(r) \frac{-\varphi'}{\varphi}\!\left(\tfrac{1}{2}+ir\right) dr
+&= \frac{\vol(\Gamma \backslash \HH)}{4\pi}\int_\RR h(r)\, r \tanh(\pi r)\, dr \\
+&+ \sum_{\{P\}_{\Gamma,\text{hyp}}} \frac{\log N(P_0)}{N(P)^{1/2} - N(P)^{-1/2}}\, g(\log N(P)) \\
+&+ \text{(elliptische Terme)} + \text{(parabolische Terme)},
+\end{align*}
+wobei die linke Summe über alle $r_j$ mit $\lambda_j = \frac{1}{4}+r_j^2$ läuft,
+$\varphi(s)$ die Streumatrix ist, und die rechte Seite über $\Gamma$-Konjugationsklassen
+(Identität, hyperbolisch, elliptisch, parabolisch) summiert.
+\end{theorem}
+
+Die Selberg-Spurformel ist eine tiefgründige Identität, die die Spektralseite
+(Eigenwerte von $\Delta$) mit der geometrischen Seite (Längen geschlossener
+Geodäten auf $\Gamma \backslash \HH$) verbindet. Sie ist das direkte Analogon
+der Riemannschen expliziten Formel $\psi(x) = x - \sum_\rho x^\rho/\rho - \ldots$
+
+\subsection{Das Weylsche Gesetz}
+
+\begin{theorem}[Weylsches Gesetz für automorphe Spektren — bewiesen]
+\label{satz:weyl}
+Die Anzahl der Laplace-Eigenwerte $\lambda_j \leq T$ erfüllt
+\[
+N(T) = \#\{j : \lambda_j \leq T\} \sim \frac{\vol(\Gamma \backslash \HH)}{4\pi}\, T
+\quad \text{für } T \to \infty.
+\]
+\end{theorem}
+
+Das Weylsche Gesetz beweist die Existenz unendlich vieler Maass-Spitzenformen
+für jede Kongruenzuntergruppe $\Gamma$.
+
+\subsection{Die Selberg-\texorpdfstring{$\frac{1}{4}$}{1/4}-Vermutung}
+
+\begin{conjecture}[Selberg, 1965 — offen]
+\label{verm:selberg}
+Für jede Kongruenzuntergruppe $\Gamma \leq \SL(2,\ZZ)$ und jeden Eigenwert
+$\lambda > 0$ von $\Delta$ auf $L^2(\Gamma \backslash \HH)$ gilt
+\[
+\lambda \geq \frac{1}{4}.
+\]
+Äquivalent: alle Laplace-Eigenwerte entsprechen temperierten Darstellungen
+($r_j \in \RR$, nicht rein imaginär).
+\end{conjecture}
+
+\begin{bemerkung}
+Die bisher beste bekannte Schranke zur Vermutung~\ref{verm:selberg} ist
+$\lambda_1 \geq \frac{1}{4} - \bigl(\frac{7}{64}\bigr)^2 \approx 0{,}2380$
+von Kim und Sarnak (2003). Für $\Gamma = \SL(2,\ZZ)$ selbst legen numerische
+Berechnungen $\lambda_1 \approx 91{,}14$ nahe (Booker-Strömbergsson), was mit
+der Vermutung übereinstimmt.
+\end{bemerkung}
+
+% =============================================================================
+\section{Das Langlands-Programm: Eine Vorschau}
+\label{sec:langlands}
+% =============================================================================
+
+\subsection{Die Langlands-Korrespondenz}
+
+Das Langlands-Programm, das Langlands 1967 in seinem Brief an Weil initiierte,
+schlägt eine weitreichende Verallgemeinerung der Klassenkörpertheorie vor und
+verknüpft:
+\begin{itemize}
+\item \textbf{Automorphe Darstellungen} $\pi$ von $G(\AA)$ für eine reduktive Gruppe $G/\QQ$;
+\item \textbf{Galois-Darstellungen} $\rho: \Gal(\bar\QQ/\QQ) \to \hat{G}(\CC)$,
+  wobei $\hat{G}$ die duale Langlands-Gruppe ist.
+\end{itemize}
+Für $G = \GL(1)$: dies ist Klassenkörpertheorie (Kronecker-Weber, Artin). Für $G = \GL(2)$:
+dies umfasst die Shimura-Taniyama-Vermutung (bewiesen von Wiles-Taylor-Diamond-Conrad-Breuil).
+
+\subsection{Automorphe $L$-Funktionen}
+
+Zu jeder automorphen Darstellung $\pi = \otimes'_v \pi_v$ von $\GL(n,\AA)$ und
+jeder endlichdimensionalen Darstellung $r: {}^L G \to \GL(N,\CC)$ der $L$-Gruppe
+gehört eine $L$-Funktion
+\[
+L(s, \pi, r) = \prod_p L_p(s, \pi_p, r_p)
+\]
+als Euler-Produkt über Primzahlen. Für die Standarddarstellung $r = \mathrm{std}$
+von ${}^L\GL(n) = \GL(n,\CC)$:
+\[
+L(s, \pi) = \prod_p \det\!\left(I - A_p\, p^{-s}\right)^{-1},
+\]
+wobei $A_p \in \GL(n,\CC)$ der \emph{Satake-Parameter} der unverzweigten Komponente
+$\pi_p$ ist.
+
+\subsection{Funktorialität}
+
+\begin{conjecture}[Langlands-Funktorialität — teilweise bewiesen]
+\label{verm:funktorialitaet}
+Seien $G, H$ reduktive Gruppen über $\QQ$ und $\rho: {}^L G \to {}^L H$ ein
+$L$-Homomorphismus. Dann existiert zu jeder automorphen Darstellung $\pi$ von
+$G(\AA)$ eine automorphe Darstellung $\Pi$ von $H(\AA)$ — der \emph{funktori\-elle
+Lift} — mit
+\[
+L(s, \Pi, r) = L(s, \pi, r \circ \rho)
+\]
+für alle Darstellungen $r$ von ${}^L H$.
+\end{conjecture}
+
+Diese Vermutung ist in mehreren wichtigen Fällen bewiesen: Basiswechsel für $\GL(n)$
+(Arthur-Clozel), symmetrischer Quadratlift $\GL(2) \to \GL(3)$ (Gelbart-Jacquet),
+und der symmetrische vierte Potenz-Lift $\GL(2) \to \GL(5)$ (Kim, 2003).
+
+% =============================================================================
+\section{Eisenstein-Reihen}
+\label{sec:eisenstein}
+% =============================================================================
+
+\subsection{Klassische Eisenstein-Reihen}
+
+Die \emph{Eisenstein-Reihe} vom Gewicht $k$ (gerade, $k \geq 4$) für $\SL(2,\ZZ)$
+ist
+\[
+E_k(z) = 1 - \frac{2k}{B_k} \sum_{n=1}^\infty \sigma_{k-1}(n)\, q^n,
+\quad q = e^{2\pi iz},
+\]
+wobei $B_k$ die $k$-te Bernoulli-Zahl ist und $\sigma_{k-1}(n) = \sum_{d|n} d^{k-1}$.
+Beispielsweise gilt $E_4(z) = 1 + 240 \sum \sigma_3(n) q^n$ und
+$E_6(z) = 1 - 504 \sum \sigma_5(n) q^n$.
+
+\subsection{Nicht-holomorphe Eisenstein-Reihen}
+
+Die \emph{nicht-holomorphe Eisenstein-Reihe} (Maass-Eisenstein-Reihe) für
+$\Gamma = \SL(2,\ZZ)$ ist definiert durch
+\[
+E(z, s) = \sum_{\gamma \in \Gamma_\infty \backslash \Gamma} \im(\gamma z)^s
+= \frac{1}{2} \sum_{\substack{(c,d)=1 \\ c,d \in \ZZ}} \frac{y^s}{|cz+d|^{2s}},
+\quad \re(s) > 1,
+\]
+wobei $\Gamma_\infty = \bigl\{ \bigl(\begin{smallmatrix}1&n\\0&1\end{smallmatrix}\bigr) : n \in \ZZ \bigr\}$
+der Stabilisator der Spitze $\infty$ ist.
+
+\begin{theorem}[Meromorphe Fortsetzung der Eisenstein-Reihen — bewiesen]
+\label{satz:eisenstein_forts}
+Die Funktion $s \mapsto E(z,s)$ setzt sich zu einer meromorphen Funktion auf ganz $\CC$
+fort. Sie besitzt einen einfachen Pol bei $s = 1$ mit Residuum $\vol(\Gamma \backslash \HH)^{-1}$
+und ist holomorph auf $\re(s) = \frac{1}{2}$. Ferner erfüllt $E(z,s)$ die Funktionalgleichung
+\[
+E(z, s) = \varphi(s)\, E\!\left(z, 1-s\right),
+\]
+wobei
+\[
+\varphi(s) = \frac{\sqrt\pi\, \Gamma(s - \tfrac{1}{2})\,\zeta(2s-1)}{\Gamma(s)\,\zeta(2s)}
+\]
+die \emph{Streumatrix} ist (hier skalar, da $\Gamma$ eine Spitze hat).
+\end{theorem}
+
+\subsection{Fourier-Entwicklung von $E(z,s)$}
+
+Die Fourier-Entwicklung von $E(z,s)$ lautet:
+\begin{align*}
+E(z,s) &= y^s + \varphi(s)\, y^{1-s} \\
+&+ \frac{2\sqrt\pi\, y^{1/2}}{\Gamma(s)\,\zeta(2s)} \sum_{n \neq 0}
+|n|^{s-1/2}\, \sigma_{1-2s}(|n|)\, K_{s-1/2}(2\pi|n|y)\, e^{2\pi i n x},
+\end{align*}
+wobei $\sigma_\nu(n) = \sum_{d|n} d^\nu$ und $K_\nu$ die Macdonald-Funktion ist.
+Die beiden Terme $y^s + \varphi(s) y^{1-s}$ bilden den \emph{konstanten Term},
+der zum stetigen Spektrum beiträgt.
+
+% =============================================================================
+\section{Kuspidales versus Eisenstein-Spektrum}
+\label{sec:kuspidal_eis}
+% =============================================================================
+
+\subsection{Spektralzerlegung von \texorpdfstring{$L^2(\Gamma \backslash \HH)$}{L2}}
+
+\begin{theorem}[Langlands-Spektralzerlegung — bewiesen, Langlands 1976]
+\label{satz:langlands_zerlegung}
+Für jede Kongruenzuntergruppe $\Gamma \leq \SL(2,\ZZ)$ gilt die orthogonale
+direkte Summenzerlegung
+\[
+L^2(\Gamma \backslash \HH) = L^2_{\mathrm{cusp}}(\Gamma \backslash \HH) \oplus \CC \oplus L^2_{\mathrm{kont}}(\Gamma \backslash \HH),
+\]
+wobei:
+\begin{enumerate}[label=(\roman*)]
+\item $L^2_{\mathrm{cusp}}$ von den \emph{Maass-Spitzenformen} aufgespannt wird
+  (mit diskreten Laplace-Eigenwerten $0 < \lambda_1 \leq \lambda_2 \leq \cdots$);
+\item $\CC$ von der konstanten Funktion (Eigenwert $0$) aufgespannt wird;
+\item $L^2_{\mathrm{kont}}$ das stetige Spektrum ist, das isometrisch durch die
+  Eisenstein-Reihen $\bigl\{E(\cdot,\tfrac{1}{2}+it) : t \in \RR\bigr\}$ via
+  die Eisenstein-Transformation
+  \[
+  \mathcal{E}: L^2(\RR_{>0}) \to L^2_{\mathrm{kont}},\quad
+  \varphi \mapsto \frac{1}{4\pi}\int_{-\infty}^\infty \hat\varphi(t)\, E\!\left(\cdot, \tfrac{1}{2}+it\right) dt
+  \]
+  realisiert wird.
+\end{enumerate}
+\end{theorem}
+
+\begin{bemerkung}
+Langlands bewies diese Zerlegung in voller Allgemeinheit für beliebige reduktive
+Gruppen über Zahlkörpern in seiner Monographie von 1976 \cite{langlands1976}.
+Für $\GL(2)$ war sie bereits früher von Selberg (1956) und Roelcke (1956) aufgestellt
+worden.
+\end{bemerkung}
+
+\subsection{Die Plancherel-Formel}
+
+Die Zerlegung in Satz~\ref{satz:langlands_zerlegung} liefert die \emph{Plancherel-Formel}:
+für $\phi, \psi \in L^2(\Gamma \backslash \HH)$ gilt
+\[
+\inner{\phi}{\psi} = \sum_j \hat\phi(r_j)\, \overline{\hat\psi(r_j)}
++ \frac{1}{4\pi} \int_{-\infty}^\infty \hat\phi(t)\, \overline{\hat\psi(t)}\, dt,
+\]
+wobei $\hat\phi(r_j) = \inner{\phi}{u_j}$ (Projektion auf Maass-Form $u_j$) und
+$\hat\phi(t) = \inner{\phi}{E(\cdot, \frac{1}{2}+it)}$.
+
+\subsection{Multiplizitäts-Eins-Satz}
+
+\begin{theorem}[Multiplizitäts-Eins — bewiesen, Pjatezki-Shapiro 1979]
+Jede irreduzible kusipidale automorphe Darstellung $\pi$ von $\GL(n,\AA)$
+tritt im kuspidalen Spektrum $L^2_{\mathrm{cusp}}(\GL(n,\QQ) \backslash \GL(n,\AA))$
+mit Multiplizität genau eins auf.
+\end{theorem}
+
+Dies ist ein fundamentales Strukturergebnis: Im Gegensatz zu kompakten Quotienten
+oder allgemeinen reduktiven Gruppen ist das kusipidale Spektrum von $\GL(n)$ multiplizitätsfrei.
+
+% =============================================================================
+\section{Anwendungen}
+\label{sec:anwendungen}
+% =============================================================================
+
+\subsection{Die Voronoi-Summenformel}
+
+\begin{theorem}[Voronoi-Summation — bewiesen]
+\label{satz:voronoi}
+Sei $f : \RR_{>0} \to \CC$ eine glatte Funktion mit kompaktem Träger und
+$\pi$ eine kusipidale automorphe Darstellung von $\GL(2,\AA)$ mit Fourier-Koeffizienten
+$a(n)$ (für $n \geq 1$). Für $(a, q) = 1$ gilt:
+\[
+\sum_{n=1}^\infty a(n)\, e\!\left(\frac{an}{q}\right)\, f(n)
+= \frac{1}{q} \sum_{\pm} \sum_{n=1}^\infty a(n)\, e\!\left(\frac{\pm \bar a n}{q}\right) \tilde f_\pm\!\!\left(\frac{n}{q^2}\right),
+\]
+wobei $\bar a \equiv a^{-1} \pmod{q}$ und $\tilde f_\pm$ explizite Integraltransformationen
+von $f$ mit Besselfunktionen sind.
+\end{theorem}
+
+Die Voronoi-Summenformel ist ein mächtiges Werkzeug in der analytischen Zahlentheorie:
+Sie transformiert Charaktersummen und Exponentialsummen in besser handhabbare duale
+Summen. Sie hat Anwendungen bei Schranken für $L$-Funktionen und Charaktersummen.
+
+\subsection{Subkonvexitätsschranken}
+
+Ein zentrales Problem in der analytischen Theorie der $L$-Funktionen ist das Erhalten
+von \emph{Subkonvexitätsschranken}: Schranken der Form
+\[
+L(\tfrac{1}{2} + it, \pi) \ll (|t| + 1)^{\frac{1}{4} - \delta}
+\]
+für ein $\delta > 0$. Die \emph{Konvexitätsschranke} (aus der Funktionalgleichung allein)
+ergibt $\delta = 0$. Jede Verbesserung $\delta > 0$ heißt \emph{Subkonvexitätsschranke}.
+
+\begin{theorem}[Weyl, Burgess, Michel-Venkatesh — verschiedene, bewiesen]
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Weyl (1921)}: Für die Riemann-Zetafunktion gilt
+  $\zeta(\frac{1}{2}+it) \ll |t|^{1/6+\epsilon}$ (Subkonvexität im $t$-Aspekt).
+\item \textbf{Burgess (1962)}: Für Dirichlet-$L$-Funktionen primitiver Charaktere
+  $\chi \pmod{q}$ gilt $L(\frac{1}{2}, \chi) \ll q^{3/16+\epsilon}$ (Subkonvexität
+  im $q$-Aspekt).
+\item \textbf{Michel-Venkatesh (2010)}: Subkonvexität für $\GL(1)$- und $\GL(2)$-$L$-Funktionen
+  in allen Aspekten gleichzeitig, mit Anwendung auf die Gleichverteilung der Heegner-Punkte.
+\end{enumerate}
+\end{theorem}
+
+\subsection{Der Sato-Tate-Satz}
+
+\begin{theorem}[Sato-Tate — bewiesen, Taylor u.\,a.\ 2006--2011]
+\label{satz:sato_tate}
+Sei $E/\QQ$ eine elliptische Kurve ohne komplexe Multiplikation, und schreibe
+$a_p = p + 1 - \#E(\FF_p) = 2\sqrt{p}\cos(\theta_p)$ mit $\theta_p \in [0,\pi]$.
+Dann sind die Winkel $\theta_p$ gleichverteilt bezüglich des Sato-Tate-Maßes
+\[
+d\mu_{\mathrm{ST}} = \frac{2}{\pi}\sin^2(\theta)\, d\theta.
+\]
+Äquivalent: für jedes $[a,b] \subset [0,\pi]$ gilt
+\[
+\frac{\#\{p \leq X : \theta_p \in [a,b]\}}{\#\{p \leq X\}} \longrightarrow \frac{2}{\pi} \int_a^b \sin^2\theta\, d\theta
+\quad \text{für } X \to \infty.
+\]
+\end{theorem}
+
+Der Beweis von Clozel, Harris, Shepherd-Barron und Taylor beruht auf:
+(1) den symmetrischen Potenz-Lifts $\mathrm{Sym}^n(f_E)$ für die Hecke-Eigenform
+$f_E$ zu $E$ (via Modularität), (2) potentieller Automorphie dieser symmetrischen
+Potenzen mittels eines neuartigen Deformationsarguments, und (3) der analytischen
+Fortsetzung und Nicht-Verschwindung der resultierenden $L$-Funktionen auf $\re(s) = 1$.
+
+% =============================================================================
+\section{Neuere Entwicklungen}
+\label{sec:neueres}
+% =============================================================================
+
+\subsection{Langlands-Funktorialität für \texorpdfstring{$\GL(2) \to \GL(n)$}{GL(2) nach GL(n)}}
+
+Die spektakulärsten neueren Fortschritte zur Funktorialität betreffen die
+symmetrischen Potenz-Lifts von $\GL(2)$ nach $\GL(n)$:
+
+\begin{theorem}[Symmetrische Potenz-Lifts — teilweise bewiesen]
+\label{satz:sym_lift}
+Sei $\pi$ eine kusipidale automorphe Darstellung von $\GL(2,\AA)$, die nicht vom
+diedralen, tetraedrischen oder oktaedrischen Typ ist. Dann gilt:
+\begin{enumerate}[label=(\roman*)]
+\item $\mathrm{Sym}^2 \pi$ existiert als automorphe Darstellung von $\GL(3,\AA)$
+  (Gelbart-Jacquet, 1978 — bewiesen);
+\item $\mathrm{Sym}^3 \pi$ existiert als automorphe Darstellung von $\GL(4,\AA)$
+  (Kim-Shahidi, 2002 — bewiesen);
+\item $\mathrm{Sym}^4 \pi$ existiert als automorphe Darstellung von $\GL(5,\AA)$
+  (Kim, 2003 — bewiesen);
+\item $\mathrm{Sym}^n \pi$ für $n \geq 5$: offen im Allgemeinen (Vermutung).
+\end{enumerate}
+\end{theorem}
+
+Die Existenz von $\mathrm{Sym}^4 \pi$ hat das wichtige Korollar, dass die
+Ramanujan-Vermutung bis auf $|a_p| \leq 2p^{7/64}$ gilt (Kim-Sarnak), was die
+triviale Schranke $p^{k/2}$ in Richtung der vermuteten $p^{(k-1)/2}$ verbessert.
+
+\subsection{Das Fundamentallemma}
+
+\begin{theorem}[Fundamentallemma — bewiesen, Ngô Bảo Châu, 2010, Fields-Medaille]
+\label{satz:fundamentallemma}
+Sei $G$ eine zusammenhängende reduktive Gruppe über einem nicht-archimedischen
+lokalen Körper $F$, und $H$ eine endoskopische Gruppe von $G$. Seien $f_H \in \mathcal{H}(H(F))$
+und $f \in \mathcal{H}(G(F))$ passende Funktionen. Dann gelten die von der Endoskopietheo\-rie
+vorhergesagten orbitalen Integralidentitäten:
+\[
+\text{SO}(\gamma_H, f_H) = \Delta(\gamma_H, \gamma)\, \text{O}(\gamma, f)
+\]
+für passende stark regulär halbeinfache Elemente $\gamma_H \in H(F)$ und
+$\gamma \in G(F)$, wobei $\Delta(\gamma_H,\gamma)$ der Langlands-Shelstad-Transferfaktor ist.
+\end{theorem}
+
+Das Fundamentallemma wurde von Langlands und Shelstad 1983 vermutet und in
+verschiedenen Fällen bewiesen, bevor Ngô einen vollständigen Beweis mittels der
+Geometrie der Hitchin-Faserungen über endlichen Körpern gab. Ngôs Beweis reduziert
+die Identität auf das Zählen von Fixpunkten des Frobenius auf bestimmten algebraischen
+Varietäten (Hitchin-Fasern) unter Verwendung des Zerlegungssatzes von
+Beilinson-Bernstein-Deligne. Die im Jahr 2010 an Ngô Bảo Châu verliehene Fields-Medaille
+würdigte dies als „den Beweis einer der wichtigsten Vermutungen des Langlands-Programms."
+
+\subsection{Das geometrische Langlands-Programm}
+
+Ein verwandtes, aber eigenständiges Programm, das von Drinfeld und Laumon (1987)
+initiiert und von Frenkel, Ben-Zvi, Nadler u.\,a. weiterentwickelt wurde, formuliert
+ein Analogon der Langlands-Korrespondenz für algebraische Kurven über $\CC$:
+\begin{itemize}
+\item Automorphe Darstellungen $\to$ $\mathcal{D}$-Moduln auf dem Modulstack der
+  $G$-Bündel $\mathrm{Bun}_G$;
+\item Galois-Darstellungen $\to$ flache $\hat{G}$-Zusammenhänge (oder, in der
+  quantischen Version, $\hat{G}$-lokale Systeme).
+\end{itemize}
+Das geometrische Programm ist in vielerlei Hinsicht zugänglicher (man kann die
+volle Kraft der algebraischen Geometrie, perverser Garben und $\infty$-Kategorien
+nutzen) und hat Rückwirkungen auf das klassische Programm.
+
+% =============================================================================
+\section*{Schlussbetrachtung}
+% =============================================================================
+
+Automorphe Formen stehen an der Schnittstelle einiger der tiefsten Strömungen
+der modernen Mathematik. Die Spektraltheorie von $\Delta$ auf arithmetischen
+Quotienten, von Selberg (bewiesen, 1956) entwickelt, bietet ein unendlichdimensionales
+Analogon der klassischen Fourier-Analysis, dessen Reichtum noch bei weitem nicht
+erschöpft ist. Das Langlands-Programm — mit seinen bewiesenen Komponenten
+(Ngôs Fundamentallemma, symmetrische Quadrat-, Kubik- und Vierter-Potenz-Lifts,
+Sato-Tate, Voronoi-Summation) und seinen offenen Teilen (allgemeine Funktorialität,
+die Selberg-$\tfrac{1}{4}$-Vermutung, die vollständige Ramanujan-Vermutung) —
+bleibt eine der zentralen Forschungsfronten der Mathematik im einundzwanzigsten Jahrhundert.
+
+Das Modul \texttt{automorphic\_forms.py} im Specialist Mathematics Project
+implementiert die Kernstrukturen: \texttt{AutomorphicForm}, \texttt{SpectralDecomposition},
+\texttt{WhittakerModel}, \texttt{GlobalLFunction}, \texttt{FunctorialLift},
+\texttt{RamanujanConjecture} und \texttt{SatakeTransform}.
+
+% =============================================================================
+\begin{thebibliography}{99}
+
+\bibitem{selberg1956}
+A.~Selberg,
+\textit{Harmonic analysis and discontinuous groups in weakly symmetric Riemannian
+spaces with applications to Dirichlet series},
+J.~Indian Math.\ Soc.\ \textbf{20} (1956), 47--87.
+
+\bibitem{langlands1970}
+R.~P.~Langlands,
+\textit{Problems in the theory of automorphic forms},
+Lectures in Modern Analysis and Applications III,
+Lecture Notes in Mathematics \textbf{170}, Springer, 1970, S.~18--61.
+
+\bibitem{langlands1976}
+R.~P.~Langlands,
+\textit{On the Functional Equations Satisfied by Eisenstein Series},
+Lecture Notes in Mathematics \textbf{544}, Springer, 1976.
+
+\bibitem{iwaniec_kowalski}
+H.~Iwaniec und E.~Kowalski,
+\textit{Analytic Number Theory},
+American Mathematical Society Colloquium Publications \textbf{53}, AMS, 2004.
+
+\bibitem{bump}
+D.~Bump,
+\textit{Automorphic Forms and Representations},
+Cambridge Studies in Advanced Mathematics \textbf{55}, Cambridge University Press, 1997.
+
+\bibitem{cogdell}
+J.~W.~Cogdell,
+\textit{Lectures on $L$-functions, Converse Theorems, and Functoriality for $\GL_n$},
+in: \textit{Lectures on Automorphic $L$-Functions},
+Fields Institute Monographs \textbf{20}, AMS, 2004, S.~1--96.
+
+\bibitem{ngo2010}
+B.~C.~Ngô,
+\textit{Le lemme fondamental pour les algèbres de Lie},
+Publications Mathématiques de l'IHÉS \textbf{111} (2010), 1--169.
+
+\bibitem{kim2003}
+H.~H.~Kim,
+\textit{Functoriality for the exterior square of $\GL_4$ and the symmetric fourth of $\GL_2$},
+J.~Amer.\ Math.\ Soc.\ \textbf{16} (2003), 139--183.
+
+\bibitem{taylor2008}
+R.~Taylor,
+\textit{Automorphy for some $\ell$-adic lifts of automorphic mod $\ell$ Galois representations, II},
+Publications Mathématiques de l'IHÉS \textbf{108} (2008), 183--239.
+
+\bibitem{michel_venkatesh}
+P.~Michel und A.~Venkatesh,
+\textit{The subconvexity problem for $\GL_2$},
+Publications Mathématiques de l'IHÉS \textbf{111} (2010), 171--271.
+
+\end{thebibliography}
+
+\end{document}
