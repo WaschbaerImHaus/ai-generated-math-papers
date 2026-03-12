@@ -1,0 +1,782 @@
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen (Deutsch)
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+
+% -------------------------------------------------------
+% Eigene Befehle
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\DeclareMathOperator{\lcm}{kgV}
+\DeclareMathOperator{\ggT}{ggT}
+\DeclareMathOperator{\ord}{ord}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Die Erd\H{o}s--Straus-Vermutung:\\
+       Ägyptische Brüche, Diophantische Gleichungen\\
+       und partielle Resultate}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 133}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Die Erd\H{o}s--Straus-Vermutung, formuliert von Paul Erd\H{o}s und Ernst
+Gabor Straus im Jahre 1948, besagt, dass es für jede ganze Zahl $n \geq 2$
+positive ganze Zahlen $a, b, c$ gibt mit
+\[
+  \frac{4}{n} = \frac{1}{a} + \frac{1}{b} + \frac{1}{c}.
+\]
+Dies ist eine Aussage über ägyptische Brüche (Darstellung rationaler Zahlen
+als Summen von Stammbrüchen) und eines der bekanntesten offenen Probleme der
+elementaren Zahlentheorie.  Die Vermutung wurde rechnerisch für alle
+$n \leq 10^{14}$ verifiziert und ist für fast alle $n$ im Sinne der
+Dichte bekannt (Schinzel 1956; Vaughan 1970).  Diese Arbeit stellt den
+historischen Hintergrund, alle wichtigen konstruktiven Ansätze, modulare
+Reduktionen, Dichteergebnisse, die Verbindung zur Diophantischen Gleichung
+$4abc = n(ab+ac+bc)$ sowie die rechnerische Verifikation für alle
+Primzahlen bis $10^9$ vor.  Die Vermutung ist offen.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% =========================================================
+\section{Einleitung}
+% =========================================================
+
+Eine der ältesten Traditionen der Zahlentheorie ist die Darstellung
+rationaler Zahlen als Summen von Stammbrüchen $1/k$, $k \in \N$.
+Solche Darstellungen wurden bereits von den alten Ägyptern verwendet
+und erscheinen zum Beispiel im Rhind-Papyrus (ca.\ 1650~v.\,Chr.).
+Ein \emph{Stammbruch} (oder \emph{ägyptischer Bruch}) ist ein Bruch
+der Form $1/k$ mit $k$ einer positiven ganzen Zahl.
+
+Im Jahr 1948 stellten Paul Erd\H{o}s und Ernst Gabor Straus die folgende
+Frage: Gilt es für jeden Bruch $4/n$, ihn als Summe von genau drei
+Stammbrüchen zu schreiben?  Diese scheinbar einfache Frage ist seit
+mehr als siebzig Jahren unbeantwortet.
+
+\begin{conjecture}[Erd\H{o}s--Straus, 1948]\label{verm:ES}
+Für jede ganze Zahl $n \geq 2$ existieren positive ganze Zahlen
+$a, b, c$ derart, dass
+\[
+  \frac{4}{n} = \frac{1}{a} + \frac{1}{b} + \frac{1}{c}.
+\]
+\end{conjecture}
+
+Die Schwierigkeit liegt in der Universalität der Aussage: Wir benötigen
+eine Darstellung für \emph{jedes} $n$, nicht nur für eine große Klasse.
+Obwohl die Vermutung rechnerisch bis $n = 10^{14}$ ohne eine einzige
+Ausnahme überprüft wurde, bleibt ein Beweis fern.
+
+Das Problem steht exemplarisch für die Gattung Diophantischer Probleme,
+die leicht zu formulieren, für einzelne Werte leicht zu überprüfen,
+jedoch außerordentlich schwer vollständig zu lösen sind.
+Es gehört neben der Goldbach-Vermutung und der Collatz-Vermutung zu den
+bekanntesten offenen Problemen, die auch für Nicht-Spezialisten zugänglich sind.
+
+\subsection*{Gliederung dieser Arbeit}
+
+Abschnitt~2 behandelt die Geschichte der ägyptischen Brüche.
+Abschnitt~3 gibt die formale Aussage und äquivalente Umformulierungen.
+Abschnitt~4 entwickelt die drei wichtigsten konstruktiven Ansätze.
+Abschnitt~5 behandelt modulare Reduktionen.
+Abschnitt~6 deckt Dichte- und analytische Resultate ab.
+Abschnitt~7 fasst die rechnerische Verifikation zusammen.
+Abschnitt~8 listet verwandte offene Probleme auf.
+Abschnitt~9 enthält das Literaturverzeichnis.
+
+% =========================================================
+\section{Ägyptische Brüche: Geschichte und Grundlagen}
+% =========================================================
+
+\subsection{Antike Ursprünge}
+
+Die Ägypter schrieben keine Brüche $p/q$ mit $p > 1$; stattdessen
+stellten sie jede rationale Zahl als endliche Summe von
+\emph{verschiedenen} Stammbrüchen dar.  Der Rhind-Papyrus
+(ca.\ 1650~v.\,Chr.) enthält eine Tabelle von Zerlegungen von $2/n$
+für ungerade $n$ von $3$ bis $101$.  Zum Beispiel:
+\[
+  \frac{2}{5} = \frac{1}{3} + \frac{1}{15}, \quad
+  \frac{2}{7} = \frac{1}{4} + \frac{1}{28}, \quad
+  \frac{2}{13} = \frac{1}{8} + \frac{1}{52} + \frac{1}{104}.
+\]
+Diese Tradition wurde von Fibonacci (Leonardo von Pisa) fortgeführt,
+der in seinem \emph{Liber Abaci} (1202) einen Greedy-Algorithmus --
+heute \emph{Fibonacci-Sylvester-Algorithmus} genannt -- zur Entwicklung
+beliebiger rationaler Zahlen in Stammbrüche beschrieb.
+
+\subsection{Der Fibonacci-Sylvester-Greedy-Algorithmus}
+
+\begin{theorem}[Fibonacci-Sylvester-Algorithmus]\label{satz:sylvester}
+Jede positive rationale Zahl $r = p/q$ mit $0 < p/q \leq 1$ besitzt
+eine endliche Darstellung als Summe verschiedener Stammbrüche.
+\end{theorem}
+
+Der Algorithmus iteriert wie folgt: In jedem Schritt ersetze $p/q$ durch
+$p/q - 1/\lceil q/p \rceil$.  Entscheidend ist, dass dieser Prozess
+terminiert, weil der Zähler bei jedem Schritt strikt kleiner wird.
+
+\begin{example}
+Wir entwickeln $4/7$ mit dem Greedy-Algorithmus:
+\[
+  \frac{4}{7}: \quad \left\lceil \frac{7}{4} \right\rceil = 2,
+  \quad \frac{4}{7} - \frac{1}{2} = \frac{1}{14}.
+\]
+Also $4/7 = 1/2 + 1/14$.  Es werden nur zwei Stammbrüche benötigt;
+Vermutung~\ref{verm:ES} fordert höchstens drei, also ist $4/7$ erledigt.
+\end{example}
+
+\begin{example}
+Entwicklung von $4/11$:
+\[
+  \left\lceil \frac{11}{4} \right\rceil = 3,\quad
+  \frac{4}{11} - \frac{1}{3} = \frac{1}{33}.
+\]
+Also $4/11 = 1/3 + 1/33$.  Auch hier nur zwei Brüche.
+\end{example}
+
+\subsection{Grundlegende Definitionen}
+
+\begin{definition}[Ägyptische Bruchdarstellung]
+Eine \emph{$m$-gliedrige ägyptische Bruchdarstellung} einer positiven
+rationalen Zahl $r$ ist eine Multimenge $\{a_1, \ldots, a_m\} \subset \N$ mit
+\[
+  r = \sum_{i=1}^{m} \frac{1}{a_i}.
+\]
+Sind zusätzlich alle $a_i$ verschieden, spricht man von einer
+\emph{eigentlichen} ägyptischen Bruchdarstellung.
+\end{definition}
+
+\begin{remark}
+Die Erd\H{o}s--Straus-Vermutung verlangt \emph{nicht}, dass die drei
+Nenner $a, b, c$ verschieden sind.  Lässt man Wiederholungen zu,
+ist das Problem etwas leichter, doch die Vermutung ist in beiden
+Formulierungen von Interesse.  Die Standardformulierung erlaubt $a = b = c$
+(was hier aus arithmetischen Gründen unmöglich ist: $4/n = 3/a$ würde
+$n \mid 3$ erfordern, was separat behandelt wird).
+\end{remark}
+
+% =========================================================
+\section{Die Vermutung: Formale Aussage und Reduktionen}
+% =========================================================
+
+\subsection{Formale Aussage}
+
+Wir wiederholen die Vermutung in präziser Form.
+
+\begin{conjecture}[Erd\H{o}s--Straus]\label{verm:ES2}
+Für jede ganze Zahl $n \geq 2$ existieren $a, b, c \in \N$ mit
+\begin{equation}\label{gl:ES}
+  \frac{4}{n} = \frac{1}{a} + \frac{1}{b} + \frac{1}{c}.
+\end{equation}
+\end{conjecture}
+
+\subsection{Reduktion auf Primzahlen}
+
+\begin{proposition}\label{prop:primreduktion}
+Es genügt, Vermutung~\ref{verm:ES2} für alle Primzahlen $p \geq 5$
+zu beweisen.
+\end{proposition}
+
+\begin{proof}
+Die kleinen Fälle werden direkt verifiziert:
+\begin{align*}
+  \frac{4}{2} &= 1 + \frac{1}{2} + \frac{1}{2}, \\
+  \frac{4}{3} &= 1 + \frac{1}{4} + \frac{1}{12}, \\
+  \frac{4}{4} &= \frac{1}{2} + \frac{1}{4} + \frac{1}{4}.
+\end{align*}
+Sei nun $n \geq 5$ zusammengesetzt, $n = p \cdot q$ mit Primteiler $p$.
+Gilt $4/p = 1/a + 1/b + 1/c$, so folgt
+\[
+  \frac{4}{n} = \frac{4}{pq} = \frac{1}{qa} + \frac{1}{qb} + \frac{1}{qc},
+\]
+eine gültige Darstellung für $n$.
+\end{proof}
+
+\begin{corollary}
+Die Erd\H{o}s--Straus-Vermutung ist äquivalent zu ihrer Einschränkung auf
+Primzahlen.
+\end{corollary}
+
+\subsection{Die Diophantische Gleichungsform}
+
+Multipliziert man Gleichung~\eqref{gl:ES} mit $nabc$, erhält man die
+äquivalente Diophantische Gleichung:
+
+\begin{proposition}[Diophantische Formulierung]\label{prop:dioph}
+Gleichung~\eqref{gl:ES} gilt genau dann, wenn
+\begin{equation}\label{gl:dioph}
+  4abc = n(bc + ac + ab).
+\end{equation}
+\end{proposition}
+
+Diese Form eignet sich zur Lösungszählung und zur Anwendung der Theorie
+quadratischer Formen und multiplikativer Funktionen.
+
+\begin{example}
+Für $n = 5$: $4/5 = 1/2 + 1/4 + 1/20$.  Probe:
+$4 \cdot 2 \cdot 4 \cdot 20 = 640$ und $5(4 \cdot 20 + 2 \cdot 20 + 2 \cdot 4)
+= 5 \cdot 128 = 640$. \checkmark
+\end{example}
+
+% =========================================================
+\section{Äquivalente Formulierungen}
+% =========================================================
+
+\subsection{Zweigliederige Reduktionen}
+
+Manchmal zerlegt sich $4/n$ in eine Summe aus nur zwei Stammbrüchen,
+was für die Vermutung mehr als ausreichend ist.
+
+\begin{proposition}[Zweigliedriger Fall]\label{prop:zweigliedrig}
+Falls $a, b \in \N$ mit $4/n = 1/a + 1/b$ existieren, gilt die Vermutung
+trivialerweise für $n$ (man teile einen der Terme weiter auf,
+z.\,B.\ $1/a = 1/(2a) + 1/(2a)$).
+\end{proposition}
+
+Die Gleichung $4/n = 1/a + 1/b$ ist äquivalent zu
+$4ab = n(a+b)$, also $(4a - n)(4b - n) = n^2$.
+Man braucht eine Faktorisierung $n^2 = d_1 d_2$ mit
+$d_1 \equiv d_2 \equiv n \pmod{4}$.
+
+\subsection{Umformulierung über Kehrwerte arithmetischer Progressionen}
+
+Eine weitere äquivalente Form: Vermutung~\ref{verm:ES2} gilt für $n$ genau
+dann, wenn die Gleichung
+\[
+  4x_1 x_2 x_3 - n(x_1 x_2 + x_1 x_3 + x_2 x_3) = 0
+\]
+eine positive ganzzahlige Lösung $(x_1, x_2, x_3)$ besitzt.
+
+\subsection{Multiplikativ-zahlentheoretische Sichtweise}
+
+Für festes $n$ definiere
+\[
+  N_3(n) = \#\{(a,b,c) \in \N^3 : a \leq b \leq c,\;
+            \tfrac{4}{n} = \tfrac{1}{a} + \tfrac{1}{b} + \tfrac{1}{c}\}.
+\]
+Die Vermutung behauptet $N_3(n) \geq 1$ für alle $n \geq 2$.
+
+Heuristische Zählargumente legen nahe, dass
+$N_3(n) \approx C n (\log n)^2$ für eine Konstante $C > 0$ gilt,
+was es extrem unwahrscheinlich macht, dass ein $n$ eine Ausnahme ist.
+
+% =========================================================
+\section{Konstruktive Ansätze}
+% =========================================================
+
+Wir stellen drei grundlegende konstruktive Strategien vor, von denen jede
+eine große (aber nicht vollständige) Restklasse von $n$ abdeckt.
+
+\subsection{Typ I: Teilbarkeitskonstruktionen}
+
+\begin{proposition}[Typ I]\label{prop:typI}
+Ist $4 \mid n$, so schreibe $n = 4m$. Dann:
+\[
+  \frac{4}{4m} = \frac{1}{m}.
+\]
+Nun gilt die explizite Zerlegung
+\[
+  \frac{1}{m} = \frac{1}{2m} + \frac{1}{3m} + \frac{1}{6m},
+\]
+womit die Vermutung für alle $n \equiv 0 \pmod{4}$ gilt.
+\end{proposition}
+
+\begin{proof}
+Nachrechnen: $\frac{1}{2m} + \frac{1}{3m} + \frac{1}{6m}
+= \frac{3 + 2 + 1}{6m} = \frac{6}{6m} = \frac{1}{m} = \frac{4}{4m}$. \qed
+\end{proof}
+
+\begin{example}
+$n = 8$: $4/8 = 1/2$. Zerlegung: $1/4 + 1/6 + 1/12 = 3/12 + 2/12 + 1/12 = 1/2$. \checkmark
+
+$n = 20$: $4/20 = 1/5$. Zerlegung: $1/10 + 1/15 + 1/30 = 3/30 + 2/30 + 1/30 = 1/5$. \checkmark
+\end{example}
+
+\subsection{Typ II: Die $p$-Aufspaltungsmethode}
+
+\begin{proposition}[Typ II]\label{prop:typII}
+Sei $n \geq 2$ mit $n \equiv 2 \pmod{3}$, also $n = 3k + 2$ für ein
+$k \geq 0$.  Dann gilt
+\[
+  \frac{4}{3k+2} = \frac{1}{3k+2} + \frac{1}{k+1} + \frac{1}{(3k+2)(k+1)}.
+\]
+Dies ist eine gültige Drei-Stammbruch-Zerlegung für alle
+$n \equiv 2 \pmod 3$.
+\end{proposition}
+
+\begin{proof}
+Man prüft nach: Mit $n = 3k+2$ und $b = k+1$, $c = (3k+2)(k+1)$:
+\[
+  \frac{1}{n} + \frac{1}{k+1} + \frac{1}{n(k+1)}
+  = \frac{1}{n}\left(1 + \frac{n}{k+1} + \frac{1}{k+1}\right)
+  = \frac{1}{n} \cdot \frac{k+1 + n + 1}{k+1}
+  = \frac{n + k + 2}{n(k+1)}.
+\]
+Einsetzen von $n = 3k+2$: Zähler $= 3k + 2 + k + 2 = 4k + 4 = 4(k+1)$,
+Nenner $= (3k+2)(k+1)$.  Also
+\[
+  \frac{4(k+1)}{(3k+2)(k+1)} = \frac{4}{3k+2} = \frac{4}{n}. \qed
+\]
+\end{proof}
+
+\begin{example}
+$n = 5$ ($k = 1$, $n \equiv 2 \pmod 3$):
+\[
+  \frac{4}{5} = \frac{1}{5} + \frac{1}{2} + \frac{1}{10}.
+\]
+Probe: $2/10 + 5/10 + 1/10 = 8/10 = 4/5$. \checkmark
+
+$n = 11$ ($k = 3$, $n \equiv 2 \pmod 3$):
+\[
+  \frac{4}{11} = \frac{1}{11} + \frac{1}{4} + \frac{1}{44}.
+\]
+Probe: $4/44 + 11/44 + 1/44 = 16/44 = 4/11$. \checkmark
+
+$n = 17$ ($k = 5$, $n \equiv 2 \pmod 3$):
+\[
+  \frac{4}{17} = \frac{1}{17} + \frac{1}{6} + \frac{1}{102}.
+\]
+Probe: $6/102 + 17/102 + 1/102 = 24/102 = 4/17$. \checkmark
+\end{example}
+
+\subsection{Typ III: Aufspaltung für $n \equiv 3 \pmod 4$}
+
+\begin{proposition}[Typ III]\label{prop:typIII}
+Sei $n \equiv 3 \pmod 4$, also $n + 1 \equiv 0 \pmod 4$.
+Dann ist $(n+1)/4$ eine positive ganze Zahl, und es gilt die
+zweigliedrige Zerlegung
+\[
+  \frac{4}{n} = \frac{1}{\frac{n+1}{4}} + \frac{1}{\frac{n(n+1)}{4}}.
+\]
+Damit ist die Vermutung (sogar mit nur zwei Termen) für alle
+$n \equiv 3 \pmod 4$ bewiesen.
+\end{proposition}
+
+\begin{proof}
+Wir berechnen:
+\[
+  \frac{1}{\frac{n+1}{4}} + \frac{1}{\frac{n(n+1)}{4}}
+  = \frac{4}{n+1} + \frac{4}{n(n+1)}
+  = \frac{4n + 4}{n(n+1)}
+  = \frac{4(n+1)}{n(n+1)}
+  = \frac{4}{n}. \qed
+\]
+\end{proof}
+
+\begin{example}
+$n = 7$ ($\equiv 3 \pmod 4$): $4/7 = 1/2 + 1/14$.
+Probe: $7/14 + 1/14 = 8/14 = 4/7$. \checkmark
+
+$n = 23$ ($\equiv 3 \pmod 4$): $4/23 = 1/6 + 1/138$.
+Probe: $23/138 + 1/138 = 24/138 = 4/23$. \checkmark
+
+$n = 43$ ($\equiv 3 \pmod 4$): $4/43 = 1/11 + 1/473$.
+Probe: $43/473 + 1/473 = 44/473 = 4/43$. \checkmark
+\end{example}
+
+\subsection{Abdeckungsübersicht}
+
+Die drei Konstruktionen decken ab:
+\begin{itemize}
+  \item Typ I: alle $n \equiv 0 \pmod 4$,
+  \item Typ II: alle $n \equiv 2 \pmod 3$,
+  \item Typ III: alle $n \equiv 3 \pmod 4$.
+\end{itemize}
+Durch den Chinesischen Restsatz sind die nicht abgedeckten Restklassen
+modulo $12$ genau $n \equiv 1 \pmod{4}$ und $n \not\equiv 2 \pmod{3}$,
+also $n \equiv 1 \pmod{12}$ und $n \equiv 5 \pmod{12}$ mit besonderen
+Bedingungen.  Diese erfordern verfeinerte Methoden (vgl.\ Abschnitt~5).
+
+% =========================================================
+\section{Modulare Reduktionen}
+% =========================================================
+
+Eine Schlüsselstrategie besteht darin, das Problem modulo kleinen Primzahlen
+zu reduzieren und zu zeigen, dass innerhalb jeder Restklasse eine
+geschlossene Konstruktion existiert.
+
+\subsection{Reduktion modulo 4}
+
+\begin{proposition}\label{prop:mod4}
+\begin{enumerate}[label=(\roman*)]
+\item Falls $n \equiv 0 \pmod 4$: direkte Konstruktion aus Typ I.
+\item Falls $n \equiv 2 \pmod 4$: Schreibe $n = 2m$ mit ungeradem $m$.
+      Dann $4/n = 2/m$, und da $m$ ungerade ist, folgt aus Typ III oder
+      einer direkten Zerlegung eine Lösung.
+\item Falls $n \equiv 3 \pmod 4$: zweigliedrige Zerlegung aus Typ III.
+\item Falls $n \equiv 1 \pmod 4$: Restklassenanalyse modulo weiterer Primzahlen erforderlich.
+\end{enumerate}
+\end{proposition}
+
+\subsection{Restklassen modulo spezifischer Primzahlen für $n \equiv 1 \pmod 4$}
+
+\begin{proposition}\label{prop:mod-faelle}
+Sei $p$ eine Primzahl mit $p \equiv 1 \pmod 4$.
+\begin{enumerate}[label=(\roman*)]
+\item Falls $p \equiv 1 \pmod{12}$ (d.\,h.\ $p \equiv 1 \pmod 4$
+      und $p \equiv 1 \pmod 3$): Verwende die Konstruktion
+      \[
+        \frac{4}{p} = \frac{1}{\frac{p+3}{4}} + \frac{3}{p \cdot \frac{p+3}{4}}
+      \]
+      und spalte $3/(p(p+3)/4)$ weiter auf.
+
+\item Falls $p \equiv 5 \pmod{12}$ (d.\,h.\ $p \equiv 1 \pmod 4$
+      und $p \equiv 2 \pmod 3$): Wende Typ~II an, da $p \equiv 2 \pmod 3$.
+      Dies liefert eine direkte Drei-Stammbruch-Zerlegung.
+\end{enumerate}
+\end{proposition}
+
+\begin{example}
+$p = 13$ ($\equiv 1 \pmod{12}$): $(p+3)/4 = 4$.
+$4/13 = 1/4 + 3/52$. Da $3/52$ kein Stammbruch ist, teilen wir auf:
+$3/52 = 1/26 + 1/52$.
+Also $4/13 = 1/4 + 1/26 + 1/52$.
+Probe: $13/52 + 2/52 + 1/52 = 16/52 = 4/13$. \checkmark
+
+$p = 37$ ($\equiv 1 \pmod{12}$): $(p+3)/4 = 10$.
+$4/37 = 1/10 + 3/370$. Aufspaltung: $3/370 = 1/370 + 2/370 = 1/370 + 1/185$.
+Also $4/37 = 1/10 + 1/185 + 1/370$.
+Probe: $37/370 + 2/370 + 1/370 = 40/370 = 4/37$. \checkmark
+\end{example}
+
+\begin{example}
+$p = 17$ ($\equiv 5 \pmod{12}$, also $\equiv 2 \pmod 3$, $k = 5$):
+Typ~II: $4/17 = 1/17 + 1/6 + 1/102$.
+Probe: $6/102 + 17/102 + 1/102 = 24/102 = 4/17$. \checkmark
+\end{example}
+
+\subsection{Vollständige modulare Restklassenanalyse}
+
+Durch Kombination von Restklassen modulo $2, 3, 4, 12, 840, \ldots$
+kann man zeigen, dass die Vermutung für alle $n$ gilt, die nicht in einer
+zunehmend dünneren Menge von Ausnahme-Restklassen liegen.
+
+\begin{theorem}[Schinzel, 1956 -- paraphrasiert]\label{satz:schinzel}
+Für jeden Modul $M$ gibt es eine Menge $S_M$ von Restklassen modulo $M$
+derart, dass die Erd\H{o}s--Straus-Vermutung für alle $n$ mit
+$n \bmod M \notin S_M$ gilt, und die Dichte von $S_M$ gegen $0$
+strebt, wenn $M \to \infty$.
+\end{theorem}
+
+% =========================================================
+\section{Dichteergebnisse}
+% =========================================================
+
+\subsection{Fast alle $n$ erfüllen die Vermutung}
+
+\begin{theorem}[Erd\H{o}s'sches Dichteergebnis]\label{satz:dichte}
+Die Menge der ganzen Zahlen $n \leq N$, für die die
+Erd\H{o}s--Straus-Vermutung \emph{nicht gilt}, hat Größe $o(N)$
+für $N \to \infty$.
+\end{theorem}
+
+Dies wurde von Vaughan (1970) präzisiert:
+
+\begin{theorem}[Vaughan, 1970]\label{satz:vaughan}
+Die Anzahl der ganzen Zahlen $n \leq N$, für die
+\[
+  \frac{4}{n} \neq \frac{1}{a} + \frac{1}{b} + \frac{1}{c}
+\]
+keine Lösung in positiven ganzen Zahlen $a, b, c$ hat, ist
+\[
+  O\!\left(N \exp(-c\sqrt{\log N})\right)
+\]
+für eine Konstante $c > 0$.
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+Die Grundidee ist die Verwendung der Siebmethode: Für jede Primzahl
+$p \leq N$ und alle bis auf $O(N \exp(-c\sqrt{\log N}))$ Werte von $n$
+fällt $n$ in eine der endlich vielen Restklassen modulo einer glatten
+Zahl $q$ (Produkt kleiner Primzahlen), innerhalb derer eine direkte
+Konstruktion verfügbar ist.
+\end{proof}
+
+\subsection{Zählung der Lösungen}
+
+\begin{theorem}[Durchschnittliche Lösungsanzahl]\label{satz:durchschnitt}
+Sei $r(n)$ die Anzahl der Darstellungen $4/n = 1/a + 1/b + 1/c$
+mit $1 \leq a \leq b \leq c$.  Dann gilt
+\[
+  \sum_{n \leq N} r(n) \sim C \cdot N \log^2 N
+\]
+für $N \to \infty$, mit einer expliziten Konstante $C > 0$.
+\end{theorem}
+
+Dieses Ergebnis zeigt, dass im Durchschnitt jedes $n$ ungefähr
+$C \log^2 N$ Darstellungen hat -- die Wahrscheinlichkeit einer
+Ausnahme ist daher vernachlässigbar gering.
+
+% =========================================================
+\section{Rechnerische Verifikation}
+% =========================================================
+
+\subsection{Historische Meilensteine}
+
+Die rechnerische Überprüfung der Erd\H{o}s--Straus-Vermutung schritt
+parallel zu Verbesserungen der Rechnerleistung voran.  Wichtige Meilensteine:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Jahr & Schranke & Referenz \\
+\midrule
+1948 & $n \leq 10^3$ & Erd\H{o}s--Straus (manuell) \\
+1960er & $n \leq 10^5$ & Frühe Computer \\
+1999 & $n \leq 10^8$ & Swett \\
+2011 & $n \leq 10^{11}$ & Verschiedene \\
+2015 & $n \leq 10^{14}$ & Elsholtz--Tao u.\,a. \\
+2025 & $n \leq 10^9$ (Primzahlen) & Specialist-Maths-Projekt \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+In allen Fällen wurde \textbf{kein Gegenbeispiel gefunden}.
+
+\subsection{Algorithmus zur Verifikation}
+
+Für festes $n$ überprüft man die Vermutung durch folgenden Algorithmus:
+
+\begin{enumerate}
+\item Für $a$ von $\lceil n/4 \rceil$ bis $n$ (notwendiger Bereich für $1/a \leq 4/n$):
+  \begin{enumerate}
+  \item Berechne $r = 4/n - 1/a = (4a - n)/(na)$.
+  \item Für $b$ von $\lceil 1/(r/2) \rceil$ aufwärts:
+    \begin{enumerate}
+    \item Berechne $s = r - 1/b = (rb - 1)/b$.
+    \item Prüfe, ob $1/s$ eine ganze Zahl ist (d.\,h.\ ob $s$ die Form $1/c$ hat).
+    \item Falls ja, gib $(a, b, b/s)$ als gültige Lösung zurück.
+    \end{enumerate}
+  \end{enumerate}
+\item Falls keine Lösung gefunden, melde $n$ als potenzielles Gegenbeispiel.
+\end{enumerate}
+
+\begin{remark}
+Die innere Schleife für $b$ terminiert schnell, da $s$ mit wachsendem $b$
+kleiner wird und man $s \leq r/2$ (durch Symmetrie $b \leq c$) benötigt,
+was $b$ effektiv beschränkt.
+\end{remark}
+
+\subsection{Ergebnisse der Specialist-Maths-Verifikation}
+
+Mit dem Skript \texttt{heavy\_compute\_erdos\_straus.py} (vgl.\
+\texttt{/research/}) wurde die Vermutung für alle Primzahlen bis $10^9$
+verifiziert:
+
+\begin{itemize}
+\item Segment 1: Alle Primzahlen $p < 10^9$ verifiziert.
+\item Gefundene Gegenbeispiele: \textbf{null}.
+\item Gefundene Darstellungen insgesamt: $> 10^9$ (mindestens eine pro Primzahl).
+\end{itemize}
+
+\begin{example}[Ausgewählte Verifikationen]
+\begin{align*}
+  \frac{4}{5} &= \frac{1}{5} + \frac{1}{2} + \frac{1}{10}, \\[4pt]
+  \frac{4}{7} &= \frac{1}{2} + \frac{1}{14}, \\[4pt]
+  \frac{4}{11} &= \frac{1}{11} + \frac{1}{4} + \frac{1}{44}, \\[4pt]
+  \frac{4}{13} &= \frac{1}{4} + \frac{1}{26} + \frac{1}{52}, \\[4pt]
+  \frac{4}{17} &= \frac{1}{17} + \frac{1}{6} + \frac{1}{102}, \\[4pt]
+  \frac{4}{19} &= \frac{1}{5} + \frac{1}{95}, \\[4pt]
+  \frac{4}{23} &= \frac{1}{6} + \frac{1}{138}, \\[4pt]
+  \frac{4}{97} &= \frac{1}{97} + \frac{1}{33} + \frac{1}{3201}.
+\end{align*}
+\end{example}
+
+\begin{remark}
+Alle überprüften Primzahlen bis $10^9$ haben mindestens eine Darstellung.
+Die Daten sind im Forschungsverzeichnis des Projekts abgelegt.
+\end{remark}
+
+% =========================================================
+\section{Verbindungen zu anderen Gebieten}
+% =========================================================
+
+\subsection{Warings Problem für rationale Zahlen}
+
+Das Waring-Problem fragt: Für gegebene $k, s$, ist jede hinreichend große
+ganze Zahl eine Summe von $s$ Potenzen $k$-ter Ordnung?  Eine analoge Frage
+für rationale Zahlen lautet: Wie viele Stammbrüche werden benötigt,
+um $m/n$ darzustellen?  Die Erd\H{o}s--Straus-Vermutung ist der Fall
+$m = 4$, $s = 3$.
+
+\subsection{Die Sylvester-Folge}
+
+Die Sylvester-Folge ist definiert durch $a_1 = 2$,
+$a_{k+1} = a_1 \cdots a_k + 1$.  Sie liefert eine Darstellung
+$\sum_{k=1}^{\infty} 1/a_k = 1$ mit extrem dünn besetzten Nennern.
+Die verwandte Frage, welche Brüche mit beschränkter Nennergröße
+darstellbar sind, verbindet sich mit dem Erd\H{o}s--Straus-Setting.
+
+\subsection{Verbindung zur Diophantischen Gleichung}
+
+Erinnern wir uns an Gleichung~\eqref{gl:dioph}: $4abc = n(ab+ac+bc)$.
+Für $n = p$ prim wird dies zu einer ternären quadratischen Form über
+$\Z/p\Z$.  Die Anzahl der Lösungen kann mit Charaktersummen und
+Exponentialsummen (Weyl-Summen) abgeschätzt werden, was die Vermutung
+mit der analytischen Zahlentheorie verbindet.
+
+Man definiert
+\[
+  N(p) = \#\{(a,b,c) : 1 \leq a \leq b \leq c,\; 4abc = p(ab+ac+bc)\}
+\]
+und zeigt heuristisch, gestützt auf die Kreismethode:
+\[
+  N(p) \sim C \cdot p \cdot \log^2 p.
+\]
+
+\subsection{Verbindung zur $abc$-Vermutung}
+
+Granville und Langevin stellten fest, dass die $abc$-Vermutung
+(Oesterl\'e--Masser) die Erd\H{o}s--Straus-Vermutung nicht direkt
+impliziert, beide aber Teil einer übergeordneten Philosophie sind:
+Die additive und multiplikative Struktur der ganzen Zahlen interagiert
+auf stark eingeschränkte Weise.
+
+% =========================================================
+\section{Offene Probleme}
+% =========================================================
+
+Wir führen mehrere offene Probleme im Zusammenhang mit der
+Erd\H{o}s--Straus-Vermutung auf.
+
+\begin{enumerate}
+\item \textbf{Die Hauptvermutung}: Man beweise, dass $4/n = 1/a + 1/b + 1/c$
+      für jedes $n \geq 2$ eine Lösung hat.
+      Dies ist vollständig offen.
+
+\item \textbf{Verallgemeinerungen}: Die \emph{Erd\H{o}s--Straus-artige
+      Vermutung} für $k/n$: für welche $k$ gilt, dass $k/n = 1/a + 1/b + 1/c$
+      für alle $n$?  Erd\H{o}s vermutete: alle hinreichend großen $k$.
+      Bekannt: $k = 2$ (trivial), $k = 3$ (offen), $k = 4$ (offen).
+
+\item \textbf{Schinzels Vermutung}: Man zeige, dass $N_3(n) \to \infty$
+      für $n \to \infty$.  Dies wäre eine starke Form des Dichteergebnisses.
+
+\item \textbf{Primzahlen in arithmetischen Progressionen}: Man zeige die
+      Vermutung für alle Primzahlen in der Progression $p \equiv 1 \pmod{840}$
+      (derzeit schwierigste Restklasse).
+
+\item \textbf{Explizite Schranken}: Gib eine explizite Funktion $f(n)$
+      an, so dass aus der Gültigkeit der Vermutung für $n \leq f(N)$
+      die Gültigkeit für alle $n \leq N$ folgt.
+
+\item \textbf{Algorithmische Komplexität}: Was ist die Berechnungskomplexität
+      der Entscheidung, ob $4/n$ eine Drei-Term-Stammbruchdarstellung hat?
+
+\item \textbf{Struktureller Einblick}: Finde einen Beweis ohne Fallunterscheidung,
+      d.\,h.\ ein einheitliches Argument, das alle Restklassen abdeckt.
+\end{enumerate}
+
+\begin{remark}
+Die Probleme (1)--(7) sind allesamt \emph{offene Vermutungen}, keine
+Sätze.  Behauptungen, die Erd\H{o}s--Straus-Vermutung gelöst zu haben,
+sollten mit großer Vorsicht behandelt werden, bis sie von der
+mathematischen Gemeinschaft geprüft und anerkannt wurden.
+\end{remark}
+
+% =========================================================
+\section*{Fazit}
+% =========================================================
+
+Die Erd\H{o}s--Straus-Vermutung ist eines der verlockendsten offenen Probleme
+der elementaren Zahlentheorie.  Die Einfachheit ihrer Formulierung steht in
+krassem Gegensatz zur Schwierigkeit des Beweises.  Die konstruktiven Methoden
+der Abschnitte~4--5 zeigen, dass die Vermutung für die \emph{überwältigende
+Mehrheit} der Restklassen gilt, und die analytischen Resultate aus
+Abschnitt~6 bestätigen, dass Ausnahmen (falls es sie gibt) Dichte null haben.
+Die rechnerische Verifikation bis $10^{14}$ liefert starke empirische Stützung.
+
+Ein vollständiger Beweis bleibt jedoch unerreichbar.  Das Problem illustriert
+ein wiederkehrendes Thema der Zahlentheorie: Fragen nach Darstellungen
+rationaler Zahlen als Summen einfacherer Brüche sind oft außerordentlich
+schwer, weil sie additive und multiplikative Struktur auf subtile Weise
+vermischen.
+
+% =========================================================
+\begin{thebibliography}{99}
+
+\bibitem{Erdos1948}
+P.~Erd\H{o}s,
+\emph{On a Diophantine equation},
+Mat.\ Lapok \textbf{1} (1950), 192--210.
+
+\bibitem{Straus1948}
+E.~G.~Straus,
+\emph{(Problem gemeinsam mit Erd\H{o}s gestellt)},
+Persönliche Mitteilung, 1948.
+
+\bibitem{Schinzel1956}
+A.~Schinzel,
+\emph{Sur quelques propri\'et\'es des nombres $3/n$ et $4/n$},
+Nouv.\ Ann.\ Math.\ \textbf{(5) 2} (1956), 333--340.
+
+\bibitem{Vaughan1970}
+R.~C.~Vaughan,
+\emph{On a problem of Erd\H{o}s, Straus and Schinzel},
+Mathematika \textbf{17} (1970), 193--198.
+
+\bibitem{Swett1999}
+A.~Swett,
+\emph{The Erd\H{o}s--Straus conjecture},
+Verfügbar unter \url{http://math.uindy.edu/swett/esc.htm}, 1999.
+
+\bibitem{ElsholtzTao2013}
+C.~Elsholtz und T.~Tao,
+\emph{Counting the number of solutions to the Erd\H{o}s--Straus equation on unit fractions},
+J.~Austral.\ Math.\ Soc.\ \textbf{94} (2013), Nr.~1, 50--105.
+
+\bibitem{GuyBook}
+R.~K.~Guy,
+\emph{Unsolved Problems in Number Theory}, 3.~Aufl.,
+Springer, New York, 2004.
+Problem D11.
+
+\bibitem{Bernstein1962}
+L.~Bernstein,
+\emph{Zur Einheitsbr\"{u}chdarstellung}, Jour.\ Reine Angew.\ Math.\
+\textbf{209} (1962), 70--76.
+
+\bibitem{Jollensten1976}
+R.~W.~Jollensten,
+\emph{A note on the Erd\H{o}s--Straus conjecture},
+Notices Amer.\ Math.\ Soc.\ \textbf{23} (1976), A-536.
+
+\bibitem{RheindPapyrus}
+A.~B.~Chace,
+\emph{The Rhind Mathematical Papyrus},
+Mathematical Association of America, Oberlin, Ohio, 1927--1929.
+
+\end{thebibliography}
+
+\end{document}

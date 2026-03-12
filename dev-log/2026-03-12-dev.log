@@ -164,3 +164,13 @@
 - Wilson-Verbindung: !p ≡ !(p-1) - 1 (mod p), Äquivalenz !(p-1) ≢ 1 (mod p)
 - Probabilistische Heuristik: erwartete Anzahl Verletzungen ~ log log x (divergent)
 - Numerik Build 131: 664578 Primzahlen bis 10^7, 0 Verletzungen, 8396 Sekunden
+
+2026-03-12 $(date +%H:%M:%S) Build 131: Paper 41 Erdős-Straus-Vermutung (EN + DE)
+  - Neue Dateien: papers/batch11/paper41_erdos_straus_en.tex
+  - Neue Dateien: papers/batch11/paper41_erdos_straus_de.tex
+  - Englisches Paper (~10 Seiten): 9 Abschnitte, 3 konstruktive Typen, Dichtesätze, numerische Verifikation
+  - Deutsches Paper (~10 Seiten): vollständige Übersetzung, alle Beweise auf Deutsch
+  - Vermutung korrekt als Conjecture/Vermutung deklariert (OFFEN)
+  - Mindestens 8 Beispiele mit konkreten Zahlen in beiden Papers
+  - Literaturverzeichnis: 10 Quellen (EN), 10 Quellen (DE)
+  - Build-Nummer: 130 → 131
