@@ -181,7 +181,7 @@ provided the limit exists. This is a weaker notion of density than the natural d
 $\lim_{N\to\infty} |A \cap [1,N]|/N$.
 \end{definition}
 
-\begin{proposition}[Positive density of well-behaved orbits]\label{prop:pos_density}
+\begin{proposition}[Positive density of well-behaved orbits, conditional on the Collatz Conjecture]\label{prop:pos_density}
 For any fixed $M \in \mathbb{N}$, the set
 $A_M = \{n \in \mathbb{N} : T^k(n) \leq M \text{ for some } k \geq 0\}$
 has natural density 1. That is, almost all positive integers (in the sense of natural density)
@@ -189,6 +189,7 @@ eventually descend below any fixed bound $M$.
 \end{proposition}
 
 \begin{proof}
+\emph{We assume the Collatz Conjecture throughout this proof.}
 Every positive integer eventually reaches a power of 2 under the conjecture (if true).
 Assuming the conjecture, all integers are in $A_M$. For a density-theoretic statement without
 assuming the conjecture, one uses the backward-iteration tree: the set of integers that

@@ -227,3 +227,52 @@ Zwei neue Papers erstellt:
 - Dateien: `papers/reviewed/batch5/paper24_rh_approaches_en.tex` + `_de.tex`
 - Problem: `\bibitem{Deligne1974}` fehlte in beiden Bibliographien, obwohl `\cite{Deligne1974}` im Text verwendet wird.
 - Fix: Bibitem in beide Dateien eingefügt (vor `\bibitem{Davenport2000}`).
+
+### 2026-03-12 — Build 123: Batch10 Paper39 + Batch9 Paper38 Bugfixes
+
+#### BUG-B10-P39-EN/DE-LLC-HISTORY — BEHOBEN (HOCH)
+- Paper: `papers/batch10/paper39_langlands_program_en.tex` + `_de.tex`
+- Problem: Chronologisch unmögliche Aussage "Kutzko (1980) building on Henniart (1993)"
+- Fix EN: "For GL₂(F): Proved by Kutzko (1980). For GL_n(F): Proved independently by Henniart (2000) and Harris--Taylor (2001)."
+- Fix DE: "Für GL₂(F): Bewiesen von Kutzko (1980). Für GL_n(F): Unabhängig bewiesen von Henniart (2000) und Harris--Taylor (2001)."
+
+#### BUG-B10-P39-DE-MISSING-SECTIONS — BEHOBEN (HOCH)
+- Paper: `papers/batch10/paper39_langlands_programm_de.tex`
+- Problem: Fehlende Sektionen 7 "Langlands-Funktorialitätsvermutung" und 8 "Das p-adische Langlands-Programm"
+- Fix: Sektion 7 (Basiswechsel, Sym^m-Lifts) und Sektion 8 (Colmez 2010) aus EN übersetzt und eingefügt
+
+#### BUG-B10-P39-DE-MISSING-BIBITEMS — BEHOBEN (MITTEL)
+- Paper: `papers/batch10/paper39_langlands_programm_de.tex`
+- Problem: Fehlende \bibitem{Henniart2000} und \bibitem{FrenkelBenZvi}
+- Fix: Beide bibitems aus EN-Version übernommen und eingefügt
+
+#### BUG-B9-P38-EN/DE-WILES1990-STEP3 — BEHOBEN (MITTEL)
+- Papers: `papers/reviewed/batch9/paper38_iwasawa_theory_en.tex` + `_de.tex`
+- Problem: Schritt 3 der Beweisskizze beschrieb Wiles 1990 fälschlicherweise mit "Euler system machinery (Kolyvagin, Rubin)"
+- Fix EN+DE: Wiles (1990) verwendet Hecke-Algebren und Modulkurven (Erweiterung von Mazur–Wiles 1984); Euler-System-Ansatz ist Rubin (1991) für imaginär-quadratische Körper
+
+### 2026-03-12 — Build 123: Batch7 Collatz-Papers — Circular-Argument + Ergodizitäts-Bugs behoben
+
+#### BUG-B7-P29-CIRCULAR-PROP4 — BEHOBEN (HOCH)
+- Papers: `papers/reviewed/batch7/paper29_collatz_conjecture_en.tex` + `paper29_collatz_vermutung_de.tex`
+- Problem: Proposition 4.1 (EN) / Satz 4.1 (DE) über Bahndichten enthielt zirkuläres Argument — Beweis setzte die Collatz-Vermutung stillschweigend voraus, ohne dies im Propositions-Statement zu deklarieren.
+- Fix EN: Propositionstitel geändert zu "..., conditional on the Collatz Conjecture"; Beweis beginnt jetzt mit `\emph{We assume the Collatz Conjecture throughout this proof.}`
+- Fix DE: Propositionstitel geändert zu "..., bedingt durch die Collatz-Vermutung"; Beweis beginnt mit `\emph{Wir setzen die Collatz-Vermutung im gesamten Beweis voraus.}`
+
+#### BUG-B7-P30-CONCLUSION — BEHOBEN (HOCH)
+- Papers: `papers/reviewed/batch7/paper30_collatz_p_adic_en.tex` + `paper30_collatz_p_adisch_de.tex`
+- Problem: Schlussfolgerung behauptete "S is ergodic" als Tatsache.
+- Fix EN: geändert zu "but $S$ is conjectured to be ergodic"
+- Fix DE: geändert zu "aber $S$ wird vermutet, ergodisch zu sein"
+
+#### BUG-B7-P32-CONCLUSION — BEHOBEN (HOCH)
+- Papers: `papers/reviewed/batch7/paper32_collatz_ergodic_en.tex` + `paper32_collatz_ergodisch_de.tex`
+- Problem: Zusammenfassung behauptete "The Syracuse map S is ergodic and mixing with exponential decay of correlations" als bewiesene Tatsache.
+- Fix EN: geändert zu "...is conjectured to be ergodic and mixing with exponential decay of correlations"
+- Fix DE: geändert zu "...wird vermutungsweise als ergodisch und mischend mit exponentiellem Korrelationsabfall angesehen"
+
+#### BUG-B7-P31-FURSTENBERG-REF — BEHOBEN (MITTEL)
+- Papers: `papers/reviewed/batch7/paper31_tao_probabilistic_collatz_en.tex` + `paper31_tao_probabilistischer_ansatz_de.tex`
+- Problem: Lemma 5.3 zitierte Furstenberg (1977) für ein "Korrespondenzprinzip" im Collatz-Kontext. Furstenberg (1977) behandelt Szemerédi-Theorem, nicht Collatz.
+- Fix EN: Lemma-Titel geändert zu "Correspondence principle in the Collatz context"; Zitat auf `\cite{Tao2022}` (cf.) umgestellt.
+- Fix DE: Lemma-Titel geändert zu "Korrespondenzprinzip im Collatz-Kontext"; `\cite{Furstenberg1977}` ersetzt durch `\cite{Tao2022}` (vgl.).

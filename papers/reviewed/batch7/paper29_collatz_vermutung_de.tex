@@ -187,7 +187,7 @@ sofern der Grenzwert existiert. Dies ist ein schwächerer Dichtebegriff als die
 natürliche Dichte $\lim_{N\to\infty} |A \cap [1,N]|/N$.
 \end{definition}
 
-\begin{proposition}[Positive Dichte gutartiger Bahnen]\label{prop:pos_density}
+\begin{proposition}[Positive Dichte gutartiger Bahnen, bedingt durch die Collatz-Vermutung]\label{prop:pos_density}
 Für jedes feste $M \in \mathbb{N}$ hat die Menge
 \[
   A_M = \{n \in \mathbb{N} : \exists k \geq 0,\; T^k(n) \leq M\}
@@ -197,6 +197,7 @@ natürlichen Dichte) steigen schließlich unter jede feste Schranke $M$ ab.
 \end{proposition}
 
 \begin{proof}
+\emph{Wir setzen die Collatz-Vermutung im gesamten Beweis voraus.}
 Der Rückwärtsiterations-Baum von $m$ wächst mit Rate $\approx 2^k$ nach $k$ Schritten:
 Für jeden Vorgänger $n$ von $m$ hat $2n$ das doppelte Gewicht, und ein Drittel aller
 Zahlen hat auch einen ungeraden Vorgänger. Die Menge der Zahlen, die innerhalb von $k$

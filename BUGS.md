@@ -5,6 +5,28 @@ _(keine bekannten Bugs)_
 
 ## Behobene Bugs
 
+### Build 123 (Batch 10 Paper39 + Batch 9 Paper38 Bugfixes)
+
+### BUG-B10-P39-EN/DE-LLC-HISTORY (Build 123): HOCH — Chronologisch unmögliche Aussage
+- **Dateien**: papers/batch10/paper39_langlands_program_en.tex + paper39_langlands_programm_de.tex
+- **Problem**: "Kutzko (1980) building on Henniart (1993)" — Kutzko kann nicht auf einer 13 Jahre späteren Arbeit aufgebaut haben.
+- **Behoben**: EN+DE korrekt: GL₂(F) → Kutzko (1980); GL_n(F) → Henniart (2000) und Harris--Taylor (2001) unabhängig.
+
+### BUG-B10-P39-DE-MISSING-SECTIONS (Build 123): HOCH — Fehlende Sektionen 7 und 8
+- **Datei**: papers/batch10/paper39_langlands_programm_de.tex
+- **Problem**: Sektion 7 (Langlands-Funktorialitätsvermutung) und Sektion 8 (p-adisches Langlands-Programm, Colmez 2010) fehlten vollständig.
+- **Behoben**: Beide Sektionen aus EN übersetzt und eingefügt; Folgesektionen umnummeriert.
+
+### BUG-B10-P39-DE-MISSING-BIBITEMS (Build 123): MITTEL — Fehlende Bibliographie-Einträge
+- **Datei**: papers/batch10/paper39_langlands_programm_de.tex
+- **Problem**: \bibitem{Henniart2000} und \bibitem{FrenkelBenZvi} fehlten in der deutschen Version.
+- **Behoben**: Beide Einträge aus der EN-Version übernommen.
+
+### BUG-B9-P38-EN/DE-WILES1990-STEP3 (Build 123): MITTEL — Falsche Beweismethode für Wiles 1990
+- **Dateien**: papers/reviewed/batch9/paper38_iwasawa_theory_en.tex + paper38_iwasawa_theorie_de.tex
+- **Problem**: Schritt 3 der Beweisskizze beschrieb Wiles 1990 mit "Euler system machinery (Kolyvagin, Rubin)"; Wiles 1990 verwendete aber Hecke-Algebren und Modulkurven. Der Euler-System-Ansatz stammt von Rubin (1991).
+- **Behoben**: Schritt 3 in EN+DE korrigiert: Wiles 1990 → Hecke-Algebren + Modulkurven (Erweiterung Mazur–Wiles 1984); Euler-System-Ansatz → Rubin (1991) für imaginär-quadratische Körper.
+
 ### Build 120 (Batch 9 Review)
 
 ### BUG-B9-P37-EN-001 (Build 120): paper37 EN — Theorem 6.1 widersprüchliche Hypothese

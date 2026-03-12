@@ -336,23 +336,24 @@ Let $C_n$ be the group of circular units in $K_n$.  One shows
 using the analytic class number formula and the Dirichlet $L$-function values.
 This provides the analytic side.
 
-\textbf{Step 3: Control theorem and Fitting ideal comparison.}
-The Euler system machine (developed by Kolyvagin, with key input from
-Rubin for the abelian case) converts the norm-compatible system into
-a divisibility
+\textbf{Step 3: Hecke algebras, modular curves, and the Fitting ideal comparison.}
+Wiles (1990) established the key divisibility
 \[
-  \mathrm{char}(X^{(i)}) \mid (G_{\omega^{1-i}}(T)) \quad \text{in } \Lambda.
+  \mathrm{char}(X^{(i)}) \mid (G_{\omega^{1-i}}(T)) \quad \text{in } \Lambda
 \]
+using \emph{Hecke algebras and modular curves}, extending the strategy of
+Mazur--Wiles (1984): one relates the Iwasawa module $X^{(i)}$ to the
+$p$-adic Hecke algebra acting on the Jacobian of the modular curve $X_1(p^n)$,
+following Ribet's proof of the converse of Herbrand's theorem.
 The reverse divisibility (equality) follows from comparing $\mu$-invariants:
 Ferrero--Washington (1979) proved $\mu(X^{(i)}) = 0$ for $\Q$-extensions,
 and the $\mu$-invariant of $G_{\omega^{1-i}}$ is also $0$ (by the non-vanishing
 of $L(1, \omega^{1-i}) \ne 0$).  With equal $\mu$-invariants, a standard
 rank argument forces equality of characteristic ideals.
 
-The original Mazur--Wiles proof used modular curves and the theory of
-Hecke operators (specifically, the relation between the Iwasawa module and
-the Jacobian of modular curves), following Ribet's proof of the converse
-of Herbrand's theorem.
+\textit{Note:} The Euler system approach (using norm-compatible circular units
+directly) was developed by Rubin (1991) for imaginary quadratic fields; it
+yields a more streamlined proof but was not the method used by Wiles in 1990.
 \end{proof}
 
 \begin{remark}[Later generalisations]

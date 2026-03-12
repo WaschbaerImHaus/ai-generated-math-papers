@@ -186,9 +186,9 @@ mit Kompatibilität der $L$- und $\varepsilon$-Faktoren.
 \end{theorem}
 
 \begin{proof}[Status]
-Für $\GL_1(F)$: Klassenkörpertheorie. \quad
-Für $\GL_2(F)$: Kutzko (1980), Henniart (1993). \quad
-Für $\GL_n(F)$ allgemein: Harris--Taylor (2001), Henniart (2000).
+Für $\GL_1(F)$: Klassenkörpertheorie. \\
+Für $\mathrm{GL}_2(F)$: Bewiesen von Kutzko (1980). \\
+Für $\mathrm{GL}_n(F)$: Unabhängig bewiesen von Henniart (2000) und Harris--Taylor (2001).
 \end{proof}
 
 % ================================================================
@@ -267,6 +267,66 @@ entsprechen.
 \end{conjecture}
 
 % ================================================================
+\section{Die Langlands-Funktorialitätsvermutung}
+% ================================================================
+
+\begin{conjecture}[Langlands-Funktorialität]
+\label{conj:funktorialitaet}
+Seien $G$ und $H$ reduktive Gruppen über $\Q$ und ${}^L G$, ${}^L H$ ihre
+\emph{Langlands-dualen Gruppen}.  Für jeden $L$-Gruppen-Homomorphismus
+$\phi : {}^L H \to {}^L G$ gibt es eine natürliche \emph{Übertragungsabbildung}
+(oder \emph{funktoriellen Lift}) auf automorphen Darstellungen:
+\[
+  \text{Aut}(H) \ni \pi \;\longmapsto\; \phi_* \pi \in \text{Aut}(G),
+\]
+der $L$-Funktionen erhält: $L(s, \pi, r \circ \phi) = L(s, \phi_*\pi, r)$
+für jede endlich-dimensionale Darstellung $r$ von ${}^L G$.
+\end{conjecture}
+
+\begin{example}[Basiswechsel für $\GL_n$]
+Der \emph{Basiswechsel-Lift} $\pi \mapsto \mathrm{BC}_{L/K}(\pi)$ für zyklische
+Erweiterungen $L/K$ wurde bewiesen von Langlands ($n=2$, 1980) und Arthur--Clozel
+($n$ allgemein, 1989).  Das bedeutet: Ist $\pi$ eine automorphe Darstellung
+von $\GL_n(\mathbb{A}_K)$, so gibt es einen funktoriellen Lift nach $\GL_n(\mathbb{A}_L)$.
+\end{example}
+
+\begin{example}[Symmetrische Potenz-Lifts]
+Der $m$-te symmetrische Potenz-Lift $\text{Sym}^m : \GL_2 \to \GL_{m+1}$
+würde $\pi_f$ (Modulform vom Gewicht 2) auf eine automorphe Darstellung
+von $\GL_{m+1}$ abbilden.  Bekannt: $m = 2, 3, 4$ (Kim--Shahidi 2002).
+Offen für $m \ge 5$.
+\end{example}
+
+% ================================================================
+\section{Das $p$-adische Langlands-Programm}
+% ================================================================
+
+\begin{remark}[Motivation]
+Die klassische Langlands-Korrespondenz arbeitet über $\C$ (oder $\bar\Q_\ell$).
+Das \emph{$p$-adische Langlands-Programm} sucht $\GL_n(\Q_\ell)$ durch
+$\GL_n(\Q_p)$ zu ersetzen und komplexe Darstellungen durch $p$-adische,
+motiviert durch:
+\begin{itemize}
+  \item Kisins Arbeit zu potenziell halbstabilen Deformationsringen.
+  \item Colmez' $p$-adische lokale Langlands-Korrespondenz für $\GL_2(\Q_p)$ (2010).
+  \item Emertons Ansatz über vervollständigte Kohomologie.
+\end{itemize}
+\end{remark}
+
+\begin{theorem}[$p$-adische lokale Langlands-Korrespondenz für $\GL_2(\Q_p)$, Colmez 2010]
+\label{thm:colmez}
+Es gibt eine kanonische Bijektion (die \emph{$p$-adische lokale Langlands-Korrespondenz})
+\[
+  \mathrm{LLC}_p^{p\text{-adisch}} :
+  \left\{\parbox{5.5cm}{\centering 2-dim.\ irreduzible $p$-adische Darstellungen
+  von $\Gal(\bar\Q_p/\Q_p)$}\right\}
+  \;\longleftrightarrow\;
+  \left\{\parbox{5.5cm}{\centering zulässige unitäre Banach-Raum-Darstellungen von $\GL_2(\Q_p)$}\right\}
+\]
+kompatibel mit der klassischen lokalen Langlands-Korrespondenz via Reduktion mod $p$.
+\end{theorem}
+
+% ================================================================
 \section{Bekannte Fälle und offene Probleme}
 % ================================================================
 
@@ -334,6 +394,11 @@ M.~Harris und R.~Taylor,
 \textit{The geometry and cohomology of some simple Shimura varieties},
 Ann.\ of Math.\ Studies \textbf{151}, Princeton Univ.\ Press, 2001.
 
+\bibitem{Henniart2000}
+G.~Henniart,
+\textit{Une preuve simple des conjectures de Langlands pour $\GL(n)$ sur un corps $p$-adique},
+Invent.\ Math.\ \textbf{139} (2000), 439--455.
+
 \bibitem{Wiles1995}
 A.~Wiles,
 \textit{Modular elliptic curves and Fermat's Last Theorem},
@@ -358,6 +423,11 @@ Ann.\ of Math.\ Studies \textbf{120}, Princeton Univ.\ Press, 1989.
 P.~Colmez,
 \textit{Repr\'esentations de $\GL_2(\Q_p)$ et $(\varphi,\Gamma)$-modules},
 Ast\'erisque \textbf{330} (2010), 281--509.
+
+\bibitem{FrenkelBenZvi}
+E.~Frenkel,
+\textit{Langlands Correspondence for Loop Groups},
+Cambridge Univ.\ Press, 2007.
 
 \end{thebibliography}
 

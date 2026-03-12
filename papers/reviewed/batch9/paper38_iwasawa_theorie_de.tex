@@ -314,16 +314,24 @@ Sei $C_n$ die Gruppe der Kreiseinheiten in $K_n$.  Es gilt
 \]
 bewiesen mit der analytischen Klassenzahlformel.
 
-\textbf{Schritt 3: Kontrollsatz und Vergleich der Fitting-Ideale.}
-Die Euler-System-Maschinerie (Kolyvagin, Rubin) liefert die Teilbarkeit
+\textbf{Schritt 3: Hecke-Algebren, Modulkurven und Vergleich der Fitting-Ideale.}
+Wiles (1990) etablierte die zentrale Teilbarkeit
 \[
-  \mathrm{char}(X^{(i)}) \mid (G_{\omega^{1-i}}(T)) \quad \text{in } \Lambda.
+  \mathrm{char}(X^{(i)}) \mid (G_{\omega^{1-i}}(T)) \quad \text{in } \Lambda
 \]
-Die Gleichheit folgt durch Vergleich der $\mu$-Invarianten:
-Ferrero--Washington (1979) bewiesen $\mu(X^{(i)}) = 0$ für $\Q$-Erweiterungen,
-und die $\mu$-Invariante von $G_{\omega^{1-i}}$ ist ebenfalls $0$
-(wegen $L(1, \omega^{1-i}) \ne 0$).  Gleiche $\mu$-Invarianten erzwingen
-durch ein Rangargument die Gleichheit der charakteristischen Ideale.
+mithilfe von \emph{Hecke-Algebren und Modulkurven}, in Erweiterung der Strategie
+von Mazur--Wiles (1984): Man verbindet den Iwasawa-Modul $X^{(i)}$ mit der
+$p$-adischen Hecke-Algebra, die auf der Jacobischen der Modulkurve $X_1(p^n)$
+wirkt, im Anschluss an Ribets Beweis des Umkehrssatzes von Herbrand.
+Die Gleichheit der charakteristischen Ideale folgt durch Vergleich der
+$\mu$-Invarianten: Ferrero--Washington (1979) bewiesen $\mu(X^{(i)}) = 0$
+für $\Q$-Erweiterungen, und die $\mu$-Invariante von $G_{\omega^{1-i}}$
+ist ebenfalls $0$ (wegen $L(1, \omega^{1-i}) \ne 0$).  Gleiche $\mu$-Invarianten
+erzwingen durch ein Rangargument die Gleichheit der charakteristischen Ideale.
+
+\textit{Hinweis:} Der Euler-System-Ansatz (direkte Verwendung normkompatibler
+Kreiseinheiten) wurde von Rubin (1991) für imaginär-quadratische Körper entwickelt
+und liefert einen eleganteren Beweis, ist aber nicht die von Wiles 1990 verwendete Methode.
 \end{proof}
 
 \begin{remark}[Spätere Verallgemeinerungen]
