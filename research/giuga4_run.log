@@ -1,0 +1,13 @@
+============================================================
+Giuga 4-Prim Heavy Search — Start: 2026-03-12 12:03:58
+Suchgrenze: Produkt ≤ 1e+15 | p1 ≤ 5,624
+Kerne: 20
+============================================================
+
+p1-Kandidaten: 739 (2..5623)
+Starte Suche mit 20 Kernen...
+
+Phase 1: p1 ≤ 100 (25 Werte, aufwändig)...
+  Phase 1 fertig: 19555s, 0 Treffer
+
+Phase 2: p1 > 100 (714 Werte, schnell)...
