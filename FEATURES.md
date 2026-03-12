@@ -456,3 +456,46 @@ _(keine bekannten offenen Features mehr)_
 - [x] `RamseyBounds.upper_spencer_1975(k)` — c·k·2^{k/2}/sqrt(ln k)
 - [x] `RamseyBounds.diagonal_bounds(k_max)` — Übersichtstabelle
 - [x] `RamseyBounds.multiplicity(s,t,n)` — Goodman-Formel
+
+### Papers — Gruppe B Vermutungen (Batches 19–25) — Build 164–171
+**52 neue LaTeX-Papers (26 Themen × EN + DE)**
+
+#### Batch 19 — Additive Kombinatorik & Kombinatorik (Build 164)
+- [x] paper72: Freiman-Struktursatz — Plünnecke-Ruzsa, Sanders, PFR über F₂ⁿ (Gowers-Green-Manners-Tao 2023)
+- [x] paper73: Erdős-Ko-Rado-Verallgemeinerungen — Frankl t-intersecting, Ahlswede-Khachatrian, q-Analog
+- [x] paper74: Lonely Runner Vermutung — n≤7 bewiesen, Diophantische Äquivalenz
+- [x] paper75: Graceful Tree Vermutung (Ringel-Kotzig) — α-Labelings, Rosa-Satz
+
+#### Batch 20 — Topologie & Dynamik (Build 165)
+- [x] paper76: Mandelbrot-MLC-Vermutung — Douady-Hubbard, Yoccoz-Puzzle, Shishikura
+- [x] paper77: Conway-Knoten Scheibigkeit — Piccirillo 2020 (glatt NICHT scheibig), topol. offen
+- [x] paper78: Whitehead-Asphärizitätsvermutung — Lyndon-Satz, D(2)-Problem, seit 1941 offen
+- [x] paper79: Temperley-Lieb / Jones-Polynom — Khovanov, Jones-Unknoten-Vermutung, Volumen-Vermutung
+
+#### Batch 21 — Algebraische Geometrie & Algebra (Build 166)
+- [x] paper80: Jacobian-Vermutung — Bass-Connell-Wright, Pinchuk (reell falsch), Dixmier-Äquivalenz
+- [x] paper81: Hadwiger-Vermutung n≥7 — k≤6 bewiesen, Kostochka/Thomason, Kühn-Osthus
+- [x] paper82: Andrews-Curtis-Vermutung — AC-Züge, Akbulut-Kirby, 4-Mannigfaltigkeitstopologie
+- [x] paper83: Beal-Vermutung — FLT als Spezialfall, Darmon-Granville, abc-Verbindung
+
+#### Batch 22 — Zahlentheorie (Galois & L-Funktionen) (Build 167)
+- [x] paper84: Fontaine-Mazur-Vermutung — p-adische Galois-Darstellungen, Kisin/Emerton, Taylor
+- [x] paper85: Lehmer-Problem / Mahler-Maß — Dobrowolski-Schranke, Deninger-Formel
+- [x] paper86: Rang elliptischer Kurven (unbeschränkt) — Bhargava-Shankar, Goldfeld-Vermutung
+- [x] paper87: Bateman-Horn-Vermutung — Singuläre Reihe, Green-Tao & Maynard-Tao (bewiesen)
+
+#### Batch 23 — Zahlentheorie II (Build 168)
+- [x] paper88: Ungerade vollkommene Zahlen — Euler-Struktur, Ochem-Rao n>10^1500
+- [x] paper89: Mersenne-Primzahlen / gerade vollkommene Zahlen — Lucas-Lehmer, Lenstra-Wagstaff
+- [x] paper90: Bunyakovsky-Vermutung — Iwaniec (n²+1 ist P₂), lokale Obstruktionen
+- [x] paper91: Erdős-Gallai-Satz (bewiesen) + offene Verallgemeinerungen
+
+#### Batch 24 — Geometrie & Differentialgeometrie (Build 169)
+- [x] paper92: Donaldson 4-Mannigfaltigkeiten — Seiberg-Witten, exotisches ℝ⁴, glattes Poincaré offen
+- [x] paper93: Gromov-Füllungsradius / Systolische Geometrie — Pu, Loewner, Katz
+- [x] paper94: Hartshorne-Vermutungen — Quillen-Suslin (bewiesen), Horrocks-Mumford, Kodim-2 offen
+- [x] paper95: Uniformisierung höherer Dimensionen — Yau-Vermutung, Mori-Siu-Yau (kompakt bewiesen)
+
+#### Batch 25 — Algebraische Geometrie Final (Build 170)
+- [x] paper96: Grothendieck-Standard-Vermutungen A/B/C/D — vollständiges Implikationsdiagramm, Motive
+- [x] paper97: Kontsevich-Integral / Vassiliev-Invarianten — Drinfeld-Assoziator, Wheeling-Satz

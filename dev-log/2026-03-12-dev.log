@@ -1319,3 +1319,53 @@ ausgewiesen. Keine unbewiesen Vermutung als Theorem deklariert.
   Dickson, Schinzel, Hardy-Littlewood, Green-Tao, Maynard-Tao)
 
 ### Wichtig: Alle unbewiesenen Aussagen als conjecture/vermutung deklariert
+
+=== 2026-03-12 21:22 — Build 164–171 — Gruppe B Papers: Batches 19–25 ===
+
+### Überblick
+26 neue LaTeX-Papers (EN + DE = 52 Dateien) für alle Gruppe-B-Vermutungen ohne dediziertes Paper.
+Alle unbewiesenen Aussagen korrekt als conjecture/vermutung deklariert.
+
+### Build 164 — Batch 19: Additive Kombinatorik & Kombinatorik
+- paper72_freiman_structure_theorem_en.tex + _de: Freiman-Struktursatz, Plünnecke-Ruzsa, Sanders, PFR über F₂ⁿ (Gowers-Green-Manners-Tao 2023)
+- paper73_erdos_ko_rado_en.tex + _de: EKR-Satz, Frankl t-intersecting, Ahlswede-Khachatrian, q-Analog, Frankl union-closed (Vermutung)
+- paper74_lonely_runner_en.tex + _de: Lonely Runner Vermutung, bewiesene Fälle n≤7, Diophantische Äquivalenz, Cayley-Graph-Verbindung
+- paper75_graceful_tree_en.tex + _de: Graceful Tree Vermutung (Ringel-Kotzig), Pfade/Caterpillars bewiesen, α-Labelings, Rosa-Satz
+
+### Build 165 — Batch 20: Topologie & Dynamik
+- paper76_mandelbrot_mlc_en.tex + _de: Mandelbrot-Menge, MLC-Vermutung, Douady-Hubbard, Yoccoz-Puzzle, Shishikura dim_H(∂M)=2
+- paper77_conway_knot_sliceness_en.tex + _de: Conway-Knoten, Piccirillo 2020 (NICHT glatt scheibig), s-Invariante, topologische Scheibigkeit offen
+- paper78_whitehead_asphericity_en.tex + _de: Whitehead-Asphärizitätsvermutung (seit 1941 offen), Lyndon-Satz, D(2)-Problem
+- paper79_temperley_lieb_jones_en.tex + _de: Temperley-Lieb-Algebra, Jones-Polynom, Khovanov-Homologie, Volumen-Vermutung, Jones-Unknoten-Vermutung
+
+### Build 166 — Batch 21: Algebraische Geometrie & Algebra
+- paper80_jacobian_conjecture_en.tex + _de: Jacobian-Vermutung, Pinchuk-Gegenbeispiel (reell), Bass-Connell-Wright, Dixmier-Äquivalenz
+- paper81_hadwiger_conjecture_en.tex + _de: Hadwiger n≥7, bewiesene Fälle k≤6, Kostochka/Thomason, Kühn-Osthus
+- paper82_andrews_curtis_en.tex + _de: Andrews-Curtis-Vermutung, AC-Züge, Akbulut-Kirby-Gegenbeispielkandidaten
+- paper83_beal_conjecture_en.tex + _de: Beal-Vermutung, FLT als Spezialfall, Darmon-Granville, abc-Verbindung
+
+### Build 167 — Batch 22: Zahlentheorie (Arithmetik & Galois)
+- paper84_fontaine_mazur_en.tex + _de: Fontaine-Mazur-Vermutung, p-adische Galois-Darstellungen, Kisin/Emerton, Taylor
+- paper85_lehmer_mahler_measure_en.tex + _de: Lehmer-Problem, Mahler-Maß, Dobrowolski-Schranke, Deninger-Formel
+- paper86_elliptic_curve_rank_en.tex + _de: Rang elliptischer Kurven, Goldfeld-Vermutung, Bhargava-Shankar (avg ≤ 0.885)
+- paper87_bateman_horn_en.tex + _de: Bateman-Horn-Vermutung, Singuläre Reihe, Green-Tao (bewiesen), Maynard-Tao (bewiesen)
+
+### Build 168 — Batch 23: Zahlentheorie II
+- paper88_odd_perfect_numbers_en.tex + _de: Ungerade vollkommene Zahlen, Euler-Struktur, Ochem-Rao n>10^1500
+- paper89_mersenne_primes_even_perfect_en.tex + _de: Mersenne-Primzahlen, Euklid-Euler, Lucas-Lehmer, Lenstra-Wagstaff-Heuristik
+- paper90_bunyakovsky_conjecture_en.tex + _de: Bunyakovsky-Vermutung, Iwaniec (n²+1 ist P₂), Bateman-Horn-Verbindung
+- paper91_erdos_gallai_degree_sequences_en.tex + _de: Erdős-Gallai-Satz (bewiesen 1960), Hakimi-Algorithmus, offene Verallgemeinerungen
+
+### Build 169 — Batch 24: Geometrie & Analysis
+- paper92_donaldson_4manifolds_en.tex + _de: Donaldson-Satz, Seiberg-Witten, exotisches ℝ⁴, glattes Poincaré Dim 4 (offen)
+- paper93_gromov_filling_radius_en.tex + _de: Systolische Geometrie, Pu/Loewner, Katz-Formel, optimale Konstanten (offen)
+- paper94_hartshorne_conjectures_en.tex + _de: Quillen-Suslin (bewiesen), Horrocks-Mumford-Bündel, Kodimension-2-Vermutung
+- paper95_uniformization_higher_dimensions_en.tex + _de: Yau-Vermutung, Mori-Siu-Yau (kompakt bewiesen), nicht-kompakter Fall offen
+
+### Build 170 — Batch 25: Algebraische Geometrie (Final)
+- paper96_grothendieck_standard_conjectures_en.tex + _de: Alle 4 Standard-Vermutungen A/B/C/D, Implikationsdiagramm, Jannsen, Motive
+- paper97_kontsevich_integral_en.tex + _de: Kontsevich-Integral, Vassiliev-Invarianten, Drinfeld-Assoziator, Wheeling-Satz, Volumen-Vermutung
+
+### Build 171 — Abschluss
+- build.txt auf 171 gesetzt
+- Dokumentation (FEATURES.md, BUGS.md) aktualisiert
