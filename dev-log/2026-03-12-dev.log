@@ -276,3 +276,32 @@ Zwei neue Papers erstellt:
 - Problem: Lemma 5.3 zitierte Furstenberg (1977) für ein "Korrespondenzprinzip" im Collatz-Kontext. Furstenberg (1977) behandelt Szemerédi-Theorem, nicht Collatz.
 - Fix EN: Lemma-Titel geändert zu "Correspondence principle in the Collatz context"; Zitat auf `\cite{Tao2022}` (cf.) umgestellt.
 - Fix DE: Lemma-Titel geändert zu "Korrespondenzprinzip im Collatz-Kontext"; `\cite{Furstenberg1977}` ersetzt durch `\cite{Tao2022}` (vgl.).
+
+### 2026-03-12 — Build 124: Vollständiges Audit 2026-03-12 — Bugfixes
+
+**Quelle:** 5 parallele Review-Agenten (vollständige Lektüre aller 39 Papers)
+**Neue Review-Dateien:** VOLLSTAENDIGES_AUDIT_MAENGELLISTE_2026_03_12.md, review_batch1_batch2_audit_2026_03_12.md, review_batch5_batch6_riemann_bsd_2026_03_12.md, review_batch7_8_papers29_36.md, review_batch9_10_papers37_39_2026_03_12.md
+
+**Kritische/Hohe Fixes (Build 122–124):**
+- Paper 29 EN+DE: Proposition 4.1 konditionalisiert (zirkulärer Beweis)
+- Paper 30 EN+DE: "S ist ergodisch" → "wird vermutet ergodisch zu sein"
+- Paper 32 EN+DE: Conclusion konditionalisiert (ergodisch/mischend)
+- Paper 31 EN+DE: Furstenberg(1977)-Zitat → Tao(2022)
+- Paper 39 EN+DE: LLC-Chronologie korrigiert (Kutzko 1980, Henniart 2000, Harris-Taylor 2001)
+- Paper 39 DE: Sektionen 7+8 übersetzt und eingefügt
+- Paper 39 DE: Bibitems Henniart2000 + FrenkelBenZvi ergänzt
+- Paper 38 EN+DE: Wiles 1990 → Hecke-Algebren+Modulkurven (nicht Euler-Systeme)
+- Paper 19 DE: Wooley-Theorem von Bemerkung zu Theorem hochgestuft
+- Paper 24 DE: Abstract-Letztsatz ergänzt; Deligne1974-Bibitem in EN+DE
+- Paper 24 EN: Deligne1974-Bibitem ergänzt
+
+**Mittlere/Geringe Fixes (Build 124):**
+- Paper 2 DE: Algebraischer Fehler Lemma 4.1 Zeile 217 korrigiert
+- Paper 10 DE: Interner Build-Kommentar entfernt
+- Paper 20 DE: Section 8 Einleitungstext ergänzt + Granville1995-Bibitem
+- Paper 37 DE: Tippfehler "Kürzbarkei" → "Kürzbarkeit"
+
+**Hinweis:** Review-Bug KRITISCH-1 (Δ=64n⁶ vs 4n⁶) als FALSE POSITIVE bestätigt:
+  Für E: y²=x³-n²x gilt Δ = -16·(4·(-n²)³+27·0²) = 64n⁶ — mathematisch korrekt.
+
+**Verbleibende offene Bugs:** 8 (in BUGS.md dokumentiert)

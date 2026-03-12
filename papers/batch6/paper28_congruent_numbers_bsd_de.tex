@@ -180,6 +180,9 @@ erf\"ullen (mit $a = -n^2$, $b = 0$, also $4a^3 + 27b^2 = -4n^6$, d.\,h.\
 $y_0^2 \mid 4n^6$), und es m\"ussen $x_0, y_0 \in \Z$ gelten (Nagell--Lutz).
 Eine vollst\"andige Fallunterscheidung zeigt, dass keine weiteren
 ganzzahligen Punkte auf $E_n$ existieren; vgl.\ \cite{Silverman1992}.
+(Alternativ: Mazurs Satz schr\"ankt $E_n(\Q)_{\mathrm{tors}}$ auf $15$ Typen ein;
+die Diskriminante $\Delta = 64n^6$ und die drei expliziten $2$-Torsionspunkte
+bestimmen die Torsion eindeutig als $\Z/2\Z \times \Z/2\Z$.)
 \end{proof}
 
 \begin{corollary}
@@ -262,10 +265,11 @@ Fl\"ache $= (1/2)(35/12)(24/5) = (1/2)(840/60) = (1/2)(14) = 7$. \checkmark
   \item Fermat bewies mittels unendlichem Abstieg, dass $n=1$ nicht kongruent
     ist. \"Aquivalent dazu hat die kongruente Zahlkurve $E_1\colon y^2 = x^3 - x$
     keinen rationalen Punkt unendlicher Ordnung (d.\,h.\ $\mathrm{rang}(E_1(\Q)) = 0$).
-  \item $n = 2, 3$: Tunnells Satz sagt unter BSD vorher, dass $C(2) \ne 2D(2)$
-    (gerades $n=2$: Bedingung \"uber $C, D$) und $A(3) \ne 2B(3)$
-    (ungerades $n=3$: Bedingung \"uber $A, B$), was $n=2,3$ nicht-kongruent bedeutet.
-    Dies ist aber noch nicht bedingungslos bewiesen.
+  \item $n = 2$ (gerade): $C(2) = 2$, $D(2) = 2$, also $C(2) = 2 \ne 4 = 2D(2)$.
+    Unter BSD ist $n=2$ nicht kongruent.
+  \item $n = 3$ (ungerade): $A(3) = 4$, $B(3) = 4$, also $A(3) = 4 \ne 8 = 2B(3)$.
+    Unter BSD ist $n=3$ nicht kongruent.
+    Dies ist aber f\"ur $n=2$ und $n=3$ noch nicht bedingungslos bewiesen.
   \item Die vollst\"andige bedingungslose L\"osung des kongruenten
     Zahlenproblems f\"ur $n=1,2,3$ folgt aus einem Beweis von BSD
     f\"ur die entsprechenden Kurven $E_1, E_2, E_3$.

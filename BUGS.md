@@ -1,9 +1,85 @@
 # BUGS.md - specialist-maths
 
 ## Offene Bugs
-_(keine bekannten Bugs)_
+
+### BUG-B1-P2-EN-HOCH-001: paper2 EN — Schritt 4 (p≥7) Abschätzung nicht rigoros
+- **Datei**: papers/reviewed/batch1/paper2_lehmer_three_primes.tex
+- **Problem**: Übergang von A≤2p+q-2 zur Schranke q<6(p-1)/(p-5) nur skizziert; A≥q/2 nicht rigoros bewiesen
+- **Priorität**: HOCH — Beweislücke, kein fataler Fehler
+
+### BUG-B1-P2-EN-MITTEL-002: paper2 EN — Fall p=5, q≥17 nur durch Computerscan
+- **Datei**: papers/reviewed/batch1/paper2_lehmer_three_primes.tex
+- **Problem**: Abstract behauptet "entirely elementary" — aber p=5, q≥17 wird nur durch Computerscan für q≤500 belegt; für q>500 kein Nachweis
+- **Priorität**: MITTEL — Abstract-Claim falsch oder Beweis unvollständig
+
+### BUG-B4-P18-EN/DE-003: paper18 EN+DE — Faktor 1/6 bei R₃(n) fragwürdig
+- **Dateien**: papers/reviewed/batch4/paper18_vinogradov_three_primes.tex + paper18_vinogradov_drei_primzahlen_de.tex
+- **Problem**: R₃(n) ~ (log n)³/6 · r₃(n) — falls r₃(n) geordnete Tripel zählt, gilt Faktor 1/6 NICHT (nur für ungeordnete Tripel)
+- **Priorität**: MITTEL
+
+### BUG-B4-P20-EN-TABLE: paper20 EN — r₂(100)-Vorhersagewert ≈8 falsch
+- **Datei**: papers/reviewed/batch4/paper20_goldbach_singular_series.tex
+- **Problem**: EN gibt r₂(100)≈8, korrekt ist ≈6 (DE hat den richtigen Wert)
+- **Priorität**: GERING
+
+### BUG-B5-P23-DE-001: paper23 DE — Abstract abgeschnitten
+- **Datei**: papers/reviewed/batch5/paper23_explicit_formula_pnt_de.tex
+- **Problem**: Letzter Satz über GRH und Dirichlet-L-Funktionen fehlt im DE-Abstract
+- **Priorität**: MITTEL
+
+### BUG-B6-P25-DE-003: paper25 DE — Fehlende Rank-Bemerkung
+- **Datei**: papers/reviewed/batch6/paper25_elliptic_curves_Q_de.tex
+- **Problem**: "It is not known whether ranks are unbounded" (EN Z. 300) fehlt in DE
+- **Priorität**: GERING
+
+### BUG-B6-P26-DE-TABELLE: paper26 DE — Fehlende aₚ-Tabelle
+- **Datei**: papers/reviewed/batch6/paper26_l_function_elliptic_de.tex
+- **Problem**: Tabelle für aₚ-Berechnung (y²=x³−x mod 5) fehlt in DE (Z. 109–115)
+- **Priorität**: MITTEL
+
+### BUG-B6-P27-DE-003: paper27 DE — Gekürzter Selmer-Gruppen-Abschnitt
+- **Datei**: papers/reviewed/batch6/paper27_bsd_conjecture_de.tex
+- **Problem**: Abschnitt 7 hat nur 8 Zeilen statt 14 (EN); exakte Folge 0→E(Q)/2E(Q)→Sel₂→Sha[2]→0 und Rang-Satz fehlen
+- **Priorität**: MITTEL
 
 ## Behobene Bugs
+
+### Build 124 (Audit 2026-03-12: Batch 1/2/4/6/9 Fixes)
+
+### BUG-B1-P2-DE-MITTEL-001 (Build 124): paper2 DE — Algebraischer Fehler Lemma 4.1
+- **Datei**: papers/reviewed/batch1/paper2_lehmer_drei_primfaktoren_de.tex
+- **Problem**: Zeile 217: `p - 1 - p/(q+1) + (p-1)/(q+1)` algebraisch falsch; korrekt: `p - (p+1)/(q+1)`
+- **Behoben**: Zwischenschritt korrigiert; Endergebnis k<p bleibt korrekt
+
+### BUG-B2-P10-DE-GERING-001 (Build 124): paper10 DE — Interner Build-Kommentar
+- **Datei**: papers/reviewed/batch2/paper10_wilson_quotient_de.tex
+- **Problem**: `% BUG-B2-P10-DE-004: Schlussfolgerung korrigiert...` im Quelltext belassen
+- **Behoben**: Kommentar entfernt
+
+### BUG-B4-P19-DE-THM (Build 124): paper19 DE — Wooleys Haupttheorem als Bemerkung
+- **Datei**: papers/reviewed/batch4/paper19_waringsches_problem_de.tex
+- **Problem**: Wooleys Efficient-Congruencing-Theorem über G(k)-Schranke stand als `\begin{bemerkung}` statt `\begin{theorem}`
+- **Behoben**: `\begin{bemerkung}` → `\begin{theorem}[Wooley, Efficient Congruencing]`
+
+### BUG-B4-P20-DE-SECTION (Build 124): paper20 DE — Section 8 Einleitung ergänzt
+- **Datei**: papers/reviewed/batch4/paper20_goldbach_singulaere_reihe_de.tex
+- **Problem**: Einleitungsabsatz zu Section 8 "Der Goldbach-Komet" fehlte
+- **Behoben**: Goldbach-Komet-Beschreibung aus EN übersetzt und eingefügt; Section-Titel präzisiert
+
+### BUG-B5-P24-DE-ABSTRACT (Build 124): paper24 DE — Abstract unvollständig
+- **Datei**: papers/reviewed/batch5/paper24_rh_approaches_de.tex
+- **Problem**: Letzter Satz über GRH und Dirichlet-L-Funktionen fehlte
+- **Behoben**: Abschließenden Satz eingefügt
+
+### BUG-B5-P24-EN/DE-DELIGNE (Build 124): paper24 EN+DE — Fehlender Deligne1974-Bibitem
+- **Dateien**: papers/reviewed/batch5/paper24_rh_approaches_en.tex + _de.tex
+- **Problem**: `\cite{Deligne1974}` verwendet ohne passendes `\bibitem`
+- **Behoben**: `\bibitem{Deligne1974}` in beide Versionen eingefügt
+
+### BUG-B9-P37-DE-TYPO (Build 124): paper37 DE — Tippfehler "Kürzbarkei"
+- **Datei**: papers/reviewed/batch9/paper37_algebraische_zahlentheorie_de.tex
+- **Problem**: "Kürzbarkei" statt "Kürzbarkeit"
+- **Behoben**: Tippfehler korrigiert
 
 ### Build 123 (Batch 10 Paper39 + Batch 9 Paper38 Bugfixes)
 
@@ -26,6 +102,28 @@ _(keine bekannten Bugs)_
 - **Dateien**: papers/reviewed/batch9/paper38_iwasawa_theory_en.tex + paper38_iwasawa_theorie_de.tex
 - **Problem**: Schritt 3 der Beweisskizze beschrieb Wiles 1990 mit "Euler system machinery (Kolyvagin, Rubin)"; Wiles 1990 verwendete aber Hecke-Algebren und Modulkurven. Der Euler-System-Ansatz stammt von Rubin (1991).
 - **Behoben**: Schritt 3 in EN+DE korrigiert: Wiles 1990 → Hecke-Algebren + Modulkurven (Erweiterung Mazur–Wiles 1984); Euler-System-Ansatz → Rubin (1991) für imaginär-quadratische Körper.
+
+### Build 122 (Batch 7 Collatz Bugfixes — Konditionale Formulierungen)
+
+### BUG-B7-P29-CIRCULAR-PROP4 (Build 122): paper29 EN+DE — Proposition 4.1 zirkulär
+- **Dateien**: papers/reviewed/batch7/paper29_collatz_conjecture_en.tex + paper29_collatz_vermutung_de.tex
+- **Problem**: Beweis von Proposition 4.1 (Orbit-Dichten) setzte Collatz-Vermutung voraus ohne Konditional-Deklaration im Satzstatement
+- **Behoben**: Proposition umbenannt zu "conditional on the Collatz Conjecture"; Beweis beginnt mit explizitem Vermutungshinweis
+
+### BUG-B7-P30-CONCLUSION (Build 122): paper30 EN+DE — "S ist ergodisch" als Tatsache
+- **Dateien**: papers/reviewed/batch7/paper30_collatz_p_adic_en.tex + paper30_collatz_p_adisch_de.tex
+- **Problem**: Conclusion: "but S is ergodic" (EN) / "aber S ist ergodisch" (DE) als bewiesene Aussage; im Textkörper korrekt als Vermutung
+- **Behoben**: → "is conjectured to be ergodic" (EN) / "wird vermutet, ergodisch zu sein" (DE)
+
+### BUG-B7-P32-CONCLUSION (Build 122): paper32 EN+DE — "S ergodisch und mischend" als Tatsache
+- **Dateien**: papers/reviewed/batch7/paper32_collatz_ergodic_en.tex + paper32_collatz_ergodisch_de.tex
+- **Problem**: Conclusion: "S is ergodic and mixing..." als bewiesene Aussage; alle diese Eigenschaften sind unbewiesen
+- **Behoben**: → "is conjectured to be ergodic and mixing..." (EN+DE)
+
+### BUG-B7-P31-FURSTENBERG-REF (Build 122): paper31 EN+DE — Falsche Furstenberg-Referenz
+- **Dateien**: papers/reviewed/batch7/paper31_tao_probabilistic_collatz_en.tex + paper31_tao_probabilistischer_ansatz_de.tex
+- **Problem**: Lemma 5.3 zitiert Furstenberg (1977) für Korrespondenzprinzip im Collatz-Kontext; Furstenberg 1977 ist der Beweis von Szemerédi's Theorem, ohne Collatz-Bezug
+- **Behoben**: Lemma-Titel zu "Korrespondenzprinzip im Collatz-Kontext" umbenannt; `\cite{Furstenberg1977}` → `\cite{Tao2022}`
 
 ### Build 120 (Batch 9 Review)
 
