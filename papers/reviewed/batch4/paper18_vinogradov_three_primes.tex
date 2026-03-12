@@ -132,12 +132,27 @@ $\eq{x} = e^{2\pi ix}$.
 
 \begin{remark}
   The true representation count (without logarithms) is
-  $r_3(n) = \#\{(p_1,p_2,p_3): p_1+p_2+p_3 = n\}$.  Since
-  $R_3(n) \sim (\log n)^3 r_3(n) / 6$ (the logarithms contribute roughly
-  $(\log n)^3$ per term), a positive lower bound for $R_3(n)$ implies
-  $r_3(n) > 0$, which is what we need.  The von Mangoldt function is
-  used because its arithmetic is cleaner (it ``detects'' prime powers
-  via the identity $\sum_{d|n} \Lambda(d) = \log n$).
+  $r_3(n) = \#\{(p_1,p_2,p_3): p_1+p_2+p_3 = n\}$.
+
+  \textbf{Ordered vs.\ unordered triples.}
+  Here $r_3(n)$ counts \emph{ordered} triples $(p_1,p_2,p_3)$: the same
+  three primes in different orders are counted separately.  The corresponding
+  count of \emph{unordered} triples $\{p_1,p_2,p_3\}$ is therefore (at most)
+  $r_3(n)/6$ (dividing by $3! = 6$ when all three primes are distinct; the
+  correction for repeated primes is negligible asymptotically).
+
+  The relation between the weighted and unweighted ordered counts is
+  $R_3(n) \sim (\log n)^3\, r_3(n)$
+  (since each prime $p \leq n$ contributes $\Lambda(p) = \log p \approx \log n$).
+  The factor $1/6$ appears \emph{only} when converting to unordered triples,
+  and does \emph{not} appear in the asymptotic formula for $R_3(n)$ or in
+  the ordered count $r_3(n)$.  Throughout this paper $r_3(n)$ is the
+  \emph{ordered} count, so no symmetry factor is applied.
+
+  A positive lower bound for $R_3(n)$ implies $r_3(n) > 0$ (at least one
+  ordered triple exists), which is all that is needed to prove the theorem.
+  The von Mangoldt function is used because its arithmetic is cleaner
+  (it ``detects'' prime powers via the identity $\sum_{d|n} \Lambda(d) = \log n$).
 \end{remark}
 
 % ================================================================

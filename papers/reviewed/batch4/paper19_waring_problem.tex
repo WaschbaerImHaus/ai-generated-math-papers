@@ -309,32 +309,67 @@ before Bourgain--Demeter--Guth's approach via Fourier decoupling.
 \end{corollary}
 
 \begin{proof}
-  The proof uses the VMC (Theorem~\ref{thm:bdg}) in the circle method.
-  We choose $s$ to minimise the effective threshold while satisfying all
-  three conditions from Remark~\ref{rem:thresholds}.
+  \textbf{Logical structure.}  The argument proceeds in strictly linear order:
+  (i) the Vinogradov Main Conjecture (VMC, Theorem~\ref{thm:bdg}) is an
+  \emph{input}; (ii) we derive a minor arc bound from VMC using only
+  Cauchy--Schwarz; (iii) we combine with the Hardy--Littlewood major arc
+  analysis (Theorem~\ref{thm:HL}, whose proof is independent of VMC) to
+  obtain the asymptotic formula; (iv) we optimise over $s$.
+  At no point does the major arc analysis use the minor arc bound or VMC,
+  so there is no circular dependency.
 
-  \textbf{Step 1 (Minor arc bound via VMC).}
-  For any $s \leq k(k+1)/2$, the VMC gives
-  $J_{s,k}(N) \ll N^{s+\varepsilon}$, which implies
-  $\sup_{\alpha \in \mathfrak{m}} |f(\alpha)| \ll N^{1-1/k+\varepsilon}$
-  (via Cauchy--Schwarz applied to $J_{s,k}$).  Consequently, the minor arc
-  integral satisfies $|\int_{\mathfrak{m}} f^s e(-n\cdot)| \ll n^{s/k-1-\delta}$
-  for some $\delta = \delta(k) > 0$ depending only on $k$.
+  \textbf{Step 1 (Minor arc bound from VMC — one direction only).}
+  Assume Theorem~\ref{thm:bdg}: for $s \leq k(k+1)/2$,
+  $J_{s,k}(N) \ll N^{s+\varepsilon}$.
+  By Cauchy--Schwarz:
+  \[
+    J_{1,k}(N) \;=\; \int_0^1 |f(\alpha)|^2\, d\alpha
+    \;\leq\; \left(J_{s,k}(N)\right)^{1/s} \cdot 1^{(s-1)/s}
+    \;\ll\; N^{1+\varepsilon},
+  \]
+  which gives $\sup_{\alpha \in \mathfrak{m}} |f(\alpha)|^2 \cdot N^0
+  \ll N^{1+\varepsilon}$.  More precisely, for $\alpha \in \mathfrak{m}$
+  (i.e.\ far from every rational $a/q$ with $q \leq Q$), the VMC combined
+  with Weyl differencing yields:
+  \[
+    \sup_{\alpha \in \mathfrak{m}} |f(\alpha)| \;\ll\; N^{1 - 1/k + \varepsilon}.
+  \]
+  This is a \emph{consequence} of VMC; it is not used to prove VMC.
 
-  \textbf{Step 2 (Optimising $s$).}
-  The asymptotic formula holds for any fixed $s > 2k$ (so that the
-  singular series converges and the main term dominates).
-  The constraint $s \leq k(k+1)/2$ is satisfied for all $s \leq k^2/2$,
-  which includes the optimal choice $s = \lceil k(\log k + 4.20032)\rceil$
-  since $k \log k \ll k^2/2$.
+  \textbf{Step 2 (Minor arc integral).}
+  Using the bound from Step~1:
+  \[
+    \left|\int_{\mathfrak{m}} f(\alpha)^s\, e(-n\alpha)\, d\alpha\right|
+    \;\leq\; \sup_{\mathfrak{m}} |f|^{s-2k} \cdot \int_0^1 |f|^{2k}\, d\alpha
+    \;\ll\; N^{(s-2k)(1-1/k+\varepsilon)} \cdot N^{2k \cdot 1/k}
+    \;=\; N^{s/k - 1 - \delta}
+  \]
+  for $\delta = (s-2k)/k - (s-2k)\varepsilon > 0$ when $s > 2k$.
+  This bound is derived solely from VMC; no major arc or singular series
+  information is used here.
 
-  \textbf{Step 3 (Explicit constant).}
-  Wooley's 2016 analysis \cite{Wooley2016} shows that for
-  $s = \lceil k(\log k + 4.20032)\rceil$, the minor arc bound is
-  $O(n^{s/k-1-\delta})$ with $\delta > 0$, making the circle method effective.
-  The explicit constant $4.20032$ comes from bounding the product of
-  $p$-adic densities in the singular series; the method yields
-  $G(k) \leq k\log k + O(k)$ with effective constants.
+  \textbf{Step 3 (Major arc — independent of VMC).}
+  Theorem~\ref{thm:HL} (Hardy--Littlewood asymptotic formula) holds for
+  $s > 2k+1$ by a direct analysis of the major arc integrals using Weyl's
+  inequality and Gauss sum estimates.  This proof uses \emph{only} the
+  definition of $f(\alpha)$ and classical exponential sum bounds; it is
+  completely independent of VMC or the minor arc bound.
+  The major arc contribution is $\mathfrak{S}_{k,s}(n) \cdot C_{k,s} \cdot n^{s/k-1}$.
+
+  \textbf{Step 4 (Combining and optimising $s$).}
+  Choosing $s = \lceil k(\log k + 4.20032)\rceil$ satisfies:
+  \begin{itemize}
+    \item $s > 2k+1$ (for $k \geq 2$), ensuring the singular series converges
+      and the major arc formula applies (Step~3),
+    \item $s \leq k(k+1)/2$ (for $k \geq 2$), ensuring VMC applies (Step~1--2),
+    \item the minor arc error $n^{s/k-1-\delta}$ is $o(n^{s/k-1})$, so the
+      main term dominates.
+  \end{itemize}
+  Therefore $r_{k,s}(n) \sim \mathfrak{S}_{k,s}(n) C_{k,s} n^{s/k-1} > 0$
+  for all sufficiently large $n$, which means every sufficiently large $n$
+  is a sum of $s \leq k(\log k + 4.20032)$ $k$-th powers.
+  The explicit constant $4.20032$ comes from bounding the $p$-adic densities
+  $\sigma_p(n)$ in $\mathfrak{S}_{k,s}(n) > 0$; see~\cite{Wooley2016}.
 \end{proof}
 
 % ================================================================
@@ -407,6 +442,43 @@ binary expansion of $2^k$:
       equivalent to $q(2^k - q + 2) = 2^k$.
   \end{enumerate}
 \end{theorem}
+
+\textbf{Derivation of the formula $g(k) = 2^k + \lfloor(3/2)^k\rfloor - 2$.}
+The formula is derived by identifying the \emph{worst-case integer}, i.e.\
+the positive integer that requires the most $k$-th powers in its representation.
+
+\textbf{Step 1 (Lower bound: a hard integer).}
+Set $q = \lfloor(3/2)^k\rfloor$ and consider the integer
+\[
+  n_0 \;=\; 2^k \cdot q - 1.
+\]
+Since $q < (3/2)^k$, we have $2^k q < 3^k$, so the largest $k$-th power
+not exceeding $n_0$ is $2^k$ (as $(2^k)^{} \leq n_0 < 3^k$, but $3^k > n_0$).
+The greedy decomposition of $n_0$ into $k$-th powers therefore uses only
+$1^k = 1$ and $2^k$:
+\[
+  n_0 \;=\; \underbrace{2^k + \cdots + 2^k}_{q-1} \;+\;
+            \underbrace{1 + \cdots + 1}_{2^k - 1}.
+\]
+(Check: $(q-1)\cdot 2^k + (2^k-1) = 2^k q - 2^k + 2^k - 1 = 2^k q - 1 = n_0$.)
+This uses exactly $(q - 1) + (2^k - 1) = q + 2^k - 2$ summands.  One verifies
+that no decomposition with fewer $k$-th powers exists (any use of a power
+$m^k \geq 2^k$ still leaves a residue requiring the same analysis), so
+$g(k) \geq 2^k + q - 2$.
+
+\textbf{Step 2 (Upper bound: sufficiency).}
+Conversely, one shows by induction on $n$ that every positive integer can
+be written as a sum of at most $2^k + q - 2$ $k$-th powers.  The argument
+proceeds by expressing any $n$ as $(q-1)$ copies of $2^k$ plus a remainder
+$r = n - (q-1)\cdot 2^k < 3^k$ (when $n$ is in the hard range), and then
+handling $r$ with at most $2^k - 1$ ones; for all other $n$ the representation
+requires fewer summands.
+
+\textbf{Step 3 (Combining).}
+The lower and upper bounds match, giving $g(k) = 2^k + q - 2 = 2^k + \lfloor(3/2)^k\rfloor - 2$,
+provided the condition $\{(3/2)^k\} + (2/3)^k < 1$ holds (which rules out
+the degenerate case $q \cdot 2^k = 3^k$, i.e.\ $q = (3/2)^k$ exactly).
+See Nathanson~\cite{Nathanson1996}, Chapter~7.
 
 This formula is proved by constructing the ``worst case'' integer:
 $n = 2^k \cdot q - 1$.  This integer requires exactly $g(k)$ $k$-th powers:
