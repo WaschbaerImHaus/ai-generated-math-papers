@@ -1091,3 +1091,37 @@ viele Nullstellen auf der kritischen Linie liegen.
   EN: "which holds for all known k" (Z. 438)
   DE: "was für alle bekannten k zutrifft" (Z. 316)
   Gemäß Audit-Anweisung ausreichend.
+
+## 2026-03-12 — Build 164: Batch 21 Papers 80–83 (EN + DE)
+
+### Erstellte Dateien (8 LaTeX-Papers)
+
+**Paper 80 (Jacobian-Vermutung)**
+- `papers/batch21/paper80_jacobian_conjecture_en.tex` — 12 Abschnitte
+  - Keller 1939, BCW-Gradreduktion, Yagzhev-Symmetriereduktion
+  - Pinchuk 1994 Gegenbeispiel (reell), Dixmier-Äquivalenz (Tsuchimoto/Belov-Kanel–Kontsevich)
+  - Alle unbewiesenen Aussagen als conjecture, nicht theorem
+- `papers/batch21/paper80_jacobian_vermutung_de.tex` — Deutsche Entsprechung
+
+**Paper 81 (Hadwiger-Vermutung)**
+- `papers/batch21/paper81_hadwiger_conjecture_en.tex` — 10 Abschnitte
+  - k<=4 bewiesen (klassisch/Dirac), k=5 äquivalent zu VFS (Wagner 1937)
+  - k=6 RST 1993 (nutzt VFS), k>=7 offen
+  - Kühn–Osthus 2005, Norin–Song 2023: beste asymptotische Schranke
+- `papers/batch21/paper81_hadwiger_vermutung_de.tex` — Deutsche Entsprechung
+
+**Paper 82 (Andrews-Curtis-Vermutung)**
+- `papers/batch21/paper82_andrews_curtis_en.tex` — 10 Abschnitte
+  - AC-Züge (AC1)–(AC5), Tietze vs. AC, AK(n)-Gegenbeispiele
+  - Miller–Schupp, s-Kobordismussatz, 4-Mannigfaltigkeiten
+  - Computersuch-Ergebnisse (Havas–Ramsay 2003)
+- `papers/batch21/paper82_andrews_curtis_de.tex` — Deutsche Entsprechung
+
+**Paper 83 (Beal-Vermutung)**
+- `papers/batch21/paper83_beal_conjecture_en.tex` — 10 Abschnitte
+  - Beal 1993, GFS als Spezialfall, parametrische Lösungsfamilien
+  - Darmon–Granville 1995, abc-Vermutung impliziert Beal
+  - Poonen–Schaefer–Stoll (x^2+y^3=z^7), Frey-Kurven
+- `papers/batch21/paper83_beal_vermutung_de.tex` — Deutsche Entsprechung
+
+### Build-Nummer: 163 → 164

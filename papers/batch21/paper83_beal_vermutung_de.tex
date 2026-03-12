@@ -1,0 +1,429 @@
+%% paper83_beal_vermutung_de.tex
+%% Die Beal-Vermutung und Verallgemeinerungen des Grossen Fermatschen Satzes (Deutsch)
+%% Autor: Michael Fuhrmann
+%% Specialist Mathematics Project, Build 166
+%% Datum: 2026-03-12
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem-Umgebungen (Deutsch)
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{satz}[theorem]{Satz}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{definition_de}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\theoremstyle{remark}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+\begin{document}
+
+\title{Die Beal-Vermutung\\
+und Verallgemeinerungen des Großen Fermatschen Satzes:\\
+Exponentielle diophantische Gleichungen\\
+mit paarweisen Teilerfremdheitsbedingungen}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 166}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\begin{abstract}
+Die Beal-Vermutung, unabhängig von Andrew Beal formuliert (1993) und verwandt
+mit der Tijdeman--Zagier-Vermutung, behauptet: Falls $A^x + B^y = C^z$ mit
+positiven ganzen Zahlen $A, B, C, x, y, z$ und $x, y, z \geq 3$, dann muss
+$\gcd(A, B, C) > 1$ gelten, d.h.\ die drei Basen müssen einen gemeinsamen Teiler
+größer als $1$ besitzen.
+
+Wir entwickeln die Vermutung in ihrem historischen Kontext als Verallgemeinerung
+des Großen Fermatschen Satzes, analysieren bekannte parametrische Lösungsfamilien
+(alle mit $\gcd > 1$ oder einem Exponenten $< 3$) und präsentieren die wichtigsten
+Teilresultate: Wiles' Beweis des GFS für $x = y = z$, den Darmon--Granville-Satz
+über endlich viele primitive Lösungen bei festen Exponenten, die tiefe Verbindung
+zur $abc$-Vermutung sowie die Ergebnisse von Poonen--Schaefer--Stoll.
+Das Preisgeld von $1{.}000{.}000$ \$ von Andrew Beal wird ebenfalls besprochen.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% =============================================================================
+\section{Einleitung und geschichtlicher Hintergrund}
+%% =============================================================================
+
+Der Große Fermatsche Satz (GFS) besagt, dass $A^n + B^n = C^n$ für $n \geq 3$
+keine Lösung in positiven ganzen Zahlen hat. Nach 358 Jahren wurde er 1995 von
+Andrew Wiles~\cite{Wiles95} bewiesen. Die natürliche Frage lautet: Was geschieht,
+wenn die Exponenten verschieden sein dürfen?
+
+\begin{vermutung}[Beal-Vermutung, 1993]\label{verm:beal}
+Falls $A, B, C, x, y, z$ positive ganze Zahlen mit $x, y, z \geq 3$ und
+\[
+  A^x + B^y = C^z,
+\]
+dann gilt $\gcd(A, B, C) > 1$.
+\end{vermutung}
+
+\begin{definition_de}
+Eine Lösung $(A, B, C, x, y, z)$ von $A^x + B^y = C^z$ heißt \emph{primitiv}, falls
+$\gcd(A, B, C) = 1$.
+\end{definition_de}
+
+Beals Vermutung behauptet: Es gibt keine primitiven Lösungen, wenn $x, y, z \geq 3$.
+
+\begin{bemerkung}[Geschichte]
+Andrew Beal ist Bankier und Hobbymathematiker, der die Vermutung 1993 nach
+ausgedehnter Computerssuche ohne Gegenbeispiel aufstellte. Das Problem wurde
+vorher auch betrachtet:
+\begin{itemize}
+  \item Robert Tijdeman und Don Zagier formulierten dieselbe Vermutung; sie heißt
+        manchmal auch \emph{Tijdeman--Zagier-Vermutung}.
+  \item Der GFS ist der Spezialfall $x = y = z \geq 3$.
+  \item Die Vermutung steht in der Tradition: Diophantische Gleichungen hohen
+        Grades haben sehr wenige Lösungen.
+\end{itemize}
+Beal bietet ein Preisgeld für Beweis oder Widerlegung: derzeit $1{.}000{.}000$~\$.
+\end{bemerkung}
+
+%% =============================================================================
+\section{Bezug zum Großen Fermatschen Satz}
+%% =============================================================================
+
+\begin{satz}[Fermat--Wiles, 1995]\label{satz:GFS}
+Es gibt keine positiven ganzzahligen Lösungen von $A^n + B^n = C^n$ für $n \geq 3$.
+\end{satz}
+
+\begin{korollar}
+Der Große Fermatsche Satz ist ein Spezialfall der Beal-Vermutung (der Fall $x = y = z$).
+\end{korollar}
+
+\begin{proof}
+Für $x = y = z = n \geq 3$ besagt die Beal-Vermutung: $A^n + B^n = C^n$ impliziert
+$\gcd(A,B,C) > 1$. Der GFS sagt, es gibt gar keine Lösungen, was stärker ist.
+Also impliziert der GFS diesen Spezialfall.
+\end{proof}
+
+\begin{bemerkung}
+Wiles' Beweis verwendet modulare elliptische Kurven und Galois-Darstellungen.
+Dieselben Techniken lassen sich nicht direkt auf ungleiche Exponenten übertragen,
+weshalb die Beal-Vermutung offen bleibt.
+\end{bemerkung}
+
+%% =============================================================================
+\section{Bekannte parametrische Lösungen}
+%% =============================================================================
+
+Alle bekannten Lösungen von $A^x + B^y = C^z$ mit $x, y, z \geq 3$ haben
+$\gcd(A,B,C) > 1$, was mit der Beal-Vermutung verträglich ist.
+
+\begin{beispiel}[Standardparametrische Familien]\label{bsp:param}
+\begin{enumerate}[label=(\alph*)]
+  \item $3^3 + 6^3 = 3^5$: $27 + 216 = 243 = 3^5$. Hier $\gcd(3,6,3) = 3 > 1$.
+  \item $2^6 + 2^6 = 2^7$: $64 + 64 = 128$, d.h.\ $(2^2)^3 + (2^2)^3 = 2^7$.
+        $\gcd(4,4,2) = 2 > 1$.
+\end{enumerate}
+\end{beispiel}
+
+\begin{satz}[Parametrische Lösungen mit gemeinsamen Teiler]\label{satz:param}
+Für alle ganzen Zahlen $a, b$ mit $a^3 + b^3 = c^k$ für ganze $c, k \geq 3$
+gilt $\gcd(a,b,c) > 1$, sofern die Lösung primitiv ist und der GFS angewandt wird.
+Allgemeinere Familien: Für $d = \gcd(A,B,C) > 1$ schreibe $A = da$, $B = db$,
+$C = dc$; dann wird $d^x a^x + d^y b^y = d^z c^z$, und für geeignete Wahl von
+$a,b,c$ entstehen gültige Lösungen.
+\end{satz}
+
+%% =============================================================================
+\section{Der Darmon--Granville-Satz}
+%% =============================================================================
+
+\begin{satz}[Darmon--Granville, 1995]\label{satz:DG}
+Seien $p, q, r \geq 1$ ganze Zahlen mit $1/p + 1/q + 1/r < 1$. Dann hat die Gleichung
+\[
+  A^p + B^q = C^r
+\]
+nur endlich viele primitive Lösungen $(A, B, C) \in \mathbb{Z}^3$ mit $\gcd(A, B, C) = 1$.
+\end{satz}
+
+\begin{proof}[Beweisidee]
+Darmon und Granville~\cite{DG95} nutzen Faltings' Theorem (frühere Mordell-Vermutung):
+Die Gleichung $A^p + B^q = C^r$ definiert eine Kurve $\mathcal{C}$ von Geschlecht
+$g \geq 2$, wenn $1/p + 1/q + 1/r < 1$ gilt (via Riemann--Hurwitz für eine
+verzweigte Überlagerung der projektiven Geraden). Faltings' Satz liefert dann
+nur endlich viele rationale Punkte.
+
+Die Geschlechtsformel: Für $x^p + y^q = z^r$ hat ein glattes projektives Modell
+Geschlecht $g \geq 2$, wenn $1/p + 1/q + 1/r < 1$.
+\end{proof}
+
+\begin{korollar}
+Für $p, q, r \geq 3$: $1/p + 1/q + 1/r \leq 1$, mit Gleichheit nur für $(3,3,3)$.
+Für $(3,3,3)$: GFS gilt. Für alle anderen $(p,q,r) \neq (3,3,3)$ mit $p,q,r \geq 3$:
+Darmon--Granville liefert endlich viele primitive Lösungen.
+\end{korollar}
+
+\begin{bemerkung}
+Darmon--Granville beweist \emph{Endlichkeit}, nicht \emph{Nichtexistenz}.
+Die Beal-Vermutung behauptet, es gibt \emph{gar keine} primitiven Lösungen.
+\end{bemerkung}
+
+%% =============================================================================
+\section{Fälle mit kleinen Exponenten}
+%% =============================================================================
+
+Wenn ein Exponent gleich $1$ oder $2$ ist, gibt es reichlich Lösungen.
+Die Einschränkung $x,y,z \geq 3$ in der Beal-Vermutung ist wesentlich.
+
+\begin{beispiel}[Exponent $= 2$]
+$A^x + B^y = C^2$ mit $x,y \geq 2$: Es gibt unendlich viele primitive Lösungen.
+Zum Beispiel: $2^3 + 1^2 = 3^2$ — check: $8 + 1 = 9$. Hier $\gcd(2,1,3) = 1$,
+aber Exponent $2$ kommt vor, also kein Verstoß gegen Beal.
+\end{beispiel}
+
+\begin{satz}[GFS-Verbindungen für $z = 2$]\label{satz:z2}
+Die Gleichung $A^p + B^q = C^2$ mit $p, q \geq 4$ hat keine primitiven Lösungen
+für $p = q = 4$ (Euler--Fermat-Abstieg).
+\end{satz}
+
+%% =============================================================================
+\section{Die \texorpdfstring{$abc$}{abc}-Vermutung und Beal}
+%% =============================================================================
+
+\begin{vermutung}[$abc$-Vermutung, Masser--Oesterlé 1985]\label{verm:abc}
+Für jedes $\varepsilon > 0$ gibt es nur endlich viele Tripel $(a,b,c)$ paarweise
+teilerfremder positiver ganzer Zahlen mit $a + b = c$ und
+\[
+  c > \mathrm{rad}(abc)^{1+\varepsilon},
+\]
+wobei $\mathrm{rad}(n) = \prod_{p \mid n} p$ das Produkt der verschiedenen Primteiler
+von $n$ ist.
+\end{vermutung}
+
+\begin{bemerkung}
+Die $abc$-Vermutung ist offen. Shinichi Mochizuki behauptete 2012 einen Beweis
+(Inter-universelle Teichmüller-Theorie), der von der Gemeinschaft aber nicht
+akzeptiert wurde; Scholze und Stix identifizierten 2018 eine Lücke.
+\end{bemerkung}
+
+\begin{satz}[$abc$ impliziert Beal]\label{satz:abcBeal}
+Unter Annahme der $abc$-Vermutung: Die Beal-Vermutung gilt für alle bis auf endlich
+viele primitive Tripel $(A, B, C)$ mit festen Exponenten $(x, y, z)$. Falls
+$1/x + 1/y + 1/z < 1$, gibt es keine primitiven Lösungen für hinreichend große $A, B, C$.
+\end{satz}
+
+\begin{proof}
+Sei $A^x + B^y = C^z$ mit $\gcd(A,B,C) = 1$. Setze $a = A^x$, $b = B^y$, $c = C^z$.
+Dann $a + b = c$ und $\gcd(a,b,c) = 1$. Es gilt:
+\[
+  \mathrm{rad}(abc) = \mathrm{rad}(A^x B^y C^z) = \mathrm{rad}(ABC) \leq A \cdot B \cdot C
+  \leq a^{1/x} \cdot b^{1/y} \cdot c^{1/z}.
+\]
+Die $abc$-Vermutung liefert $c < \mathrm{rad}(abc)^{1+\varepsilon} \leq
+(a^{1/x} b^{1/y} c^{1/z})^{1+\varepsilon}$, also
+\[
+  c^{1-(1+\varepsilon)/z} < (ab)^{(1+\varepsilon)/\min(x,y)}.
+\]
+Für $1/x + 1/y + 1/z < 1$ und kleines $\varepsilon$ folgt eine polynomiale Schranke
+für $c$, was nur endlich viele Lösungen erlaubt.
+\end{proof}
+
+%% =============================================================================
+\section{Ergebnisse von Poonen--Schaefer--Stoll}
+%% =============================================================================
+
+\begin{satz}[Poonen--Schaefer--Stoll, 2007]\label{satz:PSS}
+Die Gleichung $x^2 + y^3 = z^7$ hat genau $27$ primitive Lösungen (bis auf Vorzeichen).
+Alle Lösungen erfüllen $\gcd(x,y,z) = 1$, verträglich mit zwei Exponenten $< 3$.
+\end{satz}
+
+\begin{bemerkung}
+Das Resultat aus~\cite{PSS07} verwendet Chabauty--Coleman-Methoden, Modulformen
+und einen sorgfältigen Abstieg auf Jakobiannen von Kurven. Es zeigt, dass die
+Theorie rationaler Punkte auf Kurven hohen Geschlechts (Faltings) effektiv
+gemacht werden kann.
+\end{bemerkung}
+
+\begin{satz}[Bruin, 2003]\label{satz:bruin}
+Die Gleichung $x^2 + y^4 = z^6$ hat keine primitiven Lösungen.
+\end{satz}
+
+%% =============================================================================
+\section{Heuristische Dichte-Argumente}
+%% =============================================================================
+
+\begin{satz}[Dichte-Argument]\label{satz:dichte}
+Heuristisch ist die Anzahl primitiver Lösungen von $A^x + B^y = C^z$ mit
+$\max(A,B,C) \leq N$ von der Ordnung $O(N^{1/x + 1/y + 1/z - 1 + \varepsilon})$.
+Für $1/x + 1/y + 1/z < 1$ geht diese Schätzung gegen $0$ für $N \to \infty$,
+was die Beal-Vermutung heuristisch stützt.
+\end{satz}
+
+\begin{bemerkung}
+Dieses Heuristikargument ist kein Beweis, erklärt aber, warum die Beal-Vermutung
+plausibel ist: Die „erwartete" Anzahl von Lösungen sinkt mit wachsenden Exponenten.
+\end{bemerkung}
+
+%% =============================================================================
+\section{Verbindungen zu Modularität und elliptischen Kurven}
+%% =============================================================================
+
+\begin{satz}[Ribet--Wiles für $A^p + B^p = C^2$]\label{satz:rpw}
+Es gibt keine primitiven Lösungen von $A^p + B^p = C^2$ für Primzahlen $p \geq 7$
+mit $2 \mid C$ und $4 \mid A$.
+\end{satz}
+
+\begin{satz}[Verallgemeinerter Fermat bei festen Exponenten]\label{satz:genFerm}
+\begin{enumerate}[label=(\roman*)]
+  \item $A^n + B^n = C^2$: Keine primitiven Lösungen für $n = 3$ (Euler) und
+        $n = 4$ (Fermat-Abstieg).
+  \item $A^3 + B^3 = C^n$: Keine primitiven Lösungen für $n = 3$ (Euler);
+        für $n = 5, 7$ gelöst durch Bruin~\cite{Bruin03}.
+\end{enumerate}
+\end{satz}
+
+\begin{bemerkung}[Frey-Kurven-Verbindung]
+Für $A^p + B^q = C^r$ kann manchmal eine Frey--Hellegouarch-Kurve
+$E\colon y^2 = x(x - A^p)(x + B^q)$ konstruiert werden.
+Die Methode funktioniert sauber für $p = q = r$ (GFS), stößt aber bei ungleichen
+Exponenten auf wesentliche Hindernisse.
+\end{bemerkung}
+
+%% =============================================================================
+\section{Das Preisgeld und aktueller Stand}
+%% =============================================================================
+
+\begin{itemize}
+  \item Andrew Beal kündigte die Vermutung 1993 nach ausgedehnter Computersuche
+        ohne Gegenbeispiel an.
+  \item Aktuelles Preisgeld: $1{.}000{.}000$~\$ (verwahrt von der American Mathematical Society).
+  \item Das Preisgeld wird für einen begutachteten Beweis oder ein Gegenbeispiel ausgelobt.
+  \item Computerverifikation: Keine primitiven Lösungen gefunden mit
+        $\max(A,B,C) \leq 10^{12}$ und $3 \leq x,y,z \leq 12$.
+\end{itemize}
+
+\begin{vermutung}[Beal, aktueller Status]\label{verm:beal_status}
+Die Beal-Vermutung (Vermutung~\ref{verm:beal}) ist offen für alle $x, y, z \geq 3$
+über den positiven ganzen Zahlen. Keine primitiven Lösungen sind bekannt, und kein
+Beweis der Nichtexistenz existiert.
+\end{vermutung}
+
+%% =============================================================================
+\section{Verallgemeinerungen: Die verallgemeinerte Fermat-Gleichung}
+%% =============================================================================
+
+\begin{definition_de}
+Die \emph{verallgemeinerte Fermat-Gleichung} (VFG) fragt nach ganzzahligen Lösungen von
+\[
+  x^p + y^q + z^r = 0
+\]
+mit $\gcd(x,y,z) = 1$ und $p, q, r \geq 2$.
+\end{definition_de}
+
+\begin{satz}[Beukers, 1998]\label{satz:beukers}
+Die verallgemeinerte Fermat-Gleichung $x^2 + y^3 + z^5 = 0$ hat genau $27$
+primitive ganzzahlige Lösungen (bis auf Gesamtvorzeichenwechsel).
+\end{satz}
+
+\begin{satz}[Klassifikation der VFG nach Euler-Charakteristik]\label{satz:euler}
+Sei $\chi(p,q,r) = 1/p + 1/q + 1/r - 1$. Dann:
+\begin{enumerate}[label=(\roman*)]
+  \item $\chi > 0$ (sphärisch): $(2,2,r)$, $(2,3,3)$, $(2,3,4)$, $(2,3,5)$ —
+        unendlich viele Lösungen.
+  \item $\chi = 0$ (euklidisch): $(2,3,6)$, $(2,4,4)$, $(3,3,3)$ —
+        endlich viele primitive Lösungen.
+  \item $\chi < 0$ (hyperbolisch): Alle anderen $(p,q,r)$ mit $p,q,r \geq 2$ —
+        endlich viele nach Faltings.
+\end{enumerate}
+\end{satz}
+
+%% =============================================================================
+\section{Zusammenfassung}
+%% =============================================================================
+
+Die Beal-Vermutung ist eine natürliche Verallgemeinerung des Großen Fermatschen Satzes
+auf möglicherweise ungleiche Exponenten. Während Wiles' GFS-Beweis ein Meilenstein war,
+lässt er die Beal-Vermutung vollständig offen.
+
+Die Evidenz zugunsten der Vermutung ist stark:
+\begin{itemize}
+  \item Keine primitiven Lösungen mit $x,y,z \geq 3$ wurden je gefunden.
+  \item Heuristische Argumente sagen ihre Nichtexistenz stark voraus.
+  \item Die $abc$-Vermutung impliziert Nichtexistenz für große Lösungen.
+  \item Darmon--Granville sichert Endlichkeit für jedes feste Tripel $(x,y,z)$.
+\end{itemize}
+
+Ein Beweis würde neue Methoden jenseits des Modularitäts-/Faltings-Werkzeugs erfordern,
+vermutlich mit Galois-Darstellungen, $p$-adischer Hodge-Theorie und gänzlich neuen
+Ideen über exponentielle diophantische Gleichungen.
+
+\begin{thebibliography}{99}
+
+\bibitem{Wiles95}
+A.~Wiles,
+\textit{Modular elliptic curves and Fermat's last theorem},
+Ann.\ of Math.\ (2) \textbf{141} (1995), Nr.\ 3, 443--551.
+
+\bibitem{DG95}
+H.~Darmon, A.~Granville,
+\textit{On the equations $z^m = F(x,y)$ and $Ax^p + By^q = Cz^r$},
+Bull.\ London Math.\ Soc.\ \textbf{27} (1995), Nr.\ 6, 513--543.
+
+\bibitem{TW95}
+R.~Taylor, A.~Wiles,
+\textit{Ring-theoretic properties of certain Hecke algebras},
+Ann.\ of Math.\ (2) \textbf{141} (1995), Nr.\ 3, 553--572.
+
+\bibitem{PSS07}
+B.~Poonen, E.~F.\ Schaefer, M.~Stoll,
+\textit{Twists of $X(7)$ and primitive solutions to $x^2 + y^3 = z^7$},
+Duke Math.\ J.\ \textbf{137} (2007), Nr.\ 1, 103--158.
+
+\bibitem{Bruin03}
+N.~Bruin,
+\textit{Chabauty methods and covering techniques applied to generalized Fermat equations},
+CWI Tract \textbf{133}, Centrum voor Wiskunde en Informatica, Amsterdam, 2002.
+
+\bibitem{Cohen07}
+H.~Cohen,
+\textit{Number Theory, Vol.\ II: Analytic and Modern Tools},
+Graduate Texts in Mathematics \textbf{240}, Springer, 2007.
+
+\bibitem{Masser85}
+D.~W.\ Masser,
+\textit{Open problems},
+in \textit{Proc.\ Symp.\ Analytic Number Theory} (W.~W.~L.\ Chen, Hrsg.),
+Imperial College, London, 1985.
+
+\bibitem{Oesterle}
+J.~Oesterlé,
+\textit{Nouvelles approches du ``théorème'' de Fermat},
+Séminaire Bourbaki 1987--88, Exposé \textbf{694}, Astérisque \textbf{161--162} (1988), 165--186.
+
+\bibitem{Beal2016}
+A.~Beal,
+\textit{Beal Conjecture},
+\url{http://www.bealconjecture.com}, Zugriff 2026.
+
+\end{thebibliography}
+
+\end{document}

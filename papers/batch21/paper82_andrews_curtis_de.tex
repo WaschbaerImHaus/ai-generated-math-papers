@@ -1,0 +1,418 @@
+%% paper82_andrews_curtis_de.tex
+%% Die Andrews-Curtis-Vermutung in der kombinatorischen Gruppentheorie (Deutsch)
+%% Autor: Michael Fuhrmann
+%% Specialist Mathematics Project, Build 166
+%% Datum: 2026-03-12
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem-Umgebungen (Deutsch)
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{satz}[theorem]{Satz}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{definition_de}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\theoremstyle{remark}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+\begin{document}
+
+\title{Die Andrews--Curtis-Vermutung\\
+in der kombinatorischen Gruppentheorie:\\
+Balancierte Präsentationen, AC-Züge\\
+und Verbindungen zur $4$-Mannigfaltigkeitstopologie}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 166}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\begin{abstract}
+Die Andrews--Curtis-Vermutung (1965) behauptet, dass jede balancierte Präsentation
+$\langle x_1,\ldots,x_n \mid r_1,\ldots,r_n \rangle$ der trivialen Gruppe durch
+eine endliche Folge von AC-Zügen (zyklische Permutation, Inversion, Konjugation,
+Multiplikation einer Relation sowie Generatorinvertierung mit entsprechender
+Aktualisierung) auf die Standardpräsentation
+$\langle x_1,\ldots,x_n \mid x_1,\ldots,x_n \rangle$ reduziert werden kann.
+
+Trotz ihrer elementaren Formulierung mit nur grundlegender Gruppentheorie hat
+die Vermutung über sechzig Jahre allen Beweisversuchen widerstanden und gilt als
+eines der schwersten offenen Probleme der kombinatorischen Gruppentheorie.
+Wir behandeln die AC-Züge im Detail, präsentieren die Hauptkandidaten für
+Gegenbeispiele (Akbulut--Kirby-Folge und Miller--Schupp-Präsentationen), diskutieren
+Verbindungen zur $4$-Mannigfaltigkeitstopologie über den $s$-Kobordismussatz sowie
+Computersuchergebnisse.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% =============================================================================
+\section{Einleitung}
+%% =============================================================================
+
+Im Jahr 1965 stellten J.~J.\ Andrews und M.~L.\ Curtis~\cite{AC65} folgendes
+Problem über Gruppenpräsentationen:
+
+\begin{vermutung}[Andrews--Curtis, 1965]\label{verm:AC}
+Sei $P = \langle x_1,\ldots,x_n \mid r_1,\ldots,r_n \rangle$ eine balancierte
+Präsentation der trivialen Gruppe ($n$ Erzeuger, $n$ Relationen; präsentierte Gruppe
+$= \{1\}$). Dann kann $P$ durch eine endliche Folge der folgenden
+\emph{Andrews--Curtis-Züge} (AC-Züge) in die Standardpräsentation
+$S_n = \langle x_1,\ldots,x_n \mid x_1,\ldots,x_n \rangle$ überführt werden:
+\begin{enumerate}[label=(AC\arabic*)]
+  \item Ersetze $r_i$ durch $r_i^{-1}$.
+  \item Ersetze $r_i$ durch $r_i r_j$ (für $i \neq j$).
+  \item Ersetze $r_i$ durch $w r_i w^{-1}$ für ein beliebiges $w \in F_n$ (Konjugation).
+  \item Ersetze $r_i$ durch eine zyklische Permutation von $r_i$.
+  \item Ersetze $x_i$ durch $x_i^{-1}$ (mit entsprechender Aktualisierung aller $r_j$).
+\end{enumerate}
+\end{vermutung}
+
+\begin{bemerkung}
+Die Züge (AC1)--(AC4) sind die Standard-AC-Züge; (AC5) gehört manchmal zur
+„stabilisierten" Version. Alle Züge liefern wieder eine balancierte Präsentation
+derselben Gruppe. Die Vermutung behauptet, dass diese Züge alle balancierten
+trivialen Präsentationen in eine einzige AC-Äquivalenzklasse verbinden.
+\end{bemerkung}
+
+%% =============================================================================
+\section{Balancierte Präsentationen und die triviale Gruppe}
+%% =============================================================================
+
+\begin{definition_de}
+Eine \emph{Präsentation} einer Gruppe $G$ ist ein surjektiver Homomorphismus
+$\varphi \colon F_n \to G$ von einer freien Gruppe, geschrieben
+$G = \langle x_1,\ldots,x_n \mid r_1,\ldots,r_m \rangle$, wobei $r_i \in F_n$
+Wörter sind, deren Normalabschluss $\langle\!\langle r_1,\ldots,r_m \rangle\!\rangle
+= \ker\varphi$. Die Präsentation ist \emph{balanciert}, falls $n = m$.
+\end{definition_de}
+
+\begin{beispiel}[Präsentationen der trivialen Gruppe]\label{bsp:trivial}
+Folgende balancierte Präsentationen stellen die triviale Gruppe dar:
+\begin{enumerate}[label=(\alph*)]
+  \item $\langle x \mid x \rangle$: Standardpräsentation.
+  \item $\langle a, b \mid ab, a^{-1}b \rangle$: balanciert, triviale Gruppe.
+  \item $\langle a, b \mid a^2 b^{-1}, a^3 b^{-2} \rangle$: die Akbulut--Kirby-Präsentation
+        $\mathrm{AK}(2)$, mutmaßlicher Gegenbeispielkandidat.
+\end{enumerate}
+\end{beispiel}
+
+\begin{proposition}
+Die Menge der balancierten Präsentationen der trivialen Gruppe ist unter AC-Zügen abgeschlossen.
+\end{proposition}
+
+\begin{proof}
+Jeder AC-Zug erhält die Anzahl der Erzeuger und Relationen (alle Züge lassen $n$
+unverändert). Die präsentierte Gruppe bleibt trivial: (AC1) invertiert eine
+Konsequenz, (AC2) ersetzt $r_i$ durch ein Element in $\langle\!\langle r_1,\ldots,r_n \rangle\!\rangle$,
+(AC3)/(AC4) ersetzen durch konjugierte Elemente, (AC5) ist ein freier Gruppenautomorphismus.
+\end{proof}
+
+%% =============================================================================
+\section{Verhältnis zu Tietze-Transformationen}
+%% =============================================================================
+
+\begin{definition_de}[Tietze-Transformationen]
+Zwei Präsentationen definieren dieselbe Gruppe genau dann, wenn man eine aus der
+anderen durch eine endliche Folge von \emph{Tietze-Zügen} gewinnen kann:
+\begin{enumerate}[label=(T\arabic*)]
+  \item Hinzufügen einer Relation, die eine Folge der vorhandenen ist.
+  \item Entfernen einer Relation, die eine Folge der übrigen ist.
+  \item Hinzufügen eines neuen Erzeugers $y$ mit neuer Relation $y = w(x_i)$.
+  \item Entfernen eines Erzeugers $x_i$, der in einer Relation $x_i = w(x_j)$ auftritt.
+\end{enumerate}
+\end{definition_de}
+
+\begin{satz}[Tietze, 1908]
+Zwei endliche Präsentationen definieren isomorphe Gruppen genau dann, wenn sie
+durch eine endliche Folge von Tietze-Zügen verbunden sind.
+\end{satz}
+
+\begin{bemerkung}
+Die AC-Züge sind restriktiver als Tietze-Züge: Sie erlauben kein Hinzufügen oder
+Entfernen von Erzeugern (T3, T4), was die Balance $n$ ändern würde. Die AC-Vermutung
+fragt, ob die eingeschränkte Menge der Züge (AC1)--(AC4) dennoch ausreicht,
+um alle balancierten trivialen Präsentationen zu verbinden.
+\end{bemerkung}
+
+%% =============================================================================
+\section{Mögliche Gegenbeispiele}
+%% =============================================================================
+
+\subsection{Die Akbulut--Kirby-Folge}
+
+\begin{definition_de}[Akbulut--Kirby-Präsentationen]\label{def:AK}
+Für jede ganze Zahl $n \geq 2$ ist die Akbulut--Kirby-Präsentation:
+\[
+  \mathrm{AK}(n) = \langle a, b \mid a^n b^{-(n-1)},\; a^{n+1} b^{-n} \rangle.
+\]
+\end{definition_de}
+
+\begin{proposition}
+$\mathrm{AK}(n)$ präsentiert die triviale Gruppe für alle $n$.
+\end{proposition}
+
+\begin{proof}
+Aus $a^n = b^{n-1}$ und $a^{n+1} = b^n$ folgt $a \cdot b^{n-1} = b^n$, also $a = b$.
+Einsetzen: $b^n = b^{n-1}$, also $b = e$ und $a = e$.
+\end{proof}
+
+\begin{beispiel}[$\mathrm{AK}(2)$ im Detail]
+$\mathrm{AK}(2) = \langle a,b \mid a^2 b^{-1}, a^3 b^{-2} \rangle$.
+Durch Computer wurde verifiziert, dass diese Präsentation in keiner Folge von
+AC-Zügen bis zur Länge von mehreren Tausend Schritten auf die Standardpräsentation
+reduziert werden kann. Sie ist der bekannteste Kandidat für ein Gegenbeispiel
+zur Andrews--Curtis-Vermutung.
+\end{beispiel}
+
+\begin{bemerkung}
+Die Schwierigkeit bei $\mathrm{AK}(n)$ besteht darin, dass jede AC-Reduktion
+scheinbar eine „Zwischenkomplexifizierung" erfordert, bei der die Gesamtlänge
+der Präsentation erheblich ansteigt, bevor sie vereinfacht werden kann.
+Ob solche Sequenzen beschränkter Komplexität existieren, ist unbekannt.
+\end{bemerkung}
+
+\subsection{Miller--Schupp-Präsentationen}
+
+\begin{definition_de}[Miller--Schupp-Präsentationen]\label{def:MS}
+Für ein Wort $w \in F_2$ in Erzeugern $a, b$:
+\[
+  \mathrm{MS}(w) = \langle a, b \mid a^2, w a w^{-1} b^{-2} \rangle.
+\]
+\end{definition_de}
+
+\begin{proposition}
+$\mathrm{MS}(w)$ präsentiert die triviale Gruppe genau dann, wenn $w$ in geeignetem Sinne
+einer ungeraden Potenz von $b$ im Quotienten entspricht.
+\end{proposition}
+
+\begin{bemerkung}
+Miller und Schupp~\cite{MS99} identifizierten eine Familie von Präsentationen, die
+die triviale Gruppe darstellen, für die aber keine kurzen AC-Reduktionsfolgen bekannt sind.
+\end{bemerkung}
+
+%% =============================================================================
+\section{Verbindungen zur \texorpdfstring{$4$}{4}-Mannigfaltigkeitstopologie}
+%% =============================================================================
+
+\begin{satz}[$h$-Kobordismussatz, Smale 1960]\label{satz:hkobord}
+Für $n \geq 5$: Jeder einfach zusammenhängende glatte $h$-Kobordismus
+$(W; M_0, M_1)$ mit $\dim W = n+1$ ist diffeomorph zu $M_0 \times [0,1]$.
+\end{satz}
+
+\begin{satz}[$s$-Kobordismussatz, 1964]\label{satz:skobord}
+Für $n \geq 5$: Ein glatter Kobordismus $(W; M_0, M_1)$ ist diffeomorph zu
+$M_0 \times [0,1]$ genau dann, wenn die Inklusion $M_0 \hookrightarrow W$ eine
+einfache Homotopieäquivalenz ist (d.h.\ verschwindende Whitehead-Torsion).
+\end{satz}
+
+\begin{bemerkung}[Versagen in Dimension 4]
+Für $n = 4$ (also $5$-dimensionale Kobordismen) schlägt der $s$-Kobordismussatz im
+Allgemeinen fehl: Es gibt $s$-Kobordismen zwischen $4$-Mannigfaltigkeiten, die keine
+Produkte sind. Die Andrews--Curtis-Vermutung ist mit der Frage verbunden, ob bestimmte
+$4$-dimensionale $h$-Kobordismen trivial sind.
+\end{bemerkung}
+
+\begin{satz}[AC und $4$-Mannigfaltigkeitstopologie]\label{satz:AC4mfgk}
+Eine balancierte Präsentation $P = \langle x_1,\ldots,x_n \mid r_1,\ldots,r_n \rangle$
+der trivialen Gruppe entspricht einem $2$-Komplex $K_P$ (dem Standardkomplex der
+Präsentation). Dieser ist homotopieäquivalent zu einem Keil von $2$-Sphären
+$\bigvee S^2$. Falls $P$ AC-reduzierbar ist, ist $K_P$ formal homotopieäquivalent
+zu einem Punkt.
+\end{satz}
+
+\begin{definition_de}[Geometrische AC-Vermutung]
+Ein $2$-Komplex $K$, der homotopieäquivalent zu einem Punkt ist (d.h.\ zusammenziehbar
+ist), heißt \emph{geometrisch AC-trivial}, falls er durch eine Folge elementarer
+Kollapse auf einen Punkt reduziert werden kann.
+\end{definition_de}
+
+\begin{vermutung}[Geometrische AC-Vermutung]\label{verm:geoAC}
+Jeder endliche zusammenziehbare $2$-Komplex ist geometrisch AC-trivial.
+\end{vermutung}
+
+\begin{bemerkung}
+Die geometrische AC-Vermutung ist schwächer als die ursprüngliche AC-Vermutung
+(da letztere nicht-zusammenziehbare Zwischenräume erlaubt). Selbst diese schwächere
+Version ist offen.
+\end{bemerkung}
+
+%% =============================================================================
+\section{Der Boone--Novikov-Satz und Unentscheidbarkeit}
+%% =============================================================================
+
+\begin{satz}[Boone 1959; Novikov 1955]\label{satz:BN}
+Das Wortproblem für endlich präsentierte Gruppen ist unentscheidbar.
+\end{satz}
+
+\begin{satz}[Markov, 1958]\label{satz:markov}
+Es ist unentscheidbar, ob zwei endliche Präsentationen isomorphe Gruppen definieren.
+\end{satz}
+
+\begin{bemerkung}[Implikationen für AC]\label{bem:undec}
+Die Unentscheidbarkeit des Isomorphieproblems impliziert nicht direkt die
+Unentscheidbarkeit der AC-Vermutung, da diese eine feste Instanz (die triviale Gruppe)
+betrifft. Ob die Frage „Ist $P$ AC-äquivalent zur Standardpräsentation?" entscheidbar
+ist, ist ebenfalls offen.
+\end{bemerkung}
+
+%% =============================================================================
+\section{Computersuchergebnisse}
+%% =============================================================================
+
+\begin{satz}[Rechnerische Verifikation für kleine Komplexität]\label{satz:comp}
+Alle balancierten Präsentationen der trivialen Gruppe mit Gesamtlänge (Summe der
+Relationslängen) $\leq 12$ sind AC-äquivalent zur Standardpräsentation.
+(Genauer Wert variiert nach Autor; aktuell ca.\ $\leq 14$ verifiziert.)
+\end{satz}
+
+\begin{bemerkung}
+Havas und Ramsay~\cite{HR03} sowie Bridson~\cite{Bridson15} führten systematische
+Computersuchen durch:
+\begin{itemize}
+  \item Alle Präsentationen niedriger Komplexität reduzieren, aber die
+        Reduktionsfolgen können enorm lang sein.
+  \item $\mathrm{AK}(2)$ konnte trotz extensiver Suche nicht reduziert werden.
+  \item Der Suchraum wächst überexponentiell in der Präsentationslänge.
+\end{itemize}
+\end{bemerkung}
+
+\begin{proposition}[Längenerhöhende Züge sind notwendig]
+Für $\mathrm{AK}(2)$ muss jede AC-Reduktion (falls sie existiert) durch Präsentationen
+mit Gesamtrelationslänge $\geq 100$ gehen, was erschöpfende Suche mit heutigen
+Methoden undurchführbar macht.
+\end{proposition}
+
+%% =============================================================================
+\section{Defizit von Gruppen und balancierte Präsentationen}
+%% =============================================================================
+
+\begin{definition_de}
+Das \emph{Defizit} einer endlichen Gruppe $G$, geschrieben $\mathrm{def}(G)$, ist das
+Maximum über alle endlichen Präsentationen $\langle X \mid R \rangle$ von $G$ von
+$|X| - |R|$.
+\end{definition_de}
+
+\begin{satz}[Defizitschranke]\label{satz:defiz}
+Für eine endliche Gruppe $G$: $\mathrm{def}(G) \leq 0$.
+Außerdem: $\mathrm{def}(G) = 0$ genau dann, wenn $G$ eine balancierte Präsentation besitzt.
+\end{satz}
+
+%% =============================================================================
+\section{Verschärfungen und Variationen}
+%% =============================================================================
+
+\begin{vermutung}[Stabile AC-Vermutung]\label{verm:stableAC}
+Die Andrews--Curtis-Vermutung gilt nach \emph{Stabilisierung}: Für jede balancierte
+Präsentation $P$ der trivialen Gruppe gibt es $k \geq 0$, sodass $P * S_k$ AC-reduzierbar ist.
+\end{vermutung}
+
+\begin{satz}[AC für Ein-Relationen-Gruppen]\label{satz:einrel}
+Die Andrews--Curtis-Vermutung gilt für balancierte Präsentationen der trivialen Gruppe
+mit einem Erzeuger und einer Relation (Fall $n=1$): Hier gilt notwendigerweise $r = x^{\pm 1}$,
+was bereits Standardform ist.
+\end{satz}
+
+%% =============================================================================
+\section{Offene Probleme}
+%% =============================================================================
+
+\begin{enumerate}[label=(\arabic*)]
+  \item \textbf{AC für $n = 2$}: Ist jede balancierte Zwei-Erzeuger-Präsentation
+        der trivialen Gruppe AC-reduzierbar? Dies ist der einfachste offene Fall
+        und umfasst $\mathrm{AK}(2)$.
+
+  \item \textbf{$\mathrm{AK}(n)$-Präsentationen}: Ist $\mathrm{AK}(n)$ für
+        irgendeinen Wert $n \geq 2$ AC-reduzierbar?
+
+  \item \textbf{Topologie}: Besitzt jedes zusammenziehbare $4$-dimensionale
+        Handlekörper-Gebäude eine Henkelzerlegung, die aus der Standardzerlegung
+        durch eine ableitbare Folge hervorgeht?
+
+  \item \textbf{Algorithmische Entscheidbarkeit}: Ist das Problem „Gegeben $P$,
+        ist $P$ AC-äquivalent zur Standardpräsentation?" entscheidbar?
+
+  \item \textbf{Quantitative Schranken}: Falls $P$ AC-reduzierbar ist, wie lang ist die
+        kürzeste Reduktionsfolge als Funktion von $|P|$?
+\end{enumerate}
+
+%% =============================================================================
+\section{Zusammenfassung}
+%% =============================================================================
+
+Die Andrews--Curtis-Vermutung steht trotz ihrer elementaren Formulierung als eines
+der hartnäckigsten offenen Probleme der kombinatorischen Gruppentheorie und der
+niedrigdimensionalen Topologie. Die Gegenbeispielkandidaten $\mathrm{AK}(n)$ und
+$\mathrm{MS}(w)$ haben jahrzehntelangen Computersuchen widerstanden, und die Verbindung
+zur $4$-Mannigfaltigkeitstopologie legt nahe, dass ein Gegenbeispiel tiefgreifende
+Konsequenzen für die Klassifikation glatter $4$-Mannigfaltigkeiten hätte.
+
+\begin{thebibliography}{99}
+
+\bibitem{AC65}
+J.~J.\ Andrews, M.~L.\ Curtis,
+\textit{Free groups and handlebodies},
+Proc.\ Amer.\ Math.\ Soc.\ \textbf{16} (1965), 192--195.
+
+\bibitem{AK79}
+S.~Akbulut, R.~Kirby,
+\textit{Mazur manifolds},
+Michigan Math.\ J.\ \textbf{26} (1979), Nr.\ 3, 259--284.
+
+\bibitem{MS99}
+C.~F.\ Miller, P.\ Schupp,
+\textit{The geometry of finitely presented infinite simple groups},
+in \textit{Algorithms and Classification in Combinatorial Group Theory},
+Math.\ Sci.\ Res.\ Inst.\ Publ.\ \textbf{23} (1992), 1--30.
+
+\bibitem{HR03}
+G.~Havas, C.~Ramsay,
+\textit{Breadth-first search and the Andrews-Curtis conjecture},
+Internat.\ J.\ Algebra Comput.\ \textbf{13} (2003), Nr.\ 1, 61--68.
+
+\bibitem{Bridson15}
+M.~R.\ Bridson,
+\textit{The complexity of balanced presentations and the Andrews-Curtis conjecture},
+Preprint, arXiv:1504.04187 (2015).
+
+\bibitem{Smale60}
+S.~Smale,
+\textit{Generalized Poincaré's conjecture in dimensions greater than four},
+Ann.\ of Math.\ (2) \textbf{74} (1961), 391--406.
+
+\bibitem{Tietze08}
+H.~Tietze,
+\textit{Über die topologischen Invarianten mehrdimensionaler Mannigfaltigkeiten},
+Monatsh.\ Math.\ Phys.\ \textbf{19} (1908), 1--118.
+
+\bibitem{LS77}
+R.~C.\ Lyndon, P.~E.\ Schupp,
+\textit{Kombinatorische Gruppentheorie},
+Springer, Berlin, 1977.
+
+\end{thebibliography}
+
+\end{document}

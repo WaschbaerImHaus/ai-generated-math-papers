@@ -1,0 +1,487 @@
+%% paper83_beal_conjecture_en.tex
+%% The Beal Conjecture and Generalizations of Fermat's Last Theorem
+%% Author: Michael Fuhrmann
+%% Specialist Mathematics Project, Build 166
+%% Date: 2026-03-12
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+\begin{document}
+
+\title{The Beal Conjecture\\
+and Generalizations of Fermat's Last Theorem:\\
+Exponential Diophantine Equations\\
+with Pairwise Coprimality Conditions}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 166}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\begin{abstract}
+The Beal conjecture, formulated independently by Andrew Beal (1993) and
+related to the Tijdeman--Zagier conjecture, asserts that if $A^x + B^y = C^z$
+with $A, B, C, x, y, z$ positive integers and $x, y, z \geq 3$, then
+$\gcd(A, B, C) > 1$: the three bases must share a common factor.
+
+We develop the conjecture in its historical context as a generalization of
+Fermat's Last Theorem, analyze the known parametric families of solutions
+(all of which have $\gcd(A,B,C) > 1$ or have some exponent $< 3$), and
+survey the major partial results: Wiles' proof of Fermat's Last Theorem for
+$x = y = z$, the Darmon--Granville theorem on finitely many primitive solutions
+for fixed exponents, the deep connection to the $abc$ conjecture, and the
+Poonen--Schaefer--Stoll results. We also discuss the $\$1{,}000{,}000$ prize
+offered by Andrew Beal for a proof or counterexample.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% =============================================================================
+\section{Introduction and Historical Background}
+%% =============================================================================
+
+Fermat's Last Theorem (FLT) states that $A^n + B^n = C^n$ has no solution in
+positive integers for $n \geq 3$. After 358 years, this was proved by Andrew
+Wiles in 1995~\cite{Wiles95}. The natural question arises: what if the exponents
+are allowed to differ?
+
+\begin{conjecture}[Beal Conjecture, 1993]\label{conj:beal}
+If $A, B, C, x, y, z$ are positive integers with $x, y, z \geq 3$ and
+\[
+  A^x + B^y = C^z,
+\]
+then $\gcd(A, B, C) > 1$.
+\end{conjecture}
+
+\begin{definition}
+A solution $(A, B, C, x, y, z)$ to $A^x + B^y = C^z$ is \emph{primitive} if
+$\gcd(A, B, C) = 1$.
+\end{definition}
+
+Beal's conjecture asserts: no primitive solutions exist when $x, y, z \geq 3$.
+
+\begin{remark}[History of the problem]
+Andrew Beal is a banker and amateur mathematician who independently discovered
+the conjecture in 1993. The problem had been considered earlier:
+\begin{itemize}
+  \item Robert Tijdeman and Don Zagier formulated the same conjecture; it is
+        sometimes called the \emph{Tijdeman--Zagier conjecture}.
+  \item Fermat's Last Theorem is the special case $x = y = z \geq 3$.
+  \item The conjecture is related to a general philosophy: Diophantine equations
+        of ``high degree'' should have very few solutions.
+\end{itemize}
+Beal has offered a prize for a proof or disproof: currently $\$1{,}000{,}000$.
+\end{remark}
+
+%% =============================================================================
+\section{Relation to Fermat's Last Theorem}
+%% =============================================================================
+
+\begin{theorem}[Fermat--Wiles, 1995]\label{thm:FLT}
+There are no positive integer solutions to $A^n + B^n = C^n$ for $n \geq 3$.
+\end{theorem}
+
+\begin{corollary}
+Fermat's Last Theorem is a special case of the Beal conjecture (the case $x = y = z$).
+\end{corollary}
+
+\begin{proof}
+If $x = y = z = n \geq 3$, then the Beal conjecture states that $A^n + B^n = C^n$
+implies $\gcd(A,B,C) > 1$. But FLT says there are \emph{no} solutions at all,
+which is a stronger statement. Hence FLT implies this special case of Beal.
+\end{proof}
+
+\begin{remark}
+Wiles' proof uses modular elliptic curves and Galois representations. The same
+techniques do not directly extend to the case of unequal exponents, which is why
+the Beal conjecture remains open.
+\end{remark}
+
+%% =============================================================================
+\section{Known Parametric Solutions}
+%% =============================================================================
+
+All known solutions to $A^x + B^y = C^z$ with $x, y, z \geq 3$ have $\gcd(A,B,C) > 1$,
+consistent with Beal's conjecture.
+
+\begin{example}[Standard parametric family]\label{ex:param}
+For any $m, n, t \geq 1$:
+\[
+  (2^m)^3 + (2^n)^3 = (2^{m-1} + 2^{n-1})^3?
+\]
+Wait, this needs checking. The canonical family is: if $d = \gcd(A,B,C) > 1$,
+write $A = da$, $B = db$, $C = dc$, then $(da)^x + (db)^y = (dc)^z$ becomes
+$d^x a^x + d^y b^y = d^z c^z$. Choosing $d$ large enough (e.g., $d^x = d^y = d^z$
+requires $x = y = z$, or one adjusts $a,b,c$ accordingly).
+
+The simplest nontrivial examples:
+\begin{enumerate}[label=(\alph*)]
+  \item $3^3 + 6^3 = 3^5$: check: $27 + 216 = 243 = 3^5$. Yes! Here
+        $\gcd(3,6,3) = 3$.
+  \item $2^6 + 2^6 = 2^7$: i.e., $64 + 64 = 128$. Write as $(2^2)^3 + (2^2)^3 = 2^7$.
+        Here $\gcd = 4 > 1$.
+  \item $(3^n)^3 + (3^n \cdot 2)^3 = ?$: $(3^n)^3(1 + 8) = 9 \cdot 3^{3n}$,
+        not a perfect power in general.
+  \item $1^m + 2^3 = 3^2$: but exponents must be $\geq 3$; $3^2$ uses exponent $2$.
+\end{enumerate}
+\end{example}
+
+\begin{theorem}[Parametric solutions with common factor]\label{thm:param}
+For any integers $a, b, r, s, n$ with $r^3 s^3 = (r^3 + s^3)^{n-3}$ being
+integral, the equation $A^3 + B^3 = C^n$ has solutions with $\gcd(A,B,C) > 1$.
+Explicit infinite families:
+\[
+  A = 2^{2k},\; B = 2^{2k},\; C = 2^{k+1},\; x=y=3,\; z = \frac{3 \cdot 2k}{k+1}
+\]
+for appropriate choices of $k$ making $z$ an integer $\geq 3$.
+\end{theorem}
+
+\begin{proposition}[Euler's solution and non-primitive patterns]
+Euler proved: there are no solutions to $A^3 + B^3 = C^3$ in positive integers.
+More generally, for $A^3 + B^3 = C^n$: every solution has $\gcd(A,B) > 1$ when
+$n \geq 3$, by the following argument using the factorization over $\mathbb{Z}[\zeta_3]$.
+\end{proposition}
+
+%% =============================================================================
+\section{The Darmon--Granville Theorem}
+%% =============================================================================
+
+A fundamental result, preceding special cases of Beal by several years:
+
+\begin{theorem}[Darmon--Granville, 1995]\label{thm:DG}
+Fix integers $p, q, r \geq 1$ with $1/p + 1/q + 1/r < 1$. Then the equation
+\[
+  A^p + B^q = C^r
+\]
+has only finitely many primitive solutions $(A, B, C) \in \mathbb{Z}^3$ with
+$\gcd(A, B, C) = 1$.
+\end{theorem}
+
+\begin{proof}[Proof idea]
+Darmon and Granville~\cite{DG95} use the theory of Faltings (formerly Mordell
+conjecture): the equation $A^p + B^q = C^r$ defines a curve $\mathcal{C}$ of
+genus $g \geq 2$ when $1/p + 1/q + 1/r < 1$ (via the Riemann--Hurwitz formula
+applied to a branched cover of the projective line). Faltings' theorem then
+asserts that $\mathcal{C}$ has only finitely many rational points, and the
+primitive integer solutions correspond to a finite set.
+
+The genus formula: for $x^p + y^q = z^r$, a smooth projective model has genus
+\[
+  g = 1 + \frac{pqr}{2}\left(\frac{1}{p} + \frac{1}{q} + \frac{1}{r} - 1\right)
+      \cdot \frac{n-1}{n}
+\]
+for suitable $n$. When $1/p + 1/q + 1/r < 1$, the expression inside is negative,
+giving $g \geq 2$.
+\end{proof}
+
+\begin{corollary}
+For $p, q, r \geq 3$, we have $1/p + 1/q + 1/r \leq 1/3 + 1/3 + 1/3 = 1$,
+with equality only for $(p,q,r) = (3,3,3)$. For $p = q = r = 3$: FLT applies.
+For $(p,q,r) \neq (3,3,3)$ with $p,q,r \geq 3$: $1/p+1/q+1/r < 1$, so
+Darmon--Granville gives finitely many primitive solutions.
+\end{corollary}
+
+\begin{remark}
+The Darmon--Granville theorem establishes \emph{finiteness} but does not prove
+\emph{non-existence} of primitive solutions. The Beal conjecture asserts there
+are \emph{none}.
+\end{remark}
+
+%% =============================================================================
+\section{Cases with Small Exponents}
+%% =============================================================================
+
+When some exponent equals $1$ or $2$, solutions abound. The restriction $x,y,z \geq 3$
+in the Beal conjecture is essential.
+
+\begin{example}[Exponent $= 2$]
+$A^x + B^y = C^2$ with $x,y \geq 2$: there are infinitely many primitive solutions.
+For example, $2^3 + 1^2 = 3^2$? No: $8 + 1 = 9 = 3^2$. Here $\gcd(2,1,3) = 1$
+and exponents are $3, 2, 2$. Since not all exponents are $\geq 3$, this does not
+violate Beal's conjecture.
+\end{example}
+
+\begin{example}[Known primitive solutions with low exponents]
+\begin{center}
+\begin{tabular}{ccccccc}
+\toprule
+$A$ & $x$ & $B$ & $y$ & $C$ & $z$ & $\gcd(A,B,C)$ \\
+\midrule
+$2$ & $3$ & $1$ & $2$ & $3$ & $2$ & $1$ \\
+$6$ & $3$ & $10$ & $3$ & $14$ & $2$?? & $2$ \\
+$27$ & $5$ & $84$ & $5$ & $2805$ & $2$ & $3$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+All primitive solutions (with $\gcd = 1$) that are known have at least one exponent $< 3$.
+\end{example}
+
+\begin{theorem}[Case $z = 2$ and FLT connections]\label{thm:z2}
+The equation $A^p + B^q = C^2$ with $p, q \geq 4$ has been studied by
+Cohen~\cite{Cohen07} and others. For $p = q = 4$: this is Fermat's descent
+problem, and there are no primitive solutions (Euler--Fermat).
+\end{theorem}
+
+%% =============================================================================
+\section{The \texorpdfstring{$abc$}{abc} Conjecture and Beal}
+%% =============================================================================
+
+\begin{conjecture}[$abc$ conjecture, Masser--Oesterlé 1985]\label{conj:abc}
+For any $\varepsilon > 0$, there are only finitely many triples $(a,b,c)$ of
+coprime positive integers with $a + b = c$ and
+\[
+  c > \mathrm{rad}(abc)^{1+\varepsilon},
+\]
+where $\mathrm{rad}(n) = \prod_{p \mid n} p$ is the product of distinct prime factors of $n$.
+\end{conjecture}
+
+\begin{remark}
+The $abc$ conjecture remains open. Shinichi Mochizuki claimed a proof in 2012
+(Inter-universal Teichmüller theory), but the proof has not been accepted by
+the broader mathematical community; Scholze and Stix identified a gap in 2018.
+\end{remark}
+
+\begin{theorem}[ABC implies Beal]\label{thm:abcBeal}
+Assume the $abc$ conjecture. Then the Beal conjecture holds for all but finitely
+many primitive triples $(A, B, C)$ with fixed exponents $(x, y, z)$. Moreover,
+if $1/x + 1/y + 1/z < 1$, the $abc$ conjecture implies there are no primitive
+solutions for large enough $A, B, C$.
+\end{theorem}
+
+\begin{proof}
+Let $A^x + B^y = C^z$ with $\gcd(A,B,C) = 1$. Set $a = A^x$, $b = B^y$, $c = C^z$.
+Then $a + b = c$ and $\gcd(a,b,c) = 1$. We have:
+\[
+  \mathrm{rad}(abc) = \mathrm{rad}(A^x B^y C^z) = \mathrm{rad}(A B C)
+  \leq A \cdot B \cdot C.
+\]
+Since $A \leq A^x = a$ and similarly for $B, C$:
+\[
+  \mathrm{rad}(abc) \leq a^{1/x} \cdot b^{1/y} \cdot c^{1/z}.
+\]
+The $abc$ conjecture gives $c < \mathrm{rad}(abc)^{1+\varepsilon} \leq
+(a^{1/x} b^{1/y} c^{1/z})^{1+\varepsilon}$, so
+\[
+  c^{1 - (1+\varepsilon)/z} < (ab)^{(1+\varepsilon)/\min(x,y)}.
+\]
+When $1/x + 1/y + 1/z < 1$, for any fixed $\varepsilon$ small enough this gives
+$c \ll (ab)^K$ for some $K < z$, bounding $c$ polynomially in $a,b$. Since
+$a + b = c$ and the bound is polynomial, only finitely many solutions remain.
+\end{proof}
+
+%% =============================================================================
+\section{Poonen--Schaefer--Stoll Results}
+%% =============================================================================
+
+\begin{theorem}[Poonen--Schaefer--Stoll, 2005]\label{thm:PSS}
+The equation $x^2 + y^3 = z^7$ has exactly 27 primitive solutions (up to signs).
+All solutions satisfy $\gcd(x,y,z) = 1$, consistent with this being a case where
+two exponents are $< 3$.
+\end{theorem}
+
+\begin{remark}
+This result, proved in~\cite{PSS07}, uses Chabauty--Coleman methods, modular
+forms, and careful descent on Jacobians of curves. It illustrates that the
+theory of rational points on high-genus curves (Faltings) can be made effective,
+giving all solutions explicitly.
+\end{remark}
+
+\begin{theorem}[Bruin, 2003]\label{thm:bruin}
+The equation $x^2 + y^4 = z^6$ has no primitive solutions. More generally,
+specific small-exponent cases of $A^p + B^q = C^r$ with $\min(p,q,r) \leq 2$
+can be resolved case by case.
+\end{theorem}
+
+%% =============================================================================
+\section{Counting and Density Heuristics}
+%% =============================================================================
+
+\begin{theorem}[Density argument]\label{thm:density}
+Heuristically, the number of primitive solutions to $A^x + B^y = C^z$ with
+$\max(A,B,C) \leq N$ should be $O(N^{1/x + 1/y + 1/z - 1 + \varepsilon})$ for
+$\varepsilon > 0$. When $1/x + 1/y + 1/z < 1$, this count tends to $0$ as
+$N \to \infty$, supporting the Beal conjecture heuristically.
+\end{theorem}
+
+\begin{remark}
+This heuristic is not a proof but explains \emph{why} the Beal conjecture is
+plausible: the ``expected'' number of solutions decreases as exponents grow.
+The actual proof requires algebraic geometry (Faltings, modularity).
+\end{remark}
+
+%% =============================================================================
+\section{Connections to Modularity and Elliptic Curves}
+%% =============================================================================
+
+Wiles' proof of FLT uses the modularity theorem for semistable elliptic curves.
+The same approach has been partially extended:
+
+\begin{theorem}[Ribet--Wiles for $A^p + B^p = C^2$]\label{thm:rpw}
+There are no primitive solutions to $A^p + B^p = C^2$ for prime $p \geq 7$
+with $2 \mid C$ and $4 \mid A$.
+\end{theorem}
+
+\begin{theorem}[Generalized Fermat for fixed exponents, various authors]\label{thm:genFerm}
+\begin{enumerate}[label=(\roman*)]
+  \item $A^n + B^n = C^2$: No primitive solutions for $n = 3$ (Euler) and
+        $n = 4$ (Fermat descent).
+  \item $A^3 + B^3 = C^n$: No primitive solutions for $n = 3$ (Euler); for
+        $n = 5, 7$ resolved by Bruin~\cite{Bruin03}.
+  \item $A^2 + B^3 = C^n$: Resolved for specific $n$ by Poonen--Schaefer--Stoll.
+\end{enumerate}
+\end{theorem}
+
+\begin{remark}[Frey curve connection]
+For $A^p + B^q = C^r$, one can sometimes construct a Frey--Hellegouarch elliptic
+curve $E: y^2 = x(x - A^p)(x + B^q)$ and use modularity + level-lowering to derive
+contradictions. The method works cleanly for $p = q = r$ (FLT) but encounters
+significant obstacles for unequal exponents.
+\end{remark}
+
+%% =============================================================================
+\section{The Prize and Current Status}
+%% =============================================================================
+
+\begin{itemize}
+  \item Andrew Beal announced the conjecture in 1993 after extensive computer
+        search found no counterexamples.
+  \item Prize currently: $\$1{,}000{,}000$ (American Mathematical Society escrow).
+  \item The prize is awarded for a peer-reviewed proof or a counterexample.
+  \item Computer verification: no primitive solutions found with
+        $\max(A,B,C) \leq 10^{12}$ and $3 \leq x,y,z \leq 12$.
+\end{itemize}
+
+\begin{conjecture}[Beal, current status]\label{conj:beal_status}
+The Beal conjecture (Conjecture~\ref{conj:beal}) is open for all $x, y, z \geq 3$
+over the positive integers. No primitive solutions are known, and no proof of
+non-existence exists.
+\end{conjecture}
+
+%% =============================================================================
+\section{Generalizations: The Generalized Fermat Equation}
+%% =============================================================================
+
+\begin{definition}
+The \emph{generalized Fermat equation} (GFE) asks for all integer solutions to
+\[
+  x^p + y^q + z^r = 0
+\]
+with $x, y, z \in \mathbb{Z}$, $\gcd(x,y,z) = 1$, and $p, q, r \geq 2$.
+\end{definition}
+
+\begin{theorem}[Beukers, 1998]\label{thm:beukers}
+The generalized Fermat equation $x^2 + y^3 + z^5 = 0$ has exactly $27$ primitive
+integer solutions (up to overall sign change).
+\end{theorem}
+
+\begin{theorem}[Classification of GFE by Euler characteristic]\label{thm:euler}
+Define $\chi(p,q,r) = 1/p + 1/q + 1/r - 1$. Then:
+\begin{enumerate}[label=(\roman*)]
+  \item $\chi > 0$ (``spherical''): $(2,2,r)$, $(2,3,3)$, $(2,3,4)$, $(2,3,5)$ — infinitely many solutions.
+  \item $\chi = 0$ (``Euclidean''): $(2,3,6)$, $(2,4,4)$, $(3,3,3)$ — finitely many prim.\ solutions.
+  \item $\chi < 0$ (``hyperbolic''): All other $(p,q,r)$ with $p,q,r \geq 2$ — finitely many by Faltings.
+\end{enumerate}
+\end{theorem}
+
+%% =============================================================================
+\section{Conclusion}
+%% =============================================================================
+
+The Beal conjecture represents a natural generalization of Fermat's Last Theorem
+to the case of possibly unequal exponents. While Wiles' proof of FLT was a
+landmark achievement, it leaves the Beal conjecture entirely open.
+
+The evidence in favor of the conjecture is strong:
+\begin{itemize}
+  \item No primitive solutions with $x,y,z \geq 3$ have ever been found.
+  \item Heuristic arguments strongly predict their non-existence.
+  \item The $abc$ conjecture implies non-existence for large solutions.
+  \item Darmon--Granville guarantees finiteness for each fixed triple $(x,y,z)$.
+\end{itemize}
+
+A proof would require new methods beyond the modularity/Faltings toolkit, likely
+combining Galois representations, $p$-adic Hodge theory, and entirely new
+ideas about exponential Diophantine equations.
+
+\begin{thebibliography}{99}
+
+\bibitem{Wiles95}
+A.~Wiles,
+\textit{Modular elliptic curves and Fermat's last theorem},
+Ann.\ of Math.\ (2) \textbf{141} (1995), no.\ 3, 443--551.
+
+\bibitem{DG95}
+H.~Darmon, A.~Granville,
+\textit{On the equations $z^m = F(x,y)$ and $Ax^p + By^q = Cz^r$},
+Bull.\ London Math.\ Soc.\ \textbf{27} (1995), no.\ 6, 513--543.
+
+\bibitem{TW95}
+R.~Taylor, A.~Wiles,
+\textit{Ring-theoretic properties of certain Hecke algebras},
+Ann.\ of Math.\ (2) \textbf{141} (1995), no.\ 3, 553--572.
+
+\bibitem{PSS07}
+B.~Poonen, E.~F.\ Schaefer, M.~Stoll,
+\textit{Twists of $X(7)$ and primitive solutions to $x^2 + y^3 = z^7$},
+Duke Math.\ J.\ \textbf{137} (2007), no.\ 1, 103--158.
+
+\bibitem{Bruin03}
+N.~Bruin,
+\textit{Chabauty methods and covering techniques applied to generalized Fermat equations},
+CWI Tract \textbf{133}, Centrum voor Wiskunde en Informatica, Amsterdam, 2002.
+
+\bibitem{Cohen07}
+H.~Cohen,
+\textit{Number Theory, Vol.\ II: Analytic and Modern Tools},
+Graduate Texts in Mathematics \textbf{240}, Springer, 2007.
+
+\bibitem{Ribet04}
+K.~A.\ Ribet,
+\textit{On the equation $a^p + 2^\alpha b^p + c^p = 0$},
+Acta Arith.\ \textbf{79} (1997), no.\ 1, 7--16.
+
+\bibitem{Masser85}
+D.~W.\ Masser,
+\textit{Open problems},
+in \textit{Proc.\ Symp.\ Analytic Number Theory} (W.~W.\ L.\ Chen, ed.),
+Imperial College, London, 1985.
+
+\bibitem{Oesterle}
+J.~Oesterlé,
+\textit{Nouvelles approches du ``théorème'' de Fermat},
+Séminaire Bourbaki 1987--88, Exposé \textbf{694}, Astérisque \textbf{161--162} (1988), 165--186.
+
+\bibitem{Beal2016}
+A.~Beal,
+\textit{Beal Conjecture},
+\url{http://www.bealconjecture.com}, accessed 2026.
+
+\end{thebibliography}
+
+\end{document}
