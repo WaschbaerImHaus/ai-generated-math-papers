@@ -130,8 +130,6 @@ $T$-invariant measurable set $A$ (i.e.\ $T^{-1}A = A$ up to null sets) satisfies
 $\mu(A) \in \{0, 1\}$.
 \end{definition}
 
-% BUG-B7-P32-EN/DE-001 behoben: Eindeutigkeit von ν war unbegründet; Krylov-Bogolyubov verwendet.
-% BUG-B7-P32-EN/DE-002 behoben: Zirkuläre Begründung (Ergodizität → Mixing → Ergodizität) entfernt.
 \begin{theorem}[Ergodic theorem for the Syracuse map]\label{thm:ergodic_theorem}
 Let $\nu$ be any $T$-invariant Borel probability measure on $\mathbb{Z}_2^{\text{odd}}$
 (whose existence is guaranteed by the Krylov--Bogolyubov theorem, cf.\ Proposition~\ref{prop:exist_inv}).
@@ -178,7 +176,6 @@ $C > 0$ and $\rho < 1$ such that
 for all $k \geq 0$.
 \end{lemma}
 
-% BUG-B7-P32-EN/DE-003 behoben: Spektralradius-Berechnung als nicht rigoros markiert
 \begin{proof}[Proof sketch (informal — spectral gap not rigorously proved)]
 The correlations are controlled by the spectral radius of the transfer operator
 $\mathcal{L}_S\colon L^2(\nu) \to L^2(\nu)$, defined by
@@ -268,7 +265,6 @@ if $a_0 = 1$ (odd), it applies $(3n+1)/2$ and shifts. Under Haar measure, each b
 $a_k$ is independent Bernoulli(1/2), giving the Bernoulli measure on $\{0,1\}^{\mathbb{N}_0}$.
 \end{proof}
 
-% BUG-B7-P32-EN/DE-004 behoben: War als Theorem deklariert, ist aber unbewiesen.
 % Die Implikation logdens 0 => Hausdorff-dim < 1 gilt NICHT allgemein.
 % Korrekte Klassifikation: offene Vermutung / spekulatives Resultat.
 \begin{conjecture}[Dimension of Collatz exceptional set]\label{conj:dimension}

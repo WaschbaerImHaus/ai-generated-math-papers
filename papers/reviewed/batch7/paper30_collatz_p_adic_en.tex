@@ -200,7 +200,6 @@ not $-1/2$. The element $-1/2$ lies in $\mathbb{Q}_2 \setminus \mathbb{Z}_2$.\\
 (iii) $S(-1) = (3(-1)+1)/2^{\nu_2(-2)} = (-2)/2 = -1$, confirming $-1$ is a fixed point of $S$.
 \end{proof}
 
-% BUG-B7-P30-EN/DE-003 behoben: Beweisskizze + Zitat für "Orbits aller Perioden" ergänzt
 \begin{theorem}[Periodic orbits in $\mathbb{Z}_2$]\label{thm:periodic}
 The Collatz function $T$ has periodic orbits of all periods in $\mathbb{Z}_2$.
 However, the only periodic orbit consisting of \emph{positive integers} that is currently
@@ -220,7 +219,6 @@ $n \leq 5$), and B\'{e}nali~\cite{Benali} for the general construction.
 the construction is non-constructive for general $n$.
 \end{proof}
 
-% BUG-B7-P30-EN/DE-001 behoben: Unterschied T vs S bei Fixpunkt -1 verdeutlicht
 \begin{remark}[Distinction: fixed point of $S$ vs.\ 2-cycle under $T$]\label{rem:T_vs_S}
 It is important not to confuse the role of $-1$ under the two maps:
 \begin{itemize}
@@ -285,7 +283,6 @@ as the next time the orbit is odd in the $T$-iteration). Dividing by $2^{s_{k+1}
   S^{k+1}(x) = \frac{3^{k+1} x + 3c_k + 2^{s_k}}{2^{s_{k+1}}},
 \]
 with $c_{k+1} = (3c_k + 2^{s_k})/2^{s_{k+1}-s_k}$.
-% BUG-B7-P30-EN/DE-002 behoben: Beweis dass c_{k+1} in Z_2 liegt
 To see that $c_{k+1} \in \mathbb{Z}_2$: by the definition of $s_{k+1}$,
 the 2-adic valuation of $3S^k(x)+1$ (as an element of $\mathbb{Z}_2$)
 equals exactly $s_{k+1} - s_k$.  The numerator of $S^{k+1}(x)$ is
@@ -344,7 +341,6 @@ the $+1$ in the odd branch: if the odd branch were just $x \mapsto 3x$, then $T$
 respect the self-similar structure of $\mathbb{Z}_2$ more naturally.
 \end{proof}
 
-% BUG-B7-P30-EN/DE-004 behoben: Ergodizität als unbewiesen/Vermutung deklariert
 \begin{conjecture}[Ergodicity of the Syracuse map]\label{conj:ergodic_S}
 The Syracuse function $S\colon \mathbb{Z}_2^{\text{odd}} \to \mathbb{Z}_2^{\text{odd}}$
 is conjectured to be \emph{ergodic with respect to Haar measure} in the sense that

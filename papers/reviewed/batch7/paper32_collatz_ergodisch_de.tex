@@ -133,8 +133,6 @@ $T$-invariante messbare Menge $A$ (d.h.\ $T^{-1}A = A$ bis auf Nullmengen) die E
 $\mu(A) \in \{0, 1\}$ hat.
 \end{definition}
 
-% BUG-B7-P32-EN/DE-001 behoben: Eindeutigkeit von ν war unbegründet; Krylov-Bogolyubov
-% BUG-B7-P32-EN/DE-002 behoben: Zirkuläre Begründung Ergodizität → Mixing → Ergodizität entfernt
 \begin{theorem}[Ergodensatz für die Syrakus-Abbildung]\label{thm:ergodensatz}
 Sei $\nu$ ein beliebiges $S$-invariantes Borel-Wahrscheinlichkeitsmaß auf
 $\mathbb{Z}_2^{\text{ungerade}}$ (dessen Existenz durch den Satz von
@@ -181,7 +179,6 @@ existieren $C > 0$ und $\rho < 1$ mit
 für alle $k \geq 0$.
 \end{lemma}
 
-% BUG-B7-P32-EN/DE-003 behoben: Spektralradius als nicht-rigoros markiert
 \begin{proof}[Beweisansatz (informell — Spektrallücke nicht rigoros bewiesen)]
 Die Korrelationen werden durch den Spektralradius des Transfer-Operators
 $\mathcal{L}_S\colon L^2(\nu) \to L^2(\nu)$, $\mathcal{L}_S f(x) = \sum_{y: S(y)=x} f(y)/|S'(y)|_2$,
@@ -271,7 +268,6 @@ $a_0 = 1$ (ungerade), wendet sie $(3n+1)/2$ an und verschiebt. Unter dem Haar-Ma
 jedes Bit $a_k$ unabhängig Bernoulli(1/2), was das Bernoulli-Maß auf $\{0,1\}^{\mathbb{N}_0}$ ergibt.
 \end{proof}
 
-% BUG-B7-P32-EN/DE-004 behoben: War als Theorem deklariert, ist aber unbewiesen.
 % Die Implikation logDichte 0 => Hausdorff-Dim < 1 gilt NICHT allgemein.
 % Korrekte Klassifikation: offene Vermutung / spekulatives Resultat.
 \begin{conjecture}[Dimension der Collatz-Ausnahmemenge]\label{conj:dimension}

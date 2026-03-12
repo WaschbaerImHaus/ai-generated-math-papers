@@ -913,3 +913,44 @@ BEHOBEN: Ergänzung nach der Formel:
   - BUG-B5-P24-EN-001: \bibitem{Deligne1974} bereits vorhanden
   - BUG-B5-P24-DE-001: \bibitem{Deligne1974} bereits vorhanden
   - BUG-B9-P37-DE-TYPO: "Kürzbarkeit" bereits korrekt geschrieben
+
+---
+
+### 2026-03-12 — Build 157 — Bugfix: paper2_lehmer_drei_primfaktoren_de.tex
+
+2026-03-12 [Build 157]: 4 Bugs in Paper 2 DE (Lehmer 3 Primfaktoren) behoben
+
+**BUG-B1-P2-DE-001 (MITTEL):** Lemma lem:schranke_k, Zeile ~217:
+  - Falscher algebraischer Zwischenschritt `p - (p+1)/(q+1) < p - 1 + (p-1)/(q+1)` entfernt.
+  - Korrekte Ableitung: da (p+1)/(q+1) > 0 gilt k < p, und als ganze Zahl k ≤ p-1.
+
+**BUG-B14-P2-DE-002 (MITTEL):** Begründung für (p-1)|(q-1) in Schritt 4:
+  - Falsche Schlussfolgerung "aus n≡1 mod(p-1) folgt (p-1)|(q-1)" ersetzt.
+  - Neu: direkte Referenz auf Lemma lem:grenze_q (D=1-Fall) für Schranke an q;
+    p=3 via p-1=2|q-1 trivial; p≥5 über Fallanalyse.
+
+**BUG-B14-P2-DE-003 (MITTEL):** Lemma lem:grenze_q: Schranke q ≤ 3(p-1)/(p-2) nur für D=1 bewiesen:
+  - Lemma-Aussage explizit auf D=1 beschränkt.
+  - Für p=3: eigenständiger k'-Argument ohne Lemma (k' ∈ {1,2}, Direktprüfung).
+  - Für p=7 D>1: direkte Fallanalyse nach q.
+  - Für p≥11 D=1: korrekte Schranke 3(p-1)/(p-2) ≤ 10/3 < p belegt.
+  - Falsche Formeln 6·(p-1)/(p-5) entfernt.
+
+**BUG-010 (KOSMETISCH):** Abschnitt 3 (n=2qr): Alternativen Beweis entfernt (Redundanz).
+  - Primärer Beweis (gerade/ungerade Parität) ist vollständig und ausreichend.
+
+## 2026-03-12 Build 158: Kosmetische Fixes Batch 7, Batch 6, Batch 10, Batch 4
+
+**BUG-B7-BUGCOMMENTS (KOSMETISCH):** % BUG-Kommentare aus Batch 7 entfernt.
+  - paper30_collatz_p_adic_en.tex: 4 Kommentarzeilen entfernt (Zeilen 203, 223, 288, 347)
+  - paper30_collatz_p_adisch_de.tex: 4 Kommentarzeilen entfernt (Zeilen 209, 229, 298, 354)
+  - paper32_collatz_ergodic_en.tex: 4 Kommentarzeilen entfernt (Zeilen 133, 134, 181, 271)
+  - paper32_collatz_ergodisch_de.tex: 4 Kommentarzeilen entfernt (Zeilen 136, 137, 184, 274)
+
+**BUG-B6-P26-DE-001 (GERING):** Rang-1-Beispiel in paper26 DE auf E_5: y²=x³−25x aktualisiert.
+  - Erzeuger (−4, 6) verifiziert: 6²=36, (−4)³−25(−4)=36. ✓
+
+**BUG-B10-P39-EN-FRENKEL-TITLE (GERING):** Bibitem-Schlüssel FrenkelBenZvi → Frenkel2007 in paper39 EN.
+
+**BUG-B4-P20-BIBLIO (GERING):** Vinogradov 1937 in paper20 DE auf EN-Quelle angeglichen.
+  - Neu: "Representation of an odd number as a sum of three primes." Dokl. Akad. Nauk SSSR, 15:169--172, 1937.

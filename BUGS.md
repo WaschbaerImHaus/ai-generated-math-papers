@@ -1,6 +1,26 @@
 # BUGS.md - specialist-maths
 
-## Behobene Bugs (Build 153)
+## Behobene Bugs (Build 158)
+
+### BUG-B7-BUGCOMMENTS (KOSMETISCH — BEHOBEN Build 158): Interne % BUG-Kommentare in Batch 7
+- **Dateien**: papers/reviewed/batch7/paper30_collatz_p_adic_en.tex, paper30_collatz_p_adisch_de.tex, paper32_collatz_ergodic_en.tex, paper32_collatz_ergodisch_de.tex
+- **Problem**: Interne `% BUG-...`-Kommentarzeilen im LaTeX-Quelltext verblieben nach den Bugfixes
+- **Behoben**: Alle 8 `% BUG-`-Zeilen aus den 4 betroffenen Dateien entfernt
+
+### BUG-B6-P26-DE-001 (GERING — BEHOBEN Build 158): paper26 DE — Rang-1-Beispiel abweichend von EN
+- **Datei**: papers/batch6/paper26_l_function_elliptic_de.tex
+- **Problem**: DE verwendete $y^2+y=x^3-x$ (Leiter 37) als Rang-1-Beispiel, EN verwendete $y^2=x^3-25x$ (kongru. Zahl $n=5$); inkonsistent beim Vergleich beider Versionen
+- **Behoben**: DE-Rang-1-Beispiel auf $E_5\colon y^2=x^3-25x$ (Erzeuger $(-4,6)$) aktualisiert — identisch mit EN
+
+### BUG-B10-P39-EN-FRENKEL-TITLE (GERING — BEHOBEN Build 158): paper39 EN — FrenkelBenZvi-Key suggeriert Ko-Autor
+- **Datei**: papers/batch10/paper39_langlands_program_en.tex
+- **Problem**: `\bibitem{FrenkelBenZvi}` impliziert zwei Autoren (Frenkel & Ben-Zvi), das Werk ist aber ein Einzelautoren-Werk von E. Frenkel
+- **Behoben**: Bibitem-Schlüssel von `FrenkelBenZvi` zu `Frenkel2007` geändert
+
+### BUG-B4-P20-BIBLIO (GERING — BEHOBEN Build 158): paper20 EN+DE — Vinogradov 1937 inkonsistenter Titel
+- **Dateien**: papers/reviewed/batch4/paper20_goldbach_singular_series.tex, paper20_goldbach_singulaere_reihe_de.tex
+- **Problem**: EN: "Representation of an odd number as a sum of three primes." (Dokl. Akad. Nauk SSSR 15); DE: "Some theorems concerning the theory of primes." (Mat. Sb. 2(44)) — unterschiedliche Quellen/Titel
+- **Behoben**: DE-Bibitem auf EN-Version angeglichen: Titel und Journal vereinheitlicht (Dokl. Akad. Nauk SSSR, 15:169--172, 1937)
 
 ### BUG-B11-P40-EN/DE-001 (KRITISCH — BEHOBEN Build 153): Falsche "Giuga-Identität"
 - **Dateien**: papers/batch11/paper40_giuga_four_primes_en.tex,
