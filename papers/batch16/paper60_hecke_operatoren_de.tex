@@ -1,0 +1,821 @@
+% =============================================================================
+% Paper 60 (DE): Hecke-Operatoren und Modulformen
+% Autor: Michael Fuhrmann
+% Projekt: Specialist Mathematics, Build 143
+% Datum: 2026-03-12
+% =============================================================================
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% Satz-Umgebungen (Deutsch)
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 143}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\title{Hecke-Operatoren und Modulformen:\\
+Algebraische Struktur, Eigenformen und $L$-Funktionen}
+
+% Abstract VOR \maketitle
+\begin{abstract}
+Hecke-Operatoren sind eine Familie kommutierender, selbstadjungierter linearer
+Operatoren auf R\"aumen von Modulformen, eingef\"uhrt von Erich Hecke im Jahr
+1937. Sie legen eine tiefe multiplikative Struktur in den Fourier-Koeffizienten
+von Modulformen frei und verbinden Modulformen \"uber $L$-Funktionen mit
+Euler-Produkten unmittelbar mit arithmetischen Objekten. Diese Arbeit gibt
+eine systematische Darstellung der Hecke-Theorie f\"ur die volle Modulgruppe
+$\mathrm{SL}(2,\mathbb{Z})$ und f\"ur Kongruenzuntergruppen~$\Gamma_0(N)$.
+Behandelt werden: die Doppelnebenklassen-Konstruktion, die Wirkung auf
+Fourier-Koeffizienten, die Kommutativit\"at und Multiplikativit\"at der
+Hecke-Algebra, das Petersson-Skalarprodukt und die Selbstadjungiertheit,
+Hecke-Eigenformen und ihre $L$-Funktionen mit Euler-Produkten. Die
+Ramanujan--Petersson-Schranke $\lvert a_p(f)\rvert \le 2p^{(k-1)/2}$ wird
+sorgf\"altig differenziert: F\"ur Gewicht~$12$ ist sie Delignes Satz (bewiesen
+1974), w\"ahrend die allgemeine Version f\"ur automorphe Formen eine offene
+Vermutung bleibt. Abschlie{\ss}end werden die Atkin--Lehner-Theorie, der
+Modularit\"atssatz (Wiles 1995), Sato--Tate (Harris--Taylor u.\,a., 2011)
+und Bez\"uge zur Birch-Swinnerton-Dyer-Vermutung diskutiert.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+% =============================================================================
+\section{Einleitung}
+% =============================================================================
+
+Modulformen und die auf ihnen operierenden Operatoren stehen im Zentrum der
+modernen Zahlentheorie. Im Jahr 1937 f\"uhrte Erich Hecke eine Familie von
+Operatoren $T_n$ auf dem Raum $M_k(\Gamma)$ der Modulformen vom Gewicht~$k$
+f\"ur eine Kongruenzuntergruppe $\Gamma$ von $\mathrm{SL}(2,\mathbb{Z})$ ein.
+Diese Operatoren haben zugleich tiefgreifende analytische und arithmetische
+Konsequenzen.
+
+Auf der analytischen Seite sind die $T_n$ normale Operatoren bez\"uglich des
+Petersson-Skalarprodukts, sodass $M_k(\Gamma)$ in eine direkte Summe von
+Eigenr\"aumen zerf\"allt. Die resultierenden \emph{Hecke-Eigenformen} besitzen
+$L$-Funktionen
+\[
+  L(f,s) = \sum_{n=1}^{\infty} a_n\, n^{-s},
+\]
+die als Euler-Produkte faktorisieren -- ein Kennzeichen tiefer arithmetischer
+Bedeutung.
+
+Auf der arithmetischen Seite kodieren die Eigenwerte die Verteilung von
+Primzahlen, die Gr\"o{\ss}e von Punktmengen auf elliptischen Kurven \"uber
+endlichen K\"orpern und Darstellungen von Galois-Gruppen. Drei herausragende
+Ergebnisse veranschaulichen dies:
+\begin{enumerate}[label=(\roman*)]
+  \item Der \emph{Modularit\"atssatz} (Wiles 1995, vollendet durch
+        Breuil--Conrad--Diamond--Taylor 2001) identifiziert $L$-Funktionen
+        elliptischer Kurven \"uber $\mathbb{Q}$ mit $L$-Funktionen von
+        Hecke-Eigenformen vom Gewicht~$2$.
+  \item Die \emph{Ramanujan--Petersson-Vermutung} f\"ur $\Delta(z)$ wurde von
+        Deligne (1974) als Konsequenz der Weil-Vermutungen bewiesen.
+  \item Die \emph{Sato--Tate-Vermutung} f\"ur elliptische Kurven wurde von
+        Harris--Taylor u.\,a.\ (2011) bewiesen.
+\end{enumerate}
+
+\subsection*{Gliederung}
+
+Abschnitt~2 wiederholt Grundlagen der Modulformen. Abschnitt~3 definiert
+Hecke-Operatoren \"uber Doppelnebenklassen und ihre Wirkung auf
+Fourier-Koeffizienten. Abschnitt~4 beweist die Multiplikativit\"at.
+Abschnitt~5 behandelt Hecke-Eigenformen und Eigenr\"aume. Abschnitt~6
+entwickelt das Petersson-Skalarprodukt und die Selbstadjungiertheit.
+Abschnitt~7 diskutiert $L$-Funktionen von Eigenformen. Abschnitt~8
+stellt bewiesene und offene Teile der Ramanujan--Petersson-Vermutung gegen\"uber.
+Abschnitt~9 behandelt die Atkin--Lehner-Theorie. Abschnitt~10 gibt Anwendungen.
+
+\subsection*{Bezeichnungen}
+
+Durchgehend bezeichnet $\mathbb{H} = \{\tau \in \mathbb{C} : \operatorname{Im}\tau > 0\}$
+die obere Halbebene, $q = e^{2\pi i\tau}$, $\Gamma(1) = \mathrm{SL}(2,\mathbb{Z})$.
+F\"ur eine Primzahl $p$ und $f \in M_k(\Gamma)$ mit Fourier-Entwicklung
+$f(\tau) = \sum_{n=0}^{\infty} a(n) q^n$ schreiben wir $a_p = a(p)$.
+
+% =============================================================================
+\section{Modulformen: Grundlagen}
+% =============================================================================
+
+\subsection{Die modulare Gruppe und Kongruenzuntergruppen}
+
+Die \emph{volle Modulgruppe} $\Gamma(1) = \mathrm{SL}(2,\mathbb{Z})$ wirkt auf
+$\mathbb{H}$ durch M\"obius-Transformationen:
+\[
+  \gamma \cdot \tau = \frac{a\tau + b}{c\tau + d}, \qquad
+  \gamma = \begin{pmatrix} a & b \\ c & d \end{pmatrix} \in \mathrm{SL}(2,\mathbb{Z}).
+\]
+Die Standarderzeuger sind $S = \bigl(\begin{smallmatrix}0&-1\\1&0\end{smallmatrix}\bigr)$
+($\tau \mapsto -1/\tau$) und $T = \bigl(\begin{smallmatrix}1&1\\0&1\end{smallmatrix}\bigr)$
+($\tau \mapsto \tau + 1$). Der Standardfundamentalbereich ist
+\[
+  \mathcal{F} = \{\tau \in \mathbb{H} : \lvert\tau\rvert \ge 1,\;
+  \lvert\mathrm{Re}\,\tau\rvert \le \tfrac{1}{2}\}.
+\]
+
+F\"ur $N \ge 1$ ist die \emph{Hecke-Kongruenzuntergruppe}
+\[
+  \Gamma_0(N) = \left\{ \begin{pmatrix}a&b\\c&d\end{pmatrix} \in \mathrm{SL}(2,\mathbb{Z})
+  : c \equiv 0 \pmod{N} \right\}.
+\]
+
+\subsection{Modulformen und Spitzenformen}
+
+\begin{definition}
+Eine \emph{Modulform vom Gewicht $k$ f\"ur $\Gamma$} ist eine holomorphe Funktion
+$f \colon \mathbb{H} \to \mathbb{C}$ mit folgenden Eigenschaften:
+\begin{enumerate}[label=(\roman*)]
+  \item (Modularit\"at) $f(\gamma\tau) = (c\tau+d)^k f(\tau)$ f\"ur alle
+        $\gamma = \bigl(\begin{smallmatrix}a&b\\c&d\end{smallmatrix}\bigr) \in \Gamma$;
+  \item (Holomorphie in den Spitzen) $f$ ist holomorph in jeder Spitze von $\Gamma$.
+\end{enumerate}
+Falls $f$ zus\"atzlich in allen Spitzen verschwindet, hei{\ss}t $f$
+\emph{Spitzenform} (\emph{cusp form}). Die Vektorr\"aume der Modulformen
+und Spitzenformen werden mit $M_k(\Gamma)$ bzw.\ $S_k(\Gamma)$ bezeichnet.
+\end{definition}
+
+\subsection{Fourier-Entwicklung}
+
+Da $T \in \Gamma(1)$, ist jedes $f \in M_k(\Gamma(1))$ periodisch mit Periode~1
+und besitzt eine Fourier-Entwicklung ($q$-Entwicklung):
+\[
+  f(\tau) = \sum_{n=0}^{\infty} a(n)\, q^n, \qquad q = e^{2\pi i\tau}.
+\]
+F\"ur eine Spitzenform gilt $a(0) = 0$, also $f(\tau) = \sum_{n=1}^{\infty} a(n)\, q^n$.
+
+\subsection{Dimensionsformeln}
+
+Nach dem Riemann--Roch-Theorem sind die Dimensionen von $M_k(\Gamma(1))$ und
+$S_k(\Gamma(1))$ f\"ur $k \ge 0$ endlich. F\"ur gerades $k \ge 2$ gilt:
+\[
+  \dim S_k(\Gamma(1)) = \begin{cases}
+    \lfloor k/12 \rfloor & \text{falls } k \not\equiv 2 \pmod{12}, \\
+    \lfloor k/12 \rfloor - 1 & \text{falls } k \equiv 2 \pmod{12}.
+  \end{cases}
+\]
+Insbesondere $\dim S_{12}(\Gamma(1)) = 1$: Die Ramanujan-Delta-Funktion $\Delta(z)$
+erzeugt $S_{12}(\Gamma(1))$.
+
+\subsection{Eisenstein-Reihen und die Ramanujan-Delta-Funktion}
+
+Die normierten Eisenstein-Reihen $E_4$ und $E_6$ erzeugen $M_k(\Gamma(1))$
+f\"ur alle geraden $k \ge 4$. Ihre Fourier-Entwicklungen lauten:
+\[
+  E_4(\tau) = 1 + 240\sum_{n=1}^{\infty}\sigma_3(n)\,q^n, \qquad
+  E_6(\tau) = 1 - 504\sum_{n=1}^{\infty}\sigma_5(n)\,q^n,
+\]
+wobei $\sigma_r(n) = \sum_{d \mid n} d^r$.
+
+Die Ramanujan-Delta-Funktion ist
+\[
+  \Delta(\tau) = q\prod_{n=1}^{\infty}(1-q^n)^{24}
+               = \sum_{n=1}^{\infty}\tau(n)\,q^n \in S_{12}(\Gamma(1)),
+\]
+wobei $\tau(n)$ die \emph{Ramanujan-Tau-Funktion} ist. Bekannte Werte:
+$\tau(1)=1$, $\tau(2)=-24$, $\tau(3)=252$, $\tau(4)=-1472$, $\tau(5)=4830$.
+
+\begin{bemerkung}
+  Jede Modulform in $M_k(\Gamma(1))$ l\"asst sich als Polynom in $E_4$ und
+  $E_6$ schreiben. Eine Basis f\"ur $S_k(\Gamma(1))$ kann aus normierten
+  Hecke-Eigenformen (mit $a(1)=1$) gew\"ahlt werden.
+\end{bemerkung}
+
+% =============================================================================
+\section{Hecke-Operatoren}
+% =============================================================================
+
+\subsection{Konstruktion \"uber Doppelnebenklassen}
+
+Sei $\Gamma = \Gamma(1)$ und $p$ eine Primzahl. Betrachte die Doppelnebenklasse
+$\Gamma\alpha_p\Gamma$ f\"ur $\alpha_p = \bigl(\begin{smallmatrix}p&0\\0&1\end{smallmatrix}\bigr)$.
+Die Nebenklassenzerlegung lautet:
+\[
+  \Gamma\alpha_p\Gamma = \bigsqcup_{j=0}^{p-1}
+  \begin{pmatrix}1&j\\0&p\end{pmatrix}\Gamma
+  \;\sqcup\;
+  \begin{pmatrix}p&0\\0&1\end{pmatrix}\Gamma.
+\]
+
+\begin{definition}
+  F\"ur $f \in M_k(\Gamma)$ und eine Primzahl $p$ ist der \emph{Hecke-Operator $T_p$}:
+  \[
+    (T_p f)(\tau) = p^{k-1} \left[
+      \frac{1}{p}\sum_{j=0}^{p-1} f\!\left(\frac{\tau+j}{p}\right)
+      + f(p\tau)
+    \right].
+  \]
+  F\"ur eine allgemeine ganze Zahl $n \ge 1$ ist $T_n$ durch die formale
+  Dirichlet-Reihe
+  \[
+    \sum_{n=1}^{\infty} T_n n^{-s} =
+    \prod_{p}\bigl(1 - T_p p^{-s} + p^{k-1-2s}\bigr)^{-1}
+  \]
+  oder \"aquivalent durch
+  \[
+    T_n f = n^{k-1} \sum_{\substack{ad=n,\,d\ge 1 \\ 0 \le b < d}}
+    d^{-k}\, f\!\left(\frac{a\tau+b}{d}\right)
+  \]
+  definiert.
+\end{definition}
+
+\subsection{Wirkung auf Fourier-Koeffizienten}
+
+\begin{proposition}\label{prop:hecke-fourier}
+  Sei $f(\tau) = \sum_{m=0}^{\infty} a(m) q^m \in M_k(\Gamma(1))$ und
+  $g = T_n f$. Dann gilt $g(\tau) = \sum_{m=0}^{\infty} b(m) q^m$ mit
+  \[
+    b(m) = \sum_{\substack{d \mid \gcd(m,n) \\ d \ge 1}} d^{k-1}\,
+    a\!\left(\frac{mn}{d^2}\right).
+  \]
+  Insbesondere f\"ur eine Primzahl $p$:
+  \[
+    b(m) = a(pm) + p^{k-1}\,a(m/p),
+  \]
+  wobei $a(m/p) = 0$ falls $p \nmid m$.
+\end{proposition}
+
+\begin{proof}
+  Direkte Berechnung mit den Nebenklassenvertretern der Doppelnebenklasse:
+  \begin{align*}
+    (T_p f)(\tau)
+    &= p^{k-1}\sum_{j=0}^{p-1}\sum_{n \ge 0} a(n) e^{2\pi in(\tau+j)/p}
+       + p^{k-1}\sum_{n \ge 0} a(n) e^{2\pi inp\tau} \\
+    &= p^{k-1}\sum_{n \ge 0} a(n) e^{2\pi in\tau/p}
+       \underbrace{\sum_{j=0}^{p-1} e^{2\pi inj/p}}_{= p \text{ falls } p|n,\; 0 \text{ sonst}}
+       + p^{k-1}\sum_{n \ge 0} a(n) q^{np}.
+  \end{align*}
+  Substitution $n = pm$ im ersten Term ergibt
+  \[
+    (T_p f)(\tau) = \sum_{m \ge 0}\bigl[a(pm) + p^{k-1}a(m/p)\bigr]q^m.
+  \]
+  Die allgemeine Formel folgt durch Multiplikativit\"at.
+\end{proof}
+
+\begin{beispiel}\label{ex:delta}
+  F\"ur $\Delta(\tau) = \sum_{n \ge 1}\tau(n)q^n$ mit $k=12$ liefert
+  Proposition~\ref{prop:hecke-fourier} den $m$-ten Fourier-Koeffizienten von $T_p\Delta$:
+  \[
+    b(m) = \tau(pm) + p^{11}\,\tau(m/p).
+  \]
+\end{beispiel}
+
+% =============================================================================
+\section{Multiplikativit\"at der Hecke-Operatoren}
+% =============================================================================
+
+\subsection{Kommutativit\"at}
+
+\begin{theorem}\label{thm:kommut}
+  Die Hecke-Operatoren $T_m$ und $T_n$ kommutieren:
+  \[
+    T_m \circ T_n = T_n \circ T_m \quad \text{f\"ur alle } m, n \ge 1.
+  \]
+\end{theorem}
+
+\begin{proof}
+  Es gen\"ugt, den Fall $T_p$ und $T_q$ f\"ur Primzahlen $p, q$ zu behandeln.
+  F\"ur $p \ne q$ folgt die Kommutativit\"at aus dem Euler-Produkt: Die lokalen
+  Faktoren bei $p$ und $q$ betreffen verschiedene Variablen und kommutieren.
+  F\"ur $p = q$ liegen $T_{p^a}$ und $T_{p^b}$ beide in der lokalen Hecke-Algebra
+  $\mathbb{Z}[T_{p^k} : k \ge 1] \cong \mathbb{Z}[X]$ (ein kommutativer Ring).
+  Auf Fourier-Koeffizienten l\"asst sich die Kommutativit\"at $T_p T_q f = T_q T_p f$
+  direkt mit Proposition~\ref{prop:hecke-fourier} nachrechnen.
+\end{proof}
+
+\subsection{Multiplikativit\"at}
+
+\begin{theorem}\label{thm:mult}
+  F\"ur positive ganze Zahlen $m, n$ mit $\gcd(m,n) = 1$ gilt:
+  \[
+    T_{mn} = T_m \circ T_n = T_n \circ T_m.
+  \]
+\end{theorem}
+
+\begin{proof}
+  Die Doppelnebenklassenzerlegung von $\Gamma\alpha_{mn}\Gamma$ faktorisiert
+  unter der Teilerfremdheitsbedingung in das Produkt der Zerlegungen f\"ur
+  $\Gamma\alpha_m\Gamma$ und $\Gamma\alpha_n\Gamma$. Die Menge der
+  Rechtsnebenklassenvertreter von $\Gamma\alpha_{mn}\Gamma/\Gamma$
+  steht in Bijektion mit dem kartesischen Produkt der Vertreter f\"ur
+  $m$ und $n$. Siehe Diamond--Shurman \cite{DiamondShurman}, Satz~5.3.1.
+\end{proof}
+
+\subsection{Rekursionsformel f\"ur Primzahlpotenzen}
+
+\begin{theorem}\label{thm:rekursion}
+  F\"ur eine Primzahl $p$ und eine ganze Zahl $r \ge 1$ gilt:
+  \[
+    T_{p^{r+1}} = T_p \circ T_{p^r} - p^{k-1}\, T_{p^{r-1}},
+  \]
+  wobei $T_{p^0} = \mathrm{Id}$ (der Identit\"atsoperator).
+\end{theorem}
+
+\begin{proof}
+  Aus dem Euler-Produkt der formalen Dirichlet-Reihe von Hecke-Operatoren
+  liest man den lokalen Faktor bei $p$ ab:
+  \[
+    \sum_{r=0}^{\infty} T_{p^r} X^r = \frac{1}{1 - T_p X + p^{k-1} X^2}.
+  \]
+  Multiplikation beider Seiten mit $(1 - T_p X + p^{k-1} X^2)$ und
+  Koeffizientenvergleich bei $X^{r+1}$ ergibt die behauptete Dreitermsrekursion.
+\end{proof}
+
+\begin{korollar}
+  F\"ur $\Delta \in S_{12}(\Gamma(1))$ mit $T_p \Delta = \tau(p)\Delta$:
+  \[
+    \tau(p^{r+1}) = \tau(p)\,\tau(p^r) - p^{11}\,\tau(p^{r-1}).
+  \]
+\end{korollar}
+
+\begin{bemerkung}
+  Die S\"atze~\ref{thm:mult} und~\ref{thm:rekursion} zusammen implizieren, dass
+  die Fourier-Koeffizienten $a(n)$ einer normierten Hecke-Eigenform vollst\"andig
+  durch die Werte $a(p)$ bei Primzahlen und die Anfangsbedingung $a(1) = 1$
+  bestimmt sind.
+\end{bemerkung}
+
+% =============================================================================
+\section{Hecke-Eigenformen}
+% =============================================================================
+
+\subsection{Definition und Normierung}
+
+\begin{definition}
+  Eine Modulform $f \in M_k(\Gamma)$ hei{\ss}t \emph{Hecke-Eigenform}, falls
+  \[
+    T_n f = \lambda_n f \quad \text{f\"ur alle } n \ge 1,
+  \]
+  f\"ur Skalare $\lambda_n \in \mathbb{C}$. Sie hei{\ss}t \emph{normiert},
+  falls der f\"uhrende Fourier-Koeffizient $a(1) = 1$ ist.
+\end{definition}
+
+F\"ur eine normierte Eigenform liefert Proposition~\ref{prop:hecke-fourier}
+mit $m = 1$: $\lambda_n = a(n)$, d.\,h., die Eigenwerte sind genau die
+Fourier-Koeffizienten.
+
+\begin{theorem}[Spektrale Zerlegung]\label{thm:spektral}
+  Der Raum $S_k(\Gamma(1))$ besitzt eine Basis aus normierten Hecke-Eigenformen.
+  Diese Basis ist orthogonal bez\"uglich des Petersson-Skalarprodukts
+  (Abschnitt~\ref{sec:petersson}).
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+  Die Hecke-Operatoren $T_n$ sind selbstadjungiert bez\"uglich des
+  Petersson-Skalarprodukts (Satz~\ref{thm:selbstadjungiert}). Eine endliche
+  Familie kommutierender selbstadjungierter Operatoren auf einem
+  endlichdimensionalen Innenprodukt-Raum ist simultan diagonalisierbar.
+  Die Eigenr\"aume sind eindimensional nach dem Multiplizit\"at-Eins-Satz
+  (Korollar~\ref{kor:mult-eins}).
+\end{proof}
+
+\subsection{Multiplizit\"at-Eins-Satz}
+
+\begin{theorem}[Multiplizit\"at Eins]\label{thm:mult-eins}
+  Die simultanen Eigenr\"aume aller $T_n$ in $S_k(\Gamma(1))$ sind
+  eindimensional.
+\end{theorem}
+
+\begin{proof}
+  Die Hecke-Operatoren erzeugen eine kommutative halbeinfache Algebra (die
+  Hecke-Algebra \"uber $\mathbb{Q}$), die auf $S_k(\Gamma(1))$ wirkt. W\"are
+  ein simultaner Eigenraum $V$ zweidimensional mit Eigenwert-System $(\lambda_n)$,
+  so h\"atten zwei Eigenformen in $V$ identische Fourier-Koeffizienten
+  $a(n) = \lambda_n$ f\"ur alle $n$, was ihrer linearen Unabh\"angigkeit widerspricht.
+  Vergleiche Shimura \cite{Shimura}, Satz~3.43.
+\end{proof}
+
+\begin{korollar}\label{kor:mult-eins}
+  Eine normierte Hecke-Eigenform in $S_k(\Gamma(1))$ ist eindeutig bestimmt
+  durch ihr System von Hecke-Eigenwerten $(\lambda_p)_{p\,\text{ Primzahl}}$.
+\end{korollar}
+
+\subsection{Die Delta-Funktion als Eigenform}
+
+\begin{beispiel}
+  Da $\dim S_{12}(\Gamma(1)) = 1$, ist $\Delta$ automatisch eine normierte
+  Hecke-Eigenform mit $T_p\Delta = \tau(p)\Delta$. Damit folgt die
+  Multiplikativit\"at der Tau-Funktion:
+  \[
+    \tau(mn) = \tau(m)\tau(n) \quad \text{f\"ur } \gcd(m,n)=1.
+  \]
+\end{beispiel}
+
+% =============================================================================
+\section{Petersson-Skalarprodukt}\label{sec:petersson}
+% =============================================================================
+
+\subsection{Definition}
+
+\begin{definition}
+  F\"ur $f, g \in S_k(\Gamma)$ ist das \emph{Petersson-Skalarprodukt}:
+  \[
+    \langle f, g \rangle = \int_{\Gamma \backslash \mathbb{H}}
+    f(\tau)\overline{g(\tau)}\,(\operatorname{Im}\tau)^k\,
+    \frac{dx\,dy}{y^2}, \quad \tau = x+iy.
+\]
+  Das Ma{\ss} $d\mu = y^{-2}\,dx\,dy$ ist das $\mathrm{SL}(2,\mathbb{R})$-invariante
+  hyperbolische Ma{\ss} auf $\mathbb{H}$.
+\end{definition}
+
+Das Integral konvergiert absolut, da $f, g$ als Spitzenformen in den Spitzen
+schnell abfallen.
+
+\subsection{Selbstadjungiertheit der Hecke-Operatoren}
+
+\begin{theorem}\label{thm:selbstadjungiert}
+  F\"ur $\gcd(n, N) = 1$ ist der Hecke-Operator $T_n$ selbstadjungiert
+  bez\"uglich des Petersson-Skalarprodukts:
+  \[
+    \langle T_n f, g \rangle = \langle f, T_n g \rangle
+    \quad \text{f\"ur alle } f, g \in S_k(\Gamma_0(N)).
+  \]
+  Insbesondere sind alle $T_n$ selbstadjungiert auf $S_k(\Gamma(1))$.
+\end{theorem}
+
+\begin{proof}
+  Der Operator $T_n$ wird durch die Korrespondenz
+  $C_n \colon X_0(N) \leftarrow Z \to X_0(N)$ induziert, die zyklische
+  $n$-Isogenien parametrisiert. Die duale Korrespondenz liefert den adjungierten
+  Operator~$T_n^*$. F\"ur $\gcd(n,N)=1$ ist $T_n^* = T_n$ (die Atkin--Lehner-Involution
+  identifiziert $T_n$ mit seinem Adjungierten). Einen direkten Beweis \"uber
+  Fourier-Koeffizienten findet man bei Iwaniec \cite{Iwaniec}, Satz~6.5.
+\end{proof}
+
+\begin{korollar}
+  Hecke-Eigenformen in $S_k(\Gamma(1))$ haben reelle Eigenwerte $\lambda_n \in \mathbb{R}$.
+  Verschiedene Eigenformen sind orthogonal bez\"uglich des Petersson-Skalarprodukts.
+\end{korollar}
+
+\subsection{Rankin--Selberg-Methode}
+
+F\"ur zwei Spitzenformen $f = \sum a(n)q^n$ und $g = \sum b(n)q^n$ liefert
+die Rankin--Selberg-Faltung eine exakte Formel f\"ur $\langle f, g \rangle$:
+\[
+  \langle f, g \rangle = \frac{\Gamma(k)}{(4\pi)^k}
+  \sum_{n=1}^{\infty} \frac{a(n)\overline{b(n)}}{n^{k-1}}.
+\]
+Diese Identit\"at wird verwendet, um die Gr\"o{\ss}e von Fourier-Koeffizienten zu
+untersuchen und die Ramanujan--Petersson-Schranke in verschiedenen F\"allen zu
+beweisen.
+
+% =============================================================================
+\section{$L$-Funktionen von Eigenformen}
+% =============================================================================
+
+\subsection{Definition als Dirichlet-Reihe}
+
+\begin{definition}
+  F\"ur $f(\tau) = \sum_{n=1}^{\infty} a(n)q^n \in S_k(\Gamma(1))$ ist die
+  \emph{$L$-Funktion von $f$}:
+  \[
+    L(f,s) = \sum_{n=1}^{\infty} a(n)\,n^{-s}, \qquad \operatorname{Re}(s) > \tfrac{k+2}{2}.
+  \]
+\end{definition}
+
+\subsection{Euler-Produkt f\"ur Eigenformen}
+
+\begin{theorem}\label{thm:euler-produkt}
+  Ist $f$ eine normierte Hecke-Eigenform in $S_k(\Gamma(1))$, so besitzt
+  $L(f,s)$ ein Euler-Produkt:
+  \[
+    L(f,s) = \prod_{p\,\text{ Primzahl}} \frac{1}{1 - a(p)\,p^{-s} + p^{k-1-2s}}.
+  \]
+\end{theorem}
+
+\begin{proof}
+  Da $f$ eine Hecke-Eigenform ist, sind die Fourier-Koeffizienten multiplikativ:
+  $a(mn) = a(m)a(n)$ f\"ur $\gcd(m,n)=1$, und $a(p^{r+1}) = a(p)a(p^r) - p^{k-1}a(p^{r-1})$.
+  Die Dirichlet-Reihe einer multiplikativen arithmetischen Funktion faktorisiert
+  als Euler-Produkt (Standardbeweis via eindeutige Faktorisierung). Der lokale
+  Faktor bei $p$ ergibt sich aus der Rekursion:
+  \[
+    \sum_{r=0}^{\infty} a(p^r)\, p^{-rs}
+    = \frac{1}{1 - a(p)p^{-s} + p^{k-1-2s}}.
+  \]
+\end{proof}
+
+\begin{beispiel}
+  F\"ur die Ramanujan-Delta-Funktion:
+  \[
+    L(\Delta,s) = \sum_{n=1}^{\infty}\tau(n)\,n^{-s}
+    = \prod_p \frac{1}{1 - \tau(p)\,p^{-s} + p^{11-2s}}.
+  \]
+\end{beispiel}
+
+\subsection{Analytische Fortsetzung und Funktionalgleichung}
+
+\begin{theorem}
+  Die vollst\"andige $L$-Funktion
+  \[
+    \Lambda(f,s) = \left(\frac{\sqrt{N}}{2\pi}\right)^s \Gamma(s)\,L(f,s)
+  \]
+  setzt sich zu einer ganzen Funktion von $s \in \mathbb{C}$ fort und erf\"ullt
+  die Funktionalgleichung
+  \[
+    \Lambda(f,s) = \varepsilon \cdot \Lambda(\bar{f},\,k-s),
+  \]
+  wobei $\varepsilon = \pm 1$ der Atkin--Lehner-Eigenwert ist und
+  $\bar{f}(\tau) = \overline{f(-\bar{\tau})}$.
+  F\"ur $f \in S_k(\Gamma(1))$ mit reellen Fourier-Koeffizienten gilt
+  $\bar{f} = f$ und $\varepsilon = (-1)^{k/2}$.
+\end{theorem}
+
+\begin{proof}
+  Die analytische Fortsetzung folgt aus der Mellin-Transformation:
+  \[
+    \Lambda(f,s) = \int_0^{\infty} f(iy)\, y^{s-1}\,dy.
+  \]
+  Aufspaltung des Integrals bei $y=1$ und Anwendung der Modularit\"atstransformation
+  $f(-1/(iy)) = (iy)^k f(iy)$ liefern zugleich die Fortsetzung und die
+  Funktionalgleichung; vgl.\ Iwaniec \cite{Iwaniec}, Abschnitt~5.4.
+\end{proof}
+
+% =============================================================================
+\section{Ramanujan--Petersson-Vermutung}\label{sec:ramanujan}
+% =============================================================================
+
+\subsection{Die Ramanujan-Tau-Funktion und Delignes Satz}
+
+Ramanujan beobachtete 1916, dass die Fourier-Koeffizienten $\tau(n)$ von
+$\Delta$ offenbar $\lvert\tau(p)\rvert \le 2p^{11/2}$ f\"ur alle Primzahlen $p$
+erf\"ullen. Deligne bewies dies 1974 als Konsequenz der Weil-Vermutungen.
+
+\begin{theorem}[Deligne, 1974]\label{thm:deligne}
+  F\"ur alle Primzahlen $p$ gilt:
+  \[
+    \lvert \tau(p) \rvert \le 2p^{11/2}.
+  \]
+  Allgemeiner: F\"ur jede normierte Hecke-Eigenform $f \in S_k(\Gamma_0(N))$
+  und jede Primzahl $p \nmid N$:
+  \[
+    \lvert a_p(f) \rvert \le 2p^{(k-1)/2}.
+  \]
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+  Deligne interpretierte die Fourier-Koeffizienten als Eigenwerte des
+  Frobenius-Endomorphismus auf der $\ell$-adischen Kohomologie einer glatten
+  projektiven Variet\"at (einer Kuga--Sato-Variet\"at). Die Weil-Vermutungen
+  (von Deligne im selben Werk bewiesen, wof\"ur er 1978 die Fields-Medaille
+  erhielt) implizieren, dass diese Eigenwerte algebraische ganzzahlige Zahlen
+  sind, deren alle komplexen Konjugierten den Absolutbetrag $p^{(k-1)/2}$ haben.
+  Die Eigenwerte $\alpha_p$, $\beta_p$ des lokalen Faktors erf\"ullen
+  $\alpha_p\beta_p = p^{k-1}$ und $\lvert\alpha_p\rvert = \lvert\beta_p\rvert = p^{(k-1)/2}$,
+  woraus $\lvert a_p\rvert = \lvert\alpha_p + \beta_p\rvert \le 2p^{(k-1)/2}$ folgt.
+  Siehe Deligne \cite{Deligne74}.
+\end{proof}
+
+\subsection{Konsequenzen f\"ur die Riemann-Hypothesen-Analogie}
+
+Das Euler-Produkt faktorisiert als
+\[
+  \frac{1}{1 - a_p p^{-s} + p^{k-1-2s}} = \frac{1}{(1-\alpha_p p^{-s})(1-\beta_p p^{-s})},
+\]
+mit $\lvert\alpha_p\rvert = \lvert\beta_p\rvert = p^{(k-1)/2}$. Die Nullstellen
+des lokalen Faktors liegen daher auf der Geraden $\operatorname{Re}(s) = (k-1)/2$,
+dem Analogon der Riemann-Hypothese f\"ur $L(f,s)$.
+
+\subsection{Die allgemeine Ramanujan--Petersson-Vermutung}
+
+F\"ur allgemeine automorphe Darstellungen auf $\mathrm{GL}(n)$ lautet die
+erwartete Verallgemeinerung:
+
+\begin{conjecture}[Ramanujan--Petersson, allgemeine Form]\label{conj:rp-allg}
+  Sei $\pi$ eine kuspidале automorphe Darstellung von $\mathrm{GL}(n)$
+  \"uber $\mathbb{Q}$. Seien $\alpha_{j,p}$ ($j=1,\ldots,n$) die Satake-Parameter
+  bei einer f\"ur $\pi$ unverzweigten Primzahl $p$. Dann gilt:
+  \[
+    \lvert\alpha_{j,p}\rvert = 1 \quad \text{f\"ur alle } j=1,\ldots,n.
+  \]
+\end{conjecture}
+
+\begin{bemerkung}
+  Vermutung~\ref{conj:rp-allg} ist f\"ur $n \ge 3$ im Allgemeinen offen.
+  F\"ur $n=2$ (klassische holomorphe Spitzenformen) folgt sie aus
+  Satz~\ref{thm:deligne}. F\"ur $n=2$ mit Maass-Formen ist die volle Vermutung
+  offen (nur partielle Schranken durch Blomer--Brumley, Kim--Shahidi u.\,a.\ bekannt).
+\end{bemerkung}
+
+% =============================================================================
+\section{Atkin--Lehner-Theorie}
+% =============================================================================
+
+\subsection{Altformen und Neuformen}
+
+F\"ur eine Modulform $f \in S_k(\Gamma_0(M))$ und $M \mid N$ erh\"alt man
+durch $\tau \mapsto f(\tau)$ bzw.\ $\tau \mapsto f(d\tau)$ f\"ur Teiler
+$d \mid N/M$ Elemente in $S_k(\Gamma_0(N))$. Lineare Kombinationen solcher
+Formen hei{\ss}en \emph{Altformen}.
+
+\begin{definition}
+  Der Raum der \emph{Altformen} $S_k^{\mathrm{alt}}(\Gamma_0(N))$ wird von
+  den Bildern aller $S_k(\Gamma_0(M))$ f\"ur $M \mid N$, $M < N$ (eingebettet
+  via $f(\tau) \mapsto f(d\tau)$, $d \mid N/M$) aufgespannt. Der
+  \emph{Neuformraum} ist das orthogonale Komplement:
+  \[
+    S_k^{\mathrm{neu}}(\Gamma_0(N)) = \bigl(S_k^{\mathrm{alt}}(\Gamma_0(N))\bigr)^{\perp}.
+  \]
+\end{definition}
+
+\subsection{Atkin--Lehner-Involutionen}
+
+\begin{theorem}[Atkin--Lehner, 1970]
+  F\"ur jeden exakten Teiler $Q \mid\mid N$ (d.\,h.\ $Q \mid N$ und
+  $\gcd(Q, N/Q)=1$) gibt es eine Involution $W_Q$ auf $S_k(\Gamma_0(N))$,
+  den \emph{Atkin--Lehner-Operator}, mit der Eigenschaft:
+  \[
+    W_Q \circ T_p = T_p \circ W_Q \quad \text{f\"ur alle Primzahlen } p \nmid N.
+  \]
+  $W_N$ bildet $S_k^{\mathrm{neu}}(\Gamma_0(N))$ auf sich ab, und jede
+  normierte Neuform $f$ ist Eigenform von $W_N$ mit Eigenwert $\varepsilon = \pm 1$,
+  der \emph{Wurzelnummer} (\emph{root number}) von $f$.
+\end{theorem}
+
+\begin{proof}
+  Der Operator $W_Q$ ist durch die Matrixwirkung
+  $W_Q = \bigl(\begin{smallmatrix}Qa&b\\Nc&Qd\end{smallmatrix}\bigr)$ definiert,
+  wobei $Q^2 ad - Nbc = Q$. Man verifiziert direkt, dass $W_Q$ die Gruppe
+  $\Gamma_0(N)$ normalisiert und f\"ur $p \nmid N$ mit $T_p$ kommutiert.
+  Da $W_Q^2 \in \Gamma_0(N)$, ist $W_Q$ eine Involution auf $S_k(\Gamma_0(N))$.
+  Vgl.\ Atkin--Lehner \cite{AtkinLehner}.
+\end{proof}
+
+\subsection{Neuformen und das Vorzeichen der $L$-Funktion}
+
+Die Wurzelnummer $\varepsilon = W_N f / f = \pm 1$ erscheint in der Funktionalgleichung
+als $\Lambda(f,s) = \varepsilon\,\Lambda(f,k-s)$. F\"ur die BSD-Vermutung bestimmt
+das Vorzeichen der $L$-Funktion einer elliptischen Kurve die vorhergesagte Parit\"at
+ihres Rangs.
+
+\begin{theorem}[Atkin--Lehner--Li]\label{thm:al-li}
+  Der Raum $S_k(\Gamma_0(N))$ zerf\"allt in eine orthogonale direkte Summe:
+  \[
+    S_k(\Gamma_0(N)) = S_k^{\mathrm{alt}}(\Gamma_0(N)) \oplus S_k^{\mathrm{neu}}(\Gamma_0(N)).
+  \]
+  $S_k^{\mathrm{neu}}(\Gamma_0(N))$ hat eine Basis aus normierten Hecke-Neuformen,
+  die jeweils eindeutig (bis auf Skalar) durch ihr Eigenwert-System bestimmt sind.
+\end{theorem}
+
+% =============================================================================
+\section{Anwendungen}
+% =============================================================================
+
+\subsection{Der Modularit\"atssatz und der Gro{\ss}e Fermatsche Satz}
+
+Die bekannteste Anwendung der Theorie der Hecke-Eigenformen ist der Beweis
+des Gro{\ss}en Fermatschen Satzes.
+
+\begin{theorem}[Modularit\"atssatz; Wiles 1995, BCDT 2001]\label{thm:modularitaet}
+  Jede elliptische Kurve $E/\mathbb{Q}$ vom F\"uhrer $N$ ist modular: Es existiert
+  eine normierte Hecke-Neuform $f \in S_2^{\mathrm{neu}}(\Gamma_0(N))$ mit
+  \[
+    L(E,s) = L(f,s).
+  \]
+  Insbesondere gilt $a_p(E) = a_p(f)$ f\"ur alle Primzahlen $p \nmid N$.
+\end{theorem}
+
+\begin{bemerkung}
+  Wiles bewies dies f\"ur halbstabile elliptische Kurven \cite{Wiles95}, was
+  f\"ur den Fermatschen Satz (via das Frey--Ribet-Argument) gen\"ugte. Der
+  vollst\"andige Modularit\"atssatz f\"ur alle elliptischen Kurven \"uber $\mathbb{Q}$
+  wurde von Breuil, Conrad, Diamond und Taylor \cite{BCDT} bewiesen.
+\end{bemerkung}
+
+\subsection{Sato--Tate-Satz}
+
+F\"ur eine elliptische Kurve $E/\mathbb{Q}$ ohne CM und mit guter Reduktion
+bei $p$ schreibe $a_p(E) = 2\sqrt{p}\cos\theta_p$ mit $\theta_p \in [0,\pi]$.
+Die \emph{Sato--Tate-Vermutung} besagt, dass $\theta_p$ gleichverteilt
+bez\"uglich des Ma{\ss}es $\frac{2}{\pi}\sin^2\theta\,d\theta$ ist.
+
+\begin{theorem}[Sato--Tate; Harris, Shepherd-Barron, Taylor u.\,a., 2011]
+  F\"ur jede elliptische Kurve $E/\mathbb{Q}$ ohne CM sind die Winkel $\theta_p$
+  gleichverteilt bez\"uglich des Sato--Tate-Ma{\ss}es
+  $\mu_{\mathrm{ST}} = \frac{2}{\pi}\sin^2\theta\,d\theta$.
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+  Die wesentlichen Zutaten sind: (i) die symmetrischen Potenz-$L$-Funktionen
+  $L(\mathrm{Sym}^n E, s)$ sind automorph (und ganz f\"ur $n \ge 1$), bewiesen
+  via potentielle Automorphieergebnisse von Taylor; (ii) das Weylsche
+  Gleichverteilungskriterium, das die Aussage auf die Holomorphie und
+  Nullstellenfreiheit der $\mathrm{Sym}^n$-$L$-Funktionen reduziert.
+  Vgl.\ Taylor \cite{Taylor} und Harris--Shepherd-Barron--Taylor \cite{HST}.
+\end{proof}
+
+\subsection{Frobenius-Verteilungen und die Birch-Swinnerton-Dyer-Vermutung}
+
+F\"ur eine elliptische Kurve $E/\mathbb{Q}$ erf\"ullt die zugeh\"orige Hecke-Eigenform
+$f$ nach Satz~\ref{thm:modularitaet}: $a_p(f) = a_p(E) = p+1-\#E(\mathbb{F}_p)$.
+Die Birch-Swinnerton-Dyer-Vermutung sagt vorher:
+\[
+  \mathrm{ord}_{s=1} L(E,s) = \mathrm{Rang}(E(\mathbb{Q})).
+\]
+
+\begin{conjecture}[Birch--Swinnerton-Dyer]\label{conj:bsd}
+  F\"ur jede elliptische Kurve $E/\mathbb{Q}$ gilt:
+  \[
+    \mathrm{ord}_{s=1} L(E,s) = \mathrm{Rang}_{\mathbb{Z}} E(\mathbb{Q}).
+  \]
+\end{conjecture}
+
+Das beste bekannte Ergebnis (Gross--Zagier, Kolyvagin) ist: Falls $L(E,1) \ne 0$,
+so ist $\mathrm{Rang}(E(\mathbb{Q})) = 0$; falls $L(E,s)$ eine einfache Nullstelle
+bei $s=1$ hat, so ist $\mathrm{Rang}(E(\mathbb{Q})) = 1$.
+
+\subsection{Implementierung}
+
+Die Implementierung in \texttt{modular\_forms\_hecke.py} stellt bereit:
+\begin{itemize}
+  \item \texttt{hecke\_operator(coefficients, p, k)}: Wendet $T_p$ auf
+        Fourier-Koeffizienten an (Proposition~\ref{prop:hecke-fourier}),
+        mit LRU-Cache f\"ur Wiederholungsaufrufe;
+  \item \texttt{hecke\_eigenform(coefficients, primes)}: Pr\"uft die
+        Multiplikativit\"at und die Eigenform-Bedingung $T_p f = \lambda_p f$;
+  \item \texttt{petersson\_inner\_product\_estimate(f\_coeffs, g\_coeffs, k)}:
+        N\"ahert $\langle f, g \rangle$ via Rankin--Selberg an;
+  \item \texttt{l\_function\_modular\_form(coefficients, s, k)}: Berechnet
+        $L(f,s)$ als partielle Dirichlet-Reihe;
+  \item \texttt{functional\_equation\_l\_function(coefficients, k, N, s)}:
+        Verifiziert $\Lambda(f,s) \approx \varepsilon\,\Lambda(f,k-s)$ numerisch.
+\end{itemize}
+
+% =============================================================================
+\section*{Literatur}
+% =============================================================================
+
+\begin{thebibliography}{10}
+
+\bibitem{AtkinLehner}
+  A.\,O.\,L. Atkin und J. Lehner,
+  \emph{Hecke operators on $\Gamma_0(m)$},
+  Math.\ Ann.\ \textbf{185} (1970), 134--160.
+
+\bibitem{BCDT}
+  C. Breuil, B. Conrad, F. Diamond und R. Taylor,
+  \emph{On the modularity of elliptic curves over $\mathbb{Q}$: wild 3-adic exercises},
+  J. Amer. Math. Soc. \textbf{14} (2001), 843--939.
+
+\bibitem{Deligne74}
+  P. Deligne,
+  \emph{La conjecture de Weil, I},
+  Publ.\ Math.\ I.H.\'E.S.\ \textbf{43} (1974), 273--307.
+
+\bibitem{DiamondShurman}
+  F. Diamond und J. Shurman,
+  \emph{A First Course in Modular Forms},
+  Graduate Texts in Mathematics \textbf{228}, Springer, New York, 2005.
+
+\bibitem{HST}
+  M. Harris, N. Shepherd-Barron und R. Taylor,
+  \emph{A family of Calabi--Yau varieties and potential automorphy},
+  Ann. of Math.\ (2) \textbf{171} (2010), 779--813.
+
+\bibitem{Iwaniec}
+  H. Iwaniec,
+  \emph{Topics in Classical Automorphic Forms},
+  Graduate Studies in Mathematics \textbf{17}, Amer. Math. Soc., 1997.
+
+\bibitem{Serre}
+  J.-P. Serre,
+  \emph{A Course in Arithmetic},
+  Graduate Texts in Mathematics \textbf{7}, Springer, New York, 1973.
+
+\bibitem{Shimura}
+  G. Shimura,
+  \emph{Introduction to the Arithmetic Theory of Automorphic Functions},
+  Princeton University Press, Princeton, 1971.
+
+\bibitem{Taylor}
+  R. Taylor,
+  \emph{Automorphy for some $l$-adic lifts of automorphic mod $l$ Galois representations, II},
+  Publ.\ Math.\ I.H.\'E.S.\ \textbf{108} (2008), 183--239.
+
+\bibitem{Wiles95}
+  A. Wiles,
+  \emph{Modular elliptic curves and Fermat's Last Theorem},
+  Ann. of Math.\ (2) \textbf{141} (1995), 443--551.
+
+\end{thebibliography}
+
+\end{document}

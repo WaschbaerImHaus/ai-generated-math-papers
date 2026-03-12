@@ -1,0 +1,690 @@
+% @file paper63_galois_darstellungen_de.tex
+% @brief Galois-Darstellungen und das Langlands-Programm
+% @author Michael Fuhrmann
+% @date 2026-03-12
+% @project Specialist Mathematics Project, Build 143
+
+\documentclass[a4paper,12pt]{amsart}
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\geometry{margin=2.5cm}
+
+% Theoremumgebungen auf Deutsch
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+
+% Mathematische Abkürzungen
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Zl}{\mathbb{Z}_\ell}
+\newcommand{\Ql}{\mathbb{Q}_\ell}
+\newcommand{\Fp}{\mathbb{F}_p}
+\newcommand{\Fq}{\mathbb{F}_q}
+\newcommand{\Qbar}{\overline{\mathbb{Q}}}
+\newcommand{\GQ}{\mathrm{Gal}(\overline{\mathbb{Q}}/\mathbb{Q})}
+\newcommand{\GL}{\mathrm{GL}}
+\newcommand{\SL}{\mathrm{SL}}
+\newcommand{\Frob}{\mathrm{Frob}}
+\newcommand{\Spur}{\mathrm{tr}}
+\newcommand{\BdR}{B_{\mathrm{dR}}}
+\newcommand{\Bcrys}{B_{\mathrm{crys}}}
+\newcommand{\Tl}{T_\ell}
+\newcommand{\Vl}{V_\ell}
+
+\title{Galois-Darstellungen und das Langlands-Programm}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 143}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\begin{abstract}
+Galois-Darstellungen sind stetige Gruppenhomomorphismen
+$\varrho\colon \mathrm{Gal}(\overline{\mathbb{Q}}/\mathbb{Q}) \to \GL_n(R)$,
+wobei $R$ typischerweise ein Ring von $\ell$-adischen ganzen Zahlen oder ein endlicher
+Körper ist. Sie bilden die zentrale Brücke zwischen algebraischer Zahlentheorie und
+analytischen Objekten wie Modulformen und automorphen Darstellungen und sind die
+Grundsprache des Langlands-Programms.
+
+Diese Arbeit gibt einen Überblick über die Theorie der Galois-Darstellungen, von der
+absoluten Galois-Gruppe über $\ell$-adische und $p$-adische Darstellungen bis hin zu
+ihren tiefen Verbindungen mit elliptischen Kurven, Modulformen und der Langlands-Korrespondenz.
+Wir behandeln den Modularitätssatz von Wiles--Taylor--Wiles (1995), der bewiesen ist
+und Fermats Letzten Satz impliziert; Serres Modularitätsvermutung, bewiesen von
+Khare--Wintenberger (2009); Fontaines $p$-adische Hodge-Theorie; sowie Lafforgues
+Beweis der Langlands-Korrespondenz über Funktionenkörpern (2002, Fields-Medaille).
+Die globale Langlands-Korrespondenz für $\mathbb{Q}$ bleibt eine zentrale offene
+Vermutung der Mathematik.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%=========================================================
+\section{Einleitung}
+%=========================================================
+
+Die Theorie der Galois-Darstellungen steht am Schnittpunkt zweier großer Strömungen
+der modernen Mathematik: der \emph{algebraischen} (Galois-Theorie, algebraische
+Zahlkörper, elliptische Kurven, Motive) und der \emph{analytischen} (automorphe
+Formen, $L$-Funktionen, harmonische Analysis auf Lie-Gruppen). Eine Galois-Darstellung
+codiert die Wirkung der absoluten Galois-Gruppe $\GQ$ auf einem endlichdimensionalen
+Vektorraum und übersetzt die von Natur aus unendliche, topologische Gruppe in
+konkrete lineare Algebra.
+
+Die leitende Philosophie des \textbf{Langlands-Programms}, das Robert Langlands 1967
+und 1970 formulierte, ist das Prinzip der \emph{Funktorialität}: $n$-dimensionale
+Galois-Darstellungen sollen bijektiv den automorphen Darstellungen von
+$\GL_n(\mathbb{A}_\Q)$, der adelischen allgemeinen linearen Gruppe, entsprechen.
+Diese Korrespondenz würde, wenn sie vollständig bewiesen wäre, weite Gebiete der
+Mathematik vereinheitlichen und beispiellosen Zugang zu $L$-Funktionen bieten.
+
+\subsection*{Historischer Kontext}
+
+Die Wurzeln der Galois-Darstellungen liegen in klassischen Reziprozitätsgesetzen.
+Das quadratische Reziprozitätsgesetz von Gauß (1796) lässt sich als Aussage über das
+Verhalten von Primzahlen in quadratischen Körpern reformulieren, kontrolliert durch
+eine eindimensionale Galois-Darstellung (ein Dirichlet-Charakter). Die Klassenkörpertheorie,
+entwickelt von Hilbert, Takagi und Artin im ersten Drittel des 20.\ Jahrhunderts,
+klassifiziert alle abelschen Erweiterungen von Zahlkörpern und begründet das abelsche
+Langlands-Programm in Gestalt des Artinschen Reziprozitätsgesetzes.
+
+Das nicht-abelsche Programm begann mit Eichler--Shimura (1950er Jahre), die zeigten,
+dass die $L$-Funktion einer Hecke-Eigenform vom Gewicht~2 gleich der $L$-Funktion
+einer elliptischen Kurve ist. Serre und Deligne entwickelten in den 1960er und 1970er
+Jahren die Theorie der $\ell$-adischen Darstellungen systematisch. Der spektakuläre
+Höhepunkt war Wiles' Beweis des Letzten Fermatschen Satzes (1995), der auf dem
+Modularitätssatz für semistabile elliptische Kurven beruht.
+
+\subsection*{Aufbau dieser Arbeit}
+
+Abschnitte~\ref{sec:galois-gruppe} und~\ref{sec:ell-adisch} legen die absolute
+Galois-Gruppe und $\ell$-adische Darstellungen fest. Abschnitt~\ref{sec:elliptische-kurven}
+konstruiert Darstellungen aus elliptischen Kurven über den Tate-Modul.
+Abschnitte~\ref{sec:modularitaet} und~\ref{sec:modulformen} behandeln den Modularitätssatz
+und modulare Galois-Darstellungen. Abschnitte~\ref{sec:serre} und~\ref{sec:fontaine}
+befassen sich mit Serres Modularitätssatz und Fontaines $p$-adischer Hodge-Theorie.
+Abschnitte~\ref{sec:langlands} und~\ref{sec:neuere-resultate} geben einen Überblick
+über die Langlands-Korrespondenz und neuere Ergebnisse.
+
+%=========================================================
+\section{Die absolute Galois-Gruppe}
+\label{sec:galois-gruppe}
+%=========================================================
+
+\begin{definition}
+Die \textbf{absolute Galois-Gruppe} von $\Q$ ist
+\[
+  G_\Q := \GQ = \mathrm{Aut}(\Qbar/\Q),
+\]
+die Gruppe aller Körperautomorphismen eines festen algebraischen Abschlusses $\Qbar$,
+die $\Q$ punktweise fixieren.
+\end{definition}
+
+\subsection{Profinite Topologie}
+
+Obwohl $G_\Q$ riesig (überabzählbar) ist, trägt sie eine natürliche Topologie, die
+sie zu einer profiniten Gruppe macht:
+\[
+  G_\Q \;\cong\; \varprojlim_{[K:\Q] < \infty,\; K/\Q \text{ galoissch}} \mathrm{Gal}(K/\Q).
+\]
+Hierbei ist der inverse Limes über das gerichtete System endlicher Galois-Erweiterungen
+$K/\Q$, geordnet durch Inklusion. Die Topologie ist die \emph{Krull-Topologie}: eine
+Basis offener Untergruppen besteht aus den Normaluntergruppen $\mathrm{Gal}(\Qbar/K)$
+für endliche galoissche $K/\Q$.
+
+\begin{proposition}
+$G_\Q$ ist kompakt, total unzusammenhängend und hausdorffsch (d.\,h.\ profinit).
+\end{proposition}
+
+\begin{proof}
+Nach dem Satz von Tychonoff ist das Produkt $\prod_K \mathrm{Gal}(K/\Q)$ über alle
+endlichen Galois-Erweiterungen kompakt. Der inverse Limes ist eine abgeschlossene
+Untergruppe, also ebenfalls kompakt. Totale Unzusammenhängtheit folgt daraus, dass
+jede offene Untergruppe endlichen Index hat und die offenen Untergruppen eine
+Umgebungsbasis bilden.
+\end{proof}
+
+\subsection{Frobenius-Elemente}
+
+Für eine bei $p$ unverzweigte Galois-Erweiterung $K/\Q$ gibt es eine wohldefinierte
+Konjugiertenklasse $\Frob_p \in \mathrm{Gal}(K/\Q)$, charakterisiert durch
+\[
+  \Frob_p(\alpha) \equiv \alpha^p \pmod{\mathfrak{P}}
+\]
+für alle algebraischen ganzen Zahlen $\alpha \in \mathcal{O}_K$ und jedes Primideal
+$\mathfrak{P}$ von $K$ über $p$.
+
+\begin{definition}
+Für eine Primzahl $\ell$ ist das \textbf{geometrische Frobenius-Element} an $p \neq \ell$
+das Element $\Frob_p \in G_\Q$ (bzw.\ die von ihm definierte Konjugiertenklasse),
+das auf den $\ell$-Potenz-Einheitswurzeln durch $\zeta_{\ell^n} \mapsto \zeta_{\ell^n}^p$
+wirkt.
+\end{definition}
+
+Nach dem Dichtigkeitssatz von Chebotarev sind die Frobenius-Elemente
+$\{\Frob_p : p \text{ unverzweigt}\}$ in $G_\Q$ \emph{dicht}. Folglich ist eine
+stetige Darstellung vollständig durch die Werte an Frobenius-Elementen bestimmt.
+
+\subsection{Verzweigung}
+
+Für jede Primzahl $p$ fixiere eine Einbettung $\Qbar \hookrightarrow \overline{\Q}_p$.
+Dies ergibt eine Zerlegungsgruppe $D_p \subset G_\Q$ und eine Trägheitsgruppe
+$I_p \trianglelefteq D_p$, eingebettet in die exakte Folge
+\[
+  1 \to I_p \to D_p \to G_{\Fp} \cong \hat{\Z} \to 1.
+\]
+Das arithmetische Frobenius-Erzeugende von $G_{\Fp}$ wird zu $\Frob_p \in D_p/I_p$ angehoben.
+
+%=========================================================
+\section{\texorpdfstring{$\ell$}{l}-adische Darstellungen}
+\label{sec:ell-adisch}
+%=========================================================
+
+Sei $\ell$ eine Primzahl. Der Ring $\Zl$ der $\ell$-adischen ganzen Zahlen ist die
+Vervollständigung von $\Z$ bei $\ell$, und $\Ql = \Zl[\ell^{-1}]$ ist der Körper der
+$\ell$-adischen Zahlen.
+
+\begin{definition}
+Eine \textbf{$\ell$-adische Darstellung} von $G_\Q$ der Dimension $n$ ist ein stetiger
+Homomorphismus
+\[
+  \varrho\colon G_\Q \to \GL_n(\Zl),
+\]
+wobei $\GL_n(\Zl)$ die $\ell$-adische Topologie trägt. Oft betrachtet man auch die
+zugehörige rationale Darstellung $\varrho\colon G_\Q \to \GL_n(\Ql)$.
+\end{definition}
+
+\subsection{Stetigkeit und Endlichkeit}
+
+Da $G_\Q$ profinit und $\GL_n(\Zl)$ eine $\ell$-adische Lie-Gruppe ist, bedeutet
+Stetigkeit, dass der Kern eine offene Untergruppe enthält, d.\,h.\ dass $\varrho$
+durch eine offene Untergruppe endlichen Indexes von $G_\Q$ faktorisiert.
+
+\subsection{Der zyklotomische Charakter}
+
+Die grundlegende eindimensionale $\ell$-adische Darstellung ist der
+\textbf{zyklotomische Charakter}
+\[
+  \chi_\ell\colon G_\Q \to \Zl^\times,
+\]
+definiert durch $\sigma(\zeta) = \zeta^{\chi_\ell(\sigma)}$ für alle $\ell^n$-ten
+Einheitswurzeln $\zeta$. Konkret gilt via den kanonischen Isomorphismus
+$\hat{\Z} \cong \varprojlim \Z/\ell^n\Z$:
+\[
+  \chi_\ell(\Frob_p) = p \quad \text{für alle Primzahlen } p \neq \ell.
+\]
+
+\begin{beispiel}[Dirichlet-Charaktere]
+Ein Dirichlet-Charakter $\chi\colon (\Z/N\Z)^\times \to \mathbb{C}^\times$ des
+Führers $N$ liefert über die Klassenkörpertheorie eine eindimensionale Galois-Darstellung:
+\[
+  \varrho_\chi\colon G_\Q \twoheadrightarrow \mathrm{Gal}(\Q(\zeta_N)/\Q)
+  \cong (\Z/N\Z)^\times \xrightarrow{\chi} \mathbb{C}^\times.
+\]
+Der Frobenius-Wert ist $\varrho_\chi(\Frob_p) = \chi(p)$ für $p \nmid N$.
+\end{beispiel}
+
+\subsection{Tate-Drehungen}
+
+Für $n \in \Z$ ist die $n$-fache \textbf{Tate-Drehung} einer Darstellung $V$ durch
+$V(n) := V \otimes \chi_\ell^{\otimes n}$ definiert. Die Kategorie der $\ell$-adischen
+Darstellungen ist abgeschlossen unter direkten Summen, Tensorprodukten, Dualen und
+Tate-Drehungen.
+
+%=========================================================
+\section{Darstellungen aus elliptischen Kurven}
+\label{sec:elliptische-kurven}
+%=========================================================
+
+Elliptische Kurven liefern die wichtigsten zweidimensionalen Galois-Darstellungen.
+
+\begin{definition}
+Sei $E/\Q$ eine elliptische Kurve und $\ell$ eine Primzahl. Der
+\textbf{$\ell$-adische Tate-Modul} ist
+\[
+  \Tl(E) := \varprojlim_n E[\ell^n],
+\]
+wobei $E[\ell^n] \cong (\Z/\ell^n\Z)^2$ die $\ell^n$-Torsionspunkte (über $\Qbar$)
+sind und die Übergangsabbildungen Multiplikation mit $\ell$. Als abelsche Gruppe gilt
+$\Tl(E) \cong \Zl^2$.
+\end{definition}
+
+Da $G_\Q$ die Torsionspunkte permutiert, wirkt sie auf $\Tl(E)$ und liefert:
+
+\begin{definition}
+Die \textbf{$\ell$-adische Darstellung von $E$} ist
+\[
+  \varrho_{E,\ell}\colon G_\Q \to \GL_2(\Zl).
+\]
+Ihre rationale Version $V_\ell(E) := \Tl(E) \otimes_{\Zl} \Ql$ liefert
+$\varrho_{E,\ell}\colon G_\Q \to \GL_2(\Ql)$.
+\end{definition}
+
+\subsection{Eigenschaften von $\varrho_{E,\ell}$}
+
+\begin{theorem}[Weil 1940]
+\label{satz:weil-hasse}
+Sei $E/\Q$ eine elliptische Kurve mit guter Reduktion bei $p \neq \ell$.
+Dann ist $\varrho_{E,\ell}$ bei $p$ unverzweigt, und
+\[
+  \det(1 - \varrho_{E,\ell}(\Frob_p)\,X) = 1 - a_p X + p X^2,
+\]
+wobei $a_p = p + 1 - \#E(\Fp)$. Insbesondere gilt
+$|\alpha_p|, |\beta_p| = \sqrt{p}$ (Hassescher Satz: $|a_p| \leq 2\sqrt{p}$).
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Das charakteristische Polynom von $\Frob_p$ auf $V_\ell(E)$ berechnet die
+Zeta-Funktion von $E$ über $\Fp$ via der Lefschetz-Spurformel am Tate-Modul.
+Hasses Ungleichung $|a_p| \leq 2\sqrt{p}$ folgt aus der Positivität der
+Rosati-Involution.
+\end{proof}
+
+\subsection{Verzweigung an Primzahlen schlechter Reduktion}
+
+An einer Primzahl $p$ additiver Reduktion ist $\varrho_{E,\ell}|_{I_p}$ nicht-trivial
+und erfasst die lokale Néron-Modell-Struktur. Bei semistabiler Reduktion
+(multiplikative Reduktion) wirkt die Trägheit unipotent (Tate-Kurven-Theorie).
+
+\subsection{Das Weil-Paarung}
+
+Die natürliche alternierende Paarung $e_\ell\colon \Tl(E) \times \Tl(E) \to \Tl(\mu)$
+liefert
+\[
+  \det(\varrho_{E,\ell}) = \chi_\ell,
+\]
+den zyklotomischen Charakter. Dies ist die Schlüsselbeziehung, die die
+zweidimensionale Darstellung an den eindimensionalen zyklotomischen Charakter koppelt.
+
+%=========================================================
+\section{Der Modularitätssatz}
+\label{sec:modularitaet}
+%=========================================================
+
+\begin{theorem}[Modularitätssatz; Wiles 1995, Taylor--Wiles 1995,
+  Breuil--Conrad--Diamond--Taylor 2001]
+\label{satz:modularitaet}
+Jede elliptische Kurve $E$ über $\Q$ ist modular: Es existiert eine Neuform
+$f = \sum_{n=1}^\infty a_n(f) q^n$ vom Gewicht~2 und einem gewissen Führer $N$, sodass
+\[
+  a_p(E) = a_p(f) \quad \text{für alle Primzahlen } p \nmid N.
+\]
+Äquivalent: $L(E, s) = L(f, s)$.
+\end{theorem}
+
+\begin{bemerkung}
+Wiles bewies den semistabilen Fall (1995), der für den Beweis von Fermats Letztem
+Satz ausreichte. Der vollständige Satz für alle elliptischen Kurven über $\Q$ wurde
+von Breuil, Conrad, Diamond und Taylor (2001) bewiesen.
+\end{bemerkung}
+
+\subsection{Beweisidee}
+
+Der Beweis verläuft in folgenden Schritten:
+
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Deformationstheorie}: Für eine Primzahl $p \mid N$ (Wiles wählt $p = 3$
+oder $p = 5$) betrachte die mod-$p$-Darstellung $\bar{\varrho}_{E,p}$.
+
+\item \textbf{Modularitätsliftung}: Zeige, dass $\varrho_{E,p}$ modular ist, durch
+Liften der residuellen mod-$p$-Darstellung $\bar{\varrho}_{E,p}$ mit dem
+\emph{numerischen Kriterium} (Taylor--Wiles-Methode).
+
+\item \textbf{Taylor--Wiles-Methode}: Konstruiere ein Hilfssystem von
+Galois-Darstellungen (die \emph{Hecke-Algebren}) und beweise einen $R = T$-Satz
+(Deformationsring $R$ gleich Hecke-Algebra $T$) durch einen Dimensionsvergleich.
+
+\item \textbf{Basisfall}: Nutze die bekannte Modularität von $E$ modulo kleiner
+Primzahlen über Langlands--Tunnell (für $p = 3$).
+\end{enumerate}
+
+\subsection{Fermats Letzter Satz als Korollar}
+
+\begin{korollar}[Fermats Letzter Satz; Wiles 1995]
+Für $n \geq 3$ hat die Gleichung $x^n + y^n = z^n$ keine Lösungen in ganzen
+Zahlen mit $xyz \neq 0$.
+\end{korollar}
+
+\begin{proof}[Beweis (unter Verwendung von Satz~\ref{satz:modularitaet})]
+Angenommen, $a^p + b^p = c^p$ mit $abc \neq 0$ und Primzahl $p \geq 5$ (kleine Fälle
+sind klassisch). Frey (1986) konstruierte die elliptische Kurve
+$E_{a,b,c}\colon y^2 = x(x-a^p)(x+b^p)$. Ribet (1990) bewies (unter Verwendung des
+Mazur-Prinzips), dass wenn $E_{a,b,c}$ modular wäre, die zugehörige Neuform Führer
+$N = 2$ hätte --- aber es gibt keine Neuformen vom Gewicht~2 und Führer~2 (der
+betreffende Raum ist 0-dimensional). Dies widerspricht der Modularität, also existiert
+keine Frey-Kurve, also keine Fermat-Lösung.
+\end{proof}
+
+%=========================================================
+\section{Modulare Galois-Darstellungen}
+\label{sec:modulformen}
+%=========================================================
+
+Sei $f = \sum_{n \geq 1} a_n q^n$ eine normalisierte Hecke-Eigenform vom Gewicht~$k$,
+Führer~$N$ und Nebentypus~$\chi$. Sei $K_f = \Q(\{a_n\})$ ihr Koeffizientenkörper.
+
+\begin{theorem}[Deligne 1971]
+\label{satz:deligne}
+Für jede Primzahl $\ell$ und Einbettung $\iota\colon K_f \hookrightarrow \overline{\Q}_\ell$
+existiert eine eindeutige (bis auf Isomorphie) irreduzible, stetige Darstellung
+\[
+  \varrho_{f,\ell}\colon G_\Q \to \GL_2(\mathcal{O}_{K_f \otimes \Ql}),
+\]
+unverzweigt außerhalb $N\ell$, so dass für alle Primzahlen $p \nmid N\ell$:
+\[
+  \Spur(\varrho_{f,\ell}(\Frob_p)) = a_p(f), \qquad
+  \det(\varrho_{f,\ell}(\Frob_p)) = \chi(p)\, p^{k-1}.
+\]
+\end{theorem}
+
+\subsection{Die Ramanujan--Deligne-Schranke}
+
+\begin{theorem}[Deligne 1974; Weil-Vermutungen für Varietäten]
+\label{satz:ramanujan-deligne}
+Für eine Neuform $f$ vom Gewicht~$k$ wie oben und $p \nmid N$ erfüllen die Eigenwerte
+$\alpha_p, \beta_p$ von $\varrho_{f,\ell}(\Frob_p)$:
+\[
+  |\iota(\alpha_p)| = |\iota(\beta_p)| = p^{(k-1)/2}
+\]
+für jede Einbettung $\iota\colon K_f \hookrightarrow \mathbb{C}$.
+Für $k = 2$ ergibt sich $|a_p| \leq 2\sqrt{p}$ (Ramanujans Vermutung für $\Delta$
+und ihre Verallgemeinerung).
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+Deligne realisiert $\varrho_{f,\ell}$ in der étalen Kohomologie $H^{k-1}_{\text{ét}}$
+einer Kuga--Sato-Varietät und wendet seinen Beweis der Weil-Vermutungen (Riemannsche
+Hypothese für Varietäten über endlichen Körpern) an, der die Schranke $p^{(k-1)/2}$
+an die Frobenius-Eigenwerte liefert.
+\end{proof}
+
+%=========================================================
+\section{Serres Modularitätssatz}
+\label{sec:serre}
+%=========================================================
+
+\begin{definition}
+Eine \textbf{mod-$\ell$-Galois-Darstellung} ist ein stetiger Homomorphismus
+$\bar{\varrho}\colon G_\Q \to \GL_2(\overline{\Fp})$.
+Sie heißt \textbf{ungerade}, wenn $\det(\bar{\varrho}(\text{komplexe Konjugation})) = -1$,
+und \textbf{irreduzibel}, wenn sie keine $G_\Q$-stabile Gerade besitzt.
+\end{definition}
+
+\begin{conjecture}[Serre 1987]
+Jede ungerade, irreduzible stetige Darstellung
+$\bar{\varrho}\colon G_\Q \to \GL_2(\overline{\mathbb{F}}_\ell)$
+stammt von einer Neuform vom Gewicht $k(\bar{\varrho})$ und Führer $N(\bar{\varrho})$,
+wie durch Serres Rezept vorgeschrieben.
+\end{conjecture}
+
+\begin{theorem}[Khare--Wintenberger 2009; Serres Modularitätssatz]
+\label{satz:serre}
+Serres Vermutung ist wahr: Jede ungerade irreduzible
+$\bar{\varrho}\colon G_\Q \to \GL_2(\overline{\mathbb{F}}_\ell)$ ist modular.
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+Khare und Wintenberger beweisen dies durch eine zweistu\-fige Induktion:
+\begin{enumerate}[label=(\alph*)]
+\item \textbf{Niveauabsenkung}: Verwendung von Ribets Methode und Modularitätsliftungs\-sätzen
+  (im Geiste von Wiles), um auf den Fall kleinen Niveaus und Gewichts zu reduzieren.
+\item \textbf{Gewichtsabsenkung}: Reduktion auf charakteristik-$p$-Darstellungen
+  kleinen Führers mittels $p$-adischer Hodge-Theorie und Fontaine--Mazur-artiger Argumente.
+\item \textbf{Basisfall}: Überprüfung der Vermutung für kleines Gewicht und Niveau
+  durch explizite endliche Berechnungen.
+\end{enumerate}
+Der Beweis verwendet die volle Stärke der Taylor--Wiles--Kisin-Modularitätsliftungs\-maschinerie.
+\end{proof}
+
+\begin{korollar}
+Serres Modularitätssatz impliziert den Modularitätssatz (Satz~\ref{satz:modularitaet})
+und vertieft das Verständnis, wie residuelle Darstellungen zu Darstellungen der
+Charakteristik Null angehoben werden.
+\end{korollar}
+
+%=========================================================
+\section{\texorpdfstring{$p$}{p}-adische Darstellungen und Fontaines Theorie}
+\label{sec:fontaine}
+%=========================================================
+
+Die lokale Theorie der $p$-adischen Darstellungen (d.\,h.\ stetige
+$G_{\Q_p}$-Darstellungen auf $\Q_p$-Vektorräumen) wird durch Fontaines
+\emph{$p$-adische Hodge-Theorie} kontrolliert.
+
+\subsection{Periodenringe}
+
+Fontaine konstruierte mehrere Periodenringe zur Klassifikation $p$-adischer Darstellungen:
+
+\begin{definition}
+\begin{itemize}
+  \item $\BdR$: der de-Rham-Periodenring; ein vollständiger diskreter Bewertungskörper
+    mit Restklassenkörper $\mathbb{C}_p$ und einer Filtration.
+  \item $\Bcrys \subset \BdR$: der kristalline Periodenring mit Frobenius $\phi$
+    und einer Filtration.
+  \item $B_{\mathrm{st}} \supset \Bcrys$: der semistabile Periodenring mit
+    zusätzlichem Monodromie-Operator $N$.
+\end{itemize}
+\end{definition}
+
+\begin{definition}
+Eine $p$-adische Darstellung $V$ von $G_{\Q_p}$ heißt:
+\begin{itemize}
+  \item \textbf{Hodge--Tate}, wenn $V \otimes_{\Q_p} \mathbb{C}_p \cong \bigoplus_i \mathbb{C}_p(i)^{h_i}$,
+  \item \textbf{de Rham}, wenn $D_{\mathrm{dR}}(V) := (V \otimes_{\Q_p} \BdR)^{G_{\Q_p}}$ die Dimension $n = \dim V$ hat,
+  \item \textbf{kristallin}, wenn $D_{\mathrm{crys}}(V) := (V \otimes_{\Q_p} \Bcrys)^{G_{\Q_p}}$ die Dimension $n$ hat,
+  \item \textbf{semistabil}, wenn $D_{\mathrm{st}}(V) := (V \otimes_{\Q_p} B_{\mathrm{st}})^{G_{\Q_p}}$ die Dimension $n$ hat.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Fontaine--Faltings--Tsuji]
+\label{satz:fontaine-vergleich}
+Die $\ell$-adische Darstellung $V_\ell(E)$ einer elliptischen Kurve $E/\Q_p$ ist:
+\begin{itemize}
+  \item Kristallin, wenn $E$ gute Reduktion bei $p$ hat,
+  \item Semistabil, wenn $E$ semistabile (multiplikative) Reduktion bei $p$ hat.
+\end{itemize}
+\end{theorem}
+
+\subsection{Wach-Moduln und ganzzahlige Strukturen}
+
+Für kristalline Darstellungen liefern Wach-Moduln ganzzahlige ($\Zl$-Gitter-)
+Versionen der Fontaine-Klassifikation, die das Studium von Darstellungen über $\Zl$
+statt $\Ql$ ermöglichen.
+
+\subsection{Die Fontaine--Mazur-Vermutung}
+
+\begin{conjecture}[Fontaine--Mazur 1993]
+Eine irreduzible $p$-adische Darstellung $\varrho\colon G_\Q \to \GL_n(\Ql)$
+stammt aus der Geometrie (d.\,h.\ aus der étalen Kohomologie einer Varietät über~$\Q$)
+genau dann, wenn sie bei $p$ \emph{de Rham} ist (lokal bei $p$) und bei fast allen
+Primzahlen unverzweigt ist.
+\end{conjecture}
+
+Diese Vermutung ist in wichtigen Spezialfällen bewiesen (z.\,B.\ $n = 2$, in
+Verbindung mit Modularitätsliftung).
+
+%=========================================================
+\section{Die Langlands-Korrespondenz}
+\label{sec:langlands}
+%=========================================================
+
+\subsection{Die globale Langlands-Korrespondenz für $\GL_n$}
+
+\begin{conjecture}[Globale Langlands-Korrespondenz für $\Q$]
+\label{verm:langlands}
+Es gibt eine Bijektion zwischen:
+\begin{enumerate}[label=(\roman*)]
+\item $n$-dimensionalen irreduziblen stetigen Darstellungen
+  $\varrho\colon G_\Q \to \GL_n(\overline{\Q}_\ell)$ (geometrischer Herkunft),
+\item kuspidalen automorphen Darstellungen $\pi$ von $\GL_n(\mathbb{A}_\Q)$,
+\end{enumerate}
+dergestalt dass $L(s, \varrho) = L(s, \pi)$ für die zugehörigen $L$-Funktionen.
+\end{conjecture}
+
+Diese Vermutung bleibt für $\Q$ im Allgemeinen \textbf{offen}. Jedoch sind
+Spezialfälle etabliert:
+\begin{itemize}
+\item $n = 1$: Klassenkörpertheorie / Artinsches Reziprozitätsgesetz (bewiesen).
+\item $n = 2$: Modulformen vom Gewicht~$k$ (für elliptische Kurven durch Wiles et al.
+  bewiesen, allgemeiner durch Deligne für modulare Galois-Darstellungen).
+\item Funktionenkörper: Bewiesen durch Lafforgue (2002), s.\ Abschnitt~\ref{sec:neuere-resultate}.
+\end{itemize}
+
+\subsection{Lokale Langlands-Korrespondenz}
+
+\begin{theorem}[Lokale Langlands-Korrespondenz; Langlands 1970, Henniart 2000, Harris--Taylor 2001]
+\label{satz:lokale-langlands}
+Für jede Primzahl $p$ gibt es eine natürliche Bijektion
+\[
+  \left\{
+    \begin{array}{c}
+      n\text{-dim.\ Frobenius-semi-}\\ \text{einfache } W_{D}(\Q_p)\text{-Darst.}
+    \end{array}
+  \right\}
+  \xrightarrow{\;\sim\;}
+  \left\{
+    \begin{array}{c}
+      \text{irred.\ glatte Darst.}\\ \text{von } \GL_n(\Q_p)
+    \end{array}
+  \right\},
+\]
+wobei $W_D(\Q_p)$ die Weil--Deligne-Gruppe bezeichnet.
+\end{theorem}
+
+\subsection{Funktorialität}
+
+Langlands' Funktorialitätsprinzip besagt, dass ein Homomorphismus von $L$-Gruppen
+${}^L G \to {}^L H$ einem Transfer automorpher Darstellungen von $G(\mathbb{A})$
+nach $H(\mathbb{A})$ entsprechen soll. In vielen Fällen bewiesen (Basiswechsel,
+symmetrische Potenzhebungen für $\GL_2$), im Allgemeinen aber noch offen.
+
+%=========================================================
+\section{Neuere Resultate}
+\label{sec:neuere-resultate}
+%=========================================================
+
+\subsection{Lafforgues Satz über Funktionenkörpern}
+
+\begin{theorem}[Lafforgue 2002; Fields-Medaille]
+\label{satz:lafforgue}
+Die globale Langlands-Korrespondenz gilt für $\GL_n$ über einem Funktionenkörper
+$\mathbb{F}_q(C)$ (dem Funktionenkörper einer Kurve $C$ über einem endlichen Körper
+$\mathbb{F}_q$): Es gibt eine Bijektion zwischen $n$-dimensionalen $\ell$-adischen
+Darstellungen der absoluten Galois-Gruppe von $\mathbb{F}_q(C)$ und kuspidalen
+automorphen Darstellungen von $\GL_n(\mathbb{A}_{\mathbb{F}_q(C)})$, die
+$L$-Funktionen in Übereinstimmung bringt.
+\end{theorem}
+
+Dies war der erste vollständige Beweis der globalen Langlands-Korrespondenz für
+$\GL_n$ mit $n > 2$ und beruht auf Drinfelds Arbeit für $\GL_2$ (1974, 1980).
+
+\subsection{Potenzielle Automorphie}
+
+\begin{theorem}[Taylor 2004; Harris--Shepherd-Barron--Taylor 2010]
+\label{satz:potenzielle-automorphie}
+Sei $\varrho\colon G_\Q \to \GL_n(\overline{\Q}_\ell)$ eine „reguläre, ungerade"
+$\ell$-adische Darstellung. Dann ist $\varrho$ \emph{potenziell automorph}: Es
+existiert ein total reeller Körper $F$, sodass $\varrho|_{G_F}$ automorph ist.
+\end{theorem}
+
+Potenzielle Automorphie genügt, um zu beweisen, dass $L(\varrho, s)$ analytische
+Fortsetzung besitzt und eine Funktionalgleichung erfüllt, auch wenn volle Automorphie
+nicht etabliert ist.
+
+\subsection{Die Taylor--Wiles--Kisin-Methode}
+
+Diamond (1997), Kisin (2009) und viele andere erweiterten die Taylor--Wiles-Methode
+auf alle zweidimensionalen de-Rham-Darstellungen von $G_{\Q_p}$. Kisins Beweis
+verwendet \emph{Breuil--Kisin-Moduln} (Analoga der Wach-Moduln) und löst die meisten
+Fälle der Fontaine--Mazur-Vermutung für $n = 2$.
+
+\subsection{$p$-adische Langlands-Korrespondenz}
+
+Für $\GL_2(\Q_p)$ etablierte Colmez (2010) eine $p$-adische lokale Langlands-Korrespondenz:
+eine Bijektion zwischen zweidimensionalen triangulinären $p$-adischen Darstellungen
+von $G_{\Q_p}$ und lokal-analytischen Darstellungen von $\GL_2(\Q_p)$, verträglich
+mit der klassischen lokalen Langlands-Korrespondenz.
+
+\subsection{Höherdimensionale und geometrische Fortschritte}
+
+Neuere Arbeiten von Scholze (Verwendung von perfektoiden Räumen und Diamanten),
+V.~Lafforgue (2018, für reduktive Gruppen über Funktionenkörpern) und
+Fargues--Scholze (2021, Geometrisierung des lokalen Langlands-Programms) haben das
+strukturelle Verständnis drastisch erweitert. Fargues und Scholze haben das lokale
+Langlands-Programm geometrisiert und eine garbentheoretische Version über der
+Fargues--Fontaine-Kurve konstruiert.
+
+%=========================================================
+\section{Literatur}
+%=========================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Wiles1995}
+A.~Wiles,
+\textit{Modular elliptic curves and Fermat's last theorem},
+Annals of Mathematics \textbf{141} (1995), 443--551.
+
+\bibitem{TaylorWiles1995}
+R.~Taylor und A.~Wiles,
+\textit{Ring-theoretic properties of certain Hecke algebras},
+Annals of Mathematics \textbf{141} (1995), 553--572.
+
+\bibitem{BCDT2001}
+C.~Breuil, B.~Conrad, F.~Diamond und R.~Taylor,
+\textit{On the modularity of elliptic curves over $\mathbb{Q}$: Wild 3-adic exercises},
+Journal of the American Mathematical Society \textbf{14} (2001), 843--939.
+
+\bibitem{KhareWintenberger2009}
+C.~Khare und J.-P.~Wintenberger,
+\textit{Serre's modularity conjecture (I)},
+Inventiones Mathematicae \textbf{178} (2009), 485--504.
+
+\bibitem{Serre1987}
+J.-P.~Serre,
+\textit{Sur les représentations modulaires de degré 2 de $\mathrm{Gal}(\overline{\mathbb{Q}}/\mathbb{Q})$},
+Duke Mathematical Journal \textbf{54} (1987), 179--230.
+
+\bibitem{Fontaine1994}
+J.-M.~Fontaine,
+\textit{Représentations $p$-adiques semi-stables},
+Astérisque \textbf{223} (1994), 113--184.
+
+\bibitem{Lafforgue2002}
+L.~Lafforgue,
+\textit{Chtoucas de Drinfeld et correspondance de Langlands},
+Inventiones Mathematicae \textbf{147} (2002), 1--241.
+
+\bibitem{Deligne1974}
+P.~Deligne,
+\textit{La conjecture de Weil. I},
+Publications Mathématiques de l'IHÉS \textbf{43} (1974), 273--307.
+
+\bibitem{Langlands1970}
+R.~P.~Langlands,
+\textit{Problems in the theory of automorphic forms},
+Lectures in Modern Analysis and Applications III,
+Lecture Notes in Mathematics \textbf{170}, Springer, 1970, 18--61.
+
+\bibitem{HarrisTaylor2001}
+M.~Harris und R.~Taylor,
+\textit{The geometry and cohomology of some simple Shimura varieties},
+Annals of Mathematics Studies \textbf{151}, Princeton University Press, 2001.
+
+\end{thebibliography}
+
+\end{document}

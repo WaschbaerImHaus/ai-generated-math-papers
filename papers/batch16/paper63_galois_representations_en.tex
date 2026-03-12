@@ -1,0 +1,680 @@
+% @file paper63_galois_representations_en.tex
+% @brief Galois Representations and the Langlands Programme
+% @author Michael Fuhrmann
+% @date 2026-03-12
+% @project Specialist Mathematics Project, Build 143
+
+\documentclass[a4paper,12pt]{amsart}
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\geometry{margin=2.5cm}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+% Mathematical shortcuts
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Zl}{\mathbb{Z}_\ell}
+\newcommand{\Ql}{\mathbb{Q}_\ell}
+\newcommand{\Fp}{\mathbb{F}_p}
+\newcommand{\Fq}{\mathbb{F}_q}
+\newcommand{\Qbar}{\overline{\mathbb{Q}}}
+\newcommand{\GQ}{\mathrm{Gal}(\overline{\mathbb{Q}}/\mathbb{Q})}
+\newcommand{\GL}{\mathrm{GL}}
+\newcommand{\SL}{\mathrm{SL}}
+\newcommand{\Frob}{\mathrm{Frob}}
+\newcommand{\tr}{\mathrm{tr}}
+\newcommand{\rho}{\varrho}
+\newcommand{\BdR}{B_{\mathrm{dR}}}
+\newcommand{\Bcrys}{B_{\mathrm{crys}}}
+\newcommand{\Tl}{T_\ell}
+\newcommand{\Vl}{V_\ell}
+
+\title{Galois Representations and the Langlands Programme}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 143}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\begin{abstract}
+Galois representations are continuous group homomorphisms
+$\varrho\colon \mathrm{Gal}(\overline{\mathbb{Q}}/\mathbb{Q}) \to \GL_n(R)$,
+where $R$ is typically a ring of $\ell$-adic integers or a finite field.
+They form the central bridge between algebraic number theory and analytic objects
+such as modular forms and automorphic representations, and are the fundamental
+language of the Langlands programme.
+
+This paper surveys the theory of Galois representations from the absolute Galois
+group through $\ell$-adic and $p$-adic representations to their deep connections
+with elliptic curves, modular forms, and the Langlands correspondence.
+We discuss the Modularity Theorem of Wiles--Taylor--Wiles (1995), which is proved
+and implies Fermat's Last Theorem; Serre's Modularity Conjecture, proved by
+Khare--Wintenberger (2009); Fontaine's $p$-adic Hodge theory; and Lafforgue's proof
+of the Langlands correspondence over function fields (2002). The global Langlands
+correspondence for $\mathbb{Q}$ remains a central open conjecture of mathematics.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%=========================================================
+\section{Introduction}
+%=========================================================
+
+The theory of Galois representations stands at the crossroads of two great streams
+of modern mathematics: \emph{algebraic} (Galois theory, algebraic number fields,
+elliptic curves, motives) and \emph{analytic} (automorphic forms, $L$-functions,
+harmonic analysis on Lie groups). A Galois representation encodes the action of
+the absolute Galois group $\GQ$ on a finite-dimensional vector space, translating
+the intrinsically infinite, topological group into concrete linear algebra.
+
+The driving philosophy of the \textbf{Langlands programme}, formulated by Robert
+Langlands in 1967 and 1970, is the principle of \emph{functoriality}: that
+$n$-dimensional Galois representations should correspond bijectively to certain
+automorphic representations of $\GL_n(\mathbb{A}_\Q)$, the adelic general linear
+group. This correspondence, if fully established, would unify vast swaths of
+mathematics and yield unprecedented control over $L$-functions.
+
+\subsection*{Historical context}
+
+The roots of Galois representations lie in classical reciprocity laws. Gauss's
+quadratic reciprocity (1796) can be rephrased as a statement about the splitting
+of primes in quadratic fields, controlled by a 1-dimensional Galois representation
+(a Dirichlet character). Class field theory, developed by Hilbert, Takagi, and
+Artin through the first third of the twentieth century, classifies all abelian
+extensions of number fields and establishes abelian Langlands in the guise of
+Artin's reciprocity law.
+
+The non-abelian programme began with Eichler--Shimura (1950s), who showed that the
+$L$-function of a weight-2 newform equals the $L$-function of an elliptic curve.
+Serre and Deligne systematically developed $\ell$-adic representations in the 1960s
+and 1970s. The spectacular culmination came with Wiles's proof of Fermat's Last
+Theorem (1995), using the Modularity Theorem for semi-stable elliptic curves, which
+was later extended to all elliptic curves over $\Q$ by Breuil--Conrad--Diamond--Taylor.
+
+\subsection*{Structure of this paper}
+
+Sections~\ref{sec:galois-group} and~\ref{sec:ell-adic} set up the absolute Galois
+group and $\ell$-adic representations. Section~\ref{sec:elliptic-curves} constructs
+representations from elliptic curves via the Tate module. Sections~\ref{sec:modularity}
+and~\ref{sec:modular-forms} treat the Modularity Theorem and modular Galois
+representations. Sections~\ref{sec:serre} and~\ref{sec:fontaine} cover Serre's
+Modularity Theorem and Fontaine's $p$-adic Hodge theory. Finally,
+Sections~\ref{sec:langlands} and~\ref{sec:recent} survey the Langlands correspondence
+and recent results.
+
+%=========================================================
+\section{The Absolute Galois Group}
+\label{sec:galois-group}
+%=========================================================
+
+\begin{definition}
+The \textbf{absolute Galois group} of $\Q$ is
+\[
+  G_\Q := \GQ = \mathrm{Aut}(\Qbar/\Q),
+\]
+the group of all field automorphisms of a fixed algebraic closure $\Qbar$ that fix
+$\Q$ pointwise.
+\end{definition}
+
+\subsection{Profinite topology}
+
+Although $G_\Q$ is enormous (uncountable), it carries a natural topology making it
+a profinite group:
+\[
+  G_\Q \;\cong\; \varprojlim_{[K:\Q] < \infty,\; K/\Q \text{ Galois}} \mathrm{Gal}(K/\Q).
+\]
+Here the inverse limit is taken over the directed system of finite Galois extensions
+$K/\Q$, ordered by inclusion. The topology is the \emph{Krull topology}: a basis of
+open subgroups consists of the normal subgroups $\mathrm{Gal}(\Qbar/K)$ for finite
+Galois $K/\Q$.
+
+\begin{proposition}
+$G_\Q$ is compact, totally disconnected, and Hausdorff (i.e., profinite).
+\end{proposition}
+
+\begin{proof}
+By Tychonoff's theorem, the product $\prod_K \mathrm{Gal}(K/\Q)$ over all finite
+Galois extensions is compact. The inverse limit is a closed subgroup, hence compact.
+Total disconnectedness follows because every open subgroup has finite index and the
+open subgroups form a neighbourhood base.
+\end{proof}
+
+\subsection{Frobenius elements}
+
+For a prime $p$ unramified in a Galois extension $K/\Q$, there is a well-defined
+conjugacy class $\Frob_p \in \mathrm{Gal}(K/\Q)$ characterised by
+\[
+  \Frob_p(\alpha) \equiv \alpha^p \pmod{\mathfrak{P}}
+\]
+for all algebraic integers $\alpha \in \mathcal{O}_K$ and any prime $\mathfrak{P}$
+of $K$ above $p$.
+
+\begin{definition}
+Let $\ell$ be a prime. The \textbf{geometric Frobenius} at $p \neq \ell$ is the
+element $\Frob_p \in G_\Q$ (or rather the conjugacy class it defines) acting on the
+$\ell$-power roots of unity by $\zeta_{\ell^n} \mapsto \zeta_{\ell^n}^p$.
+\end{definition}
+
+By the Chebotarev density theorem, the Frobenius elements $\{\Frob_p : p \text{ unramified}\}$
+are \emph{dense} in $G_\Q$. Consequently, a continuous representation is completely
+determined by the values on Frobenius elements.
+
+\subsection{Ramification}
+
+For each prime $p$, fix an embedding $\Qbar \hookrightarrow \overline{\Q}_p$.
+This gives a decomposition group $D_p \subset G_\Q$ and an inertia group $I_p \trianglelefteq D_p$
+sitting in the exact sequence
+\[
+  1 \to I_p \to D_p \to G_{\Fp} \cong \hat{\Z} \to 1.
+\]
+The arithmetic Frobenius generator of $G_{\Fp}$ lifts to $\Frob_p \in D_p/I_p$.
+
+%=========================================================
+\section{\texorpdfstring{$\ell$}{l}-adic Representations}
+\label{sec:ell-adic}
+%=========================================================
+
+Fix a prime $\ell$. The ring $\Zl$ of $\ell$-adic integers is the completion of $\Z$
+at $\ell$, and $\Ql = \Zl[\ell^{-1}]$ is the field of $\ell$-adic numbers.
+
+\begin{definition}
+An \textbf{$\ell$-adic representation} of $G_\Q$ of dimension $n$ is a continuous
+homomorphism
+\[
+  \varrho\colon G_\Q \to \GL_n(\Zl),
+\]
+where $\GL_n(\Zl)$ carries the $\ell$-adic topology. Often we consider the
+associated rational representation $\varrho\colon G_\Q \to \GL_n(\Ql)$.
+\end{definition}
+
+\subsection{Continuity and finiteness}
+
+Because $G_\Q$ is profinite and $\GL_n(\Zl)$ is an $\ell$-adic Lie group, continuity
+means that the kernel contains an open subgroup, equivalently that $\varrho$ factors
+through a finite-index open subgroup of $G_\Q$.
+
+\subsection{The cyclotomic character}
+
+The fundamental 1-dimensional $\ell$-adic representation is the \textbf{cyclotomic
+character}
+\[
+  \chi_\ell\colon G_\Q \to \Zl^\times,
+\]
+defined by $\sigma(\zeta) = \zeta^{\chi_\ell(\sigma)}$ for all $\ell^n$-th roots of
+unity $\zeta$. Concretely, via the canonical isomorphism
+$\hat{\Z} \cong \varprojlim \Z/\ell^n\Z$, one has
+\[
+  \chi_\ell(\Frob_p) = p \quad \text{for all primes } p \neq \ell.
+\]
+
+\begin{example}[Dirichlet characters]
+A Dirichlet character $\chi\colon (\Z/N\Z)^\times \to \mathbb{C}^\times$ of conductor
+$N$ gives a 1-dimensional Galois representation via class field theory:
+\[
+  \varrho_\chi\colon G_\Q \twoheadrightarrow \mathrm{Gal}(\Q(\zeta_N)/\Q) \cong (\Z/N\Z)^\times
+  \xrightarrow{\chi} \mathbb{C}^\times.
+\]
+The Frobenius value is $\varrho_\chi(\Frob_p) = \chi(p)$ for $p \nmid N$.
+\end{example}
+
+\subsection{Tate twists}
+
+For $n \in \Z$, the $n$-fold \textbf{Tate twist} of a representation $V$ is
+$V(n) := V \otimes \chi_\ell^{\otimes n}$. The category of $\ell$-adic representations
+is closed under direct sums, tensor products, duals, and Tate twists.
+
+%=========================================================
+\section{Representations from Elliptic Curves}
+\label{sec:elliptic-curves}
+%=========================================================
+
+Elliptic curves provide the most important source of 2-dimensional Galois representations.
+
+\begin{definition}
+Let $E/\Q$ be an elliptic curve and $\ell$ a prime. The \textbf{$\ell$-adic Tate
+module} is
+\[
+  \Tl(E) := \varprojlim_n E[\ell^n],
+\]
+where $E[\ell^n] \cong (\Z/\ell^n\Z)^2$ are the $\ell^n$-torsion points (over $\Qbar$)
+and the maps are multiplication by $\ell$. As an abelian group,
+$\Tl(E) \cong \Zl^2$.
+\end{definition}
+
+Since $G_\Q$ permutes the torsion points, it acts on $\Tl(E)$, giving
+
+\begin{definition}
+The \textbf{$\ell$-adic representation of $E$} is
+\[
+  \varrho_{E,\ell}\colon G_\Q \to \GL_2(\Zl).
+\]
+Its rational version $V_\ell(E) := \Tl(E) \otimes_{\Zl} \Ql$ yields
+$\varrho_{E,\ell}\colon G_\Q \to \GL_2(\Ql)$.
+\end{definition}
+
+\subsection{Properties of $\varrho_{E,\ell}$}
+
+\begin{theorem}[Weil, 1940]
+\label{thm:weil-hasse}
+Let $E/\Q$ have good reduction at $p \neq \ell$. Then $\varrho_{E,\ell}$ is
+unramified at $p$, and
+\[
+  \det(1 - \varrho_{E,\ell}(\Frob_p)\,X) = 1 - a_p X + p X^2,
+\]
+where $a_p = p + 1 - \#E(\Fp)$. In particular,
+$|\alpha_p|, |\beta_p| = \sqrt{p}$ where $\alpha_p, \beta_p$ are the roots
+(Hasse's theorem: $|a_p| \leq 2\sqrt{p}$).
+\end{theorem}
+
+\begin{proof}[Sketch]
+The characteristic polynomial of $\Frob_p$ on $V_\ell(E)$ computes the zeta
+function of $E$ over $\Fp$ via the Lefschetz trace formula on the Tate module.
+Hasse's inequality $|a_p| \leq 2\sqrt{p}$ follows from the positivity of the
+Rosati involution.
+\end{proof}
+
+\subsection{Ramification at primes of bad reduction}
+
+At a prime $p$ of additive reduction, $\varrho_{E,\ell}|_{I_p}$ is non-trivial and
+captures the local Néron model structure. For semi-stable reduction (multiplicative),
+the inertia acts unipotently (Tate curve theory).
+
+\subsection{The Weil pairing}
+
+The natural alternating pairing $e_\ell\colon \Tl(E) \times \Tl(E) \to \Tl(\mu)$
+gives
+\[
+  \det(\varrho_{E,\ell}) = \chi_\ell,
+\]
+the cyclotomic character. This is the key constraint linking the two-dimensional
+representation to the one-dimensional cyclotomic character.
+
+%=========================================================
+\section{The Modularity Theorem}
+\label{sec:modularity}
+%=========================================================
+
+\begin{theorem}[Modularity Theorem; Wiles 1995, Taylor--Wiles 1995,
+  Breuil--Conrad--Diamond--Taylor 2001]
+\label{thm:modularity}
+Every elliptic curve $E$ over $\Q$ is modular: there exists a newform
+$f = \sum_{n=1}^\infty a_n(f) q^n$ of weight 2 and some level $N$ such that
+\[
+  a_p(E) = a_p(f) \quad \text{for all primes } p \nmid N.
+\]
+Equivalently, $L(E, s) = L(f, s)$.
+\end{theorem}
+
+\begin{remark}
+Wiles proved the semi-stable case (1995), which sufficed to prove Fermat's Last
+Theorem. The full theorem for all elliptic curves over $\Q$ was established by
+Breuil, Conrad, Diamond, and Taylor (2001).
+\end{remark}
+
+\subsection{Strategy of proof}
+
+The proof proceeds via the following steps:
+
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Deformation theory}: For a prime $p | N$ (taken as $p = 3$ or $p = 5$
+by Wiles), consider the mod-$p$ representation $\bar{\varrho}_{E,p}$.
+
+\item \textbf{Modularity lifting}: Show that $\varrho_{E,p}$ (the $p$-adic
+representation) is modular by lifting the mod-$p$ residual representation
+$\bar{\varrho}_{E,p}$ using the \emph{numerical criterion} (the Taylor--Wiles method).
+
+\item \textbf{Taylor--Wiles method}: Construct an auxiliary system of Galois
+representations (the \emph{Hecke algebras}) and prove an $R = T$ theorem
+(deformation ring $R$ equals Hecke algebra $T$) by a comparison of dimensions
+via the Wiles numerical criterion.
+
+\item \textbf{Base case}: Use the known modularity of $E$ modulo small primes via
+Langlands--Tunnell (for $p = 3$) or a different base case.
+\end{enumerate}
+
+\subsection{Fermat's Last Theorem as corollary}
+
+\begin{corollary}[Fermat's Last Theorem; Wiles 1995]
+For $n \geq 3$, the equation $x^n + y^n = z^n$ has no solutions in non-zero integers.
+\end{corollary}
+
+\begin{proof}[Proof (given Theorem~\ref{thm:modularity})]
+Suppose $a^p + b^p = c^p$ with $abc \neq 0$ and prime $p \geq 5$ (small cases are classical).
+Frey (1986) constructed the elliptic curve $E_{a,b,c}\colon y^2 = x(x-a^p)(x+b^p)$.
+Ribet (1990) proved (using Mazur's principle) that if $E_{a,b,c}$ were modular,
+its associated newform would have level $N = 2$ --- but there are no weight-2 newforms
+of level 2 (the relevant space is 0-dimensional). This contradicts modularity, so no
+Frey curve exists, hence no Fermat solution.
+\end{proof}
+
+%=========================================================
+\section{Modular Galois Representations}
+\label{sec:modular-forms}
+%=========================================================
+
+Let $f = \sum_{n \geq 1} a_n q^n$ be a normalised Hecke eigenform of weight $k$,
+level $N$, and Nebentypus $\chi$. Let $K_f = \Q(\{a_n\})$ be its coefficient field.
+
+\begin{theorem}[Deligne 1971]
+\label{thm:deligne}
+For each prime $\ell$ and embedding $\iota\colon K_f \hookrightarrow \overline{\Q}_\ell$,
+there exists a unique (up to isomorphism) irreducible, continuous representation
+\[
+  \varrho_{f,\ell}\colon G_\Q \to \GL_2(\mathcal{O}_{K_f \otimes \Ql})
+\]
+unramified outside $N\ell$, such that for all primes $p \nmid N\ell$:
+\[
+  \tr(\varrho_{f,\ell}(\Frob_p)) = a_p(f), \qquad
+  \det(\varrho_{f,\ell}(\Frob_p)) = \chi(p)\, p^{k-1}.
+\]
+\end{theorem}
+
+\subsection{The Ramanujan--Deligne bound}
+
+\begin{theorem}[Deligne 1974; Weil Conjectures for varieties]
+\label{thm:ramanujan-deligne}
+For $f$ a weight-$k$ newform as above and $p \nmid N$, the eigenvalues
+$\alpha_p, \beta_p$ of $\varrho_{f,\ell}(\Frob_p)$ satisfy
+\[
+  |\iota(\alpha_p)| = |\iota(\beta_p)| = p^{(k-1)/2}
+\]
+for every embedding $\iota\colon K_f \hookrightarrow \mathbb{C}$.
+For $k = 2$, this gives $|a_p| \leq 2\sqrt{p}$ (Ramanujan's conjecture for $\Delta$
+and its generalisation).
+\end{theorem}
+
+\begin{proof}[Proof idea]
+Deligne realises $\varrho_{f,\ell}$ in the étale cohomology $H^{k-1}_{\text{ét}}$
+of a Kuga--Sato variety and applies his proof of the Weil conjectures (Riemann
+hypothesis for varieties over finite fields), which gives the bound $p^{(k-1)/2}$
+on the eigenvalues of Frobenius.
+\end{proof}
+
+%=========================================================
+\section{Serre's Modularity Theorem}
+\label{sec:serre}
+%=========================================================
+
+\begin{definition}
+A \textbf{mod-$\ell$ Galois representation} is a continuous homomorphism
+$\bar{\varrho}\colon G_\Q \to \GL_2(\overline{\Fp})$.
+It is \textbf{odd} if $\det(\bar{\varrho}(\text{complex conjugation})) = -1$,
+and \textbf{irreducible} if it has no $G_\Q$-stable line.
+\end{definition}
+
+\begin{conjecture}[Serre 1987]
+Every odd, irreducible continuous representation
+$\bar{\varrho}\colon G_\Q \to \GL_2(\overline{\mathbb{F}}_\ell)$
+arises from a newform of precisely the weight $k(\bar{\varrho})$ and level
+$N(\bar{\varrho})$ prescribed by Serre's recipe.
+\end{conjecture}
+
+\begin{theorem}[Khare--Wintenberger 2009; Serre's Modularity Theorem]
+\label{thm:serre}
+Serre's conjecture is true: every odd irreducible
+$\bar{\varrho}\colon G_\Q \to \GL_2(\overline{\mathbb{F}}_\ell)$
+is modular.
+\end{theorem}
+
+\begin{proof}[Proof strategy]
+Khare and Wintenberger prove this by a two-step induction:
+\begin{enumerate}[label=(\alph*)]
+\item \textbf{Level-lowering}: Use Ribet's method and modularity lifting theorems
+  (in the spirit of Wiles) to reduce to the case of small level and weight.
+\item \textbf{Weight-lowering}: Reduce to characteristic-$p$ representations of
+  small conductor using $p$-adic Hodge theory and Fontaine--Mazur-type arguments.
+\item \textbf{Base case}: Verify the conjecture for small weight and level by an
+  explicit finite computation.
+\end{enumerate}
+The proof uses the full strength of the Taylor--Wiles--Kisin modularity lifting
+machinery.
+\end{proof}
+
+\begin{corollary}
+Serre's Modularity Theorem implies the Modularity Theorem (Theorem~\ref{thm:modularity})
+and strengthens the understanding of how residual representations lift to
+characteristic-zero representations.
+\end{corollary}
+
+%=========================================================
+\section{\texorpdfstring{$p$}{p}-adic Representations and Fontaine Theory}
+\label{sec:fontaine}
+%=========================================================
+
+The local theory of $p$-adic representations (i.e., continuous $G_{\Q_p}$-representations
+on $\Q_p$-vector spaces) is controlled by Fontaine's \emph{$p$-adic Hodge theory}.
+
+\subsection{Period rings}
+
+Fontaine constructed several period rings to classify $p$-adic representations:
+
+\begin{definition}
+\begin{itemize}
+  \item $\BdR$: the de Rham period ring; a complete discrete valuation field with
+    residue field $\mathbb{C}_p$ and a filtration.
+  \item $\Bcrys \subset \BdR$: the crystalline period ring with Frobenius $\phi$
+    and a filtration.
+  \item $B_{\mathrm{st}} \supset \Bcrys$: the semi-stable period ring, with an
+    additional monodromy operator $N$.
+\end{itemize}
+\end{definition}
+
+\begin{definition}
+A $p$-adic representation $V$ of $G_{\Q_p}$ is:
+\begin{itemize}
+  \item \textbf{Hodge--Tate} if $V \otimes_{\Q_p} \mathbb{C}_p \cong \bigoplus_i \mathbb{C}_p(i)^{h_i}$,
+  \item \textbf{de Rham} if $D_{\mathrm{dR}}(V) := (V \otimes_{\Q_p} \BdR)^{G_{\Q_p}}$ has dimension $n = \dim V$,
+  \item \textbf{crystalline} if $D_{\mathrm{crys}}(V) := (V \otimes_{\Q_p} \Bcrys)^{G_{\Q_p}}$ has dimension $n$,
+  \item \textbf{semi-stable} if $D_{\mathrm{st}}(V) := (V \otimes_{\Q_p} B_{\mathrm{st}})^{G_{\Q_p}}$ has dimension $n$.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Fontaine--Faltings--Tsuji]
+\label{thm:fontaine-comparison}
+The $\ell$-adic representation $V_\ell(E)$ of an elliptic curve $E/\Q_p$ is:
+\begin{itemize}
+  \item Crystalline if $E$ has good reduction at $p$,
+  \item Semi-stable if $E$ has semi-stable (multiplicative) reduction at $p$.
+\end{itemize}
+\end{theorem}
+
+\subsection{Wach modules and integral structures}
+
+For crystalline representations, Wach modules provide integral ($\Zl$-lattice)
+versions of the Fontaine classification, allowing the study of representations
+over $\Zl$ rather than $\Ql$.
+
+\subsection{The Fontaine--Mazur conjecture}
+
+\begin{conjecture}[Fontaine--Mazur 1993]
+An irreducible $p$-adic representation $\varrho\colon G_\Q \to \GL_n(\Ql)$ comes
+from geometry (i.e., from the étale cohomology of a variety over $\Q$) if and only
+if it is \emph{de Rham} at $p$ (locally at $p$) and unramified at almost all primes.
+\end{conjecture}
+
+This conjecture is proved in important special cases (e.g., $n = 2$, connected to
+modularity lifting).
+
+%=========================================================
+\section{The Langlands Correspondence}
+\label{sec:langlands}
+%=========================================================
+
+\subsection{The global Langlands correspondence for $\GL_n$}
+
+\begin{conjecture}[Global Langlands correspondence for $\Q$]
+\label{conj:langlands}
+There is a bijection between:
+\begin{enumerate}[label=(\roman*)]
+\item $n$-dimensional irreducible continuous representations
+  $\varrho\colon G_\Q \to \GL_n(\overline{\Q}_\ell)$ (of geometric origin),
+\item Cuspidal automorphic representations $\pi$ of $\GL_n(\mathbb{A}_\Q)$
+\end{enumerate}
+such that $L(s, \varrho) = L(s, \pi)$ for the associated $L$-functions.
+\end{conjecture}
+
+This conjecture remains \textbf{open} for $\Q$ in general. However, special cases
+are established:
+
+\begin{itemize}
+\item $n = 1$: Class field theory / Artin reciprocity (proved, 20th century).
+\item $n = 2$: Weight-$k$ modular forms (proved for elliptic curves by Wiles et al.,
+  and more generally for modular Galois representations by Deligne).
+\item Function fields: Proved by Lafforgue (2002), see Section~\ref{sec:recent}.
+\end{itemize}
+
+\subsection{Local Langlands correspondence}
+
+\begin{theorem}[Local Langlands; Langlands 1970, Henniart 2000, Harris--Taylor 2001]
+\label{thm:local-langlands}
+For any prime $p$, there is a natural bijection
+\[
+  \left\{
+    \begin{array}{c}
+      n\text{-dim. Frobenius-semi-}\\ \text{simple } W_{D}(\Q_p)\text{-reps}
+    \end{array}
+  \right\}
+  \xrightarrow{\;\sim\;}
+  \left\{
+    \begin{array}{c}
+      \text{irreducible smooth reps}\\ \text{of } \GL_n(\Q_p)
+    \end{array}
+  \right\}
+\]
+where $W_D(\Q_p)$ denotes the Weil--Deligne group.
+\end{theorem}
+
+\subsection{Functoriality}
+
+Langlands's functoriality principle states that a homomorphism of $L$-groups
+${}^L G \to {}^L H$ should correspond to a transfer of automorphic representations
+from $G(\mathbb{A})$ to $H(\mathbb{A})$. Proved in many cases (base change, symmetric
+power lifts for $\GL_2$) but open in general.
+
+%=========================================================
+\section{Recent Results}
+\label{sec:recent}
+%=========================================================
+
+\subsection{Lafforgue's theorem over function fields}
+
+\begin{theorem}[Lafforgue 2002; Fields Medal]
+\label{thm:lafforgue}
+The global Langlands correspondence holds for $\GL_n$ over a function field
+$\mathbb{F}_q(C)$ (the function field of a curve $C$ over a finite field $\mathbb{F}_q$):
+there is a bijection between $n$-dimensional $\ell$-adic representations of the
+absolute Galois group of $\mathbb{F}_q(C)$ and cuspidal automorphic representations
+of $\GL_n(\mathbb{A}_{\mathbb{F}_q(C)})$, matching $L$-functions.
+\end{theorem}
+
+This was the first complete proof of the global Langlands correspondence for $\GL_n$
+with $n > 2$. It uses Drinfeld's work for $\GL_2$ (1974, 1980) as foundation.
+
+\subsection{Potential automorphy}
+
+\begin{theorem}[Taylor 2004; Harris--Shepherd-Barron--Taylor 2010]
+\label{thm:potential-automorphy}
+Let $\varrho\colon G_\Q \to \GL_n(\overline{\Q}_\ell)$ be a "regular, odd"
+$\ell$-adic representation. Then $\varrho$ is \emph{potentially automorphic}:
+there exists a totally real field $F$ such that $\varrho|_{G_F}$ is automorphic.
+\end{theorem}
+
+Potential automorphy suffices to prove that $L(\varrho, s)$ has analytic continuation
+and satisfies a functional equation, even when full automorphy is not established.
+
+\subsection{The Taylor--Wiles--Kisin method}
+
+Diamond (1997), Kisin (2009), and many others extended the Taylor--Wiles method to
+cover all 2-dimensional de Rham representations of $G_{\Q_p}$. Kisin's proof uses
+\emph{Breuil--Kisin modules} (analogues of Wach modules) and resolves most cases of
+the Fontaine--Mazur conjecture for $n = 2$.
+
+\subsection{$p$-adic Langlands correspondence}
+
+For $\GL_2(\Q_p)$, Colmez (2010) established a $p$-adic local Langlands correspondence:
+a bijection between 2-dimensional trianguline $p$-adic representations of $G_{\Q_p}$
+and locally analytic representations of $\GL_2(\Q_p)$, compatible with the classical
+local Langlands correspondence.
+
+\subsection{Higher-dimensional and geometric advances}
+
+Recent work by Scholze (using perfectoid spaces and diamonds), V.~Lafforgue (2018, for
+reductive groups over function fields), and Fargues--Scholze (2021, geometrisation of
+local Langlands) has dramatically advanced the structural understanding. Fargues and
+Scholze have geometrised the local Langlands programme, constructing a sheaf-theoretic
+version over the Fargues--Fontaine curve.
+
+%=========================================================
+\section{References}
+%=========================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Wiles1995}
+A.~Wiles,
+\textit{Modular elliptic curves and Fermat's last theorem},
+Annals of Mathematics \textbf{141} (1995), 443--551.
+
+\bibitem{TaylorWiles1995}
+R.~Taylor and A.~Wiles,
+\textit{Ring-theoretic properties of certain Hecke algebras},
+Annals of Mathematics \textbf{141} (1995), 553--572.
+
+\bibitem{BCDT2001}
+C.~Breuil, B.~Conrad, F.~Diamond, and R.~Taylor,
+\textit{On the modularity of elliptic curves over $\mathbb{Q}$: Wild 3-adic exercises},
+Journal of the American Mathematical Society \textbf{14} (2001), 843--939.
+
+\bibitem{KhareWintenberger2009}
+C.~Khare and J.-P.~Wintenberger,
+\textit{Serre's modularity conjecture (I)},
+Inventiones Mathematicae \textbf{178} (2009), 485--504.
+
+\bibitem{Serre1987}
+J.-P.~Serre,
+\textit{Sur les représentations modulaires de degré 2 de $\mathrm{Gal}(\overline{\mathbb{Q}}/\mathbb{Q})$},
+Duke Mathematical Journal \textbf{54} (1987), 179--230.
+
+\bibitem{Fontaine1994}
+J.-M.~Fontaine,
+\textit{Représentations $p$-adiques semi-stables},
+Astérisque \textbf{223} (1994), 113--184.
+
+\bibitem{Lafforgue2002}
+L.~Lafforgue,
+\textit{Chtoucas de Drinfeld et correspondance de Langlands},
+Inventiones Mathematicae \textbf{147} (2002), 1--241.
+
+\bibitem{Deligne1974}
+P.~Deligne,
+\textit{La conjecture de Weil. I},
+Publications Mathématiques de l'IHÉS \textbf{43} (1974), 273--307.
+
+\bibitem{Langlands1970}
+R.~P.~Langlands,
+\textit{Problems in the theory of automorphic forms},
+Lectures in Modern Analysis and Applications III,
+Lecture Notes in Mathematics \textbf{170}, Springer, 1970, 18--61.
+
+\bibitem{HarrisTaylor2001}
+M.~Harris and R.~Taylor,
+\textit{The geometry and cohomology of some simple Shimura varieties},
+Annals of Mathematics Studies \textbf{151}, Princeton University Press, 2001.
+
+\end{thebibliography}
+
+\end{document}
