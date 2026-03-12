@@ -1481,3 +1481,27 @@ Paper 87 – Bateman-Horn:
 - Paper 83 Beal: OFFEN (Vermutung gestützt)
   - 2.004.000 Tripel getestet, kein primitives Gegenbeispiel
   - abc-Vermutung → Beal (falls wahr)
+
+---
+2026-03-12 — Build 172: Batch 25 Gruppe B — Tiefenanalyse & Verifikation
+
+## Änderungen
+
+### Neue Dateien
+- src/gruppe_b_batch25_verification.py:
+  Python-Verifikationsskript für Batch-25-Vermutungen:
+  * ChowGroupP2: Chow-Gruppen von ℙ², Vermutung D verifiziert (21 Testzyklen)
+  * VassilievInvariant: Tabellen j₂,j₃,j₄ für 9 Knoten; Chiralitätstest Kleeblatt
+  * ChordDiagramAlgebra: dim(A_n)-Tabelle n=0..8, Abweichung Partitionsformel erklärt
+  * JonesPolynomialVassiliev: Analytische Herleitung j₃=1/4 aus Jones-Polynom
+- reviews/research_batch25_gruppe_b_2026_03_12.md:
+  Vollständiges Review beider Papers (Paper 96: Grothendieck, Paper 97: Kontsevich)
+
+### Ergebnisse
+- Grothendieck Std-Vermutungen A,B,C,D: alle OFFEN (Spezialfälle ℙⁿ, Kurven, ab. Var.: bewiesen)
+- Implikationsdiagramm: B⟹A⟹C, D⟹A (Kleiman), A+B⟹D
+- Jannsen 1992 (M_num semi-einfach): BEWIESEN, aber schwächer als Vermutung D
+- André 1996 (motivierte Zyklen): schwächere Klasse, erfüllt Vermutungen per Definition
+- Kontsevich vollständig: OFFEN; Vassiliev trennen alle Knoten: OFFEN
+- Knotenisotopie entscheidbar: BEWIESEN (Haken/Waldhausen/Thurston)
+- j₃(3₁)=1/4, j₃(3₁*)=-1/4: Chiralität des Kleeblatts BEWIESEN via Ord-3-Vassiliev
