@@ -1,5 +1,39 @@
 # BUGS.md - specialist-maths
 
+## Behobene Bugs (Build 163)
+
+### BUG-AUDIT-P41-CRT-INCOMPLETE (MITTEL — BEHOBEN Build 161): CRT-Überdeckung unvollständig in paper41 EN+DE
+- **Dateien**: papers/batch11/paper41_erdos_straus_en.tex, paper41_erdos_straus_de.tex
+- **Problem**: Unabgedeckte Restklassen wurden als {1,9} (mod 12) angegeben — korrekt sind {1,6,9,10} (mod 12). n≡6 (n≡2 mod 4, n≡0 mod 3) und n≡10 (n≡2 mod 4, n≡1 mod 3) werden von keinem der drei Typen abgedeckt. Fehler erst durch vollständige CRT-Nachrechnung entdeckt.
+- **Behoben**: Korrektur auf {1,6,9,10} (mod 12) in EN und DE
+
+### BUG-AUDIT-P42-WIDERSPRUCH (MITTEL — BEHOBEN Build 161): 10^7 vs 10^8 Widerspruch in paper42 EN
+- **Datei**: papers/batch11/paper42_kurepa_conjecture_en.tex
+- **Problem**: Korollar 2.1 behauptete "No prime p ≤ 10^8" ohne konkrete Quelle; unser Build 131 verifizierte nur bis 10^7. Widerspruch zwischen Abstract und Korollar.
+- **Behoben**: Korollar zu "Computational result (this paper): No prime p < 10^7" umformuliert; 10^8 bleibt als Literaturhinweis ohne Theorem-Status
+
+### BUG-AUDIT-P31-NU-EXISTENCE (HOCH — BEHOBEN Build 162): Existenz von ν undeklarariert in paper31 EN+DE
+- **Dateien**: papers/reviewed/batch7/paper31_collatz_tao_probabilistic_en.tex und DE-Version
+- **Problem**: Definition 5.1 / Theorem 5.2 suggerierte die Existenz eines S-invarianten ergodischen Maßes ν mit geometrischer E-Verteilung ohne es als unbewiesen zu deklarieren. Die Existenz solch eines Maßes ist eine offene Frage.
+- **Behoben**: Explizite Deklaration als "unproven assumption of the i.i.d. model" eingefügt; Theorem 5.2 als "(conditional)" markiert
+
+### BUG-AUDIT-P33-HARDY-SELBERG (MITTEL — BEHOBEN Build 162): Hardy 1914 vs Selberg 1942 in paper33 EN
+- **Datei**: papers/reviewed/batch8/paper33_riemann_hypothesis_analytic_en.tex
+- **Problem**: "Selberg (1942) first showed that a positive proportion of zeros lie on the critical line" — falsch; Hardy (1914) bewies als Erster ∞ viele Nullstellen auf der kritischen Linie; Selberg verbesserte auf positive Proportion.
+- **Behoben**: Hardy (1914) → Selberg (1942) → Levinson (1974) korrekte Chronologie
+
+### BUG-AUDIT-P2-NOTATION (GERING — BEHOBEN Build 163): Notationaler Clash k/d im p=5-Fall in paper2 EN
+- **Datei**: papers/reviewed/batch1/paper2_lehmer_three_primes.tex
+- **Problem**: Im p=5 Sub-Fall war unklar wie lokaler Divisor d mit globalem k = (pq-1)/(r-1) zusammenhängt
+- **Behoben**: Expliziter Kommentar "where the last step uses k = (5q-1)/d from Step 1" eingefügt
+
+### BUG-AUDIT-P2-GRENZEN (GERING — BEHOBEN Build 163): Computergrenzen EN/DE inkonsistent in paper2
+- **Datei**: papers/reviewed/batch1/paper2_lehmer_three_primes.tex
+- **Problem**: EN sagte q ≤ 10,000, DE sagte q ≤ 500
+- **Behoben**: Beide auf q ≤ 500 vereinheitlicht
+
+---
+
 ## Behobene Bugs (Build 159)
 
 ### BUG-PY-001/002 (KRITISCH — BEHOBEN Build 159): eval() Injection in app.py und visualization.py
