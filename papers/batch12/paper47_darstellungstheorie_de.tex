@@ -1,0 +1,846 @@
+%% paper47_darstellungstheorie_de.tex
+%% Paper 47 (DE): Darstellungstheorie — Von Gruppenalgebren zum Langlands-Programm
+%% Autor: Michael Fuhrmann
+%% Projekt: Specialist Mathematics, Build 135
+%% Datum: 2026-03-12
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+\title{Darstellungstheorie:\\
+Von Gruppenalgebren zum Langlands-Programm}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 135}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Die Darstellungstheorie stellt einen systematischen Rahmen bereit, um abstrakte
+Gruppen durch ihre konkreten Wirkungen auf Vektorräumen zu verstehen.  Ausgehend
+von der grundlegenden Definition eines Gruppenhomomorphismus in allgemeine lineare
+Gruppen entwickeln wir den Kern des Faches: Schurs Lemma, den Maschke-Satz über
+vollständige Reduzibilität sowie die reiche Orthogonalitätstheorie der Charaktere.
+Anschließend untersuchen wir die Darstellungstheorie der symmetrischen Gruppen
+$S_n$ mittels Young-Tableaux und Specht-Moduln und wechseln zum stetigen Rahmen
+mit der Höchstgewicht-Klassifikation der Darstellungen von $\mathrm{GL}_n$ und
+$\mathrm{SL}_n$.  Anwendungen reichen von Burnsides $pq$-Satz in der reinen
+Gruppentheorie bis zur molekularen Symmetrie und Kristallographie.  Abschließend
+geben wir eine Einführung in Galois-Darstellungen und das Langlands-Programm,
+eines der tiefsten Vermutungsgebäude der modernen Mathematik.
+\end{abstract}
+
+\tableofcontents
+
+%% ============================================================
+\section{Einleitung}
+%% ============================================================
+
+Darstellungstheorie ist die Kunst, abstrakte algebraische Strukturen dadurch zu
+verstehen, dass man sie auf Vektorräumen wirken lässt.  Eine \emph{Darstellung}
+einer Gruppe $G$ auf einem Vektorraum $V$ ist schlicht ein Gruppenhomomorphismus
+\[
+    \rho \colon G \longrightarrow \mathrm{GL}(V),
+\]
+wobei $\mathrm{GL}(V)$ die Gruppe der invertierbaren linearen Endomorphismen von
+$V$ bezeichnet.  Durch Wahl einer Basis identifiziert man $\mathrm{GL}(V) \cong
+\mathrm{GL}(n,k)$ für $n = \dim_k V$, so dass $\rho$ jedem Gruppenelement $g \in G$
+eine invertierbare $n \times n$-Matrix $\rho(g)$ zuordnet.
+
+Das Fach steht an einer bemerkenswerten Kreuzung von Algebra und linearer
+Algebra.  Auf der einen Seite übersetzt es die oft schwer handhabbare Kombinatorik
+einer Gruppe in die gut verstandene Geometrie der Matrixmultiplikation.  Auf der
+anderen Seite liefert es das algebraische Fundament großer Teile der modernen
+Physik: Die Darstellungen der Rotationsgruppe $\mathrm{SO}(3)$ und ihrer
+zweifachen Überlagerung $\mathrm{SU}(2)$ beschreiben den quantenmechanischen
+Spin, während die Darstellungen der Lorentz-Gruppe und von $\mathrm{SU}(3)$
+Elementarteilchen im Standardmodell klassifizieren.
+
+Aus rein mathematischer Perspektive hat das Fach enorme Fortschritte angestoßen.
+Burnsides Beweis von 1904, dass jede Gruppe der Ordnung $p^a q^b$ ($p$, $q$
+prim) auflösbar ist, stützt sich in wesentlicher Weise auf Charaktertheorie,
+und bis heute gibt es keinen rein gruppentheoretischen Beweis.  Die Klassifikation
+der endlichen einfachen Gruppen wäre ohne die eingehende Untersuchung modularer
+Darstellungen nicht denkbar.  Und an der Forschungsfront sagt das
+Langlands-Programm---von Robert Langlands 1967 in einem berühmten Brief an
+André Weil formuliert---tiefe Korrespondenzen zwischen automorphen Darstellungen
+reduktiver Gruppen und Galois-Darstellungen voraus und vereinigt weite Teile der
+Zahlentheorie, Geometrie und Analysis.
+
+\medskip
+
+\noindent\textbf{Überblick.} Abschnitt~\ref{sec:grund} führt die
+Grunddefinitionen und die wichtigsten Beispielklassen ein.
+Abschnitt~\ref{sec:schur} beweist Schurs Lemma und zieht seine fundamentalen
+Konsequenzen.  Abschnitt~\ref{sec:maschke} beweist die vollständige
+Reduzibilität über Körpern, deren Charakteristik die Gruppenordnung nicht
+teilt.  Abschnitt~\ref{sec:charaktere} entwickelt die Charaktertheorie
+inklusive der beiden Orthogonalitätsrelationen.  Abschnitt~\ref{sec:sn}
+behandelt die Darstellungstheorie der symmetrischen Gruppe mittels
+Young-Tableaux.  Abschnitt~\ref{sec:gln} skizziert die Höchstgewicht-Theorie
+für $\mathrm{GL}_n$ und $\mathrm{SL}_n$.  Abschnitt~\ref{sec:anwendungen}
+sammelt drei klassische Anwendungen.  Abschnitt~\ref{sec:langlands} führt in
+Galois-Darstellungen und das Langlands-Programm ein.
+
+%% ============================================================
+\section{Grundbegriffe der Darstellungstheorie}
+\label{sec:grund}
+%% ============================================================
+
+Sei $G$ eine Gruppe und $k$ ein Körper.  Sofern nicht anders angegeben,
+sei $k = \mathbb{C}$.
+
+\begin{definition}
+Eine \emph{Darstellung} von $G$ über $k$ ist ein Paar $(V,\rho)$, wobei $V$ ein
+$k$-Vektorraum und $\rho \colon G \to \mathrm{GL}(V)$ ein Gruppenhomomorphismus
+ist.  Die \emph{Dimension} (oder der \emph{Grad}) von $(V,\rho)$ ist
+$\dim_k V$.
+\end{definition}
+
+Äquivalent ist eine Darstellung ein $k[G]$-Modul, wobei $k[G]$ die
+\emph{Gruppenalgebra} von $G$ über $k$ bezeichnet: den freien $k$-Vektorraum auf
+den Elementen von $G$ mit Multiplikation, die diejenige von $G$ linear fortsetzt.
+
+\begin{beispiel}[Triviale Darstellung]
+Die \emph{triviale Darstellung} ist $\rho_{\mathrm{triv}} \colon G \to
+\mathrm{GL}(k)$, $g \mapsto 1$.  Jedes Element wirkt als Identität.
+\end{beispiel}
+
+\begin{beispiel}[Reguläre Darstellung]
+Die \emph{reguläre Darstellung} $(\mathbb{C}[G], \rho_{\mathrm{reg}})$ ist durch
+Links-Multiplikation definiert:
+\[
+    \rho_{\mathrm{reg}}(g)(e_h) = e_{gh},
+\]
+wobei $\{e_h\}_{h \in G}$ die Standardbasis von $\mathbb{C}[G]$ ist.  Ihre
+Dimension ist $|G|$ und sie enthält jede irreduzible Darstellung von $G$ mit einer
+Multiplizität gleich ihrer eigenen Dimension.
+\end{beispiel}
+
+\begin{beispiel}[Permutationsdarstellung]
+Wirkt $G$ auf einer endlichen Menge $X = \{x_1,\ldots,x_n\}$, so ist die
+\emph{Permutationsdarstellung} $V = \mathbb{C}^X$ durch
+$\rho(g)(e_{x_i}) = e_{g \cdot x_i}$ definiert.  Die reguläre Darstellung ist
+der Spezialfall $X = G$ mit der Links-Multiplikationswirkung.
+\end{beispiel}
+
+\begin{beispiel}[Vorzeichen-Darstellung von $S_n$]
+Die symmetrische Gruppe $S_n$ besitzt eine eindimensionale Darstellung
+$\mathrm{sgn} \colon S_n \to \{+1,-1\}$, die jede Permutation auf ihr Vorzeichen
+abbildet.  Für $n \geq 2$ ist sie von der trivialen Darstellung verschieden und
+liefert unser erstes Beispiel einer nicht-trivialen irreduziblen Darstellung.
+\end{beispiel}
+
+\begin{definition}
+Eine \emph{Unterdarstellung} von $(V,\rho)$ ist ein $G$-stabiler Unterraum
+$W \subseteq V$, d.h.\ $\rho(g)W \subseteq W$ für alle $g \in G$.  Die
+Darstellung $(V,\rho)$ heißt \emph{irreduzibel}, wenn ihre einzigen
+Unterdarstellungen $\{0\}$ und $V$ selbst sind.
+\end{definition}
+
+\begin{definition}
+Ein \emph{Morphismus} (oder \emph{$G$-äquivariante Abbildung}, oder
+\emph{Intertwiner}) zwischen Darstellungen $(V,\rho)$ und $(W,\sigma)$ ist
+eine lineare Abbildung $T \colon V \to W$ mit
+\[
+    T \circ \rho(g) = \sigma(g) \circ T \quad \text{für alle } g \in G.
+\]
+Zwei Darstellungen heißen \emph{isomorph} (oder \emph{äquivalent}), wenn
+ein bijektiver Intertwiner zwischen ihnen existiert.
+\end{definition}
+
+\begin{beispiel}[Darstellungen von $\mathbb{Z}/2\mathbb{Z}$]
+Die Gruppe $\mathbb{Z}/2\mathbb{Z} = \{0,1\}$ besitzt genau zwei irreduzible
+komplexe Darstellungen, beide eindimensional:
+\begin{itemize}
+  \item Triviale Darstellung: $\rho(0) = (1)$, $\rho(1) = (1)$.
+  \item Vorzeichen-Darstellung: $\rho(0) = (1)$, $\rho(1) = (-1)$.
+\end{itemize}
+Dies sind alle irreduziblen Darstellungen, da deren Anzahl gleich der Anzahl der
+Konjugationsklassen ist, welche für eine abelsche Gruppe der Ordnung $2$ gleich
+$2$ ist.
+\end{beispiel}
+
+\begin{beispiel}[Darstellungen von $S_3$]
+Die Gruppe $S_3$ hat Ordnung $6$ und drei Konjugationsklassen: $\{e\}$,
+$\{(12),(13),(23)\}$, $\{(123),(132)\}$.  Damit gibt es genau drei irreduzible
+Darstellungen:
+\begin{itemize}
+  \item Triviale Darstellung (Dimension $1$): $\rho(\sigma) = 1$ für alle $\sigma$.
+  \item Vorzeichen-Darstellung (Dimension $1$): $\rho(\sigma) = \mathrm{sgn}(\sigma)$.
+  \item Standard-Darstellung (Dimension $2$): orthogonale Wirkung auf das
+        2-dimensionale Komplement des Fixpunktraums in der Permutationsdarstellung.
+\end{itemize}
+Man verifiziert: $1^2 + 1^2 + 2^2 = 6 = |S_3|$.
+\end{beispiel}
+
+%% ============================================================
+\section{Schurs Lemma}
+\label{sec:schur}
+%% ============================================================
+
+Schurs Lemma ist der Eckpfeiler aller weiteren Strukturtheorie.  Es besagt, dass
+irreduzible Darstellungen so wenige nicht-triviale Intertwiner wie möglich besitzen.
+
+\begin{theorem}[Schurs Lemma]
+\label{satz:schur}
+Seien $(V,\rho)$ und $(W,\sigma)$ irreduzible Darstellungen von $G$ über einem
+Körper $k$, und sei $T \colon V \to W$ eine $G$-äquivariante lineare Abbildung.
+\begin{enumerate}[label=\textup{(\roman*)}]
+  \item Entweder ist $T = 0$ oder $T$ ist ein Isomorphismus.
+  \item Ist $k$ algebraisch abgeschlossen und $V = W$ (mit $\rho = \sigma$), so
+        gilt $T = \lambda \cdot \mathrm{id}_V$ für ein Skalar $\lambda \in k$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) Der Kern $\ker T$ ist eine Unterdarstellung von $V$ und das Bild
+$\mathrm{im}\, T$ ist eine Unterdarstellung von $W$.  Da $V$ irreduzibel ist,
+gilt $\ker T \in \{\{0\},V\}$.  Da $W$ irreduzibel ist, gilt
+$\mathrm{im}\, T \in \{\{0\},W\}$.  Ist $\ker T = V$, so ist $T = 0$.
+Andernfalls ist $\ker T = \{0\}$ und $\mathrm{im}\, T = W$, also ist $T$
+bijektiv.
+
+(ii) Da $k$ algebraisch abgeschlossen ist, besitzt $T$ einen Eigenwert
+$\lambda \in k$.  Die Abbildung $T - \lambda\,\mathrm{id}_V$ ist wieder
+$G$-äquivariant und hat einen nicht-trivialen Kern, also ist sie nach Teil (i)
+die Nullabbildung, d.h.\ $T = \lambda\,\mathrm{id}_V$.
+\end{proof}
+
+\begin{korollar}
+\label{kor:schur}
+Sei $G$ eine endliche Gruppe und $k = \mathbb{C}$.  Sind $(V,\rho)$ und
+$(W,\sigma)$ nicht-isomorphe irreduzible Darstellungen, so ist jede
+$G$-äquivariante Abbildung $T \colon V \to W$ die Nullabbildung.  Insbesondere:
+\[
+    \mathrm{Hom}_G(V,W) = \begin{cases} \mathbb{C} & \text{falls } V \cong W, \\ 0 & \text{sonst.} \end{cases}
+\]
+\end{korollar}
+
+\begin{korollar}
+Jede irreduzible komplexe Darstellung einer abelschen Gruppe ist eindimensional.
+\end{korollar}
+
+\begin{proof}
+Für jedes $h \in G$ ist die Abbildung $\rho(h) \colon V \to V$ $G$-äquivariant,
+da $G$ abelsch ist.  Nach Schurs Lemma gilt $\rho(h) = \lambda_h \cdot
+\mathrm{id}_V$.  Damit ist jeder Unterraum von $V$ $G$-stabil.  Die
+Irreduzibilität erzwingt $\dim V = 1$.
+\end{proof}
+
+\begin{bemerkung}
+Die Voraussetzung der algebraischen Abgeschlossenheit in Teil (ii) ist notwendig.
+Über $\mathbb{R}$ ist die zweidimensionale Darstellung von $\mathrm{SO}(2)$ durch
+Rotationsmatrizen irreduzibel, doch ihr Endomorphismenring ist isomorph zu
+$\mathbb{C}$, nicht zu $\mathbb{R}$.
+\end{bemerkung}
+
+Die Bedeutung von Schurs Lemma lässt sich an einem weiteren Korollar ablesen,
+das der Charaktertheorie zugrunde liegt:
+
+\begin{korollar}[Schur-Orthogonalitätsrelationen, elementare Form]
+Seien $\rho \colon G \to \mathrm{GL}(V)$ und $\sigma \colon G \to \mathrm{GL}(W)$
+irreduzible Darstellungen.  Dann gilt für alle $i, j, k, l$:
+\[
+    \frac{1}{|G|} \sum_{g \in G} \rho(g)_{ij}\,\overline{\sigma(g)_{kl}}
+    = \frac{\delta_{\rho\sigma}\,\delta_{ik}\,\delta_{jl}}{\dim V}.
+\]
+\end{korollar}
+
+%% ============================================================
+\section{Vollständige Reduzibilität: Der Maschke-Satz}
+\label{sec:maschke}
+%% ============================================================
+
+\begin{theorem}[Maschke-Satz]
+\label{satz:maschke}
+Sei $G$ eine endliche Gruppe und $k$ ein Körper mit $\mathrm{char}(k) = 0$ oder
+$\mathrm{char}(k) \nmid |G|$.  Dann ist jede Darstellung von $G$ über $k$
+\emph{vollständig reduzibel}: Sie zerfällt in eine direkte Summe irreduzibler
+Unterdarstellungen.
+\end{theorem}
+
+\begin{proof}
+Es genügt zu zeigen, dass jede Unterdarstellung ein $G$-stabiles Komplement
+besitzt.  Sei $(V,\rho)$ eine Darstellung und $W \subseteq V$ eine
+Unterdarstellung.  Da $V$ ein endlich-dimensionaler $k$-Vektorraum ist, existiert
+eine lineare Projektion $\pi_0 \colon V \to W$ (mit $\pi_0|_W = \mathrm{id}_W$),
+die aber im Allgemeinen nicht $G$-äquivariant ist.  Wir \emph{mitteln} über die
+Gruppe, um eine $G$-äquivariante Projektion zu erzeugen:
+\[
+    \pi \coloneqq \frac{1}{|G|} \sum_{g \in G} \rho(g) \circ \pi_0 \circ \rho(g)^{-1}.
+\]
+Der Faktor $1/|G|$ ist wohldefiniert, da $|G|$ nach Voraussetzung in $k$
+invertierbar ist.  Man verifiziert:
+\begin{itemize}
+  \item $\pi$ ist $G$-äquivariant: $\rho(h) \circ \pi = \pi \circ \rho(h)$ für alle $h \in G$.
+  \item $\pi|_W = \mathrm{id}_W$: Für $w \in W$ und beliebiges $g$ gilt
+        $\rho(g)^{-1}w \in W$ (da $W$ $G$-stabil ist), also
+        $\pi_0(\rho(g)^{-1}w) = \rho(g)^{-1}w$ und $\rho(g)\rho(g)^{-1}w = w$.
+  \item Insbesondere $\pi \circ \pi = \pi$ (Idempotenz).
+\end{itemize}
+Daher ist $V = W \oplus \ker\pi$ eine Zerlegung in $G$-stabile Unterräume.  Durch
+Noethersche Induktion über $\dim V$ terminiert der Prozess und liefert eine
+Zerlegung in Irreduzible.
+\end{proof}
+
+\begin{bemerkung}
+Die Voraussetzung $\mathrm{char}(k) \nmid |G|$ ist scharf.  Über einem Körper der
+Charakteristik $p$ mit $p \mid |G|$ können unzerlegbare, aber reduzible
+Darstellungen auftreten.  Die \emph{modulare Darstellungstheorie} endlicher
+Gruppen (Brauer-Theorie) ist das Studium dieser subtileren Situation.
+\end{bemerkung}
+
+Unter den Voraussetzungen des Maschke-Satzes zerfällt jede Darstellung $(V,\rho)$
+als
+\[
+    V \cong \bigoplus_{i} V_i^{\oplus m_i},
+\]
+wobei die $V_i$ paarweise nicht-isomorphe irreduzible Darstellungen sind und
+$m_i \geq 0$ eindeutig bestimmte nicht-negative ganze Zahlen sind, die
+\emph{Multiplizitäten} genannt werden.  Die Multiplizitäten lassen sich mithilfe
+der im nächsten Abschnitt entwickelten Charaktertheorie berechnen.
+
+%% ============================================================
+\section{Charaktere}
+\label{sec:charaktere}
+%% ============================================================
+
+\begin{definition}
+Der \emph{Charakter} einer Darstellung $(V,\rho)$ ist die Funktion
+\[
+    \chi_V \colon G \longrightarrow k, \quad \chi_V(g) = \mathrm{Spur}(\rho(g)).
+\]
+\end{definition}
+
+Charaktere sind \emph{Klassenfunktionen}: sie sind konstant auf Konjugationsklassen,
+da $\mathrm{Spur}(ABA^{-1}) = \mathrm{Spur}(B)$.  Der Vektorraum der
+Klassenfunktionen auf $G$ wird mit $\mathrm{Kl}(G)$ bezeichnet; seine Dimension
+ist gleich der Anzahl $r$ der Konjugationsklassen.
+
+\begin{proposition}
+\label{prop:char}
+Seien $(V,\rho)$ und $(W,\sigma)$ Darstellungen.  Dann:
+\begin{enumerate}[label=\textup{(\roman*)}]
+  \item $\chi_V(e) = \dim V$.
+  \item $\chi_V(g^{-1}) = \overline{\chi_V(g)}$ für $|G| < \infty$, $k = \mathbb{C}$.
+  \item $\chi_{V \oplus W} = \chi_V + \chi_W$.
+  \item $\chi_{V \otimes W} = \chi_V \cdot \chi_W$.
+\end{enumerate}
+\end{proposition}
+
+\begin{definition}[Inneres Produkt auf Klassenfunktionen]
+Für $k = \mathbb{C}$ ist das \emph{innere Produkt} auf Klassenfunktionen:
+\[
+    \langle \alpha, \beta \rangle_G \coloneqq \frac{1}{|G|} \sum_{g \in G} \alpha(g)\,\overline{\beta(g)}.
+\]
+\end{definition}
+
+\begin{theorem}[Erste Orthogonalitätsrelation]
+\label{satz:orth1}
+Seien $V_1,\ldots,V_r$ die paarweise nicht-isomorphen irreduziblen Darstellungen
+einer endlichen Gruppe $G$ über $\mathbb{C}$.  Dann gilt:
+\[
+    \langle \chi_{V_i}, \chi_{V_j} \rangle_G = \delta_{ij}.
+\]
+Mit anderen Worten: Die irreduziblen Charaktere bilden eine \emph{Orthonormalbasis}
+des Raums $\mathrm{Kl}(G)$ der Klassenfunktionen.
+\end{theorem}
+
+\begin{proof}
+Aus Schurs Lemma (Korollar~\ref{kor:schur}) folgt:
+\[
+    \langle \chi_{V_i}, \chi_{V_j} \rangle_G
+    = \frac{1}{|G|} \sum_{g \in G} \chi_{V_i}(g)\,\overline{\chi_{V_j}(g)}
+    = \dim_{\mathbb{C}} \mathrm{Hom}_G(V_i, V_j)
+    = \delta_{ij}. \qedhere
+\]
+\end{proof}
+
+\begin{theorem}[Zweite Orthogonalitätsrelation]
+\label{satz:orth2}
+Seien $C_1,\ldots,C_r$ die Konjugationsklassen von $G$ und $g_s \in C_s$
+beliebige Repräsentanten.  Dann gilt:
+\[
+    \sum_{i=1}^{r} \chi_{V_i}(g_s)\,\overline{\chi_{V_i}(g_t)} = \frac{|G|}{|C_s|}\,\delta_{st}.
+\]
+\end{theorem}
+
+\begin{korollar}[Anzahl der Irreduziblen]
+Die Anzahl der irreduziblen Darstellungen einer endlichen Gruppe ist gleich der
+Anzahl ihrer Konjugationsklassen.
+\end{korollar}
+
+\begin{korollar}[Zerlegungsformel]
+\label{kor:zerlegung}
+Für jede Darstellung $(V,\rho)$ mit Charakter $\chi_V$ gilt: Die Multiplizität
+der irreduziblen Darstellung $V_i$ in $V$ ist
+\[
+    m_i = \langle \chi_V, \chi_{V_i} \rangle_G.
+\]
+\end{korollar}
+
+\begin{beispiel}[Charaktertafel von $S_3$]
+Die symmetrische Gruppe $S_3$ hat Ordnung $6$ und drei Konjugationsklassen:
+$C_1 = \{e\}$, $C_2 = \{(12),(13),(23)\}$, $C_3 = \{(123),(132)\}$.
+Die drei irreduziblen Darstellungen sind: die triviale Darstellung $\mathbf{1}$,
+die Vorzeichen-Darstellung $\mathrm{sgn}$ und die Standard-Darstellung
+$\mathrm{std}$ der Dimension $2$.
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+ & $e$ & $(12)$ & $(123)$ \\
+\midrule
+$\chi_{\mathbf{1}}$ & $1$ & $1$ & $1$ \\
+$\chi_{\mathrm{sgn}}$ & $1$ & $-1$ & $1$ \\
+$\chi_{\mathrm{std}}$ & $2$ & $0$ & $-1$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Man verifiziert $\sum_i (\chi_{V_i}(e))^2 = 1 + 1 + 4 = 6 = |S_3|$, eine
+notwendige Identität für eine vollständige Liste der Irreduziblen.
+\end{beispiel}
+
+\begin{theorem}[Burnsides Dimensionsformel]
+\label{satz:burnside_dim}
+Sei $G$ eine endliche Gruppe mit irreduziblen komplexen Darstellungen
+$V_1,\ldots,V_r$ der Dimensionen $d_1,\ldots,d_r$.  Dann gilt:
+\[
+    \sum_{i=1}^{r} d_i^2 = |G|.
+\]
+\end{theorem}
+
+%% ============================================================
+\section{Darstellungen der symmetrischen Gruppen $S_n$}
+\label{sec:sn}
+%% ============================================================
+
+Die symmetrische Gruppe $S_n$ ist eine der bedeutendsten Gruppen in Mathematik
+und Physik, und ihre Darstellungstheorie wird vollständig durch die Kombinatorik
+von \emph{Partitionen} und \emph{Young-Tableaux} beschrieben.
+
+\begin{definition}
+Eine \emph{Partition} von $n$ ist eine schwach absteigende Folge positiver
+ganzer Zahlen $\lambda = (\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_k > 0)$
+mit $\lambda_1 + \cdots + \lambda_k = n$.  Wir schreiben $\lambda \vdash n$.
+\end{definition}
+
+\begin{definition}
+Das \emph{Young-Diagramm} von $\lambda \vdash n$ besteht aus $n$ Kästchen in
+Zeilen von oben nach unten, mit $\lambda_i$ Kästchen in Zeile $i$.  Ein
+\emph{Young-Tableau} der Form $\lambda$ ist eine Füllung der Kästchen mit den
+Zahlen $1,\ldots,n$; es heißt \emph{standardisiert}, wenn die Einträge entlang
+jeder Zeile von links nach rechts und entlang jeder Spalte von oben nach unten
+zunehmen.
+\end{definition}
+
+\begin{beispiel}
+Die Partition $\lambda = (3,2) \vdash 5$ hat Young-Diagramm mit drei Kästchen in
+der ersten und zwei in der zweiten Zeile.  Es gibt genau $5$ standardisierte
+Young-Tableaux dieser Form.  Zum Beispiel:
+\[
+\begin{array}{|c|c|c|}
+\hline
+1 & 2 & 3 \\
+\hline
+4 & 5 & \\
+\cline{1-2}
+\end{array}
+\quad\text{und}\quad
+\begin{array}{|c|c|c|}
+\hline
+1 & 2 & 4 \\
+\hline
+3 & 5 & \\
+\cline{1-2}
+\end{array}
+\quad\text{usw.}
+\]
+\end{beispiel}
+
+\begin{definition}[Specht-Modul]
+Für $\lambda \vdash n$ ist der \emph{Specht-Modul} $S^\lambda$ ein spezifischer
+irreduzibler $\mathbb{C}[S_n]$-Modul, der wie folgt konstruiert wird.  Man fixiere
+ein Young-Tableau $T$ der Form $\lambda$ und setze
+\[
+    R(T) = \{\sigma \in S_n : \sigma \text{ erhält jede Zeile von } T\},
+\quad
+    C(T) = \{\sigma \in S_n : \sigma \text{ erhält jede Spalte von } T\}.
+\]
+Der \emph{Young-Symmetrisierer} ist
+\[
+    c_T = \underbrace{\left(\sum_{\sigma \in R(T)} \sigma\right)}_{a_T} \cdot
+          \underbrace{\left(\sum_{\tau \in C(T)} \mathrm{sgn}(\tau)\,\tau\right)}_{b_T}.
+\]
+Dann ist $S^\lambda = \mathbb{C}[S_n] \cdot c_T$ ein irreduzibler
+$\mathbb{C}[S_n]$-Modul, bis auf Isomorphismus unabhängig von der Wahl von $T$.
+\end{definition}
+
+\begin{theorem}[Klassifikation der Irreduziblen von $S_n$]
+\label{satz:sn_klass}
+Die Moduln $\{S^\lambda : \lambda \vdash n\}$ bilden eine vollständige Familie
+paarweise nicht-isomorpher irreduzibler komplexer Darstellungen von $S_n$.  Die
+Dimension von $S^\lambda$ ist gleich der Anzahl standardisierter Young-Tableaux
+der Form $\lambda$, gegeben durch die \emph{Hakenlängenformel}:
+\[
+    \dim S^\lambda = \frac{n!}{\prod_{\square \in \lambda} h(\square)},
+\]
+wobei $h(\square)$ die \emph{Hakenlänge} am Kästchen $\square$ bezeichnet
+(Anzahl der Kästchen direkt rechts davon plus direkt darunter, plus $1$ für
+$\square$ selbst).
+\end{theorem}
+
+\begin{beispiel}[Frobenius-Formel]
+Der Charakter $\chi^\lambda$ des Specht-Moduls $S^\lambda$ kann durch die
+Frobenius-Charakterformel berechnet werden.  Für eine Permutation $\sigma \in S_n$
+vom Zyklentyp $\mu = (1^{m_1} 2^{m_2} \cdots)$ gilt:
+\[
+    \chi^\lambda(\sigma) = \langle s_\lambda, p_\mu \rangle,
+\]
+wobei $s_\lambda$ das Schur-Polynom ist, $p_\mu = \prod_i p_{\mu_i}$ die
+Potenzreihen-Symmetriefunktion und das innere Produkt das Hall-Skalarprodukt
+auf symmetrischen Funktionen.
+\end{beispiel}
+
+\begin{beispiel}[Irreduzible von $S_4$]
+Die Partitionen von $4$ sind $(4)$, $(3,1)$, $(2,2)$, $(2,1,1)$, $(1,1,1,1)$
+und liefern $5$ irreduzible Darstellungen der Dimensionen $1, 3, 2, 3, 1$.
+Man prüft: $1^2 + 3^2 + 2^2 + 3^2 + 1^2 = 24 = 4!$ wie erwartet.
+\end{beispiel}
+
+%% ============================================================
+\section{Darstellungen von $\mathrm{GL}_n$ und $\mathrm{SL}_n$}
+\label{sec:gln}
+%% ============================================================
+
+Die Darstellungstheorie kompakter Lie-Gruppen, oder allgemeiner reduktiver
+algebraischer Gruppen, ist weit reicher als der endliche Fall.  Wir skizzieren
+die Höchstgewicht-Klassifikation für $\mathrm{GL}_n(\mathbb{C})$ und
+$\mathrm{SL}_n(\mathbb{C})$.
+
+\begin{definition}
+Eine Darstellung $(\rho, V)$ von $\mathrm{GL}_n(\mathbb{C})$ heißt
+\emph{polynomiell} (bzw.\ \emph{rational}), wenn jeder Matrixkoeffizient
+$g \mapsto \langle v^*, \rho(g)v\rangle$ eine polynomielle (bzw.\ rationale)
+Funktion der Matrixeinträge von $g$ ist.
+\end{definition}
+
+Die irreduziblen polynomiellen Darstellungen von $\mathrm{GL}_n$ werden durch
+\emph{dominante Gewichte} indiziert: Folgen $\lambda = (\lambda_1 \geq \lambda_2
+\geq \cdots \geq \lambda_n \geq 0)$ nicht-negativer ganzer Zahlen.  Diese
+entsprechen genau den Partitionen $\lambda$ mit höchstens $n$ Teilen.
+
+\begin{theorem}[Höchstgewicht-Klassifikation]
+\label{satz:hoechstgewicht}
+Zu jedem dominanten Gewicht $\lambda = (\lambda_1 \geq \cdots \geq \lambda_n \geq 0)$
+existiert eine bis auf Isomorphismus eindeutige irreduzible polynomielle
+Darstellung $V_\lambda$ von $\mathrm{GL}_n(\mathbb{C})$.  Jede irreduzible
+polynomielle Darstellung ist von dieser Form.  Die Darstellung $V_\lambda$ ist
+genau der Schur-Modul zur Partition $\lambda$.
+\end{theorem}
+
+\begin{theorem}[Weylsche Charakterformel]
+\label{satz:weyl_charformel}
+Sei $G = \mathrm{SL}_n(\mathbb{C})$ mit maximalem Torus $T$ der
+Diagonalmatrizen der Determinante $1$.  Für ein dominantes ganzzahliges Gewicht
+$\lambda$ ist der Charakter der irreduziblen Darstellung $V_\lambda$, ausgewertet
+auf $\mathrm{diag}(t_1,\ldots,t_n) \in T$:
+\[
+    \chi_{V_\lambda}(t) = \frac{\sum_{w \in W} \epsilon(w)\, t^{w(\lambda+\rho)-\rho}}{\prod_{\alpha > 0}(1 - t^{-\alpha})},
+\]
+wobei $W = S_n$ die Weyl-Gruppe ist, $\epsilon(w) = \det(w)$, $\rho =
+\tfrac{1}{2}\sum_{\alpha > 0}\alpha$ der Weyl-Vektor (halbe Summe der positiven
+Wurzeln) und das Produkt über positive Wurzeln $\alpha$ läuft.
+\end{theorem}
+
+\begin{beispiel}[Darstellungen von $\mathrm{SL}_2$]
+Für $G = \mathrm{SL}_2(\mathbb{C})$ sind die dominanten Gewichte die
+nicht-negativen ganzen Zahlen $n \geq 0$.  Die irreduzible Darstellung $V_n$
+des Höchstgewichts $n$ hat Dimension $n+1$ und kann als Raum der homogenen
+Polynome vom Grad $n$ in zwei Variablen realisiert werden, wobei $\mathrm{SL}_2$
+durch Substitution wirkt.  Der Charakter ist
+\[
+    \chi_{V_n}\!\left(\begin{smallmatrix}t & 0 \\ 0 & t^{-1}\end{smallmatrix}\right)
+    = t^n + t^{n-2} + \cdots + t^{-n} = \frac{t^{n+1} - t^{-(n+1)}}{t - t^{-1}}.
+\]
+Dies sind verkleidete Tschebyscheff-Polynome und stimmen mit den Spin-$n/2$-Dar\-stel\-lun\-gen
+von $\mathrm{SU}(2)$ in der Quantenmechanik überein.
+\end{beispiel}
+
+\begin{proposition}[Schur-Funktoren]
+Für eine Partition $\lambda \vdash d$ mit höchstens $n$ Teilen ordnet der
+\emph{Schur-Funktor} $\mathbb{S}^\lambda$ jedem Vektorraum $E$ der Dimension $n$
+die Darstellung
+\[
+    \mathbb{S}^\lambda E \coloneqq (E^{\otimes d} \otimes S^\lambda)^{S_d}
+\]
+zu, wobei $S^\lambda$ der Specht-Modul von $S_d$ ist.  Dies liefert den
+irreduziblen $\mathrm{GL}(E)$-Modul $V_\lambda$ und stellt eine kanonische
+Verbindung zwischen den Darstellungstheorien von $S_d$ und $\mathrm{GL}_n$ her.
+\end{proposition}
+
+%% ============================================================
+\section{Anwendungen}
+\label{sec:anwendungen}
+%% ============================================================
+
+\subsection{Burnsides $pq$-Satz}
+
+\begin{theorem}[Burnside, 1904]
+\label{satz:burnside_pq}
+Sei $G$ eine endliche Gruppe der Ordnung $p^a q^b$, wobei $p$ und $q$ Primzahlen
+und $a, b \geq 0$ sind.  Dann ist $G$ auflösbar.
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+Der Beweis verwendet zwei charaktertheoretische Hilfssätze.
+
+\begin{lemma}
+\label{lem:b1}
+Ist $\chi$ ein irreduzibler Charakter von $G$ vom Grad $d$ und $C$ eine
+Konjugationsklasse mit $\gcd(|C|, d) = 1$, so gilt für jedes $g \in C$ entweder
+$\chi(g) = 0$ oder $\rho(g)$ ist eine skalare Matrix.
+\end{lemma}
+
+\begin{lemma}
+\label{lem:b2}
+Eine endliche Gruppe ist genau dann auflösbar, wenn jeder nicht-triviale
+irreduzible Charakter einen Grad hat, der durch eine Primzahl teilbar ist.
+\end{lemma}
+
+Mittels Sylow-Theorie findet man in $G$ eine Konjugationsklasse $C$ der Größe
+$p^s$ für ein $s \geq 1$.  Lemma~\ref{lem:b1} erzwingt, dass jeder irreduzible
+Charakter vom Grad nicht durch $p$ teilbar entweder auf $C$ verschwindet oder
+$\rho(g)$ skalar macht.  Die Spalten-Orthogonalitätsrelation erzwingt dann eine
+normale Untergruppe, was die Einfachheit von $G$ widerlegt, außer wenn $G$ abelsch
+ist.  Induktion über $|G|$ liefert die Auflösbarkeit.
+\end{proof}
+
+\begin{bemerkung}
+Burnsides ursprünglicher Beweis von 1904 war der erste Einsatz von Charaktertheorie
+zum Beweis eines rein gruppentheoretischen Resultats.  Ein charakterfreier Beweis
+wurde von Goldschmidt und Bender erst in den 1970er Jahren gefunden und ist
+erheblich aufwändiger.  Dies illustriert die Stärke darstellungstheoretischer
+Methoden.
+\end{bemerkung}
+
+\subsection{Molekulare Symmetrie}
+
+In der Chemie wirkt die Symmetriegruppe eines Moleküls (wie die Rotationsgruppe
+eines regulären Polyeders) auf dem Raum der Elektronenorbitale oder
+Schwingungsmoden.  Die Zerlegung dieser (typischerweise reduzibler) Darstellungen
+in Irreduzible erklärt die Entartungsstruktur der Energieniveaus und die
+Auswahlregeln für spektroskopische Übergänge.
+
+Beispielsweise hat das Methan-Molekül $\mathrm{CH}_4$ die Symmetriegruppe
+$T_d \cong S_4$.  Die $2p$-Orbitale der vier Wasserstoffatome bilden die
+$4$-dimensionale Permutationsdarstellung, die als $A_1 \oplus T_2$ zerfällt
+(in spektroskopischer Notation) und das beobachtete Bindungsmuster erklärt.
+
+\subsection{Kristallographie}
+
+Die $230$ kristallographischen Raumgruppen in drei Dimensionen klassifizieren alle
+möglichen periodischen Atomanordnungen.  Jede solche Gruppe $\Gamma$ passt in eine
+kurze exakte Sequenz $1 \to \mathbb{Z}^3 \to \Gamma \to P \to 1$, wobei $P$ eine
+\emph{Punktgruppe} (eine endliche Untergruppe von $\mathrm{O}(3)$) ist.  Die
+irreduziblen Darstellungen von $P$ klassifizieren die Symmetrietypen der
+Phonon-Moden am $\Gamma$-Punkt der Brillouin-Zone, mit direkten Anwendungen
+in der Interpretation von Raman- und Infrarotspektren.
+
+Darüber hinaus wird das \emph{Burnside-Lemma} (Cauchy-Frobenius-Lemma)
+\[
+    |X/G| = \frac{1}{|G|} \sum_{g \in G} |X^g|
+\]
+in der Kombinatorik eingesetzt, um die Anzahl wesentlich verschiedener Objekte
+unter Symmetriewirkung zu zählen --- z.B.\ die Anzahl chemisch verschiedener
+Färbungen eines Moleküls.
+
+%% ============================================================
+\section{Verbindung zum Langlands-Programm}
+\label{sec:langlands}
+%% ============================================================
+
+Das Langlands-Programm, das Robert Langlands 1967 in einem berühmten Brief an
+André Weil initiierte, ist ein weitreichendes Geflecht von Vermutungen und Sätzen,
+das tiefe Korrespondenzen zwischen drei scheinbar unabhängigen Objekten vorhersagt:
+\begin{enumerate}
+  \item \textbf{Automorphe Darstellungen}: bestimmte Darstellungen adelischer
+        Gruppen $G(\mathbb{A}_{\mathbb{Q}})$, die Modulformen und Dirichlet-Charaktere
+        verallgemeinern.
+  \item \textbf{Galois-Darstellungen}: stetige Homomorphismen $\rho \colon
+        \mathrm{Gal}(\bar{\mathbb{Q}}/\mathbb{Q}) \to {}^L G$ in die
+        Langlands-duale Gruppe.
+  \item \textbf{L-Funktionen}: meromorphe Funktionen auf $\mathbb{C}$, die
+        arithmetische Information in Euler-Produkten codieren und
+        Funktionalgleichungen erfüllen.
+\end{enumerate}
+
+\subsection{Galois-Darstellungen}
+
+Sei $\ell$ eine Primzahl.  Eine \emph{$\ell$-adische Galois-Darstellung} ist
+ein stetiger Homomorphismus
+\[
+    \rho \colon \mathrm{Gal}(\bar{\mathbb{Q}}/\mathbb{Q}) \longrightarrow \mathrm{GL}_n(\mathbb{Z}_\ell),
+\]
+wobei $\mathbb{Z}_\ell$ die $\ell$-adische Topologie und die Galois-Gruppe die
+Krull-Topologie trägt.  Die in den vorigen Abschnitten entwickelte
+Darstellungstheorie gilt hier mit $G = \mathrm{Gal}(\bar{\mathbb{Q}}/\mathbb{Q})$,
+einer profinierten Gruppe.
+
+\begin{beispiel}[Zyklotomischer Charakter]
+Der \emph{zyklotomische Charakter} $\chi_\ell \colon
+\mathrm{Gal}(\bar{\mathbb{Q}}/\mathbb{Q}) \to \mathbb{Z}_\ell^\times$ ist durch
+$\sigma(\zeta_{\ell^n}) = \zeta_{\ell^n}^{\chi_\ell(\sigma)}$ für alle
+$\ell^n$-ten Einheitswurzeln $\zeta_{\ell^n}$ definiert.  Dies ist eine
+irreduzible eindimensionale Galois-Darstellung, die die Arithmetik
+zyklotomischer Körper kodiert.
+\end{beispiel}
+
+\begin{beispiel}[Galois-Darstellung einer elliptischen Kurve]
+Sei $E/\mathbb{Q}$ eine elliptische Kurve.  Das Tate-Modul
+\[
+    T_\ell(E) = \varprojlim_n E[\ell^n](\bar{\mathbb{Q}}) \cong \mathbb{Z}_\ell^2
+\]
+trägt eine natürliche Wirkung von $\mathrm{Gal}(\bar{\mathbb{Q}}/\mathbb{Q})$
+und liefert eine zweidimensionale $\ell$-adische Darstellung
+$\rho_{E,\ell} \colon \mathrm{Gal}(\bar{\mathbb{Q}}/\mathbb{Q}) \to \mathrm{GL}_2(\mathbb{Z}_\ell)$.
+Die L-Funktion $L(E,s) = L(\rho_{E,\ell}, s)$ ist dieselbe L-Funktion, die in
+der Birch-und-Swinnerton-Dyer-Vermutung auftritt.
+\end{beispiel}
+
+\subsection{Die Langlands-Korrespondenz}
+
+\begin{vermutung}[Globale Langlands-Korrespondenz für $\mathrm{GL}_n$]
+\label{verm:langlands}
+Es gibt eine natürliche Bijektion zwischen:
+\begin{enumerate}[label=\textup{(\roman*)}]
+  \item Kuspidalen automorphen Darstellungen $\pi$ von $\mathrm{GL}_n(\mathbb{A}_{\mathbb{Q}})$.
+  \item Irreduziblen $n$-dimensionalen komplexen Darstellungen der
+        Weil--Deligne-Gruppe $W_{\mathbb{Q}}' = W_{\mathbb{Q}} \ltimes \mathbb{C}$
+        (oder, vermutungsweise, der Langlands-Gruppe $\mathcal{L}_{\mathbb{Q}}$).
+\end{enumerate}
+Unter dieser Bijektion stimmt die L-Funktion $L(s,\pi)$ auf der automorphen Seite
+mit der Artin-L-Funktion $L(s,\rho)$ auf der Galois-Seite überein.
+\end{vermutung}
+
+\begin{bemerkung}
+Vermutung~\ref{verm:langlands} ist im Allgemeinen offen.  Wesentliche
+Spezialfälle wurden bewiesen:
+\begin{itemize}
+  \item $n = 1$: Klassenkörpertheorie (Kronecker--Weber, Artin-Reziprozität).
+  \item $G = \mathrm{GL}_2$, Gewicht-$2$-Formen: Taylor--Wiles (1995), als Teil
+        des Beweises des Letzten Satzes von Fermat.
+  \item Funktionskörper-Analogon: Drinfeld (1974, $n=2$) und Lafforgue
+        (2002, allgemeines $n$).
+  \item Geometrisches Langlands-Programm über komplexen Kurven: Frenkel--Ben-Zvi
+        u.a.
+\end{itemize}
+Die jüngsten Arbeiten von V.\ Lafforgue über die Richtung ``automorph zu Galois''
+über Funktionskörpern sowie von Scholze--Fargues mittels perfektoider Geometrie
+und der Fargues--Fontaine-Kurve stellen die aktuelle Forschungsfront dar.
+\end{bemerkung}
+
+\subsection{Modularität und Fermats Letzter Satz}
+
+Die Verbindung zwischen Darstellungstheorie und Zahlentheorie wird besonders
+sichtbar im Beweis des Letzten Satzes von Fermat.  Angenommen, es gäbe eine
+Lösung $a^p + b^p = c^p$ mit $p \geq 5$ prim.  Frey (1986) ordnete dieser
+hypothetischen Lösung die elliptische Kurve $E_{a,b,c}$ zu, und Ribet (1990)
+bewies, dass die zugehörige Galois-Darstellung $\rho_{E,p}$ eine
+Gewicht-$2$-Modulform des Niveaus $2$ liefern würde.  Da es jedoch keine solchen
+Formen gibt (durch Aufzählung kleiner Niveaus), ergibt sich ein Widerspruch.
+Der entscheidende Schritt---dass jede semistabile elliptische Kurve über
+$\mathbb{Q}$ modular ist (d.h.\ ihre Galois-Darstellung von einer Modulform
+stammt)---wurde von Wiles und Taylor--Wiles 1995 bewiesen.  Dieser
+Modularitätssatz ist ein Meilenstein der Langlands-Korrespondenz in Dimension
+$n = 2$.
+
+%% ============================================================
+\section*{Literatur}
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Serre77}
+J.-P.\ Serre,
+\textit{Lineare Darstellungen endlicher Gruppen}
+[Originalausgabe: \textit{Linear Representations of Finite Groups}],
+Graduate Texts in Mathematics, Bd.~42,
+Springer-Verlag, New York, 1977.
+
+\bibitem{FultonHarris91}
+W.\ Fulton und J.\ Harris,
+\textit{Representation Theory: A First Course},
+Graduate Texts in Mathematics, Bd.~129,
+Springer-Verlag, New York, 1991.
+
+\bibitem{JamesLiebeck01}
+G.\ James und M.\ Liebeck,
+\textit{Representations and Characters of Groups},
+2.\ Aufl., Cambridge University Press, Cambridge, 2001.
+
+\bibitem{BumpLie04}
+D.\ Bump,
+\textit{Lie Groups},
+Graduate Texts in Mathematics, Bd.~225,
+Springer-Verlag, New York, 2004.
+
+\bibitem{Langlands70}
+R.\ P.\ Langlands,
+\textit{Problems in the Theory of Automorphic Forms},
+in: Lectures in Modern Analysis and Applications III,
+Lecture Notes in Mathematics, Bd.~170,
+Springer-Verlag, Berlin, 1970, S.~18--61.
+
+\bibitem{TaylorWiles95}
+R.\ Taylor und A.\ Wiles,
+Ring theoretic properties of certain Hecke algebras,
+\textit{Ann.\ of Math.} \textbf{141} (1995), 553--572.
+
+\bibitem{Lafforgue02}
+L.\ Lafforgue,
+Chtoucas de Drinfeld et correspondance de Langlands,
+\textit{Invent.\ Math.} \textbf{147} (2002), 1--241.
+
+\bibitem{Neukirch99}
+J.\ Neukirch, A.\ Schmidt und K.\ Wingberg,
+\textit{Cohomology of Number Fields},
+Grundlehren der mathematischen Wissenschaften, Bd.~323,
+Springer-Verlag, Berlin, 1999.
+
+\bibitem{BumpSchilling17}
+D.\ Bump und A.\ Schilling,
+\textit{Crystal Bases: Representations and Combinatorics},
+World Scientific, Singapur, 2017.
+
+\bibitem{Bourbaki68}
+N.\ Bourbaki,
+\textit{Groupes et algèbres de Lie}, Chapitres 4--6,
+Hermann, Paris, 1968.
+
+\end{thebibliography}
+
+\end{document}

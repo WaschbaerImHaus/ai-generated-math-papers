@@ -1,0 +1,830 @@
+% ============================================================
+% Paper 45: Ringtheorie und kommutative Algebra (Deutsch)
+% Autor: Michael Fuhrmann
+% Projekt: Specialist Mathematics, Build 135
+% Datum: 2026-03-12
+% ============================================================
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% ---- Theorem-Umgebungen ----
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+% ---- Operatoren ----
+\DeclareMathOperator{\Spec}{Spec}
+\DeclareMathOperator{\Ann}{Ann}
+\DeclareMathOperator{\rad}{rad}
+\DeclareMathOperator{\Nil}{Nil}
+\DeclareMathOperator{\Jac}{Jac}
+\DeclareMathOperator{\lcm}{kgV}
+\DeclareMathOperator{\ht}{ht}
+\DeclareMathOperator{\codim}{codim}
+\DeclareMathOperator{\chr}{char}
+\DeclareMathOperator{\Frac}{Frac}
+\DeclareMathOperator{\Cl}{Cl}
+
+\title{Ringtheorie und kommutative Algebra\\
+\large Ideale, Faktorisierung, noethersche Ringe und Gröbner-Basen}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 135}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{document}
+
+\begin{abstract}
+Dieses Paper gibt eine in sich geschlossene Einführung in die Ringtheorie und
+kommutative Algebra und behandelt die zentralen Objekte und Sätze der modernen
+Algebra. Ausgehend von der axiomatischen Definition eines Rings entwickeln wir
+die Theorie der Ideale und Quotientenringe, beweisen die Isomorphiesätze und
+untersuchen Polynomringe mit ihren Irreduzibilitätskriterien. Die Hierarchie
+euklidischer Ring $\Rightarrow$ Hauptidealring (HIR) $\Rightarrow$ faktorieller Ring (UFD)
+wird vollständig entwickelt. Anschließend behandeln wir noethersche und artinsche Ringe,
+einschließlich des Hilbert-Basissatzes und des Nakayama-Lemmas. Lokalisierung und ihre
+Anwendung auf Dedekind-Ringe bilden die Brücke zur algebraischen Zahlentheorie. Das
+Paper schließt mit einer Einführung in Gröbner-Basen und den Buchberger-Algorithmus
+als Berechnungswerkzeug. Alle Ergebnisse werden mit Beweisen oder Beweissk{}izzen
+begleitet und durch konkrete Beispiele illustriert. Die Darstellung stützt sich auf
+die Implementierungen in \texttt{ring\_theory.py} und \texttt{commutative\_algebra.py}
+des Specialist-Mathematics-Projekts.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ============================================================
+\section{Einleitung}
+% ============================================================
+
+Ringe sind die grundlegenden algebraischen Strukturen, die die Arithmetik der ganzen
+Zahlen verallgemeinern. Überall dort, wo Addition und Multiplikation zusammenspielen ---
+in der Zahlentheorie, der Geometrie, der Kombinatorik oder der mathematischen Physik ---
+liefern ringtheoretische Methoden den vereinheitlichenden Rahmen.
+
+Die historische Entwicklung der Ringtheorie wurde von konkreten Problemen angetrieben.
+Gauß untersuchte $\mathbb{Z}[i]$, um seinen Zwei-Quadrate-Satz zu beweisen.
+Kummer führte „ideale Zahlen" ein, um die eindeutige Faktorisierung in Kreiskörpern
+zu retten. Dedekind formalisierte den modernen Idealbegriff und bewies, dass Ringe
+algebraischer ganzer Zahlen genau das sind, was wir heute Dedekind-Ringe nennen ---
+Strukturen, in denen eindeutige Faktorisierung auf Idealebene gilt, auch wenn sie auf
+Elementebene versagt.
+
+Im zwanzigsten Jahrhundert revolutionierte Emmy Noether~\cite{Noether1921} das Gebiet,
+indem sie den Fokus von expliziten Berechnungen auf strukturelle Prinzipien verlagerte.
+Ihre aufsteigende Kettenbedingung, die noethersche Eigenschaft, erwies sich als genau
+die Hypothese, die benötigt wird, damit Algebra sauber funktioniert. Gleichzeitig zeigte
+Hilberts Basissatz, dass Polynomringe diese gute Eigenschaft erben, was das Fundament
+der modernen algebraischen Geometrie legte.
+
+Heute bildet die kommutative Algebra --- die Untersuchung kommutativer Ringe und ihrer
+Moduln --- den technischen Kern der algebraischen Geometrie, der algebraischen Zahlentheorie
+und Teilen der Kombinatorik. Die Sprache von $\Spec$, Lokalisierung und Garben verbindet
+reine Algebra mit Geometrie auf eine Weise, die seit Grothendiecks Neuformulierung in
+den 1950er und 1960er Jahren entscheidend war.
+
+Dieses Paper deckt folgende Themen ab:
+\begin{enumerate}[label=(\roman*)]
+  \item Grunddefinitionen und Beispiele von Ringen und Körpern;
+  \item Ideale, Quotientenringe und der Chinesische Restsatz;
+  \item Ringhomomorphismen und die Isomorphiesätze;
+  \item Polynomringe, Gaußsches Lemma und Eisenstein-Kriterium;
+  \item Die Hierarchie UFD $\supset$ HIR $\supset$ euklidischer Ring;
+  \item Noethersche und artinsche Ringe, Hilbert-Basissatz, Nakayama-Lemma;
+  \item Lokalisierung und Dedekind-Ringe;
+  \item Gröbner-Basen und der Buchberger-Algorithmus.
+\end{enumerate}
+
+\medskip
+
+\noindent\textbf{Notation.} Alle Ringe haben eine multiplikative Eins $1$, und
+Ringhomomorphismen bilden $1$ auf $1$ ab. Wir schreiben $\mathbb{Z}$, $\mathbb{Q}$,
+$\mathbb{R}$, $\mathbb{C}$ für die ganzen, rationalen, reellen und komplexen Zahlen,
+sowie $\mathbb{F}_p = \mathbb{Z}/p\mathbb{Z}$ für den Körper mit $p$ Elementen.
+
+% ============================================================
+\section{Grundlagen der Ringtheorie}
+% ============================================================
+
+\begin{definition}[Ring]
+Ein \emph{Ring} ist eine Menge $R$ zusammen mit zwei binären Operationen $+$
+(Addition) und $\cdot$ (Multiplikation), die folgendes erfüllen:
+\begin{enumerate}[label=(\roman*)]
+  \item $(R,+)$ ist eine abelsche Gruppe mit neutralem Element $0$;
+  \item $(R,\cdot)$ ist ein Monoid mit neutralem Element $1$;
+  \item Die Multiplikation ist distributiv über die Addition:
+        $a(b+c) = ab + ac$ und $(a+b)c = ac + bc$ für alle $a,b,c \in R$.
+\end{enumerate}
+Der Ring heißt \emph{kommutativ}, wenn $ab = ba$ für alle $a,b \in R$ gilt.
+\end{definition}
+
+\begin{example}\label{bsp:ringe}
+Die wichtigsten Beispiele sind:
+\begin{enumerate}[label=(\alph*)]
+  \item $\mathbb{Z}$, $\mathbb{Q}$, $\mathbb{R}$, $\mathbb{C}$ mit der gewöhnlichen
+        Addition und Multiplikation;
+  \item $\mathbb{Z}/n\mathbb{Z}$ (ganze Zahlen modulo $n$) für beliebiges $n \geq 1$;
+  \item Der Polynomring $R[x_1,\ldots,x_n]$ über einem beliebigen Ring $R$;
+  \item Der Matrizenring $M_n(R)$ --- nicht kommutativ für $n \geq 2$;
+  \item Der Ring der stetigen Funktionen $C([0,1])$ mit punktweisen Operationen;
+  \item Quadratische Ganzzahlringe $\mathbb{Z}[\sqrt{d}] = \{a + b\sqrt{d} \mid a,b \in \mathbb{Z}\}$
+        für quadratfreies $d \in \mathbb{Z}$.
+\end{enumerate}
+\end{example}
+
+\begin{definition}[Spezielle Ringklassen]
+Sei $R$ ein kommutativer Ring mit $1 \neq 0$.
+\begin{itemize}
+  \item $R$ ist ein \emph{Integritätsbereich} (oder \emph{nullteilerfreier Ring}),
+        wenn aus $ab = 0$ folgt: $a = 0$ oder $b = 0$.
+  \item $R$ ist ein \emph{Körper}, wenn jedes von Null verschiedene Element ein
+        multiplikatives Inverses besitzt.
+  \item Die \emph{Einheitengruppe} ist $R^\times = \{u \in R \mid \exists v: uv = 1\}$.
+  \item Die \emph{Charakteristik} $\chr(R)$ ist das kleinste positive $n$ mit
+        $n \cdot 1 = 0$, oder $0$, wenn kein solches $n$ existiert.
+\end{itemize}
+\end{definition}
+
+\begin{proposition}\label{prop:koerper-int}
+Jeder Körper ist ein Integritätsbereich. Umgekehrt ist jeder endliche Integritätsbereich
+ein Körper.
+\end{proposition}
+
+\begin{proof}
+Sei $F$ ein Körper und $ab = 0$ mit $a \neq 0$. Dann gilt $b = a^{-1}(ab) = 0$.
+Für die Umkehrung sei $R$ ein endlicher Integritätsbereich und $a \in R \setminus \{0\}$.
+Die Abbildung $x \mapsto ax$ ist injektiv (da $R$ nullteilerfrei ist) und wegen der
+Endlichkeit von $R$ auch surjektiv. Insbesondere hat $ax = 1$ eine Lösung.
+\end{proof}
+
+\begin{example}[Einheiten und Nullteiler]
+In $\mathbb{Z}/12\mathbb{Z}$: Die Einheiten sind $\{1,5,7,11\}$ (zu $12$ teilerfremde
+Elemente), und $2 \cdot 6 = 0$, sodass $2$ ein Nullteiler ist.
+In $\mathbb{Z}[i]$ (Gaußsche ganze Zahlen): $(\mathbb{Z}[i])^\times = \{\pm 1, \pm i\}$.
+\end{example}
+
+\begin{theorem}[Wedderburns kleiner Satz]
+Jeder endliche Schiefkörper ist kommutativ (also ein Körper).
+\end{theorem}
+
+\begin{proof}[Beweissk{}izze]
+Man verwendet die Klassengleichung der multiplikativen Gruppe und Eigenschaften
+von Kreisteilungspolynomen, um zu zeigen, dass das Zentrum des Schiefkörpers
+mit dem ganzen Ring übereinstimmen muss. Siehe \cite[Satz~13.1]{Lang2002}.
+\end{proof}
+
+% ============================================================
+\section{Ideale und Quotientenringe}
+% ============================================================
+
+\begin{definition}[Ideal]
+Eine Teilmenge $I \subseteq R$ ist ein \emph{(zweiseitiges) Ideal}, wenn:
+\begin{enumerate}[label=(\roman*)]
+  \item $(I,+)$ eine Untergruppe von $(R,+)$ ist;
+  \item $rI \subseteq I$ und $Ir \subseteq I$ für alle $r \in R$ gilt
+        (im kommutativen Fall fallen diese beiden Bedingungen zusammen).
+\end{enumerate}
+Das von $a_1,\ldots,a_n \in R$ \emph{erzeugte Ideal} ist
+\[
+  (a_1,\ldots,a_n) = \Bigl\{\sum_{i=1}^{n} r_i a_i \,\Big|\, r_i \in R\Bigr\}.
+\]
+Ein Ideal der Form $(a) = aR$ heißt \emph{Hauptideal}.
+\end{definition}
+
+\begin{definition}[Primideale und maximale Ideale]
+Sei $R$ ein kommutativer Ring und $\mathfrak{p}, \mathfrak{m} \subsetneq R$ Ideale.
+\begin{itemize}
+  \item $\mathfrak{p}$ ist ein \emph{Primideal}, wenn aus $ab \in \mathfrak{p}$ folgt:
+        $a \in \mathfrak{p}$ oder $b \in \mathfrak{p}$.
+  \item $\mathfrak{m}$ ist ein \emph{maximales Ideal}, wenn kein Ideal $I$ mit
+        $\mathfrak{m} \subsetneq I \subsetneq R$ existiert.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Charakterisierung über Quotientenringe]
+Sei $I$ ein Ideal in einem kommutativen Ring $R$.
+\begin{enumerate}[label=(\roman*)]
+  \item $I$ ist prim genau dann, wenn $R/I$ ein Integritätsbereich ist.
+  \item $I$ ist maximal genau dann, wenn $R/I$ ein Körper ist.
+  \item Jedes maximale Ideal ist prim (da jeder Körper ein Integritätsbereich ist).
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) $ab + I = (a+I)(b+I) = 0$ in $R/I$ genau dann, wenn $ab \in I$. Die Nullteilerfreiheit
+in $R/I$ bedeutet genau, dass daraus $a \in I$ oder $b \in I$ folgt.
+(ii) $R/I$ ist ein Körper genau dann, wenn jedes von Null verschiedene Element
+$a + I$ eine Einheit ist, d.h. es gibt $b$ mit $ab - 1 \in I$. Dies ist äquivalent
+zur Maximalität von $I$: für jedes $r \notin I$ liefert $(I,r) = R$ ein $ar + j = 1$
+mit $a \in R$, $j \in I$.
+\end{proof}
+
+\begin{example}\label{bsp:ideale-Z}
+In $\mathbb{Z}$: Die Primideale sind $(0)$ und $(p)$ für Primzahlen $p$.
+Die maximalen Ideale sind genau die $(p)$. Das Ideal $(6) = (2)(3)$ ist weder prim
+noch maximal: $\mathbb{Z}/(6) \cong \mathbb{Z}/2 \times \mathbb{Z}/3$ ist kein
+Integritätsbereich.
+\end{example}
+
+\begin{theorem}[Chinesischer Restsatz]\label{satz:crt}
+Sei $R$ ein kommutativer Ring und $I_1,\ldots,I_k$ paarweise koprime Ideale
+(d.h. $I_i + I_j = R$ für $i \neq j$). Dann ist die natürliche Abbildung
+\[
+  R \,\Big/\, \bigcap_{i=1}^k I_i \;\xrightarrow{\;\sim\;}\; \prod_{i=1}^k R/I_i
+\]
+ein Ringisomorphismus.
+\end{theorem}
+
+\begin{proof}
+Der Homomorphismus $\varphi\colon R \to \prod R/I_i$, $r \mapsto (r + I_i)_i$, hat
+den Kern $\bigcap I_i$. Die Surjektivität (und damit die Bijektivität nach dem Übergang
+zum Quotienten) folgt aus der Koprimheitsbedingung durch ein Induktionsargument:
+Für jedes $j$ gibt es Elemente $e_j \in R$ mit $e_j \equiv 1 \pmod{I_j}$ und
+$e_j \equiv 0 \pmod{I_i}$ für $i \neq j$. Diese ``Idempotenten'' erlauben es,
+jedes Ziel $(a_1,\ldots,a_k)$ durch $r = \sum_j a_j e_j$ zu erreichen.
+\end{proof}
+
+\begin{corollary}
+$\mathbb{Z}/n\mathbb{Z} \cong \prod_{p^k \| n} \mathbb{Z}/p^k\mathbb{Z}$
+(Produkt über die Primzahlpotenzen in der Primfaktorzerlegung von $n$).
+\end{corollary}
+
+Das \emph{Primspektrum} $\Spec(R)$ ist die Menge aller Primideale von $R$,
+versehen mit der \emph{Zariski-Topologie}: Abgeschlossene Mengen haben die Form
+$V(I) = \{\mathfrak{p} \in \Spec(R) \mid I \subseteq \mathfrak{p}\}$.
+Für $R = \mathbb{Z}/n\mathbb{Z}$ entsprechen die Primideale genau den Primteilern
+von $n$ (plus dem Nullideal wenn $n = p$ prim ist).
+
+% ============================================================
+\section{Ringhomomorphismen und Isomorphiesätze}
+% ============================================================
+
+\begin{definition}[Ringhomomorphismus]
+Eine Abbildung $\varphi\colon R \to S$ zwischen Ringen ist ein \emph{Ringhomomorphismus},
+wenn
+\[
+  \varphi(a+b) = \varphi(a) + \varphi(b),\quad
+  \varphi(ab) = \varphi(a)\varphi(b),\quad
+  \varphi(1_R) = 1_S.
+\]
+Der \emph{Kern} ist $\ker\varphi = \{r \in R \mid \varphi(r) = 0\}$, ein Ideal von $R$.
+Das \emph{Bild} ist $\operatorname{Bild}(\varphi)$, ein Unterring von $S$.
+\end{definition}
+
+\begin{theorem}[Erster Isomorphiesatz für Ringe]
+Sei $\varphi\colon R \to S$ ein Ringhomomorphismus. Dann gilt
+\[
+  R/\ker\varphi \;\cong\; \operatorname{Bild}(\varphi).
+\]
+\end{theorem}
+
+\begin{proof}
+Die Abbildung $\bar\varphi\colon R/\ker\varphi \to \operatorname{Bild}(\varphi)$,
+definiert durch $\bar\varphi(r + \ker\varphi) = \varphi(r)$, ist wohldefiniert
+(unabhängig vom Repräsentanten), ein Ringhomomorphismus, injektiv
+(da $\ker\bar\varphi = 0$) und surjektiv auf $\operatorname{Bild}(\varphi)$.
+\end{proof}
+
+\begin{theorem}[Zweiter und dritter Isomorphiesatz]
+Sei $R$ ein Ring, $I \subseteq J$ Ideale von $R$.
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Zweiter Isomorphiesatz:} Ist $S$ ein Unterring und $I$ ein Ideal,
+        so ist $S + I$ ein Unterring, $S \cap I$ ein Ideal von $S$, und
+        $S/(S \cap I) \cong (S+I)/I$.
+  \item \textbf{Dritter Isomorphiesatz:} $J/I$ ist ein Ideal von $R/I$ und
+        $(R/I)/(J/I) \cong R/J$.
+  \item \textbf{Korrespondenzsatz:} Es gibt eine Bijektion zwischen den Idealen
+        von $R/I$ und den Idealen von $R$, die $I$ enthalten.
+\end{enumerate}
+\end{theorem}
+
+\begin{example}
+Der Auswertungshomomorphismus $\varphi\colon \mathbb{R}[x] \to \mathbb{C}$,
+$\varphi(f) = f(i)$, hat den Kern $(x^2 + 1)$ und das Bild $\mathbb{C}$, was
+$\mathbb{R}[x]/(x^2+1) \cong \mathbb{C}$ liefert.
+\end{example}
+
+\begin{definition}[Nilradikal und Jacobson-Radikal]
+Für einen kommutativen Ring $R$:
+\begin{itemize}
+  \item Das \emph{Nilradikal} ist $\Nil(R) = \{r \in R \mid r^n = 0 \text{ für ein } n\} = \bigcap_{\mathfrak{p} \in \Spec(R)} \mathfrak{p}$.
+  \item Das \emph{Jacobson-Radikal} ist $\Jac(R) = \bigcap_{\mathfrak{m} \text{ maximal}} \mathfrak{m}$.
+\end{itemize}
+\end{definition}
+
+% ============================================================
+\section{Polynomringe}
+% ============================================================
+
+\begin{definition}[Polynomring]
+Für einen kommutativen Ring $R$ besteht der \emph{Polynomring} $R[x]$ aus allen
+formalen Summen $f = \sum_{k=0}^n a_k x^k$ mit $a_k \in R$, mit der üblichen
+Addition und Faltungsmultiplikation. Allgemeiner bezeichnet $R[x_1,\ldots,x_n]$
+den Polynomring in $n$ Variablen.
+\end{definition}
+
+\begin{theorem}[Gaußsches Lemma]
+Sei $R$ ein faktorieller Ring (UFD) mit Quotientenkörper $K = \Frac(R)$.
+Ein Polynom $f \in R[x]$ vom Grad $\geq 1$ ist genau dann irreduzibel in $R[x]$,
+wenn $f$ \emph{primitiv} ist (der ggT seiner Koeffizienten ist $1$) und in $K[x]$
+irreduzibel ist. Folgerung: $R[x]$ ist ein UFD, wenn $R$ es ist.
+\end{theorem}
+
+\begin{proof}
+Der Schlüsselschritt ist die ``Gaußsche Produktformel'': Wenn $f, g \in R[x]$
+primitiv sind, ist auch $fg$ primitiv. Dies wird bewiesen, indem man annimmt,
+dies sei falsch, und modulo einem Primteiler eines Koeffizienten von $fg$ reduziert,
+um in $(R/(p))[x]$ (ein Integritätsbereich) einen Widerspruch zu erhalten. Daraus
+folgt die Multiplikativität des Inhalts, und die Äquivalenz der Irreduzibilität in
+$R[x]$ und $K[x]$ ergibt sich. Siehe \cite[IV, \S2]{Lang2002}.
+\end{proof}
+
+\begin{theorem}[Eisenstein-Kriterium]\label{satz:eisenstein}
+Sei $R$ ein UFD, $\mathfrak{p}$ ein Primideal, und
+$f = a_n x^n + \cdots + a_1 x + a_0 \in R[x]$ mit $n \geq 1$.
+Angenommen:
+\begin{enumerate}[label=(\roman*)]
+  \item $a_n \notin \mathfrak{p}$,
+  \item $a_0, a_1, \ldots, a_{n-1} \in \mathfrak{p}$,
+  \item $a_0 \notin \mathfrak{p}^2$.
+\end{enumerate}
+Dann ist $f$ irreduzibel in $\Frac(R)[x]$.
+\end{theorem}
+
+\begin{proof}
+Angenommen, $f = gh$ mit $g, h \in R[x]$ vom positiven Grad. Reduktion modulo $\mathfrak{p}$
+liefert $\bar{f} = a_n x^n = \bar{g}\bar{h}$ in $(R/\mathfrak{p})[x]$, einem Integritätsbereich.
+Also gilt $\bar{g} = cx^r$ und $\bar{h} = dx^s$ für $r + s = n$, $r, s \geq 1$.
+Dann ist $\mathfrak{p} \mid g(0)$ und $\mathfrak{p} \mid h(0)$, also
+$\mathfrak{p}^2 \mid g(0)h(0) = a_0$ --- Widerspruch zu (iii).
+\end{proof}
+
+\begin{example}
+\begin{enumerate}[label=(\alph*)]
+  \item $x^p - p$ ist über $\mathbb{Q}$ irreduzibel nach Eisenstein mit $\mathfrak{p}=(p)$.
+  \item Das $p$-te Kreisteilungspolynom $\Phi_p(x) = x^{p-1} + \cdots + x + 1$ ist
+        irreduzibel: Substitution $x \mapsto x+1$ und Anwendung von Eisenstein mit $p$.
+\end{enumerate}
+\end{example}
+
+\begin{theorem}
+Für einen kommutativen Ring $R$ gilt für $R[x]$:
+\begin{itemize}
+  \item Ist $R$ ein Integritätsbereich, so auch $R[x]$.
+  \item $\chr(R[x]) = \chr(R)$.
+  \item $(R[x])^\times = R^\times$ (für Integritätsbereiche $R$).
+  \item $\mathbb{F}_q[x]$ (für $q = p^n$ eine Primpotenz) ist ein euklidischer Ring,
+        also HIR und UFD.
+\end{itemize}
+\end{theorem}
+
+% ============================================================
+\section{Eindeutige Faktorisierung: UFD, HIR und euklidische Ringe}
+% ============================================================
+
+\begin{definition}[Teilbarkeit und Irreduzible]
+In einem Integritätsbereich $R$:
+\begin{itemize}
+  \item $a$ \emph{teilt} $b$ (geschrieben $a \mid b$), wenn $b = ac$ für ein $c \in R$.
+  \item $p \in R$ ist \emph{irreduzibel}, wenn aus $p = ab$ folgt, dass $a$ oder $b$
+        eine Einheit ist.
+  \item $p \in R$ ist \emph{prim}, wenn $(p)$ ein Primideal ist, d.h. aus $p \mid ab$
+        folgt $p \mid a$ oder $p \mid b$.
+  \item Jedes prime Element ist irreduzibel; in einem UFD gilt auch die Umkehrung.
+\end{itemize}
+\end{definition}
+
+\begin{definition}[UFD, HIR, euklidischer Ring]
+\begin{itemize}
+  \item Ein Integritätsbereich $R$ ist ein \emph{faktorieller Ring} (UFD, unique
+        factorization domain), wenn jedes von Null verschiedene Nichtelement eine
+        eindeutige Zerlegung in Irreduzible besitzt (bis auf Reihenfolge und Einheiten).
+  \item $R$ ist ein \emph{Hauptidealring} (HIR, principal ideal domain, PID), wenn
+        jedes Ideal ein Hauptideal ist.
+  \item $R$ ist ein \emph{euklidischer Ring}, wenn eine Funktion
+        $\delta\colon R \setminus \{0\} \to \mathbb{N}_0$ existiert mit: Für alle
+        $a \in R$, $b \in R \setminus \{0\}$ gibt es $q, r \in R$ mit $a = qb + r$
+        und entweder $r = 0$ oder $\delta(r) < \delta(b)$.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Hierarchie der Ringklassen]\label{satz:hierarchie}
+Es gelten die Implikationen (keine ist umkehrbar):
+\[
+  \text{Euklidischer Ring} \;\Rightarrow\; \text{HIR} \;\Rightarrow\; \text{UFD}
+  \;\Rightarrow\; \text{Integritätsbereich}.
+\]
+\end{theorem}
+
+\begin{proof}[Beweissk{}izze]
+\textit{Euklidisch $\Rightarrow$ HIR:} Sei $I \neq 0$ ein Ideal und $b \in I$ mit
+minimalem $\delta(b)$. Für beliebiges $a \in I$ schreibe $a = qb + r$. Da $r = a - qb
+\in I$ und $\delta(b)$ minimal ist, muss $r = 0$ gelten, also $a \in (b)$.
+
+\textit{HIR $\Rightarrow$ UFD:} In einem HIR ist jedes irreduzible Element prim
+(da $(p)$ maximal, also prim ist). Existenz von Zerlegungen folgt aus der aufsteigenden
+Kettenbedingung (alle HIR sind noethersch). Eindeutigkeit folgt aus der Primeigenschaft.
+
+\textit{UFD $\Rightarrow$ Integritätsbereich:} Per Definition.
+
+Gegenbeispiele für die Umkehrungen: $\mathbb{Z}[\sqrt{-5}]$ ist kein UFD:
+$6 = 2 \cdot 3 = (1+\sqrt{-5})(1-\sqrt{-5})$ --- zwei verschiedene Zerlegungen.
+$\mathbb{Z}[x]$ ist ein UFD, aber kein HIR: Das Ideal $(2,x)$ ist nicht prim.
+$k[x,y]$ ist ein UFD, aber kein HIR für jeden Körper $k$.
+Es gibt HIR, die keine euklidischen Ringe sind (z.B. $\mathbb{Z}[(1+\sqrt{-19})/2]$).
+\end{proof}
+
+\begin{example}[Euklidische Ringe]
+\begin{enumerate}[label=(\alph*)]
+  \item $\mathbb{Z}$ mit $\delta(n) = |n|$;
+  \item $k[x]$ für jeden Körper $k$ mit $\delta(f) = \deg(f)$;
+  \item Die Gaußschen ganzen Zahlen $\mathbb{Z}[i]$ mit $\delta(a+bi) = a^2 + b^2$
+        (der Norm). Der Euklidische Algorithmus erlaubt die explizite Berechnung von
+        $\ggT(m,n)$ in $\mathbb{Z}[i]$.
+        Zwei-Quadrate-Satz: $p = a^2 + b^2$ für eine Primzahl $p$ genau dann, wenn
+        $p = 2$ oder $p \equiv 1 \pmod 4$.
+\end{enumerate}
+\end{example}
+
+\begin{theorem}[Eindeutige Faktorisierung in $\mathbb{Z}[i]$]
+Die Gaußschen ganzen Zahlen bilden einen euklidischen Ring (also HIR und UFD).
+Die Einheiten sind $\{\pm 1, \pm i\}$. Die Gaußschen Primzahlen sind:
+\begin{itemize}
+  \item $(1+i)$ (über $2$);
+  \item $p \in \mathbb{Z}$ prim mit $p \equiv 3 \pmod 4$ (bleiben prim in $\mathbb{Z}[i]$);
+  \item $a + bi$ mit $a^2 + b^2 = p$ für Primzahlen $p \equiv 1 \pmod 4$.
+\end{itemize}
+\end{theorem}
+
+% ============================================================
+\section{Noethersche und artinsche Ringe}
+% ============================================================
+
+\begin{definition}[Kettenbedingungen]
+Ein kommutativer Ring $R$ heißt \emph{noethersch}, wenn er die \emph{aufsteigende
+Kettenbedingung} (ACC, ascending chain condition) für Ideale erfüllt: Jede Kette
+$I_1 \subseteq I_2 \subseteq \cdots$ von Idealen stabilisiert schließlich
+($I_n = I_{n+1} = \cdots$ für ein $n$).
+
+Äquivalent: $R$ ist noethersch genau dann, wenn jedes Ideal endlich erzeugt ist.
+
+$R$ heißt \emph{artinsch}, wenn er die \emph{absteigende Kettenbedingung} (DCC)
+erfüllt: Jede Kette $I_1 \supseteq I_2 \supseteq \cdots$ stabilisiert.
+\end{definition}
+
+\begin{theorem}[Hilbert-Basissatz]\label{satz:hilbert-basis}
+Ist $R$ ein noetherscher Ring, so ist auch der Polynomring $R[x]$ noethersch.
+\end{theorem}
+
+\begin{proof}
+Sei $I \subseteq R[x]$ ein Ideal. Wir zeigen, dass $I$ endlich erzeugt ist.
+Für jedes $n \geq 0$ sei $J_n = \{a \in R \mid \text{es gibt } f \in I \text{ vom Grad } n
+\text{ mit führendem Koeffizienten } a\} \cup \{0\}$.
+Jedes $J_n$ ist ein Ideal von $R$, und $J_0 \subseteq J_1 \subseteq J_2 \subseteq \cdots$
+(Multiplikation mit $x$ erhöht den Grad). Da $R$ noethersch ist, stabilisiert diese Kette:
+$J_N = J_{N+1} = \cdots$ für ein $N$. Jedes $J_n$ ist endlich erzeugt: Wähle Erzeuger
+$a_{n,1},\ldots,a_{n,k_n} \in J_n$ mit zugehörigen Polynomen $f_{n,j} \in I$ vom Grad $n$
+mit führendem Koeffizienten $a_{n,j}$. Die endliche Menge $\{f_{n,j}\}_{n \leq N, j \leq k_n}$
+erzeugt $I$ (durch ein Gradinduk{}tionsargument). Also ist $I$ endlich erzeugt.
+\end{proof}
+
+\begin{corollary}
+Für jeden Körper $k$ ist der Polynomring $k[x_1,\ldots,x_n]$ noethersch.
+Insbesondere hat jedes Ideal in $k[x_1,\ldots,x_n]$ ein endliches Erzeugendensystem
+(eine \emph{Gröbner-Basis}, siehe Abschnitt~\ref{abschnitt:groebner}).
+\end{corollary}
+
+\begin{theorem}[Nakayama-Lemma]\label{satz:nakayama}
+Sei $R$ ein lokaler Ring mit maximalem Ideal $\mathfrak{m}$, und sei $M$ ein
+endlich erzeugter $R$-Modul. Wenn $M = \mathfrak{m}M$, dann $M = 0$.
+
+Allgemeiner: Ist $N \subseteq M$ ein Untermodul und $M = N + \mathfrak{m}M$,
+dann $M = N$.
+\end{theorem}
+
+\begin{proof}
+Seien $m_1,\ldots,m_k$ Erzeuger von $M$. Da $M = \mathfrak{m}M$, können wir schreiben
+$m_i = \sum_{j=1}^k a_{ij} m_j$ mit $a_{ij} \in \mathfrak{m}$.
+In Matrixform ergibt sich $(I - A)\mathbf{m} = 0$ mit $A = (a_{ij})$.
+Die Matrix $I - A$ hat Einträge $\delta_{ij} - a_{ij}$; da $a_{ij} \in \mathfrak{m}$,
+sind die Diagonaleinträge $1 - a_{ii}$ Einheiten (die einzigen Nichteinheiten eines
+lokalen Rings liegen in $\mathfrak{m}$). Also ist $\det(I-A)$ eine Einheit,
+$I-A$ ist invertierbar, und es folgt $\mathbf{m} = 0$.
+\end{proof}
+
+\begin{corollary}
+Sei $R$ lokal mit maximalem Ideal $\mathfrak{m}$ und $M$ endlich erzeugt.
+Dann erzeugen $m_1,\ldots,m_k \in M$ den Modul $M$ genau dann, wenn ihre Bilder
+in $M/\mathfrak{m}M$ den $R/\mathfrak{m}$-Vektorraum $M/\mathfrak{m}M$ erzeugen.
+\end{corollary}
+
+\begin{theorem}[Hopkins--Levitzki]
+Ein noetherscher artinscher Ring $R$ besitzt eine Kompositionsreihe als Modul über
+sich selbst. Ferner gilt: $R$ ist artinsch genau dann, wenn $R$ noethersch und von
+Krull-Dimension $0$ ist.
+\end{theorem}
+
+Die \emph{Krull-Dimension} $\dim(R)$ eines Rings $R$ ist das Supremum der Längen
+von Ketten von Primidealen $\mathfrak{p}_0 \subsetneq \mathfrak{p}_1 \subsetneq \cdots
+\subsetneq \mathfrak{p}_n$. Für Körper gilt $\dim = 0$, für $\mathbb{Z}$ und $k[x]$
+gilt $\dim = 1$, und für $k[x_1,\ldots,x_n]$ gilt $\dim = n$.
+
+% ============================================================
+\section{Lokalisierung}
+% ============================================================
+
+\begin{definition}[Lokalisierung]
+Sei $R$ ein kommutativer Ring und $S \subseteq R$ eine \emph{multiplikative Menge}
+(abgeschlossen unter Multiplikation, $1 \in S$). Die \emph{Lokalisierung}
+$S^{-1}R$ ist die Menge der Äquivalenzklassen von Paaren $(a, s) \in R \times S$,
+wobei $(a,s) \sim (a',s')$ genau dann gilt, wenn $\exists t \in S: t(as' - a's) = 0$,
+mit den Operationen
+\[
+  \frac{a}{s} + \frac{a'}{s'} = \frac{as' + a's}{ss'}, \qquad
+  \frac{a}{s} \cdot \frac{a'}{s'} = \frac{aa'}{ss'}.
+\]
+Es gibt einen natürlichen Ringhomomorphismus $\iota\colon R \to S^{-1}R$, $r \mapsto r/1$.
+\end{definition}
+
+\begin{example}[Wichtige Spezialfälle]
+\begin{enumerate}[label=(\alph*)]
+  \item $S = R \setminus \{0\}$: $S^{-1}R = \Frac(R)$ ist der Quotientenkörper eines
+        Integritätsbereichs.
+  \item $S = R \setminus \mathfrak{p}$ für ein Primideal $\mathfrak{p}$:
+        $R_\mathfrak{p} = S^{-1}R$ ist die \emph{Lokalisierung bei} $\mathfrak{p}$,
+        ein lokaler Ring mit maximalem Ideal $\mathfrak{p}R_\mathfrak{p}$.
+  \item $S = \{1, f, f^2, \ldots\}$ für $f \in R$: $R_f = S^{-1}R$ invertiert $f$.
+\end{enumerate}
+\end{example}
+
+\begin{theorem}[Universelle Eigenschaft der Lokalisierung]
+Die Abbildung $\iota\colon R \to S^{-1}R$ ist initial unter den Ringhomomorphismen
+$\varphi\colon R \to T$, für die $\varphi(s)$ eine Einheit in $T$ für alle $s \in S$
+ist. Das heißt, jedes solche $\varphi$ faktorisiert eindeutig über $\iota$.
+\end{theorem}
+
+\begin{theorem}[Ideale in Lokalisierungen]
+Es gibt eine Bijektion zwischen:
+\begin{itemize}
+  \item Primidealen von $S^{-1}R$, und
+  \item Primidealen $\mathfrak{p}$ von $R$ mit $\mathfrak{p} \cap S = \emptyset$.
+\end{itemize}
+Unter dieser Bijektion entspricht $\mathfrak{p}$ dem Ideal $S^{-1}\mathfrak{p}$.
+\end{theorem}
+
+\begin{definition}[Dedekind-Ring]
+Ein Integritätsbereich $R$ heißt \emph{Dedekind-Ring}, wenn:
+\begin{enumerate}[label=(\roman*)]
+  \item $R$ noethersch ist,
+  \item $R$ im Quotientenkörper $\Frac(R)$ ganz abgeschlossen ist,
+  \item jedes von Null verschiedene Primideal von $R$ maximal ist ($\dim R \leq 1$).
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[Eindeutige Idealzerlegung in Dedekind-Ringen]
+In einem Dedekind-Ring $R$ zerfällt jedes von Null verschiedene Ideal eindeutig
+(bis auf Reihenfolge) in Primideale:
+\[
+  I = \mathfrak{p}_1^{e_1} \cdots \mathfrak{p}_r^{e_r}.
+\]
+\end{theorem}
+
+\begin{proof}[Beweissk{}izze]
+Die wesentlichen Schritte: (1) Jedes Ideal enthält ein Produkt von Primidealen
+(noethersche Induktion); (2) für jedes Primideal $\mathfrak{p}$ ist die Lokalisierung
+$R_\mathfrak{p}$ ein DVR (diskreter Bewertungsring), also HIR mit eindeutigem maximalem
+Ideal; (3) die Zerlegung wird aus den lokalen Daten zusammengesetzt. Siehe \cite{Neukirch1999}.
+\end{proof}
+
+\begin{example}[Ringe ganzer Zahlen als Dedekind-Ringe]
+Der Ganzheitsring $\mathcal{O}_K$ eines Zahlkörpers $K = \mathbb{Q}(\sqrt{d})$ ist
+ein Dedekind-Ring. Sein ganzer Abschluss in $K$ ist:
+\[
+  \mathcal{O}_K = \begin{cases}
+    \mathbb{Z}\!\left[\tfrac{1+\sqrt{d}}{2}\right] & \text{wenn } d \equiv 1 \pmod 4, \\
+    \mathbb{Z}[\sqrt{d}] & \text{wenn } d \equiv 2 \text{ oder } 3 \pmod 4.
+  \end{cases}
+\]
+Die \emph{Klassengruppe} $\Cl(\mathcal{O}_K)$ misst, wie weit $\mathcal{O}_K$
+von einem HIR entfernt ist. Es gilt $h(d) = |\Cl(\mathcal{O}_K)| = 1$ genau dann,
+wenn $\mathcal{O}_K$ ein HIR ist.
+Das Stark--Heegner-Theorem klassifiziert alle imaginär-quadratischen Zahlkörper mit
+$h = 1$: $d \in \{-1, -2, -3, -7, -11, -19, -43, -67, -163\}$.
+\end{example}
+
+% ============================================================
+\section{Noether-Normalisierung und ganze Erweiterungen}
+% ============================================================
+
+\begin{definition}[Ganzes Element]
+Sei $R \subseteq S$ eine Ringerweiterung. Ein Element $s \in S$ heißt \emph{ganz
+über $R$}, wenn es eine normierte Polynomgleichung $s^n + a_{n-1}s^{n-1} + \cdots +
+a_0 = 0$ mit $a_i \in R$ erfüllt. Der \emph{ganze Abschluss} von $R$ in $S$ ist der
+Unterring $\bar{R} = \{s \in S \mid s \text{ ganz über } R\}$.
+$R$ heißt \emph{ganz abgeschlossen}, wenn $\bar{R} = R$ (in $\Frac(R)$).
+\end{definition}
+
+\begin{theorem}[Noether-Normalisierungslemma]
+Sei $k$ ein Körper und $A = k[x_1,\ldots,x_n]/I$ eine endlich erzeugte $k$-Algebra
+($I$ ein Ideal). Dann gibt es algebraisch unabhängige Elemente $y_1,\ldots,y_d \in A$,
+sodass $A$ eine endliche (insbesondere ganze) Erweiterung von $k[y_1,\ldots,y_d]$ ist.
+Dabei ist $d = \dim A$ die Krull-Dimension von $A$.
+\end{theorem}
+
+\begin{proof}[Beweissk{}izze]
+Per Induktion über $n$. Ist $I = 0$, so gilt $A = k[x_1,\ldots,x_n]$ und $y_i = x_i$.
+Sonst wähle $f \in I$, $f \neq 0$. Durch eine Variablensubstitution $x_i' = x_i -
+x_1^{c^{i-1}}$ (für geeignetes $c$) wird $f$ in $x_1$ nach Substitution normiert.
+Dann ist $x_1$ ganz über dem kleineren Ring $k[x_2',\ldots,x_n']$, und man fährt
+induktiv fort. Siehe \cite[Satz~5.10]{AtiyahMacdonald1969}.
+\end{proof}
+
+\begin{corollary}
+Für eine affine Varietät $V \subseteq \mathbb{A}^n_k$, definiert durch ein Ideal
+$I \subseteq k[x_1,\ldots,x_n]$, gilt:
+\[
+  \dim V = \dim k[V] = \dim k[x_1,\ldots,x_n]/I.
+\]
+Insbesondere: $\dim \mathbb{A}^n_k = n$ und $\dim V(f) = n-1$ für eine Hyperfläche.
+\end{corollary}
+
+% ============================================================
+\section{Gröbner-Basen}\label{abschnitt:groebner}
+% ============================================================
+
+Gröbner-Basen, eingeführt von Bruno Buchberger im Jahr 1965~\cite{Buchberger1970},
+liefern eine kanonische Menge von Erzeugern für Polynomideale und ermöglichen die
+algorithmische Lösung von Ideal-Zugehörigkeits- und algebraischen Varietätsproblemen.
+
+\begin{definition}[Monomialordnung]
+Eine \emph{Monomialordnung} auf $k[x_1,\ldots,x_n]$ ist eine Totalordnung $\prec$
+auf Monomen $x^\alpha = x_1^{\alpha_1}\cdots x_n^{\alpha_n}$, die mit der Multiplikation
+verträglich ist und $1 \prec x^\alpha$ für alle $\alpha \neq 0$ erfüllt.
+
+Standardbeispiele: \emph{lexikographisch} (lex), \emph{total graduiert invers
+lexikographisch} (grevlex), \emph{total graduiert lexikographisch} (grlex).
+\end{definition}
+
+\begin{definition}[Divisionsalgorithmus und Gröbner-Basis]
+Sei $\prec$ eine Monomialordnung fixiert. Für $f \in k[x_1,\ldots,x_n]$ bezeichne
+$\operatorname{LT}(f)$ den \emph{Leitterm} (höchstes Monom mal Koeffizient).
+Eine Menge $G = \{g_1,\ldots,g_s\} \subseteq I$ ist eine \emph{Gröbner-Basis} für
+das Ideal $I$, wenn
+\[
+  \langle \operatorname{LT}(g_1), \ldots, \operatorname{LT}(g_s) \rangle
+  = \langle \operatorname{LT}(f) \mid f \in I \rangle.
+\]
+Äquivalent: Jedes Element von $I$ reduziert sich modulo $G$ auf $0$.
+\end{definition}
+
+\begin{theorem}[Buchberger-Kriterium]
+$G = \{g_1,\ldots,g_s\}$ ist genau dann eine Gröbner-Basis für $I = (G)$, wenn
+für alle $i \neq j$ das \emph{S-Polynom}
+\[
+  S(g_i, g_j) = \frac{\operatorname{kgV}(\operatorname{LM}(g_i), \operatorname{LM}(g_j))}{\operatorname{LT}(g_i)} g_i
+  - \frac{\operatorname{kgV}(\operatorname{LM}(g_i), \operatorname{LM}(g_j))}{\operatorname{LT}(g_j)} g_j
+\]
+sich modulo $G$ auf $0$ reduziert.
+\end{theorem}
+
+\begin{algorithm}[Buchberger-Algorithmus]
+\textbf{Eingabe:} $F = \{f_1,\ldots,f_s\}$; \textbf{Ausgabe:} Gröbner-Basis $G$ für $(F)$.
+\begin{enumerate}
+  \item Setze $G := F$.
+  \item Für alle Paare $\{g_i, g_j\} \subseteq G$ berechne $r = \overline{S(g_i,g_j)}^G$
+        (Rest bei der Division durch $G$).
+  \item Ist $r \neq 0$, füge $r$ zu $G$ hinzu und wiederhole.
+  \item Gib $G$ aus.
+\end{enumerate}
+Der Algorithmus terminiert, weil das Leittermideal bei jedem Schritt streng wächst
+und $k[x_1,\ldots,x_n]$ noethersch ist.
+\end{algorithm}
+
+\begin{theorem}[Anwendungen von Gröbner-Basen]
+Sei $G$ eine Gröbner-Basis für $I$:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Ideal-Zugehörigkeit:} $f \in I$ genau dann, wenn $\overline{f}^G = 0$.
+  \item \textbf{Lösung von Gleichungssystemen:} Elimination von Variablen durch
+        Gröbner-Basen mit Lex-Ordnung; die letzte Variable erfüllt ein univariates Polynom.
+  \item \textbf{Dimension:} $\dim k[x_1,\ldots,x_n]/I$ entspricht der Krull-Dimension,
+        berechnet aus dem Leittermideal.
+  \item \textbf{Hilbert-Funktion:} Die Anzahl der Monome, die nicht in
+        $\langle \operatorname{LT}(I) \rangle$ liegen, vom Grad $\leq d$ ergibt die
+        Hilbert-Funktion von $k[x_1,\ldots,x_n]/I$.
+\end{enumerate}
+\end{theorem}
+
+\begin{example}
+Betrachte $I = (x^2 + y - 1,\; y^2 - x) \subseteq \mathbb{Q}[x,y]$ mit Lex-Ordnung
+$x \succ y$. Die Gröbner-Basis hat die Form (schematisch):
+\[
+  G = \{y^4 + y^2 - y - 1,\; x - y^2\}.
+\]
+Die Lex-Basis zeigt, dass $y$ ein univariates Polynom erfüllt, was die Lösung des
+Systems $\{x^2 + y = 1, y^2 = x\}$ durch Rücksubstitution ermöglicht.
+\end{example}
+
+\begin{remark}
+Die \emph{reduzierte Gröbner-Basis} ist eindeutig bestimmt (bei gegebener Monomialordnung
+und $I \neq 0$): Sie ist die Gröbner-Basis, bei der alle Koeffizienten des Leitmonoms
+gleich $1$ sind und kein Monom in $f_i$ durch ein Leitmonom eines anderen $f_j$
+teilbar ist. Dies macht Gröbner-Basen zum kanonischen Erzeugendensystem für Polynomideale.
+\end{remark}
+
+% ============================================================
+\section{Literatur}
+% ============================================================
+
+\begin{thebibliography}{10}
+
+\bibitem{AtiyahMacdonald1969}
+M.~F. Atiyah und I.~G. Macdonald.
+\newblock \textit{Introduction to Commutative Algebra}.
+\newblock Addison-Wesley, Reading, MA, 1969.
+\newblock Das klassische prägnante Lehrbuch; behandelt Lokalisierung, noethersche
+Ringe und Dimensionstheorie.
+
+\bibitem{Lang2002}
+S.~Lang.
+\newblock \textit{Algebra}, überarbeitete 3.~Aufl.
+\newblock Springer, New York, 2002.
+\newblock Umfassendes Referenzwerk; Gaußsches Lemma, Eisenstein-Kriterium, UFDs
+und Körpertheorie.
+
+\bibitem{Matsumura1989}
+H.~Matsumura.
+\newblock \textit{Commutative Ring Theory}.
+\newblock Cambridge Studies in Advanced Mathematics, Bd.~8.
+\newblock Cambridge University Press, Cambridge, 1989.
+\newblock Fortgeschrittene Behandlung noetherscher/artinscher Ringe, Dimension, Flachheit.
+
+\bibitem{Neukirch1999}
+J.~Neukirch.
+\newblock \textit{Algebraische Zahlentheorie}.
+\newblock Grundlehren der Mathematischen Wissenschaften, Bd.~322.
+\newblock Springer, Berlin, 1999.
+\newblock Dedekind-Ringe, Idealzerlegung, Klassengruppen aus zahlentheoretischer Sicht.
+
+\bibitem{Eisenbud1995}
+D.~Eisenbud.
+\newblock \textit{Commutative Algebra with a View toward Algebraic Geometry}.
+\newblock Graduate Texts in Mathematics, Bd.~150.
+\newblock Springer, New York, 1995.
+\newblock Gründliche moderne Behandlung, die kommutative Algebra und Geometrie verbindet;
+Gröbner-Basen in Kapitel~15.
+
+\bibitem{CoxLittleOShea2015}
+D.~Cox, J.~Little und D.~O'Shea.
+\newblock \textit{Ideals, Varieties, and Algorithms}, 4.~Aufl.
+\newblock Undergraduate Texts in Mathematics.
+\newblock Springer, New York, 2015.
+\newblock Zugängliche Einführung in Gröbner-Basen, Buchberger-Algorithmus und
+algorithmische algebraische Geometrie.
+
+\bibitem{Buchberger1970}
+B.~Buchberger.
+\newblock Ein algorithmisches Kriterium für die Lösbarkeit eines algebraischen
+Gleichungssystems.
+\newblock \textit{Aequationes Mathematicae}, 4(3):374--383, 1970.
+\newblock Originalartikel, der den Buchberger-Algorithmus einführt.
+
+\bibitem{Noether1921}
+E.~Noether.
+\newblock Idealtheorie in Ringbereichen.
+\newblock \textit{Mathematische Annalen}, 83(1--2):24--66, 1921.
+\newblock Grundlegendes Paper, das die axiomatische Idealtheorie und die aufsteigende
+Kettenbedingung etabliert.
+
+\bibitem{Hungerford1980}
+T.~W. Hungerford.
+\newblock \textit{Algebra}.
+\newblock Graduate Texts in Mathematics, Bd.~73.
+\newblock Springer, New York, 1980.
+\newblock Gute Referenz für Isomorphiesätze, Polynomringe und Moduln.
+
+\bibitem{Dummit2004}
+D.~S. Dummit und R.~M. Foote.
+\newblock \textit{Abstract Algebra}, 3.~Aufl.
+\newblock Wiley, Hoboken, NJ, 2004.
+\newblock Standard-Graduiertenhandbuch; umfassende Behandlung der Ringtheorie
+einschließlich noetherscher Ringe und UFDs.
+
+\end{thebibliography}
+
+\end{document}
