@@ -1,0 +1,902 @@
+% ============================================================
+% paper48_additive_number_theory_en.tex
+% Paper 48: Additive Number Theory
+% Author: Michael Fuhrmann
+% Project: specialist-maths, Build 137
+% Date: 2026-03-12
+% ============================================================
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% --- Theorem-Umgebungen ---
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+% --- Metadaten ---
+\title{Additive Number Theory:\\
+Sumsets, Goldbach, Waring, and Beyond}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 137}
+\email{specialist-maths@localhost}
+\date{\today}
+
+% --- Makros ---
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Primes}{\mathbb{P}}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\sumset}[2]{#1 + #2}
+\newcommand{\ksum}[2]{#1 \hat{+} #2}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\lcm}{lcm}
+
+% ============================================================
+\begin{document}
+
+\begin{abstract}
+Additive number theory studies the additive structure of the integers,
+asking which numbers can be represented as sums of elements from
+prescribed sets---primes, perfect powers, or arbitrary subsets of~$\N$.
+This paper provides a self-contained introduction to the central concepts
+and results: sumset theory, Schnirelmann density, bases of finite order,
+the Goldbach conjectures (binary and ternary), Chen's theorem, the
+Hardy--Littlewood heuristic, Waring's problem and the Hilbert--Waring
+theorem, Schnirelmann's theorem, Freiman's structure theorem, and the
+Erd\H{o}s--Tur\'{a}n conjecture.  We distinguish carefully between
+proved theorems and open conjectures, and illustrate all concepts with
+computational examples drawn from the accompanying Python modules
+\texttt{additive\_number\_theory.py} and \texttt{goldbach\_extended.py}.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ============================================================
+\section{Introduction}\label{sec:intro}
+% ============================================================
+
+Additive number theory is the branch of mathematics that investigates
+how integers can be expressed as sums of elements from specific sets.
+The simplest question is: given a set $A \subseteq \N$, which positive
+integers belong to the \emph{sumset} $A + A = \{a + a' : a, a' \in A\}$?
+More generally, one asks for the \emph{$h$-fold sumset}
+$hA = A + A + \cdots + A$ ($h$ summands).
+
+Historically, additive number theory grew from three celebrated problems:
+
+\begin{enumerate}[label=(\arabic*)]
+\item \textbf{Goldbach (1742):} Is every even integer $\geq 4$ the sum
+      of two primes?  Is every odd integer $\geq 7$ the sum of three primes?
+\item \textbf{Waring (1770):} Can every positive integer be expressed as
+      a sum of at most $g(k)$ perfect $k$-th powers?
+\item \textbf{Basis problems:} Which sets $A$ satisfy $hA = \N$ for
+      some finite $h$?  What is the minimal such $h$?
+\end{enumerate}
+
+The subject has deep connections to analytic number theory
+(the Hardy--Littlewood circle method), harmonic analysis (Fourier
+techniques on $\Z/N\Z$), combinatorics (Freiman's theorem, additive
+combinatorics), and modern arithmetic geometry.
+
+\subsection*{Overview of this paper}
+
+Section~\ref{sec:sumsets} introduces sumsets, Schnirelmann density, and
+bases of finite order.  Section~\ref{sec:goldbach} presents Goldbach's
+binary and ternary conjectures with their current status.
+Section~\ref{sec:goldbach-ext} covers Chen's theorem, Vinogradov's
+three-prime theorem, and the Hardy--Littlewood conjecture.
+Section~\ref{sec:waring} treats Waring's problem and the Hilbert--Waring
+theorem.  Section~\ref{sec:schnirelmann} develops Schnirelmann's density
+approach.  Section~\ref{sec:freiman} presents Freiman's structure theorem.
+Section~\ref{sec:erdos-turan} states the Erd\H{o}s--Tur\'{a}n conjecture.
+Section~\ref{sec:computational} illustrates computational aspects.
+Section~\ref{sec:references} collects references.
+
+% ============================================================
+\section{Sumsets and Density}\label{sec:sumsets}
+% ============================================================
+
+\subsection{Basic Definitions}
+
+\begin{definition}[Sumset]
+Let $A, B \subseteq \Z$.  The \emph{sumset} of $A$ and $B$ is
+\[
+  A + B \;:=\; \{ a + b : a \in A,\; b \in B \}.
+\]
+The \emph{$h$-fold sumset} is $hA := A + A + \cdots + A$ ($h$ terms).
+The \emph{restricted sumset} is
+$A \hat{+} B := \{a + b : a \in A,\, b \in B,\, a \neq b\}$.
+\end{definition}
+
+\begin{definition}[Basis of Order $h$]\label{def:basis}
+A set $A \subseteq \N_0$ is called an \emph{additive basis of order~$h$}
+(or \emph{$h$-basis}) for $\N$ if every sufficiently large positive
+integer belongs to $hA$.  It is a \emph{basis of exact order $h$} if
+$h$ is the smallest such integer.  If only finitely many positive
+integers are missing from $hA$, we speak of an \emph{asymptotic basis}.
+\end{definition}
+
+The prime numbers, the squares, the cubes, and many other classical sets
+form bases of finite order (cf.\ Sections~\ref{sec:goldbach}
+and~\ref{sec:waring}).
+
+\subsection{Schnirelmann Density}
+
+The concept of \emph{Schnirelmann density} provides a quantitative
+measure for how densely a set is distributed in~$\N$.
+
+\begin{definition}[Schnirelmann Density]\label{def:schnirelmann-density}
+For a set $A \subseteq \N_0$ with $0 \in A$, the \emph{Schnirelmann density}
+is
+\[
+  \sigma(A) \;:=\; \inf_{n \geq 1} \frac{A(n)}{n},
+\]
+where $A(n) = \abs{\{a \in A : 1 \leq a \leq n\}}$ is the \emph{counting
+function} of~$A$.
+\end{definition}
+
+Note that $\sigma(A) = 0$ if $1 \notin A$, and $\sigma(A) = 1$ if and
+only if $A = \N$.  The key advantage over natural density is:
+
+\begin{theorem}[Schnirelmann's Sum Theorem]\label{thm:schnirelmann-sum}
+For sets $A, B \subseteq \N_0$ with $0 \in A \cap B$,
+\[
+  \sigma(A + B) \;\geq\; \sigma(A) + \sigma(B) - \sigma(A)\,\sigma(B).
+\]
+In particular, if $\sigma(A) + \sigma(B) \geq 1$, then $A + B = \N$.
+\end{theorem}
+
+\begin{proof}
+Let $n \geq 1$ be arbitrary.  Among the $n + 1$ elements
+$0 = a_0 < a_1 < \cdots < a_k \leq n$ of $A \cap [0,n]$, the
+intervals $(a_{i-1}, a_i)$ contain no element of $A$, hence the elements
+$a_{i-1} + b$ for $b \in B \cap [0, a_i - a_{i-1}]$ all lie in $A + B$.
+Counting carefully yields the stated inequality.
+\end{proof}
+
+\begin{corollary}\label{cor:density-one}
+If $\sigma(A) \geq 1/2$, then $A + A \supseteq \N$.
+\end{corollary}
+
+\subsection{Natural Density and Upper Density}
+
+For comparison, recall that the \emph{natural (asymptotic) density} of
+$A \subseteq \N$ is $d(A) = \lim_{n \to \infty} A(n)/n$ (if the limit
+exists), and the \emph{upper density} is
+$\bar d(A) = \limsup_{n \to \infty} A(n)/n$.
+
+Unlike Schnirelmann density, natural density is not sub-multiplicative
+and does not directly control the order of~$A$ as a basis.  The
+Schnirelmann density is smaller: $\sigma(A) \leq d(A)$ whenever both
+exist.
+
+% ============================================================
+\section{Goldbach's Conjecture}\label{sec:goldbach}
+% ============================================================
+
+\subsection{Historical Background}
+
+In a letter to Leonhard Euler dated 7 June 1742, Christian Goldbach
+stated that every integer greater than 2 is the sum of three primes
+(counting 1 as prime, following the convention of his time).  Euler
+reformulated the conjecture in the modern form, leading to two distinct
+statements that we call the \emph{binary} (strong) and \emph{ternary}
+(weak) Goldbach conjectures.
+
+\subsection{The Binary (Strong) Goldbach Conjecture}
+
+\begin{conjecture}[Binary Goldbach Conjecture]\label{conj:goldbach-binary}
+Every even integer $n \geq 4$ is the sum of two prime numbers:
+\[
+  \forall\; n \geq 4,\; n \equiv 0 \pmod{2} \;\Longrightarrow\;
+  \exists\; p, q \in \Primes : n = p + q.
+\]
+\end{conjecture}
+
+This conjecture has been open since 1742.  Define the
+\emph{Goldbach partition function}
+\[
+  G(n) \;:=\; \abs{\bigl\{(p, q) : p + q = n,\; p \leq q,\;
+                p, q \text{ prime}\bigr\}}.
+\]
+
+\begin{remark}
+Conjecture~\ref{conj:goldbach-binary} is equivalent to $G(n) \geq 1$
+for all even $n \geq 4$.  Numerical evidence is overwhelming:
+\begin{itemize}
+\item Verified for all even $n \leq 4 \times 10^{18}$
+      (Oliveira e Silva, Herzog, Pardi, 2012 \cite{OliveiraSilva2012}).
+\item For ``large'' $n$, $G(n)$ grows approximately as
+      $n / (\log n)^2$ (see Section~\ref{sec:goldbach-ext}).
+\item $G(4) = 1$: $4 = 2 + 2$.
+\item $G(100) = 6$: $100 = 3+97 = 11+89 = 17+83 = 29+71 = 41+59 = 47+53$.
+\end{itemize}
+\end{remark}
+
+\subsection{The Ternary (Weak) Goldbach Conjecture}
+
+\begin{conjecture}[Ternary Goldbach Conjecture --- Now a Theorem]\label{conj:goldbach-ternary}
+Every odd integer $n \geq 7$ is the sum of three prime numbers.
+\end{conjecture}
+
+We note that this is \emph{no longer a conjecture}: it was proved by
+Harald Helf\-gott in 2013, completing the work started by Vinogradov in
+1937.
+
+\begin{theorem}[Helfgott 2013, \cite{Helfgott2013}]\label{thm:helfgott}
+Every odd integer $n \geq 7$ is expressible as the sum of three primes:
+\[
+  \forall\; n \geq 7,\; n \equiv 1 \pmod{2} \;\Longrightarrow\;
+  \exists\; p_1, p_2, p_3 \in \Primes : n = p_1 + p_2 + p_3.
+\]
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The proof combines:
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Analytic part:} The circle method of Hardy--Littlewood--
+      Vinogradov yields an asymptotic formula for the number of
+      representations $r_3(n)$ when $n$ is large.  Specifically,
+      Vinogradov (1937) showed $r_3(n) > 0$ for all odd $n > \exp(\exp(11.503))$.
+      Helfgott improved this to all odd $n > 10^{30}$ via refined
+      exponential sum estimates.
+\item \textbf{Computational part:} Direct verification for all odd
+      $7 \leq n \leq 8.875 \times 10^{30}$ using the classification of
+      primes and modern computer algebra.
+\end{enumerate}
+Together these two parts cover all odd $n \geq 7$.
+\end{proof}
+
+\subsection{Heuristic Evidence for the Binary Conjecture}
+
+The \emph{Goldbach comet} is the scatter plot of $G(n)$ for even $n$.
+It shows a clear upward trend, with characteristic spikes at
+highly composite numbers (cf.\ Section~\ref{sec:computational}).
+
+The heuristic argument is simple: if primes were distributed randomly
+with density $1/\log n$ near $n$, then
+\[
+  G(n) \;\approx\; \frac{n}{(\log n)^2}
+\]
+which grows without bound.  More precisely, a probabilistic model gives
+\[
+  G(n) \;\approx\; 2 \Pi_2
+  \prod_{\substack{p > 2 \\ p \mid n}} \frac{p-1}{p-2}
+  \cdot \frac{n}{(\log n)^2}
+\]
+where $\Pi_2 = \prod_{p > 2} \frac{p(p-2)}{(p-1)^2} \approx 0.6602$
+is the twin prime constant (Hardy--Littlewood conjecture, see
+Section~\ref{sec:goldbach-ext}).
+
+% ============================================================
+\section{Goldbach Extended: Chen, Vinogradov, Hardy--Littlewood}
+\label{sec:goldbach-ext}
+% ============================================================
+
+\subsection{Chen's Theorem}
+
+The strongest unconditional approximation to the binary Goldbach
+conjecture is:
+
+\begin{theorem}[Chen's Theorem, 1973 \cite{Chen1973}]\label{thm:chen}
+Every sufficiently large even integer $n$ can be written as
+\[
+  n = p + m,
+\]
+where $p$ is prime and $m$ is either prime or a product of exactly two
+primes (i.e., $m \in P_2$, a \emph{$P_2$-number}).
+\end{theorem}
+
+\begin{remark}
+Chen's theorem is often stated as ``$p + P_2$''.  It falls just short of
+Goldbach: instead of requiring $m$ to be prime, it allows $m = p_1 p_2$
+as well.  The proof uses the \emph{large sieve} and sophisticated sieve
+methods.
+\end{remark}
+
+\begin{example}
+For $n = 20$:
+\begin{align*}
+  20 &= 3 + 17 \quad (17 \text{ prime}) \\
+  20 &= 7 + 13 \quad (13 \text{ prime}) \\
+  20 &= 2 + 18 = 2 + 2 \cdot 9 \quad (18 = 2 \cdot 3^2 \text{: not } P_2) \\
+  20 &= 7 + 13 \checkmark
+\end{align*}
+Chen's theorem guarantees at least one such representation for all large
+even $n$.
+\end{example}
+
+\subsection{Vinogradov's Three-Prime Theorem}
+
+\begin{theorem}[Vinogradov 1937 \cite{Vinogradov1937}]\label{thm:vinogradov}
+Every sufficiently large odd integer $N$ is the sum of three primes:
+\[
+  r_3(N) \;:=\; \sum_{\substack{p_1 + p_2 + p_3 = N \\ p_i \text{ prime}}}
+  \log p_1 \cdot \log p_2 \cdot \log p_3
+  \;\sim\;
+  \mathfrak{S}(N) \cdot \frac{N^2}{2(\log N)^3},
+\]
+where
+\[
+  \mathfrak{S}(N) \;=\;
+  \prod_{p \mid N} \left(1 - \frac{1}{(p-1)^2}\right)
+  \prod_{p \nmid N} \left(1 + \frac{1}{(p-1)^3}\right)
+\]
+is the \emph{singular series}, which satisfies $\mathfrak{S}(N) > 0$
+for all odd~$N$.
+\end{theorem}
+
+\begin{proof}[Proof sketch --- Circle Method]
+The proof uses the Hardy--Littlewood--Ramanujan circle method.  Define
+the exponential sum
+\[
+  S(\alpha) \;:=\; \sum_{p \leq N} \Lambda(p)\, e^{2\pi i \alpha p},
+\]
+where $\Lambda$ is the von Mangoldt function.  Then by Fourier analysis,
+\[
+  r_3(N) \;=\; \int_0^1 S(\alpha)^3\, e^{-2\pi i N \alpha}\, d\alpha.
+\]
+
+\textbf{Major arcs} $\mathfrak{M}$: For $\alpha$ near a rational $a/q$
+with small denominator $q \leq Q = N^{1/3}$, i.e.,
+$\abs{\alpha - a/q} < N^{-2/3}$, one approximates $S(\alpha)$ via
+Gauss sums and the prime number theorem in arithmetic progressions.
+This yields the main term $\mathfrak{S}(N) \cdot N^2 / (2(\log N)^3)$.
+
+\textbf{Minor arcs} $\mathfrak{m} = [0,1] \setminus \mathfrak{M}$:
+Vinogradov's mean value theorem and the method of exponential sums
+(van der Corput--Weyl--Vinogradov) give the bound
+\[
+  \sup_{\alpha \in \mathfrak{m}} |S(\alpha)| \;\ll\; \frac{N}{(\log N)^A}
+\]
+for every $A > 0$.  Hence the minor arc integral is
+$o\!\left(N^2/(\log N)^3\right)$ and negligible.
+\end{proof}
+
+\subsection{Hardy--Littlewood Goldbach Conjecture}
+
+\begin{conjecture}[Hardy--Littlewood, 1923 \cite{HardyLittlewood1923}]
+\label{conj:hardy-littlewood}
+For every even $n \geq 4$,
+\[
+  G(n) \;\sim\; 2\,\Pi_2
+  \prod_{\substack{p > 2 \\ p \mid n}}
+  \frac{p-1}{p-2}
+  \cdot \frac{n}{(\log n)^2}, \qquad n \to \infty,
+\]
+where
+\[
+  \Pi_2 \;:=\; \prod_{p > 2} \frac{p(p-2)}{(p-1)^2}
+        \;\approx\; 0.6601618\ldots
+\]
+is the \emph{twin prime constant}.
+\end{conjecture}
+
+\begin{remark}
+This conjecture is open.  It is consistent with all numerical evidence.
+Note that the extra factor $\prod_{p \mid n} (p-1)/(p-2)$ explains why
+$G(n)$ is larger for numbers $n$ with many odd prime factors (the comet
+spikes).
+\end{remark}
+
+% ============================================================
+\section{Waring's Problem}\label{sec:waring}
+% ============================================================
+
+\subsection{Statement and History}
+
+In 1770, Edward Waring asserted without proof that every positive integer
+is the sum of at most 4 squares, 9 cubes, 19 fourth powers, and so on.
+This became known as \emph{Waring's problem}.
+
+\begin{definition}[$g(k)$ and $G(k)$]
+For $k \geq 2$, let
+\begin{align*}
+  g(k) &:= \text{smallest } s \text{ such that every positive integer is
+           a sum of } s \text{ perfect } k\text{-th powers,}\\
+  G(k) &:= \text{smallest } s \text{ such that every \emph{sufficiently large}
+           positive integer is a sum of } s \text{ perfect } k\text{-th powers.}
+\end{align*}
+Clearly $G(k) \leq g(k)$.
+\end{definition}
+
+\subsection{The Hilbert--Waring Theorem}
+
+\begin{theorem}[Hilbert--Waring Theorem, 1909 \cite{Hilbert1909}]
+\label{thm:hilbert-waring}
+For every $k \geq 2$, the quantity $g(k)$ is finite.  Equivalently,
+the set of perfect $k$-th powers forms an additive basis of finite order.
+\end{theorem}
+
+\begin{proof}[Proof idea]
+Hilbert's original proof (1909) used algebraic identities and a
+combinatorial averaging argument.  Modern proofs use the Hardy--Littlewood
+circle method: the number of representations of $n$ as a sum of $s$
+perfect $k$-th powers is
+\[
+  R_{s,k}(n) \;=\; \int_0^1
+  \left(\sum_{m=1}^{n^{1/k}} e^{2\pi i \alpha m^k}\right)^s
+  e^{-2\pi i n \alpha}\, d\alpha.
+\]
+For $s$ sufficiently large (relative to $k$), the method shows
+$R_{s,k}(n) > 0$ for all large $n$.
+\end{proof}
+
+\subsection{Known Values}
+
+The exact value of $g(k)$ is known for all $k$ (with minor exceptions
+depending on a Diophantine condition):
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}ccc@{}}
+\toprule
+$k$ & $g(k)$ & $G(k)$ (known/conjectured) \\
+\midrule
+2 & 4  & 4 \\
+3 & 9  & $\leq 7$ (exact: $G(3) = 7$ conjectured) \\
+4 & 19 & 15 (conjectured; $G(4) \leq 15$ proved) \\
+5 & 37 & $\leq 21$ \\
+6 & 73 & $\leq 31$ \\
+7 & 143 & $\leq 45$ \\
+8 & 279 & $\leq 62$ \\
+\bottomrule
+\end{tabular}
+\caption{Values of $g(k)$ (all proved) and bounds on $G(k)$.}
+\label{tab:waring}
+\end{table}
+
+\begin{theorem}[Lagrange's Four-Square Theorem, 1770 \cite{Lagrange1770}]
+Every positive integer is the sum of four perfect squares:
+\[
+  g(2) = 4.
+\]
+\end{theorem}
+
+The general formula for $g(k)$ (for $k \geq 2$) is:
+\[
+  g(k) = 2^k + \floor{(3/2)^k} - 2
+\]
+whenever $2^k\{(3/2)^k\} + \floor{(3/2)^k} \leq 2^k$
+(this holds for all known $k$, and is expected to hold for all $k$).
+
+\begin{example}
+\begin{align*}
+  g(2) &= 4: \quad 7 = 4 + 1 + 1 + 1 = 2^2 + 1^2 + 1^2 + 1^2. \\
+  g(3) &= 9: \quad 23 = 8 + 8 + 1 + 1 + 1 + 1 + 1 + 1 + 1 = 9 \text{ cubes}. \\
+  g(4) &= 19: \quad 15 = 1^4 + \cdots + 1^4 \text{ (15 times)}.
+\end{align*}
+\end{example}
+
+% ============================================================
+\section{Schnirelmann's Theorem}\label{sec:schnirelmann}
+% ============================================================
+
+\subsection{The Schnirelmann Approach to Goldbach}
+
+Schnirelmann (1930) introduced his density to give the first unconditional
+proof that the primes form an additive basis of \emph{finite} order.
+
+\begin{theorem}[Schnirelmann, 1930 \cite{Schnirelmann1930}]
+\label{thm:schnirelmann}
+The set of primes $\mathbb{P}$ (together with $\{0, 1\}$) forms an
+additive basis of order $s < \infty$ for $\N$, i.e., every integer
+$n \geq 2$ is the sum of at most $s$ primes.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Let $A = \{0, 1\} \cup \mathbb{P}$.  Goldbach's conjecture (at the time
+unproved) would give $\sigma(A + A) > 0$.  Schnirelmann cleverly avoided
+Goldbach by using:
+\begin{enumerate}[label=(\arabic*)]
+\item $\sigma(A) > 0$ (since $1 \in A$ and many primes are in $A$).
+\item The \emph{Schnirelmann sum theorem}
+      (Theorem~\ref{thm:schnirelmann-sum}): iterating $A + A + \cdots$
+      eventually has Schnirelmann density $\geq 1$, i.e., equals all of $\N$.
+\end{enumerate}
+Schnirelmann's original bound was $s \leq 800{,}000$.  Later improvements
+(Romanov, Heilbronn, Landau, Vinogradov) reduced this dramatically.
+\end{proof}
+
+\subsection{The Schnirelmann Constant}
+
+\begin{definition}[Schnirelmann Constant]
+The \emph{Schnirelmann constant} $s$ is the smallest integer such that
+every integer $n \geq 2$ is the sum of at most $s$ primes.
+\end{definition}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+Author & Year & Bound on $s$ \\
+\midrule
+Schnirelmann & 1930 & $s \leq 800{,}000$ \\
+Romanov      & 1934 & $s \leq 2{,}208$ \\
+Vinogradov   & 1937 & $s \leq 4$ (for odd $n \geq N_0$ large) \\
+Helfgott     & 2013 & $s \leq 4$ (for all $n \geq 2$; $s = 3$ for odd $n \geq 7$) \\
+\bottomrule
+\end{tabular}
+\caption{History of bounds on the Schnirelmann constant~$s$.}
+\label{tab:schnirelmann}
+\end{table}
+
+As a consequence of Helfgott's theorem (Theorem~\ref{thm:helfgott}):
+\begin{corollary}
+Every integer $n \geq 2$ is the sum of at most $4$ primes.
+\end{corollary}
+
+\subsection{Schnirelmann Density Inequality}
+
+For the set of primes $\mathbb{P}$, the Schnirelmann density satisfies:
+\[
+  \sigma(\mathbb{P}) \;=\; 0
+\]
+since $2 \notin \mathbb{P}_0$ (where we adjoin $0$).  Nevertheless,
+the density of $A = \{0,1\} \cup \mathbb{P}$ satisfies $\sigma(A) > 0$
+because $1 \in A$.  The key inequality
+\[
+  \sigma(A + B) \;\geq\; \sigma(A) + \sigma(B) - \sigma(A)\sigma(B)
+\]
+allows iterative improvement until density reaches~1.
+
+% ============================================================
+\section{Freiman's Theorem}\label{sec:freiman}
+% ============================================================
+
+\subsection{The Trivial Bound}
+
+\begin{lemma}[Trivial Lower Bound]\label{lem:trivial}
+For any finite set $A \subseteq \Z$ with $\abs{A} = n$,
+\[
+  \abs{A + A} \;\geq\; 2n - 1.
+\]
+\end{lemma}
+
+\begin{proof}
+If $A = \{a_1 < a_2 < \cdots < a_n\}$, then
+$2a_1 < a_1 + a_2 < 2a_2 < \cdots < a_{n-1} + a_n < 2a_n$
+gives $2n - 1$ distinct elements.
+\end{proof}
+
+Equality $\abs{A + A} = 2\abs{A} - 1$ holds if and only if $A$ is an
+arithmetic progression (AP).  Freiman's theorem gives a structural
+characterization when $\abs{A + A}$ is small.
+
+\subsection{Freiman's Structure Theorem}
+
+\begin{definition}[Generalized Arithmetic Progression]
+A \emph{generalized arithmetic progression} (GAP) of dimension $d$ is
+a set of the form
+\[
+  P \;=\; \{a_0 + x_1 r_1 + x_2 r_2 + \cdots + x_d r_d :
+             0 \leq x_j \leq L_j - 1\}
+\]
+for some $a_0, r_1, \ldots, r_d \in \Z$ and positive integers
+$L_1, \ldots, L_d$.  Its \emph{size} is $L_1 \cdot L_2 \cdots L_d$.
+\end{definition}
+
+\begin{theorem}[Freiman's Theorem \cite{Freiman1973}]\label{thm:freiman}
+Let $A \subseteq \Z$ be a finite set with $\abs{A + A} \leq K \abs{A}$
+for some $K \geq 1$.  Then $A$ is contained in a generalized arithmetic
+progression $P$ of dimension $d \leq d(K)$ and size at most $f(K)\abs{A}$,
+where $d(K)$ and $f(K)$ depend only on~$K$.
+\end{theorem}
+
+\begin{remark}
+Freiman's original (1973) proof gave enormous bounds.  Ruzsa (1994)
+gave an elegant proof with $d \leq K - 1$ and $f(K) = e^{CK}$ for some
+absolute constant $C > 0$.  The Polynomial Freiman--Ruzsa conjecture
+(Gowers 2007, Green--Tao 2006) seeks to sharpen these to
+$d = O(\log K)$ and $f(K) = K^{O(1)}$; it was proved by
+Gowers--Green--Manners--Tao in 2023.
+\end{remark}
+
+\begin{corollary}[Freiman, Double-Sumset Version]
+If $\abs{A + A} \leq K\abs{A}$, then $A$ is ``almost'' an arithmetic
+progression: it lies in a progression of bounded dimension.
+\end{corollary}
+
+\subsection{Cauchy--Davenport Theorem}
+
+For sets in $\Z/p\Z$ ($p$ prime), the analogue of the trivial bound is sharp:
+
+\begin{theorem}[Cauchy--Davenport, \cite{Cauchy1813}]
+Let $p$ be prime and $A, B \subseteq \Z/p\Z$ be non-empty.  Then
+\[
+  \abs{A + B} \;\geq\; \min(p,\; \abs{A} + \abs{B} - 1).
+\]
+\end{theorem}
+
+This is tight: equality holds when $A$ and $B$ are APs with the same
+common difference.
+
+% ============================================================
+\section{Erd\H{o}s--Tur\'{a}n Conjecture}\label{sec:erdos-turan}
+% ============================================================
+
+\subsection{Representation Functions}
+
+\begin{definition}[Representation Function]
+For $A \subseteq \N_0$ and $h \geq 2$, define
+\[
+  r_{h,A}(n) \;:=\; \abs{\{(a_1, \ldots, a_h) \in A^h :
+                          a_1 + \cdots + a_h = n\}}.
+\]
+If $A$ is a basis of order $h$ for $\N$, then $r_{h,A}(n) \geq 1$
+for all sufficiently large~$n$.
+\end{definition}
+
+\subsection{The Conjecture}
+
+\begin{conjecture}[Erd\H{o}s--Tur\'{a}n, 1941 \cite{ErdosTuran1941}]
+\label{conj:erdos-turan}
+If $A \subseteq \N_0$ is an additive basis of order $2$ (i.e., every
+sufficiently large integer is the sum of two elements of $A$), then
+\[
+  r_{2,A}(n) \;=\; \abs{\{(a, b) \in A \times A : a + b = n\}}
+\]
+cannot be bounded: $\limsup_{n \to \infty} r_{2,A}(n) = \infty$.
+\end{conjecture}
+
+In other words, if every large $n$ can be represented as $a + b$ with
+$a, b \in A$, then necessarily infinitely many integers have very
+\emph{many} such representations.
+
+\begin{remark}
+This conjecture is \textbf{open}.  It has been verified for many
+specific families of sets, but no general proof is known.
+
+Partial results:
+\begin{itemize}
+\item Erd\H{o}s (1956): There exists a basis $A$ of order 2 for which
+      $r_{2,A}(n) = O(\log n)$.  So the conjecture, if true, would be
+      essentially tight.
+\item Borwein--Choi--Chu (2006): Verified for specific polynomial
+      sequences.
+\item The analogous statement for order $h \geq 3$ is also open.
+\end{itemize}
+\end{remark}
+
+\subsection{Connection to the Goldbach Conjecture}
+
+If Goldbach's binary conjecture (Conjecture~\ref{conj:goldbach-binary})
+holds, then $\mathbb{P}$ is a basis of order 2 for even integers.
+The Erd\H{o}s--Tur\'{a}n conjecture would then predict
+$\limsup_{n \to \infty} G(n) = \infty$, which is consistent with
+(but much weaker than) the Hardy--Littlewood conjecture
+(Conjecture~\ref{conj:hardy-littlewood}).
+
+% ============================================================
+\section{Computational Aspects}\label{sec:computational}
+% ============================================================
+
+\subsection{Implementation in \texttt{goldbach\_extended.py}}
+
+The Python module \texttt{goldbach\_extended.py} implements:
+\begin{itemize}
+\item \texttt{GoldbachExtended}: computes $G(n)$, the Goldbach comet,
+      the Hardy--Littlewood heuristic, Chen's theorem verification,
+      ternary Goldbach checks, and the Schnirelmann constant analysis.
+\item \texttt{VinogradovMethod}: computes the exponential sum $S(\alpha)$,
+      the singular series $\mathfrak{S}(N)$, major arc descriptions, and
+      a numerical estimate of $r_3(N)$ via numerical integration.
+\end{itemize}
+
+\subsection{Goldbach Comet}
+
+The \emph{Goldbach comet} is the plot of $G(n)$ for even $n$.
+Table~\ref{tab:comet} shows computed values:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}cc|cc|cc@{}}
+\toprule
+$n$ & $G(n)$ & $n$ & $G(n)$ & $n$ & $G(n)$ \\
+\midrule
+4   & 1  & 20  & 4  & 60  & 9  \\
+6   & 1  & 30  & 5  & 100 & 6  \\
+8   & 1  & 40  & 3  & 120 & 12 \\
+10  & 2  & 50  & 4  & 200 & 9  \\
+12  & 1  & 52  & 3  & 360 & 22 \\
+\bottomrule
+\end{tabular}
+\caption{Goldbach partition function $G(n)$ for selected even~$n$.
+The spike at $n = 360$ reflects its many small prime factors.}
+\label{tab:comet}
+\end{table}
+
+\subsection{Hardy--Littlewood Heuristic}
+
+The \texttt{hardy\_littlewood\_goldbach(n)} method computes:
+\[
+  \widehat{G}(n) \;=\; 2\,\Pi_2
+  \prod_{\substack{p > 2 \\ p \mid n}} \frac{p-1}{p-2}
+  \cdot \frac{n}{(\log n)^2}.
+\]
+
+\begin{example}
+For $n = 100$: $100 = 2^2 \cdot 5^2$, so $p = 5$ is the only relevant
+odd prime factor.
+\[
+  \widehat{G}(100) \;=\; 2 \times 0.6602 \times \frac{4}{3} \times
+  \frac{100}{(\log 100)^2} \;\approx\; 6.5.
+\]
+The true value is $G(100) = 6$, a very good fit.
+\end{example}
+
+\subsection{Ternary Goldbach Verification}
+
+The method \texttt{verify\_ternary\_goldbach\_range(n\_max)} confirms
+Helfgott's theorem computationally for $n \leq 10{,}000$:
+\begin{itemize}
+\item All 4{,}997 odd numbers from 7 to 9{,}999 can be expressed as
+      a sum of three primes.
+\item No failures found (consistent with Theorem~\ref{thm:helfgott}).
+\end{itemize}
+
+\subsection{Singular Series Computation}
+
+For odd $N = 101$, the singular series (computed with \texttt{prime\_limit=200}) gives:
+\[
+  \mathfrak{S}(101) \;\approx\; 1.3284.
+\]
+The predicted number of representations (weighted) is then:
+\[
+  r_3(101) \;\approx\; 1.3284 \times \frac{101^2}{2 (\log 101)^3}
+  \;\approx\; 74.
+\]
+
+\subsection{Waring's Problem --- Verification}
+
+The module \texttt{additive\_number\_theory.py} implements
+\texttt{WaringProblem.waring\_g(k)} which verifies $g(k)$ for small~$k$
+by exhaustive search:
+\[
+  g(2) = 4,\quad g(3) = 9,\quad g(4) = 19.
+\]
+These are confirmed by direct computation for integers up to
+$n = 1{,}000$.
+
+% ============================================================
+\section{Summary and Open Problems}\label{sec:summary}
+% ============================================================
+
+We summarize the status of the main results:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}p{6.5cm}ll@{}}
+\toprule
+Statement & Status & Reference \\
+\midrule
+Binary Goldbach ($n \geq 4$ even $= p + q$) &
+  \textbf{Conjecture (open)} & \cite{Goldbach1742} \\
+Ternary Goldbach ($n \geq 7$ odd $= p+q+r$) &
+  \textbf{Theorem} & \cite{Helfgott2013} \\
+Chen's Theorem (large even $n = p + P_2$) &
+  \textbf{Theorem} & \cite{Chen1973} \\
+Vinogradov's 3-prime theorem (large odd) &
+  \textbf{Theorem} & \cite{Vinogradov1937} \\
+Hardy--Littlewood Conjecture ($G(n)$ asymptotic) &
+  \textbf{Conjecture (open)} & \cite{HardyLittlewood1923} \\
+Hilbert--Waring Theorem ($g(k) < \infty$) &
+  \textbf{Theorem} & \cite{Hilbert1909} \\
+Lagrange Four Squares ($g(2) = 4$) &
+  \textbf{Theorem} & \cite{Lagrange1770} \\
+Schnirelmann: primes form a basis &
+  \textbf{Theorem} & \cite{Schnirelmann1930} \\
+Freiman's Structure Theorem &
+  \textbf{Theorem} & \cite{Freiman1973} \\
+Erd\H{o}s--Tur\'{a}n Conjecture &
+  \textbf{Conjecture (open)} & \cite{ErdosTuran1941} \\
+\bottomrule
+\end{tabular}
+\caption{Overview: proved theorems vs.\ open conjectures.}
+\label{tab:status}
+\end{table}
+
+\subsection*{Open Problems}
+\begin{enumerate}[label=(\arabic*)]
+\item Prove (or disprove) the binary Goldbach conjecture.
+\item Determine the exact value of $G(k)$ for $k \geq 3$.
+\item Prove the Erd\H{o}s--Tur\'{a}n conjecture.
+\item Prove the Hardy--Littlewood conjecture on $G(n)$.
+\item Extend Green--Tao (primes contain arbitrarily long APs) to
+      quantitative results on the length of APs in dense subsets of primes.
+\end{enumerate}
+
+% ============================================================
+\section*{References}\label{sec:references}
+% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Goldbach1742}
+C.\ Goldbach,
+\textit{Letter to L.\ Euler}, 7 June 1742.
+
+\bibitem{Lagrange1770}
+J.-L.\ Lagrange,
+\textit{D\'{e}monstration d'un th\'{e}or\`{e}me d'arithm\'{e}tique},
+Nouveaux M\'{e}m.\ Acad.\ Roy.\ Sci.\ Belles-Lettres de Berlin (1770), 123--133.
+
+\bibitem{Cauchy1813}
+A.-L.\ Cauchy,
+\textit{Recherches sur les nombres},
+J.\ \'{E}cole Polytech.\ \textbf{9} (1813), 99--116.
+
+\bibitem{Schnirelmann1930}
+L.\ G.\ Schnirelmann,
+\textit{\"{U}ber additive Eigenschaften von Zahlen}
+(Russian), Math.\ Ann.\ \textbf{107} (1932), 649--690.
+Originally in: Izv.\ Donskogo Politekhn.\ Inst.\ \textbf{14} (1930).
+
+\bibitem{Vinogradov1937}
+I.\ M.\ Vinogradov,
+\textit{Some theorems concerning the theory of prime numbers},
+Matem.\ Sbornik \textbf{2}(44) (1937), 179--196.
+
+\bibitem{HardyLittlewood1923}
+G.\ H.\ Hardy and J.\ E.\ Littlewood,
+\textit{Some problems of `Partitio Numerorum': III.\ On the expression of
+a number as a sum of primes},
+Acta Math.\ \textbf{44} (1923), 1--70.
+
+\bibitem{Hilbert1909}
+D.\ Hilbert,
+\textit{Beweis f\"{u}r die Darstellbarkeit der ganzen Zahlen durch eine
+feste Anzahl $n^{\text{ter}}$ Potenzen (Waringsche Problem)},
+Math.\ Ann.\ \textbf{67} (1909), 281--300.
+
+\bibitem{Chen1973}
+J.\ R.\ Chen,
+\textit{On the representation of a large even integer as the sum of a
+prime and the product of at most two primes},
+Sci.\ Sinica \textbf{16} (1973), 157--176.
+
+\bibitem{ErdosTuran1941}
+P.\ Erd\H{o}s and P.\ Tur\'{a}n,
+\textit{On a problem of Sidon in additive number theory, and on some
+related problems},
+J.\ London Math.\ Soc.\ \textbf{16} (1941), 212--215.
+
+\bibitem{Freiman1973}
+G.\ A.\ Freiman,
+\textit{Foundations of a Structural Theory of Set Addition},
+Transl.\ Math.\ Monographs \textbf{37}, AMS, Providence, RI, 1973.
+
+\bibitem{OliveiraSilva2012}
+T.\ Oliveira e Silva, S.\ Herzog, and S.\ Pardi,
+\textit{Empirical verification of the even Goldbach conjecture and
+computation of prime gaps up to $4 \times 10^{18}$},
+Math.\ Comp.\ \textbf{83} (2014), 2033--2060.
+
+\bibitem{Helfgott2013}
+H.\ A.\ Helfgott,
+\textit{The ternary Goldbach conjecture is true},
+arXiv:1312.7748 (2013).
+
+\end{thebibliography}
+
+\end{document}

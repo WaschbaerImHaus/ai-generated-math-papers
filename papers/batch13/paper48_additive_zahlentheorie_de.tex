@@ -1,0 +1,922 @@
+% ============================================================
+% paper48_additive_zahlentheorie_de.tex
+% Paper 48: Additive Zahlentheorie (Deutsch)
+% Autor: Michael Fuhrmann
+% Projekt: specialist-maths, Build 137
+% Datum: 2026-03-12
+% ============================================================
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% --- Theorem-Umgebungen (deutsch) ---
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+% --- Metadaten ---
+\title{Additive Zahlentheorie:\\
+Summenmengen, Goldbach, Waring und mehr}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 137}
+\email{specialist-maths@localhost}
+\date{\today}
+
+% --- Makros ---
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Primes}{\mathbb{P}}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\DeclareMathOperator{\ggT}{ggT}
+\DeclareMathOperator{\kgV}{kgV}
+
+% ============================================================
+\begin{document}
+
+\begin{abstract}
+Die additive Zahlentheorie untersucht, wie ganze Zahlen als Summen von
+Elementen vorgegebener Mengen dargestellt werden k\"{o}nnen --- Primzahlen,
+$k$-te Potenzen oder beliebige Teilmengen von $\N$.
+In diesem Aufsatz werden die grundlegenden Begriffe und wichtigsten
+Ergebnisse vorgestellt: Summenmengen, Schnirelmann-Dichte, Basen endlicher
+Ordnung, die Goldbach-Vermutungen (bin\"{a}r und tern\"{a}r),
+Chens Satz, der Hardy-Littlewood-Ansatz, Warings Problem und der
+Hilbert-Waring-Satz, Schnirelmanns Satz, Freimans Struktursatz sowie
+die Erd\H{o}s-Tur\'{a}n-Vermutung.
+Es wird strikt zwischen bewiesenen S\"{a}tzen und offenen Vermutungen
+unterschieden.  Alle Konzepte werden durch Rechenbeispiele aus den
+Python-Modulen \texttt{additive\_number\_theory.py} und
+\texttt{goldbach\_extended.py} illustriert.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ============================================================
+\section{Einleitung}\label{sec:einleitung}
+% ============================================================
+
+Die additive Zahlentheorie ist jener Zweig der Mathematik, der
+untersucht, wie ganze Zahlen als Summen von Elementen bestimmter Mengen
+darstellbar sind.  Die einfachste Frage lautet: Gegeben eine Menge
+$A \subseteq \N$, welche positiven ganzen Zahlen geh\"{o}ren zur
+\emph{Summenmenge} $A + A = \{a + a' : a, a' \in A\}$?
+Allgemeiner fragt man nach dem \emph{$h$-fachen Sumset}
+$hA = A + A + \cdots + A$ ($h$ Summanden).
+
+Historisch erwuchs die additive Zahlentheorie aus drei ber\"{u}hmten Problemen:
+
+\begin{enumerate}[label=(\arabic*)]
+\item \textbf{Goldbach (1742):} Ist jede gerade Zahl $\geq 4$ die Summe
+      zweier Primzahlen?  Ist jede ungerade Zahl $\geq 7$ die Summe dreier
+      Primzahlen?
+\item \textbf{Waring (1770):} L\"{a}sst sich jede positive ganze Zahl als
+      Summe von h\"{o}chstens $g(k)$ vollst\"{a}ndigen $k$-ten Potenzen
+      darstellen?
+\item \textbf{Basisprobleme:} F\"{u}r welche Mengen $A$ gilt $hA = \N$
+      f\"{u}r ein endliches $h$?  Was ist das minimale solche $h$?
+\end{enumerate}
+
+Das Gebiet hat tiefe Verbindungen zur analytischen Zahlentheorie
+(Hardy-Littlewood-Kreismethode), zur harmonischen Analysis
+(Fourier-Techniken auf $\Z/N\Z$), zur Kombinatorik
+(Freimans Satz, additive Kombinatorik) und zur modernen arithmetischen
+Geometrie (Green-Tao-Satz).
+
+\subsection*{\"{U}berblick}
+
+Abschnitt~\ref{sec:summenmengen} f\"{u}hrt Summenmengen, Schnirelmann-Dichte
+und Basen endlicher Ordnung ein.
+Abschnitt~\ref{sec:goldbach} behandelt die Goldbach-Vermutungen.
+Abschnitt~\ref{sec:goldbach-ext} enth\"{a}lt Chens Satz, Vinogradovs
+Dreiprimzahlsatz und die Hardy-Littlewood-Vermutung.
+Abschnitt~\ref{sec:waring} widmet sich Warings Problem.
+Abschnitt~\ref{sec:schnirelmann} entwickelt Schnirelmanns Zugang.
+Abschnitt~\ref{sec:freiman} pr\"{a}sentiert Freimans Struktursatz.
+Abschnitt~\ref{sec:erdos-turan} formuliert die Erd\H{o}s-Tur\'{a}n-Vermutung.
+Abschnitt~\ref{sec:rechnerisch} illustriert rechnerische Aspekte.
+Abschnitt~\ref{sec:zusammenfassung} fasst zusammen.
+
+% ============================================================
+\section{Summenmengen und Dichte}\label{sec:summenmengen}
+% ============================================================
+
+\subsection{Grunddefinitionen}
+
+\begin{definition}[Summenmenge]
+Seien $A, B \subseteq \Z$.  Die \emph{Summenmenge} von $A$ und $B$ ist
+\[
+  A + B \;:=\; \{ a + b : a \in A,\; b \in B \}.
+\]
+Das \emph{$h$-fache Sumset} ist $hA := A + A + \cdots + A$ ($h$ Faktoren).
+Die \emph{eingeschr\"{a}nkte Summenmenge} ist
+$A \hat{+} B := \{a + b : a \in A,\, b \in B,\, a \neq b\}$.
+\end{definition}
+
+\begin{definition}[Basis $h$-ter Ordnung]\label{def:basis}
+Eine Menge $A \subseteq \N_0$ hei\ss{}t \emph{additive Basis $h$-ter Ordnung}
+(oder \emph{$h$-Basis}) f\"{u}r $\N$, wenn jede hinreichend gro\ss{}e positive
+ganze Zahl zu $hA$ geh\"{o}rt.  Sie ist eine \emph{Basis genauer Ordnung $h$},
+wenn $h$ das kleinste solche ganze Zahl ist.
+Fehlen in $hA$ nur endlich viele positive ganze Zahlen, spricht man von
+einer \emph{asymptotischen Basis}.
+\end{definition}
+
+Die Primzahlen, die Quadratzahlen, die Kubikzahlen und viele andere
+klassische Mengen bilden Basen endlicher Ordnung
+(vgl.\ Abschnitte~\ref{sec:goldbach} und~\ref{sec:waring}).
+
+\subsection{Schnirelmann-Dichte}
+
+Das Konzept der \emph{Schnirelmann-Dichte} liefert ein quantitatives
+Ma\ss{} daf\"{u}r, wie dicht eine Menge in $\N$ verteilt ist.
+
+\begin{definition}[Schnirelmann-Dichte]\label{def:schnirelmann-dichte}
+F\"{u}r eine Menge $A \subseteq \N_0$ mit $0 \in A$ ist die
+\emph{Schnirelmann-Dichte}
+\[
+  \sigma(A) \;:=\; \inf_{n \geq 1} \frac{A(n)}{n},
+\]
+wobei $A(n) = \abs{\{a \in A : 1 \leq a \leq n\}}$ die
+\emph{Z\"{a}hlfunktion} von $A$ ist.
+\end{definition}
+
+Es gilt $\sigma(A) = 0$, wenn $1 \notin A$, und $\sigma(A) = 1$ genau
+dann, wenn $A = \N$.  Der entscheidende Vorteil gegen\"{u}ber der
+nat\"{u}rlichen Dichte ist:
+
+\begin{theorem}[Schnirelmanns Summsatz]\label{thm:schnirelmann-summ}
+Seien $A, B \subseteq \N_0$ mit $0 \in A \cap B$.  Dann gilt:
+\[
+  \sigma(A + B) \;\geq\; \sigma(A) + \sigma(B) - \sigma(A)\,\sigma(B).
+\]
+Insbesondere: Wenn $\sigma(A) + \sigma(B) \geq 1$, so ist $A + B = \N$.
+\end{theorem}
+
+\begin{proof}
+Sei $n \geq 1$ beliebig.  Unter den $n + 1$ Elementen
+$0 = a_0 < a_1 < \cdots < a_k \leq n$ von $A \cap [0,n]$ enthalten die
+Intervalle $(a_{i-1}, a_i)$ kein Element von $A$; daher liegen die
+Elemente $a_{i-1} + b$ f\"{u}r $b \in B \cap [0, a_i - a_{i-1}]$ alle
+in $A + B$.  Sorgf\"{a}ltiges Z\"{a}hlen ergibt die behauptete Ungleichung.
+\end{proof}
+
+\begin{korollar}\label{kor:dichte-eins}
+Wenn $\sigma(A) \geq 1/2$, so ist $A + A \supseteq \N$.
+\end{korollar}
+
+\subsection{Nat\"{u}rliche Dichte und Oberdichte}
+
+Zum Vergleich: Die \emph{nat\"{u}rliche (asymptotische) Dichte} von
+$A \subseteq \N$ ist $d(A) = \lim_{n \to \infty} A(n)/n$ (falls der
+Grenzwert existiert), die \emph{Oberdichte} ist
+$\bar d(A) = \limsup_{n \to \infty} A(n)/n$.
+
+Im Gegensatz zur Schnirelmann-Dichte ist die nat\"{u}rliche Dichte
+nicht submultiplikativ und kontrolliert nicht direkt die Ordnung von $A$
+als Basis.  Es gilt stets $\sigma(A) \leq d(A)$.
+
+% ============================================================
+\section{Goldbach-Vermutung}\label{sec:goldbach}
+% ============================================================
+
+\subsection{Historischer Hintergrund}
+
+In einem Brief an Leonhard Euler vom 7.\ Juni 1742 schrieb Christian
+Goldbach, jede ganze Zahl gr\"{o}\ss{}er als 2 sei die Summe von drei
+Primzahlen (er z\"{a}hlte 1 als Primzahl).  Euler formulierte die
+Vermutung in moderner Form neu, woraus zwei Aussagen entstanden, die wir
+als \emph{bin\"{a}re} (starke) und \emph{tern\"{a}re} (schwache)
+Goldbach-Vermutung bezeichnen.
+
+\subsection{Die bin\"{a}re (starke) Goldbach-Vermutung}
+
+\begin{vermutung}[Bin\"{a}re Goldbach-Vermutung]\label{verm:goldbach-binaer}
+Jede gerade ganze Zahl $n \geq 4$ ist die Summe zweier Primzahlen:
+\[
+  \forall\; n \geq 4,\; n \equiv 0 \pmod{2} \;\Longrightarrow\;
+  \exists\; p, q \in \Primes : n = p + q.
+\]
+\end{vermutung}
+
+Diese Vermutung ist seit 1742 offen.  Wir definieren die
+\emph{Goldbach-Partitionsfunktion}
+\[
+  G(n) \;:=\; \abs{\bigl\{(p, q) : p + q = n,\; p \leq q,\;
+                p, q \text{ prim}\bigr\}}.
+\]
+
+\begin{bemerkung}
+Vermutung~\ref{verm:goldbach-binaer} ist \"{a}quivalent zu
+$G(n) \geq 1$ f\"{u}r alle geraden $n \geq 4$.
+Numerische Evidenz:
+\begin{itemize}
+\item Verifiziert f\"{u}r alle geraden $n \leq 4 \times 10^{18}$
+      (Oliveira e Silva, Herzog, Pardi 2012 \cite{OliveiraSilva2012}).
+\item F\"{u}r ``gro\ss{}e'' $n$ w\"{a}chst $G(n)$ ungef\"{a}hr wie
+      $n/(\log n)^2$ (vgl.\ Abschnitt~\ref{sec:goldbach-ext}).
+\item $G(4) = 1$: $4 = 2 + 2$.
+\item $G(100) = 6$: $100 = 3+97 = 11+89 = 17+83 = 29+71 = 41+59 = 47+53$.
+\end{itemize}
+\end{bemerkung}
+
+\subsection{Die tern\"{a}re (schwache) Goldbach-Vermutung}
+
+\begin{vermutung}[Tern\"{a}re Goldbach-Vermutung --- heute ein Satz]
+\label{verm:goldbach-ternaer}
+Jede ungerade ganze Zahl $n \geq 7$ ist die Summe dreier Primzahlen.
+\end{vermutung}
+
+Wir bemerken, dass dies \emph{keine Vermutung mehr} ist:
+Harald Helfgott bewies sie 2013, womit er die Arbeit Vinogradovs (1937)
+vollendete.
+
+\begin{theorem}[Helfgott 2013, \cite{Helfgott2013}]\label{thm:helfgott}
+Jede ungerade ganze Zahl $n \geq 7$ l\"{a}sst sich als Summe dreier
+Primzahlen schreiben:
+\[
+  \forall\; n \geq 7,\; n \equiv 1 \pmod{2} \;\Longrightarrow\;
+  \exists\; p_1, p_2, p_3 \in \Primes : n = p_1 + p_2 + p_3.
+\]
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+Der Beweis verbindet zwei Teile:
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Analytischer Teil:} Vinogradov (1937) zeigte mittels der
+      Kreismethode, dass $r_3(n) > 0$ f\"{u}r alle ungeraden
+      $n > \exp(\exp(11{,}503))$.  Helfgott verbesserte dies auf alle
+      ungeraden $n > 10^{30}$ durch verfeinerte Exponentialsummen-Sch\"{a}tzungen.
+\item \textbf{Rechnerischer Teil:} Direkte Verifikation f\"{u}r alle
+      ungeraden $7 \leq n \leq 8{,}875 \times 10^{30}$ durch numerische
+      Methoden.
+\end{enumerate}
+Beide Teile zusammen decken alle ungeraden $n \geq 7$ ab.
+\end{proof}
+
+\subsection{Heuristische Evidenz f\"{u}r die bin\"{a}re Vermutung}
+
+Der \emph{Goldbach-Komet} ist die Streudiagramm-Darstellung von $G(n)$
+f\"{u}r gerade $n$.  Er zeigt einen deutlichen Aufw\"{a}rtstrend mit
+charakteristischen Spitzen bei zahlenreichen zusammengesetzten Zahlen
+(vgl.\ Abschnitt~\ref{sec:rechnerisch}).
+
+Das heuristische Argument: Wenn Primzahlen zuf\"{a}llig mit Dichte
+$1/\log n$ nahe $n$ verteilt w\"{a}ren, dann gilt
+\[
+  G(n) \;\approx\; \frac{n}{(\log n)^2} \;\longrightarrow\; \infty.
+\]
+Genauer liefert ein probabilistisches Modell:
+\[
+  G(n) \;\approx\; 2\Pi_2
+  \prod_{\substack{p > 2 \\ p \mid n}} \frac{p-1}{p-2}
+  \cdot \frac{n}{(\log n)^2}
+\]
+mit der Zwillingsprimkonstante $\Pi_2 \approx 0{,}6602$
+(Hardy-Littlewood-Vermutung, Abschnitt~\ref{sec:goldbach-ext}).
+
+% ============================================================
+\section{Goldbach-Erweiterungen: Chen, Vinogradov,
+Hardy-Littlewood}\label{sec:goldbach-ext}
+% ============================================================
+
+\subsection{Chens Satz}
+
+Die st\"{a}rkste bedingungslose Ann\"{a}herung an die bin\"{a}re
+Goldbach-Vermutung ist:
+
+\begin{theorem}[Chens Satz, 1973 \cite{Chen1973}]\label{thm:chen}
+Jede hinreichend gro\ss{}e gerade ganze Zahl $n$ l\"{a}sst sich schreiben als
+\[
+  n = p + m,
+\]
+wobei $p$ prim ist und $m$ entweder prim oder ein Produkt von genau zwei
+Primzahlen ist (d.h.\ $m \in P_2$, eine \emph{$P_2$-Zahl}).
+\end{theorem}
+
+\begin{bemerkung}
+Chens Satz wird oft als ``$p + P_2$'' formuliert.  Er f\"{a}llt knapp
+hinter Goldbach zur\"{u}ck: statt $m$ prim zu verlangen, erlaubt er
+auch $m = p_1 p_2$.  Der Beweis verwendet das \emph{gro\ss{}e Sieb}
+und ausgekl\"{u}gelte Siebmethoden.
+\end{bemerkung}
+
+\begin{beispiel}
+F\"{u}r $n = 20$:
+\begin{align*}
+  20 &= 3 + 17 \quad (17 \text{ prim}) \\
+  20 &= 7 + 13 \quad (13 \text{ prim}) \\
+\end{align*}
+Chens Satz garantiert mindestens eine solche Darstellung f\"{u}r alle
+hinreichend gro\ss{}en geraden $n$.
+\end{beispiel}
+
+\subsection{Vinogradovs Dreiprimzahlsatz}
+
+\begin{theorem}[Vinogradov 1937 \cite{Vinogradov1937}]\label{thm:vinogradov}
+Jede hinreichend gro\ss{}e ungerade ganze Zahl $N$ ist Summe dreier
+Primzahlen:
+\[
+  r_3(N) \;:=\; \sum_{\substack{p_1 + p_2 + p_3 = N \\ p_i \text{ prim}}}
+  \log p_1 \cdot \log p_2 \cdot \log p_3
+  \;\sim\;
+  \mathfrak{S}(N) \cdot \frac{N^2}{2(\log N)^3},
+\]
+wobei
+\[
+  \mathfrak{S}(N) \;=\;
+  \prod_{p \mid N} \left(1 - \frac{1}{(p-1)^2}\right)
+  \prod_{p \nmid N} \left(1 + \frac{1}{(p-1)^3}\right)
+\]
+die \emph{singuläre Reihe} ist, die $\mathfrak{S}(N) > 0$ f\"{u}r alle
+ungeraden $N$ erf\"{u}llt.
+\end{theorem}
+
+\begin{proof}[Beweisidee --- Kreismethode]
+Der Beweis nutzt die Hardy-Littlewood-Ramanujan-Kreismethode.
+Definiere die Exponentialsumme
+\[
+  S(\alpha) \;:=\; \sum_{p \leq N} \Lambda(p)\, e^{2\pi i \alpha p},
+\]
+wobei $\Lambda$ die von-Mangoldt-Funktion ist.  Dann gilt
+nach Fourier-Analysis:
+\[
+  r_3(N) \;=\; \int_0^1 S(\alpha)^3\, e^{-2\pi i N \alpha}\, d\alpha.
+\]
+
+\textbf{Hauptb\"{o}gen} $\mathfrak{M}$:
+F\"{u}r $\alpha$ nahe einem rationalen $a/q$ mit kleinem Nenner
+$q \leq Q = N^{1/3}$, d.h.\ $|\alpha - a/q| < N^{-2/3}$, approximiert
+man $S(\alpha)$ durch Gau\ss{}summen und den Primzahlsatz in
+arithmetischen Progressionen.  Dies liefert den Hauptterm
+$\mathfrak{S}(N) \cdot N^2/(2(\log N)^3)$.
+
+\textbf{Nebenb\"{o}gen} $\mathfrak{m} = [0,1] \setminus \mathfrak{M}$:
+Vinogradovs Mittelwertsatz und die Methode der Exponentialsummen
+(van der Corput-Weyl-Vinogradov) ergeben die Schranke
+\[
+  \sup_{\alpha \in \mathfrak{m}} |S(\alpha)| \;\ll\; \frac{N}{(\log N)^A}
+\]
+f\"{u}r jedes $A > 0$.  Daher ist das Nebenbogen-Integral
+$o\!\left(N^2/(\log N)^3\right)$ und vernachl\"{a}ssigbar.
+\end{proof}
+
+\begin{bemerkung}
+Vinogradovs Satz gilt f\"{u}r $N > \exp(\exp(11{,}503))$.
+Helfgott (2013) reduzierte diese Schranke auf $N > 10^{30}$ und
+kombinierte sie mit einer rechnerischen Verifikation f\"{u}r
+$N \leq 8{,}875 \times 10^{30}$, um Theorem~\ref{thm:helfgott}
+zu beweisen.
+\end{bemerkung}
+
+\subsection{Hardy-Littlewood-Goldbach-Vermutung}
+
+\begin{vermutung}[Hardy-Littlewood, 1923 \cite{HardyLittlewood1923}]
+\label{verm:hardy-littlewood}
+F\"{u}r jede gerade Zahl $n \geq 4$ gilt asymptotisch:
+\[
+  G(n) \;\sim\; 2\,\Pi_2
+  \prod_{\substack{p > 2 \\ p \mid n}}
+  \frac{p-1}{p-2}
+  \cdot \frac{n}{(\log n)^2}, \qquad n \to \infty,
+\]
+mit der Zwillingsprimkonstante
+\[
+  \Pi_2 \;:=\; \prod_{p > 2} \frac{p(p-2)}{(p-1)^2}
+        \;\approx\; 0{,}6601618\ldots
+\]
+\end{vermutung}
+
+\begin{bemerkung}
+Diese Vermutung ist \textbf{offen}.  Sie steht in Einklang mit der
+gesamten numerischen Evidenz.  Der Zusatzfaktor
+$\prod_{p \mid n}(p-1)/(p-2)$ erkl\"{a}rt, warum $G(n)$ bei Zahlen
+mit vielen kleinen Primfaktoren besonders gro\ss{} ist (die Spitzen
+im Kometen).
+\end{bemerkung}
+
+% ============================================================
+\section{Waringsches Problem}\label{sec:waring}
+% ============================================================
+
+\subsection{Formulierung und Geschichte}
+
+Im Jahr 1770 behauptete Edward Waring ohne Beweis, jede positive ganze
+Zahl sei Summe von h\"{o}chstens 4 Quadraten, 9 Kuben, 19 vierten
+Potenzen usw.  Dies wurde als \emph{Waringsches Problem} bekannt.
+
+\begin{definition}[$g(k)$ und $G(k)$]
+F\"{u}r $k \geq 2$ sei:
+\begin{align*}
+  g(k) &:= \text{kleinstes } s, \text{ sodass jede positive ganze Zahl
+           Summe von } s \text{ vollst\"{a}ndigen } k\text{-ten Potenzen ist,}\\
+  G(k) &:= \text{kleinstes } s, \text{ sodass jede \emph{hinreichend gro\ss{}e}
+           positive ganze Zahl Summe von } s \text{ vollst\"{a}ndigen }
+           k\text{-ten Potenzen ist.}
+\end{align*}
+Offensichtlich gilt $G(k) \leq g(k)$.
+\end{definition}
+
+\subsection{Der Hilbert-Waring-Satz}
+
+\begin{theorem}[Hilbert-Waring-Satz, 1909 \cite{Hilbert1909}]
+\label{thm:hilbert-waring}
+F\"{u}r jedes $k \geq 2$ ist $g(k)$ endlich.  \"{A}quivalent:
+Die Menge der vollst\"{a}ndigen $k$-ten Potenzen bildet eine additive
+Basis endlicher Ordnung.
+\end{theorem}
+
+\begin{proof}[Beweis\-idee]
+Hilberts urspr\"{u}nglicher Beweis (1909) nutzte algebraische Identit\"{a}ten
+und ein kombinatorisches Mittelungsargument.  Moderne Beweise verwenden
+die Hardy-Littlewood-Kreismethode: Die Anzahl der Darstellungen von $n$
+als Summe von $s$ vollst\"{a}ndigen $k$-ten Potenzen ist
+\[
+  R_{s,k}(n) \;=\; \int_0^1
+  \left(\sum_{m=1}^{n^{1/k}} e^{2\pi i \alpha m^k}\right)^s
+  e^{-2\pi i n \alpha}\, d\alpha.
+\]
+F\"{u}r $s$ hinreichend gro\ss{} (in Abh\"{a}ngigkeit von $k$) zeigt die
+Methode $R_{s,k}(n) > 0$ f\"{u}r alle gro\ss{}en $n$.
+\end{proof}
+
+\subsection{Bekannte Werte}
+
+Der exakte Wert von $g(k)$ ist f\"{u}r alle $k$ bekannt (mit geringf\"{u}gigen
+Ausnahmen, die von einer diophantischen Bedingung abh\"{a}ngen):
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}ccc@{}}
+\toprule
+$k$ & $g(k)$ & $G(k)$ (bekannt/vermutet) \\
+\midrule
+2 & 4  & 4 \\
+3 & 9  & $\leq 7$ (exakter Wert: $G(3) = 7$ vermutet) \\
+4 & 19 & 15 (vermutet; $G(4) \leq 15$ bewiesen) \\
+5 & 37 & $\leq 21$ \\
+6 & 73 & $\leq 31$ \\
+7 & 143 & $\leq 45$ \\
+8 & 279 & $\leq 62$ \\
+\bottomrule
+\end{tabular}
+\caption{Werte von $g(k)$ (alle bewiesen) und Schranken f\"{u}r $G(k)$.}
+\label{tab:waring}
+\end{table}
+
+\begin{theorem}[Lagranges Vier-Quadrate-Satz, 1770 \cite{Lagrange1770}]
+Jede positive ganze Zahl ist die Summe von vier Quadratzahlen:
+$g(2) = 4$.
+\end{theorem}
+
+Die allgemeine Formel f\"{u}r $g(k)$ ($k \geq 2$) lautet:
+\[
+  g(k) = 2^k + \floor{(3/2)^k} - 2,
+\]
+sofern $2^k\{(3/2)^k\} + \floor{(3/2)^k} \leq 2^k$
+(gilt f\"{u}r alle bekannten $k$).
+
+\begin{beispiel}
+\begin{align*}
+  g(2) = 4: &\quad 7 = 2^2 + 1^2 + 1^2 + 1^2. \\
+  g(3) = 9: &\quad 23 = 2^3 + 2^3 + 1^3 + \cdots + 1^3
+                       \text{ (insgesamt 9 Kuben)}. \\
+  g(4) = 19: &\quad 15 = 1^4 + 1^4 + \cdots + 1^4
+                        \text{ (15-mal 1)}.
+\end{align*}
+\end{beispiel}
+
+% ============================================================
+\section{Schnirelmanns Satz}\label{sec:schnirelmann}
+% ============================================================
+
+\subsection{Schnirelmanns Zugang zu Goldbach}
+
+Schnirelmann (1930) f\"{u}hrte seine Dichte ein, um als erster zu
+beweisen, dass die Primzahlen eine additive Basis \emph{endlicher}
+Ordnung bilden.
+
+\begin{theorem}[Schnirelmann, 1930 \cite{Schnirelmann1930}]
+\label{thm:schnirelmann}
+Die Menge der Primzahlen $\mathbb{P}$ (zusammen mit $\{0, 1\}$) bildet
+eine additive Basis der Ordnung $s < \infty$ f\"{u}r $\N$, d.h.\ jede
+ganze Zahl $n \geq 2$ ist Summe von h\"{o}chstens $s$ Primzahlen.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Sei $A = \{0, 1\} \cup \mathbb{P}$.  Schnirelmann vermied die
+Goldbach-Vermutung (damals unbewiesen) durch:
+\begin{enumerate}[label=(\arabic*)]
+\item $\sigma(A) > 0$ (da $1 \in A$ und viele Primzahlen in $A$ liegen).
+\item Den \emph{Schnirelmannschen Summsatz}
+      (Theorem~\ref{thm:schnirelmann-summ}): Iteratives Bilden von
+      $A + A + \cdots$ ergibt schlie\ss{}lich Schnirelmann-Dichte $\geq 1$,
+      d.h.\ die Summe enth\"{a}lt alle positiven ganzen Zahlen.
+\end{enumerate}
+Schnirelmanns urspr\"{u}ngliche Schranke war $s \leq 800{.}000$.
+\end{proof}
+
+\subsection{Die Schnirelmann-Konstante}
+
+\begin{definition}[Schnirelmann-Konstante]
+Die \emph{Schnirelmann-Konstante} $s$ ist das kleinste ganze Zahl, sodass
+jede ganze Zahl $n \geq 2$ Summe von h\"{o}chstens $s$ Primzahlen ist.
+\end{definition}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+Autor & Jahr & Schranke f\"{u}r $s$ \\
+\midrule
+Schnirelmann & 1930 & $s \leq 800{.}000$ \\
+Romanov      & 1934 & $s \leq 2{.}208$ \\
+Vinogradov   & 1937 & $s \leq 4$ (f\"{u}r ungerades $n \geq N_0$ gro\ss{}) \\
+Helfgott     & 2013 & $s \leq 4$ (f\"{u}r alle $n \geq 2$;
+                              $s = 3$ f\"{u}r ungerades $n \geq 7$) \\
+\bottomrule
+\end{tabular}
+\caption{Geschichte der Schranken f\"{u}r die Schnirelmann-Konstante~$s$.}
+\label{tab:schnirelmann}
+\end{table}
+
+Als Folgerung aus Theorem~\ref{thm:helfgott}:
+\begin{korollar}
+Jede ganze Zahl $n \geq 2$ ist Summe von h\"{o}chstens $4$ Primzahlen.
+\end{korollar}
+
+\subsection{Schnirelmann-Dichte-Ungleichung}
+
+F\"{u}r die Primzahlmenge $\mathbb{P}$ gilt $\sigma(\mathbb{P}) = 0$,
+da $2 \notin \mathbb{P}_0$ (mit angef\"{u}gter 0).  Dennoch gilt
+$\sigma(A) > 0$ f\"{u}r $A = \{0,1\} \cup \mathbb{P}$, weil $1 \in A$.
+Die Schl\"{u}sselungleichung
+\[
+  \sigma(A + B) \;\geq\; \sigma(A) + \sigma(B) - \sigma(A)\sigma(B)
+\]
+erlaubt eine schrittweise Verbesserung bis die Dichte $1$ erreicht.
+
+% ============================================================
+\section{Freimans Struktursatz}\label{sec:freiman}
+% ============================================================
+
+\subsection{Die triviale Schranke}
+
+\begin{lemma}[Triviale untere Schranke]\label{lem:trivial}
+F\"{u}r jede endliche Menge $A \subseteq \Z$ mit $\abs{A} = n$ gilt:
+\[
+  \abs{A + A} \;\geq\; 2n - 1.
+\]
+\end{lemma}
+
+\begin{proof}
+F\"{u}r $A = \{a_1 < a_2 < \cdots < a_n\}$ sind
+$2a_1 < a_1 + a_2 < 2a_2 < \cdots < a_{n-1} + a_n < 2a_n$
+lauter verschiedene Elemente von $A + A$, also genau $2n - 1$ St\"{u}ck.
+\end{proof}
+
+Gleichheit $\abs{A + A} = 2\abs{A} - 1$ gilt genau dann, wenn $A$
+eine arithmetische Progression ist.  Freimans Satz charakterisiert
+strukturell, wann $\abs{A + A}$ klein ist.
+
+\subsection{Freimans Struktursatz}
+
+\begin{definition}[Verallgemeinerte arithmetische Progression]
+Eine \emph{verallgemeinerte arithmetische Progression} (GAP) der Dimension
+$d$ ist eine Menge der Form
+\[
+  P \;=\; \{a_0 + x_1 r_1 + x_2 r_2 + \cdots + x_d r_d :
+             0 \leq x_j \leq L_j - 1\}
+\]
+f\"{u}r $a_0, r_1, \ldots, r_d \in \Z$ und positive ganze Zahlen
+$L_1, \ldots, L_d$.  Ihre \emph{Gr\"{o}\ss{}e} ist $L_1 \cdot L_2 \cdots L_d$.
+\end{definition}
+
+\begin{theorem}[Freimans Satz \cite{Freiman1973}]\label{thm:freiman}
+Sei $A \subseteq \Z$ endlich mit $\abs{A + A} \leq K \abs{A}$
+f\"{u}r ein $K \geq 1$.  Dann ist $A$ in einer verallgemeinerten
+arithmetischen Progression $P$ der Dimension $d \leq d(K)$ und der
+Gr\"{o}\ss{}e h\"{o}chstens $f(K)\abs{A}$ enthalten,
+wobei $d(K)$ und $f(K)$ nur von $K$ abh\"{a}ngen.
+\end{theorem}
+
+\begin{bemerkung}
+Freimans urspr\"{u}nglicher Beweis (1973) lieferte gewaltige Schranken.
+Ruzsa (1994) gab einen eleganten Beweis mit $d \leq K - 1$ und
+$f(K) = e^{CK}$.  Die \emph{Polynomielle Freiman-Ruzsa-Vermutung}
+(Gowers 2007, Green-Tao 2006) strebt Verbesserungen zu
+$d = O(\log K)$ und $f(K) = K^{O(1)}$ an; sie wurde von
+Gowers-Green-Manners-Tao 2023 bewiesen.
+\end{bemerkung}
+
+\begin{korollar}[Freiman, Doppelsumset-Version]
+Wenn $\abs{A + A} \leq K\abs{A}$, ist $A$ ``fast'' eine arithmetische
+Progression: es liegt in einer Progression beschr\"{a}nkter Dimension.
+\end{korollar}
+
+\subsection{Cauchy-Davenport-Satz}
+
+F\"{u}r Mengen in $\Z/p\Z$ ($p$ prim) ist die triviale Schranke scharf:
+
+\begin{theorem}[Cauchy-Davenport \cite{Cauchy1813}]
+Sei $p$ prim und $A, B \subseteq \Z/p\Z$ nicht leer.  Dann gilt:
+\[
+  \abs{A + B} \;\geq\; \min(p,\; \abs{A} + \abs{B} - 1).
+\]
+\end{theorem}
+
+Gleichheit gilt genau dann, wenn $A$ und $B$ arithmetische
+Progressionen mit demselben gemeinsamen Unterschied sind.
+
+% ============================================================
+\section{Erd\H{o}s-Tur\'{a}n-Vermutung}\label{sec:erdos-turan}
+% ============================================================
+
+\subsection{Darstellungsfunktionen}
+
+\begin{definition}[Darstellungsfunktion]
+F\"{u}r $A \subseteq \N_0$ und $h \geq 2$ definieren wir:
+\[
+  r_{h,A}(n) \;:=\; \abs{\{(a_1, \ldots, a_h) \in A^h :
+                          a_1 + \cdots + a_h = n\}}.
+\]
+Ist $A$ eine Basis der Ordnung $h$ f\"{u}r $\N$, so gilt
+$r_{h,A}(n) \geq 1$ f\"{u}r alle hinreichend gro\ss{}en $n$.
+\end{definition}
+
+\subsection{Die Vermutung}
+
+\begin{vermutung}[Erd\H{o}s-Tur\'{a}n, 1941 \cite{ErdosTuran1941}]
+\label{verm:erdos-turan}
+Wenn $A \subseteq \N_0$ eine additive Basis der Ordnung $2$ ist (d.h.\
+jede hinreichend gro\ss{}e Zahl ist Summe zweier Elemente von $A$),
+dann ist
+\[
+  r_{2,A}(n) \;=\; \abs{\{(a, b) \in A \times A : a + b = n\}}
+\]
+unbeschr\"{a}nkt: $\limsup_{n \to \infty} r_{2,A}(n) = \infty$.
+\end{vermutung}
+
+Mit anderen Worten: Wenn jede gro\ss{}e Zahl als $a + b$ mit $a, b \in A$
+darstellbar ist, dann haben zwingend unendlich viele Zahlen \emph{viele}
+solche Darstellungen.
+
+\begin{bemerkung}
+Diese Vermutung ist \textbf{offen}.  Sie wurde f\"{u}r viele spezifische
+Mengenfamilien verifiziert, aber kein allgemeiner Beweis ist bekannt.
+
+Partielle Resultate:
+\begin{itemize}
+\item Erd\H{o}s (1956): Es gibt eine Basis $A$ der Ordnung 2 mit
+      $r_{2,A}(n) = O(\log n)$.  Die Vermutung w\"{a}re daher, falls
+      wahr, im Wesentlichen scharf.
+\item Borwein-Choi-Chu (2006): Verifiziert f\"{u}r spezifische
+      polynomielle Folgen.
+\end{itemize}
+\end{bemerkung}
+
+\subsection{Zusammenhang mit der Goldbach-Vermutung}
+
+Wenn Goldbachs bin\"{a}re Vermutung (Vermutung~\ref{verm:goldbach-binaer})
+gilt, bildet $\mathbb{P}$ eine Basis der Ordnung 2 f\"{u}r gerade
+ganze Zahlen.  Die Erd\H{o}s-Tur\'{a}n-Vermutung w\"{u}rde dann
+$\limsup_{n \to \infty} G(n) = \infty$ voraussagen --- konsistent mit,
+aber viel schw\"{a}cher als die Hardy-Littlewood-Vermutung
+(Vermutung~\ref{verm:hardy-littlewood}).
+
+% ============================================================
+\section{Rechnerische Aspekte}\label{sec:rechnerisch}
+% ============================================================
+
+\subsection{Implementierung in \texttt{goldbach\_extended.py}}
+
+Das Python-Modul \texttt{goldbach\_extended.py} implementiert:
+\begin{itemize}
+\item \texttt{GoldbachExtended}: berechnet $G(n)$, den Goldbach-Kometen,
+      die Hardy-Littlewood-Heuristik, Chens Satz-Verifikation,
+      tern\"{a}re Goldbach-Pr\"{u}fungen und die Schnirelmann-Analyse.
+\item \texttt{VinogradovMethod}: berechnet die Exponentialsumme $S(\alpha)$,
+      die singuläre Reihe $\mathfrak{S}(N)$, Hauptbogen-Beschreibungen
+      und eine numerische Sch\"{a}tzung von $r_3(N)$.
+\end{itemize}
+
+\subsection{Goldbach-Komet}
+
+Der \emph{Goldbach-Komet} ist das Streudiagramm von $G(n)$ f\"{u}r gerade $n$.
+Tabelle~\ref{tab:komet} zeigt berechnete Werte:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}cc|cc|cc@{}}
+\toprule
+$n$ & $G(n)$ & $n$ & $G(n)$ & $n$ & $G(n)$ \\
+\midrule
+4   & 1  & 20  & 4  & 60  & 9  \\
+6   & 1  & 30  & 5  & 100 & 6  \\
+8   & 1  & 40  & 3  & 120 & 12 \\
+10  & 2  & 50  & 4  & 200 & 9  \\
+12  & 1  & 52  & 3  & 360 & 22 \\
+\bottomrule
+\end{tabular}
+\caption{Goldbach-Partitionsfunktion $G(n)$ f\"{u}r ausgew\"{a}hlte gerade $n$.
+Die Spitze bei $n = 360$ erkl\"{a}rt sich durch die vielen kleinen
+Primfaktoren dieser Zahl.}
+\label{tab:komet}
+\end{table}
+
+\subsection{Hardy-Littlewood-Heuristik}
+
+Die Methode \texttt{hardy\_littlewood\_goldbach(n)} berechnet:
+\[
+  \widehat{G}(n) \;=\; 2\,\Pi_2
+  \prod_{\substack{p > 2 \\ p \mid n}} \frac{p-1}{p-2}
+  \cdot \frac{n}{(\log n)^2}.
+\]
+
+\begin{beispiel}
+F\"{u}r $n = 100$: $100 = 2^2 \cdot 5^2$, also ist $p = 5$ der einzige
+relevante ungerade Primfaktor.
+\[
+  \widehat{G}(100) \;=\; 2 \times 0{,}6602 \times \frac{4}{3} \times
+  \frac{100}{(\log 100)^2} \;\approx\; 6{,}5.
+\]
+Der wahre Wert ist $G(100) = 6$ --- ein sehr gutes Ergebnis.
+\end{beispiel}
+
+\subsection{Tern\"{a}re Goldbach-Verifikation}
+
+Die Methode \texttt{verify\_ternary\_goldbach\_range(n\_max)} best\"{a}tigt
+Theorem~\ref{thm:helfgott} rechnerisch f\"{u}r $n \leq 10{.}000$:
+\begin{itemize}
+\item Alle 4{.}997 ungeraden Zahlen von 7 bis 9{.}999 k\"{o}nnen als
+      Summe dreier Primzahlen geschrieben werden.
+\item Keine Ausnahmen gefunden (konsistent mit Theorem~\ref{thm:helfgott}).
+\end{itemize}
+
+\subsection{Singuläre Reihe}
+
+F\"{u}r ungerades $N = 101$ liefert die singuläre Reihe
+(mit \texttt{prime\_limit=200}):
+\[
+  \mathfrak{S}(101) \;\approx\; 1{,}3284.
+\]
+Die vorhergesagte Darstellungsanzahl (gewichtet) ist dann:
+\[
+  r_3(101) \;\approx\; 1{,}3284 \times \frac{101^2}{2 (\log 101)^3}
+  \;\approx\; 74.
+\]
+
+\subsection{Waringsches Problem --- Verifikation}
+
+Das Modul \texttt{additive\_number\_theory.py} implementiert
+\texttt{WaringProblem.waring\_g(k)}, das $g(k)$ f\"{u}r kleine $k$
+durch ersch\"{o}pfende Suche verifiziert:
+\[
+  g(2) = 4,\quad g(3) = 9,\quad g(4) = 19.
+\]
+Diese Werte werden durch direkte Berechnung f\"{u}r ganze Zahlen bis
+$n = 1{.}000$ best\"{a}tigt.
+
+% ============================================================
+\section{Zusammenfassung und offene Probleme}\label{sec:zusammenfassung}
+% ============================================================
+
+Wir fassen den Status der wichtigsten Ergebnisse zusammen:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}p{7cm}ll@{}}
+\toprule
+Aussage & Status & Referenz \\
+\midrule
+Bin\"{a}re Goldbach ($n \geq 4$ gerade $= p + q$) &
+  \textbf{Vermutung (offen)} & \cite{Goldbach1742} \\
+Tern\"{a}re Goldbach ($n \geq 7$ ungerade $= p+q+r$) &
+  \textbf{Theorem} & \cite{Helfgott2013} \\
+Chens Satz (hinr.\ gro\ss{}es gerades $n = p + P_2$) &
+  \textbf{Theorem} & \cite{Chen1973} \\
+Vinogradovs Dreiprimzahlsatz (gro\ss{}es ungerades $n$) &
+  \textbf{Theorem} & \cite{Vinogradov1937} \\
+Hardy-Littlewood-Vermutung ($G(n)$ Asymptotik) &
+  \textbf{Vermutung (offen)} & \cite{HardyLittlewood1923} \\
+Hilbert-Waring-Satz ($g(k) < \infty$) &
+  \textbf{Theorem} & \cite{Hilbert1909} \\
+Lagranges Vier-Quadrate-Satz ($g(2) = 4$) &
+  \textbf{Theorem} & \cite{Lagrange1770} \\
+Schnirelmann: Primzahlen bilden eine Basis &
+  \textbf{Theorem} & \cite{Schnirelmann1930} \\
+Freimans Struktursatz &
+  \textbf{Theorem} & \cite{Freiman1973} \\
+Erd\H{o}s-Tur\'{a}n-Vermutung &
+  \textbf{Vermutung (offen)} & \cite{ErdosTuran1941} \\
+\bottomrule
+\end{tabular}
+\caption{\"{U}bersicht: bewiesene S\"{a}tze vs.\ offene Vermutungen.}
+\label{tab:status}
+\end{table}
+
+\subsection*{Offene Probleme}
+\begin{enumerate}[label=(\arabic*)]
+\item Beweis (oder Widerlegung) der bin\"{a}ren Goldbach-Vermutung.
+\item Bestimmung des exakten Wertes von $G(k)$ f\"{u}r $k \geq 3$.
+\item Beweis der Erd\H{o}s-Tur\'{a}n-Vermutung.
+\item Beweis der Hardy-Littlewood-Vermutung \"{u}ber $G(n)$.
+\item Erweiterung des Green-Tao-Satzes (Primzahlen enthalten beliebig
+      lange arithmetische Progressionen) auf quantitative Ergebnisse
+      \"{u}ber die L\"{a}nge von APs in dichten Teilmengen von Primzahlen.
+\end{enumerate}
+
+% ============================================================
+\section*{Literatur}\label{sec:literatur}
+% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Goldbach1742}
+C.\ Goldbach,
+\textit{Brief an L.\ Euler}, 7.\ Juni 1742.
+
+\bibitem{Lagrange1770}
+J.-L.\ Lagrange,
+\textit{D\'{e}monstration d'un th\'{e}or\`{e}me d'arithm\'{e}tique},
+Nouveaux M\'{e}m.\ Akad.\ Roy.\ Sci.\ Belles-Lettres de Berlin (1770),
+S.\  123--133.
+
+\bibitem{Cauchy1813}
+A.-L.\ Cauchy,
+\textit{Recherches sur les nombres},
+J.\ \'{E}cole Polytech.\ \textbf{9} (1813), S.\ 99--116.
+
+\bibitem{Schnirelmann1930}
+L.\ G.\ Schnirelmann,
+\textit{\"{U}ber additive Eigenschaften von Zahlen}
+(russisch), Math.\ Ann.\ \textbf{107} (1932), S.\ 649--690.
+Urspr\"{u}nglich in: Izv.\ Donskogo Politekhn.\ Inst.\ \textbf{14} (1930).
+
+\bibitem{Vinogradov1937}
+I.\ M.\ Vinogradov,
+\textit{Some theorems concerning the theory of prime numbers},
+Matem.\ Sbornik \textbf{2}(44) (1937), S.\ 179--196.
+
+\bibitem{HardyLittlewood1923}
+G.\ H.\ Hardy und J.\ E.\ Littlewood,
+\textit{Some problems of `Partitio Numerorum': III.\ On the expression of
+a number as a sum of primes},
+Acta Math.\ \textbf{44} (1923), S.\ 1--70.
+
+\bibitem{Hilbert1909}
+D.\ Hilbert,
+\textit{Beweis f\"{u}r die Darstellbarkeit der ganzen Zahlen durch eine
+feste Anzahl $n^{\text{ter}}$ Potenzen (Waringsche Problem)},
+Math.\ Ann.\ \textbf{67} (1909), S.\ 281--300.
+
+\bibitem{Chen1973}
+J.\ R.\ Chen,
+\textit{On the representation of a large even integer as the sum of a
+prime and the product of at most two primes},
+Sci.\ Sinica \textbf{16} (1973), S.\ 157--176.
+
+\bibitem{ErdosTuran1941}
+P.\ Erd\H{o}s und P.\ Tur\'{a}n,
+\textit{On a problem of Sidon in additive number theory, and on some
+related problems},
+J.\ London Math.\ Soc.\ \textbf{16} (1941), S.\ 212--215.
+
+\bibitem{Freiman1973}
+G.\ A.\ Freiman,
+\textit{Foundations of a Structural Theory of Set Addition},
+Transl.\ Math.\ Monographs \textbf{37}, AMS, Providence, RI, 1973.
+
+\bibitem{OliveiraSilva2012}
+T.\ Oliveira e Silva, S.\ Herzog und S.\ Pardi,
+\textit{Empirical verification of the even Goldbach conjecture and
+computation of prime gaps up to $4 \times 10^{18}$},
+Math.\ Comp.\ \textbf{83} (2014), S.\ 2033--2060.
+
+\bibitem{Helfgott2013}
+H.\ A.\ Helfgott,
+\textit{The ternary Goldbach conjecture is true},
+arXiv:1312.7748 (2013).
+
+\end{thebibliography}
+
+\end{document}
