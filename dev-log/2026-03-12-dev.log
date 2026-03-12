@@ -321,3 +321,74 @@ Zwei neue Papers erstellt:
   - FEATURES.md aktualisiert (Gruppe A Sektion)
   - Review-Bugfixes aus 5 Audit-Dateien: LLC-Chronologie, Wiles 1990,
     Collatz-Ergodizität (conditional), Proposition 4.1 (circular), Lehmer Lemma 4.1
+
+### 2026-03-12 — Build 126: Neue Module euler_gamma_irrationality, zeta_odd_values, pillai_chowla
+
+**Neue Module:**
+- `src/euler_gamma_irrationality.py`: EulerMascheroniConstant + StieltjesConstants
+  - γ auf bis zu 100 Stellen (mpmath Brent-McMillan)
+  - Harmonische-Reihen-, ζ-Grenzwert-, Vacca-, Apéry-artige Darstellungen
+  - Stieltjes-Konstanten γ_n (n=0..10), Laurent-Entwicklung von ζ(s)
+  - Papanikolaou-Schranke q > 10^{242080} dokumentiert
+
+- `src/zeta_odd_values.py`: ZetaOddValues
+  - ζ(3) auf 50 Stellen; ζ(5), ζ(7) hochpräzise
+  - Apéry-Approximationsfolge und Kettenbruch
+  - Hypergeometrische Darstellungen
+  - Ball-Rivoal-Theorem (2001) und Zudilin-Theorem (2004) formell implementiert
+  - Irrationalitätsmaß μ(ζ(3)) ≤ 5.513890 (Rhin-Viola 2001)
+
+- `src/pillai_chowla.py`: PillaiChowla
+  - Pillai-Chowla-Vermutung (schwach) verifiziert für n ≤ 200
+  - Wichtige Korrektur: Stärkere Form (alle n≠m) ist FALSCH (Gegenbeispiele: n=3,m=6 → gcd=7)
+  - Wilson-Theorem, Wilson-Primzahlen (5, 13, 563)
+  - Sylvester-Produkt und Sylvester-Folge
+  - Mertens' 3. Theorem: ∏_{p≤n} p/(p-1) ~ e^γ ln n
+
+**MD-Dokumentation:**
+- `src/euler_gamma_irrationality.md`
+- `src/zeta_odd_values.md`
+- `src/pillai_chowla.md`
+
+**Tests:** `tests/test_gamma_zeta_pillai.py` — 97 Tests, alle bestanden
+
+### 2026-03-12 12:05:48 — Build 127: Mahler-Maß, Vollkommene Zahlen, Waring-Goldbach
+
+**Neue Module:**
+- `src/mahler_measure.py`: MahlerMeasure + SchurSiegelSmythTrace
+  - Mahler-Maß via Produktformel und Jensen-Integral
+  - Lehmer-Dezim-Polynom: M ≈ 1.17628 (auf 4 Dezimalstellen verifiziert)
+  - Smyth-Konstante 1.3247... für nicht-reziproke Polynome
+  - Kronecker-Theorem: M(P)=1 ↔ alle Wurzeln auf Einheitskreis
+  - Kreisteilungspolynome via sympy.cyclotomic_poly
+  - SchurSiegelSmythTrace: Spurverhältnis für total positive alg. Zahlen
+
+- `src/perfect_numbers.py`: SigmaFunction + EvenPerfectNumbers + OddPerfectNumberBounds
+  - σ(n), Multiplikativität, Abundanzindex
+  - Euklid-Euler-Theorem: erste 8 gerade vollkommene Zahlen
+  - Mersenne-Primzahltest, Verifikation Euklid-Euler
+  - Touchard-Kongruenz: n ≡ 1 (mod 12) oder n ≡ 9 (mod 36)
+  - Nielsen-Schranke: ≥ 9 verschiedene Primfaktoren
+  - Chein-Struktur, Euler-Form n = p^{4a+1}·m²
+
+- `src/waring_goldbach.py`: WaringGoldbachK2 + WaringGoldbachGeneral
+  - k=2: Darstellung als Summe von ≤5 Primzahlquadraten (Hua 1938)
+  - Sieb-basierte Darstellungssuche
+  - Hua's G(k)-Schranken für k=1..8
+  - Vinogradov-Wooley Efficient Congruencing-Formel
+  - Goldbach-Vermutung-Prüfung (CONJECTURE-Status korrekt markiert)
+  - Vinogradov/Helfgott Drei-Primzahlen-Theorem
+
+**Mathematische Korrektur (Test-TDD):**
+  - n=10 ist NICHT als Summe von Primzahlquadraten darstellbar
+    (1 ist keine Primzahl; einzige P² ≤ 10 sind 4=2² und 9=3²)
+  - Test auf n=13 = 2²+3² (korrekt) korrigiert
+
+**MD-Dokumentation:**
+- `src/mahler_measure.md`
+- `src/perfect_numbers.md`
+- `src/waring_goldbach.md`
+
+**Tests:** `tests/test_mahler_perfect_waring.py` — 111 Tests, alle bestanden
+
+### Build-Nummer: 126 → 127
