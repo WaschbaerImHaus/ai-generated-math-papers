@@ -1,0 +1,864 @@
+% =============================================================================
+% paper46_galoistheorie_de.tex
+% Paper 46: Galois-Theorie — Von Körpererweiterungen zur Unlösbarkeit der Quintik
+% Specialist Mathematics Project — Build 135
+% Autor: Michael Fuhrmann
+% Datum: 2026-03-12
+% =============================================================================
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% ---------------------------------------------------------------------------
+% Theorem-Umgebungen
+% ---------------------------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+% ---------------------------------------------------------------------------
+% Metadaten
+% ---------------------------------------------------------------------------
+\title{Galois-Theorie:\\
+       Von Körpererweiterungen zur Unlösbarkeit der Quintik}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 135}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\keywords{Galois-Theorie, Körpererweiterungen, Zerfällungskörper, Galois-Gruppe,
+          Hauptsatz, Lösbarkeit durch Radikale, Satz von Abel-Ruffini,
+          Kronecker-Weber-Satz, Konstruierbarkeit}
+
+\subjclass[2020]{12F10, 12F20, 11R32, 12E05}
+
+% ---------------------------------------------------------------------------
+% Makros
+% ---------------------------------------------------------------------------
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Gal}{\operatorname{Gal}}
+\newcommand{\Aut}{\operatorname{Aut}}
+\newcommand{\ord}{\operatorname{ord}}
+\newcommand{\Fix}{\operatorname{Fix}}
+\newcommand{\chara}{\operatorname{char}}
+
+% =============================================================================
+\begin{document}
+% =============================================================================
+
+\begin{abstract}
+Die Galois-Theorie gehört zu den tiefgründigsten Errungenschaften der
+Mathematikgeschichte. Von \'{E}variste Galois 1832 entwickelt und posthum
+veröffentlicht, stellt sie eine tiefe Korrespondenz zwischen den Symmetriegruppen
+der Polynomwurzeln und der Arithmetik von Körpererweiterungen her. Diese Arbeit
+präsentiert eine in sich geschlossene Einführung in die Galois-Theorie: Ausgehend
+von den Grundlagen der Körpererweiterungen und algebraischen Abschlüsse über
+Zerfällungskörper, Separabilität, Normalität und Galois-Gruppe bis hin zum
+berühmten Hauptsatz der Galois-Theorie. Anschließend wird diese Maschinerie
+angewandt, um die klassischen Probleme der Lösbarkeit durch Radikale — insbesondere
+der Satz von Abel-Ruffini — und die Konstruierbarkeit mit Zirkel und Lineal zu
+klären. Der Kronecker-Weber-Satz über abelsche Erweiterungen von $\Q$ wird als
+weiteres bedeutendes Anwendungsbeispiel vorgestellt. Durchgehend illustrieren
+konkrete Beispiele die abstrakte Theorie.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% =============================================================================
+\section{Einleitung}
+% =============================================================================
+
+Das Problem, Polynomgleichungen durch Radikale zu lösen — also durch
+\emph{geschlossene Formeln} mit den Koeffizienten und verschachtelten Wurzeln —
+beschäftigte Mathematiker über Jahrhunderte. Die Babylonier kannten die
+Lösungsformel für quadratische Gleichungen um 2000 v.\,Chr.; Cardano
+veröffentlichte die kubische Formel in der \emph{Ars Magna} (1545), und
+Ferrari leitete im selben Jahrzehnt eine Formel für Grad vier her. Aber
+Grad fünf widerstand allen Anstrengungen bis 1799, als Paolo Ruffini
+(mit einem unvollständigen Beweis) ankündigte, keine solche Formel könne
+existieren; Abel lieferte 1824 den ersten rigorosen Beweis.
+
+Die entgültige Erklärung kam von \'{E}variste Galois (1811--1832), der in
+einem Memoire, das er in der Nacht vor seinem tödlichen Duell schrieb, erschuf,
+was wir heute \emph{Galois-Theorie} nennen. Galois ordnete jedem Polynom
+$f \in K[x]$ eine Symmetriegruppe $\Gal(f/K)$ seiner Wurzeln zu und bewies:
+\[
+  f \text{ ist durch Radikale lösbar} \iff \Gal(f/K) \text{ ist eine auflösbare Gruppe.}
+\]
+Da das generische Grad-5-Polynom die Galois-Gruppe $S_5$ besitzt und
+$A_5 \trianglelefteq S_5$ einfach und nicht-abelsch ist, ist $S_5$ nicht
+auflösbar; daher existiert keine Radikalformel für Grad fünf.
+
+Die Theorie hat sich weit über ihren Ursprung hinaus entwickelt. Heute ist
+die Galois-Theorie zentral für die algebraische Zahlentheorie, das
+Langlands-Programm und die moderne Kryptographie.
+
+\subsection*{Historische Zeittafel}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Jahr & Entwicklung \\
+\midrule
+$\sim$2000 v.\,Chr. & Babylonische Lösungsformel für quadratische Gleichungen \\
+1545 & Cardano/Ferrari: kubische und quartische Formeln (\emph{Ars Magna}) \\
+1799 & Ruffini: erster (unvollständiger) Beweis der Unlösbarkeit für Grad 5 \\
+1824 & Abel: strenger Beweis des Satzes von Abel-Ruffini \\
+1832 & Galois: gruppentheoretisches Kriterium; Memoire posthum veröffentlicht \\
+1870 & Jordan: erstes Buch über Gruppentheorie mit Galois-Theorie \\
+1801/1853 & Gauß/Kronecker-Weber: Kreisteilungskörper und abelsche Erweiterungen \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% =============================================================================
+\section{Körpererweiterungen}
+\label{sec:koerper}
+% =============================================================================
+
+\subsection{Grundlegende Definitionen}
+
+\begin{definition}
+Eine \emph{Körpererweiterung} $L/K$ ist eine Einbettung von Körpern
+$K \subseteq L$. Der \emph{Grad} $[L:K] = \dim_K L$ ist die Dimension von
+$L$ als $K$-Vektorraum. Die Erweiterung heißt \emph{endlich}, wenn
+$[L:K] < \infty$.
+\end{definition}
+
+\begin{theorem}[Turmsatz]
+Sind $K \subseteq F \subseteq L$ Körper, so gilt
+\[
+  [L:K] = [L:F] \cdot [F:K].
+\]
+\end{theorem}
+
+\begin{proof}
+Sei $\{e_i\}$ eine Basis von $F$ über $K$ und $\{f_j\}$ eine Basis von $L$
+über $F$. Man zeigt, dass $\{e_i f_j\}$ eine $K$-Basis von $L$ bildet, also
+$[L:K] = |I| \cdot |J| = [F:K] \cdot [L:F]$.
+\end{proof}
+
+\subsection{Algebraische und transzendente Elemente}
+
+\begin{definition}
+Ein Element $\alpha \in L$ heißt \emph{algebraisch über $K$}, wenn ein
+nichttriviales Polynom $f \in K[x]$ mit $f(\alpha) = 0$ existiert. Andernfalls
+heißt $\alpha$ \emph{transzendent über $K$}. Die Erweiterung $L/K$ heißt
+\emph{algebraisch}, wenn jedes Element von $L$ algebraisch über $K$ ist.
+\end{definition}
+
+\begin{definition}
+Das \emph{Minimalpolynom} $\mathrm{min}_{K}(\alpha)$ eines algebraischen
+Elements $\alpha$ über $K$ ist das eindeutige normierte irreduzible Polynom
+in $K[x]$, das $\alpha$ als Nullstelle hat.
+\end{definition}
+
+\begin{proposition}
+Ist $\alpha$ algebraisch über $K$ mit Minimalpolynom $p$ vom Grad $n$, so gilt
+$K(\alpha) \cong K[x]/(p)$ und $[K(\alpha):K] = n$.
+\end{proposition}
+
+\begin{beispiel}
+Das Minimalpolynom von $\sqrt{2}$ über $\Q$ ist $x^2 - 2$, also
+$[\Q(\sqrt{2}):\Q] = 2$ und $\Q(\sqrt{2}) = \{a + b\sqrt{2} : a,b \in \Q\}$.
+Entsprechend gilt $\mathrm{min}_\Q(\sqrt[3]{2}) = x^3 - 2$, also
+$[\Q(\sqrt[3]{2}):\Q] = 3$.
+\end{beispiel}
+
+\begin{beispiel}
+Der algebraische Abschluss $\overline{\Q}$ von $\Q$ ist algebraisch über $\Q$,
+aber von unendlichem Grad. Die reellen Zahlen $\pi$ und $e$ sind transzendent
+über $\Q$ (Lindemann-Weierstraß).
+\end{beispiel}
+
+\subsection{Einfache Erweiterungen und Kompositum}
+
+\begin{definition}
+Das \emph{Kompositum} $L_1 L_2$ zweier Erweiterungen $L_1, L_2$ von $K$ in
+einem gemeinsamen Oberkörper ist der kleinste Teilkörper, der $L_1$ und $L_2$
+enthält.
+\end{definition}
+
+% =============================================================================
+\section{Zerfällungskörper und algebraischer Abschluss}
+% =============================================================================
+
+\subsection{Zerfällungskörper}
+
+\begin{definition}
+Ein \emph{Zerfällungskörper} von $f \in K[x]$ ist eine Körpererweiterung
+$L/K$, so dass $f$ über $L$ in Linearfaktoren zerfällt, d.\,h.
+$f(x) = a \prod_{i=1}^n (x - \alpha_i)$ mit $\alpha_i \in L$, und
+$L = K(\alpha_1,\dots,\alpha_n)$.
+\end{definition}
+
+\begin{theorem}[Existenz und Eindeutigkeit von Zerfällungskörpern]
+\label{thm:zerfall}
+Für jedes $f \in K[x]$ existiert ein Zerfällungskörper $L/K$. Dieser ist bis
+auf $K$-Isomorphie eindeutig, und es gilt $[L:K] \leq (\deg f)!$.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+\emph{Existenz}: Durch Induktion über $\deg f$. Hat $f$ keinen irreduziblen
+Faktor vom Grad $> 1$ in $K[x]$, ist $K$ selbst der Zerfällungskörper. Andernfalls
+wähle einen irreduziblen Faktor $p \mid f$, setze $K_1 = K[x]/(p)$, adjungiere
+eine Wurzel $\alpha_1$ von $p$, und fahre mit $f/(x-\alpha_1)$ über $K_1$ fort.
+
+\emph{Eindeutigkeit}: Zwei Zerfällungskörper $L, L'$ sind durch einen
+$K$-Isomorphismus verbunden, der schrittweise entlang der Wurzeln konstruiert wird.
+\end{proof}
+
+\begin{beispiel}
+Der Zerfällungskörper von $x^3 - 2$ über $\Q$ ist
+$\Q(\sqrt[3]{2}, \omega)$ mit $\omega = e^{2\pi i/3}$.
+Es gilt $[\Q(\sqrt[3]{2},\omega):\Q] = 6$.
+\end{beispiel}
+
+\subsection{Algebraischer Abschluss}
+
+\begin{definition}
+Ein Körper $\Omega$ heißt \emph{algebraisch abgeschlossen}, wenn jedes
+nicht-konstante Polynom in $\Omega[x]$ eine Wurzel in $\Omega$ besitzt.
+Der \emph{algebraische Abschluss} $\overline{K}$ von $K$ ist der kleinste
+algebraisch abgeschlossene Körper, der $K$ enthält.
+\end{definition}
+
+\begin{theorem}[Existenz des algebraischen Abschlusses (Steinitz, 1910)]
+Jeder Körper $K$ besitzt einen algebraischen Abschluss $\overline{K}$,
+eindeutig bis auf $K$-Isomorphie.
+\end{theorem}
+
+% =============================================================================
+\section{Separabilität und Normalität}
+% =============================================================================
+
+\subsection{Separable Erweiterungen}
+
+\begin{definition}
+Ein Polynom $f \in K[x]$ heißt \emph{separabel}, wenn es keine mehrfachen
+Wurzeln in $\overline{K}$ besitzt, d.\,h. $\gcd(f, f') = 1$ in $K[x]$.
+Ein algebraisches Element $\alpha$ über $K$ heißt separabel, wenn
+$\mathrm{min}_K(\alpha)$ separabel ist. Eine algebraische Erweiterung $L/K$
+heißt \emph{separabel}, wenn jedes Element von $L$ separabel über $K$ ist.
+\end{definition}
+
+\begin{bemerkung}
+Jede algebraische Erweiterung eines Körpers der Charakteristik $0$ (z.\,B.\ $\Q$)
+oder eines endlichen Körpers ist separabel. Nicht-separable Erweiterungen treten
+nur in Charakteristik $p > 0$ auf.
+\end{bemerkung}
+
+\begin{theorem}[Satz vom primitiven Element]
+Ist $L/K$ eine endliche separable Erweiterung, so gilt $L = K(\theta)$ für
+ein $\theta \in L$.
+\end{theorem}
+
+\subsection{Normale Erweiterungen}
+
+\begin{definition}
+Eine endliche Erweiterung $L/K$ heißt \emph{normal}, wenn sie der
+Zerfällungskörper eines Polynoms $f \in K[x]$ ist. Äquivalent: Für jedes
+irreduzible $p \in K[x]$ gilt: Hat $p$ eine Wurzel in $L$, so zerfällt $p$
+vollständig in $L$.
+\end{definition}
+
+\begin{beispiel}
+$\Q(\sqrt[3]{2})/\Q$ ist \emph{nicht} normal: $x^3 - 2$ hat eine Wurzel
+$\sqrt[3]{2} \in \Q(\sqrt[3]{2})$, zerfällt dort aber nicht vollständig.
+Der Zerfällungskörper $\Q(\sqrt[3]{2},\omega)$ ist normal über $\Q$.
+\end{beispiel}
+
+% =============================================================================
+\section{Die Galois-Gruppe}
+\label{sec:galoisgruppe}
+% =============================================================================
+
+\begin{definition}
+Sei $L/K$ eine Körpererweiterung. Die \emph{Galois-Gruppe} ist
+\[
+  \Gal(L/K) = \Aut_K(L) = \{\sigma: L \xrightarrow{\sim} L \mid \sigma|_K = \mathrm{id}_K\}.
+\]
+Dies ist eine Gruppe unter Komposition von Abbildungen.
+\end{definition}
+
+\begin{definition}
+Eine endliche Erweiterung $L/K$ heißt \emph{Galois-Erweiterung}, wenn sie
+sowohl normal als auch separabel ist. In diesem Fall gilt $|\Gal(L/K)| = [L:K]$.
+\end{definition}
+
+\begin{beispiel}[Kreisteilungserweiterung]
+Sei $\zeta_n = e^{2\pi i/n}$. Die Erweiterung $\Q(\zeta_n)/\Q$ ist galoissch
+mit
+\[
+  \Gal(\Q(\zeta_n)/\Q) \cong (\Z/n\Z)^\times.
+\]
+Jeder Automorphismus $\sigma_k$ (mit $\ggT(k,n)=1$) sendet $\zeta_n \mapsto \zeta_n^k$.
+\end{beispiel}
+
+\begin{beispiel}[Galois-Gruppe von $x^3 - 2$]
+Der Zerfällungskörper $L = \Q(\sqrt[3]{2}, \omega)$ über $\Q$ hat $[L:\Q] = 6$.
+Die Galois-Gruppe $\Gal(L/\Q) \cong S_3$, die symmetrische Gruppe auf drei
+Elementen, die durch Permutation der drei Wurzeln
+$\{\sqrt[3]{2}, \omega\sqrt[3]{2}, \omega^2\sqrt[3]{2}\}$ operiert.
+\end{beispiel}
+
+\begin{beispiel}[Galois-Gruppe einer quadratischen Gleichung]
+Für $f(x) = x^2 - d$ mit $d \in \Q$ kein vollständiges Quadrat gilt
+$\Gal(\Q(\sqrt{d})/\Q) \cong \Z/2\Z$,
+erzeugt durch $\sqrt{d} \mapsto -\sqrt{d}$.
+\end{beispiel}
+
+\subsection{Diskriminante und Galois-Gruppe}
+
+\begin{theorem}
+Sei $f \in K[x]$ separabel vom Grad $n$ mit Zerfällungskörper $L/K$.
+Die Galois-Gruppe $G = \Gal(L/K)$ bettet sich in $S_n$ ein via ihre Wirkung
+auf die Wurzeln. Ist $\Delta = \prod_{i < j}(\alpha_i - \alpha_j)^2$ die
+Diskriminante:
+\begin{enumerate}[label=(\roman*)]
+  \item $G \subseteq A_n$ genau dann, wenn $\sqrt{\Delta} \in K$.
+  \item Für $n = 3$: $G \cong A_3 \cong \Z/3\Z$ genau dann, wenn
+        $\sqrt{\Delta} \in K$; sonst $G \cong S_3$.
+  \item Für $n = 2$: $G \cong \Z/2\Z$ genau dann, wenn
+        $\Delta \notin K^{\times 2}$.
+\end{enumerate}
+\end{theorem}
+
+\subsection{Frobenius-Endomorphismus}
+
+\begin{definition}
+Für einen endlichen Körper $\F_{p^n}$ ist der \emph{Frobenius-Automorphismus}
+$\varphi: x \mapsto x^p$. Es gilt
+\[
+  \Gal(\F_{p^n}/\F_p) = \langle \varphi \rangle \cong \Z/n\Z.
+\]
+\end{definition}
+
+% =============================================================================
+\section{Der Hauptsatz der Galois-Theorie}
+% =============================================================================
+
+\begin{theorem}[Hauptsatz der Galois-Theorie]
+\label{thm:hauptsatz}
+Sei $L/K$ eine endliche Galois-Erweiterung mit Galois-Gruppe $G = \Gal(L/K)$.
+Es gibt eine ordnungsumkehrende Bijektion
+\[
+  \left\{\text{Untergruppen } H \leq G\right\}
+  \longleftrightarrow
+  \left\{\text{Zwischenkörper } K \subseteq F \subseteq L\right\}
+\]
+gegeben durch $H \mapsto L^H = \Fix(H) = \{x \in L : \sigma(x) = x\ \forall\,\sigma \in H\}$
+und $F \mapsto \Gal(L/F)$. Außerdem gilt:
+\begin{enumerate}[label=(\roman*)]
+  \item $[L:L^H] = |H|$ und $[L^H:K] = [G:H]$.
+  \item $H$ ist normal in $G$ genau dann, wenn $L^H/K$ eine Galois-Erweiterung
+        ist; in diesem Fall $\Gal(L^H/K) \cong G/H$.
+  \item Die triviale Untergruppe $\{e\}$ entspricht $L$, und $G$ selbst
+        entspricht $K$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Die wesentlichen Hilfsmittel sind:
+\begin{itemize}
+  \item \emph{Artins Satz}: Ist $G$ eine endliche Automorphismengruppe von $L$
+        mit Fixkörper $K = L^G$, so gilt $[L:K] = |G|$, und $L/K$ ist galoissch
+        mit Gruppe $G$.
+  \item \emph{Injektivität}: Die Abbildung $H \mapsto L^H$ ist injektiv, da
+        jedes $\sigma \in H \setminus \{e\}$ ein Element von $L$ bewegt, das
+        nicht von allen $\sigma \in H$ festgelassen wird.
+  \item \emph{Surjektivität}: Für jeden Zwischenkörper $F$ gilt
+        $F = L^{\Gal(L/F)}$ nach Artins Satz, angewandt auf $\Gal(L/F)$
+        mit Fixkörper $F$.
+  \item Die Gradformel $[L:L^H] = |H|$ folgt direkt aus Artins Satz.
+\end{itemize}
+\end{proof}
+
+\begin{beispiel}[Galois-Korrespondenz für $\Q(\sqrt{2},\sqrt{3})$]
+Sei $L = \Q(\sqrt{2},\sqrt{3})$. Dann $[L:\Q] = 4$ und
+$G = \Gal(L/\Q) \cong \Z/2\Z \times \Z/2\Z = \{e, \sigma, \tau, \sigma\tau\}$
+mit $\sigma(\sqrt{2}) = -\sqrt{2}$, $\sigma(\sqrt{3}) = \sqrt{3}$,
+$\tau(\sqrt{2}) = \sqrt{2}$, $\tau(\sqrt{3}) = -\sqrt{3}$.
+
+Untergruppen und zugehörige Fixkörper:
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Untergruppe $H$ & Fixkörper $L^H$ \\
+\midrule
+$\{e\}$ & $L = \Q(\sqrt{2},\sqrt{3})$ \\
+$\{e, \sigma\}$ & $\Q(\sqrt{3})$ \\
+$\{e, \tau\}$ & $\Q(\sqrt{2})$ \\
+$\{e, \sigma\tau\}$ & $\Q(\sqrt{6})$ \\
+$G$ & $\Q$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Da $G$ abelsch ist, sind alle Untergruppen normal, d.\,h. alle
+Zwischenerweiterungen sind galoissch über $\Q$.
+\end{beispiel}
+
+% =============================================================================
+\section{Lösbarkeit durch Radikale}
+% =============================================================================
+
+\subsection{Radikalerweiterungen}
+
+\begin{definition}
+Eine Erweiterung $L/K$ heißt \emph{Radikalerweiterung}, wenn ein Turm
+\[
+  K = K_0 \subset K_1 \subset \cdots \subset K_r = L
+\]
+existiert mit $K_{i+1} = K_i(\alpha_i)$ und $\alpha_i^{n_i} \in K_i$ für
+gewisse $n_i \in \Z_{>0}$. Ein Polynom $f \in K[x]$ ist \emph{durch Radikale
+lösbar}, wenn sein Zerfällungskörper in einer Radikalerweiterung von $K$
+enthalten ist.
+\end{definition}
+
+\begin{definition}
+Eine Gruppe $G$ heißt \emph{auflösbar}, wenn sie eine subnormale Reihe
+\[
+  \{e\} = G_r \trianglelefteq G_{r-1} \trianglelefteq \cdots \trianglelefteq G_0 = G
+\]
+mit abelschen Faktoren $G_{i-1}/G_i$ besitzt.
+\end{definition}
+
+\begin{beispiel}[Auflösbare Gruppen kleiner Ordnung]
+$S_1, S_2, S_3, S_4$ sind auflösbar:
+\begin{align*}
+  S_3 &\supset A_3 \cong \Z/3\Z \supset \{e\},
+  \quad \text{Faktoren: } \Z/2\Z,\ \Z/3\Z \\
+  S_4 &\supset A_4 \supset V_4 \cong (\Z/2\Z)^2 \supset \Z/2\Z \supset \{e\},
+  \quad \text{alle Faktoren abelsch.}
+\end{align*}
+\end{beispiel}
+
+\subsection{Der Hauptsatz über Lösbarkeit durch Radikale}
+
+\begin{theorem}[Galois, 1832]
+\label{thm:loesbar}
+Sei $K$ ein Körper der Charakteristik $0$ und $f \in K[x]$. Dann ist $f$
+durch Radikale über $K$ lösbar genau dann, wenn $\Gal(f/K)$ eine auflösbare
+Gruppe ist.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+($\Rightarrow$) Liegt $L$ in einem Radikalturm $K = K_0 \subset \cdots \subset
+K_r$, so kann man jeden Schritt durch eine zyklische Erweiterung ersetzen
+(nach Adjunktion geeigneter Einheitswurzeln), was eine Kette von Galois-Gruppen
+mit zyklischen — also abelschen — Quotienten liefert. Damit ist $\Gal(L/K)$
+auflösbar.
+
+($\Leftarrow$) Ist $G = \Gal(L/K)$ auflösbar mit der Reihe
+$\{e\} = G_r \trianglelefteq \cdots \trianglelefteq G_0 = G$, so bilden die
+Fixkörper $K_i = L^{G_i}$ Zwischenerweiterungen mit
+$\Gal(K_{i+1}/K_i) \cong G_i/G_{i+1}$ zyklisch. Nach der Kummer-Theorie
+(nach Adjunktion geeigneter Einheitswurzeln) ist jede zyklische Erweiterung
+vom Grad $n$ von der Form $K_i(\alpha_i)$ mit $\alpha_i^n \in K_i$, also
+radikal.
+\end{proof}
+
+\subsection{Explizite Formeln für Grad 2, 3 und 4}
+
+Der Vollständigkeit halber führen wir die klassischen Radikalformeln auf.
+
+\begin{beispiel}[Grad 2]
+$x^2 + px + q = 0$ hat die Lösungen
+$x = \dfrac{-p \pm \sqrt{p^2 - 4q}}{2}$.
+Die Galois-Gruppe ist trivial, wenn $p^2 - 4q$ ein Quadrat in $K$ ist,
+sonst $\Z/2\Z$; in beiden Fällen auflösbar.
+\end{beispiel}
+
+\begin{beispiel}[Grad 3: Cardano-Formel]
+Für $x^3 + px + q = 0$ (deprimierte Form) sei $\Delta = -4p^3 - 27q^2$.
+Die Wurzeln sind
+\[
+  x_k = \omega^k \sqrt[3]{-\frac{q}{2} + \sqrt{-\frac{\Delta}{108}}}
+       + \omega^{-k} \sqrt[3]{-\frac{q}{2} - \sqrt{-\frac{\Delta}{108}}},
+  \quad k = 0,1,2,
+\]
+mit $\omega = e^{2\pi i/3}$. Der Radikalturm ist
+$\Q \subset \Q(\omega) \subset \Q(\omega, u)$, wobei $u$ eine Kubikwurzel ist.
+\end{beispiel}
+
+\begin{beispiel}[Grad 4: Ferraris Methode]
+Ferrari (1545) reduzierte die Quartik durch eine Hilfsgröße (\emph{Resolventenkubik}).
+Für $f(x) = x^4 + bx^2 + cx + d$ lautet die kubische Resolvente
+$y^3 - by^2 - 4dy + (4bd - c^2)$. Nach Lösung der Kubik durch Cardano
+reduziert sich die Quartik auf zwei quadratische Gleichungen, was einen
+Radikalturm der Tiefe 4 ergibt.
+\end{beispiel}
+
+% =============================================================================
+\section{Die Unlösbarkeit der Quintik}
+% =============================================================================
+
+\subsection{Einfachheit von $A_5$}
+
+\begin{theorem}[$A_5$ ist einfach]
+\label{thm:a5einfach}
+Die alternierende Gruppe $A_5$ der geraden Permutationen auf 5 Elementen
+ist einfach, d.\,h. sie besitzt keinen echten nicht-trivialen Normalteiler.
+\end{theorem}
+
+\begin{proof}
+$|A_5| = 60$. Die Konjugationsklassen in $A_5$ haben die Größen
+$1, 12, 12, 15, 20$. Ein Normalteiler $N \trianglelefteq A_5$ ist eine
+Vereinigung von Konjugationsklassen, die die Identität enthält; also ist $|N|$
+ein Teiler von $60$ und muss als Teilsumme aus $\{1, 12, 12, 15, 20\}$
+(die $1$ enthaltend) darstellbar sein. Die einzigen solchen Teilsummen, die
+$60$ teilen, sind $1$ und $60$, also gilt $N = \{e\}$ oder $N = A_5$.
+\end{proof}
+
+\subsection{Nicht-Auflösbarkeit von $S_5$}
+
+\begin{theorem}[$S_5$ ist nicht auflösbar]
+\label{thm:s5nichtloesbar}
+Die symmetrische Gruppe $S_5$ ist nicht auflösbar.
+\end{theorem}
+
+\begin{proof}
+Die einzigen Normalteiler von $S_5$ sind $\{e\}$, $A_5$ und $S_5$. Die Reihe
+$S_5 \supset A_5 \supset \{e\}$ hat den Faktor $A_5/\{e\} \cong A_5$, der
+nicht abelsch ist ($|A_5| = 60$, und eine einfache nicht-triviale Gruppe
+der Ordnung $> 1$ ist nicht abelsch, es sei denn zyklisch). Also ist $S_5$
+nicht auflösbar.
+\end{proof}
+
+\subsection{Der Satz von Abel-Ruffini-Galois}
+
+\begin{theorem}[Abel-Ruffini, 1824; Galois, 1832]
+\label{thm:abelruffini}
+Es gibt keine allgemeine Lösungsformel durch Radikale für Polynomgleichungen
+vom Grad $n \geq 5$ über $\Q$.
+\end{theorem}
+
+\begin{proof}
+Es genügt, ein Polynom vom Grad $5$ mit Galois-Gruppe $S_5$ anzugeben.
+Betrachte $f(x) = x^5 - x - 1 \in \Q[x]$. Man kann zeigen (mit Hilfe der
+Diskriminante und Dedekinds Reduktionslemma modulo Primzahlen), dass
+$\Gal(f/\Q) \cong S_5$. Nach Satz~\ref{thm:loesbar} ist $f$ durch Radikale
+lösbar genau dann, wenn $S_5$ auflösbar ist. Da $S_5$ nicht auflösbar ist
+(Satz~\ref{thm:s5nichtloesbar}), besitzt $f$ keine Darstellung seiner Wurzeln
+durch Radikale und Koeffizienten.
+
+Da das \emph{generische} Grad-$n$-Polynom über $\Q(t_1,\dots,t_n)$ die
+Galois-Gruppe $S_n$ hat und $S_n$ für $n \geq 5$ nicht auflösbar ist,
+existiert keine allgemeine Radikalformel für beliebige Polynome vom Grad
+$n \geq 5$.
+\end{proof}
+
+\begin{bemerkung}
+Der Satz besagt \emph{nicht}, dass kein einziges Grad-5-Polynom durch
+Radikale lösbar wäre. Viele sind es durchaus: z.\,B.\ $x^5 - 2$ ist lösbar
+(seine Galois-Gruppe ist die Frobenius-Gruppe $\Z/5\Z \rtimes \Z/4\Z$ der
+Ordnung 20, die auflösbar ist). Die Aussage ist, dass keine
+\emph{universelle Formel} in den Koeffizienten für alle Polynome funktioniert.
+\end{bemerkung}
+
+\begin{bemerkung}
+Kompositionsreihen nach Grad:
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+Grad & Galois-Gruppe & Auflösbar? & Formel \\
+\midrule
+1 & $\{e\}$ & Ja & $x = -b/a$ \\
+2 & $\Z/2\Z$ & Ja & Quadratische Formel \\
+3 & $\subseteq S_3$ & Ja & Cardano (1545) \\
+4 & $\subseteq S_4$ & Ja & Ferrari (1545) \\
+$\geq 5$ & kann $S_n$ sein & Nein & Keine allgemeine Formel \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{bemerkung}
+
+% =============================================================================
+\section{Der Kronecker-Weber-Satz}
+% =============================================================================
+
+\subsection{Kreisteilungskörper}
+
+\begin{definition}
+Das $n$-te \emph{Kreisteilungspolynom} ist
+\[
+  \Phi_n(x) = \prod_{\substack{1 \leq k \leq n \\ \ggT(k,n) = 1}} (x - e^{2\pi i k/n})
+  \in \Z[x],
+\]
+vom Grad $\varphi(n) = |(\Z/n\Z)^\times|$. Der $n$-te Kreisteilungskörper ist
+$\Q(\zeta_n)$ mit $\zeta_n = e^{2\pi i/n}$.
+\end{definition}
+
+\begin{theorem}[Galois-Gruppe des Kreisteilungskörpers]
+$\Q(\zeta_n)/\Q$ ist eine Galois-Erweiterung vom Grad $\varphi(n)$ mit
+$\Gal(\Q(\zeta_n)/\Q) \cong (\Z/n\Z)^\times$
+(abelsche Gruppe).
+\end{theorem}
+
+\subsection{Der Satz}
+
+\begin{theorem}[Kronecker-Weber, 1853/1886]
+\label{thm:kronweber}
+Jede endliche abelsche Erweiterung von $\Q$ ist in einem Kreisteilungskörper
+enthalten. Genauer: Ist $L/\Q$ eine endliche Galois-Erweiterung mit abelscher
+Galois-Gruppe, so gilt $L \subseteq \Q(\zeta_n)$ für ein $n \in \Z_{>0}$.
+\end{theorem}
+
+\begin{bemerkung}
+Kronecker formulierte den Satz 1853, jedoch ohne vollständigen Beweis.
+Weber gab 1886 einen (fast vollständigen) Beweis. Den ersten vollständigen
+Beweis lieferte Hilbert (1896).
+\end{bemerkung}
+
+\begin{proof}[Beweisskizze via lokale-globale Argumente]
+Der moderne Beweis verläuft in zwei Schritten:
+\begin{enumerate}
+  \item \emph{Lokaler Kronecker-Weber}: Jede endliche abelsche Erweiterung von
+        $\Q_p$ (den $p$-adischen rationalen Zahlen) ist in einem Kreisteilungskörper
+        über $\Q_p$ enthalten (bewiesen über die Struktur von $\Q_p^\times$ mittels
+        lokaler Klassenkörpertheorie oder direkten Argumenten).
+  \item \emph{Globale Zusammensetzung}: Eine endliche abelsche Erweiterung
+        $L/\Q$ ist durch ihre Vervollständigungen an allen Primzahlen bestimmt.
+        Aus dem lokalen Ergebnis an jeder Primzahl $p \mid [L:\Q]$ konstruiert
+        man ein $n$ mit $L \subseteq \Q(\zeta_n)$.
+\end{enumerate}
+\end{proof}
+
+\begin{beispiel}
+Die Erweiterung $\Q(\sqrt{d})/\Q$ für quadratfreies $d$ hat Galois-Gruppe
+$\Z/2\Z$ (abelsch). Nach Kronecker-Weber gilt
+$\Q(\sqrt{d}) \subseteq \Q(\zeta_n)$ für ein geeignetes $n$. Tatsächlich:
+$\Q(\sqrt{d}) \subseteq \Q(\zeta_{|d|})$ (bzw.\ $\Q(\zeta_{4|d|})$ für
+$d \equiv 2,3 \pmod{4}$).
+\end{beispiel}
+
+\begin{beispiel}
+$\Q(i) = \Q(\sqrt{-1}) \subseteq \Q(\zeta_4)$, da $\zeta_4 = i$.
+\end{beispiel}
+
+\begin{bemerkung}
+Kronecker-Weber ist der erste große Satz der Klassenkörpertheorie. Seine
+Verallgemeinerung — das Artinsche Reziprozitätsgesetz — beschreibt abelsche
+Erweiterungen eines beliebigen Zahlkörpers $K$ mittels der Idelklassengruppe
+von $K$.
+\end{bemerkung}
+
+% =============================================================================
+\section{Konstruierbarkeit mit Zirkel und Lineal}
+% =============================================================================
+
+\subsection{Algebraisches Kriterium}
+
+\begin{definition}
+Eine reelle Zahl $\alpha$ heißt \emph{konstruierbar}, wenn sie aus $0$ und $1$
+durch endlich viele Körperoperationen und Quadratwurzeln gewonnen werden kann.
+Äquivalent: $\alpha$ ist konstruierbar genau dann, wenn ein Turm
+\[
+  \Q = F_0 \subset F_1 \subset \cdots \subset F_m
+\]
+mit $[F_{i+1}:F_i] = 2$ für alle $i$ und $\alpha \in F_m$ existiert.
+\end{definition}
+
+\begin{theorem}[Algebraisches Kriterium für Konstruierbarkeit]
+\label{thm:konstruierbar}
+Eine reelle Zahl $\alpha$ ist konstruierbar genau dann, wenn $[\Q(\alpha):\Q]$
+eine Zweierpotenz ist.
+\end{theorem}
+
+\subsection{Klassische Unlösbarkeitsergebnisse}
+
+\begin{korollar}[Würfelverdopplung — unmöglich]
+$\sqrt[3]{2}$ ist mit Zirkel und Lineal nicht konstruierbar.
+\end{korollar}
+
+\begin{proof}
+$[\Q(\sqrt[3]{2}):\Q] = 3$, keine Zweierpotenz.
+\end{proof}
+
+\begin{korollar}[Winkeldreiteilung — im Allgemeinen unmöglich]
+Ein Winkel von $60°$ kann im Allgemeinen nicht mit Zirkel und Lineal
+dreigestrahlt werden.
+\end{korollar}
+
+\begin{proof}
+Die Dreiteilung von $60°$ erfordert die Konstruktion von $\cos 20°$, das die
+Gleichung $8x^3 - 6x - 1 = 0$ erfüllt (irreduzibel über $\Q$, Grad 3). Daher
+$[\Q(\cos 20°):\Q] = 3$, keine Zweierpotenz.
+\end{proof}
+
+\begin{korollar}[Quadratur des Kreises — unmöglich]
+Die reelle Zahl $\sqrt{\pi}$ ist transzendent (Lindemann, 1882), also nicht
+algebraisch und insbesondere nicht konstruierbar.
+\end{korollar}
+
+\subsection{Satz von Gauß-Wantzel: Reguläre Polygone}
+
+\begin{definition}
+Die \emph{Fermat-Primzahlen} sind Primzahlen der Form $F_k = 2^{2^k} + 1$.
+Die bekannten Fermat-Primzahlen sind $3, 5, 17, 257, 65537$
+(für $k = 0,1,2,3,4$).
+\end{definition}
+
+\begin{theorem}[Gauß-Wantzel, 1801/1837]
+\label{thm:gausswantzel}
+Ein reguläres $n$-Eck ist mit Zirkel und Lineal konstruierbar genau dann, wenn
+\[
+  n = 2^a \cdot p_1 \cdot p_2 \cdots p_k,
+\]
+wobei $a \geq 0$ und $p_1 < p_2 < \cdots < p_k$ paarweise verschiedene
+Fermat-Primzahlen sind.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Die Konstruktion eines regulären $n$-Ecks ist äquivalent zur Konstruktion von
+$\zeta_n = e^{2\pi i/n}$, das in $\Q(\zeta_n)$ mit $[\Q(\zeta_n):\Q] = \varphi(n)$
+liegt. Nach Satz~\ref{thm:konstruierbar} ist dies möglich genau dann, wenn
+$\varphi(n)$ eine Zweierpotenz ist. Die elementare Zahlentheorie zeigt, dass
+$\varphi(n) = 2^a$ genau dann gilt, wenn $n$ die angegebene Form hat.
+\end{proof}
+
+\begin{beispiel}[Heptadekagon]
+Gauß entdeckte 1796 (im Alter von 19 Jahren), dass das reguläre 17-Eck
+($n = 17 = F_2$) konstruierbar ist, da $\varphi(17) = 16 = 2^4$. Die explizite
+Konstruktion beinhaltet $\cos(2\pi/17)$, das ausgedrückt werden kann als
+\[
+  \cos\!\left(\frac{2\pi}{17}\right)
+  = \frac{-1 + \sqrt{17} + \sqrt{34 - 2\sqrt{17}}
+    + 2\sqrt{17 + 3\sqrt{17} - \sqrt{34-2\sqrt{17}} - 2\sqrt{34+2\sqrt{17}}}}{16}.
+\]
+Diese Entdeckung soll Gauß so begeistert haben, dass er sich statt für
+Philologie für Mathematik entschied.
+\end{beispiel}
+
+\begin{beispiel}
+Das reguläre Siebeneck ($n = 7$) ist \emph{nicht} konstruierbar:
+$\varphi(7) = 6$ ist keine Zweierpotenz.
+\end{beispiel}
+
+% =============================================================================
+\section{Zusammenfassung und Ausblick}
+% =============================================================================
+
+Die Galois-Theorie verknüpft Algebra, Geometrie und Arithmetik durch ein
+einziges vereinheitlichendes Prinzip: \emph{Symmetrie bestimmt Lösbarkeit.}
+Die hier entwickelten Hauptresultate bilden einen kohärenten Bogen:
+
+\begin{enumerate}
+  \item Körpererweiterungen vom Grad $n$ entsprechen Polynomen vom Grad $n$
+        (§\ref{sec:koerper}).
+  \item Galois-Erweiterungen besitzen eine Symmetriegruppe (§\ref{sec:galoisgruppe}).
+  \item Der Hauptsatz schafft eine perfekte Dualität zwischen Untergruppen
+        und Zwischenkörpern (Satz~\ref{thm:hauptsatz}).
+  \item Ein Polynom ist durch Radikale lösbar genau dann, wenn seine
+        Symmetriegruppe auflösbar ist (Satz~\ref{thm:loesbar}).
+  \item $S_5$ ist nicht auflösbar — dies beweist den Satz von Abel-Ruffini
+        (Satz~\ref{thm:abelruffini}).
+  \item Abelsche Erweiterungen von $\Q$ sind kreisteilungsartig
+        (Satz~\ref{thm:kronweber}).
+  \item Konstruierbarkeit reduziert sich auf Zweierpotenzen als Grad
+        (Sätze~\ref{thm:konstruierbar}, \ref{thm:gausswantzel}).
+\end{enumerate}
+
+\noindent\textbf{Weiterführende Themen.}
+Moderne Erweiterungen der Galois-Theorie umfassen:
+\begin{itemize}
+  \item \emph{Inverses Galois-Problem}: Ist jede endliche Gruppe als Galois-Gruppe
+        über $\Q$ realisierbar? (Im Allgemeinen offen; für auflösbare Gruppen
+        durch Schafarevitsch gelöst.)
+  \item \emph{Étale Kohomologie und Grothendieck}: Verallgemeinerung auf
+        algebraische Geometrie via fundamentale Gruppe
+        $\pi_1^{\text{ét}}(\mathrm{Spec}\,K) = \Gal(\overline{K}/K)$.
+  \item \emph{Langlands-Programm}: Tiefe Vermutungen über Galois-Darstellungen
+        $\rho: \Gal(\overline{\Q}/\Q) \to GL_n(\C)$ und automorphe Formen.
+  \item \emph{$p$-adische und Iwasawa-Theorie}: Galois-Gruppen unendlicher
+        Türme von Zahlkörpern.
+\end{itemize}
+
+\addtocounter{section}{-1}
+\refstepcounter{section}
+\renewcommand{\thesection}{\Alph{section}}
+
+% =============================================================================
+\begin{thebibliography}{99}
+% =============================================================================
+
+\bibitem{galois1832}
+\'{E}.~Galois,
+\textit{Mémoire sur les conditions de résolubilit\'{e} des équations par
+radicaux},
+Manuskript (1832); erstmals veröffentlicht in \textit{Journal de
+Math\'{e}matiques Pures et Appliqu\'{e}es} \textbf{11} (1846), 381--444.
+
+\bibitem{abel1824}
+N.H.~Abel,
+\textit{Mémoire sur les équations algébriques où on démontre l'impossibilité
+de la résolution de l'équation générale du cinquième degré},
+Christiania, 1824.
+
+\bibitem{ruffini1799}
+P.~Ruffini,
+\textit{Teoria generale delle equazioni},
+Bologna, 1799.
+
+\bibitem{lang2002}
+S.~Lang,
+\textit{Algebra}, 3. Aufl.,
+Graduate Texts in Mathematics \textbf{211},
+Springer, New York, 2002.
+
+\bibitem{neukirch1999}
+J.~Neukirch,
+\textit{Algebraische Zahlentheorie},
+Grundlehren der mathematischen Wissenschaften \textbf{322},
+Springer, Berlin, 1992.
+
+\bibitem{stewart2015}
+I.~Stewart,
+\textit{Galois Theory}, 4. Aufl.,
+CRC Press, Boca Raton, 2015.
+
+\bibitem{dummitfoote2004}
+D.S.~Dummit und R.M.~Foote,
+\textit{Abstract Algebra}, 3. Aufl.,
+Wiley, Hoboken, 2004.
+
+\bibitem{cox2004}
+D.A.~Cox,
+\textit{Galois Theory},
+Wiley-Interscience, Hoboken, 2004.
+
+\bibitem{artin1944}
+E.~Artin,
+\textit{Galois Theory},
+Notre Dame Mathematical Lectures \textbf{2},
+University of Notre Dame Press, 1944.
+
+\bibitem{serre1979}
+J.-P.~Serre,
+\textit{Lokale Körper} [Local Fields],
+Graduate Texts in Mathematics \textbf{67},
+Springer, New York, 1979.
+
+\end{thebibliography}
+
+\end{document}
