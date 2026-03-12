@@ -274,3 +274,61 @@
 
 ### Neues Review-Dokument
 - reviews/review_batch11_2026_03_12.md erstellt
+
+---
+
+## 2026-03-12 — Build 136: Batch 12 Audit (Papers 44–47, EN+DE)
+
+### Audit-Umfang
+- 8 LaTeX-Papers vollständig geprüft (mathematisch, syntaktisch, sprachlich, strukturell)
+- Papers: paper44–47, jeweils EN und DE
+
+### Gefundene und behobene Fehler
+
+**2026-03-12: paper44_gruppentheorie_de.tex (NIEDRIG)**
+- Grammatikfehler: "gruppentheoretisches Invariante" → "gruppentheoretisches Invariant"
+
+**2026-03-12: paper45_ring_theory_en.tex (HOCH)**
+- `\begin{algorithm}` verwendet ohne `\newtheorem{algorithm}` → LaTeX-Fehler
+- Behoben: `\newtheorem{algorithm}[theorem]{Algorithm}` in Präambel ergänzt
+
+**2026-03-12: paper45_ringtheorie_de.tex (HOCH + MITTEL)**
+- Gleicher `algorithm`-Fehler wie EN-Version
+- Behoben: `\newtheorem{algorithm}[theorem]{Algorithmus}` ergänzt
+- Fehlendes `\ggT`-Makro (in Beispiel verwendet aber nicht definiert)
+- Behoben: `\newcommand{\ggT}{\operatorname{ggT}}` ergänzt
+
+**2026-03-12: paper46_galois_theory_en.tex (KRITISCH + MITTEL)**
+- Kritischer mathematischer/syntaktischer Fehler in Frobenius-Definition:
+  `$\F_{p^n} = \Gal(p^n)$` — \Gal(p^n) ist kein Körper, LaTeX-semantisch falsch
+  Behoben: Fehlerhafte `= \Gal(p^n)` Gleichsetzung entfernt
+- Fehlendes `\label{sec:fieldext}` bei Section "Field Extensions"
+  obwohl im Summary-Abschnitt `§\ref{sec:fieldext}` referenziert wird
+  Behoben: `\label{sec:fieldext}` zur Section hinzugefügt
+
+**2026-03-12: paper46_galoistheorie_de.tex (MITTEL)**
+- Fehlendes `\ggT`-Makro (in Kreisteilungspolynom `\ggT(k,n)=1` verwendet)
+- Behoben: `\newcommand{\ggT}{\operatorname{ggT}}` in Makro-Block ergänzt
+
+**2026-03-12: paper47_representation_theory_en.tex (MITTEL)**
+- `\begin{abstract}` kam NACH `\maketitle` — in amsart falsche Reihenfolge
+- Behoben: Abstract-Block vor `\maketitle` verschoben
+
+**2026-03-12: paper47_darstellungstheorie_de.tex (MITTEL)**
+- Gleicher abstract-Reihenfolge-Fehler wie EN-Version
+- Behoben: Abstract-Block vor `\maketitle` verschoben
+
+### Mathematische Korrektheit bestätigt
+- Lagrange, Sylow 1/2/3, Jordan-Hölder, Feit-Thompson, CFSG: alle korrekt als Theorem
+- Inverses Galois-Problem: korrekt OFFEN (nur als Bullet-Point, kein Theorem-Env.)
+- Hilbert-Basissatz, Eisenstein, Gauß-Lemma, Nakayama: korrekt als Theorem
+- Abel-Ruffini, Kronecker-Weber, Gauß-Wantzel: korrekt als Theorem
+- Langlands-Korrespondenz: korrekt als Conjecture/Vermutung
+- Maschke, Schur: korrekt als Theorem
+
+### Neue Dateien
+- reviews/review_batch12_2026_03_12.md erstellt
+- src/build.txt: 135 → 136
+
+### Ergebnis: 9 Bugs behoben (1 kritisch, 4 hoch/mittel, 4 niedrig)
+- Alle 8 Papers: DRUCKREIF nach Korrekturen
