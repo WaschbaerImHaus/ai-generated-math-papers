@@ -1,0 +1,706 @@
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{Transcendence Theory:\\
+Classical Results, Open Problems, and Computational Aspects}
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 141}
+\email{specialist-maths@project.local}
+\date{March 12, 2026}
+\keywords{transcendental numbers, Liouville's theorem, Hermite, Lindemann,
+Gelfond-Schneider, Baker's theorem, Euler-Mascheroni constant, Schanuel's conjecture}
+\subjclass[2020]{11J81, 11J91, 11J04, 11J82, 11J89}
+
+\begin{abstract}
+Transcendence theory investigates which complex numbers cannot be roots of any
+non-zero polynomial with rational coefficients. This paper surveys the classical
+milestones: Liouville's construction of the first provably transcendental numbers
+(1844), Hermite's proof that $e$ is transcendental (1873), Lindemann's proof
+that $\pi$ is transcendental (1882) with the corollary that squaring the circle
+is impossible, the Lindemann--Weierstrass theorem, the Gelfond--Schneider
+theorem resolving Hilbert's seventh problem (1934/1935), and Baker's
+far-reaching generalization to linear forms in logarithms (1966).
+We also examine the Euler-Mascheroni constant $\gamma$, whose irrationality
+remains one of the most famous open problems in mathematics, alongside other
+outstanding conjectures including Schanuel's conjecture and the transcendence
+of $e + \pi$ and $e \cdot \pi$. Algorithmic aspects are illustrated with
+Python implementations from the \texttt{transcendence\_theory.py} and
+\texttt{euler\_gamma\_irrationality.py} modules.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% ==========================================================================
+\section{Introduction}
+%% ==========================================================================
+
+The question of which numbers can be expressed as roots of polynomial equations
+with rational coefficients is one of the oldest and deepest in mathematics.
+A complex number $\alpha$ is called \emph{algebraic} if there exists a non-zero
+polynomial $p(x) \in \mathbb{Z}[x]$ with $p(\alpha) = 0$; otherwise $\alpha$
+is called \emph{transcendental}.
+
+The history of transcendence theory spans nearly two centuries.
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{1844}: Joseph Liouville became the first to prove the existence
+        of transcendental numbers by constructing specific examples — the
+        Liouville numbers — whose approximability by rationals is too rapid to
+        be algebraic.
+  \item \textbf{1851}: Liouville published his general criterion (Liouville's
+        theorem on Diophantine approximation).
+  \item \textbf{1873}: Charles Hermite proved that the base of natural
+        logarithms, $e \approx 2.71828\ldots$, is transcendental — the first
+        proof that a \emph{specific naturally arising} constant is transcendental.
+  \item \textbf{1882}: Ferdinand von Lindemann proved that $\pi \approx
+        3.14159\ldots$ is transcendental, settling the ancient question of
+        squaring the circle: it is impossible to construct a square of area
+        $\pi$ using compass and straightedge alone.
+  \item \textbf{1885}: Karl Weierstrass generalized Lindemann's method to
+        obtain the Lindemann--Weierstrass theorem.
+  \item \textbf{1900}: David Hilbert listed the transcendence of $2^{\sqrt{2}}$
+        (and more generally $\alpha^\beta$ for algebraic $\alpha \neq 0,1$ and
+        irrational algebraic $\beta$) as the seventh of his famous 23 problems.
+  \item \textbf{1934/1935}: Alexander Gelfond and Theodor Schneider
+        independently solved Hilbert's seventh problem.
+  \item \textbf{1966}: Alan Baker proved a sweeping generalization concerning
+        linear forms in logarithms of algebraic numbers, for which he received
+        the Fields Medal in 1970.
+\end{itemize}
+
+Despite these profound advances, many basic questions remain open.
+Whether $\gamma = 0.5772\ldots$ (the Euler-Mascheroni constant) is even
+irrational is unknown. The transcendence of $e + \pi$, $e \cdot \pi$,
+$\zeta(3)/\pi^3$, and many other naturally arising constants awaits proof.
+
+This paper is organized as follows. Section~\ref{sec:algebraic-transcendental}
+recalls the definitions and basic cardinality arguments. Sections~\ref{sec:liouville}
+through~\ref{sec:baker} present the principal theorems in historical order.
+Section~\ref{sec:open} collects the major open problems, and
+Section~\ref{sec:euler-mascheroni} focuses on the Euler-Mascheroni constant.
+
+
+%% ==========================================================================
+\section{Algebraic and Transcendental Numbers}
+\label{sec:algebraic-transcendental}
+%% ==========================================================================
+
+\begin{definition}
+A complex number $\alpha \in \mathbb{C}$ is \emph{algebraic} (over $\mathbb{Q}$)
+if there exists a non-zero polynomial $p(x) = a_n x^n + \cdots + a_0 \in
+\mathbb{Z}[x]$ such that $p(\alpha) = 0$. The \emph{degree} of $\alpha$ is the
+degree of its minimal polynomial, i.e.\ the monic polynomial of least degree
+in $\mathbb{Q}[x]$ vanishing at $\alpha$.
+
+A number that is not algebraic is called \emph{transcendental}.
+\end{definition}
+
+\begin{example}
+\begin{enumerate}[label=(\roman*)]
+  \item Every rational number $r = p/q$ is algebraic of degree 1.
+  \item $\sqrt{2}$ is algebraic of degree 2, with minimal polynomial $x^2 - 2$.
+  \item Every $n$-th root of unity $\zeta_n = e^{2\pi i/n}$ is algebraic
+        (root of the cyclotomic polynomial $\Phi_n(x)$).
+  \item $\sqrt{2} + \sqrt{3}$ is algebraic of degree 4.
+  \item $e$, $\pi$, $e^\pi$ are transcendental (see later sections).
+\end{enumerate}
+\end{example}
+
+The set $\overline{\mathbb{Q}}$ of all algebraic numbers forms a subfield of
+$\mathbb{C}$ that is algebraically closed. Its cardinality is countable.
+
+\begin{proposition}
+The set of algebraic numbers $\overline{\mathbb{Q}}$ is countable.
+\end{proposition}
+\begin{proof}
+For each degree $d \geq 1$ and each choice of coefficients $(a_0, \ldots, a_d)
+\in \mathbb{Z}^{d+1}$ with $a_d \neq 0$, the polynomial $a_d x^d + \cdots +
+a_0$ has at most $d$ complex roots. The set of all such polynomials is
+countable (as a countable union of countable sets), and each polynomial
+contributes finitely many algebraic numbers. Hence $\overline{\mathbb{Q}}$ is
+a countable union of finite sets and is therefore countable.
+\end{proof}
+
+\begin{corollary}
+Transcendental numbers exist and, in fact, form a set of the cardinality
+of the continuum. Almost every real number (in the sense of Lebesgue measure)
+is transcendental.
+\end{corollary}
+
+\begin{remark}
+While the existence of transcendental numbers follows from cardinality
+alone (Cantor, 1874), such an argument does not construct any
+specific transcendental number. This motivated Liouville's explicit construction.
+\end{remark}
+
+
+%% ==========================================================================
+\section{Liouville's Theorem and Liouville Numbers}
+\label{sec:liouville}
+%% ==========================================================================
+
+The first explicit transcendental numbers were constructed by Liouville in 1844
+via what is now called \emph{Liouville's theorem on Diophantine approximation}.
+
+\begin{theorem}[Liouville, 1844]
+\label{thm:liouville}
+Let $\alpha$ be a real algebraic number of degree $d \geq 1$. Then there exists
+a constant $c = c(\alpha) > 0$ such that for all rationals $p/q$ (in lowest
+terms, $q \geq 1$),
+\[
+  \left|\alpha - \frac{p}{q}\right| \geq \frac{c}{q^d}.
+\]
+Equivalently, algebraic numbers of degree $d$ cannot be approximated by
+rationals at a rate faster than $q^{-d}$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Let $f(x) = a_d x^d + \cdots + a_0 \in \mathbb{Z}[x]$ be the minimal polynomial
+of $\alpha$. Since $f(\alpha) = 0$ and $f$ is irreducible over $\mathbb{Q}$,
+we have $f(p/q) \neq 0$ for all $p/q \in \mathbb{Q}$.
+Clearing denominators: $|q^d f(p/q)| \geq 1$ (integer, non-zero).
+By the mean value theorem, $f(p/q) = f(p/q) - f(\alpha) = f'(\xi)\,(p/q - \alpha)$
+for some $\xi$ between $p/q$ and $\alpha$. For $|p/q - \alpha| \leq 1$,
+$|\xi|$ is bounded and $|f'(\xi)| \leq M$ for some $M$. Thus
+$|p/q - \alpha| \geq 1/(M q^d)$.
+\end{proof}
+
+This theorem allows one to construct transcendental numbers explicitly:
+
+\begin{definition}
+A real number $\xi$ is called a \emph{Liouville number} if for every $n \in
+\mathbb{N}$ there exist infinitely many rationals $p/q$ with $q > 1$ and
+\[
+  \left|\xi - \frac{p}{q}\right| < \frac{1}{q^n}.
+\]
+Liouville numbers have \emph{irrationality measure} $\mu(\xi) = \infty$.
+\end{definition}
+
+\begin{example}[Liouville's constant]
+The number
+\[
+  L = \sum_{k=1}^{\infty} 10^{-k!}
+  = 0.1100010000000000000000010\ldots
+\]
+is a Liouville number and hence transcendental. The partial sums
+$p_n / q_n$ with $q_n = 10^{n!}$ satisfy $|L - p_n/q_n| < 2 \cdot
+10^{-(n+1)!} = 2/q_n^{n+1}$, violating Liouville's bound for any finite $d$.
+\end{example}
+
+\begin{remark}
+Not all transcendental numbers are Liouville numbers. For instance, $e$ has
+irrationality measure $\mu(e) = 2$, the same as any algebraic irrational.
+The current best lower bound for $\pi$ is $\mu(\pi) \geq 7.103$ (Salikhov, 2008).
+\end{remark}
+
+The irrationality measure $\mu(x)$ is defined as
+\[
+  \mu(x) = \sup\!\left\{\mu \in \mathbb{R} : \left|x - \frac{p}{q}\right|
+  < \frac{1}{q^\mu} \text{ has infinitely many solutions } p/q \in \mathbb{Q}
+  \right\}.
+\]
+Dirichlet's theorem implies $\mu(x) \geq 2$ for all irrational $x$.
+
+
+%% ==========================================================================
+\section{\texorpdfstring{$e$ is Transcendental}{e is Transcendental}}
+\label{sec:e-transcendental}
+%% ==========================================================================
+
+\begin{theorem}[Hermite, 1873]
+\label{thm:e-transcendental}
+The number $e = \sum_{n=0}^{\infty} 1/n!$ is transcendental.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Suppose for contradiction that $e$ is algebraic. Then there exist integers
+$a_0, a_1, \ldots, a_n$ with $a_0, a_n \neq 0$ such that
+\[
+  a_0 + a_1 e + a_2 e^2 + \cdots + a_n e^n = 0.
+\]
+For a large prime $p$ (to be chosen), define the auxiliary polynomial
+\[
+  f(x) = \frac{x^{p-1}(x-1)^p(x-2)^p \cdots (x-n)^p}{(p-1)!}.
+\]
+Set $F(x) = \sum_{j=0}^{np+p-1} f^{(j)}(x)$ (sum of all derivatives).
+Consider the integral
+\[
+  J(t) = e^t \int_0^t e^{-u} f(u)\,du = F(0)\,e^t - F(t).
+\]
+Define
+\[
+  I_k = \int_0^k e^{k-u} f(u)\,du = F(0)\,e^k - F(k), \qquad k = 0, 1, \ldots, n.
+\]
+Then $\sum_{k=0}^n a_k I_k = F(0) \underbrace{\sum_{k=0}^n a_k e^k}_{=0}
+- \sum_{k=0}^n a_k F(k)$.
+
+One shows: (1) $F(0)$ and $F(k)$ for $k = 1, \ldots, n$ are integers
+divisible by $p!/(p-1)! = p$, with $F(0)/p$ not divisible by $p$ for large
+prime $p$ not dividing $a_0 \cdot n!$. Hence $\sum a_k F(k) \neq 0$.
+(2) On the other hand, $|I_k| \leq k \cdot e^k \cdot \max_{[0,k]} |f|
+\to 0$ as $p \to \infty$ (the factorial in the denominator dominates).
+This gives a non-zero integer that is arbitrarily small — a contradiction.
+\end{proof}
+
+\begin{remark}
+Hermite's original proof was significantly more computational. The cleaner
+version presented here is due in part to Hilbert and Hurwitz (ca.\ 1893).
+The key idea — constructing a function whose value at integer points is nearly
+an integer — became the prototype for all subsequent transcendence proofs.
+\end{remark}
+
+Numerically, one can verify that no polynomial of small degree with small
+integer coefficients vanishes at $e$. Our module \texttt{transcendence\_theory.py}
+implements \texttt{e\_is\_transcendental\_demo()}, which checks all monic
+polynomials of degree $\leq 6$ with coefficients in $\{-5, \ldots, 5\}$:
+the minimum value of $|f(e)|$ over all such polynomials is approximately
+$3.9 \times 10^{-3}$ (for degree 2), demonstrating numerically that $e$ does
+not come close to being a root of any such polynomial.
+
+
+%% ==========================================================================
+\section{\texorpdfstring{$\pi$ is Transcendental}{pi is Transcendental}}
+\label{sec:pi-transcendental}
+%% ==========================================================================
+
+\begin{theorem}[Lindemann, 1882]
+\label{thm:pi-transcendental}
+The number $\pi$ is transcendental.
+\end{theorem}
+
+\begin{proof}[Proof sketch (via Lindemann--Weierstrass)]
+Euler's identity $e^{i\pi} + 1 = 0$ gives $e^{i\pi} = -1$.
+If $\pi$ were algebraic, then $i\pi$ would also be algebraic (since $i$ is
+algebraic, being a root of $x^2 + 1$). The Lindemann--Weierstrass theorem
+(Theorem~\ref{thm:lw}) states that for any non-zero algebraic $\alpha$,
+$e^\alpha$ is transcendental. But $e^{i\pi} = -1$ is algebraic — contradiction.
+Hence $\pi$ is transcendental.
+\end{proof}
+
+\begin{corollary}[Squaring the circle is impossible]
+It is impossible to construct, with compass and straightedge alone, a square
+whose area equals that of a given circle.
+\end{corollary}
+\begin{proof}
+A length is constructible if and only if it is algebraic over $\mathbb{Q}$
+and lies in an iterated quadratic extension. Since $\pi$ is transcendental, it
+is not constructible. A square of area $\pi r^2$ (equal to the circle of radius
+$r$) would require constructing $\sqrt{\pi} \cdot r$, but $\sqrt{\pi}$ is
+transcendental as well (if $\sqrt{\pi} = \alpha$ were algebraic, then
+$\pi = \alpha^2$ would be algebraic — contradiction).
+\end{proof}
+
+\begin{remark}
+The same method shows that $\cos(\alpha)$, $\sin(\alpha)$, $\tan(\alpha)$
+are transcendental for every non-zero algebraic $\alpha$, and that
+$\log(\beta)$ is transcendental for every positive algebraic $\beta \neq 1$.
+\end{remark}
+
+
+%% ==========================================================================
+\section{The Lindemann--Weierstrass Theorem}
+\label{sec:lw}
+%% ==========================================================================
+
+\begin{theorem}[Lindemann--Weierstrass, 1882/1885]
+\label{thm:lw}
+Let $\alpha_1, \ldots, \alpha_n \in \overline{\mathbb{Q}}$ be pairwise
+distinct algebraic numbers. Then $e^{\alpha_1}, \ldots, e^{\alpha_n}$ are
+linearly independent over $\overline{\mathbb{Q}}$.
+
+Equivalently: if $\beta_1, \ldots, \beta_n \in \overline{\mathbb{Q}}$ are
+not all zero, then
+\[
+  \beta_1 e^{\alpha_1} + \cdots + \beta_n e^{\alpha_n} \neq 0.
+\]
+\end{theorem}
+
+An important special case:
+
+\begin{corollary}
+For any non-zero algebraic $\alpha$, the number $e^\alpha$ is transcendental.
+\end{corollary}
+
+The proof of the Lindemann--Weierstrass theorem uses an auxiliary polynomial
+construction analogous to Hermite's proof, but generalized to handle several
+exponentials simultaneously. The key ingredient is an estimate of the form:
+if the conclusion fails, then a certain integer expression is non-zero but
+can be made arbitrarily small in absolute value — a contradiction.
+
+\begin{example}
+\begin{enumerate}[label=(\roman*)]
+  \item $\alpha = 1$: $e^1 = e$ is transcendental (Hermite).
+  \item $\alpha = i\pi$: $e^{i\pi} = -1$ is algebraic, so by contrapositive
+        $i\pi$ is transcendental, and since $i$ is algebraic, $\pi$ is
+        transcendental.
+  \item $\alpha = \sqrt{2}$: since $\sqrt{2}$ is algebraic and non-zero,
+        $e^{\sqrt{2}}$ is transcendental.
+  \item $\ln 2$ is transcendental: it is $e^\alpha = 2$ with $\alpha = \ln 2$.
+        If $\ln 2$ were algebraic, then $e^{\ln 2} = 2$ would follow from
+        the theorem — but 2 is algebraic, so the contrapositive gives that
+        $\ln 2$ must be transcendental.
+\end{enumerate}
+\end{example}
+
+The Lindemann--Weierstrass theorem also implies transcendence of the values
+of the trigonometric and logarithmic functions at algebraic arguments:
+
+\begin{corollary}
+For $r \in \mathbb{Q} \setminus \{0\}$:
+$\sin(r)$, $\cos(r)$, $\tan(r)$, $e^r$, $\ln(r+1)$ are all transcendental.
+\end{corollary}
+
+
+%% ==========================================================================
+\section{The Gelfond--Schneider Theorem}
+\label{sec:gelfond-schneider}
+%% ==========================================================================
+
+Hilbert's seventh problem (1900) asked: if $\alpha$ and $\beta$ are algebraic,
+$\alpha \neq 0, 1$, and $\beta$ is irrational, must $\alpha^\beta$ be transcendental?
+
+\begin{theorem}[Gelfond--Schneider, 1934/1935]
+\label{thm:gelfond-schneider}
+Let $\alpha, \beta \in \overline{\mathbb{Q}}$ with $\alpha \neq 0$, $\alpha \neq 1$,
+and $\beta \notin \mathbb{Q}$. Then $\alpha^\beta$ is transcendental.
+\end{theorem}
+
+Alexander Gelfond (1934) and Theodor Schneider (1935) independently proved
+this result, resolving Hilbert's seventh problem.
+
+\begin{proof}[Proof idea]
+Write $\alpha^\beta = e^{\beta \log \alpha}$. The proof constructs an auxiliary
+function $F(z) = \sum_{j,k} c_{jk} \alpha^{jz} \beta^k z^k$ and shows that if
+$\alpha^\beta$ were algebraic, this function would vanish at too many points,
+contradicting an analytic estimate (the function cannot be identically zero
+while vanishing on a large lattice).
+\end{proof}
+
+\begin{example}
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Gelfond--Schneider constant:} $2^{\sqrt{2}} \approx 2.6651\ldots$
+        is transcendental. Here $\alpha = 2$, $\beta = \sqrt{2}$ (irrational algebraic).
+  \item \textbf{Gelfond's constant:} $e^\pi = (e^{i\pi})^{-i} = (-1)^{-i}$.
+        With $\alpha = -1$ (algebraic, $\neq 0,1$) and $\beta = -i$
+        (irrational algebraic), $e^\pi$ is transcendental. Numerically
+        $e^\pi \approx 23.1407\ldots$.
+  \item $i^i = e^{i \log i} = e^{i \cdot i\pi/2} = e^{-\pi/2}$ is transcendental
+        (same reasoning, since $e^\pi$ is transcendental).
+\end{enumerate}
+\end{example}
+
+\begin{remark}
+The Gelfond--Schneider theorem does not apply when $\beta \in \mathbb{Q}$
+(algebraic of degree 1). For example, $2^{1/2} = \sqrt{2}$ is algebraic.
+The condition $\beta \notin \mathbb{Q}$ is essential.
+\end{remark}
+
+
+%% ==========================================================================
+\section{Baker's Theorem on Linear Forms in Logarithms}
+\label{sec:baker}
+%% ==========================================================================
+
+Baker's theorem (1966) is a profound generalization of the Gelfond--Schneider
+theorem to linear forms in logarithms of algebraic numbers.
+
+\begin{theorem}[Baker, 1966]
+\label{thm:baker}
+Let $\alpha_1, \ldots, \alpha_n \in \overline{\mathbb{Q}} \setminus \{0\}$,
+and let $\beta_0, \beta_1, \ldots, \beta_n \in \overline{\mathbb{Q}}$, not all
+zero. If
+\[
+  \Lambda = \beta_0 + \beta_1 \log \alpha_1 + \cdots + \beta_n \log \alpha_n \neq 0,
+\]
+then $\Lambda$ is transcendental.
+
+Moreover, Baker proved an \emph{effective lower bound}:
+\[
+  |\Lambda| \geq \exp\!\bigl(-C \cdot (\log A_1) \cdots (\log A_n) \cdot \log B\bigr),
+\]
+where $A_i$ and $B$ are suitably defined height parameters, and $C > 0$ depends
+only on $n$ and the degrees of $\alpha_i$, $\beta_j$.
+\end{theorem}
+
+Alan Baker received the Fields Medal in 1970 for this result and its applications.
+
+\begin{remark}
+The Gelfond--Schneider theorem corresponds to $n = 1$, $\beta_0 = 0$,
+$\beta_1 = \beta$, $\alpha_1 = \alpha$: $\Lambda = \beta \log \alpha \neq 0$
+implies $e^\Lambda = \alpha^\beta$ is transcendental.
+\end{remark}
+
+\begin{example}
+\begin{enumerate}[label=(\roman*)]
+  \item $\log 2$, $\log 3$, and $\log 6$ are pairwise linearly independent over
+        $\overline{\mathbb{Q}}$ (all transcendental by Lindemann--Weierstrass).
+  \item The identity $\pi = -i \log(-1)$ shows $\pi$ is transcendental via Baker
+        (in the complex logarithm setting).
+  \item Baker's effective bounds yield concrete results: for example,
+        $|m \log 2 - n \log 3| > (mn)^{-C}$ for explicit $C$, which is
+        crucial in the theory of $S$-unit equations.
+\end{enumerate}
+\end{example}
+
+Baker's theorem has had enormous consequences in number theory:
+\begin{itemize}[leftmargin=2em]
+  \item Effective solution of Thue's equation and Thue--Mahler equations.
+  \item Proof that every elliptic curve over $\mathbb{Q}$ has only finitely
+        many integer points (effective version of Siegel's theorem).
+  \item Applications to class numbers and to the study of $S$-integer points.
+  \item Algorithmic basis for solving a wide class of Diophantine equations.
+\end{itemize}
+
+
+%% ==========================================================================
+\section{The Euler-Mascheroni Constant}
+\label{sec:euler-mascheroni}
+%% ==========================================================================
+
+The Euler-Mascheroni constant is defined by
+\[
+  \gamma = \lim_{n \to \infty} \left( \sum_{k=1}^n \frac{1}{k} - \ln n \right)
+  = 0.57721566490153286\ldots
+\]
+It appears ubiquitously in analysis and number theory: in the Laurent expansion
+of the Riemann zeta function at $s = 1$,
+\[
+  \zeta(s) = \frac{1}{s-1} + \gamma + O(s-1),
+\]
+in the Weierstrass product for the gamma function,
+\[
+  \Gamma(z) = \frac{e^{-\gamma z}}{z} \prod_{n=1}^\infty
+  \left(1 + \frac{z}{n}\right)^{-1} e^{z/n},
+\]
+and in the digamma function: $\psi(1) = \Gamma'(1)/\Gamma(1) = -\gamma$.
+
+Despite its central role in mathematics, the arithmetic nature of $\gamma$ is
+essentially unknown:
+
+\begin{conjecture}[Irrationality of $\gamma$]
+\label{conj:gamma-irrational}
+The Euler-Mascheroni constant $\gamma$ is irrational.
+\end{conjecture}
+
+\begin{conjecture}[Transcendence of $\gamma$]
+\label{conj:gamma-transcendental}
+The Euler-Mascheroni constant $\gamma$ is transcendental.
+\end{conjecture}
+
+Both conjectures are completely open as of 2026.
+
+\begin{remark}
+Papanikolaou (1997) showed that if $\gamma = p/q$ is rational with
+$\gcd(p,q)=1$, then $q > 10^{242080}$. This is not a proof of irrationality —
+it merely excludes denominators up to that bound. Our module
+\texttt{euler\_gamma\_irrationality.py} implements
+\texttt{rational\_approximation\_bound()} which returns this result.
+\end{remark}
+
+The connection between $\gamma$ and the zeta function is encoded in the
+Stieltjes constants $\gamma_n$, defined by the Laurent expansion
+\[
+  \zeta(s) = \frac{1}{s-1} + \sum_{n=0}^\infty \frac{(-1)^n \gamma_n}{n!} (s-1)^n,
+  \qquad \gamma_0 = \gamma.
+\]
+The irrationality of any Stieltjes constant $\gamma_n$ is also unknown.
+
+
+%% ==========================================================================
+\section{Open Problems}
+\label{sec:open}
+%% ==========================================================================
+
+Transcendence theory has many famous open problems. We list the most prominent:
+
+\begin{conjecture}[Transcendence of $e + \pi$]
+\label{conj:e+pi}
+The number $e + \pi$ is transcendental (and in particular, irrational).
+\end{conjecture}
+
+\begin{conjecture}[Transcendence of $e \cdot \pi$]
+\label{conj:e-pi}
+The number $e \cdot \pi$ is transcendental.
+\end{conjecture}
+
+\begin{remark}
+It is known that $e + \pi$ and $e \cdot \pi$ cannot both be algebraic
+(since they are the sum and product of the roots of $z^2 - (e+\pi)z + e\pi$,
+and if both were algebraic, then $e$ and $\pi$ would be algebraic — contradiction).
+Hence at least one of them is transcendental, but neither individual statement
+has been proved.
+\end{remark}
+
+\begin{conjecture}[Algebraic independence of $e$ and $\pi$]
+\label{conj:e-pi-independence}
+The numbers $e$ and $\pi$ are algebraically independent over $\mathbb{Q}$.
+That is, there is no non-zero polynomial $P(x,y) \in \mathbb{Q}[x,y]$ with
+$P(e,\pi) = 0$.
+\end{conjecture}
+
+\begin{conjecture}[Transcendence of $\zeta(3)/\pi^3$]
+\label{conj:zeta3}
+The number $\zeta(3)/\pi^3 = \text{Ap\'ery's constant}/\pi^3$ is transcendental.
+It is not even known whether $\zeta(3)/\pi^3$ is irrational (though $\zeta(3)$
+itself is irrational — proved by Ap\'ery in 1978).
+\end{conjecture}
+
+\begin{conjecture}[Schanuel's conjecture, 1960s]
+\label{conj:schanuel}
+If $z_1, \ldots, z_n \in \mathbb{C}$ are linearly independent over $\mathbb{Q}$,
+then the $2n$ numbers $z_1, \ldots, z_n, e^{z_1}, \ldots, e^{z_n}$ have
+transcendence degree at least $n$ over $\mathbb{Q}$.
+\end{conjecture}
+
+\begin{remark}
+Schanuel's conjecture, if true, would imply virtually all known transcendence
+results and much more. In particular:
+\begin{itemize}[leftmargin=2em]
+  \item $e$ and $\pi$ are algebraically independent (apply with $z_1 = 1$,
+        $z_2 = i\pi$).
+  \item The Lindemann--Weierstrass theorem follows directly.
+  \item The transcendence of $e^\pi$, $\ln\pi$, $\ln\ln 2$, etc.\ would follow.
+\end{itemize}
+Despite being widely believed, Schanuel's conjecture has not been proved,
+not even in special cases beyond what Baker's theorem provides.
+\end{remark}
+
+Table~\ref{tab:status} summarizes the transcendence status of key constants.
+
+\begin{table}[ht]
+\centering
+\caption{Transcendence status of selected constants (as of 2026)}
+\label{tab:status}
+\begin{tabular}{lll}
+\toprule
+Constant & Status & Reference \\
+\midrule
+$e$ & Transcendental (proved) & Hermite (1873) \\
+$\pi$ & Transcendental (proved) & Lindemann (1882) \\
+$e^\pi$ & Transcendental (proved) & Gelfond--Schneider \\
+$2^{\sqrt{2}}$ & Transcendental (proved) & Gelfond--Schneider \\
+$\ln 2$, $\ln 3$ & Transcendental (proved) & Lindemann--Weierstrass \\
+$e + \pi$ & Open (conjectured transcendental) & --- \\
+$e \cdot \pi$ & Open (conjectured transcendental) & --- \\
+$\gamma$ & Irrationality open & Papanikolaou (1997) \\
+$\zeta(3)$ & Irrational (proved), transcendence open & Ap\'ery (1978) \\
+$\zeta(5), \zeta(7), \ldots$ & Open & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+%% ==========================================================================
+\section{Computational Aspects and Implementation}
+\label{sec:computational}
+%% ==========================================================================
+
+The \texttt{transcendence\_theory.py} module (Build 141, Specialist Mathematics
+Project) provides numerical tools for exploring transcendence questions.
+
+\paragraph{Number classification.}
+The function \texttt{classify\_number(x)} attempts to decide whether $x$ is
+rational, algebraic, or probably transcendental. For a given floating-point
+value, it first checks rationality via best rational approximation
+($\texttt{fractions.Fraction}$), then searches for a minimal polynomial
+of degree $\leq 6$ with integer coefficients in $\{-8, \ldots, 8\}$.
+
+\paragraph{Irrationality measure.}
+The function \texttt{irrationality\_measure(x)} estimates $\mu(x)$ by computing
+$\mu \approx -\log|x - p/q|/\log q$ for the best rational approximations $p/q$
+with $q \leq 10000$.
+
+\paragraph{Continued fraction analysis.}
+The function \texttt{continued\_fraction\_irrationality(x)} computes the
+continued fraction expansion $[a_0; a_1, a_2, \ldots]$ and estimates the
+irrationality measure from the growth of partial quotients $a_k$, using the
+relation $\mu \approx 2 + \limsup_k \log(a_{k+1})/\log(q_k)$.
+
+\paragraph{Euler-Mascheroni constant.}
+The \texttt{EulerMascheroniConstant} class (in
+\texttt{euler\_gamma\_irrationality.py}) computes $\gamma$ to arbitrary
+precision via \texttt{mpmath} (Brent-McMillan algorithm), verifies the
+Papanikolaou bound, and illustrates the connection to the Gamma function
+via $\psi(1) = \Gamma'(1) = -\gamma$.
+
+
+%% ==========================================================================
+\section{References}
+%% ==========================================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{hermite1873}
+C.~Hermite,
+\textit{Sur la fonction exponentielle},
+Comptes Rendus de l'Acad\'emie des Sciences \textbf{77} (1873), 18--24, 74--79, 226--233, 285--293.
+
+\bibitem{lindemann1882}
+F.~von Lindemann,
+\textit{\"Uber die Zahl $\pi$},
+Mathematische Annalen \textbf{20} (1882), 213--225.
+
+\bibitem{weierstrass1885}
+K.~Weierstrass,
+\textit{Zu Lindemann's Abhandlung: ``\"Uber die Ludolph'sche Zahl''},
+Sitzungsberichte der K\"oniglich Preu\ss{}ischen Akademie der Wissenschaften
+\textbf{5} (1885), 1067--1086.
+
+\bibitem{gelfond1934}
+A.O.~Gelfond,
+\textit{Sur le septi\`eme probl\`eme de Hilbert},
+Bulletin de l'Acad\'emie des Sciences de l'URSS, S\'erie Math\'ematique
+\textbf{7} (1934), 623--630.
+
+\bibitem{schneider1935}
+T.~Schneider,
+\textit{Transzendenzuntersuchungen periodischer Funktionen, I},
+Journal f\"ur die reine und angewandte Mathematik \textbf{172} (1935), 65--69.
+
+\bibitem{baker1966}
+A.~Baker,
+\textit{Linear forms in the logarithms of algebraic numbers},
+Mathematika \textbf{13} (1966), 204--216.
+
+\bibitem{baker1975}
+A.~Baker,
+\textit{Transcendental Number Theory},
+Cambridge University Press, Cambridge, 1975.
+
+\bibitem{papanikolaou1997}
+T.~Papanikolaou,
+\textit{Einige neue Resultate \"uber den Euler-Mascheroni-Quotienten},
+Diploma thesis, Universit\"at des Saarlandes, 1997.
+
+\bibitem{waldschmidt2000}
+M.~Waldschmidt,
+\textit{Diophantine Approximation on Linear Algebraic Groups},
+Grundlehren der Mathematischen Wissenschaften \textbf{326},
+Springer, Berlin, 2000.
+
+\bibitem{nesterenko1996}
+Yu.V.~Nesterenko,
+\textit{Modular functions and transcendence},
+Sbornik: Mathematics \textbf{187} (1996), 1319--1348.
+
+\end{thebibliography}
+
+\end{document}

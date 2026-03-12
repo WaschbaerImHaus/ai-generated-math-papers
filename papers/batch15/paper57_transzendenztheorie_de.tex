@@ -1,0 +1,728 @@
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+\title{Transzendenztheorie:\\
+Klassische Resultate, offene Probleme und algorithmische Aspekte}
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 141}
+\email{specialist-maths@project.local}
+\date{12. März 2026}
+\keywords{transzendente Zahlen, Liouvillescher Satz, Hermite, Lindemann,
+Gelfond-Schneider, Bakerscher Satz, Euler-Mascheroni-Konstante,
+Schanuels Vermutung}
+\subjclass[2020]{11J81, 11J91, 11J04, 11J82, 11J89}
+
+\begin{abstract}
+Die Transzendenztheorie untersucht, welche komplexen Zahlen keine Nullstellen
+eines von null verschiedenen Polynoms mit rationalen Koeffizienten sind.
+Dieser Artikel gibt einen Überblick über die klassischen Meilensteine:
+Liouvilles Konstruktion der ersten beweisbar transzendenten Zahlen (1844),
+Hermites Beweis der Transzendenz von $e$ (1873), Lindemanns Beweis der
+Transzendenz von $\pi$ (1882) -- mit der Folgerung, dass die Quadratur des
+Kreises unmöglich ist -- den Satz von Lindemann--Weierstrass, den Satz von
+Gelfond--Schneider, der Hilberts siebtes Problem löst (1934/1935), sowie
+Bakers weitreichende Verallgemeinerung auf Linearkombinationen von Logarithmen
+(1966). Daneben wird die Euler-Mascheroni-Konstante $\gamma$ behandelt,
+deren Irrationalität eines der bekanntesten offenen Probleme der Mathematik
+darstellt, zusammen mit weiteren offenen Fragen um Schanuels Vermutung sowie
+die Transzendenz von $e + \pi$ und $e \cdot \pi$. Algorithmische Aspekte
+werden anhand der Python-Module \texttt{transcendence\_theory.py} und
+\texttt{euler\_gamma\_irrationality.py} illustriert.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% ==========================================================================
+\section{Einleitung}
+%% ==========================================================================
+
+Die Frage, welche Zahlen als Nullstellen von Polynomgleichungen mit rationalen
+Koeffizienten dargestellt werden können, gehört zu den ältesten und tiefsten
+der Mathematik. Eine komplexe Zahl $\alpha$ heißt \emph{algebraisch} (über
+$\mathbb{Q}$), wenn ein von null verschiedenes Polynom $p(x) \in \mathbb{Z}[x]$
+existiert mit $p(\alpha) = 0$; andernfalls heißt $\alpha$ \emph{transzendent}.
+
+Die Geschichte der Transzendenztheorie umspannt fast zwei Jahrhunderte:
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{1844}: Joseph Liouville zeigte als Erster die Existenz
+        transzendenter Zahlen, indem er explizite Beispiele konstruierte ---
+        die Liouville-Zahlen ---, deren Approximierbarkeit durch rationale
+        Zahlen zu schnell ist, um algebraisch zu sein.
+  \item \textbf{1851}: Liouville veröffentlichte sein allgemeines Kriterium
+        (Satz von Liouville über diophantische Approximation).
+  \item \textbf{1873}: Charles Hermite bewies, dass die Basis des natürlichen
+        Logarithmus, $e \approx 2{,}71828\ldots$, transzendent ist --- der
+        erste Beweis, dass eine \emph{spezifisch auftretende} Konstante
+        transzendent ist.
+  \item \textbf{1882}: Ferdinand von Lindemann bewies die Transzendenz von
+        $\pi \approx 3{,}14159\ldots$ und löste damit die jahrtausendealte
+        Frage nach der Quadratur des Kreises: Es ist unmöglich, mit Zirkel
+        und Lineal ein Quadrat mit dem Flächeninhalt $\pi$ zu konstruieren.
+  \item \textbf{1885}: Karl Weierstrass verallgemeinerte Lindemanns Methode
+        zum Satz von Lindemann--Weierstrass.
+  \item \textbf{1900}: David Hilbert formulierte die Transzendenz von
+        $2^{\sqrt{2}}$ als siebtes Problem seiner berühmten Liste von 23
+        offenen Problemen.
+  \item \textbf{1934/1935}: Alexander Gelfond und Theodor Schneider lösten
+        unabhängig voneinander Hilberts siebtes Problem.
+  \item \textbf{1966}: Alan Baker bewies eine weitreichende Verallgemeinerung
+        über lineare Formen in Logarithmen algebraischer Zahlen und erhielt
+        dafür 1970 die Fields-Medaille.
+\end{itemize}
+
+Trotz dieser großen Fortschritte bleiben viele grundlegende Fragen offen.
+Ob $\gamma = 0{,}5772\ldots$ (die Euler-Mascheroni-Konstante) überhaupt
+irrational ist, ist unbekannt. Die Transzendenz von $e + \pi$, $e \cdot \pi$,
+$\zeta(3)/\pi^3$ und vieler anderer natürlich auftretender Konstanten harrt
+des Beweises.
+
+Dieser Artikel ist wie folgt gegliedert: Abschnitt~\ref{sec:alg-transz}
+erläutert die Definitionen und Abzählbarkeitsargumente.
+Abschnitte~\ref{sec:liouville} bis~\ref{sec:baker} stellen die wichtigsten
+Sätze in historischer Reihenfolge vor. Abschnitt~\ref{sec:offen} sammelt die
+offenen Probleme, und Abschnitt~\ref{sec:euler-mascheroni} widmet sich der
+Euler-Mascheroni-Konstante.
+
+
+%% ==========================================================================
+\section{Algebraische und transzendente Zahlen}
+\label{sec:alg-transz}
+%% ==========================================================================
+
+\begin{definition}
+Eine komplexe Zahl $\alpha \in \mathbb{C}$ heißt \emph{algebraisch} (über
+$\mathbb{Q}$), falls ein von null verschiedenes Polynom $p(x) = a_n x^n +
+\cdots + a_0 \in \mathbb{Z}[x]$ mit $p(\alpha) = 0$ existiert. Der
+\emph{algebraische Grad} von $\alpha$ ist der Grad ihres Minimalpolynoms,
+d.\,h.\ des normierten Polynoms kleinsten Grades in $\mathbb{Q}[x]$, das bei
+$\alpha$ verschwindet.
+
+Eine nicht-algebraische Zahl heißt \emph{transzendent}.
+\end{definition}
+
+\begin{beispiel}
+\begin{enumerate}[label=(\roman*)]
+  \item Jede rationale Zahl $r = p/q$ ist algebraisch vom Grad 1.
+  \item $\sqrt{2}$ ist algebraisch vom Grad 2, Minimalpolynom $x^2 - 2$.
+  \item Jede $n$-te Einheitswurzel $\zeta_n = e^{2\pi i/n}$ ist algebraisch
+        (Nullstelle des Kreisteilungspolynoms $\Phi_n(x)$).
+  \item $\sqrt{2} + \sqrt{3}$ ist algebraisch vom Grad 4.
+  \item $e$, $\pi$, $e^\pi$ sind transzendent (s.\ spätere Abschnitte).
+\end{enumerate}
+\end{beispiel}
+
+Die Menge $\overline{\mathbb{Q}}$ aller algebraischen Zahlen bildet einen
+algebraisch abgeschlossenen Teilkörper von $\mathbb{C}$. Ihre Mächtigkeit
+ist abzählbar.
+
+\begin{proposition}
+Die Menge der algebraischen Zahlen $\overline{\mathbb{Q}}$ ist abzählbar.
+\end{proposition}
+\begin{proof}
+Für jeden Grad $d \geq 1$ und jede Koeffizientenwahl $(a_0, \ldots, a_d) \in
+\mathbb{Z}^{d+1}$ mit $a_d \neq 0$ hat das Polynom $a_d x^d + \cdots + a_0$
+höchstens $d$ komplexe Nullstellen. Die Menge aller solchen Polynome ist
+abzählbar (als abzählbare Vereinigung abzählbarer Mengen), und jedes Polynom
+liefert endlich viele algebraische Zahlen. Somit ist $\overline{\mathbb{Q}}$
+eine abzählbare Vereinigung endlicher Mengen, also abzählbar.
+\end{proof}
+
+\begin{korollar}
+Transzendente Zahlen existieren und bilden tatsächlich eine überabzählbare
+Menge der Mächtigkeit des Kontinuums. Fast jede reelle Zahl (im Sinne des
+Lebesgue-Maßes) ist transzendent.
+\end{korollar}
+
+\begin{bemerkung}
+Obwohl die Existenz transzendenter Zahlen bereits aus dem Abzählbarkeitsargument
+(Cantor, 1874) folgt, liefert ein solcher Beweis kein konkretes Beispiel.
+Dies motivierte Liouvilles explizite Konstruktion.
+\end{bemerkung}
+
+
+%% ==========================================================================
+\section{Liouvilles Satz und Liouville-Zahlen}
+\label{sec:liouville}
+%% ==========================================================================
+
+Die ersten expliziten transzendenten Zahlen wurden von Liouville 1844 mittels
+seines \emph{Satzes über diophantische Approximation} konstruiert.
+
+\begin{theorem}[Liouville, 1844]
+\label{satz:liouville}
+Sei $\alpha$ eine reelle algebraische Zahl vom Grad $d \geq 1$. Dann existiert
+eine Konstante $c = c(\alpha) > 0$, sodass für alle Brüche $p/q \in \mathbb{Q}$
+(in gekürzter Form, $q \geq 1$) gilt:
+\[
+  \left|\alpha - \frac{p}{q}\right| \geq \frac{c}{q^d}.
+\]
+Algebraische Zahlen vom Grad $d$ können also nicht schneller als mit der Rate
+$q^{-d}$ durch rationale Zahlen approximiert werden.
+\end{theorem}
+
+\begin{proof}[Beweissskizze]
+Sei $f(x) = a_d x^d + \cdots + a_0 \in \mathbb{Z}[x]$ das Minimalpolynom von
+$\alpha$. Da $f(\alpha) = 0$ und $f$ über $\mathbb{Q}$ irreduzibel ist, gilt
+$f(p/q) \neq 0$ für alle $p/q \in \mathbb{Q}$.
+Nenner-Freistellung: $|q^d f(p/q)| \geq 1$ (ganze Zahl, $\neq 0$).
+Nach dem Mittelwertsatz gilt $f(p/q) - f(\alpha) = f'(\xi)(p/q - \alpha)$
+für ein $\xi$ zwischen $p/q$ und $\alpha$. Für $|p/q - \alpha| \leq 1$
+ist $|f'(\xi)| \leq M$ beschränkt. Daraus folgt
+$|p/q - \alpha| \geq 1/(M q^d)$.
+\end{proof}
+
+Dieser Satz ermöglicht die explizite Konstruktion transzendenter Zahlen:
+
+\begin{definition}
+Eine reelle Zahl $\xi$ heißt \emph{Liouville-Zahl}, falls für jedes $n \in
+\mathbb{N}$ unendlich viele Brüche $p/q$ mit $q > 1$ existieren, sodass
+\[
+  \left|\xi - \frac{p}{q}\right| < \frac{1}{q^n}.
+\]
+Liouville-Zahlen besitzen das \emph{Irrationalitätsmaß} $\mu(\xi) = \infty$.
+\end{definition}
+
+\begin{beispiel}[Liouvillesche Konstante]
+Die Zahl
+\[
+  L = \sum_{k=1}^{\infty} 10^{-k!}
+  = 0{,}1100010000000000000000010\ldots
+\]
+ist eine Liouville-Zahl und damit transzendent. Die Partialsummen
+$p_n/q_n$ mit $q_n = 10^{n!}$ erfüllen $|L - p_n/q_n| < 2 \cdot 10^{-(n+1)!}
+= 2/q_n^{n+1}$, was Liouvilles Schranke für jeden endlichen Grad $d$ verletzt.
+\end{beispiel}
+
+\begin{bemerkung}
+Nicht alle transzendenten Zahlen sind Liouville-Zahlen. Zum Beispiel besitzt
+$e$ das Irrationalitätsmaß $\mu(e) = 2$, ebenso wie jede algebraisch irrationale
+Zahl. Die derzeit beste untere Schranke für $\pi$ ist $\mu(\pi) \geq 7{,}103$
+(Salikhov, 2008).
+\end{bemerkung}
+
+Das \emph{Irrationalitätsmaß} $\mu(x)$ ist definiert als
+\[
+  \mu(x) = \sup\!\left\{\mu \in \mathbb{R} : \left|x - \frac{p}{q}\right|
+  < \frac{1}{q^\mu} \text{ hat unendlich viele Lösungen } p/q \in \mathbb{Q}
+  \right\}.
+\]
+Der Satz von Dirichlet impliziert $\mu(x) \geq 2$ für alle irrationalen $x$.
+
+
+%% ==========================================================================
+\section{\texorpdfstring{$e$ ist transzendent}{e ist transzendent}}
+\label{sec:e-transz}
+%% ==========================================================================
+
+\begin{theorem}[Hermite, 1873]
+\label{satz:e-transz}
+Die Zahl $e = \sum_{n=0}^{\infty} 1/n!$ ist transzendent.
+\end{theorem}
+
+\begin{proof}[Beweissskizze]
+Annahme: $e$ ist algebraisch. Dann existieren ganze Zahlen $a_0, a_1, \ldots,
+a_n$ mit $a_0, a_n \neq 0$, sodass
+\[
+  a_0 + a_1 e + a_2 e^2 + \cdots + a_n e^n = 0.
+\]
+Für eine große Primzahl $p$ (die geeignet gewählt wird) definiere das Hilfspolynom
+\[
+  f(x) = \frac{x^{p-1}(x-1)^p(x-2)^p \cdots (x-n)^p}{(p-1)!}.
+\]
+Setze $F(x) = \sum_{j=0}^{np+p-1} f^{(j)}(x)$ (Summe aller Ableitungen).
+Betrachte das Integral
+\[
+  J(t) = e^t \int_0^t e^{-u} f(u)\,du = F(0)\,e^t - F(t).
+\]
+Definiere $I_k = \int_0^k e^{k-u} f(u)\,du$, $k = 0, \ldots, n$.
+Dann gilt $\sum_{k=0}^n a_k I_k = F(0) \underbrace{\sum_{k=0}^n a_k e^k}_{=0}
+- \sum_{k=0}^n a_k F(k)$.
+
+Man zeigt: (1) $F(0)$ und $F(k)$ sind ganze Zahlen, die durch $p$ teilbar sind,
+wobei $F(0)/p$ für große Primzahl $p$ (die $a_0 \cdot n!$ nicht teilt) nicht
+durch $p$ teilbar ist -- also ist $\sum a_k F(k) \neq 0$.
+(2) Andererseits gilt $|I_k| \to 0$ für $p \to \infty$ (der Faktor $(p-1)!$
+im Nenner dominiert). Dies ergibt eine von null verschiedene ganze Zahl mit
+beliebig kleinem Betrag -- Widerspruch.
+\end{proof}
+
+\begin{bemerkung}
+Hermites ursprünglicher Beweis war erheblich rechenaufwändiger. Die hier
+präsentierte klarere Version geht teilweise auf Hilbert und Hurwitz (ca.\ 1893)
+zurück. Die zentrale Idee -- Konstruktion einer Funktion, deren Werte an
+ganzzahligen Stellen nahezu ganze Zahlen sind -- wurde zum Vorbild aller
+späteren Transzendenznachweise.
+\end{bemerkung}
+
+Numerisch lässt sich verifizieren, dass kein Polynom kleinen Grades mit kleinen
+ganzzahligen Koeffizienten bei $e$ verschwindet. Das Modul
+\texttt{transcendence\_theory.py} implementiert \texttt{e\_is\_transcendental\_demo()},
+das alle normierten Polynome vom Grad $\leq 6$ mit Koeffizienten in
+$\{-5, \ldots, 5\}$ prüft: Der Minimalwert von $|f(e)|$ über alle solchen
+Polynome beträgt etwa $3{,}9 \times 10^{-3}$ (für Grad 2).
+
+
+%% ==========================================================================
+\section{\texorpdfstring{$\pi$ ist transzendent}{pi ist transzendent}}
+\label{sec:pi-transz}
+%% ==========================================================================
+
+\begin{theorem}[Lindemann, 1882]
+\label{satz:pi-transz}
+Die Zahl $\pi$ ist transzendent.
+\end{theorem}
+
+\begin{proof}[Beweissskizze (via Lindemann--Weierstrass)]
+Die Eulersche Formel $e^{i\pi} + 1 = 0$ ergibt $e^{i\pi} = -1$.
+Falls $\pi$ algebraisch wäre, so auch $i\pi$ (da $i$ algebraisch ist als
+Nullstelle von $x^2 + 1$). Der Satz von Lindemann--Weierstrass
+(Satz~\ref{satz:lw}) besagt, dass $e^\alpha$ für jedes von null verschiedene
+algebraische $\alpha$ transzendent ist. Aber $e^{i\pi} = -1$ ist algebraisch
+-- Widerspruch. Also ist $\pi$ transzendent.
+\end{proof}
+
+\begin{korollar}[Quadratur des Kreises ist unmöglich]
+Es ist unmöglich, allein mit Zirkel und Lineal ein Quadrat zu konstruieren,
+dessen Fläche gleich der eines gegebenen Kreises ist.
+\end{korollar}
+\begin{proof}
+Eine Länge ist genau dann konstruierbar, wenn sie algebraisch über $\mathbb{Q}$
+ist und in einer iterierten quadratischen Erweiterung liegt. Da $\pi$ transzendent
+ist, ist es nicht konstruierbar. Ein Quadrat mit Flächeninhalt $\pi r^2$ würde
+die Konstruktion von $\sqrt{\pi} \cdot r$ erfordern, aber $\sqrt{\pi}$ ist
+ebenfalls transzendent (wäre $\sqrt{\pi} = \alpha$ algebraisch, so auch
+$\pi = \alpha^2$ -- Widerspruch).
+\end{proof}
+
+\begin{bemerkung}
+Mit derselben Methode zeigt man, dass $\cos(\alpha)$, $\sin(\alpha)$,
+$\tan(\alpha)$ für jedes von null verschiedene algebraische $\alpha$ transzendent
+sind, und dass $\log(\beta)$ für jedes positive algebraische $\beta \neq 1$
+transzendent ist.
+\end{bemerkung}
+
+
+%% ==========================================================================
+\section{Der Satz von Lindemann--Weierstrass}
+\label{sec:lw}
+%% ==========================================================================
+
+\begin{theorem}[Lindemann--Weierstrass, 1882/1885]
+\label{satz:lw}
+Seien $\alpha_1, \ldots, \alpha_n \in \overline{\mathbb{Q}}$ paarweise
+verschiedene algebraische Zahlen. Dann sind $e^{\alpha_1}, \ldots, e^{\alpha_n}$
+linear unabhängig über $\overline{\mathbb{Q}}$.
+
+Äquivalent: Sind $\beta_1, \ldots, \beta_n \in \overline{\mathbb{Q}}$ nicht alle
+null, so gilt
+\[
+  \beta_1 e^{\alpha_1} + \cdots + \beta_n e^{\alpha_n} \neq 0.
+\]
+\end{theorem}
+
+Ein wichtiger Spezialfall:
+
+\begin{korollar}
+Für jedes von null verschiedene algebraische $\alpha$ ist die Zahl $e^\alpha$
+transzendent.
+\end{korollar}
+
+Der Beweis des Satzes von Lindemann--Weierstrass verwendet eine
+Hilfspolynomkonstruktion analog zu Hermites Beweis, aber für gleichzeitig
+mehrere Exponentialfunktionen. Wesentlich ist eine Abschätzung der Form:
+Würde die Schlussfolgerung scheitern, ergäbe sich ein ganzzahliger Ausdruck,
+der von null verschieden, aber beliebig klein ist -- ein Widerspruch.
+
+\begin{beispiel}
+\begin{enumerate}[label=(\roman*)]
+  \item $\alpha = 1$: $e^1 = e$ ist transzendent (Hermite).
+  \item $\alpha = i\pi$: $e^{i\pi} = -1$ ist algebraisch; per Kontraposition
+        ist $i\pi$ transzendent, und da $i$ algebraisch ist, ist $\pi$
+        transzendent.
+  \item $\alpha = \sqrt{2}$: Da $\sqrt{2}$ algebraisch und von null verschieden
+        ist, ist $e^{\sqrt{2}}$ transzendent.
+  \item $\ln 2$ ist transzendent: Wäre $\ln 2$ algebraisch, so ergäbe der Satz
+        $e^{\ln 2} = 2$ -- aber $2$ ist algebraisch, die Kontraposition liefert
+        also, dass $\ln 2$ transzendent sein muss.
+\end{enumerate}
+\end{beispiel}
+
+\begin{korollar}
+Für $r \in \mathbb{Q} \setminus \{0\}$ sind $\sin(r)$, $\cos(r)$, $\tan(r)$,
+$e^r$, $\ln(r+1)$ alle transzendent.
+\end{korollar}
+
+
+%% ==========================================================================
+\section{Der Satz von Gelfond--Schneider}
+\label{sec:gelfond-schneider}
+%% ==========================================================================
+
+Hilberts siebtes Problem (1900) fragte: Wenn $\alpha$ und $\beta$ algebraisch
+sind, $\alpha \neq 0, 1$, und $\beta$ irrational, muss dann $\alpha^\beta$
+transzendent sein?
+
+\begin{theorem}[Gelfond--Schneider, 1934/1935]
+\label{satz:gelfond-schneider}
+Seien $\alpha, \beta \in \overline{\mathbb{Q}}$ mit $\alpha \neq 0$, $\alpha
+\neq 1$ und $\beta \notin \mathbb{Q}$. Dann ist $\alpha^\beta$ transzendent.
+\end{theorem}
+
+Alexander Gelfond (1934) und Theodor Schneider (1935) bewiesen dieses Resultat
+unabhängig voneinander und lösten damit Hilberts siebtes Problem.
+
+\begin{proof}[Beweisidee]
+Man schreibt $\alpha^\beta = e^{\beta \log \alpha}$. Der Beweis konstruiert
+eine Hilfsfunktion $F(z) = \sum_{j,k} c_{jk} \alpha^{jz} \beta^k z^k$
+und zeigt, dass diese Funktion, wäre $\alpha^\beta$ algebraisch, zu oft
+verschwinden würde -- im Widerspruch zu einer analytischen Abschätzung
+(die Funktion kann nicht identisch null sein und gleichzeitig auf einem
+großen Gitter verschwinden).
+\end{proof}
+
+\begin{beispiel}
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Gelfond-Schneider-Konstante:} $2^{\sqrt{2}} \approx 2{,}6651\ldots$
+        ist transzendent. Hier $\alpha = 2$, $\beta = \sqrt{2}$ (irrational algebraisch).
+  \item \textbf{Gelfondsche Konstante:} $e^\pi = (e^{i\pi})^{-i} = (-1)^{-i}$.
+        Mit $\alpha = -1$ (algebraisch, $\neq 0,1$) und $\beta = -i$
+        (irrational algebraisch) ist $e^\pi$ transzendent.
+        Numerisch $e^\pi \approx 23{,}1407\ldots$.
+  \item $i^i = e^{i \log i} = e^{i \cdot i\pi/2} = e^{-\pi/2}$ ist transzendent
+        (da $e^\pi$ transzendent ist).
+\end{enumerate}
+\end{beispiel}
+
+\begin{bemerkung}
+Der Satz von Gelfond--Schneider gilt nicht, wenn $\beta \in \mathbb{Q}$ (also
+algebraisch vom Grad 1). Zum Beispiel ist $2^{1/2} = \sqrt{2}$ algebraisch.
+Die Bedingung $\beta \notin \mathbb{Q}$ ist wesentlich.
+\end{bemerkung}
+
+
+%% ==========================================================================
+\section{Der Bakersche Satz über lineare Formen in Logarithmen}
+\label{sec:baker}
+%% ==========================================================================
+
+Bakers Satz (1966) ist eine weitreichende Verallgemeinerung des Satzes von
+Gelfond--Schneider auf lineare Formen in Logarithmen algebraischer Zahlen.
+
+\begin{theorem}[Baker, 1966]
+\label{satz:baker}
+Seien $\alpha_1, \ldots, \alpha_n \in \overline{\mathbb{Q}} \setminus \{0\}$
+und $\beta_0, \beta_1, \ldots, \beta_n \in \overline{\mathbb{Q}}$, nicht alle
+null. Gilt
+\[
+  \Lambda = \beta_0 + \beta_1 \log \alpha_1 + \cdots + \beta_n \log \alpha_n \neq 0,
+\]
+so ist $\Lambda$ transzendent.
+
+Darüber hinaus bewies Baker eine \emph{effektive untere Schranke}:
+\[
+  |\Lambda| \geq \exp\!\bigl(-C \cdot (\log A_1) \cdots (\log A_n) \cdot \log B\bigr),
+\]
+wobei $A_i$ und $B$ geeignet definierte Höhenparameter sind und $C > 0$ nur
+von $n$ und den Graden der $\alpha_i$, $\beta_j$ abhängt.
+\end{theorem}
+
+Alan Baker erhielt für diesen Satz 1970 die Fields-Medaille.
+
+\begin{bemerkung}
+Der Satz von Gelfond--Schneider entspricht dem Spezialfall $n = 1$, $\beta_0 =
+0$, $\beta_1 = \beta$, $\alpha_1 = \alpha$: $\Lambda = \beta \log \alpha \neq
+0$ impliziert, dass $e^\Lambda = \alpha^\beta$ transzendent ist.
+\end{bemerkung}
+
+\begin{beispiel}
+\begin{enumerate}[label=(\roman*)]
+  \item $\log 2$, $\log 3$ und $\log 6$ sind paarweise linear unabhängig über
+        $\overline{\mathbb{Q}}$ (alle transzendent nach Lindemann--Weierstrass).
+  \item Die Identität $\pi = -i \log(-1)$ zeigt mittels Baker die Transzendenz
+        von $\pi$ (im komplexen Logarithmus).
+  \item Bakers effektive Schranken liefern konkrete Resultate: z.\,B.\ gilt
+        $|m \log 2 - n \log 3| > (mn)^{-C}$ für explizites $C$, was in der
+        Theorie der $S$-Einheiten-Gleichungen entscheidend ist.
+\end{enumerate}
+\end{beispiel}
+
+Bakers Satz hatte enorme Konsequenzen für die Zahlentheorie:
+\begin{itemize}[leftmargin=2em]
+  \item Effektive Lösung der Thue-Gleichung und der Thue-Mahler-Gleichungen.
+  \item Beweis, dass jede elliptische Kurve über $\mathbb{Q}$ nur endlich viele
+        ganzzahlige Punkte besitzt (effektive Version des Siegelschen Satzes).
+  \item Anwendungen auf Klassenzahlen und $S$-ganzzahlige Punkte.
+  \item Algorithmische Grundlage für die Lösung vieler diophantischer Gleichungen.
+\end{itemize}
+
+
+%% ==========================================================================
+\section{Die Euler-Mascheroni-Konstante}
+\label{sec:euler-mascheroni}
+%% ==========================================================================
+
+Die Euler-Mascheroni-Konstante ist definiert durch
+\[
+  \gamma = \lim_{n \to \infty} \left( \sum_{k=1}^n \frac{1}{k} - \ln n \right)
+  = 0{,}57721566490153286\ldots
+\]
+Sie tritt allgegenwärtig in Analysis und Zahlentheorie auf: in der
+Laurent-Entwicklung der Riemannschen Zeta-Funktion bei $s = 1$,
+\[
+  \zeta(s) = \frac{1}{s-1} + \gamma + O(s-1),
+\]
+im Weierstraßschen Produkt der Gammafunktion,
+\[
+  \Gamma(z) = \frac{e^{-\gamma z}}{z} \prod_{n=1}^\infty
+  \left(1 + \frac{z}{n}\right)^{-1} e^{z/n},
+\]
+sowie in der Digamma-Funktion: $\psi(1) = \Gamma'(1)/\Gamma(1) = -\gamma$.
+
+Trotz ihrer zentralen Rolle in der Mathematik ist die arithmetische Natur
+von $\gamma$ im Wesentlichen unbekannt:
+
+\begin{conjecture}[Irrationalität von $\gamma$]
+\label{verm:gamma-irr}
+Die Euler-Mascheroni-Konstante $\gamma$ ist irrational.
+\end{conjecture}
+
+\begin{conjecture}[Transzendenz von $\gamma$]
+\label{verm:gamma-transz}
+Die Euler-Mascheroni-Konstante $\gamma$ ist transzendent.
+\end{conjecture}
+
+Beide Vermutungen sind Stand 2026 völlig offen.
+
+\begin{bemerkung}
+Papanikolaou (1997) zeigte: Falls $\gamma = p/q$ rational mit $\ggT(p,q) = 1$
+ist, so gilt $q > 10^{242080}$. Dies ist kein Beweis der Irrationalität --
+es schließt lediglich Nenner bis zu dieser Schranke aus. Das Modul
+\texttt{euler\_gamma\_irrationality.py} implementiert
+\texttt{rational\_approximation\_bound()}, das dieses Resultat zurückgibt.
+\end{bemerkung}
+
+Die Verbindung zwischen $\gamma$ und der Zeta-Funktion ist in den
+Stieltjes-Konstanten $\gamma_n$ kodiert, definiert durch die Laurent-Entwicklung
+\[
+  \zeta(s) = \frac{1}{s-1} + \sum_{n=0}^\infty \frac{(-1)^n \gamma_n}{n!}
+  (s-1)^n, \qquad \gamma_0 = \gamma.
+\]
+Die Irrationalität einer jeden Stieltjes-Konstante $\gamma_n$ ist ebenfalls
+unbekannt.
+
+Weitere Reihendarstellungen von $\gamma$:
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Vacca-Formel (1910):} $\gamma = \sum_{k=1}^\infty (-1)^k
+        \lfloor \log_2 k \rfloor / k$
+  \item \textbf{Euler/Zeta-Darstellung:} $\gamma = 1 - \sum_{n=2}^\infty
+        (\zeta(n) - 1)/n$
+  \item \textbf{Brent-McMillan-Algorithmus:} Effiziente Berechnung auf
+        $O(n)$ Dezimalstellen in $O(n \log^3 n)$ Zeit.
+\end{itemize}
+
+
+%% ==========================================================================
+\section{Offene Probleme}
+\label{sec:offen}
+%% ==========================================================================
+
+Die Transzendenztheorie kennt viele berühmte offene Probleme. Wir nennen die
+wichtigsten:
+
+\begin{conjecture}[Transzendenz von $e + \pi$]
+\label{verm:e+pi}
+Die Zahl $e + \pi$ ist transzendent (insbesondere irrational).
+\end{conjecture}
+
+\begin{conjecture}[Transzendenz von $e \cdot \pi$]
+\label{verm:e-pi}
+Die Zahl $e \cdot \pi$ ist transzendent.
+\end{conjecture}
+
+\begin{bemerkung}
+Es ist bekannt, dass $e + \pi$ und $e \cdot \pi$ nicht beide algebraisch sein
+können (da sie Summe und Produkt der Nullstellen von $z^2 - (e+\pi)z + e\pi$
+sind, und wären beide algebraisch, so auch $e$ und $\pi$ -- Widerspruch).
+Also ist mindestens eine von beiden transzendent, aber keine einzelne Aussage
+wurde bisher bewiesen.
+\end{bemerkung}
+
+\begin{conjecture}[Algebraische Unabhängigkeit von $e$ und $\pi$]
+\label{verm:e-pi-unabh}
+Die Zahlen $e$ und $\pi$ sind algebraisch unabhängig über $\mathbb{Q}$. Das
+heißt, es gibt kein von null verschiedenes Polynom $P(x,y) \in \mathbb{Q}[x,y]$
+mit $P(e,\pi) = 0$.
+\end{conjecture}
+
+\begin{conjecture}[Transzendenz von $\zeta(3)/\pi^3$]
+\label{verm:zeta3}
+Die Zahl $\zeta(3)/\pi^3$ ist transzendent. Es ist noch nicht einmal bekannt,
+ob $\zeta(3)/\pi^3$ irrational ist (obwohl $\zeta(3)$ selbst irrational ist --
+bewiesen von Apéry, 1978).
+\end{conjecture}
+
+\begin{conjecture}[Schanuels Vermutung, 1960er Jahre]
+\label{verm:schanuel}
+Sind $z_1, \ldots, z_n \in \mathbb{C}$ linear unabhängig über $\mathbb{Q}$,
+dann haben die $2n$ Zahlen $z_1, \ldots, z_n, e^{z_1}, \ldots, e^{z_n}$
+mindestens Transzendenzgrad $n$ über $\mathbb{Q}$.
+\end{conjecture}
+
+\begin{bemerkung}
+Schanuels Vermutung würde, wenn sie bewiesen wäre, nahezu alle bekannten
+Transzendenzergebnisse und weit mehr implizieren:
+\begin{itemize}[leftmargin=2em]
+  \item $e$ und $\pi$ sind algebraisch unabhängig (mit $z_1 = 1$, $z_2 = i\pi$).
+  \item Der Satz von Lindemann--Weierstrass folgt direkt.
+  \item Die Transzendenz von $e^\pi$, $\ln\pi$, $\ln\ln 2$ usw.\ würde folgen.
+\end{itemize}
+Trotz allgemeiner Überzeugung von ihrer Richtigkeit wurde Schanuels Vermutung
+bisher nicht bewiesen -- nicht einmal in Spezialfällen über das hinaus, was
+Bakers Satz liefert.
+\end{bemerkung}
+
+Tabelle~\ref{tab:status} fasst den Transzendenzierstatus wichtiger Konstanten
+zusammen.
+
+\begin{table}[ht]
+\centering
+\caption{Transzendenzierstatus ausgewählter Konstanten (Stand 2026)}
+\label{tab:status}
+\begin{tabular}{lll}
+\toprule
+Konstante & Status & Quelle \\
+\midrule
+$e$ & Transzendent (bewiesen) & Hermite (1873) \\
+$\pi$ & Transzendent (bewiesen) & Lindemann (1882) \\
+$e^\pi$ & Transzendent (bewiesen) & Gelfond--Schneider \\
+$2^{\sqrt{2}}$ & Transzendent (bewiesen) & Gelfond--Schneider \\
+$\ln 2$, $\ln 3$ & Transzendent (bewiesen) & Lindemann--Weierstrass \\
+$e + \pi$ & Offen (vermutet transzendent) & --- \\
+$e \cdot \pi$ & Offen (vermutet transzendent) & --- \\
+$\gamma$ & Irrationalität offen & Papanikolaou (1997) \\
+$\zeta(3)$ & Irrational (bewiesen), Transzendenz offen & Apéry (1978) \\
+$\zeta(5), \zeta(7), \ldots$ & Offen & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+%% ==========================================================================
+\section{Algorithmische Aspekte und Implementierung}
+\label{sec:algorithmisch}
+%% ==========================================================================
+
+Das Modul \texttt{transcendence\_theory.py} (Build 141, Specialist Mathematics
+Project) stellt numerische Werkzeuge zur Untersuchung von Transzendenzeigenschaften
+bereit.
+
+\paragraph{Zahlenklassifikation.}
+Die Funktion \texttt{classify\_number(x)} versucht zu entscheiden, ob $x$
+rational, algebraisch oder wahrscheinlich transzendent ist. Für einen
+Gleitkommawert prüft sie zunächst Rationalität via bester rationaler
+Approximation (\texttt{fractions.Fraction}), sucht dann nach einem
+Minimalpolynom vom Grad $\leq 6$ mit ganzzahligen Koeffizienten in
+$\{-8, \ldots, 8\}$.
+
+\paragraph{Irrationalitätsmaß.}
+Die Funktion \texttt{irrationality\_measure(x)} schätzt $\mu(x)$, indem sie
+$\mu \approx -\log|x - p/q|/\log q$ für die besten rationalen Näherungen
+$p/q$ mit $q \leq 10000$ berechnet.
+
+\paragraph{Kettenbruchanalyse.}
+Die Funktion \texttt{continued\_fraction\_irrationality(x)} berechnet die
+Kettenbruchentwicklung $[a_0; a_1, a_2, \ldots]$ und schätzt das
+Irrationalitätsmaß aus dem Wachstum der Teilnenner $a_k$ anhand der Beziehung
+$\mu \approx 2 + \limsup_k \log(a_{k+1})/\log(q_k)$.
+
+\paragraph{Euler-Mascheroni-Konstante.}
+Die Klasse \texttt{EulerMascheroniConstant} (in
+\texttt{euler\_gamma\_irrationality.py}) berechnet $\gamma$ mit beliebiger
+Präzision via \texttt{mpmath} (Brent-McMillan-Algorithmus), verifiziert die
+Papanikolaou-Schranke und illustriert die Verbindung zur Gammafunktion
+über $\psi(1) = \Gamma'(1) = -\gamma$.
+
+
+%% ==========================================================================
+\section{Literatur}
+%% ==========================================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{hermite1873}
+C.~Hermite,
+\textit{Sur la fonction exponentielle},
+Comptes Rendus de l'Acad\'emie des Sciences \textbf{77} (1873), 18--24, 74--79,
+226--233, 285--293.
+
+\bibitem{lindemann1882}
+F.~von Lindemann,
+\textit{\"Uber die Zahl $\pi$},
+Mathematische Annalen \textbf{20} (1882), 213--225.
+
+\bibitem{weierstrass1885}
+K.~Weierstrass,
+\textit{Zu Lindemann's Abhandlung: ``\"Uber die Ludolph'sche Zahl''},
+Sitzungsberichte der K\"oniglich Preu\ss{}ischen Akademie der Wissenschaften
+\textbf{5} (1885), 1067--1086.
+
+\bibitem{gelfond1934}
+A.O.~Gelfond,
+\textit{Sur le septi\`eme probl\`eme de Hilbert},
+Bulletin de l'Acad\'emie des Sciences de l'URSS, S\'erie Math\'ematique
+\textbf{7} (1934), 623--630.
+
+\bibitem{schneider1935}
+T.~Schneider,
+\textit{Transzendenzuntersuchungen periodischer Funktionen, I},
+Journal f\"ur die reine und angewandte Mathematik \textbf{172} (1935), 65--69.
+
+\bibitem{baker1966}
+A.~Baker,
+\textit{Linear forms in the logarithms of algebraic numbers},
+Mathematika \textbf{13} (1966), 204--216.
+
+\bibitem{baker1975}
+A.~Baker,
+\textit{Transcendental Number Theory},
+Cambridge University Press, Cambridge, 1975.
+
+\bibitem{papanikolaou1997}
+T.~Papanikolaou,
+\textit{Einige neue Resultate \"uber den Euler-Mascheroni-Quotienten},
+Diplomarbeit, Universit\"at des Saarlandes, 1997.
+
+\bibitem{waldschmidt2000}
+M.~Waldschmidt,
+\textit{Diophantine Approximation on Linear Algebraic Groups},
+Grundlehren der Mathematischen Wissenschaften \textbf{326},
+Springer, Berlin, 2000.
+
+\bibitem{nesterenko1996}
+Yu.\,V.~Nesterenko,
+\textit{Modular functions and transcendence},
+Sbornik: Mathematics \textbf{187} (1996), 1319--1348.
+
+\end{thebibliography}
+
+\end{document}
