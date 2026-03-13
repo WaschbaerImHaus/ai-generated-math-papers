@@ -1,5 +1,22 @@
 # BUGS.md - specialist-maths
 
+## Behobene Bugs (Build 191)
+
+### BUG-B23-P86-DE-001 (GERING — BEHOBEN Build 191): Grammatikfehler "Invariante" in paper86 DE
+- **Datei**: papers/batch22/paper86_elliptische_kurven_rang_de.tex
+- **Problem**: "ein zentrales und rätselhafte Invariante" — grammatisch falsch (Invariante ist feminin)
+- **Behoben**: → "eine zentrale und rätselhafte Invariante"
+
+### BUG-B23-P74-EN-001 (GERING — BEHOBEN Build 191): Cusick Tabellenjahr 1974 falsch in paper74 EN+DE
+- **Dateien**: papers/batch19/paper74_lonely_runner_en.tex, paper74_lonely_runner_de.tex
+- **Problem**: Tabelle zeigte "1974" für Cusick (n=3), aber Cusicks Paper "View-obstruction problems" erschien in Aequationes Math. 9 (1973). bibitem-Key Cusick1973 war korrekt, Tabellenjahr war falsch.
+- **Behoben**: Tabellenjahr 1974 → 1973 in EN und DE
+
+### BUG-B23-P39-DE-BIBITEM (GERING — BEHOBEN Build 191): Inkonsistenter bibitem-Key in paper39 DE
+- **Datei**: papers/batch10/paper39_langlands_programm_de.tex
+- **Problem**: `\bibitem{FrenkelBenZvi}` in DE-Version, aber `\bibitem{Frenkel2007}` in EN-Version
+- **Behoben**: Umbenannt zu `\bibitem{Frenkel2007}` für Konsistenz mit EN
+
 ## Behobene Bugs (Build 163)
 
 ### BUG-AUDIT-P41-CRT-INCOMPLETE (MITTEL — BEHOBEN Build 161): CRT-Überdeckung unvollständig in paper41 EN+DE
