@@ -11,3 +11,10 @@ Phase 1: p1 ≤ 100 (25 Werte, aufwändig)...
   Phase 1 fertig: 19555s, 0 Treffer
 
 Phase 2: p1 > 100 (714 Werte, schnell)...
+  Phase 2 fertig: 13286s
+
+============================================================
+Fertig: 32841s (9.12h)
+4-Prim-Giuga-Zahlen gefunden: 0
+BESTÄTIGT: Kein 4-Prim-Giuga-Pseudoprim mit Produkt ≤ 1e+15
+Ergebnis gespeichert: /home/claude-code/project/specialist-maths/research/giuga4_result.json

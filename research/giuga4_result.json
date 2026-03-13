@@ -1,0 +1,9 @@
+{
+  "conjecture": "Giuga 4-Prim",
+  "max_product": 1000000000000000,
+  "p1_limit": 5624,
+  "found": [],
+  "confirmed": true,
+  "elapsed_seconds": 32841.0,
+  "timestamp": "2026-03-12T21:11:19.521044"
+}

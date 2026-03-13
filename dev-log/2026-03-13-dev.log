@@ -16,3 +16,7 @@ Build 176: Papers 76/89/95 aktualisiert — Dudko-Lyubich 2023 (MLC@Feigenbaum),
   Laufzeit: 401 Sekunden (6.7 Minuten) mit 20 Kernen
   Algorithmus: O(√p) Teilersuche auf D²=p²x² (vollständige x²-Teilerenumeration)
   JSON gespeichert: research/erdos_straus_result.json
+
+2026-03-13 07:30 - Build 181: Commit & Push Erdős-Straus-Ergebnis
+  Git-Push erfolgreich. MEMORY.md aktualisiert.
+  Nächste Schritte: README.md aktualisieren, ggf. neue Batch-Papers erstellen.
