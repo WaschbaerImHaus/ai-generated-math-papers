@@ -5,6 +5,8 @@
 \usepackage[T1]{fontenc}
 \usepackage{geometry}
 \geometry{margin=2.5cm}
+\usepackage{tikz}
+\usepackage{graphicx}
 
 % -------------------------------------------------------
 % Theorem environments
@@ -37,8 +39,10 @@
 \newcommand{\ord}{\mathrm{ord}}
 \DeclareMathOperator{\degree}{deg}
 \DeclareMathOperator{\End}{End}
+\DeclareMathOperator{\Hom}{Hom}
 \DeclareMathOperator{\tr}{tr}
 \DeclareMathOperator{\STU}{STU}
+\newcommand{\id}{\mathrm{id}}
 
 % -------------------------------------------------------
 \begin{document}
@@ -141,8 +145,7 @@ Extend any knot invariant $v$ to singular knots by the \emph{Vassiliev
 where $K_+$ (resp.\ $K_-$) is obtained by resolving the double point
 positively (resp.\ negatively).  More precisely:
 \[
-  v\Bigl(\,\raisebox{-3pt}{\includegraphics[height=12pt]{crossing}}\,\Bigr)
-  = v(K_+) - v(K_-).
+  v(K_\times) = v(K_+) - v(K_-).
 \]
 In symbolic notation, for a double point $\times$ we write
 $v(\times) = v(K_+) - v(K_-)$.
