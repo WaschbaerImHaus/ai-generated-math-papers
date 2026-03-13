@@ -52,9 +52,10 @@ und das Unendlichkeitsproblem}
 Der Satz von Euklid und Euler stellt eine vollständige Bijektion zwischen
 geraden vollkommenen Zahlen und Mersenne-Primzahlen her: Jede gerade vollkommene
 Zahl hat die Form $2^{p-1}(2^p - 1)$, wobei $2^p - 1$ eine Mersenne-Primzahl ist.
-Stand 2024 sind genau 51 Mersenne-Primzahlen bekannt; die größte ist
-$M_{82\,589\,933} = 2^{82\,589\,933} - 1$, entdeckt im Dezember 2018 durch
-das GIMPS-Projekt (\textit{Great Internet Mersenne Prime Search}).
+Stand Oktober 2024 sind genau 52 Mersenne-Primzahlen bekannt; die größte ist
+$M_{136\,279\,841} = 2^{136\,279\,841} - 1$, entdeckt am 12.\ Oktober 2024
+durch Luke Durant im Rahmen des GIMPS-Projekts (\textit{Great Internet Mersenne Prime Search})
+— die erste Mersenne-Primzahl mit einem Exponenten über $10^8$.
 Die zentrale offene Frage lautet: Gibt es unendlich viele Mersenne-Primzahlen?
 Diese Arbeit präsentiert den Satz von Euklid--Euler, den Lucas--Lehmer-Primalitätstest,
 eine Übersicht bekannter Mersenne-Primzahlen, Dichteheuristiken von Lenstra und
@@ -213,7 +214,7 @@ $s_3 = 62 \equiv 0 \pmod{31}$. Da $s_{5-2} = s_3 = 0$, ist $M_5 = 31$ prim. $\ch
 \section{Bekannte Mersenne-Primzahlen}
 % ============================================================
 
-Stand Anfang 2024 sind genau 51 Mersenne-Primzahlen bekannt.
+Stand Oktober 2024 sind genau 52 Mersenne-Primzahlen bekannt.
 Ihre Exponenten $p$ lauten (ausgewählte):
 
 \begin{center}
@@ -229,6 +230,7 @@ Nr. & Exponent $p$ & Nr. & Exponent $p$ \\
 \vdots & \vdots & \vdots & \vdots \\
 48 & 57885161 & 49 & 74207281 \\
 50 & 77232917 & 51 & 82589933 \\
+52 & 136279841 & & \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -237,6 +239,19 @@ Nr. & Exponent $p$ & Nr. & Exponent $p$ \\
 Die 51.\ Mersenne-Primzahl $M_{82\,589\,933}$ wurde am 7.\ Dezember 2018 von
 Patrick Laroche im Rahmen von GIMPS entdeckt.
 Sie hat $24\,862\,048$ Dezimalstellen.
+\end{bemerkung}
+
+\begin{bemerkung}[52.\ Mersenne-Primzahl, Oktober 2024]
+\label{bem:52te}
+Am 12.\ Oktober 2024 gab GIMPS die Entdeckung der 52.\ bekannten
+Mersenne-Primzahl bekannt:
+\[
+    M_{136\,279\,841} = 2^{136\,279\,841} - 1.
+\]
+Dies ist die erste Mersenne-Primzahl mit einem Exponenten über $10^8$.
+Sie hat $41\,024\,320$ Dezimalstellen und ist damit die größte bekannte
+Primzahl zum Zeitpunkt dieser Arbeit.  Die Entdeckung wurde von Luke Durant
+mittels eines GPU-beschleunigten GIMPS-Clients gemacht~\cite{GIMPS2024b}.
 \end{bemerkung}
 
 % ============================================================
@@ -516,6 +531,12 @@ Monatsh.\ Math.\ Phys.\ \textbf{3} (1892), 265--284.
 R.\ Crandall und C.\ Pomerance,
 \textit{Prime Numbers: A Computational Perspective},
 2.\ Aufl., Springer, 2005.
+
+\bibitem{GIMPS2024b}
+GIMPS,
+\textit{GIMPS entdeckt größte bekannte Primzahl: $2^{136\,279\,841}-1$},
+Pressemitteilung, 12.\ Oktober 2024,
+\url{https://www.mersenne.org/}.
 
 \bibitem{Ribenboim1996}
 P.\ Ribenboim,

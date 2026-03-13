@@ -433,8 +433,33 @@ $c \in \mathcal{M}$ lokal zusammenhängend.
 Der unendlich renormalisierbare Feigenbaum-Parameter
 $c_{\mathrm{Feig}} \approx -1{,}4011552$ ist das primäre Hindernis:
 MLC bei diesem Parameter würde aus Schranken an den konformen Moduli
-des Feigenbaum-Fixpunkts folgen, ein Problem, das noch nicht vollständig
-gelöst ist.
+des Feigenbaum-Fixpunkts folgen.
+
+\begin{satz}[Dudko--Lyubich, 2023~\cite{DudkoLyubich2023}]
+\label{satz:DudkoLyubich}
+Die Mandelbrot-Menge $\mathcal{M}$ ist lokal zusammenhängend beim
+Feigenbaum-Parameter $c = c_{\mathrm{Feig}}$.
+\end{satz}
+
+\begin{proof}[Beweisidee]
+Dudko und Lyubich beweisen ausreichend starke Schranken an den konformen
+Moduli des \emph{Feigenbaum-Fixpunkts} — des Fixpunkts des
+Periodenverdopplungs-Renormalisierungsoperators.  Konkret zeigen sie,
+dass das Hauptnest der Yoccoz-Puzzle bei $c_{\mathrm{Feig}}$ Moduli
+hat, die gegen Unendlich wachsen; nach Lyubichs Kriterium von 1997
+impliziert dies lokale Zusammenhängigkeit.  Entscheidend ist eine
+rigorose \emph{computergestützte Schätzung} des Feigenbaum-Fixpunkts,
+aufbauend auf Arbeiten von Lanford (1982) und der Sullivan--McMullen
+Starrheitstheorie.
+\end{proof}
+
+\begin{bemerkung}
+Satz~\ref{satz:DudkoLyubich} ist ein bedeutendes Teilergebnis: MLC ist
+nun beim Feigenbaum-Punkt bewiesen.  Der allgemeine Fall für beliebige
+unendlich renormalisierbare Parameter mit \emph{unbeschränkter Kombinatorik}
+bleibt offen.  Der Preprint erschien im September 2023 auf arXiv
+(arXiv:2309.02107).
+\end{bemerkung}
 
 %% -------------------------------------------------------------------------
 \section{Die Fatou-Shishikura-Ungleichung}
@@ -611,6 +636,11 @@ P.~Lavaurs,
 \textit{Systèmes dynamiques holomorphes: explosion de points périodiques
 paraboliques},
 Thèse, Université Paris-Sud, Orsay, 1989.
+
+\bibitem{DudkoLyubich2023}
+D.~Dudko und M.~Lyubich,
+\textit{Local connectivity of the Mandelbrot set at the Feigenbaum point},
+arXiv:2309.02107, 2023.
 
 \bibitem{AvilaLyubich2008}
 A.~Avila, M.~Lyubich,

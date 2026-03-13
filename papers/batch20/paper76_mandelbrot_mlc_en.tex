@@ -447,8 +447,33 @@ that is at most finitely renormalisable.
 
 The infinitely renormalisable Feigenbaum parameter $c_{\mathrm{Feig}} \approx -1.4011552$
 is the primary obstruction: MLC at this parameter would follow from
-bounds on the conformal moduli of the Feigenbaum fixed point, a problem
-still unresolved in full generality.
+bounds on the conformal moduli of the Feigenbaum fixed point.
+
+\begin{theorem}[Dudko--Lyubich, 2023~\cite{DudkoLyubich2023}]
+\label{thm:DudkoLyubich}
+The Mandelbrot set $\mathcal{M}$ is locally connected at the
+Feigenbaum parameter $c = c_{\mathrm{Feig}}$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Dudko and Lyubich establish sufficiently strong bounds on the conformal
+moduli of the \emph{Feigenbaum fixed point} — the period-doubling
+renormalisation operator's fixed map.  Concretely, they prove that the
+principal nest of Yoccoz puzzles at $c_{\mathrm{Feig}}$ has moduli
+growing to infinity, which by Lyubich's 1997 criterion implies local
+connectivity.  The key innovation is a rigorous \emph{computer-assisted
+estimate} of the Feigenbaum fixed point and its renormalisation
+geometry, building on work of Lanford (1982) and the Sullivan--McMullen
+rigidity theory.
+\end{proof}
+
+\begin{remark}
+Theorem~\ref{thm:DudkoLyubich} is a landmark partial result: MLC is now
+established at the Feigenbaum point.  The general case for arbitrary
+infinitely renormalisable parameters with \emph{unbounded combinatorics}
+remains open.  The preprint appeared on arXiv in September 2023
+(arXiv:2309.02107).
+\end{remark}
 
 %% -------------------------------------------------------------------------
 \section{The Fatou--Shishikura Inequality}
@@ -627,6 +652,11 @@ P.~Lavaurs,
 \textit{Systèmes dynamiques holomorphes: explosion de points périodiques
 paraboliques},
 Thèse, Université Paris-Sud, Orsay, 1989.
+
+\bibitem{DudkoLyubich2023}
+D.~Dudko and M.~Lyubich,
+\textit{Local connectivity of the Mandelbrot set at the Feigenbaum point},
+arXiv:2309.02107, 2023.
 
 \bibitem{AvilaLyubich2008}
 A.~Avila, M.~Lyubich,
