@@ -319,9 +319,8 @@ $829$-bit RSA-250 record ($2020$) required roughly $2700$ core-years.
 \begin{conjecture}[RSA Hardness]
 \textbf{(Open.)} Given a product $n = pq$ of two large primes and a ciphertext
 $c = m^e \bmod n$, recovering $m$ without knowing $p,q$ is computationally
-infeasible. No polynomial-time algorithm for the RSA problem is known. The
-RSA problem is polynomial-time equivalent to factoring $n$ under natural
-reductions.
+infeasible. No polynomial-time algorithm for the RSA problem is known. Factoring $n$ trivially solves the RSA problem;
+whether the converse holds (RSA $\Rightarrow$ factoring) remains open.
 \end{conjecture}
 
 Current recommendations: RSA key lengths of $\ge 3072$ bits (NIST 2022)

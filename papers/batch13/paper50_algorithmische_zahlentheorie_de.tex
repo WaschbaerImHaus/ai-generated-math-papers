@@ -151,10 +151,10 @@ Berechne $7^{-1} \pmod{11}$: Erweiterter Euklid liefert $1 = 8\cdot 7 - 5\cdot 1
 also $7^{-1} \equiv 8 \pmod{11}$. Probe: $7 \cdot 8 = 56 = 5\cdot 11 + 1 \equiv 1$.
 \end{beispiel}
 
-\subsection{Lehrers Algorithmus und binärer GGT}
+\subsection{Lehmers Algorithmus und binärer GGT}
 
 Für Multipräzisions-Arithmetik (Zahlen mit $k$ Maschinenwörtern) kostet
-Schuldivision $O(k^2)$ Operationen. \emph{Lehrers Algorithmus} reduziert dies
+Schuldivision $O(k^2)$ Operationen. \emph{Lehmers Algorithmus} reduziert dies
 auf $O(k\log^2 k \log\log k)$, indem er vollständige Divisionen durch
 Einwort-Approximationen ersetzt. Der \emph{binäre GGT} vermeidet Divisionen
 ganz durch Verschiebungen und Subtraktionen.
@@ -315,8 +315,8 @@ Der 512-Bit-RSA-155-Rekord (1999) benötigte 8000 MIPS-Jahre; der 829-Bit-RSA-25
 Gegeben ein Produkt $n = pq$ zweier großer Primzahlen und ein Chiffretext
 $c = m^e \bmod n$: Die Rückgewinnung von $m$ ohne Kenntnis von $p,q$ gilt als
 rechnerisch nicht machbar. Kein Polynomialzeit-Algorithmus für das RSA-Problem
-ist bekannt. Das RSA-Problem ist polynomial-Zeit-äquivalent zur Faktorisierung
-von $n$ unter natürlichen Reduktionen.
+ist bekannt. Die Faktorisierung von $n$ löst das RSA-Problem trivial;
+ob die Umkehrung gilt (RSA $\Rightarrow$ Faktorisierung), ist offen.
 \end{vermutung}
 
 Aktuelle Empfehlung: RSA-Schlüssellängen $\ge 3072$ Bit (NIST 2022) oder

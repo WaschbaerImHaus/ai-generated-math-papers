@@ -1,6 +1,6 @@
 % ============================================================
 %  paper49_mertens_funktion_de.tex
-%  Die Mertens-Funktion: Möbius-Kancelierung, Dirichlet-Reihen
+%  Die Mertens-Funktion: Möbius-Auslöschung, Dirichlet-Reihen
 %  und ihr Bezug zur Riemannschen Hypothese
 %
 %  Autor : Michael Fuhrmann
@@ -41,7 +41,7 @@
 
 % ---- Titelblock --------------------------------------------
 \title{Die Mertens-Funktion:\\
-Möbius-Kancelierung, Dirichlet-Reihen und\\
+Möbius-Auslöschung, Dirichlet-Reihen und\\
 ihr Bezug zur Riemannschen Hypothese}
 
 \author{Michael Fuhrmann}
@@ -252,7 +252,7 @@ Ausgewählte größere Werte:
 \[
   M(10) = -1, \quad M(100) = 1, \quad M(1000) = 2, \quad M(10000) = -23.
 \]
-Diese kleinen Werte illustrieren eine bemerkenswerte Kancelierung: Ungefähr
+Diese kleinen Werte illustrieren eine bemerkenswerte Auslöschung: Ungefähr
 die Hälfte der quadratfreien ganzen Zahlen hat eine gerade, die andere Hälfte
 eine ungerade Anzahl von Primfaktoren.
 \end{beispiel}
@@ -625,10 +625,12 @@ $\lambda(mn)=\lambda(m)\lambda(n)$ immer.
 $L(n) \le 0$ für alle $n \ge 2$.
 \end{vermutung}
 
-\begin{theorem}[Haselgrove, 1958]
+\begin{theorem}[Haselgrove, 1958; Lehman, 1960; Tanaka, 1980]
 \label{satz:haselgrove}
-Die Pólya-Vermutung ist \emph{falsch}.
-Das kleinste bekannte Gegenbeispiel ist $n = 906\,316\,571$.
+Die Pólya-Vermutung ist \emph{falsch}.  Haselgrove (1958) bewies ihre
+Falschheit nicht-konstruktiv.  Lehman (1960) fand das erste explizite
+Gegenbeispiel.  Das kleinste Gegenbeispiel ist $n = 906\,150\,257$
+(Tanaka, 1980).
 \end{theorem}
 
 Die Pólya-Vermutung ist das Liouville-Analogon der Mertens-Vermutung; sie
@@ -762,7 +764,7 @@ bei $N \approx 7{,}76 \times 10^9$.
 Unter der RH ließen sich effiziente Algorithmen für $M(N)$ entwickeln, die
 die $\BigO(N^{1/2+\varepsilon})$-Schranke ausnutzen.  Umgekehrt würde ein
 hypothetischer Algorithmus mit Laufzeit $o(N^{1/2})$ starke (wenn auch
-kein formalen) Hinweise auf die Wahrheit der RH liefern.
+keine formalen) Hinweise auf die Wahrheit der RH liefern.
 
 % ============================================================
 \section*{Zusammenfassung}
@@ -773,7 +775,7 @@ Die Mertens-Funktion steht an der Schnittstelle dreier fundamentaler Themen:
   \item \textbf{Analytische Zahlentheorie} – über die Dirichlet-Reihe
         $1/\zeta(s)$ und die explizite Formel.
   \item \textbf{Probabilistische Heuristiken} – die „zufällige"
-        Kancelierung der $\mu(n)$-Werte.
+        Auslöschung der $\mu(n)$-Werte.
 \end{enumerate}
 
 Mertens' drei Sätze liefern die grundlegenden Abschätzungen für die
