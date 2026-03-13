@@ -474,12 +474,12 @@ in a planar embedding. Then
 
 \begin{proof}
 By induction on the number of edges. If $G$ is a tree, then $E = V - 1$,
-$F = 1$ (only the unbounded face), and $V - (V-1) + 1 = 2$. ✓
+$F = 1$ (only the unbounded face), and $V - (V-1) + 1 = 2$. \checkmark
 
 Now suppose $G$ has a cycle, so there exists an edge $e$ on a cycle. Removing
 $e$ merges two faces into one, so $F' = F - 1$, $E' = E - 1$, $V' = V$.
 By induction, $V' - E' + F' = 2$, i.e., $V - (E-1) + (F-1) = 2$, which
-gives $V - E + F = 2$. ✓
+gives $V - E + F = 2$. \checkmark
 
 If $G$ is connected but has a bridge $e$ (not on any cycle), removing $e$
 disconnects $G$: $V' = V$, $E' = E - 1$. The two resulting components

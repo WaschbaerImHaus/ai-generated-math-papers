@@ -240,7 +240,7 @@ The representation count is
 \begin{proof}
   % BUG-B4-P19-EN-001 überprüft: Paper 17 hat \newtheorem{theorem}{Theorem}[section] und
   % \newtheorem{lemma}[theorem]{Lemma} (geteilter Zähler). Weyl's inequality ist das erste
-  % Theorem/Lemma in Section 6 von Paper 17 → korrekte Nummer ist Theorem 6.1. ✓ KEIN BUG.
+  % Theorem/Lemma in Section 6 von Paper 17 → korrekte Nummer ist Theorem 6.1. \checkmark KEIN BUG.
   Apply Weyl's inequality (Paper~17, Theorem~6.1\footnote{%
     Theorem 6.1 in Paper~17 is the Weyl inequality \texttt{thm:weyl}, the first numbered
     statement in Section~6 (``Minor Arc Bounds'') of that paper.}) with $s = (k-2)2^{k-1}+5$:
@@ -489,13 +489,13 @@ it uses $(q-1)$ copies of $2^k$ and $(2^k - 1)$ copies of $1^k$.
 \toprule
 $k$ & $g(k)$ & $q = \lfloor(3/2)^k\rfloor$ & $g(k) = 2^k + q - 2$ & Year proved \\
 \midrule
-2 & 4 & 2 & $4+2-2=4$ ✓ & Lagrange 1770 \\
-3 & 9 & 3 & $8+3-2=9$ ✓ & Wieferich 1909 \\
-4 & 19 & 5 & $16+5-2=19$ ✓ & Balasubramanian et al.\ 1986 \\
-5 & 37 & 7 & $32+7-2=37$ ✓ & Chen 1958 \\
-6 & 73 & 11 & $64+11-2=73$ ✓ & Pillai 1936 \\
-7 & 143 & 17 & $128+17-2=143$ ✓ & Pillai 1936 \\
-8 & 279 & 25 & $256+25-2=279$ ✓ & Pillai 1936 \\
+2 & 4 & 2 & $4+2-2=4$ \checkmark & Lagrange 1770 \\
+3 & 9 & 3 & $8+3-2=9$ \checkmark & Wieferich 1909 \\
+4 & 19 & 5 & $16+5-2=19$ \checkmark & Balasubramanian et al.\ 1986 \\
+5 & 37 & 7 & $32+7-2=37$ \checkmark & Chen 1958 \\
+6 & 73 & 11 & $64+11-2=73$ \checkmark & Pillai 1936 \\
+7 & 143 & 17 & $128+17-2=143$ \checkmark & Pillai 1936 \\
+8 & 279 & 25 & $256+25-2=279$ \checkmark & Pillai 1936 \\
 \bottomrule
 \end{tabular}
 \end{center}

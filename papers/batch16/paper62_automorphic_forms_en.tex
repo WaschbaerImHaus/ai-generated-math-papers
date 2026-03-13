@@ -35,7 +35,7 @@
 \newcommand{\RR}{\mathbb{R}}
 \newcommand{\CC}{\mathbb{C}}
 \newcommand{\NN}{\mathbb{N}}
-\newcommand{\AA}{\mathbb{A}}
+\newcommand{\AAring}{\mathbb{A}}
 \newcommand{\FF}{\mathbb{F}}
 \newcommand{\GL}{\mathrm{GL}}
 \newcommand{\SL}{\mathrm{SL}}
@@ -222,8 +222,8 @@ The \emph{ring of adèles} $\AA = \AA_\QQ$ is the restricted direct product
 \[
 \AA = \RR \times \prod_{p}' \QQ_p = \left\{ (x_\infty, x_2, x_3, x_5, \ldots) : x_p \in \ZZ_p \text{ for almost all } p \right\},
 \]
-equipped with the restricted product topology. The diagonal embedding $\QQ \hookrightarrow \AA$
-is discrete, and $\QQ \backslash \AA$ is compact.
+equipped with the restricted product topology. The diagonal embedding $\QQ \hookrightarrow \AAring$
+is discrete, and $\QQ \backslash \AAring$ is compact.
 
 The group $\GL(2,\AA)$ contains $\GL(2,\QQ)$ as a discrete subgroup (via the diagonal embedding),
 and the double coset space $\GL(2,\QQ) \backslash \GL(2,\AA) / \GL(2,\hat\ZZ)$ is naturally
@@ -236,8 +236,8 @@ An \emph{automorphic form on $\GL(2)$} is a smooth function
 $\phi: \GL(2,\AA) \to \CC$ satisfying:
 \begin{enumerate}[label=(\roman*)]
 \item \textbf{Left invariance}: $\phi(\gamma g) = \phi(g)$ for all $\gamma \in \GL(2,\QQ)$;
-\item \textbf{Central character}: $\phi(zg) = \omega(z)\phi(g)$ for all $z \in \AA^\times$,
-  where $\omega: \QQ^\times \backslash \AA^\times \to \CC^\times$ is a Hecke character;
+\item \textbf{Central character}: $\phi(zg) = \omega(z)\phi(g)$ for all $z \in \AAring^\times$,
+  where $\omega: \QQ^\times \backslash \AAring^\times \to \CC^\times$ is a Hecke character;
 \item \textbf{$K$-finiteness}: the orbit under the maximal compact subgroup
   $K = \mathrm{O}(2) \times \prod_p \GL(2,\ZZ_p)$ spans a finite-dimensional space;
 \item \textbf{$\mathfrak{z}$-finiteness}: $\phi$ is annihilated by an ideal of finite

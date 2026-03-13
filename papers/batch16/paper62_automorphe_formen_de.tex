@@ -37,7 +37,7 @@
 \newcommand{\RR}{\mathbb{R}}
 \newcommand{\CC}{\mathbb{C}}
 \newcommand{\NN}{\mathbb{N}}
-\newcommand{\AA}{\mathbb{A}}
+\newcommand{\AAring}{\mathbb{A}}
 \newcommand{\FF}{\mathbb{F}}
 \newcommand{\GL}{\mathrm{GL}}
 \newcommand{\SL}{\mathrm{SL}}
@@ -216,7 +216,7 @@ Der \emph{Adèlring} $\AA = \AA_\QQ$ ist das eingeschränkte direkte Produkt
 \AA = \RR \times \prod_{p}' \QQ_p = \left\{ (x_\infty, x_2, x_3, x_5, \ldots) : x_p \in \ZZ_p \text{ für fast alle } p \right\},
 \]
 ausgestattet mit der eingeschränkten Produkttopologie. Die diagonale Einbettung
-$\QQ \hookrightarrow \AA$ ist diskret, und $\QQ \backslash \AA$ ist kompakt.
+$\QQ \hookrightarrow \AAring$ ist diskret, und $\QQ \backslash \AAring$ ist kompakt.
 
 Die Gruppe $\GL(2,\AA)$ enthält $\GL(2,\QQ)$ als diskrete Untergruppe (via der
 diagonalen Einbettung), und der Doppelnebenklassenraum
@@ -230,8 +230,8 @@ Eine \emph{automorphe Form auf $\GL(2)$} ist eine glatte Funktion
 $\phi: \GL(2,\AA) \to \CC$ mit folgenden Eigenschaften:
 \begin{enumerate}[label=(\roman*)]
 \item \textbf{Linksinvarianz}: $\phi(\gamma g) = \phi(g)$ für alle $\gamma \in \GL(2,\QQ)$;
-\item \textbf{Zentral-Charakter}: $\phi(zg) = \omega(z)\phi(g)$ für alle $z \in \AA^\times$,
-  wobei $\omega: \QQ^\times \backslash \AA^\times \to \CC^\times$ ein Hecke-Charakter ist;
+\item \textbf{Zentral-Charakter}: $\phi(zg) = \omega(z)\phi(g)$ für alle $z \in \AAring^\times$,
+  wobei $\omega: \QQ^\times \backslash \AAring^\times \to \CC^\times$ ein Hecke-Charakter ist;
 \item \textbf{$K$-Endlichkeit}: die Bahn unter der maximalen kompakten Untergruppe
   $K = \mathrm{O}(2) \times \prod_p \GL(2,\ZZ_p)$ erzeugt einen endlichdimensionalen Raum;
 \item \textbf{$\mathfrak{z}$-Endlichkeit}: $\phi$ wird durch ein Ideal endlicher Kodimension

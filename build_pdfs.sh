@@ -3,12 +3,13 @@
 # Autor: Michael Fuhrmann
 # Erzeugt PDFs unter papers-pdf/ (nicht im Git-Repo)
 
-set -e
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PAPERS_DIR="$SCRIPT_DIR/papers"
 OUT_DIR="$SCRIPT_DIR/papers-pdf"
 LOG_FILE="$OUT_DIR/build.log"
+
+# Timeout pro pdflatex-Aufruf in Sekunden (60s verhindert hängende TikZ/etc.)
+PDFLATEX_TIMEOUT=60
 
 echo "=== specialist-maths PDF Build ==="
 echo "Quelle: $PAPERS_DIR"
@@ -32,11 +33,11 @@ while IFS= read -r -d '' TEX_FILE; do
 
     echo -n "  Kompiliere: $REL/$BASENAME.tex ... "
 
-    # Zweimal kompilieren für korrekte Referenzen
-    if pdflatex -interaction=nonstopmode -halt-on-error \
+    # Zweimal kompilieren für korrekte Referenzen (mit Timeout gegen hängende Prozesse)
+    if timeout "$PDFLATEX_TIMEOUT" pdflatex -interaction=nonstopmode -halt-on-error \
         -output-directory="$TARGET_DIR" \
         "$TEX_FILE" >> "$LOG_FILE" 2>&1 && \
-       pdflatex -interaction=nonstopmode -halt-on-error \
+       timeout "$PDFLATEX_TIMEOUT" pdflatex -interaction=nonstopmode -halt-on-error \
         -output-directory="$TARGET_DIR" \
         "$TEX_FILE" >> "$LOG_FILE" 2>&1; then
         echo "OK"
