@@ -1,2 +1,12 @@
 2026-03-13 06:18:19
 Build 176: Papers 76/89/95 aktualisiert — Dudko-Lyubich 2023 (MLC@Feigenbaum), 52. Mersenne-Primzahl 2^136279841-1 (Okt 2024), Gang Liu 2016 (Yau max. Volumenwachstum)
+
+2026-03-13 07:21 - Build 179: Erdős-Straus Algorithmus-Bug behoben
+  BUG: Alter Algorithmus prüfte nur Teiler von D=px, nicht von D²=p²x².
+  Gegenbeispiel: p=2521, dx=5, x=636, n=23. Nötige d=848=2⁴×53
+    teilt x²=636²=2⁴×9×53² aber nicht x=636=2²×3×53.
+  FIX: Vollständige Enumeration aller Teiler von x² via Faktorisierung.
+    Algorithmus: x faktorisieren → alle q^k-Kombinationen (0≤k≤2e) erzeugen.
+    45 Teiler von x²=636² korrekt generiert, d=848 enthalten.
+  VALIDIERT: 0 Failures in 664k Primzahlen bis 10M.
+  Vollständige Berechnung bis 10^9 gestartet (PID 82126), ETA ~5 Min.
