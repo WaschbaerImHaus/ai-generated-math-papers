@@ -35,3 +35,14 @@ Thumbs.db
 
 # Hypothesis Test-Cache
 .hypothesis/
+
+# PDF-Ausgaben (nicht Teil des Repos)
+papers-pdf/
+papers/**/*.pdf
+papers/**/*.aux
+papers/**/*.log
+papers/**/*.out
+papers/**/*.toc
+papers/**/*.synctex.gz
+papers/**/*.fls
+papers/**/*.fdb_latexmk
