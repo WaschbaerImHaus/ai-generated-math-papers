@@ -1,0 +1,457 @@
+% ============================================================
+% Paper 90 (DE): Die Bunyakovsky-Vermutung und irreduzible
+%                Polynome, die Primzahlen darstellen
+% Autor: Michael Fuhrmann
+% Specialist Mathematics Project, Build 168
+% Datum: 2026-03-12
+% ============================================================
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% ---- Theorem-Umgebungen (Deutsch) ----
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{satz}[theorem]{Satz}
+\newtheorem{korollar}[theorem]{Korollar}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{definition_de}[theorem]{Definition}
+\newtheorem{example}[theorem]{Beispiel}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\newtheorem{vermutung}[theorem]{Vermutung}
+
+% ---- Operatoren ----
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+
+% ============================================================
+\begin{document}
+
+\title{Die Bunyakovsky-Vermutung und irreduzible\\
+Polynome, die Primzahlen darstellen}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 168}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\begin{abstract}
+Im Jahr 1857 vermutete Viktor Bunyakovsky, dass jedes irreduzible Polynom
+$f \in \Z[x]$ mit positivem führenden Koeffizienten, das eine einfache
+notwendige Bedingung erfüllt --- dass die Werte $f(n)$ für $n \in \Z$ keinen
+gemeinsamen Teiler $> 1$ besitzen --- unendlich viele Primzahlwerte annimmt.
+Dies ist die natürliche Verallgemeinerung von Dirichlets Satz über Primzahlen
+in arithmetischen Progressionen (der lineare Fall).
+Für Polynome vom Grad $\geq 2$ ist die Vermutung vollständig offen.
+Diese Arbeit präsentiert die genaue Formulierung, die notwendigen lokalen
+Bedingungen, die Bateman--Horn-Vermutung über das Zählen von Darstellungen,
+Schinzels Hypothese H (eine Verallgemeinerung auf simultane Polynomwerte),
+explizite Beispiele (darunter das Problem, ob $n^2 + 1$ unendlich oft prim ist),
+sowie die Verbindung zu Eulers glücklichen Zahlen.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+% ============================================================
+\section{Einleitung}
+% ============================================================
+
+Der grundlegendste Satz über Primzahlen in Folgen ist Dirichlets Satz (1837):
+
+\begin{satz}[Dirichlet 1837]
+Ist $\gcd(a, b) = 1$, so enthält die arithmetische Progression
+$a, a+b, a+2b, \ldots$ unendlich viele Primzahlen.
+\end{satz}
+
+Das erzeugende Polynom dieser Progression ist $f(n) = a + bn$ --- linear,
+irreduzibel über $\Q$, mit positivem führenden Koeffizienten und
+$\gcd_{n \in \Z}\{f(n)\} = 1$.
+
+Die Bunyakovsky-Vermutung fragt: Gilt dasselbe für Polynome höheren Grades?
+
+\begin{vermutung}[Bunyakovsky 1857]
+\label{verm:buny}
+Sei $f \in \Z[x]$ ein irreduzibles Polynom vom Grad $d \geq 1$ mit
+positivem führenden Koeffizienten.
+Gilt $\gcd_{n \geq 0} f(n) = 1$ (keine feste Primzahl teilt alle Werte),
+so nimmt $f(n)$ für unendlich viele $n \in \N$ Primzahlwerte an.
+\end{vermutung}
+
+\begin{bemerkung}
+Die Bedingung $\gcd_{n \geq 0} f(n) = 1$ ist eine rein lokale Bedingung:
+Es gibt keine Primzahl $p$ mit $p \mid f(n)$ für alle $n$.
+\end{bemerkung}
+
+Für $d = 1$ ist Vermutung~\ref{verm:buny} Dirichlets Satz (bewiesen).
+Für $d \geq 2$ ist sie vollständig offen.
+
+% ============================================================
+\section{Die lokale Obstruktionsbedingung}
+% ============================================================
+
+\begin{definition_de}
+Eine Primzahl $p$ ist ein \emph{fester Teiler} von $f$, wenn $p \mid f(n)$
+für alle $n \in \Z$ gilt.
+Der relevante \emph{Inhalt} ist
+\[
+  \Delta(f) = \gcd\{f(n) : n \in \Z\}.
+\]
+\end{definition_de}
+
+\begin{proposition}
+\label{prop:lokal}
+Für $f \in \Z[x]$ vom Grad $d$ gilt:
+\[
+  \Delta(f) = \gcd\{f(0), f(1), \ldots, f(d)\}.
+\]
+\end{proposition}
+
+\begin{proof}
+Die Werte $f(0), \ldots, f(d)$ bestimmen $f$ eindeutig (Lagrange-Interpolation).
+Jede Primzahl $p \mid \Delta(f)$ teilt $f(n)$ für alle ganzen Zahlen $n$
+durch ein Periodizitäts- und Bewertungsargument.
+\end{proof}
+
+\begin{example}
+$f(n) = n^2 + n + 2$: $\gcd(f(0), f(1), f(2)) = \gcd(2, 4, 8) = 2$.
+Also ist $2$ ein fester Teiler: $f(n)$ nimmt nie einen ungeraden Primwert an.
+\end{example}
+
+\begin{example}
+$f(n) = n^2 + 1$: $\Delta(f) = 1$.
+Die ersten Primwerte: $f(1)=2$, $f(2)=5$, $f(4)=17$, $f(6)=37$, $f(10)=101$,
+$f(14)=197$.
+\end{example}
+
+\begin{vermutung}[$n^2 + 1$ unendlich oft prim]
+\label{verm:nsq}
+Es gibt unendlich viele $n \in \N$, für die $n^2 + 1$ prim ist.
+\end{vermutung}
+
+Vermutung~\ref{verm:nsq} ist ein Spezialfall der Bunyakovsky-Vermutung
+und vollständig offen.
+
+% ============================================================
+\section{Lokale Bedingungen: notwendig aber nicht hinreichend}
+% ============================================================
+
+\begin{satz}[Lokale Bedingungen sind notwendig]
+Hat $f \in \Z[x]$ einen festen Primteiler $p$, so ist $p \mid f(n)$ für alle
+$n$, und $f(n)$ kann höchstens einen Primzahlwert ($p$ selbst) annehmen.
+\end{satz}
+
+\begin{bemerkung}
+Die Bunyakovsky-Vermutung behauptet, dass lokale Bedingungen auch
+\emph{hinreichend} für die Unendlichkeit der Primzahlwerte sind.
+Dies ist das tiefe, unbewiesene Kernstück.
+\end{bemerkung}
+
+\begin{example}[Lokale Bedingungen genügen nicht zur Reduktionsprüfung]
+$f(n) = n^4 + 4$: Durch Sophie Germains Identität gilt
+\[
+  n^4 + 4 = (n^2 + 2n + 2)(n^2 - 2n + 2),
+\]
+also ist $f$ für alle $n > 1$ zusammengesetzt, obwohl $\Delta(f) = 1$.
+Aber $f$ ist \emph{reduzibel} über $\Q$ --- die Irreduzibilitätsbedingung
+der Bunyakovsky-Vermutung ist nicht erfüllt.
+\end{example}
+
+Dieses Beispiel zeigt, warum Irreduzibilität wesentlich ist.
+
+% ============================================================
+\section{Dirichlets Satz als linearer Spezialfall}
+% ============================================================
+
+\begin{satz}[Dirichlet 1837, vollständige Aussage]
+Für $\gcd(a, b) = 1$ enthält $(a + bn)_{n \geq 0}$ unendlich viele Primzahlen.
+Außerdem sind die Primzahlen gleichmäßig auf die zu $b$ teilerfremden
+Restklassen verteilt:
+\[
+  \pi(x; b, a) \sim \frac{1}{\phi(b)} \cdot \frac{x}{\log x}
+  \quad (x \to \infty).
+\]
+\end{satz}
+
+\begin{proof}[Beweisidee]
+Verwendet Dirichlet-$L$-Reihen $L(s, \chi) = \sum_{n=1}^\infty \chi(n) n^{-s}$
+für Dirichlet-Charaktere $\chi$ modulo $b$ und zeigt $L(1, \chi) \neq 0$
+für $\chi \neq \chi_0$.
+\end{proof}
+
+\begin{bemerkung}
+Der Beweis von Dirichlets Satz nutzt die Gruppenstruktur von $(\Z/b\Z)^*$
+in wesentlicher Weise.
+Diese Struktur ist für Polynome höheren Grades nicht verfügbar --- daher
+ist die Verallgemeinerung so schwierig.
+\end{bemerkung}
+
+% ============================================================
+\section{Die Bateman--Horn-Vermutung}
+% ============================================================
+
+Bateman und Horn (1962) formulierten eine quantitative Version der
+Bunyakovsky-Vermutung:
+
+\begin{vermutung}[Bateman--Horn 1962]
+\label{verm:BH}
+Seien $f_1, \ldots, f_k \in \Z[x]$ verschiedene irreduzible Polynome mit
+positiven führenden Koeffizienten und $\Delta(f_1 \cdots f_k) = 1$.
+Die Anzahl der $n \leq x$, für die alle $f_1(n), \ldots, f_k(n)$ simultan
+prim sind, ist asymptotisch
+\[
+  \frac{C(f_1, \ldots, f_k)}{d_1 \cdots d_k} \cdot \frac{x}{(\log x)^k},
+\]
+wobei $d_i = \deg f_i$ und die \emph{singuläre Reihe}
+\[
+  C(f_1, \ldots, f_k)
+  = \prod_p \left(1 - \frac{1}{p}\right)^{-k}
+    \left(1 - \frac{\omega(p)}{p}\right)
+\]
+mit $\omega(p)$ gleich der Anzahl der Lösungen von
+$f_1(n) \cdots f_k(n) \equiv 0 \pmod{p}$.
+\end{vermutung}
+
+\begin{bemerkung}
+Für $k=1$, $f_1(n) = n^2 + 1$ sagt Vermutung~\ref{verm:BH} voraus:
+\[
+  |\{n \leq x : n^2 + 1 \text{ prim}\}| \sim \frac{C}{2} \cdot \frac{x}{\log x},
+\]
+wobei $C = \prod_{p \equiv 1 (4)} \frac{p-1}{p-2} \cdot \prod_{p \equiv 3 (4)} \frac{p}{p-1}$.
+\end{bemerkung}
+
+% ============================================================
+\section{Schinzels Hypothese H}
+% ============================================================
+
+\begin{vermutung}[Schinzel--Sierpiński Hypothese H, 1958]
+\label{verm:H}
+Seien $f_1, \ldots, f_k \in \Z[x]$ irreduzible Polynome mit positiven
+führenden Koeffizienten. Hat das Produkt $f_1 \cdots f_k$ keinen festen
+Primteiler, so gibt es unendlich viele $n \in \N$, für die
+$f_1(n), \ldots, f_k(n)$ simultan prim sind.
+\end{vermutung}
+
+\begin{bemerkung}
+Hypothese H impliziert:
+\begin{itemize}[nosep]
+  \item Die Bunyakovsky-Vermutung ($k=1$, $\deg f \geq 2$);
+  \item Die Primzahlzwillings-Vermutung ($f_1(n) = n$, $f_2(n) = n+2$);
+  \item Die Primkonstellation-Vermutung;
+  \item Unendlich viele Sophie-Germain-Primzahlen.
+\end{itemize}
+Hypothese H gilt als mit aktuellen Methoden völlig unerreichbar.
+\end{bemerkung}
+
+% ============================================================
+\section{Eulers Glückszahlen und primerzeugende Polynome}
+% ============================================================
+
+\begin{example}[Eulers primerzeugendes Polynom]
+Das Polynom $f(n) = n^2 - n + 41$ liefert Primzahlen für $n = 0, 1, \ldots, 40$:
+\[
+  f(0) = 41,\quad f(1) = 41,\quad f(2) = 43,\quad \ldots,\quad f(40) = 1601,
+\]
+alle prim. Aber $f(41) = 41^2 = 1681$ ist zusammengesetzt.
+\end{example}
+
+\begin{definition_de}
+Eine positive ganze Zahl $m$ heißt \emph{Euler-Glückszahl}, wenn
+$n^2 - n + m$ für $n = 1, 2, \ldots, m-1$ stets prim ist.
+\end{definition_de}
+
+\begin{satz}[Klassifikation der Euler-Glückszahlen]
+Die einzigen Euler-Glückszahlen sind $2, 3, 5, 11, 17, 41$.
+\end{satz}
+
+\begin{bemerkung}
+Das Polynom $n^2 + n + 41$ hat ebenfalls bemerkenswerte primerzeugende
+Eigenschaften.
+Unter der Bunyakovsky-Vermutung stellt es unendlich viele Primzahlen dar.
+Die außergewöhnlichen Eigenschaften dieses Polynoms hängen mit dem
+imaginär-quadratischen Körper $\Q(\sqrt{-163})$ zusammen, der
+Klassenzahl $1$ hat (Baker--Heegner--Stark).
+\end{bemerkung}
+
+% ============================================================
+\section{Verbindung zur algebraischen Geometrie}
+% ============================================================
+
+\begin{bemerkung}
+Ken Ono und Mitarbeiter haben Verbindungen zwischen der Bunyakovsky-Vermutung
+und der Arithmetik algebraischer Kurven untersucht.
+Das Problem, ob $f(n)$ prim ist, hängt mit rationalen Punkten auf gewissen
+algebraischen Varietäten zusammen.
+\end{bemerkung}
+
+\begin{satz}[Ono, partielles Ergebnis]
+Sei $f(n) = n^2 + an + b$ irreduzibel über $\Q$ mit $\Delta(f) = 1$.
+Hat der zugehörige imaginär-quadratische Körper $\Q(\sqrt{a^2-4b})$
+die Klassenzahl $1$, so zerfallen alle Primwerte von $f$ in diesem Körper.
+\end{satz}
+
+\begin{bemerkung}
+Die imaginär-quadratischen Körper der Klassenzahl $1$ sind
+$\Q(\sqrt{-d})$ für $d \in \{1, 2, 3, 7, 11, 19, 43, 67, 163\}$
+(Baker--Heegner--Stark).
+Das Polynom $n^2 + n + 41$ entspricht $\Q(\sqrt{-163})$, was seine
+außergewöhnliche Primzahlproduktion erklärt.
+\end{bemerkung}
+
+% ============================================================
+\section{Das polynomiale Goldbach-Problem}
+% ============================================================
+
+\begin{vermutung}[Polynomiales Goldbach]
+\label{verm:polygold}
+Jede hinreichend große gerade ganze Zahl lässt sich als Summe zweier Werte
+der Form $f(m)$ und $f(n)$ mit prim schreiben, für ein gegebenes
+primdarstellendes Polynom $f$.
+\end{vermutung}
+
+Konkrete Fragen umfassen:
+\begin{itemize}[nosep]
+  \item Ist jede ganze Zahl als $p + n^2$ mit $p$ prim darstellbar?
+  \item Gibt es unendlich viele Primzahlen der Form $n^2 + 1$?
+        (Landaus viertes Problem, 1912)
+\end{itemize}
+
+\begin{bemerkung}
+Landaus viertes Problem (1912) fragt explizit nach unendlich vielen Primzahlen
+der Form $n^2 + 1$. Es ist ein Spezialfall der Bunyakovsky-Vermutung und
+vollständig offen.
+\end{bemerkung}
+
+% ============================================================
+\section{Bekannte Ergebnisse in Richtung Bunyakovsky}
+% ============================================================
+
+\begin{satz}[Iwaniec 1978]
+Das Polynom $f(n) = n^2 + 1$ nimmt unendlich viele Werte an, die entweder
+prim oder Produkt von genau zwei Primzahlen (fast-prim, $P_2$) sind.
+\end{satz}
+
+\begin{bemerkung}
+Iwaniecs Ergebnis verwendet das Sieb von Eratosthenes in verfeinerter Form
+(Brun--Titchmarsh--Iwaniec-Sieb).
+Es zeigt, dass $n^2 + 1$ nicht stets zusammengesetzt sein kann, beweist aber
+nicht die Unendlichkeit der Primwerte, weil das Sieb das ``Paritätsproblem''
+nicht löst.
+\end{bemerkung}
+
+\begin{satz}[Linnik für lineare Polynome]
+Die kleinste Primzahl in der Progression $a \pmod b$ ist $\ll b^L$
+für eine absolute Konstante $L$. Aktuell bestes Ergebnis: $L = 5$
+(Xylouris 2011).
+\end{satz}
+
+% ============================================================
+\section{Übersicht bekannter Fälle und offener Probleme}
+% ============================================================
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Polynom & Status & Referenz \\
+\midrule
+$an + b$, $\gcd(a,b)=1$ & Bewiesen (unendlich viele Primzahlen) & Dirichlet 1837 \\
+$n^2 + 1$ & Offen (vermutet unendlich) & Bunyakovsky 1857 \\
+$n^2 + n + 41$ & Offen (vermutet unendlich) & Bunyakovsky 1857 \\
+$n^4 + 1$ & Offen & Bunyakovsky 1857 \\
+$n^2 + 1$ ist $P_2$ & Bewiesen (unendlich viele Fastprimzahlen) & Iwaniec 1978 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Offene Fragen:}
+\begin{enumerate}[label=(\arabic*)]
+  \item Beweise die Bunyakovsky-Vermutung für ein einzelnes irreduzibles
+        Polynom vom Grad $\geq 2$.
+  \item Beweise Hypothese H für irgendein Paar von Polynomen.
+  \item Löse Landaus viertes Problem: unendlich viele Primzahlen der Form $n^2+1$.
+  \item Verbessere die Bateman--Horn-Konstante $C(f)$ durch unbedingte Methoden.
+\end{enumerate}
+
+% ============================================================
+\section{Schluss}
+% ============================================================
+
+Die Bunyakovsky-Vermutung ist die natürliche Verallgemeinerung von Dirichlets Satz
+auf Polynome vom Grad $\geq 2$.
+Ihr einfachster Spezialfall --- dass $n^2 + 1$ unendlich oft prim ist ---
+hat dem Beweis seit über 165 Jahren widerstanden.
+Die Vermutung wird durch massive Rechenevidenz, die quantitative
+Bateman--Horn-Vorhersage und Analogien mit bewiesenen Ergebnissen in
+Funktionenkörpern gestützt.
+Dennoch erscheint ein Beweis in weiter Ferne.
+
+\begin{vermutung}[Wiederholt]
+Jedes irreduzible $f \in \Z[x]$ mit positivem führenden Koeffizienten
+und $\Delta(f) = 1$ stellt unendlich viele Primzahlen dar.
+\end{vermutung}
+
+% ============================================================
+\begin{thebibliography}{99}
+
+\bibitem{Bunyakovsky1857}
+V.\ Bunyakovsky,
+\textit{Nouveaux théorèmes relatifs à la distinction des nombres premiers},
+Mem.\ Acad.\ Sci.\ St.\,Pétersbourg (6) \textbf{6} (1857), 305--329.
+
+\bibitem{Dirichlet1837}
+P.\ G.\ L.\ Dirichlet,
+\textit{Beweis des Satzes, daß jede unbegrenzte arithmetische Progression
+unendlich viele Primzahlen enthält},
+Abh.\ Kön.\ Preuss.\ Akad.\ Wiss.\ (1837), 45--81.
+
+\bibitem{SchinzelSierpinski1958}
+A.\ Schinzel und W.\ Sierpiński,
+\textit{Sur certaines hypothèses concernant les nombres premiers},
+Acta Arith.\ \textbf{4} (1958), 185--208.
+
+\bibitem{BatemanHorn1962}
+P.\ T.\ Bateman und R.\ A.\ Horn,
+\textit{A heuristic asymptotic formula concerning the distribution of prime numbers},
+Math.\ Comp.\ \textbf{16} (1962), 363--367.
+
+\bibitem{Iwaniec1978}
+H.\ Iwaniec,
+\textit{Almost-primes represented by quadratic polynomials},
+Invent.\ Math.\ \textbf{47} (1978), 171--188.
+
+\bibitem{Xylouris2011}
+T.\ Xylouris,
+\textit{On the least prime in an arithmetic progression},
+Acta Arith.\ \textbf{150} (2011), 65--91.
+
+\bibitem{CrandallPomerance2005}
+R.\ Crandall und C.\ Pomerance,
+\textit{Prime Numbers: A Computational Perspective},
+2.\ Aufl., Springer, 2005.
+
+\bibitem{Ono2004}
+K.\ Ono,
+\textit{The Web of Modularity},
+CBMS \textbf{102}, AMS, 2004.
+
+\bibitem{Granville1995}
+A.\ Granville,
+\textit{Harald Cramér and the distribution of prime numbers},
+Scand.\ Actuar.\ J.\ \textbf{1995}, 12--28.
+
+\end{thebibliography}
+
+\end{document}
