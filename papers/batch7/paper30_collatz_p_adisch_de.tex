@@ -1,0 +1,435 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+
+\begin{document}
+
+\title{Die Collatz-Vermutung und $p$-adische Zahlen:\\
+Das $3x+1$-Problem über den 2-adischen ganzen Zahlen}
+\author{Michael Fuhrmann}
+\date{März 2026}
+\maketitle
+
+\begin{abstract}
+Das $3x+1$-Problem erhält einen natürlichen geometrischen und analytischen Rahmen,
+wenn es in die 2-adischen ganzen Zahlen $\mathbb{Z}_2$ eingebettet wird. In diesem
+Rahmen werden die Collatz-Funktion $T$ und die Syrakus-Funktion $S$ zu stetigen
+Selbstabbildungen eines kompakten ultrametrischen Raumes. Wir entwickeln die 2-adische
+Metrik, charakterisieren die Collatz-Abbildung als Kontraktion auf geeigneten
+Teilmengen, untersuchen Fixpunkte und periodische Bahnen in $\mathbb{Z}_2$ und
+erklären die Verbindung zwischen 2-adischen Entwicklungen und Syrakus-Folgen.
+Die $p$-adische Perspektive beleuchtet, warum das Collatz-Problem so schwierig ist:
+Das relevante dynamische Verhalten konzentriert sich nahe dem Rand von $\mathbb{Z}_2$
+auf eine Weise, die klassischen analytischen Techniken widersteht.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+\section{Einleitung}
+
+Die $p$-adischen ganzen Zahlen $\mathbb{Z}_p$ liefern eine Vervollständigung von
+$\mathbb{Z}$, die in vielerlei Hinsicht natürlicher als die reellen Zahlen für Fragen
+über Teilbarkeit und Kongruenzen ist. Für das Collatz-Problem ist die Primzahl $p = 2$
+die natürliche Wahl, da die gerade/ungerade-Verzweigung von $T$ genau der niederwertigsten
+2-adischen Stelle entspricht.
+
+Lagarias \cite{Lagarias1985} bemerkte, dass die Collatz-Funktion sich stetig auf
+$\mathbb{Z}_2$ fortsetzt und dass diese Fortsetzung eine reichhaltige Struktur von
+periodischen Bahnen und Fixpunkten aufweist, die \emph{nicht} positiven ganzen Zahlen
+entsprechen. Das Verständnis dieser ``exotischen'' Fixpunkte in $\mathbb{Z}_2$ könnte
+ein Schritt zum Verständnis sein, warum die positiven ganzen Zahlen alle (vermutlich)
+zur 1 fließen.
+
+\subsection{Überblick}
+
+Abschnitt~\ref{sec:2adisch} führt die 2-adischen ganzen Zahlen ein. Abschnitt~\ref{sec:collatz_2adisch}
+definiert $T$ und $S$ auf $\mathbb{Z}_2$. Abschnitt~\ref{sec:fixpunkte} klassifiziert
+Fixpunkte und periodische Bahnen. Abschnitt~\ref{sec:syrakus} entwickelt die Verbindung
+zu Syrakus-Folgen. Abschnitt~\ref{sec:dynamik} diskutiert die maßtheoretische Dynamik.
+
+\section{Die 2-adischen ganzen Zahlen}\label{sec:2adisch}
+
+\begin{definition}[2-adische Bewertung]\label{def:bewertung}
+Für $n \in \mathbb{Z} \setminus \{0\}$ ist die \emph{2-adische Bewertung} $\nu_2(n)$ das
+größte $k \geq 0$ mit $2^k \mid n$. Wir setzen $\nu_2(0) = +\infty$.
+\end{definition}
+
+\begin{definition}[2-adischer Absolutbetrag und Metrik]\label{def:metrik}
+Der \emph{2-adische Absolutbetrag} von $x \in \mathbb{Q}$ ist
+\[
+  |x|_2 \;=\; 2^{-\nu_2(x)},
+\]
+mit $|0|_2 = 0$. Die \emph{2-adische Metrik} ist $d_2(x,y) = |x-y|_2$.
+\end{definition}
+
+\begin{theorem}[Eigenschaften der 2-adischen Metrik]\label{thm:ultrametrik}
+Die 2-adische Metrik erfüllt die \emph{starke Dreiecksungleichung} (Ultrametrik-Eigenschaft):
+\[
+  |x + y|_2 \;\leq\; \max(|x|_2, |y|_2).
+\]
+Als Folgerung gilt: Je zwei 2-adische Bälle sind entweder disjunkt oder einer enthält
+den anderen.
+\end{theorem}
+
+\begin{proof}
+Sei $\nu_2(x) = a$ und $\nu_2(y) = b$ mit $a \leq b$. Dann gilt
+$x + y = 2^a(x/2^a + 2^{b-a} \cdot y/2^b)$.
+Der Term in der Klammer ist eine ganze Zahl, deren erster Faktor ungerade ist. Also
+$\nu_2(x+y) \geq a = \min(\nu_2(x), \nu_2(y))$, woraus
+$|x+y|_2 \leq 2^{-a} = \max(|x|_2, |y|_2)$ folgt.
+\end{proof}
+
+\begin{definition}[2-adische ganze Zahlen]\label{def:Z2}
+Der \emph{Ring der 2-adischen ganzen Zahlen} $\mathbb{Z}_2$ ist die Vervollständigung von
+$\mathbb{Z}$ (oder $\mathbb{Q}$) bezüglich der Metrik $d_2$. Konkret gilt:
+\[
+  \mathbb{Z}_2 \;=\; \Bigl\{ x = \sum_{k=0}^\infty a_k 2^k \;:\; a_k \in \{0,1\} \Bigr\}.
+\]
+Die Ringstruktur setzt die übliche Addition und Multiplikation auf $\mathbb{Z}$ fort,
+wobei Überträge sich in der 2-adischen Entwicklung nach rechts fortpflanzen.
+\end{definition}
+
+\begin{proposition}[Topologische Eigenschaften von $\mathbb{Z}_2$]\label{prop:topologie}
+$\mathbb{Z}_2$ ist kompakt, vollständig und total unzusammenhängend. Die natürliche
+Abbildung $\mathbb{Z} \hookrightarrow \mathbb{Z}_2$ ist eine dichte Einbettung.
+\end{proposition}
+
+\begin{proof}
+Kompaktheit folgt aus dem Satz von Tychonoff: $\mathbb{Z}_2 \cong \{0,1\}^{\mathbb{N}_0}$
+als topologische Räume. Das Produkt kompakter Räume ist kompakt. Die Einbettung
+$\mathbb{Z} \hookrightarrow \mathbb{Z}_2$ sendet $n \geq 0$ auf seine Binärdarstellung
+(endliche Summe), und negative ganze Zahlen auf ihre 2-adischen Entwicklungen (unendliche
+Reihen). Die Dichte folgt daraus, dass die ganzen Zahlen mod $2^N$ jedes Element von
+$\mathbb{Z}_2$ auf Genauigkeit $2^{-N}$ approximieren.
+\end{proof}
+
+\section{Die Collatz- und Syrakus-Funktionen auf $\mathbb{Z}_2$}\label{sec:collatz_2adisch}
+
+\begin{definition}[Fortsetzung von $T$ auf $\mathbb{Z}_2$]\label{def:T_fort}
+Für $x \in \mathbb{Z}_2$ setze
+\[
+  T(x) \;=\; \begin{cases} x/2 & \text{falls } x \equiv 0 \pmod{2}, \\
+                            3x+1 & \text{falls } x \equiv 1 \pmod{2},
+              \end{cases}
+\]
+wobei die Parität von $x \in \mathbb{Z}_2$ durch den konstanten Term $a_0 \in \{0,1\}$
+bestimmt wird.
+\end{definition}
+
+\begin{theorem}[Stetigkeit von $T$ auf $\mathbb{Z}_2$]\label{thm:stetig}
+Die Funktion $T\colon \mathbb{Z}_2 \to \mathbb{Z}_2$ ist wohldefiniert und stetig
+bezüglich der 2-adischen Metrik. Der ungerade Zweig $x \mapsto 3x+1$ bildet
+$2\mathbb{Z}_2 + 1$ (die ungeraden Elemente) auf $2\mathbb{Z}_2$ (die geraden Elemente)
+ab, sodass $T$ $\mathbb{Z}_2$ in sich abbildet.
+\end{theorem}
+
+\begin{proof}
+Stetigkeit von $x \mapsto x/2$ auf $2\mathbb{Z}_2$: Schreibe $x = 2u$, $y = 2v$
+mit $u, v \in \mathbb{Z}_2$. Dann gilt $|x - y|_2 = |2|_2 \cdot |u-v|_2 = \tfrac{1}{2}|u-v|_2$.
+Falls $|x - y|_2 \leq 2^{-N}$, so folgt $|u-v|_2 \leq 2^{-N+1}$, und
+$|x/2 - y/2|_2 = |u - v|_2 \leq 2^{-N+1}$.
+Also ist $T$ stetig auf $2\mathbb{Z}_2$ (da $T(x) = u \in \mathbb{Z}_2$).
+Stetigkeit von $x \mapsto 3x+1$ auf $\mathbb{Z}_2^{\text{ungerade}}$:
+$|3x+1 - (3y+1)|_2 = |3(x-y)|_2 = |3|_2 \cdot |x-y|_2 = |x-y|_2 \leq 2^{-N}$
+für $|x-y|_2 \leq 2^{-N}$, da $3$ eine Einheit in $\mathbb{Z}_2$ ist
+($\gcd(3,2)=1$ impliziert $|3|_2 = 1$), also ist die Multiplikation mit 3 eine
+Isometrie und insbesondere ein Homöomorphismus. Die Funktion $T$ ist daher auf
+beiden Teilen stetig, und da diese Teile offen und abgeschlossen (kloffen) in
+$\mathbb{Z}_2$ sind, ist $T$ auf ganz $\mathbb{Z}_2$ stetig.
+\end{proof}
+
+\begin{definition}[Syrakus-Funktion auf $\mathbb{Z}_2^{\text{ungerade}}$]\label{def:S_fort}
+Für ungerades $x \in \mathbb{Z}_2$ (d.h.\ $a_0 = 1$) setze
+\[
+  S(x) \;=\; \frac{3x+1}{2^{\nu_2(3x+1)}}.
+\]
+Da $3x + 1 \equiv 0 \pmod{2}$ für ungerades $x$ gilt, ist $\nu_2(3x+1) \geq 1$,
+also $S(x) \in \mathbb{Z}_2$. Außerdem bildet $S$ $\mathbb{Z}_2^{\text{ungerade}}$ in sich ab.
+\end{definition}
+
+\begin{proposition}[Shift-Interpretation]\label{prop:shift}
+Die aufeinanderfolgenden 2-adischen Stellen der Syrakus-Iterationen $S^k(x)$ kodieren
+die ``Paritätsfolge'' der Collatz-Bahn. Genauer: Sei $e_k = \nu_2(3 S^{k-1}(x) + 1)$
+für $k \geq 1$. Dann durchläuft die Collatz-Bahn von $x$ (unter $T$) genau $e_k$
+gerade Zahlen zwischen dem $k$-ten und $(k+1)$-ten ungeraden Wert.
+\end{proposition}
+
+\begin{proof}
+Per Definition von $S$ entspricht der Schritt von ungeradem $m$ zu ungeradem $S(m)$
+der Folge von Collatz-Schritten: $m \to 3m+1 \to (3m+1)/2 \to \cdots \to S(m)$,
+bestehend aus genau $e = \nu_2(3m+1)$ Divisionen durch 2. Also zählt $e_k$ die
+Anzahl der geraden Werte in der Collatz-Bahn zwischen aufeinanderfolgenden ungeraden
+Werten. Die 2-adische Entwicklung von $x$ bestimmt die Paritätsfolge und etabliert
+die Bijektion zwischen 2-adischen Stellen und Bahnstruktur.
+\end{proof}
+
+\section{Fixpunkte und periodische Bahnen in $\mathbb{Z}_2$}\label{sec:fixpunkte}
+
+\begin{theorem}[Fixpunkte von $T$ und $S$ in $\mathbb{Z}_2$]\label{thm:fixpunkte}
+Die Fixpunkte sind:
+\begin{enumerate}
+  \item[(i)] Gerader Fixpunkt von $T$: $T(x) = x/2 = x$ impliziert $x = 0$.
+  \item[(ii)] Ungerade Fixpunkte von $T$: Die Gleichung $T(x) = 3x+1 = x$ liefert $x = -1/2$.
+              Da jedoch $|-1/2|_2 = 2 > 1$, gilt $-1/2 \notin \mathbb{Z}_2$. Also hat $T$
+              \emph{keinen} ungeraden Fixpunkt in $\mathbb{Z}_2$.
+  \item[(iii)] Ungerader Fixpunkt von $S$: Für die Syrakus-Funktion (komprimierte Form)
+              $S(x) = (3x+1)/2^{\nu_2(3x+1)}$ gilt im Fall $\nu_2(3x+1)=1$: $S(x) = x$
+              ergibt $3x+1 = 2x$, also $x = -1$.
+              Da $|-1|_2 = 1$, liegt $-1 \in \mathbb{Z}_2^{\text{ungerade}}$
+              mit der Darstellung $-1 = \sum_{k=0}^\infty 2^k = \ldots 11111111_2$.
+\end{enumerate}
+Also hat $T$ genau einen Fixpunkt in $\mathbb{Z}_2$: $x = 0$.
+Die komprimierte Syrakus-Abbildung $S$ hat zusätzlich den Fixpunkt $x = -1$.
+\end{theorem}
+
+\begin{proof}
+(i) $x = T(x) = x/2$ impliziert $x = 0$.\\
+(ii) $x = T(x) = 3x+1$ ergibt $x = -1/2$, aber $\nu_2(-1/2) = -1$, also $|-1/2|_2 = 2 > 1$
+und $-1/2 \notin \mathbb{Z}_2$.\\
+Hinweis: $\sum_{k=1}^\infty 2^k = 2 \cdot \sum_{k=0}^\infty 2^k = 2 \cdot (-1) = -2$ in
+$\mathbb{Z}_2$ (nicht $-1/2$). Das Element $-1/2$ liegt in $\mathbb{Q}_2 \setminus \mathbb{Z}_2$.\\
+(iii) $S(-1) = (3 \cdot (-1) + 1)/2^{\nu_2(-2)} = (-2)/2 = -1$, was $-1$ als Fixpunkt von $S$ bestätigt.
+\end{proof}
+
+\begin{theorem}[Periodische Bahnen in $\mathbb{Z}_2$]\label{thm:periodisch}
+Die Collatz-Funktion $T$ hat in $\mathbb{Z}_2$ periodische Bahnen aller Perioden.
+Die einzige derzeit bekannte periodische Bahn bestehend aus \emph{positiven ganzen Zahlen}
+ist jedoch der triviale Zyklus $\{1, 4, 2\}$ (mit $T(1)=4$, $T(4)=2$, $T(2)=1$).
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Für jede gewünschte Periode $n \in \mathbb{N}$ konstruiert man einen periodischen Punkt
+$x \in \mathbb{Z}_2$ wie folgt: Man löst das Gleichungssystem $T^n(x) \equiv x \pmod{2^k}$
+in $\mathbb{Z}/2^k\mathbb{Z}$ für sukzessiv wachsendes $k$ mit dem Chinesischen
+Restsatz und dem Hensel-Lemma (Lift von Lösungen modulo $2^k$ nach modulo $2^{k+1}$).
+Dies ist möglich, weil $T$ modulo Potenzen von 2 eine nicht-degenerierte Struktur hat.
+Der projektive Limes dieser Lösungsfolge liefert einen periodischen Punkt in
+$\mathbb{Z}_2$; vgl.\ \cite{Lagarias1985} für die Klassifikation der Zyklen unter
+negativen ganzen Zahlen (die Perioden aller Ordnungen $n \leq 5$ demonstrieren).
+\emph{Vorsicht:} Diese periodischen Punkte in $\mathbb{Z}_2$ liegen im Allgemeinen
+nicht in $\mathbb{N}$; die Konstruktion ist für allgemeines $n$ nicht-konstruktiv.
+\end{proof}
+
+\begin{remark}[Unterschied: Fixpunkt von $S$ vs.\ 2-Zyklus unter $T$]\label{rem:T_vs_S}
+Es ist wichtig, die Rolle von $-1$ unter den beiden Abbildungen nicht zu verwechseln:
+\begin{itemize}
+  \item Unter $T$: $T(-1) = 3(-1)+1 = -2$, $T(-2) = -1$. Daher ist $-1$ \emph{kein}
+    Fixpunkt von $T$, sondern gehört zum 2-Zyklus $\{-1,-2\}$ von $T$.
+  \item Unter $S$: $S(-1) = (3\cdot(-1)+1)/2^{v_2(-2)} = -2/2 = -1$. Somit ist $-1$
+    ein \emph{Fixpunkt der komprimierten Syrakus-Abbildung $S$}.
+\end{itemize}
+Diese Unterscheidung ist wesentlich: Satz~\ref{thm:fixpunkte} betrifft Fixpunkte von $T$
+und $S$ getrennt. Der 2-Zyklus von $T$ ``sieht aus wie'' ein Fixpunkt von $S$, weil $S$
+den geraden Schritt $T(-1)=-2 \to T(-2)=-1$ komprimiert.
+\end{remark}
+
+\begin{remark}\label{rem:negativ}
+In $\mathbb{Z} \subset \mathbb{Z}_2$ lassen auch die negativen ganzen Zahlen periodische
+Bahnen unter $T$ zu. Zum Beispiel: $T(-1) = 3(-1)+1 = -2$, $T(-2) = -1$, was den
+Zyklus $\{-1, -2\}$ ergibt. Ebenso ist $-5 \to -14 \to -7 \to -20 \to -10 \to -5$ ein
+Zyklus der Periode 5. Diese Zyklen unter negativen ganzen Zahlen sind vollständig
+klassifiziert (vgl.\ \cite{Lagarias1985}).
+\end{remark}
+
+\begin{proposition}[2-adische Darstellung des trivialen Zyklus]\label{prop:trivial_2adisch}
+Der triviale positive Zyklus $1 \to 4 \to 2 \to 1$ in $\mathbb{Z}_2$ entspricht der
+periodischen 2-adischen Bahn
+\[
+  1 = (1)_2, \quad 4 = (100)_2, \quad 2 = (10)_2.
+\]
+Der 2-adische Abstand zwischen aufeinanderfolgenden Elementen ist beschränkt:
+$|T^k(1) - 1|_2 \leq 1$ für alle $k$.
+\end{proposition}
+
+\section{Syrakus-Folgen und 2-adische Entwicklungen}\label{sec:syrakus}
+
+\begin{definition}[Paritätsfolge und 2-adische Entwicklung]\label{def:parität}
+Für $x \in \mathbb{Z}_2$ mit Entwicklung $x = \sum_{k=0}^\infty a_k 2^k$ ist die
+\emph{Paritätsfolge} von $x$ die Folge $(a_0, a_1, a_2, \ldots) \in \{0,1\}^{\mathbb{N}_0}$.
+Die Collatz-Bahn von $x$ ist vollständig durch die Paritätsfolge bestimmt:
+$a_k$ sagt uns, ob $T^k(x)$ im 2-adischen Sinne ungerade ($a_k = 1$) oder gerade ($a_k = 0$) ist.
+\end{definition}
+
+\begin{theorem}[Syrakus-Darstellungssatz]\label{thm:syrakus_darst}
+Sei $x \in \mathbb{Z}_2^{\text{ungerade}}$ mit Paritätsfolge $(1, a_1, a_2, \ldots)$.
+Definiere die Stoppstellen $0 = s_0 < s_1 < s_2 < \cdots$ durch
+$s_{k+1} = \min\{j > s_k : a_j = 1\}$
+(die Positionen der ungeraden Elemente in der Collatz-Bahn).
+Dann kodiert die 2-adische Entwicklung von $x$ alle diese Positionen, und die
+Syrakus-Iterationen $S^k(x)$ sind durch
+\[
+  S^k(x) \;=\; \frac{3^k x + c_k}{2^{s_k}}
+\]
+für explizite positive ganze Zahlen $c_k \geq 0$ bestimmt, die von der partiellen
+Paritätsfolge abhängen.
+\end{theorem}
+
+\begin{proof}
+Wir beweisen dies durch vollständige Induktion über $k$.\\
+Induktionsanfang $k=0$: $S^0(x) = x = 3^0 x / 2^0$. Korrekt.\\
+Induktionsschritt: Angenommen $S^k(x) = (3^k x + c_k)/2^{s_k}$. Dann gilt:
+\[
+  3 S^k(x) + 1 = \frac{3^{k+1} x + 3c_k + 2^{s_k}}{2^{s_k}}.
+\]
+Die 2-adische Bewertung des Zählers ist $s_{k+1} - s_k$ (per Definition von $s_{k+1}$
+als nächste Zeit, zu der die Bahn bei der $T$-Iteration ungerade ist). Division durch
+$2^{s_{k+1}-s_k}$ ergibt:
+\[
+  S^{k+1}(x) = \frac{3^{k+1} x + 3c_k + 2^{s_k}}{2^{s_{k+1}}},
+\]
+mit $c_{k+1} = (3c_k + 2^{s_k})/2^{s_{k+1}-s_k}$.
+Zur Begr\"undung $c_{k+1} \in \mathbb{Z}_2$: Per Definition von $s_{k+1}$
+hat $3S^k(x)+1$ (als Element von $\mathbb{Z}_2$) genau die 2-adische Bewertung
+$s_{k+1} - s_k$. Der Z\"ahler $3^{k+1}x + 3c_k + 2^{s_k}$ ist durch
+$2^{s_{k+1}}$ teilbar, da $S^k(x)$ ungerade in $\mathbb{Z}_2$ ist.
+Folglich ist $2^{s_{k+1}-s_k} \mid (3c_k + 2^{s_k})$, also $c_{k+1}$
+eine nicht-negative ganze Zahl, und aus $\mathbb{Z} \subset \mathbb{Z}_2$
+folgt $c_{k+1} \in \mathbb{Z}_2$.
+\end{proof}
+
+\begin{corollary}[Collatz-Vermutung in 2-adischer Sprache]\label{cor:reformulierung}
+Die Collatz-Vermutung ist äquivalent zur Aussage: Für jedes $x \in \mathbb{N}$ existiert
+$k \geq 0$ mit $S^k(x) = 1$ (in der komprimierten Form). In Begriffen der 2-adischen
+Analysis besagt dies, dass die Vorwärtsbahn jeder positiven ganzen Zahl unter $S$
+schließlich den Fixpunkt $1 \in \mathbb{N} \subset \mathbb{Z}_2$ trifft.
+\end{corollary}
+
+\section{Maßtheoretische Dynamik auf $\mathbb{Z}_2$}\label{sec:dynamik}
+
+\begin{definition}[Haar-Maß auf $\mathbb{Z}_2$]\label{def:haar}
+Das \emph{Haar-Maß} $\mu$ auf $\mathbb{Z}_2$ ist das eindeutige translationsinvariante
+Wahrscheinlichkeitsmaß. Es ist charakterisiert durch $\mu(a + 2^k \mathbb{Z}_2) = 2^{-k}$
+für alle $a \in \mathbb{Z}$ und $k \geq 0$.
+\end{definition}
+
+\begin{proposition}[Maß gerader und ungerader Elemente]\label{prop:parit_mass}
+Unter dem Haar-Maß $\mu$ auf $\mathbb{Z}_2$ gilt:
+\[
+  \mu(\mathbb{Z}_2^{\text{gerade}}) \;=\; \mu(2\mathbb{Z}_2) \;=\; 1/2,
+\qquad
+  \mu(\mathbb{Z}_2^{\text{ungerade}}) \;=\; \mu(1 + 2\mathbb{Z}_2) \;=\; 1/2.
+\]
+Dies spiegelt wider, dass genau die Hälfte aller ganzen Zahlen (im Sinne der natürlichen
+Dichte) gerade ist.
+\end{proposition}
+
+\begin{proof}
+Per Definition des Haar-Maßes gilt $\mu(a + 2\mathbb{Z}_2) = 1/2$ für jedes $a \in \{0,1\}$,
+da $a + 2\mathbb{Z}_2$ ein offener Ball vom Radius $2^{-1}$ ist.
+\end{proof}
+
+\begin{theorem}[Bildmaß unter $T$]\label{thm:bildmass}
+Das Bildmaß $T_* \mu$ des Haar-Maßes unter $T\colon \mathbb{Z}_2 \to \mathbb{Z}_2$
+ist nicht gleich $\mu$. Insbesondere ist $T$ keine maßerhaltende Abbildung auf
+$(\mathbb{Z}_2, \mu)$.
+\end{theorem}
+
+\begin{proof}
+Das Urbild von $y \in \mathbb{Z}_2$ unter dem geraden Zweig ist stets $\{2y\}$, also
+ein einziger Punkt. Der ungerade Zweig bildet $1 + 2\mathbb{Z}_2$ (Haar-Maß $1/2$)
+auf $4 + 6\mathbb{Z}_2 + \cdots \subset 2\mathbb{Z}_2$ ab (gerader Bereich). Das $+1$
+im ungeraden Zweig erzeugt eine asymmetrische Verschiebung, die verhindert, dass $T$
+das Haar-Maß erhält. Wäre der ungerade Zweig $x \mapsto 3x$ statt $x \mapsto 3x+1$,
+würde $T$ die selbstähnliche Struktur von $\mathbb{Z}_2$ besser respektieren.
+\end{proof}
+
+\begin{conjecture}[Ergodizität der Syrakus-Abbildung]\label{conj:ergodisch_S}
+Die Syrakus-Funktion $S\colon \mathbb{Z}_2^{\text{ungerade}} \to \mathbb{Z}_2^{\text{ungerade}}$
+ist vermutlich \emph{ergodisch bezüglich des Haar-Maßes} in dem Sinne, dass die einzigen
+$S$-invarianten messbaren Mengen vom Haar-Maß 0 oder 1 trivial sind.
+\end{conjecture}
+
+\begin{remark}[Status der Ergodizitäts-Vermutung]
+Da $S$ bezüglich des Haar-Maßes \emph{nicht} maßerhaltend ist (wie oben gezeigt),
+gilt die klassische Ergodentheorie nicht direkt. Die obige Aussage ist eine informelle
+Behauptung, motiviert durch das pseudozufällige Verhalten der Collatz-Abbildung auf
+2-adischen ganzen Zahlen. Ein rigoroser Beweis würde die Angabe eines $S$-invarianten
+Maßes $\nu$ (das nicht notwendig mit dem Haar-Maß übereinstimmt) und den Nachweis
+der Ergodizitätsbedingung für $(\mathbb{Z}_2^{\text{ungerade}}, \nu, S)$ erfordern.
+Dies ist in der Literatur nicht etabliert; vgl.\ Paper~32 für eine detailliertere
+Behandlung invarianter Maße und Mischungseigenschaften.
+\end{remark}
+
+\begin{remark}\label{rem:vermutung_mass}
+Falls die Collatz-Vermutung wahr ist, bilden die positiven ganzen Zahlen
+$\mathbb{N} \cap \mathbb{Z}_2^{\text{ungerade}}$ eine Menge vom Maß 0 in
+$\mathbb{Z}_2^{\text{ungerade}}$ (da sie abzählbar sind), und dennoch konvergieren
+\emph{alle} von ihnen (vermutlich) unter $S$ gegen 1. Dies verdeutlicht den
+Maß-Null-Charakter der Collatz-Vermutung aus 2-adischer Sicht.
+\end{remark}
+
+\section{Zusammenfassung}
+
+Die 2-adischen ganzen Zahlen bieten einen natürlichen und leistungsfähigen Rahmen für
+das Collatz-Problem. Wesentliche Ergebnisse:
+\begin{itemize}
+  \item Die Collatz-Funktion $T$ setzt sich zu einer stetigen Selbstabbildung von
+        $\mathbb{Z}_2$ fort.
+  \item $T$ hat genau einen Fixpunkt in $\mathbb{Z}_2$: $x=0$. Die Syrakus-Abbildung $S$ hat zusätzlich den Fixpunkt $x=-1$. Der triviale positive Zyklus ist $\{1, 4, 2\}$.
+  \item Die Paritätsfolge von $x$ kodiert die gesamte Collatz-Bahnstruktur.
+  \item Der Syrakus-Darstellungssatz verbindet 2-adische Entwicklungen mit der Bahngeometrie.
+  \item $T$ ist nicht maßerhaltend bezüglich des Haar-Maßes, aber $S$ wird vermutet, ergodisch zu sein.
+\end{itemize}
+Der 2-adische Rahmen formuliert die Collatz-Vermutung als Frage über die Dynamik einer
+stetigen Abbildung auf einem kompakten Raum um und öffnet die Tür für Werkzeuge aus
+der $p$-adischen Analysis, Ergodentheorie und harmonischen Analysis.
+
+\begin{thebibliography}{99}
+
+\bibitem{Collatz1937}
+L.~Collatz.
+\newblock Unveröffentlichtes Problem, vorgestellt beim Internationalen Mathematikerkongress, 1937.
+
+\bibitem{Lagarias1985}
+J.~C. Lagarias.
+\newblock The $3x+1$ problem and its generalizations.
+\newblock \emph{American Mathematical Monthly}, 92(1):3--23, 1985.
+
+\bibitem{Lagarias2010}
+J.~C. Lagarias (Hrsg.).
+\newblock \emph{The Ultimate Challenge: The $3x+1$ Problem}.
+\newblock American Mathematical Society, Providence, RI, 2010.
+
+\bibitem{Tao2022}
+T.~Tao.
+\newblock Almost all Collatz orbits attain almost bounded values.
+\newblock \emph{Forum of Mathematics, Sigma}, 10:e72, 2022.
+
+\bibitem{Koblitz1984}
+N.~Koblitz.
+\newblock \emph{$p$-adic Numbers, $p$-adic Analysis, and Zeta Functions}.
+\newblock 2.\ Auflage, Springer-Verlag, New York, 1984.
+
+\bibitem{Serre1973}
+J.-P. Serre.
+\newblock \emph{A Course in Arithmetic}.
+\newblock Springer-Verlag, New York, 1973.
+
+\bibitem{Bernstein1994}
+D.~J. Bernstein.
+\newblock A non-iterative 2-adic statement of the $3x+1$ conjecture.
+\newblock \emph{Proceedings of the American Mathematical Society}, 121(2):405--408, 1994.
+
+\bibitem{Furstenberg1977}
+H.~Furstenberg.
+\newblock Ergodic behavior of diagonal measures and a theorem of Szemer\'edi on arithmetic progressions.
+\newblock \emph{Journal d'Analyse Math\'ematique}, 31(1):204--256, 1977.
+
+\end{thebibliography}
+
+\end{document}

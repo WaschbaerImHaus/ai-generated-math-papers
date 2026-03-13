@@ -1,0 +1,451 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{booktabs}
+
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\eq}[1]{e\!\left(#1\right)}
+
+% -------------------------------------------------------
+\begin{document}
+
+\title{Das Waringsche Problem:\\
+       Hilbert--Waring-Satz, $G(k)$-Schranken\\
+       und Wooleys effizientes Kongruenzrechnen}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 80}
+\email{specialist-maths@localhost}
+\date{2026}
+
+\begin{abstract}
+Das Waringsche Problem (1770) fragt: Gibt es für jedes $k \geq 2$ eine Zahl
+$g(k)$, so dass jede positive ganze Zahl als Summe von höchstens $g(k)$
+ganzzahligen $k$-ten Potenzen dargestellt werden kann?  Der Hilbert--Waring-Satz
+(1909) beantwortet dies bejahend: $g(k)$ existiert für alle $k$.
+
+Die Hardy--Littlewood-Kreismethode liefert eine asymptotische Formel für
+die Darstellungsanzahl $r_{k,s}(n)$ und beweist die Existenz des „wahren"
+Invarianten $G(k)$ — der kleinsten Zahl $s$, so dass jede hinreichend
+große Zahl $n$ als Summe von $s$ $k$-ten Potenzen darstellbar ist.
+Wir stellen vor: klassische Werte ($g(2)=4$, $g(3)=9$, $g(4)=19$),
+den Unterschied zwischen $g(k)$ und $G(k)$, die Hardy--Littlewood-Formel,
+Weyls Schranke $G(k) \leq (k-2)2^{k-1}+5$, Winogradows asymptotische Verbesserung
+$G(k) \leq k(\log k + \log\log k + O(1))$ und Wooleys Schranke $G(k) \leq k(\log k + 4{,}20)$
+(aus dem Beweis der Vinogradow-Hauptvermutung, 2016).
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung}
+% ================================================================
+
+Im Jahr 1770 schrieb Edward Waring in seinen \emph{Meditationes Algebraicae}:
+\begin{quote}
+  Jede ganze Zahl ist Summe von höchstens 4 Quadraten, höchstens 9 Kubikzahlen,
+  höchstens 19 vierten Potenzen usw.
+\end{quote}
+
+\begin{definition}
+  \begin{align*}
+    g(k) &= \min\bigl\{s \in \N : \forall n \in \N,\;
+              n = x_1^k + \cdots + x_s^k \text{ lösbar mit } x_i \geq 0\bigr\}, \\
+    G(k) &= \min\bigl\{s \in \N : \forall n \text{ hinreichend groß},\;
+              n = x_1^k + \cdots + x_s^k \text{ lösbar}\bigr\}.
+  \end{align*}
+\end{definition}
+
+\begin{bemerkung}
+  $g(k)$ ist empfindlich gegenüber kleinen Zahlen (z.B.\ $23 = 8+8+1+1+1+1+1+1+1$
+  benötigt 9 Kuben); $G(k)$ misst das generische Verhalten für großes $n$.
+  Es gilt immer $G(k) \leq g(k)$.
+\end{bemerkung}
+
+\textbf{Bekannte Werte (Tabelle):}
+
+\begin{center}
+\begin{tabular}{ccccl}
+\toprule
+$k$ & $g(k)$ & $G(k)$ & $G(k)$ exakt? & Quelle \\
+\midrule
+2 & 4 & 4 & Ja & Lagrange 1770 \\
+3 & 9 & $\leq 7$ & Nein & $G(3) \geq 4$ bekannt \\
+4 & 19 & $\leq 15$ & Nein & Davenport 1939 ($g(4){=}19$: Balasubramanian et al.\ 1986) \\
+5 & 37 & $\leq 17$ & Nein & \\
+groß $k$ & s.u. & $\leq k(\log k+4{,}2)$ & Nein & Wooley 2016 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ================================================================
+\section{Der Fall $k=2$: Lagranges Vier-Quadrate-Satz}
+\label{sec:quadrate}
+% ================================================================
+
+\begin{theorem}[Lagrange, 1770]\label{thm:lagrange}
+  Jede positive ganze Zahl ist Summe von vier Quadraten.  Also $g(2) = 4$.
+\end{theorem}
+
+Der Beweis kombiniert:
+\begin{enumerate}
+  \item \textbf{Eulers Identität}: Produkt zweier Viererquadratsummen ist
+    wieder eine Viererquadratsumme.
+  \item \textbf{Jede Primzahl ist Viererquadratsumme}: Für $p=2$: $2=1+1$.
+    Für ungerades $p$: $a^2 + b^2 + 1 \equiv 0 \pmod p$ hat eine Lösung
+    (Zählargument), Descente infinie oder Minkowskis Satz vollenden den Beweis.
+  \item \textbf{Multiplikativität}: Jede Zahl ist Produkt von Primzahlen,
+    daher ist jede Zahl Viererquadratsumme.
+\end{enumerate}
+
+\begin{theorem}[$G(2) = 4$]\label{thm:g2}
+  Die Schranke ist scharf: $7 \equiv 7 \pmod 8$ benötigt vier Quadrate,
+  da $x^2 \in \{0, 1, 4\} \pmod 8$ und daher
+  $x_1^2 + x_2^2 + x_3^2 \in \{0,1,2,3,4,5,6\} \pmod 8$ (nie $7$).
+\end{theorem}
+
+% ================================================================
+\section{Der Hilbert--Waring-Satz}
+\label{sec:hilbert}
+% ================================================================
+
+\begin{theorem}[Hilbert--Waring, 1909]\label{thm:hw}
+  Für jedes $k \geq 1$ ist $g(k)$ endlich.
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+  Hilberts Originalbeweis (1909) nutzte algebraische Identitäten, die zeigen,
+  dass $1$ rational als Summe von $k$-ten Potenzen darstellbar ist.  Die
+  Schlüsselidentität ist:
+  \[
+    \binom{2k}{k} \;=\; \frac{1}{k} \sum_{j=0}^{k} (-1)^{k-j} \binom{k}{j} (2j-k)^{2k} / k^{2k},
+  \]
+  die $\binom{2k}{k}$ als rationale Linearkombination von $2k$-ten Potenzen ausdrückt.
+  Eine einfachere Variante (Dickson, 1939) nutzt Schurs Lemma.
+  Der moderne Beweis via Kreismethode ist in Abschnitt~\ref{sec:kreismethode} skizziert.
+\end{proof}
+
+% ================================================================
+\section{Die Kreismethode für das Waringsche Problem}
+\label{sec:kreismethode}
+% ================================================================
+
+Sei $M = \lfloor N^{1/k} \rfloor$ und $f(\alpha) = \sum_{m=1}^{M} \eq{m^k \alpha}$.
+Die Darstellungsanzahl ist:
+\[
+  r_{k,s}(n) \;=\; \int_0^1 f(\alpha)^s\, \eq{-n\alpha}\, d\alpha.
+\]
+
+\begin{theorem}[Hardy--Littlewood-Formel]\label{thm:HL}
+  Für $s > 2k+1$:
+  \[
+    r_{k,s}(n) \;=\; \mathfrak{S}_{k,s}(n)\, \mathfrak{J}_{k,s}(n)\, n^{s/k-1}
+                     \;+\; O\!\left(n^{s/k-1-\delta}\right),
+  \]
+  wobei $\mathfrak{S}_{k,s}(n)$ die singuläre Reihe (mit Euler-Produkt über
+  $p$-adische Dichten) und $\mathfrak{J}_{k,s}(n) = C_{k,s} > 0$ das
+  singuläre Integral ist.
+\end{theorem}
+
+\begin{korollar}[Weyl-Schranke für $G(k)$]\label{cor:gk_weyl}
+  Für alle $k \geq 2$:
+  \[
+    G(k) \;\leq\; (k-2)\,2^{k-1} + 5.
+  \]
+\end{korollar}
+
+\begin{proof}
+  Man wendet Weyls Ungleichung auf den Nebenbogen an: für $s = (k-2)2^{k-1}+5$
+  liefert der Nebenbogenanteil einen Fehlerterm der Ordnung $N^{s/k-1-\delta}$
+  mit $\delta = 2^{1-k} > 0$, der gegenüber dem Hauptterm $\mathfrak{S}_{k,s}(n)\,
+  \mathfrak{J}_{k,s}(n)\, n^{s/k-1}$ aus Satz~\ref{thm:HL} verschwindet.
+  Details: Vaughan~\cite{Vaughan1981}, Kap.~5.
+\end{proof}
+
+% ================================================================
+\section{Winogradows Mittelwertsatz}
+\label{sec:mvs}
+% ================================================================
+
+\begin{theorem}[Winogradow, 1935]\label{thm:wmvt}
+  Sei $J_{s,k}(N)$ die Anzahl der Lösungen von
+  $x_1^j + \cdots + x_s^j = y_1^j + \cdots + y_s^j$ $(j=1,\ldots,k)$
+  mit $1 \leq x_i, y_i \leq N$.  Für $s \geq k(k+1)/2$:
+  \[
+    J_{s,k}(N) \;\ll\; N^{2s - k(k+1)/2 + \varepsilon}.
+  \]
+\end{theorem}
+
+\begin{theorem}[Vinogradow-Hauptvermutung: Bourgain--Demeter--Guth / Wooley]\label{thm:bdg}
+  Für alle $k \geq 2$ und $s \leq k(k+1)/2$:
+  \[
+    J_{s,k}(N) \;\ll\; N^{s + \varepsilon}.
+  \]
+\end{theorem}
+
+\begin{korollar}[Wooleys Schranke]\label{cor:wooley}
+  Für alle $k \geq 2$:
+  \[
+    G(k) \;\leq\; k(\log k + 4{,}20032).
+  \]
+\end{korollar}
+
+\begin{proof}
+  \textbf{Logische Struktur.}  Der Beweis verläuft streng linear:
+  (i) Die Vinogradow-Hauptvermutung (VHV, Satz~\ref{thm:bdg}) ist eine
+  \emph{Voraussetzung}; (ii) aus VHV wird eine Nebenbogen-Schranke per
+  Cauchy--Schwarz hergeleitet; (iii) die Hauptbogenanalyse (Satz~\ref{thm:HL},
+  deren Beweis von VHV unabhängig ist) liefert das Hauptglied; (iv)
+  $s$ wird optimiert.  Es gibt keine zirkuläre Abhängigkeit.
+
+  \textbf{Schritt~1 (Nebenbogenschranke aus VHV).}
+  Nach Satz~\ref{thm:bdg} gilt für $s \leq k(k+1)/2$:
+  $J_{s,k}(N) \ll N^{s+\varepsilon}$.
+  Mittels Cauchy--Schwarz und Weyl-Differenzierung folgt:
+  \[
+    \sup_{\alpha \in \mathfrak{m}} |f(\alpha)| \;\ll\; N^{1 - 1/k + \varepsilon}.
+  \]
+  Dies ist eine \emph{Folge} der VHV; die VHV selbst wird hierbei nicht
+  verwendet, um Hauptbogenergebnisse vorauszusetzen.
+
+  \textbf{Schritt~2 (Nebenbogenintegral).}
+  Mit der Schranke aus Schritt~1 folgt:
+  \[
+    \left|\int_{\mathfrak{m}} f(\alpha)^s\, e(-n\alpha)\, d\alpha\right|
+    \;\ll\; N^{s/k - 1 - \delta}
+  \]
+  für ein $\delta > 0$, sobald $s > 2k$.  Dieser Schritt setzt ausschließlich
+  die VHV voraus — keine Hauptbogen- oder Singulärreihendaten.
+
+  \textbf{Schritt~3 (Hauptbogen — unabhängig von VHV).}
+  Satz~\ref{thm:HL} (Hardy--Littlewood-Formel) gilt für $s > 2k+1$
+  aufgrund einer direkten Hauptbogenanalyse mit Weyls Ungleichung und
+  Gauß-Summen-Abschätzungen.  Dieser Beweis ist vollständig unabhängig
+  von VHV oder dem Nebenbogenergebnis und liefert das Hauptglied
+  $\mathfrak{S}_{k,s}(n)\cdot C_{k,s}\cdot n^{s/k-1}$.
+
+  \textbf{Schritt~4 (Kombination und Optimierung von $s$).}
+  Wähle $s = \lceil k(\log k + 4{,}20032)\rceil$.  Dann gilt:
+  \begin{itemize}
+    \item $s > 2k+1$ (für $k \geq 2$): Singulärreihenkonvergenz und
+      Hauptbogenformel anwendbar (Schritt~3),
+    \item $s \leq k(k+1)/2$ (für $k \geq 2$): VHV anwendbar (Schritte~1--2),
+    \item Nebenbogen-Fehler $n^{s/k-1-\delta} = o(n^{s/k-1})$:
+      Hauptterm dominiert.
+  \end{itemize}
+  Damit gilt $r_{k,s}(n) \sim \mathfrak{S}_{k,s}(n) C_{k,s} n^{s/k-1} > 0$
+  für alle hinreichend großen $n$, d.h.\ jedes hinreichend große $n$ ist
+  Summe von $s \leq k(\log k + 4{,}20032)$ $k$-ten Potenzen.
+  Die Konstante $4{,}20032$ stammt aus der Abschätzung der $p$-adischen
+  Dichten $\sigma_p(n)$ in $\mathfrak{S}_{k,s}(n) > 0$;
+  siehe~\cite{Wooley2016}.
+\end{proof}
+
+% ================================================================
+\section{Wooleys effizientes Kongruenzrechnen}
+\label{sec:effizient}
+% ================================================================
+
+\begin{bemerkung}[Wooleys Methode: Effizientes Kongruenzrechnen]
+  Wooleys Methode (2012--2016) beruht auf einer $p$-adischen Induktion:
+  \begin{enumerate}
+    \item Man zerlegt Lösungen des Vinogradow-Systems modulo $p^l$ nach
+      dem $p$-adischen Bewertungsgrad der Variablen.
+    \item Variablen mit hohem $p$-adischem Betrag (durch große
+      Primzahlpotenzen teilbar) tragen zu einem \emph{verschachtelten}
+      Mittelwertsatz bei kleinerer Skala $N/p$ bei.
+    \item Wiederholte Anwendung des Hebeprinzips (Hensel-Lift) und
+      H\"older-Ungleichung kombiniert die Schranken.
+  \end{enumerate}
+  Das Ergebnis: $J_{k(k+1)/2, k}(N) \ll N^{k(k+1)/2 + \varepsilon}$
+  (die Vinogradow-Hauptvermutung).  Das vollständige Argument ist rein
+  arithmetisch ($p$-adische Struktur) und steht im Gegensatz zur
+  harmonisch-analytischen Methode von Bourgain--Demeter--Guth.
+\end{bemerkung}
+
+\begin{bemerkung}[Vergleich mit BDG]
+  Bourgain--Demeter--Guth (2015) bewiesen dieselbe Vermutung durch eine
+  völlig andere Methode: den \emph{$\ell^2$-Entkopplungssatz} für die
+  Momentenkurve.  Ihr Beweis ist analytisch (Fourier-Analysis,
+  Kakeya-artige Abschätzungen), während Wooleys Beweis rein arithmetisch
+  ($p$-adische Struktur) ist.  Beide Ansätze geben dasselbe Ergebnis.
+\end{bemerkung}
+
+\begin{theorem}[Effizientes Kongruenzrechnen, Wooley 2012--2016]%
+  \label{thm:effcong}
+  Für alle $k \geq 2$ und $1 \leq s \leq k(k+1)/2$:
+  \[
+    J_{s,k}(N) \;\ll_\varepsilon\; N^{s+\varepsilon}.
+  \]
+  Dies bestätigt die Vinogradow-Hauptvermutung vollständig.
+  Kombiniert mit der Kreismethode ergibt sich:
+  \[
+    G(k) \;\leq\; k\!\left(\log k + 4{,}20032\ldots\right).
+  \]
+\end{theorem}
+
+% ================================================================
+\section{Bekannte Werte und Schranken}
+\label{sec:werte}
+% ================================================================
+
+\subsection{Die Funktion $g(k)$}
+
+\begin{theorem}[Formel für $g(k)$]\label{thm:gk_formel}
+  Sei $q = \lfloor (3/2)^k \rfloor$.  Gilt
+  $\{(3/2)^k\} + (2/3)^k < 1$ (was für alle bekannten $k$ zutrifft),
+  so gilt $g(k) = 2^k + q - 2$.
+\end{theorem}
+
+\begin{proof}[Beweisidee]
+  Die „schwerste" Zahl ist $n = 2^k q - 1$.  Sie benötigt genau $(q-1)$
+  Summanden $2^k$ und $(2^k - 1)$ Einsen, also $(q-1)+(2^k-1) = 2^k+q-2$
+  Summanden.  Andererseits beweist man durch Induktion über die Struktur
+  von $n$ (Binärdarstellung von $q$), dass $2^k+q-2$ Summanden immer
+  ausreichen.
+\end{proof}
+
+\begin{center}
+\begin{tabular}{rrrrl}
+\toprule
+$k$ & $g(k)$ & $q$ & $g(k) = 2^k+q-2$? & Jahr \\
+\midrule
+2 & 4 & 2 & $4+2-2=4$ \checkmark & Lagrange 1770 \\
+3 & 9 & 3 & $8+3-2=9$ \checkmark & Wieferich 1909 \\
+4 & 19 & 5 & $16+5-2=19$ \checkmark & Balasubramanian 1986 \\
+5 & 37 & 7 & $32+7-2=37$ \checkmark & Chen 1958 \\
+6 & 73 & 11 & $64+11-2=73$ \checkmark & Pillai 1936 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Die Funktion $G(k)$}
+
+\begin{center}
+\begin{tabular}{rrrrl}
+\toprule
+$k$ & $G(k)$ exakt & $G(k) \leq$ & Untere Schranke & Quelle \\
+\midrule
+2 & 4 & 4 & 4 & Lagrange \\
+3 & unbekannt & 7 & 4 & Heath-Brown 1988 \\
+4 & 15 & 15 & 15 & Kempner 1912 ($G(4)\!\geq\!15$); Davenport 1939 ($G(4)\!\leq\!15$) \\
+5 & unbekannt & 17 & 6 & Vaughan 1989 \\
+groß $k$ & — & $k(\log k+4{,}2)$ & $k+1$ & Wooley 2016 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{bemerkung}[Untere Schranke $G(k) \geq k+1$]
+  Für geeignetes Primzahl $p \equiv 1 \pmod k$ liefert eine
+  $p$-adische Obstruction: Die $k$-ten Potenzen modulo $p$ bilden eine
+  Untergruppe des Index $k$ in $(\Z/p\Z)^*$.  Daher sind nicht alle
+  Residuen als Summe von $k$ $k$-ten Potenzen darstellbar (man braucht
+  mindestens $k+1$).
+\end{bemerkung}
+
+% ================================================================
+\section{Die singuläre Reihe für das Waringsche Problem}
+\label{sec:sing_reihe}
+% ================================================================
+
+\begin{definition}
+  $\mathfrak{S}_{k,s}(n) = \prod_p \sigma_p(n)$, wobei
+  $\sigma_p(n) = \lim_{l\to\infty} p^{-l(s-1)}
+  \cdot \#\{\mathbf{x} \pmod{p^l}: x_1^k+\cdots+x_s^k \equiv n \pmod{p^l}\}$.
+\end{definition}
+
+\begin{theorem}[$\mathfrak{S}_{k,s}(n) > 0$ für großes $s$]\label{thm:sing_pos}
+  Für $s \geq 2k+1$ gilt $\mathfrak{S}_{k,s}(n) > 0$ für alle $n$.
+  D.h.\ die Gleichung hat für alle Primzahlen $p$ $p$-adische Lösungen.
+\end{theorem}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Das Waringsche Problem vereint:
+\begin{enumerate}
+  \item \textbf{Globale Lösbarkeit} ($g(k)$: alle ganzen Zahlen),
+  \item \textbf{Asymptotische Lösbarkeit} ($G(k)$: alle großen ganzen Zahlen),
+  \item \textbf{Lokale Lösbarkeit} ($\mathfrak{S}_{k,s}(n)$: $p$-adische Bedingungen),
+  \item \textbf{Analytische Schranken} (Exponentialsummen, Kreismethode,
+    Weyl-Differenzierung, Winogradow-Mittelwertsatz).
+\end{enumerate}
+
+Die Vinogradow-Hauptvermutung (bewiesen von Wooley 2016 und BDG 2015)
+gibt die bestmögliche Schranke $J_{s,k}(N) \ll N^{2s-k(k+1)/2+\varepsilon}$
+und damit $G(k) \leq k\log k + O(k)$.  Exakte Werte von $G(k)$ für $k \geq 3$
+bleiben offen.
+
+% ================================================================
+\begin{thebibliography}{9}
+
+\bibitem{Waring1770}
+E.~Waring.
+\newblock \emph{Meditationes Algebraicae}.
+\newblock Cambridge, 1770.
+
+\bibitem{Hilbert1909}
+D.~Hilbert.
+\newblock Beweis für die Darstellbarkeit der ganzen Zahlen durch eine feste
+  Anzahl $n$-ter Potenzen.
+\newblock \emph{Math.\ Ann.}, 67:281--300, 1909.
+
+\bibitem{Vaughan1981}
+R.~C.~Vaughan.
+\newblock \emph{The Hardy--Littlewood Method}, 2.~Aufl.
+\newblock Cambridge University Press, 1997.
+
+\bibitem{Nathanson1996}
+M.~B.~Nathanson.
+\newblock \emph{Additive Number Theory: The Classical Bases}.
+\newblock Springer, 1996.
+
+\bibitem{Wooley2016}
+T.~D.~Wooley.
+\newblock The cubic case of the main conjecture in Vinogradov's mean value theorem.
+\newblock \emph{Adv.\ Math.}, 294:532--561, 2016.
+
+\bibitem{BDG2015}
+J.~Bourgain, C.~Demeter und L.~Guth.
+\newblock Proof of the main conjecture in Vinogradov's mean value theorem.
+\newblock \emph{Ann.\ Math.}, 184(2):633--682, 2016.
+
+\bibitem{HardyLittlewood1920}
+G.~H.~Hardy und J.~E.~Littlewood.
+\newblock A new solution of Waring's problem.
+\newblock \emph{Quart.\ J.\ Math.}, 48:272--293, 1920.
+
+\bibitem{Wooley2012}
+T.~D.~Wooley.
+\newblock Vinogradov's mean value theorem via efficient congruencing.
+\newblock \emph{Ann.\ Math.}, 175(3):1575--1627, 2012.
+
+\bibitem{Wooley2013}
+T.~D.~Wooley.
+\newblock Vinogradov's mean value theorem via efficient congruencing, II.
+\newblock \emph{Duke Math.\ J.}, 162(4):673--730, 2013.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,618 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{booktabs}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\eq}[1]{e\!\left(#1\right)}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\li}{li}
+\DeclareMathOperator{\sgn}{sgn}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{The Hardy--Littlewood Circle Method:\\
+       Exponential Sums, Major and Minor Arcs}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 80}
+\email{specialist-maths@localhost}
+\date{2026}
+
+\begin{abstract}
+The Hardy--Littlewood \emph{circle method} is one of the most powerful
+techniques in analytic number theory.  Introduced by Hardy and Ramanujan
+(1918) and developed by Hardy and Littlewood (1920--1928) for additive
+problems, it reduces the question of representing an integer $n$ as a sum
+of a prescribed number of terms to the evaluation of a contour integral
+over the unit circle $[0,1)$.  The key idea is to split this interval into
+\emph{major arcs} (neighbourhoods of rational numbers with small
+denominator, where exponential sums are large and tractable) and
+\emph{minor arcs} (where exponential sums are small and can be bounded).
+We develop the method from first principles: exponential sums (Weyl sums
+and Gauss sums), the Farey dissection, the structure of major arcs and
+their contribution via the \emph{singular series} and \emph{singular
+integral}, and the Weyl differencing technique for minor arc bounds.
+We illustrate the method on Waring's problem and set up the framework
+for Vinogradov's three-prime theorem.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Introduction}
+% ================================================================
+
+A central problem in additive number theory is: \emph{In how many ways
+can a positive integer $n$ be written as
+\[
+  n \;=\; x_1^k + x_2^k + \cdots + x_s^k,
+\]}
+where $x_i$ are non-negative integers (Waring's problem), or as
+\[
+  n \;=\; p_1 + p_2 + \cdots + p_r
+\]
+where $p_i$ are primes (Goldbach-type problems)?
+
+The circle method transforms such questions into integrals.  Let
+$r_s(n)$ denote the number of representations of $n$ as a sum of $s$
+$k$-th powers.  The generating function (exponential sum)
+\[
+  f(\alpha) \;=\; \sum_{m=0}^{M} \eq{m^k \alpha},
+  \qquad \eq{x} := e^{2\pi i x},
+\]
+satisfies the key identity
+\begin{equation}\label{eq:key}
+  r_s(n) \;=\; \int_0^1 f(\alpha)^s\, \eq{-n\alpha}\, d\alpha.
+\end{equation}
+This follows immediately from the orthogonality of the characters
+$\alpha \mapsto \eq{m\alpha}$: the integral picks out exactly the
+coefficient of $\eq{n\alpha}$ in $f(\alpha)^s$.
+
+The circle method is the art of evaluating~\eqref{eq:key} by
+decomposing $[0,1)$ into regions where $f(\alpha)$ is either large
+(and can be computed explicitly) or small (and can be bounded).
+
+\textbf{Notation.}  Throughout, $\eq{x} = e^{2\pi ix}$, $\log = \log_e$,
+$p$ always denotes a prime, $\Lambda$ denotes the von Mangoldt function,
+and all implicit constants are absolute unless noted.
+
+% ================================================================
+\section{Exponential Sums}
+\label{sec:expsums}
+% ================================================================
+
+\subsection{Weyl sums}
+
+\begin{definition}[Weyl sum]
+  For a polynomial $f(x) = \alpha_k x^k + \cdots + \alpha_1 x \in \R[x]$
+  and $N \geq 1$, the \emph{Weyl sum} is
+  \[
+    W(f; N) \;=\; \sum_{n=1}^{N} \eq{f(n)}.
+  \]
+  In the simplest case $f(x) = \alpha x^k$, we write $W(\alpha; k; N)$.
+\end{definition}
+
+The trivial bound is $|W(f; N)| \leq N$.  The key insight is that when
+$\alpha$ is ``far from rationals with small denominator'', cancellation
+reduces this significantly.
+
+\begin{lemma}[Weyl, 1916: geometric sum]\label{lem:geom}
+  For $\alpha \in \R$ and $N \geq 1$:
+  \[
+    \left|\sum_{n=1}^{N} \eq{n\alpha}\right|
+    \;\leq\; \min\!\left(N,\; \frac{1}{2\|\alpha\|}\right),
+  \]
+  where $\|x\| = \min_{m \in \Z} |x - m|$ denotes the distance to the
+  nearest integer.
+\end{lemma}
+
+\begin{proof}
+  The sum is a geometric series with ratio $\eq{\alpha}$.  If
+  $\eq{\alpha} = 1$, i.e.\ $\alpha \in \Z$, then the sum equals $N$.
+  Otherwise:
+  \[
+    \left|\sum_{n=1}^N \eq{n\alpha}\right|
+    = \left|\frac{\eq{\alpha} - \eq{(N+1)\alpha}}{1 - \eq{\alpha}}\right|
+    \leq \frac{2}{|1 - \eq{\alpha}|}
+    = \frac{1}{|\sin(\pi\alpha)|}
+    \leq \frac{1}{2\|\alpha\|},
+  \]
+  using $|\sin(\pi x)| \geq 2\|x\|$.  Taking the minimum with $N$ gives
+  the result.
+\end{proof}
+
+\subsection{Gauss sums}
+
+\begin{definition}[Complete Gauss sum]
+  For integers $a$, $q$ with $q \geq 1$, the \emph{Gauss sum} is
+  \[
+    G(a, q) \;=\; \sum_{m=1}^{q} \eq{\frac{a m^k}{q}}.
+  \]
+\end{definition}
+
+\begin{lemma}[Gauss sum bound]\label{lem:gauss}
+  For $\gcd(a, q) = 1$:
+  \[
+    |G(a, q)| \;\leq\; k \cdot q^{1/2 + \varepsilon}
+  \]
+  for any $\varepsilon > 0$.  More precisely, for $k = 2$:
+  $|G(a,q)| \leq \sqrt{q}$ when $q$ is odd and $q \equiv 1 \pmod 4$;
+  in general $|G(a,q)| \leq \sqrt{2q}$.
+\end{lemma}
+
+These bounds on Gauss sums are central to controlling major arc
+integrals, as we shall see in Section~\ref{sec:major}.
+
+\subsection{Exponential sums over primes}
+
+For prime-counting problems, the relevant exponential sum involves the
+von Mangoldt function $\Lambda(n) = \log p$ if $n = p^k$ and $0$ otherwise.
+
+\begin{definition}[Prime exponential sum]
+  \[
+    S(\alpha) \;=\; S(\alpha; N)
+    \;=\; \sum_{n \leq N} \Lambda(n)\, \eq{n\alpha}.
+  \]
+\end{definition}
+
+This sum has magnitude $\ll N$ on the major arcs (via Dirichlet
+characters and the prime number theorem for arithmetic progressions)
+and magnitude $\ll N^{1-\delta}$ on the minor arcs (via Vinogradov's
+estimates or the large sieve).
+
+% ================================================================
+\section{The Farey Dissection}
+\label{sec:farey}
+% ================================================================
+
+The Farey dissection provides a canonical partition of $[0,1)$ into
+arcs centred at rational fractions $a/q$ with small denominator.
+
+\begin{definition}[Farey sequence]
+  The \emph{Farey sequence} $\mathcal{F}_Q$ of order $Q$ is the
+  set of all fractions $a/q$ with $0 \leq a \leq q \leq Q$ and
+  $\gcd(a, q) = 1$ (plus $0/1$ and $1/1$), arranged in increasing order.
+\end{definition}
+
+\begin{definition}[Farey arc]
+  The \emph{Farey arc} associated to $a/q \in \mathcal{F}_Q$ is the
+  interval
+  \[
+    \mathfrak{M}(a, q)
+    \;=\; \left[\frac{a}{q} - \frac{1}{qQ'}, \frac{a}{q} + \frac{1}{qQ''}\right],
+  \]
+  where $Q'$ and $Q''$ are determined by the neighbours of $a/q$ in
+  $\mathcal{F}_Q$.  Crucially, consecutive Farey fractions $a/q < a'/q'$
+  satisfy $|a'q - aq'| = 1$ (a fundamental property of the Farey sequence).
+\end{definition}
+
+\begin{lemma}[Farey partition]\label{lem:farey}
+  The Farey arcs of order $Q$ are pairwise disjoint and cover $[0,1)$:
+  \[
+    [0, 1) \;=\; \bigsqcup_{q \leq Q} \bigsqcup_{\substack{a=0\\ \gcd(a,q)=1}}^{q-1}
+                 \mathfrak{M}(a, q).
+  \]
+  Each arc $\mathfrak{M}(a, q)$ has length $\sim 1/(qQ)$.
+\end{lemma}
+
+\begin{proof}
+  This is a standard result in the theory of Farey sequences; see
+  Hardy--Wright~\cite{HardyWright}, Chapter~3.  The disjointness follows
+  from the mediant property: between consecutive Farey fractions $a/q$
+  and $a'/q'$, the midpoint is $(a+a')/(q+q')$, and each point is
+  claimed by exactly one arc.
+\end{proof}
+
+% ================================================================
+\section{Major and Minor Arcs}
+\label{sec:arcs}
+% ================================================================
+
+In practice, one uses a slightly simplified version of the Farey
+dissection, with a fixed parameter $Q$ controlling the ``quality'' of
+the rational approximation.
+
+\begin{definition}[Major and minor arcs]\label{def:arcs}
+  Let $N \geq 1$ and $Q = Q(N)$ (to be chosen later, typically
+  $Q = N^\delta$ for small $\delta > 0$, or $Q = N / (\log N)^B$).
+  Define:
+  \begin{align*}
+    \text{Major arcs:} \quad
+    \mathfrak{M} &\;=\; \bigcup_{q \leq Q}\, \bigcup_{\substack{a=0\\ \gcd(a,q)=1}}^{q-1}
+                         \mathfrak{M}(a, q), \\[4pt]
+    \mathfrak{M}(a, q) &\;=\; \left\{\alpha \in [0,1) :
+      \left|\alpha - \frac{a}{q}\right| \leq \frac{Q}{N}\right\}, \\[4pt]
+    \text{Minor arcs:} \quad
+    \mathfrak{m} &\;=\; [0,1) \setminus \mathfrak{M}.
+  \end{align*}
+\end{definition}
+
+\begin{remark}
+  The major arcs $\mathfrak{M}(a,q)$ are pairwise disjoint provided
+  $Q^2 \leq N$, which we henceforth assume.  Each arc has length
+  $2Q/N$ (roughly), and there are $\sum_{q \leq Q} \phi(q) \sim Q^2/2$
+  such arcs.  The total measure of $\mathfrak{M}$ is $\ll Q^3/N$.
+\end{remark}
+
+The philosophy of the circle method is:
+\begin{enumerate}
+  \item On \textbf{major arcs}, $\alpha$ is close to some $a/q$ with
+    $q \leq Q$.  Then $f(\alpha)$ can be approximated by an explicit
+    sum (involving Gauss sums) times a simple integral.  The
+    contribution is the \emph{main term} of $r_s(n)$.
+  \item On \textbf{minor arcs}, $\alpha$ is ``far from small-denominator
+    rationals''.  Then $|f(\alpha)|$ is small (by Weyl differencing or
+    the large sieve), and the contribution is an \emph{error term}.
+\end{enumerate}
+
+The threshold $Q$ must be chosen to balance the two contributions:
+large enough so that the minor arcs carry only small error, small enough
+so that the major arc computation remains tractable.
+
+% ================================================================
+\section{Major Arc Analysis}
+\label{sec:major}
+% ================================================================
+
+We work out the major arc contribution for Waring's problem:
+$f(\alpha) = \sum_{m \leq M} \eq{m^k \alpha}$ where $M = N^{1/k}$.
+
+\begin{lemma}[Major arc approximation]\label{lem:major_approx}
+  For $\alpha = a/q + \beta$ with $\gcd(a,q) = 1$, $q \leq Q$, and
+  $|\beta| \leq Q/N$:
+  \[
+    f(\alpha) \;=\; \frac{G(a, q)}{q}\, v(\beta) \;+\; O\!\left(q^{1+\varepsilon}\right),
+  \]
+  where $v(\beta) = \int_0^M \eq{\beta t^k}\, dt$ is the \emph{Weyl integral}
+  (a smooth approximation), and $G(a,q)$ is the Gauss sum of
+  Definition~2.3.
+\end{lemma}
+
+\begin{proof}
+  We split the sum $\sum_{m \leq M} \eq{m^k(a/q + \beta)}$ according to
+  residues $m \equiv r \pmod q$.  For each residue $r$:
+  \[
+    \sum_{\substack{m \leq M\\ m \equiv r (q)}} \eq{m^k(a/q + \beta)}
+    \;=\; \eq{r^k a/q} \sum_{j : qj+r \leq M} \eq{(qj+r)^k \beta}.
+  \]
+  Summing over $r = 1, \ldots, q$ and approximating the inner sum by an
+  integral (Euler--Maclaurin with error $O(1)$ per term, so $O(q)$ total):
+  \[
+    f(\alpha) \;=\; \frac{1}{q}\, G(a, q)\, v(\beta) \;+\; O(q).
+  \]
+  The improved error $O(q^{1+\varepsilon})$ comes from a more careful
+  analysis (see Vaughan~\cite{Vaughan1981}).
+\end{proof}
+
+\subsection{The singular series}
+
+\begin{definition}[Singular series]\label{def:singular_series}
+  For integers $n, k, s$, the \emph{singular series} is
+  \[
+    \mathfrak{S}(n) \;=\; \sum_{q=1}^{\infty} \sum_{\substack{a=1\\ \gcd(a,q)=1}}^{q}
+                          \left(\frac{G(a,q)}{q}\right)^s \eq{-\frac{an}{q}}.
+  \]
+  By Lemma~\ref{lem:gauss}, this converges absolutely for $s > 2k+1$.
+\end{definition}
+
+\begin{remark}
+  The singular series $\mathfrak{S}(n)$ has an Euler product decomposition:
+  \[
+    \mathfrak{S}(n) \;=\; \prod_p \sigma_p(n),
+  \]
+  where $\sigma_p(n)$ is the $p$-adic density of solutions to
+  $x_1^k + \cdots + x_s^k \equiv n \pmod{p^j}$ for large $j$.
+  In particular, $\mathfrak{S}(n) > 0$ if and only if the equation
+  $x_1^k + \cdots + x_s^k = n$ has $p$-adic solutions for all $p$.
+\end{remark}
+
+\subsection{The singular integral}
+
+\begin{definition}[Singular integral]
+  \[
+    \mathfrak{J}(n) \;=\; \int_{-\infty}^{\infty} v(\beta)^s\, \eq{-n\beta}\, d\beta,
+  \]
+  where $v(\beta) = \int_0^1 \eq{\beta u^k}\, du$ (after normalising $M=1$,
+  the general case follows by scaling).
+\end{definition}
+
+\begin{lemma}[Singular integral estimate]\label{lem:sing_int}
+  For $s > k$ and $n > 0$:
+  \[
+    \mathfrak{J}(n) \;\sim\; C_{k,s} \cdot n^{s/k - 1},
+  \]
+  where $C_{k,s} = \Gamma(1 + 1/k)^s / \Gamma(s/k)$ is an explicit constant
+  depending only on $k$ and $s$.
+\end{lemma}
+
+\begin{proof}
+  By the substitution $\beta \mapsto \beta/n$ and $u \mapsto (n/s)^{1/k} u$,
+  the integral $\mathfrak{J}(n)$ scales as $n^{s/k - 1}$.  The constant
+  is evaluated by recognising the integrand as related to the Fourier
+  transform of $|u|^{1/k}$; see Vaughan~\cite[Chapter~4]{Vaughan1981}.
+\end{proof}
+
+\subsection{Major arc total contribution}
+
+\begin{theorem}[Major arc contribution]\label{thm:major}
+  With the notation above, for $s > 2k+1$:
+  \[
+    \int_{\mathfrak{M}} f(\alpha)^s \eq{-n\alpha}\, d\alpha
+    \;=\; \mathfrak{S}(n)\, \mathfrak{J}(n)\, N^{s/k - 1}
+          \;+\; O\!\left(N^{s/k - 1 - \delta}\right)
+  \]
+  for some $\delta = \delta(k, s) > 0$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+  On each major arc $\mathfrak{M}(a, q)$, substitute
+  $\alpha = a/q + \beta$ and use Lemma~\ref{lem:major_approx}:
+  \[
+    \int_{\mathfrak{M}(a,q)} f(\alpha)^s \eq{-n\alpha}\, d\alpha
+    \;\approx\; \left(\frac{G(a,q)}{q}\right)^s \eq{-an/q}
+                \int_{-Q/N}^{Q/N} v(\beta)^s \eq{-n\beta}\, d\beta.
+  \]
+  Summing over all $(a, q)$ with $q \leq Q$ and extending the $\beta$-integral
+  to $\R$ (with negligible error for $Q$ large), we recover
+  $\mathfrak{S}(n) \cdot \mathfrak{J}(n) \cdot N^{s/k-1}$.  Error
+  terms arise from: (i) the approximation in Lemma~\ref{lem:major_approx},
+  contributing $O(N^{s/k - 1 - 1/k})$; (ii) the tail of the singular
+  series, contributing $O(Q^{-1+\varepsilon})$.  Choosing $Q$ appropriately
+  balances these.
+\end{proof}
+
+% ================================================================
+\section{Minor Arc Bounds: Weyl's Inequality}
+\label{sec:minor}
+% ================================================================
+
+On the minor arcs, we need to show $|f(\alpha)|$ is substantially less
+than $N$.  The fundamental tool is:
+
+\begin{theorem}[Weyl's inequality]\label{thm:weyl}
+  Let $k \geq 2$ and suppose $|\alpha - a/q| \leq 1/q^2$ for some
+  integers $a, q$ with $\gcd(a,q) = 1$ and $1 \leq q \leq N^k$.  Then
+  \[
+    \left|\sum_{n=1}^{N} \eq{n^k \alpha}\right|
+    \;\ll\; N^{1+\varepsilon}
+             \left(\frac{1}{q} + \frac{1}{N} + \frac{q}{N^k}\right)^{2^{1-k}}.
+  \]
+\end{theorem}
+
+\begin{proof}[Proof sketch (Weyl differencing)]
+  We sketch the argument for $k = 2$.  Squaring the sum:
+  \[
+    \left|\sum_n \eq{n^2 \alpha}\right|^2
+    = \sum_m \sum_n \eq{(n^2 - m^2)\alpha}
+    = \sum_h \sum_n \eq{h(2n + h)\alpha},
+  \]
+  where $h = n - m$.  Fixing $h$ and summing over $n$, the inner sum is
+  a geometric series $\sum_n \eq{2hn\alpha}$, bounded by
+  $\min(N, \|2h\alpha\|^{-1})$.  Summing over $h \leq N$ and using
+  $\|2h\alpha\| \geq 2h\|\alpha\|$ for generic $\alpha$ yields the
+  improvement over the trivial bound.  For general $k$, one iterates
+  this differencing $k-1$ times; see Hardy--Wright~\cite[Chapter~21]{HardyWright}
+  or Vaughan~\cite[Chapter~2]{Vaughan1981}.
+\end{proof}
+
+\begin{corollary}[Minor arc bound]\label{cor:minor}
+  On the minor arcs, i.e.\ when $\alpha \in \mathfrak{m}$, every $\alpha$
+  satisfies $|q\alpha - a| \geq Q/N$ for all $q \leq Q$.  By Dirichlet's
+  theorem, there exist $a, q$ with $q \leq N^k/Q$ and
+  $|q\alpha - a| \leq Q/N$.  Applying Weyl's inequality:
+  \[
+    |f(\alpha)| \;\ll\; N^{1 - \sigma(k) + \varepsilon},
+  \]
+  where $\sigma(k) = 2^{1-k}$ for suitable $Q$.
+\end{corollary}
+
+\begin{remark}[Efficiency for large $k$]
+  For $k \geq 2$, Weyl's inequality gives a saving of $N^{-\sigma}$ with
+  $\sigma = 2^{1-k}$, which becomes very small as $k \to \infty$.
+  Vinogradov's mean value theorem (refined by Wooley's efficient
+  congruencing) gives exponentially better bounds, reducing $G(k)$ from
+  Weyl's bound of $2^k$ to $k(\log k + O(1))$.
+\end{remark}
+
+% ================================================================
+\section{The Full Circle Method: Putting It Together}
+\label{sec:full}
+% ================================================================
+
+We can now state the main theorem of the circle method for Waring's problem.
+
+\begin{theorem}[Hardy--Littlewood--Vinogradov]\label{thm:main}
+  For $k \geq 2$ and $s \geq s_0(k)$ (a threshold depending on $k$),
+  and for all sufficiently large $n$:
+  \[
+    r_s(n) \;=\; \mathfrak{S}(n)\, \mathfrak{J}(n)\, n^{s/k - 1}
+                 \;+\; O\!\left(n^{s/k - 1 - \delta}\right),
+  \]
+  where $\mathfrak{S}(n) > 0$ for all $n$ (the local solubility condition
+  is automatically satisfied for $s \geq C(k)$).  In particular,
+  $r_s(n) > 0$ for all sufficiently large $n$.
+\end{theorem}
+
+\begin{proof}[Proof outline]
+  Split the integral~\eqref{eq:key} as
+  \[
+    r_s(n) \;=\; \int_{\mathfrak{M}} f^s \eq{-n\cdot} + \int_{\mathfrak{m}} f^s \eq{-n\cdot}.
+  \]
+  \textbf{Major arc:} By Theorem~\ref{thm:major}, the major arc integral
+  equals $\mathfrak{S}(n)\, \mathfrak{J}(n)\, n^{s/k-1} + O(n^{s/k-1-\delta})$.
+
+  \textbf{Minor arc:} On $\mathfrak{m}$, use Corollary~\ref{cor:minor}
+  to bound $|f(\alpha)| \leq N^{1-\sigma}$ and apply two of the $s$ factors
+  trivially ($\int_0^1 |f|^2 d\alpha \leq N$, by Parseval).  This gives
+  \[
+    \left|\int_{\mathfrak{m}} f^s \eq{-n\cdot}\right|
+    \;\leq\; N^{(s-2)(1-\sigma)} \cdot \int_0^1 |f|^2
+    \;\ll\; N^{s-2-(s-2)\sigma + 1}
+    \;=\; N^{s-1-(s-2)\sigma}.
+  \]
+  For $s > 2/\sigma + 1$, this is $o(N^{s/k - 1})$, so the minor arc is
+  absorbed into the error term.
+\end{proof}
+
+% ================================================================
+\section{Application to Goldbach-Type Problems}
+\label{sec:goldbach}
+% ================================================================
+
+For prime-counting problems, the exponential sum is
+$S(\alpha) = \sum_{n \leq N} \Lambda(n) \eq{n\alpha}$.
+The representation count for $r$ primes summing to $n$ is:
+\[
+  R_r(n) \;=\; \sum_{\substack{p_1 + \cdots + p_r = n\\ p_i \leq N}}
+               \log p_1 \cdots \log p_r
+  \;=\; \int_0^1 S(\alpha)^r \eq{-n\alpha}\, d\alpha.
+\]
+
+\begin{lemma}[Major arc for primes]\label{lem:major_prime}
+  For $\alpha = a/q + \beta$ with $\gcd(a, q) = 1$ and $q$ small:
+  \[
+    S(\alpha) \;\approx\; \frac{\mu(q)}{\phi(q)}\, v_N(\beta),
+  \]
+  where $v_N(\beta) = \int_2^N \eq{t\beta}\, dt / \log t \approx N\cdot \eq{N\beta}$
+  and $\mu$ is the M\"obius function.
+\end{lemma}
+
+This approximation holds when $\chi_0$ is the principal character and
+the prime number theorem for arithmetic progressions $\pmod{q}$ applies.
+The $\mu(q)/\phi(q)$ factor encodes the contribution from all characters
+mod $q$ (non-principal characters contribute negligibly on major arcs by
+orthogonality and non-vanishing of $L(1,\chi)$).
+
+The minor arc bound for prime sums uses the \emph{large sieve inequality}
+(see Paper~15) and Vinogradov's lemma:
+\[
+  \max_{\alpha \in \mathfrak{m}} |S(\alpha)| \;\ll\; N(\log N)^{-B}
+\]
+for any $B > 0$, provided $Q = (\log N)^A$ for suitable $A = A(B)$.
+This is the content of the Bombieri--Vinogradov theorem and underlies
+the proof of Vinogradov's three-prime theorem (Paper~18).
+
+% ================================================================
+\section{Historical Notes and Extensions}
+\label{sec:history}
+% ================================================================
+
+\begin{remark}[History]
+  The circle method was first used by Hardy and Ramanujan (1918) to derive
+  the asymptotic formula for the partition function $p(n)$.  Hardy and
+  Littlewood (1920--1923) applied it to Waring's problem (Papers I--IV),
+  establishing the asymptotic formula for $r_s(n)$ and obtaining the
+  original bound $G(k) \leq (k-2)2^{k-1} + 5$.  Vinogradov (1937)
+  dramatically improved the minor arc bounds via his mean value estimates.
+  Wooley (1992--2016) developed \emph{efficient congruencing} and proved
+  the Vinogradov mean value conjecture for all $k$; independently,
+  Bourgain, Demeter, and Guth (2015) proved the same result via
+  $\ell^2$-decoupling (the BDG theorem).  Both proofs are complete and
+  Wooley's 2016 efficient-congruencing proof covers all $k$, not only $k=3$.
+\end{remark}
+
+\begin{remark}[Limitations]
+  The circle method has fundamental limitations:
+  \begin{itemize}
+    \item It requires $s \geq s_0(k)$ ``many'' summands; for binary Goldbach
+      ($r = 2$ primes) it gives only conditional results.
+    \item The \emph{parity problem} in sieve theory is closely related to why
+      $s = 2$ is out of reach: the circle method, used naively, cannot
+      distinguish $p + p$ from $p + p \cdot p'$ (products of two primes).
+    \item Nevertheless, for $r \geq 3$ primes, the method succeeds
+      unconditionally (Vinogradov's theorem, Paper~18).
+  \end{itemize}
+\end{remark}
+
+% ================================================================
+\section{Conclusion}
+% ================================================================
+
+The Hardy--Littlewood circle method rests on a single elegant idea: the
+integral representation~\eqref{eq:key} of the representation count.
+The method's power comes from the systematic exploitation of the
+structure of exponential sums near rational numbers:
+\begin{enumerate}
+  \item Near a rational $a/q$ with small $q$ (\textbf{major arcs}),
+    the exponential sum is approximated by a Gauss sum times an integral.
+    Summing over all such rationals gives the \emph{singular series}
+    $\mathfrak{S}(n)$ and \emph{singular integral} $\mathfrak{J}(n)$.
+  \item Away from all small-denominator rationals (\textbf{minor arcs}),
+    the exponential sum is small by Weyl's inequality or the large sieve.
+    The minor arc integral is an error term.
+\end{enumerate}
+
+This framework successfully resolves Waring's problem and ternary Goldbach,
+and underpins much of modern analytic number theory.  The papers that follow
+(Papers~18--20) apply and extend this method.
+
+% ================================================================
+\begin{thebibliography}{9}
+
+\bibitem{HardyRamanujan1918}
+G.~H.~Hardy and S.~Ramanujan.
+\newblock Asymptotic formulae in combinatory analysis.
+\newblock \emph{Proc.\ London Math.\ Soc.\ (2)}, 17:75--115, 1918.
+
+\bibitem{HardyLittlewood1923}
+G.~H.~Hardy and J.~E.~Littlewood.
+\newblock Some problems of ``Partitio Numerorum''.  III: On the expression of
+  a number as a sum of primes.
+\newblock \emph{Acta Math.}, 44:1--70, 1923.
+
+\bibitem{HardyWright}
+G.~H.~Hardy and E.~M.~Wright.
+\newblock \emph{An Introduction to the Theory of Numbers}, 6th~ed.
+\newblock Oxford University Press, 2008.
+
+\bibitem{Vaughan1981}
+R.~C.~Vaughan.
+\newblock \emph{The Hardy--Littlewood Method}, 2nd~ed.
+\newblock Cambridge University Press, 1997.
+
+\bibitem{Vinogradov1954}
+I.~M.~Vinogradov.
+\newblock \emph{The Method of Trigonometrical Sums in the Theory of Numbers}.
+\newblock Interscience Publishers, London, 1954.
+  (Translated and revised by K.~F.~Roth and A.~Davenport.)
+
+\bibitem{Wooley2016}
+T.~D.~Wooley.
+\newblock The cubic case of the main conjecture in Vinogradov's mean value theorem.
+\newblock \emph{Adv.\ Math.}, 294:532--561, 2016.
+
+\bibitem{IwaniecKowalski}
+H.~Iwaniec and E.~Kowalski.
+\newblock \emph{Analytic Number Theory}.
+\newblock American Mathematical Society, Providence, RI, 2004.
+
+\end{thebibliography}
+
+\end{document}

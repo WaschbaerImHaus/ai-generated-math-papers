@@ -1,0 +1,465 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{booktabs}
+
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{beispiel}[theorem]{Beispiel}
+
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\eq}[1]{e\!\left(#1\right)}
+
+% -------------------------------------------------------
+\begin{document}
+
+\title{Die Hardy--Littlewood-Kreismethode:\\
+       Exponentialsummen, Haupt- und Nebenbögen}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 80}
+\email{specialist-maths@localhost}
+\date{2026}
+
+\begin{abstract}
+Die Hardy--Littlewood-\emph{Kreismethode} ist eine der mächtigsten
+Techniken der analytischen Zahlentheorie.  Sie wurde von Hardy und
+Ramanujan (1918) eingeführt und von Hardy und Littlewood (1920--1928) auf
+additive Probleme angewendet.  Die Grundidee ist die Integraldarstellung
+der Darstellungsanzahl $r_s(n)$ (eine Zahl $n$ als Summe von $s$
+$k$-ten Potenzen darzustellen) über einen Konturintegral auf dem
+Einheitskreis $[0,1)$.  Das Intervall wird in \emph{Hauptbögen}
+(Umgebungen rationaler Zahlen mit kleinem Nenner, wo die Exponentialsumme
+groß und explizit berechenbar ist) und \emph{Nebenbögen} (wo die
+Exponentialsumme klein und abschätzbar ist) zerlegt.
+
+Wir entwickeln die Methode von Grund auf: Exponentialsummen (Weyl-Summen
+und Gauß-Summen), die Farey-Zerlegung, die Struktur von Haupt- und
+Nebenbögen, den Hauptterm über die \emph{singuläre Reihe} und das
+\emph{singuläre Integral}, sowie Weyls Differenzierungsmethode für
+Nebenbogen-Schranken.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung}
+% ================================================================
+
+Ein zentrales Problem der additiven Zahlentheorie lautet: \emph{Auf wie
+viele Arten kann eine positive ganze Zahl $n$ geschrieben werden als}
+\[
+  n \;=\; x_1^k + x_2^k + \cdots + x_s^k
+\]
+mit nicht-negativen ganzen Zahlen $x_i$ (Waringsches Problem), oder als
+\[
+  n \;=\; p_1 + p_2 + \cdots + p_r
+\]
+mit Primzahlen $p_i$ (Goldbach-artige Probleme)?
+
+Die Kreismethode transformiert solche Fragen in Integrale.  Die
+\emph{Erzeugende Funktion} (Exponentialsumme)
+\[
+  f(\alpha) \;=\; \sum_{m=0}^{M} \eq{m^k \alpha},
+  \qquad \eq{x} := e^{2\pi i x},
+\]
+erfüllt die Schlüsselidentität:
+\begin{equation}\label{eq:key}
+  r_s(n) \;=\; \int_0^1 f(\alpha)^s\, \eq{-n\alpha}\, d\alpha.
+\end{equation}
+Dies folgt unmittelbar aus der Orthogonalität der Charaktere
+$\alpha \mapsto \eq{m\alpha}$: das Integral „greift" genau den
+Koeffizienten von $\eq{n\alpha}$ in $f(\alpha)^s$ heraus.
+
+Die Kreismethode ist die Kunst, dieses Integral durch Zerlegung
+von $[0,1)$ in Gebiete zu berechnen, wo $f(\alpha)$ entweder groß
+(und explizit berechenbar) oder klein (und abschätzbar) ist.
+
+\textbf{Notation.}  $\eq{x} = e^{2\pi ix}$, $\log = \ln$, $p$
+bezeichnet stets eine Primzahl, $\Lambda$ die von Mangoldt-Funktion.
+
+% ================================================================
+\section{Exponentialsummen}
+\label{sec:expsummen}
+% ================================================================
+
+\subsection{Weyl-Summen}
+
+\begin{definition}[Weyl-Summe]
+  Für ein Polynom $f(x) = \alpha_k x^k + \cdots + \alpha_1 x \in \R[x]$
+  und $N \geq 1$ ist die \emph{Weyl-Summe}:
+  \[
+    W(f; N) \;=\; \sum_{n=1}^{N} \eq{f(n)}.
+  \]
+  Im einfachsten Fall $f(x) = \alpha x^k$ schreiben wir $W(\alpha; k; N)$.
+\end{definition}
+
+Die triviale Schranke lautet $|W(f; N)| \leq N$.  Wenn $\alpha$ weit
+von Brüchen mit kleinem Nenner entfernt ist, tritt erhebliche
+Auslöschung auf.
+
+\begin{lemma}[Weyl, 1916: Geometrische Summe]\label{lem:geom}
+  Für $\alpha \in \R$ und $N \geq 1$:
+  \[
+    \left|\sum_{n=1}^{N} \eq{n\alpha}\right|
+    \;\leq\; \min\!\left(N,\; \frac{1}{2\|\alpha\|}\right),
+  \]
+  wobei $\|x\| = \min_{m \in \Z} |x - m|$ der Abstand zur nächsten
+  ganzen Zahl ist.
+\end{lemma}
+
+\begin{proof}
+  Die Summe ist eine geometrische Reihe mit Quotient $\eq{\alpha}$.
+  Falls $\eq{\alpha} = 1$ (d.h.\ $\alpha \in \Z$), ergibt sie $N$.
+  Sonst:
+  \[
+    \left|\sum_{n=1}^N \eq{n\alpha}\right|
+    = \left|\frac{\eq{\alpha} - \eq{(N+1)\alpha}}{1 - \eq{\alpha}}\right|
+    \leq \frac{2}{|1 - \eq{\alpha}|}
+    = \frac{1}{|\sin(\pi\alpha)|}
+    \leq \frac{1}{2\|\alpha\|},
+  \]
+  unter Verwendung von $|\sin(\pi x)| \geq 2\|x\|$.  Das Minimum mit
+  $N$ liefert die Behauptung.
+\end{proof}
+
+\subsection{Gauß-Summen}
+
+\begin{definition}[Vollständige Gauß-Summe]
+  Für ganze Zahlen $a$, $q$ mit $q \geq 1$:
+  \[
+    G(a, q) \;=\; \sum_{m=1}^{q} \eq{\frac{a m^k}{q}}.
+  \]
+\end{definition}
+
+\begin{lemma}[Gauß-Summen-Schranke]\label{lem:gauss}
+  Für $\gcd(a, q) = 1$: $|G(a, q)| \leq k \cdot q^{1/2 + \varepsilon}$.
+  Für $k = 2$ (quadratische Gauß-Summen): $|G(a,q)| \leq \sqrt{2q}$.
+\end{lemma}
+
+\subsection{Exponentialsummen über Primzahlen}
+
+\begin{definition}[Primzahl-Exponentialsumme]
+  \[
+    S(\alpha) \;=\; \sum_{n \leq N} \Lambda(n)\, \eq{n\alpha},
+  \]
+  wobei $\Lambda(n) = \log p$ für $n = p^k$ (Primzahlpotenz) und $0$ sonst.
+\end{definition}
+
+% ================================================================
+\section{Die Farey-Zerlegung}
+\label{sec:farey}
+% ================================================================
+
+Die Farey-Zerlegung liefert eine kanonische Partition von $[0,1)$ in
+Bögen um rationale Brüche $a/q$ mit kleinem Nenner.
+
+\begin{definition}[Farey-Folge]
+  Die \emph{Farey-Folge} $\mathcal{F}_Q$ der Ordnung $Q$ ist die Menge
+  aller Brüche $a/q$ mit $0 \leq a \leq q \leq Q$ und $\gcd(a,q) = 1$
+  (plus $0/1$ und $1/1$), in aufsteigender Reihenfolge.
+\end{definition}
+
+\begin{lemma}[Farey-Partition]\label{lem:farey}
+  Die Farey-Bögen der Ordnung $Q$ sind paarweise disjunkt und überdecken
+  $[0,1)$:
+  \[
+    [0, 1) \;=\; \bigsqcup_{q \leq Q} \bigsqcup_{\substack{a=0\\ \gcd(a,q)=1}}^{q-1}
+                 \mathfrak{M}(a, q).
+  \]
+  Jeder Bogen $\mathfrak{M}(a, q)$ hat Länge $\sim 1/(qQ)$.
+\end{lemma}
+
+\begin{proof}
+  Dies ist ein Standardresultat in der Theorie der Farey-Folgen;
+  siehe Hardy--Wright~\cite{HardyWright}, Kapitel~3.  Die Disjunktheit
+  folgt aus der Mediant-Eigenschaft: Zwischen zwei aufeinanderfolgenden
+  Farey-Brüchen $a/q$ und $a'/q'$ liegt der Mediant $(a+a')/(q+q')$,
+  und jeder Punkt wird von genau einem Bogen beansprucht.  Die
+  Überdeckung folgt daraus, dass jeder Punkt $\alpha \in [0,1)$ einen
+  nächstgelegenen Farey-Bruch besitzt.
+\end{proof}
+
+% ================================================================
+\section{Haupt- und Nebenbögen}
+\label{sec:boegen}
+% ================================================================
+
+In der Praxis verwendet man eine vereinfachte Version mit einem festen
+Parameter $Q$.
+
+\begin{definition}[Haupt- und Nebenbögen]\label{def:boegen}
+  Sei $N \geq 1$ und $Q = Q(N)$ (typisch: $Q = N^\delta$ oder
+  $Q = N/(\log N)^B$).  Definiere:
+  \begin{align*}
+    \text{Hauptbögen:}\quad
+    \mathfrak{M} &\;=\; \bigcup_{q \leq Q}\, \bigcup_{\substack{a=0\\ \gcd(a,q)=1}}^{q-1}
+                         \mathfrak{M}(a, q), \\
+    \mathfrak{M}(a, q) &\;=\; \left\{\alpha \in [0,1) :
+      \left|\alpha - \frac{a}{q}\right| \leq \frac{Q}{N}\right\}, \\
+    \text{Nebenbögen:}\quad
+    \mathfrak{m} &\;=\; [0,1) \setminus \mathfrak{M}.
+  \end{align*}
+\end{definition}
+
+Die Philosophie der Kreismethode ist:
+\begin{enumerate}
+  \item Auf \textbf{Hauptbögen} kann $f(\alpha)$ durch Gauß-Summen
+    mal einem glatten Integral approximiert werden.
+    Dies liefert den \emph{Hauptterm} von $r_s(n)$.
+  \item Auf \textbf{Nebenbögen} ist $|f(\alpha)|$ klein (durch
+    Weylsche Differenzierung oder das große Sieb).
+    Dies liefert einen \emph{Fehlerterm}.
+\end{enumerate}
+
+% ================================================================
+\section{Hauptbogen-Analyse}
+\label{sec:hauptbogen}
+% ================================================================
+
+\begin{lemma}[Hauptbogen-Approximation]\label{lem:hauptapprox}
+  Für $\alpha = a/q + \beta$ mit $\gcd(a,q)=1$, $q \leq Q$ und
+  $|\beta| \leq Q/N$:
+  \[
+    f(\alpha) \;=\; \frac{G(a, q)}{q}\, v(\beta) \;+\; O\!\left(q^{1+\varepsilon}\right),
+  \]
+  wobei $v(\beta) = \int_0^M \eq{\beta t^k}\, dt$ das \emph{Weyl-Integral} ist.
+\end{lemma}
+
+\subsection{Die singuläre Reihe}
+
+\begin{definition}[Singuläre Reihe]\label{def:sing_reihe}
+  \[
+    \mathfrak{S}(n) \;=\; \sum_{q=1}^{\infty} \sum_{\substack{a=1\\ \gcd(a,q)=1}}^{q}
+                          \left(\frac{G(a,q)}{q}\right)^s \eq{-\frac{an}{q}}.
+  \]
+  Diese hat die Euler-Produktdarstellung
+  $\mathfrak{S}(n) = \prod_p \sigma_p(n)$,
+  wobei $\sigma_p(n)$ die $p$-adische Dichte von Lösungen ist.
+\end{definition}
+
+\begin{bemerkung}
+  $\mathfrak{S}(n) > 0$ genau dann, wenn die Gleichung
+  $x_1^k + \cdots + x_s^k = n$ für alle Primzahlen $p$ $p$-adische
+  Lösungen hat (lokale Lösbarkeit).
+\end{bemerkung}
+
+\subsection{Das singuläre Integral}
+
+\begin{definition}[Singuläres Integral]
+  \[
+    \mathfrak{J}(n) \;=\; \int_{-\infty}^{\infty} v(\beta)^s\, \eq{-n\beta}\, d\beta.
+  \]
+\end{definition}
+
+\begin{lemma}[Singuläres Integral, Abschätzung]\label{lem:sing_int}
+  Für $s > k$ und $n > 0$:
+  $\mathfrak{J}(n) \sim C_{k,s} \cdot n^{s/k - 1}$
+  mit einer von $k$ und $s$ abhängigen Konstante $C_{k,s} > 0$.
+\end{lemma}
+
+\begin{theorem}[Hauptbogen-Beitrag]\label{thm:hauptbogen}
+  Für $s > 2k+1$:
+  \[
+    \int_{\mathfrak{M}} f(\alpha)^s \eq{-n\alpha}\, d\alpha
+    \;=\; \mathfrak{S}(n)\, \mathfrak{J}(n)\, N^{s/k - 1}
+          \;+\; O\!\left(N^{s/k - 1 - \delta}\right)
+  \]
+  für ein $\delta = \delta(k, s) > 0$.
+\end{theorem}
+
+% ================================================================
+\section{Nebenbogen-Schranken: Weyls Ungleichung}
+\label{sec:nebenbogen}
+% ================================================================
+
+\begin{theorem}[Weylsche Ungleichung]\label{thm:weyl}
+  Sei $k \geq 2$ und $|\alpha - a/q| \leq 1/q^2$ für ganze Zahlen
+  $a, q$ mit $\gcd(a,q)=1$ und $1 \leq q \leq N^k$.  Dann gilt:
+  \[
+    \left|\sum_{n=1}^{N} \eq{n^k \alpha}\right|
+    \;\ll\; N^{1+\varepsilon}
+             \left(\frac{1}{q} + \frac{1}{N} + \frac{q}{N^k}\right)^{2^{1-k}}.
+  \]
+\end{theorem}
+
+\begin{proof}[Beweisidee (Weylsche Differenzierung für $k=2$)]
+  Wir quadrieren die Summe:
+  \[
+    \left|\sum_n \eq{n^2 \alpha}\right|^2
+    = \sum_h \sum_n \eq{h(2n + h)\alpha},
+  \]
+  wobei $h = n - m$.  Die innere Summe über $n$ ist eine geometrische
+  Reihe, beschränkt durch $\min(N, \|2h\alpha\|^{-1})$.  Summation
+  über $h \leq N$ liefert die Verbesserung gegenüber der trivialen Schranke.
+  Für allgemeines $k$ iteriert man die Differenzierung $k-1$-mal.
+\end{proof}
+
+\begin{korollar}[Nebenbogen-Schranke]\label{cor:nebenbogen}
+  Auf den Nebenbögen $\mathfrak{m}$ gilt:
+  \[
+    |f(\alpha)| \;\ll\; N^{1 - \sigma(k) + \varepsilon},
+  \]
+  wobei $\sigma(k) = 2^{1-k}$ (Weyl) oder besser (Vinogradov--Wooley).
+\end{korollar}
+
+% ================================================================
+\section{Die vollständige Kreismethode}
+\label{sec:vollstaendig}
+% ================================================================
+
+\begin{theorem}[Hardy--Littlewood--Vinogradov]\label{thm:haupt}
+  Für $k \geq 2$ und $s \geq s_0(k)$ und alle hinreichend großen $n$:
+  \[
+    r_s(n) \;=\; \mathfrak{S}(n)\, \mathfrak{J}(n)\, n^{s/k - 1}
+                 \;+\; O\!\left(n^{s/k - 1 - \delta}\right).
+  \]
+  Insbesondere gilt $r_s(n) > 0$ für alle hinreichend großen $n$.
+\end{theorem}
+
+\begin{proof}[Beweis (Skizze)]
+  Man zerlegt:
+  $r_s(n) = \int_{\mathfrak{M}} f^s \eq{-n\cdot} + \int_{\mathfrak{m}} f^s \eq{-n\cdot}$.
+
+  \textbf{Hauptbogen:} Satz~\ref{thm:hauptbogen} liefert den Hauptterm.
+
+  \textbf{Nebenbogen:} Mit Korollar~\ref{cor:nebenbogen} und Parsevals Identität:
+  \[
+    \left|\int_{\mathfrak{m}} f^s \eq{-n\cdot}\right|
+    \leq N^{(s-2)(1-\sigma)} \cdot N \;=\; N^{s-1-(s-2)\sigma}.
+  \]
+  Für $s > 1 + 2/\sigma$ ist dies $o(N^{s/k - 1})$.
+\end{proof}
+
+% ================================================================
+\section{Anwendung auf Goldbach-artige Probleme}
+\label{sec:goldbach}
+% ================================================================
+
+Für Primzahl-Summen verwendet man
+$S(\alpha) = \sum_{n \leq N} \Lambda(n) \eq{n\alpha}$.
+
+\begin{lemma}[Hauptbogen für Primzahlen]\label{lem:hauptbogen_primes}
+  Für $\alpha = a/q + \beta$ mit kleinem $q$:
+  $S(\alpha) \approx \frac{\mu(q)}{\phi(q)}\, v_N(\beta)$.
+\end{lemma}
+
+Der Faktor $\mu(q)/\phi(q)$ kodiert den Beitrag des Hauptcharakters mod $q$.
+Die Nebenbogen-Schranke für $S(\alpha)$ folgt aus dem Bombieri--Vinogradov-Satz
+und dem großen Sieb (vgl.\ Paper~15):
+\[
+  \max_{\alpha \in \mathfrak{m}} |S(\alpha)| \;\ll\; N(\log N)^{-B}.
+\]
+
+% ================================================================
+\section{Historische Anmerkungen und Erweiterungen}
+\label{sec:hist}
+% ================================================================
+
+\begin{bemerkung}[Geschichte]
+  Die Kreismethode wurde erstmals von Hardy und Ramanujan (1918) zur
+  asymptotischen Formel für die Partitionsfunktion $p(n)$ verwendet.
+  Hardy und Littlewood (1920--1923) wendeten sie auf das Waringsche
+  Problem an.  Vinogradov (1937) verbesserte die Nebenbogen-Schranken
+  drastisch.  Wooley (2012--2016) bewies den kubischen Fall ($k=3$) der
+  Vinogradov-Hauptvermutung durch \emph{effizientes Kongruenzrechnen}.
+  Den vollständigen Beweis für alle $k$ lieferten Bourgain, Demeter und Guth
+  (2015) mit der $\ell^2$-Decoupling-Methode (BDG-Satz).
+\end{bemerkung}
+
+\begin{bemerkung}[Grenzen der Kreismethode]
+  Die Kreismethode hat fundamentale Grenzen:
+  \begin{itemize}
+    \item Sie benötigt $s \geq s_0(k)$ „genug" Summanden.  Für binäres
+      Goldbach ($r = 2$ Primzahlen) liefert sie nur bedingte Resultate.
+    \item Das \emph{Paritätsproblem} der Siebtheorie erklärt, warum
+      $s = 2$ außer Reichweite liegt.
+    \item Für $r \geq 3$ Primzahlen gelingt der Beweis unbedingt
+      (Vinogradovs Satz, Paper~18).
+  \end{itemize}
+\end{bemerkung}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Die Hardy--Littlewood-Kreismethode beruht auf einer einzigen eleganten
+Idee: der Integraldarstellung~\eqref{eq:key} der Darstellungsanzahl.
+
+\begin{enumerate}
+  \item In der Nähe eines Bruchs $a/q$ mit kleinem $q$
+    (\textbf{Hauptbögen}) wird die Exponentialsumme durch
+    Gauß-Summen mal einem Integral approximiert.  Die Summe über
+    alle solchen Brüche liefert die \emph{singuläre Reihe} $\mathfrak{S}(n)$
+    und das \emph{singuläre Integral} $\mathfrak{J}(n)$.
+  \item Fernab von Brüchen mit kleinem Nenner (\textbf{Nebenbögen})
+    ist die Exponentialsumme nach Weyls Ungleichung klein.
+    Das Nebenbogen-Integral ist ein Fehlerterm.
+\end{enumerate}
+
+Die folgenden Papers (18--20) wenden und erweitern diese Methode.
+
+% ================================================================
+\begin{thebibliography}{9}
+
+\bibitem{HardyRamanujan1918}
+G.~H.~Hardy und S.~Ramanujan.
+\newblock Asymptotic formulae in combinatory analysis.
+\newblock \emph{Proc.\ London Math.\ Soc.\ (2)}, 17:75--115, 1918.
+
+\bibitem{HardyLittlewood1923}
+G.~H.~Hardy und J.~E.~Littlewood.
+\newblock Some problems of ``Partitio Numerorum''. III.
+\newblock \emph{Acta Math.}, 44:1--70, 1923.
+
+\bibitem{Vaughan1981}
+R.~C.~Vaughan.
+\newblock \emph{The Hardy--Littlewood Method}, 2.~Aufl.
+\newblock Cambridge University Press, 1997.
+
+\bibitem{Vinogradov1954}
+I.~M.~Winogradow.
+\newblock \emph{Die Methode der Trigonometrischen Summen in der Zahlentheorie}.
+\newblock Harri Deutsch, Frankfurt, 1989. (Deutsche Übersetzung.)
+
+\bibitem{Wooley2016}
+T.~D.~Wooley.
+\newblock The cubic case of the main conjecture in Vinogradov's mean value theorem.
+\newblock \emph{Adv.\ Math.}, 294:532--561, 2016.
+
+\bibitem{IwaniecKowalski}
+H.~Iwaniec und E.~Kowalski.
+\newblock \emph{Analytic Number Theory}.
+\newblock American Mathematical Society, Providence, RI, 2004.
+
+\bibitem{HardyWright}
+G.~H.~Hardy und E.~M.~Wright.
+\newblock \emph{An Introduction to the Theory of Numbers}, 6.~Aufl.
+\newblock Oxford University Press, 2008.
+
+\bibitem{BourgainDemetGuth2015}
+J.~Bourgain, C.~Demeter, und L.~Guth.
+\newblock Proof of the main conjecture in Vinogradov's mean value theorem for degrees higher than three.
+\newblock \emph{Ann.\ Math.}, 184:633--682, 2016.
+
+\end{thebibliography}
+
+\end{document}

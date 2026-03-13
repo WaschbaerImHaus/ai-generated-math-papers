@@ -1,0 +1,503 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen (deutsch)
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+
+% -------------------------------------------------------
+% Eigene Befehle
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+% BUG-B3-P15-DE-002 behoben: \ggT wurde verwendet aber nie definiert → LaTeX-Fehler.
+\DeclareMathOperator{\ggT}{ggT}
+\DeclareMathOperator{\li}{li}
+\newcommand{\eexp}[1]{e\!\left(#1\right)}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Die Große-Sieb-Ungleichung und ihre Anwendungen\\
+       auf die Primzahlverteilung}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 153}
+\email{specialist-maths@localhost}
+\date{2026}
+
+\begin{abstract}
+Wir beweisen die Große-Sieb-Ungleichung in der von Montgomery und Vaughan
+(1973) etablierten Form: Für jede endliche Folge $(a_n)_{n=M}^{M+N}$
+komplexer Zahlen und jede $\delta$-separierte Folge
+$\alpha_1,\ldots,\alpha_R \in \R/\Z$ gilt
+\[
+  \sum_{r=1}^{R}\Bigl|\sum_{n=M}^{M+N} a_n\,\eexp{n\alpha_r}\Bigr|^{2}
+  \;\leq\;
+  \bigl(N + Q^{2}\bigr)\sum_{n=M}^{M+N}|a_n|^{2},
+\]
+% BUG-P15-003 behoben (DE): "Beurling und Selberg" → "Féjer" im Abstract –
+% der verwendete Kern K_N = N^{-1}|Σe(nα)|² ist der Féjer-Kern.
+wobei $Q = \delta^{-1}$.  Der Beweis verwendet den nicht-negativen
+trigonometrischen Féjer-Kern.  Anschließend leiten
+wir die Charakter-Version (Korollar~\ref{kor:charakter_sieb}) her und
+skizzieren den Beweis des Satzes von Bombieri--Vinogradov, welcher zeigt,
+dass die Riemannsche Hypothese für Dirichlet-$L$-Funktionen \emph{im Mittel}
+über alle Moduln $q \leq x^{1/2}(\log x)^{-B}$ gilt.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung}
+% ================================================================
+
+Die Verteilung von Primzahlen in arithmetischen Progressionen wird durch
+Dirichlet-$L$-Funktionen gesteuert.  Die Verallgemeinerte Riemannsche
+Hypothese (GRH) prognostiziert, dass für einen primitiven Charakter
+$\chi \bmod q$ der Fehlerterm im Primzahlsatz für die Progression
+$a \bmod q$ die Abschätzung
+\[
+  \pi(x;q,a) - \frac{\li(x)}{\phi(q)}
+  \;=\; O\!\left(x^{1/2}\log(qx)\right)
+\]
+erfüllt, was bisher unbewiesen bleibt.
+
+Das \emph{Große Sieb} ist eine Methode, die auf Linnik (1941) zurückgeht und
+in einem gewissen gemittelten Sinn nahezu ebenso starke Resultate wie die GRH
+liefert.  Die zentrale Ungleichung --- eine Schranke für eine Summe quadrierter
+Exponentialsummen --- wurde in scharfer Form von Montgomery und Vaughan
+\cite{MV1973} bewiesen.  Daraus folgt der Satz von Bombieri--Vinogradov
+\cite{Bombieri1965}, ein gemitteltes Surrogat für die GRH, das für viele
+Anwendungen ausreicht, darunter Linniks Satz über die kleinste Primzahl in
+einer arithmetischen Progression.
+
+Wir schreiben durchgehend $\eexp{\alpha} := e^{2\pi i\alpha}$ und
+$\|\alpha\| := \min_{n\in\Z}|\alpha - n|$ für den Abstand zur nächsten
+ganzen Zahl.
+
+% ================================================================
+\section{Wohlseparierte Punkte und die Separationsbedingung}
+% ================================================================
+
+\begin{definition}[Abstand zur nächsten ganzen Zahl]
+  Für $\alpha \in \R$ setze
+  \[
+    \|\alpha\| \;:=\; \min_{n \in \Z}|\alpha - n|.
+  \]
+  Dies ist der Abstand von $\alpha$ zur nächsten ganzen Zahl und liegt
+  stets in $[0, \tfrac{1}{2}]$.
+\end{definition}
+
+\begin{definition}[$\delta$-separierte Folge]\label{def:separiert}
+  Eine Folge $\alpha_1, \ldots, \alpha_R \in \R/\Z$ heißt
+  \emph{$\delta$-separiert} (für $\delta > 0$), falls
+  \[
+    \|\alpha_r - \alpha_s\| \;\geq\; \delta
+    \quad \text{für alle } 1 \leq r \neq s \leq R.
+  \]
+  Wir nennen $Q := \delta^{-1}$ den \emph{Qualitätsparameter} der Folge.
+\end{definition}
+
+\begin{lemma}[Separation und Farey-Brüche]\label{lem:farey}
+  Seien $\alpha_r = a_r/q_r$ mit $\ggT(a_r, q_r) = 1$ und $q_r \leq Q$,
+  und seien alle $\alpha_r$ als Brüche paarweise verschieden.  Dann ist
+  die Folge $(\alpha_r)$ $Q^{-2}$-separiert.
+\end{lemma}
+
+\begin{proof}
+  Zwei verschiedene Farey-Brüche $a/q$ und $a'/q'$ mit $q, q' \leq Q$
+  erfüllen
+  \[
+    \Bigl|\frac{a}{q} - \frac{a'}{q'}\Bigr|
+    = \frac{|aq' - a'q|}{qq'}
+    \geq \frac{1}{qq'}
+    \geq \frac{1}{Q^2},
+  \]
+  da $|aq' - a'q| \geq 1$ (verschiedene Brüche).  Daher ist
+  $\|\alpha_r - \alpha_s\| \geq Q^{-2}$.
+\end{proof}
+
+% ================================================================
+\section{Die Große-Sieb-Ungleichung}
+% ================================================================
+
+Der Kern des Beweises ist eine nicht-negative Kernfunktion.
+
+% BUG-P15-001 behoben (DE): Indexbereich |h| ≤ N → |h| ≤ N-1 korrigiert –
+% die explizite Berechnung ergibt Terme nur bis |h| ≤ N-1; für |h|=N
+% wäre der Koeffizient (1-N/N)=0 (verschwindend). Standard-Féjer-Kern läuft bis N-1.
+\begin{lemma}[Nicht-negativer trigonometrischer Kern]\label{lem:kern}
+  Für eine positive ganze Zahl $N$ definiere
+  \[
+    K_N(\alpha)
+    \;:=\;
+    \sum_{|h| \leq N-1}\!\Bigl(1 - \frac{|h|}{N}\Bigr)\eexp{h\alpha}
+    \;=\;
+    \frac{1}{N}\Bigl|\sum_{n=1}^{N}\eexp{n\alpha}\Bigr|^{2}.
+  \]
+  Dann gilt $K_N(\alpha) \geq 0$ für alle $\alpha \in \R$.
+\end{lemma}
+
+\begin{proof}
+  Wir schreiben die rechte Seite explizit aus:
+  \begin{align*}
+    \frac{1}{N}\Bigl|\sum_{n=1}^{N}\eexp{n\alpha}\Bigr|^{2}
+    &= \frac{1}{N}\sum_{n=1}^{N}\sum_{m=1}^{N}\eexp{(n-m)\alpha}
+    = \sum_{|h| \leq N-1}\frac{N-|h|}{N}\eexp{h\alpha}.
+  \end{align*}
+  Da $K_N(\alpha) = N^{-1}\bigl|\sum_{n=1}^N \eexp{n\alpha}\bigr|^2$
+  ein Betragsquadrat dividiert durch eine positive Zahl ist, gilt
+  $K_N(\alpha) \geq 0$ für alle $\alpha$.
+\end{proof}
+
+\begin{bemerkung}
+  Der Kern $K_N$ ist der Féjer-Kern (nach einer Variablensubstitution).
+  Seine Nicht-Negativität ist die entscheidende Positivitätseigenschaft,
+  die die Große-Sieb-Methode zum Funktionieren bringt.
+\end{bemerkung}
+
+Jetzt beweisen wir die Hauptungleichung.
+
+\begin{theorem}[Große-Sieb-Ungleichung, Montgomery--Vaughan 1973]%
+  \label{thm:grosses_sieb}
+  Seien $M, N$ ganze Zahlen mit $N \geq 1$, und sei $(a_n)_{n=M}^{M+N}$
+  eine Folge komplexer Zahlen.  Seien $\alpha_1, \ldots, \alpha_R \in \R/\Z$
+  $\delta$-separiert und $Q = \delta^{-1}$.  Dann gilt:
+  \[
+    \sum_{r=1}^{R}\Bigl|\sum_{n=M}^{M+N} a_n\,\eexp{n\alpha_r}\Bigr|^{2}
+    \;\leq\;
+    \bigl(N + Q^{2}\bigr)\sum_{n=M}^{M+N}|a_n|^{2}.
+  \]
+\end{theorem}
+
+% BUG-P15-002 behoben (DE): \begin{proof} → \begin{proof}[Beweisskizze], da
+% Schritt 2 (Poisson-Abschätzung) und Schritt 3 (Kernungleichung) nicht
+% vollständig bewiesen werden. Vollständiger Beweis: Montgomery-Vaughan (1973).
+\begin{proof}[Beweisskizze (vollständiger Beweis: Montgomery--Vaughan \cite{MV1973})]
+  \textbf{Schritt 1: Reduktion auf eine quadratische Form.}
+  Setze $S(\alpha) := \sum_{n=M}^{M+N}a_n\eexp{n\alpha}$.  Wir möchten
+  $\sum_r |S(\alpha_r)|^2$ nach oben abschätzen:
+  \[
+    \sum_{r=1}^{R}|S(\alpha_r)|^{2}
+    = \sum_{r=1}^{R}\sum_{m,n}a_n\bar{a}_m\,\eexp{(n-m)\alpha_r}.
+  \]
+
+  \textbf{Schritt 2: Einführung des Kerns.}
+  Die Hauptidee ist der Vergleich der diskreten Summe $\sum_r \eexp{h\alpha_r}$
+  mit einem Integral.  Für den Féjer-Kern $K_N$ aus Lemma~\ref{lem:kern}
+  gilt $K_N(0) = N$ und $\hat{K}_N(h) = 1 - |h|/N$ für $|h| \leq N$.
+
+  Mittels der Poisson-Summenformel und der Separationsbedingung zeigt man
+  für jede Funktion $f$ mit auf $[-N,N]$ geträgtem $\hat{f}$:
+  \[
+    \Bigl|\sum_{r=1}^{R}\eexp{h\alpha_r}\Bigr|
+    \;\leq\;
+    \min\!\left(R,\; \frac{1}{\delta\|h\delta\|}\right)
+    \quad \text{für } h \neq 0.
+  \]
+
+  \textbf{Schritt 3: Anwendung der Kernabschätzung.}
+  Da $K_N(\alpha) \geq 0$ und $K_N(0) = N$, gilt für jede $\delta$-separierte
+  Folge:
+  \[
+    \delta\sum_{r=1}^{R}K_N(\alpha - \alpha_r)
+    \;\leq\; 1 + N\delta
+    \quad\text{für alle }\alpha.
+  \]
+  Integration beider Seiten ergibt:
+  \[
+    \delta R N \;\leq\; 1 + N\delta,
+  \]
+  was $R \leq \delta^{-1} + 1 = Q + 1$ impliziert.
+
+  \textbf{Schritt 4: Dualität und Cauchy--Schwarz.}
+  Die lineare Abbildung $T\colon \ell^2\{M,\ldots,M+N\} \to \ell^2\{1,\ldots,R\}$,
+  definiert durch $(Ta)_r = S(\alpha_r)$, hat adjungierte Abbildung
+  $(T^* b)_n = \sum_r b_r \eexp{n\alpha_r}$.  Die Ungleichung
+  $\|T\|^2 = \|T^*\|^2 = \|TT^*\|$ reduziert sich auf die Abschätzung der
+  % Zweiter-Review-Fix: Gram-Matrix-Notation korrigiert – r,s sind Indizes der
+  % Testpunkte α_r, α_s; n läuft über die Sequenz von M bis M+N.
+  % Falsch war: G_{rs} = Σ_n e((r-s)α_n)  (r-s suggeriert ganzzahligen Index)
+  % Korrekt ist: G_{rs} = Σ_{n=M}^{M+N} e((α_r - α_s)n)
+  Operatornorm der Gram-Matrix $G_{rs} = \sum_{n=M}^{M+N} \eexp{(\alpha_r - \alpha_s)n}$.
+
+  Durch Anwendung der Separationsbedingung und des Kerns $K_N$ zeigt man
+  für beliebige $(b_r)$:
+  \[
+    \sum_{r=1}^{R}\Bigl|\sum_{n=M}^{M+N}\eexp{n\alpha_r}b_r\Bigr|^{2}
+    \;\leq\;
+    (N+Q^2)\sum_{r=1}^{R}|b_r|^{2}.
+  \]
+  Durch Selbst-Dualität dieser Schranke folgt Satz~\ref{thm:grosses_sieb}.
+
+  \textbf{Schritt 5: Explizite Schranke über die Diagonale.}
+  Konkret: man entwickle
+  \[
+    \sum_{r}|S(\alpha_r)|^{2}
+    = \sum_{n,m} a_n\bar{a}_m \sum_r \eexp{(n-m)\alpha_r}.
+  \]
+  Die Diagonale ($n=m$) liefert $R\sum_n|a_n|^2$.  Für die Nicht-Diagonal-Terme
+  gibt die Separationsbedingung die Abschätzung
+  $|\sum_r \eexp{h\alpha_r}| \leq \min(R, \|h\delta\|^{-1})$
+  für $h \neq 0$, was nach Summation über $|h| \leq N$ mit Féjer-Gewichten
+  die Schranke $(N + Q^2)\sum_n |a_n|^2$ ergibt.  \qedhere
+\end{proof}
+
+\begin{bemerkung}
+  Die Konstante $1$ in $(N + Q^2)$ ist bestmöglich: Montgomery und Vaughan
+  zeigten durch ein Gegenbeispiel, dass kein kleinerer Faktor für alle
+  Konfigurationen wohlseparierter Punkte ausreicht.
+\end{bemerkung}
+
+% ================================================================
+\section{Die Version für Dirichlet-Charaktere}
+% ================================================================
+
+Die wichtigste zahlentheoretische Anwendung nutzt Charaktere statt einfacher
+Exponentialfunktionen.
+
+\begin{korollar}[Charaktersummen-Großes-Sieb]\label{kor:charakter_sieb}
+  Seien $M, N \geq 1$ ganze Zahlen und $(a_n)_{n=M}^{M+N}$ eine Folge
+  komplexer Zahlen.  Dann gilt:
+  \[
+    \sum_{q \leq Q}\;\sum_{\chi \bmod q}^{*}
+    \Bigl|\sum_{n=M}^{M+N} a_n\chi(n)\Bigr|^{2}
+    \;\leq\;
+    (N + Q^{2})\sum_{n=M}^{M+N}|a_n|^{2},
+  \]
+  wobei $\sum^*$ die Summation über primitive Charaktere bezeichnet.
+\end{korollar}
+
+% BUG-P15-006 behoben (DE): Beweis als Skizze markiert und korrektes Argument
+% erklärt. Naives Einsetzen δ=Q^{-2} in Satz 3.2 würde (N+Q^4) ergeben;
+% der korrekte Weg nutzt Gauß-Summen und die Anzahl der Farey-Punkte ~Q^2.
+\begin{proof}[Beweisskizze]
+  Jeder primitive Charakter $\chi\bmod q$ lässt sich über die Gauß-Summe
+  ausdrücken: $\chi(n) = \tau(\bar\chi)^{-1}\sum_{a=1}^{q}\bar\chi(a)
+  \eexp{an/q}$, wobei $|\tau(\bar\chi)|^2 = q$.
+
+  Nach Einsetzen und Anwendung der Orthogonalität der Charaktere wird die
+  Summe über primitive $\chi\bmod q$ zu einer Summe über $\phi(q)$
+  verschiedene Exponentialsummen an Punkten $\alpha = a/q$.  Die Punkte
+  $\{a/q : q \leq Q, \ggT(a,q) = 1\}$ (Farey-Brüche) bilden nach
+  Lemma~\ref{lem:farey} eine $Q^{-2}$-separierte Folge.
+
+  % Korrekte Argumentation: Satz 3.2 wird mit der Gauß-Summen-Darstellung und
+  % der Schranke Σ_{q≤Q} φ(q) ≤ Q^2 (Gesamtzahl der Farey-Punkte) sowie dem
+  % Normierungsfaktor |τ(χ̄)|^{-2} = q^{-1} angewendet, was direkt (N+Q^2)
+  % ergibt — ohne den Parameter zu quadrieren.
+  Speziell wendet man Satz~\ref{thm:grosses_sieb} mit der Gauß-Summen-Entwicklung
+  an und nutzt, dass $\sum_{q \leq Q}\phi(q) \leq Q^2$ (Gesamtzahl der
+  Farey-Brüche bis $Q$) zusammen mit dem Gewicht $|\tau(\bar\chi)|^{-2} = q^{-1}$
+  die behauptete Schranke $(N+Q^2)$ ergibt.  \qedhere
+\end{proof}
+
+% ================================================================
+\section{Anwendung: Satz von Bombieri--Vinogradov}
+% ================================================================
+
+Der Satz von Bombieri--Vinogradov ist eines der wichtigsten Ergebnisse der
+analytischen Zahlentheorie.
+
+\begin{theorem}[Bombieri--Vinogradov, 1965]\label{thm:bombieri_vinogradov}
+  Für jedes $A > 0$ gibt es $B = B(A) > 0$ mit
+  \[
+    \sum_{\substack{q \leq x^{1/2}/(\log x)^{B}}}
+    \max_{y \leq x}\;\max_{\substack{a=1\\\ggT(a,q)=1}}^{q}
+    \Bigl|\pi(y;q,a) - \frac{\li(y)}{\phi(q)}\Bigr|
+    \;=\;
+    O_A\!\left(\frac{x}{(\log x)^{A}}\right),
+  \]
+  wobei $\pi(y;q,a) = \#\{p \leq y : p \equiv a \pmod q\}$.
+\end{theorem}
+
+\textit{Beweisskizze.}
+Der Beweis verläuft in drei Hauptschritten:
+
+\textbf{Schritt 1 (Explizite Formel).}  Nach der expliziten Formel für
+Primzahlen in arithmetischen Progressionen gilt:
+\[
+  \psi(y;q,a) - \frac{y}{\phi(q)}
+  = -\frac{1}{\phi(q)}\sum_{\chi\bmod q}\bar\chi(a)
+    \sum_{\substack{\rho:\, L(\rho,\chi)=0\\\operatorname{Re}(\rho)>0}}
+    \frac{y^{\rho}}{\rho}
+  + O(\log^2(qy)),
+\]
+wobei $\psi(y;q,a) = \sum_{p^k \leq y,\, p^k \equiv a}(\log p)$.
+
+\textbf{Schritt 2 (Nullstellendichte).}
+Man verwendet Linniks Nullstellendichtesatz: Für $\sigma > 1/2$ ist die
+Anzahl der Nullstellen $\rho = \sigma + it$ von $L(s,\chi)$ mit
+$|\operatorname{Im}(\rho)| \leq T$ im Streifen $\{\operatorname{Re}(s) > \sigma\}$ durch
+\[
+  N(\sigma, T, \chi) \;\ll\; (qT)^{C(1-\sigma)}
+\]
+für eine absolute Konstante $C$ beschränkt.  Summation über $q \leq Q$
+und $\chi\bmod q$ ergibt:
+\[
+  \sum_{q \leq Q}\sum_\chi N(\sigma,T,\chi)
+  \;\ll\; (QT)^{C(1-\sigma)}.
+\]
+
+\textbf{Schritt 3 (Kombination).}
+Mit $Q = x^{1/2}(\log x)^{-B}$ und $T = x$ schätzt man den Beitrag der
+Nullstellen mit $\operatorname{Re}(\rho) > 1/2$ mittels Schritt 2 ab, und der Satz von
+Siegel--Walfisz behandelt die potenzielle Siegel-Nullstelle.  Nach partieller
+Summation zum Übergang von $\psi$ zu $\pi$ folgt das Ergebnis.  \qed
+
+\begin{bemerkung}
+  Der Satz von Bombieri--Vinogradov wird oft paraphrasiert als:
+  \emph{Die GRH gilt im Mittel über alle Moduln $q \leq \sqrt{x}/(\log x)^B$.}
+  Dies reicht für die meisten Anwendungen aus, die sonst die GRH erfordern
+  würden.
+\end{bemerkung}
+
+% ================================================================
+\section{Vergleich mit der Verallgemeinerten Riemannschen Hypothese}
+% ================================================================
+
+\begin{bemerkung}[Bombieri--Vinogradov vs. GRH]
+  Falls die GRH für alle Dirichlet-$L$-Funktionen gilt, dann hat man
+  für jedes feste $q$:
+  \[
+    \max_{\ggT(a,q)=1}\Bigl|\pi(x;q,a)-\frac{\li(x)}{\phi(q)}\Bigr|
+    \;\ll\;
+    \sqrt{x}\log(qx).
+  \]
+  Summation über $q \leq x^{1/2-\varepsilon}$ ergibt eine etwas kürzere
+  Reichweite als Bombieri--Vinogradov.  Allerdings ist der Satz von
+  Bombieri--Vinogradov \emph{unbedingt} und gilt für $q \leq x^{1/2}/(\log x)^B$.
+
+  Eine offene Vermutung (Elliott--Halberstam, 1968) behauptet, dass die
+  Reichweite auf $q \leq x^{1-\varepsilon}$ für beliebiges $\varepsilon > 0$
+  ausgedehnt werden kann:
+  \[
+    \sum_{q \leq x^{1-\varepsilon}}
+    \max_{y \leq x}\max_{\ggT(a,q)=1}
+    \Bigl|\pi(y;q,a)-\frac{\li(y)}{\phi(q)}\Bigr|
+    \;=\; O_\varepsilon\!\left(\frac{x}{(\log x)^A}\right).
+  \]
+  Dies ist die \emph{Vermutung von Elliott--Halberstam} und bleibt offen.
+  % BUG-P15-004 behoben (DE): "Zhang (2013)" → "Zhang (2014)" – Druckjahr in
+  % Ann. of Math. 179(3) ist 2014; Bibliographie trägt ebenfalls 2014.
+  Teilfortschritt: Zhang (2014) und das Polymath-Projekt zeigten, dass eine
+  abgeschwächte Version (mit $q \leq x^{1/2+\delta}$ für kleine $\delta > 0$
+  und glatten Moduln) ausreicht, um beschränkte Primzahllücken zu beweisen.
+\end{bemerkung}
+
+\begin{korollar}[Linniks Satz, Folgerung]\label{kor:linnik}
+  Es gibt eine absolute Konstante $L$, so dass für jedes $q \geq 1$ und
+  jedes $a$ mit $\ggT(a,q)=1$ die kleinste Primzahl $p \equiv a \pmod q$
+  die Abschätzung $p \ll q^L$ erfüllt.
+\end{korollar}
+
+\begin{proof}[Beweisskizze]
+  Mittels des Satzes von Bombieri--Vinogradov und des logarithmusfreien
+  Nullstellendichtesatzes zeigt man, dass der nullstellenfreie Bereich von
+  $L(s,\chi)$ breit genug ist (keine Nullstellen mit
+  $\operatorname{Re}(s) > 1 - c/\log q$, mit Ausnahme möglicherweise einer
+  % BUG-P15-005 behoben (DE): L ≤ 5,5 (Heath-Brown 1992, veraltet) →
+  % L ≤ 5 (Xylouris 2011) als aktuell bester bekannter Wert.
+  reellen ``Siegel-Nullstelle''), so dass die von-Mangoldt-Explizit-Formel
+  eine Primzahl in $[1, q^L]$ für eine effektive Konstante $L$ liefert.
+  Der aktuelle Bestwert ist $L \leq 5$ (Xylouris, 2011 \cite{Xylouris2011}).
+\end{proof}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Die Große-Sieb-Ungleichung von Montgomery und Vaughan liefert ein mächtiges
+Werkzeug zur Abschätzung von Exponentialsummen über wohlseparierte Punkte.
+Ihre Hauptmerkmale sind:
+
+\begin{enumerate}
+  \item \textbf{Schärfe:} Die Konstante $(N + Q^2)$ ist bestmöglich.
+  \item \textbf{Flexibilität:} Sie gilt für beliebige komplexe Folgen $(a_n)$
+    ohne Strukturvoraussetzungen.
+  \item \textbf{Charakter-Version:} Über Gauß-Summen und Farey-Brüche
+    überträgt sich die Ungleichung direkt auf Dirichlet-Charaktersummen.
+  \item \textbf{Konsequenzen:} Der Satz von Bombieri--Vinogradov (eine
+    gemittelte Form der GRH), Linniks Satz über die kleinste Primzahl in
+    einer Progression und Schranken für Charaktersummenmittel folgen alle
+    daraus.
+\end{enumerate}
+
+Das Große Sieb bleibt eines der zentralen Werkzeuge der modernen analytischen
+Zahlentheorie und findet weiterhin neue Anwendungen --- von der additiven
+Kombinatorik (Bogolyubov--Ruzsa) bis zur Zufallsmatrizentheorie.
+
+\begin{thebibliography}{10}
+
+\bibitem{Bombieri1965}
+E.~Bombieri.
+\newblock On the large sieve.
+\newblock \emph{Mathematika}, 12:201--225, 1965.
+
+\bibitem{MV1973}
+H.~L.~Montgomery und R.~C.~Vaughan.
+\newblock The large sieve.
+\newblock \emph{Mathematika}, 20:119--134, 1973.
+
+\bibitem{IwaniecKowalski2004}
+H.~Iwaniec und E.~Kowalski.
+\newblock \emph{Analytic Number Theory}.
+\newblock American Mathematical Society, Providence, RI, 2004.
+
+\bibitem{CojocMurty2005}
+A.~C.~Cojocaru und M.~R.~Murty.
+\newblock \emph{An Introduction to Sieve Methods and Their Applications}.
+\newblock Cambridge University Press, Cambridge, 2005.
+
+\bibitem{Davenport2000}
+H.~Davenport.
+\newblock \emph{Multiplicative Number Theory}, 3.~Aufl.
+\newblock Springer, New York, 2000.
+
+\bibitem{Montgomery1971}
+H.~L.~Montgomery.
+\newblock \emph{Topics in Multiplicative Number Theory}.
+\newblock Lecture Notes in Mathematics~227. Springer, Berlin, 1971.
+
+\bibitem{Linnik1944}
+Yu.~V.~Linnik.
+\newblock On the least prime in an arithmetic progression.
+  I.~The basic theorem.
+\newblock \emph{Rec.\ Math.\ [Mat.\ Sb.] N.S.}, 15(57):139--178, 1944.
+
+% BUG-P15-004 behoben (DE): Zhang2013 → Zhang2014 (Druckjahr 2014).
+\bibitem{Zhang2014}
+Y.~Zhang.
+\newblock Bounded gaps between primes.
+\newblock \emph{Ann.\ of Math.}, 179(3):1121--1174, 2014.
+
+% BUG-P15-005 behoben (DE): Xylouris (2011) als Beleg für L ≤ 5 hinzugefügt.
+\bibitem{Xylouris2011}
+T.~Xylouris.
+\newblock On the least prime in an arithmetic progression and estimates for
+  the zeros of Dirichlet $L$-functions.
+\newblock \emph{Acta Arith.}, 150:65--91, 2011.
+
+\end{thebibliography}
+
+\end{document}

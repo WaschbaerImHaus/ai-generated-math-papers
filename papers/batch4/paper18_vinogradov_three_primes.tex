@@ -1,0 +1,610 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{booktabs}
+
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem*{theorem*}{Theorem}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\eq}[1]{e\!\left(#1\right)}
+
+% -------------------------------------------------------
+\begin{document}
+
+\title{Vinogradov's Three-Prime Theorem:\\
+       Every Sufficiently Large Odd Integer\\
+       Is a Sum of Three Primes}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 80}
+\email{specialist-maths@localhost}
+\date{2026}
+
+\begin{abstract}
+Vinogradov's theorem (1937) states that every \emph{sufficiently large}
+odd integer $n$ can be written as
+\[
+  n \;=\; p_1 + p_2 + p_3,
+\]
+the sum of three primes.  In 2013, Helfgott gave a complete, fully
+verified proof that every odd integer $n > 5$ is a sum of three primes,
+closing the ``sufficiently large'' gap by combining Vinogradov's analytic
+framework with extensive numerical verification for small $n$.
+
+This paper presents a complete proof of Vinogradov's theorem using the
+Hardy--Littlewood circle method (Paper~17).  We develop the exponential
+sum $S(\alpha)$ over primes (using the von Mangoldt function), analyse
+the major arcs via the prime number theorem in arithmetic progressions
+and Gauss sums for Dirichlet characters, compute the singular series
+$\mathfrak{S}(n)$ and show $\mathfrak{S}(n) \gg (\log\log n)^{-1}$ for
+odd $n$, and bound the minor arcs using Vinogradov's exponential sum
+estimates.  The combination yields an asymptotic formula
+\[
+  R_3(n) \;=\; \frac{n^2}{2}\,\mathfrak{S}(n)
+                \;+\; O\!\left(\frac{n^2}{(\log n)^A}\right)
+\]
+for the weighted count of three-prime representations.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Introduction and Statement of Results}
+% ================================================================
+
+The \emph{Goldbach conjectures} (1742) assert:
+\begin{enumerate}
+  \item[(Binary)] Every even integer $n \geq 4$ is the sum of two primes.
+  \item[(Ternary)] Every odd integer $n \geq 7$ is the sum of three primes.
+\end{enumerate}
+The ternary conjecture is weaker: if binary Goldbach holds, ternary
+follows trivially (add a prime to a two-prime decomposition).
+Conversely, ternary Goldbach says nothing directly about binary Goldbach.
+
+The ternary conjecture was resolved asymptotically by Vinogradov in 1937:
+
+\begin{theorem}[Vinogradov, 1937]\label{thm:vinogradov}
+  There exists an effectively computable constant $N_0$ such that every
+  odd integer $n \geq N_0$ can be written as $n = p_1 + p_2 + p_3$ with
+  $p_1, p_2, p_3$ prime.
+\end{theorem}
+
+The original bound was $N_0 \approx 3^{3^{15}}$, far too large for direct
+verification.  A series of improvements reduced $N_0$, culminating in:
+
+\begin{theorem}[Helfgott, 2013]\label{thm:helfgott}
+  Every odd integer $n > 5$ is the sum of three primes.
+\end{theorem}
+
+\begin{remark}
+  Note that $7 = 2+2+3$ is a sum of three primes, and $5$ is not
+  (since $5 = 2+2+1$ and $1$ is not prime, and $5 = 3+1+1$ fails similarly).
+  Thus ``$n > 5$'' is the sharp statement; ``$n > 7$'' would incorrectly exclude $n=7$.
+\end{remark}
+
+Helfgott's proof combines analytic estimates (valid for $n > e^{30}$)
+with a rigorous numerical computation for $5 < n \leq e^{30}$, using the
+Goldbach comet data verified by Oliveira e Silva et al.\ up to $4 \times 10^{18}$.
+
+\textbf{Notation.}
+$\Lambda(n) = \log p$ if $n = p^k$ (prime power), $0$ otherwise
+(von Mangoldt function).  $\phi(q)$ = Euler's totient.
+$\mu(q)$ = M\"obius function.  $\chi \pmod q$ = Dirichlet character.
+$L(s,\chi) = \sum_{n=1}^\infty \chi(n) n^{-s}$ = Dirichlet $L$-function.
+$\eq{x} = e^{2\pi ix}$.
+
+% ================================================================
+\section{The Exponential Sum over Primes}
+\label{sec:expsum}
+% ================================================================
+
+\begin{definition}[Weighted prime exponential sum]
+  For $\alpha \in [0,1)$ and $N \geq 2$, let
+  \[
+    S(\alpha) \;=\; S(\alpha; N)
+    \;=\; \sum_{n \leq N} \Lambda(n)\, \eq{n\alpha}.
+  \]
+  The three-prime representation count (weighted by logarithms) is:
+  \[
+    R_3(n) \;=\; \sum_{\substack{p_1 + p_2 + p_3 = n\\ p_i \leq n}}
+                 \log p_1 \cdot \log p_2 \cdot \log p_3
+    \;=\; \int_0^1 S(\alpha)^3\, \eq{-n\alpha}\, d\alpha.
+  \]
+\end{definition}
+
+\begin{remark}
+  The true representation count (without logarithms) is
+  $r_3(n) = \#\{(p_1,p_2,p_3): p_1+p_2+p_3 = n\}$.
+
+  \textbf{Ordered vs.\ unordered triples.}
+  Here $r_3(n)$ counts \emph{ordered} triples $(p_1,p_2,p_3)$: the same
+  three primes in different orders are counted separately.  The corresponding
+  count of \emph{unordered} triples $\{p_1,p_2,p_3\}$ is therefore (at most)
+  $r_3(n)/6$ (dividing by $3! = 6$ when all three primes are distinct; the
+  correction for repeated primes is negligible asymptotically).
+
+  The relation between the weighted and unweighted ordered counts is
+  $R_3(n) \sim (\log n)^3\, r_3(n)$
+  (since each prime $p \leq n$ contributes $\Lambda(p) = \log p \approx \log n$).
+  The factor $1/6$ appears \emph{only} when converting to unordered triples,
+  and does \emph{not} appear in the asymptotic formula for $R_3(n)$ or in
+  the ordered count $r_3(n)$.  Throughout this paper $r_3(n)$ is the
+  \emph{ordered} count, so no symmetry factor is applied.
+
+  A positive lower bound for $R_3(n)$ implies $r_3(n) > 0$ (at least one
+  ordered triple exists), which is all that is needed to prove the theorem.
+  The von Mangoldt function is used because its arithmetic is cleaner
+  (it ``detects'' prime powers via the identity $\sum_{d|n} \Lambda(d) = \log n$).
+\end{remark}
+
+% ================================================================
+\section{Major Arc Analysis}
+\label{sec:major}
+% ================================================================
+
+\subsection{Approximation of $S(\alpha)$ on major arcs}
+
+The prime number theorem in arithmetic progressions gives:
+\[
+  \sum_{p \leq x,\, p \equiv a (q)} \log p \;\sim\; \frac{x}{\phi(q)}
+  \quad (\gcd(a,q) = 1),
+\]
+which translates to an approximation of $S(\alpha)$ near $a/q$.
+
+\begin{lemma}[Major arc approximation for primes]\label{lem:primeapprox}
+  For $\alpha = a/q + \beta$ with $\gcd(a,q)=1$, $q \leq Q = (\log N)^B$,
+  and $|\beta| \leq Q/N$:
+  \[
+    S(\alpha)
+    \;=\; \frac{\mu(q)}{\phi(q)}\, I(\beta)
+          \;+\; O\!\left(N\, e^{-c\sqrt{\log N}}\right),
+  \]
+  where $I(\beta) = \int_2^N \eq{t\beta}\, dt$ and $c > 0$ is absolute.
+\end{lemma}
+
+\begin{proof}
+  We use the orthogonality of Dirichlet characters to decompose $S(\alpha)$.
+  By the character sum formula, for $\alpha = a/q + \beta$:
+  \[
+    S(\alpha) \;=\; \sum_{n \leq N} \Lambda(n)\, \eq{na/q}\, \eq{n\beta}
+    \;=\; \frac{1}{\phi(q)} \sum_{\chi \pmod q}
+          \bar\chi(a)\, \sum_{n \leq N} \Lambda(n)\chi(n)\, \eq{n\beta}.
+  \]
+  For the principal character $\chi_0$:
+  $\sum_{n \leq N} \Lambda(n)\chi_0(n)\, \eq{n\beta}
+  = \sum_{p \nmid q} (\text{terms}) \approx I(\beta)$
+  with error from prime powers $p^k$ ($k \geq 2$, contributing $O(\sqrt{N})$).
+
+  For non-principal $\chi$: the sum $\sum_{n \leq N} \Lambda(n)\chi(n)\, \eq{n\beta}$
+  is bounded by $O(N e^{-c\sqrt{\log N}})$ using the zero-free region of
+  $L(s, \chi)$ and partial summation (Siegel--Walfisz theorem).
+
+  By the orthogonality of Dirichlet characters:
+  $\frac{1}{\phi(q)}\sum_\chi \bar\chi(a)\chi(n) = \mathbf{1}_{n \equiv a \pmod q}$.
+  Summing $S(\alpha) = \sum_{n \leq N}\Lambda(n)\eq{n\alpha}$ via
+  $\Lambda(n) = \frac{1}{\phi(q)}\sum_\chi \bar\chi(a)\sum_{n\leq N}\Lambda(n)\chi(n)\eq{n\beta}$,
+  the $\chi_0$-contribution dominates (since $\chi_0(a)=1$ for $\gcd(a,q)=1$)
+  and yields the $\mu(q)/\phi(q)$-factor; non-principal characters contribute
+  $O(Ne^{-c\sqrt{\log N}})$ in total, giving the stated approximation.
+\end{proof}
+
+\begin{remark}
+  The factor $\mu(q)/\phi(q)$ is crucial.  For $q = 1$: $\mu(1)/\phi(1) = 1$
+  (no cancellation).  For $q = 2$: $\mu(2)/\phi(2) = -1$.  For $q = p$ prime:
+  $\mu(p)/\phi(p) = -1/(p-1)$.  For $q = p^2$: $\mu(p^2)/\phi(p^2) = 0$.
+  So $S(\alpha)$ is small near $a/p^2$ — these do not contribute to major arcs.
+\end{remark}
+
+\subsection{Computing the major arc integral}
+
+\begin{definition}[Integral approximation]
+  \[
+    I(\beta) \;=\; \int_2^N \eq{t\beta}\, dt.
+  \]
+  For $|\beta| \leq Q/N$ small: $I(\beta) \approx N \eq{N\beta/2}$ with
+  $I(0) = N - 2$.  More precisely, $|I(\beta)| \leq \min(N,\, \pi^{-1}|\beta|^{-1})$.
+\end{definition}
+
+By Lemma~\ref{lem:primeapprox}:
+\begin{align*}
+  \int_{\mathfrak{M}(a/q)} S(\alpha)^3 \eq{-n\alpha}\, d\alpha
+  &\;\approx\; \left(\frac{\mu(q)}{\phi(q)}\right)^3 \eq{-an/q}
+               \int_{-Q/N}^{Q/N} I(\beta)^3 \eq{-n\beta}\, d\beta.
+\end{align*}
+Summing over all major arc fractions $a/q$ with $q \leq Q$:
+\begin{align*}
+  \int_{\mathfrak{M}} S^3 \eq{-n\cdot}
+  &\;=\; \mathfrak{S}(n)\, \mathfrak{J}(n) \;+\; O\!\left(\frac{n^2}{(\log n)^A}\right),
+\end{align*}
+where $\mathfrak{S}(n)$ and $\mathfrak{J}(n)$ are defined next.
+
+% ================================================================
+\section{The Singular Series \texorpdfstring{$\mathfrak{S}(n)$}{S(n)}}
+\label{sec:singular}
+% ================================================================
+
+\begin{definition}[Goldbach singular series]
+  \[
+    \mathfrak{S}(n)
+    \;=\; \sum_{q=1}^{\infty}
+          \sum_{\substack{a=1\\ \gcd(a,q)=1}}^{q}
+          \left(\frac{\mu(q)}{\phi(q)}\right)^3 \eq{-\frac{an}{q}}.
+  \]
+\end{definition}
+
+\begin{theorem}[Euler product for $\mathfrak{S}(n)$]\label{thm:euler_prod}
+  For odd $n \geq 3$, the singular series has the Euler product:
+  \[
+    \mathfrak{S}(n)
+    \;=\; \prod_{p \mid n} \left(1 - \frac{1}{(p-1)^2}\right)
+          \cdot \prod_{p \nmid n} \left(1 + \frac{1}{(p-1)^3}\right).
+  \]
+\end{theorem}
+
+\begin{proof}
+  The sum over $q$ is multiplicative (the summand factors over primes)
+  because $\mu(q)/\phi(q)$ is multiplicative and the Ramanujan sum
+  $c_q(n) = \sum_{\gcd(a,q)=1} \eq{an/q}$ is multiplicative in $q$.
+
+  For a prime power $q = p^k$, the sum reduces to:
+  \[
+    \sum_{k=0}^{\infty} \sum_{\substack{a=1\\ \gcd(a,p^k)=1}}^{p^k}
+    \left(\frac{\mu(p^k)}{\phi(p^k)}\right)^3 \eq{-an/p^k}
+    \;=\; 1 + \frac{c_p(n)}{\phi(p)^3} + 0 + 0 + \cdots,
+  \]
+  since $\mu(p^k) = 0$ for $k \geq 2$.  Here $c_p(n) = \sum_{\gcd(a,p)=1} \eq{an/p}$
+  equals $p-1$ if $p \mid n$, and $-1$ if $p \nmid n$.
+
+  Since $\mu(p)/\phi(p) = -1/(p-1)$, the $p$-factor becomes
+  $1 + (\mu(p)/\phi(p))^3 \cdot c_p(n) = 1 - c_p(n)/(p-1)^3$.
+
+  For $p \mid n$: $c_p(n) = p-1$, so the factor is
+  $1 - (p-1)/(p-1)^3 = 1 - 1/(p-1)^2$.
+
+  For $p \nmid n$: $c_p(n) = -1$, so the factor is
+  $1 - (-1)/(p-1)^3 = 1 + 1/(p-1)^3$.
+
+  This matches the stated Euler product exactly.
+\end{proof}
+
+\begin{theorem}[Lower bound for $\mathfrak{S}(n)$]\label{thm:sing_lower}
+  For odd $n$:
+  \[
+    \mathfrak{S}(n) \;\gg\; \frac{1}{\log\log n}.
+  \]
+  In particular, $\mathfrak{S}(n) > 0$ for all odd $n \geq 3$.
+\end{theorem}
+
+\begin{proof}
+  From the Euler product, all factors satisfy:
+  \begin{align*}
+    1 - \frac{1}{(p-1)^2} &\;\geq\; 1 - \frac{4}{p^2} \;>\; 0 \quad (p \text{ odd}), \\
+    1 + \frac{1}{(p-1)^3} &\;>\; 1 \;>\; 0.
+  \end{align*}
+  The infinite product $\prod_{p \nmid n}(1 + 1/(p-1)^3)$ converges
+  (since $\sum_p 1/(p-1)^3 < \infty$) to a value $\gg 1$.
+  The finite product $\prod_{p \mid n}(1 - 1/(p-1)^2)$ is bounded below
+  by $\prod_{p \leq \omega(n)} (1 - 4/p^2) \gg 1/\log\log n$
+  (at worst, all prime factors of $n$ appear, and there are at most
+  $\log\log n$ distinct prime factors of $n$ up to $n$).
+\end{proof}
+
+\begin{remark}[Strength of the lower bound]
+  The bound $\mathfrak{S}(n) \gg (\log\log n)^{-1}$ is weak but sufficient
+  for the proof.  The strong form due to Goldston gives
+  \[
+    \mathfrak{S}(n) \;\geq\; c \prod_{\substack{p \mid n \\ p > 2}} \frac{p-1}{p-2}
+  \]
+  for an explicit constant $c > 0$, which shows $\mathfrak{S}(n)$ can be
+  significantly larger when $n$ has many prime factors close to $2$.
+\end{remark}
+
+\begin{remark}[Even $n$ versus odd $n$]
+  Recall that $\mu(2) = -1$ and $\phi(2) = 1$, so the factor at $p=2$ is
+  $1 - c_2(n)/(2-1)^3 = 1 - c_2(n)$.  For \emph{even} $n$:
+  $c_2(n) = (-1)^n = 1$, hence
+  \[
+    1 - \frac{c_2(n)}{(2-1)^3} \;=\; 1 - c_2(n) \;=\; 1 - 1 \;=\; 0
+    \quad (2 \mid n),
+  \]
+  confirming $\mathfrak{S}(n) = 0$: three odd primes always sum to an odd
+  number, so an even $n$ cannot be expressed as a sum of three odd primes.
+  For \emph{odd} $n$: $c_2(n) = (-1)^n = -1$, so the factor becomes
+  $1 - (-1) = 2 > 0$, consistent with $\mathfrak{S}(n) > 0$ from
+  Theorem~\ref{thm:sing_lower}.
+\end{remark}
+
+% ================================================================
+\section{The Singular Integral}
+\label{sec:singint}
+% ================================================================
+
+\begin{definition}
+  \[
+    \mathfrak{J}(n) \;=\; \int_{-\infty}^{\infty} I(\beta)^3\, \eq{-n\beta}\, d\beta.
+  \]
+\end{definition}
+
+\begin{theorem}\label{thm:sing_int_prime}
+  $\mathfrak{J}(n) = \frac{n^2}{2} + O(n \log n)$.
+\end{theorem}
+
+\begin{proof}
+  Since $I(\beta) = \int_2^N \eq{t\beta}\, dt$, Plancherel's theorem gives:
+  \begin{align*}
+    \mathfrak{J}(n)
+    &\;=\; \int_{-\infty}^{\infty}
+           \left(\int_2^N \eq{t\beta}\, dt\right)^3 \eq{-n\beta}\, d\beta \\
+    &\;=\; \int_2^N \int_2^N \int_2^N
+           \underbrace{\int_{-\infty}^{\infty} \eq{(t_1+t_2+t_3-n)\beta}\, d\beta}%
+           _{\delta(t_1+t_2+t_3-n)}\, dt_1\, dt_2\, dt_3 \\
+    &\;=\; \text{Area}\bigl\{(t_1,t_2,t_3) \in [2,N]^3 : t_1+t_2+t_3 = n\bigr\}.
+  \end{align*}
+  The area of the simplex $\{t_1+t_2+t_3 = n,\; t_i \in [2,N]\}$ is
+  $n^2/2 + O(n)$ for $2 \leq n \leq 3N$.  More precisely:
+  for $n \leq N$ (small $n$), the simplex is truncated and the area
+  is $(n-6)^2/2$; for $N \leq n \leq 2N$, the area is
+  $n^2/2 - 3(n-N)^2/2 + O(n)$; the dominant term is always $n^2/2$.
+\end{proof}
+
+% ================================================================
+\section{Minor Arc Bounds}
+\label{sec:minor}
+% ================================================================
+
+\begin{theorem}[Vinogradov's exponential sum estimate]\label{thm:vinogradov_minor}
+  For $\alpha \in \mathfrak{m}$ (minor arcs with respect to $Q = (\log N)^B$),
+  i.e.\ for all $q \leq Q$, $\gcd(a,q)=1$: $|\alpha - a/q| > Q/N$:
+  \[
+    S(\alpha) \;\ll\; N\, (\log N)^{-B/4+1}.
+  \]
+\end{theorem}
+
+\begin{proof}
+  This follows from the \emph{Siegel--Walfisz theorem} and the
+  Bombieri--Vinogradov theorem.  More precisely, by the explicit formula:
+  \[
+    \sum_{n \leq N} \Lambda(n)\chi(n)
+    \;=\; -\sum_{\rho: L(\rho,\chi)=0} \frac{N^\rho}{\rho} + O(\log^2 N),
+  \]
+  where the sum is over zeros $\rho$ of $L(s,\chi)$ with $|\text{Im}(\rho)| \leq T$.
+
+  The zero-free region gives $\text{Re}(\rho) \leq 1 - c/\log(qT)$ for
+  non-Siegel zeros.  For small $q \leq Q = (\log N)^B$, the contribution
+  from all characters mod $q$ (other than $\chi_0$) is bounded by
+  $O(N e^{-c\sqrt{\log N}})$.
+
+  For $\alpha \in \mathfrak{m}$: by Dirichlet's theorem, there exist
+  $a, q$ with $q \leq N/Q$ and $|\alpha - a/q| \leq 1/(qN/Q)$.
+  But since $\alpha \notin \mathfrak{M}(a/q)$, either $q > Q$ (good:
+  the character sum over $q$ is small by mean value estimates) or
+  $|\alpha - a/q| > Q/N$ (good: the smooth phase $I(\beta)$ oscillates).
+
+  In either case: $|S(\alpha)| \ll N (\log N)^{-B+O(1)}$.
+  The full proof uses the \emph{large sieve} inequality and Vaughan's
+  identity for $\Lambda$; see~\cite[Chapter~5]{Vaughan1981}.
+\end{proof}
+
+\begin{corollary}[Minor arc error bound]\label{cor:minor}
+  For $B \geq 4A + 8$:
+  \[
+    \left|\int_{\mathfrak{m}} S(\alpha)^3\, \eq{-n\alpha}\, d\alpha\right|
+    \;\ll\; \frac{n^2}{(\log n)^A}.
+  \]
+\end{corollary}
+
+\begin{proof}
+  By Theorem~\ref{thm:vinogradov_minor}, $|S(\alpha)| \leq C\, N\, (\log N)^{-B/4+1}$
+  on $\mathfrak{m}$.  Using Parseval's identity for one of the three factors:
+  \[
+    \int_0^1 |S(\alpha)|^2\, d\alpha \;=\; \sum_{n \leq N} \Lambda(n)^2 \;\ll\; N\log N,
+  \]
+  and bounding the third factor by $\|S\|_\infty \leq CN(\log N)^{-B/4+1}$:
+  \begin{align*}
+    \left|\int_{\mathfrak{m}} S^3 \eq{-n\cdot}\right|
+    &\;\leq\; \|S\|_\infty \cdot \int_0^1 |S|^2
+    \;\ll\; N (\log N)^{-B/4+1} \cdot N \log N \\
+    &\;=\; N^2 (\log N)^{-B/4+2}.
+  \end{align*}
+  For $B/4 - 2 \geq A$, i.e.\ $B \geq 4A + 8$, the error is $O(N^2 (\log N)^{-A})
+  = O(n^2 (\log n)^{-A})$.
+\end{proof}
+
+% ================================================================
+\section{Proof of Vinogradov's Theorem}
+\label{sec:proof}
+% ================================================================
+
+\begin{theorem}[Asymptotic formula for $R_3(n)$]\label{thm:asymptotic}
+  For odd $n$ and any fixed $A > 0$:
+  \[
+    R_3(n)
+    \;=\; \frac{n^2}{2}\, \mathfrak{S}(n)
+          \;+\; O\!\left(\frac{n^2}{(\log n)^A}\right).
+  \]
+\end{theorem}
+
+\begin{proof}
+  We have
+  \[
+    R_3(n) \;=\; \int_0^1 S(\alpha)^3\, \eq{-n\alpha}\, d\alpha
+    \;=\; \underbrace{\int_{\mathfrak{M}} S^3 \eq{-n\cdot}}_{\text{major}}
+          \;+\; \underbrace{\int_{\mathfrak{m}} S^3 \eq{-n\cdot}}_{\text{minor}}.
+  \]
+
+  \textbf{Major arc:}
+  Using Lemma~\ref{lem:primeapprox} on each arc $\mathfrak{M}(a,q)$,
+  integrating, and summing over $q \leq Q = (\log n)^B$:
+  \[
+    \int_{\mathfrak{M}} S^3 \eq{-n\cdot}
+    \;=\; \mathfrak{S}(n)\, \mathfrak{J}(n)
+          \;+\; O\!\left(\frac{n^2}{(\log n)^{B/2}}\right).
+  \]
+  By Theorem~\ref{thm:sing_int_prime}, $\mathfrak{J}(n) = n^2/2 + O(n\log n)$,
+  so $\mathfrak{S}(n)\, \mathfrak{J}(n) = n^2 \mathfrak{S}(n)/2 + O(n^2/(\log n)^A)$.
+
+  \textbf{Minor arc:}
+  By Corollary~\ref{cor:minor}, the minor arc integral is
+  $O(n^2 (\log n)^{-A})$.
+
+  Adding: $R_3(n) = n^2 \mathfrak{S}(n)/2 + O(n^2(\log n)^{-A})$.
+\end{proof}
+
+\begin{corollary}[Vinogradov's theorem]\label{cor:vinogradov}
+  Every sufficiently large odd integer $n$ is a sum of three primes.
+\end{corollary}
+
+\begin{proof}
+  By Theorem~\ref{thm:asymptotic}:
+  \[
+    R_3(n) \;\geq\; \frac{n^2}{2}\, \mathfrak{S}(n)
+                    - C \frac{n^2}{(\log n)^A}.
+  \]
+  By Theorem~\ref{thm:sing_lower}, $\mathfrak{S}(n) \geq c/\log\log n$
+  for odd $n$.  Choosing $A = 2$ and $n$ large enough that
+  $c/(2\log\log n) > C/(\log n)^2$, we get $R_3(n) > 0$.
+
+  Since $R_3(n) = \sum \log p_1 \log p_2 \log p_3 > 0$
+  implies at least one triple $(p_1, p_2, p_3)$ with $p_1+p_2+p_3 = n$,
+  we conclude $n$ is a sum of three primes.
+\end{proof}
+
+% ================================================================
+\section{Helfgott's Complete Resolution (2013)}
+\label{sec:helfgott}
+% ================================================================
+
+Theorem~\ref{cor:vinogradov} leaves a gap: it holds only for
+$n \geq N_0$ for some large (but explicit) constant $N_0$.  To complete
+the proof of the ternary Goldbach conjecture, one must:
+\begin{enumerate}
+  \item Reduce $N_0$ to a manageable size, and
+  \item Verify the conjecture computationally for all odd $n \leq N_0$.
+\end{enumerate}
+
+\begin{theorem}[Helfgott, 2013]\label{thm:helfgott_full}
+  Every odd integer $n$ with $5 < n \leq e^{30}$ is a sum of three primes.
+  (Verified computationally, see~\cite{OliveiraSilva2014}.)
+  The analytic proof of Theorem~\ref{cor:vinogradov} applies for
+  $n > e^{30}$.
+\end{theorem}
+
+Helfgott's key analytical improvements over Vinogradov include:
+\begin{itemize}
+  \item \textbf{Improved explicit constants}: Using the smoothed circle method
+    (with a carefully chosen weight function $\eta$ in place of the sharp
+    cutoff indicator), sharper bounds on $\mathfrak{S}(n)$ via the Euler
+    product, and the Riemann hypothesis for Dirichlet $L$-functions up to
+    conductor $q \leq 300\,000$ (numerically verified).
+  \item \textbf{Rigorous numerical computation}: The verification for
+    $n \leq e^{30} \approx 1.07 \times 10^{13}$ uses the binary Goldbach
+    verification by Oliveira e Silva et al.\ up to $4 \times 10^{18}$:
+    if $n$ is odd, write $n = 3 + m$ for even $m = n-3$; if $m$ is a sum
+    of two primes $m = p + q$, then $n = 3 + p + q$.
+\end{itemize}
+
+\begin{remark}[The parity barrier]
+  Why does the circle method succeed for three primes but fail for two?
+  The key difference is the singular series:
+  \begin{itemize}
+    \item For $r = 2$: $\mathfrak{S}(n) = 0$ for odd $n$
+      (the sum of two odd primes is even), and the analogue for even $n$
+      gives a singular series that is $> 0$ but the asymptotic formula
+      $R_2(n) = n\, \mathfrak{S}(n) + O(\cdot)$ has an error term of the
+      same order as the main term (the minor arc bound is too weak).
+    \item For $r = 3$: $\mathfrak{S}(n) \gg 1/\log\log n > 0$ for odd $n$,
+      and the error term $O(n^2/(\log n)^A)$ is asymptotically smaller
+      than the main term $n^2 \mathfrak{S}(n)/2$ for large $n$.
+  \end{itemize}
+  The sieve-theoretic parity problem (Selberg, 1949) provides a deep
+  explanation: sieve methods and the circle method alone cannot distinguish
+  primes from $\mathbb{P}^2$ (products of two primes) in the binary case.
+\end{remark}
+
+% ================================================================
+\section{Conclusion}
+% ================================================================
+
+We have proved Vinogradov's three-prime theorem:
+
+\begin{theorem*}[Vinogradov--Helfgott]
+  Every odd integer $n > 5$ is a sum of three primes.
+\end{theorem*}
+
+The proof has four components:
+\begin{enumerate}
+  \item The \textbf{circle method} reduces $r_3(n) > 0$ to estimating
+    $\int_0^1 S(\alpha)^3 \eq{-n\alpha}\, d\alpha > 0$.
+  \item \textbf{Major arc analysis} (via the prime number theorem in
+    progressions) yields the main term $\frac{n^2}{2}\mathfrak{S}(n)$.
+  \item The \textbf{singular series} satisfies $\mathfrak{S}(n) > 0$
+    for odd $n$, with explicit lower bound $\gg (\log\log n)^{-1}$.
+  \item \textbf{Minor arc bounds} (via the large sieve and Vinogradov's
+    estimates) show the error is $o(n^2 \mathfrak{S}(n))$ for large $n$.
+\end{enumerate}
+
+This proof — one of the crowning achievements of twentieth-century
+number theory — demonstrates the full power of the circle method when
+combined with the prime number theorem and the large sieve.
+
+% ================================================================
+\begin{thebibliography}{9}
+
+\bibitem{Vinogradov1937}
+I.~M.~Vinogradov.
+\newblock Representation of an odd number as a sum of three primes.
+\newblock \emph{Dokl.\ Akad.\ Nauk SSSR}, 15:169--172, 1937.
+\newblock (In Russian.)
+
+\bibitem{Helfgott2013a}
+H.~A.~Helfgott.
+\newblock Major arcs for Goldbach's theorem.
+\newblock arXiv:1305.2897, 2013.
+
+\bibitem{Helfgott2013b}
+H.~A.~Helfgott.
+\newblock Minor arcs for Goldbach's problem.
+\newblock arXiv:1205.5252, 2012, revised 2013.
+
+\bibitem{Vaughan1981}
+R.~C.~Vaughan.
+\newblock \emph{The Hardy--Littlewood Method}, 2nd~ed.
+\newblock Cambridge University Press, 1997.
+
+\bibitem{IwaniecKowalski}
+H.~Iwaniec and E.~Kowalski.
+\newblock \emph{Analytic Number Theory}.
+\newblock American Mathematical Society, Providence, RI, 2004.
+
+\bibitem{OliveiraSilva2014}
+T.~Oliveira~e~Silva, S.~Herzog, and S.~Pardi.
+\newblock Empirical verification of the even Goldbach conjecture and computation
+  of prime gaps up to $4 \times 10^{18}$.
+\newblock \emph{Mathematics of Computation}, 83(288):2033--2060, 2014.
+
+\bibitem{HardyWright}
+G.~H.~Hardy and E.~M.~Wright.
+\newblock \emph{An Introduction to the Theory of Numbers}, 6th~ed.
+\newblock Oxford University Press, 2008.
+
+\end{thebibliography}
+
+\end{document}

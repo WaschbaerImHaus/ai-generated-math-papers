@@ -1,0 +1,361 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+% -------------------------------------------------------
+% Eigene Befehle
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Die nicht-trivialen Nullstellen der Riemann'schen Zeta-Funktion:\\
+       Z\"ahlung, Verteilung und das GUE-Gesetz}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 84}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Wir untersuchen die nicht-trivialen Nullstellen der Riemann'schen Zeta-Funktion
+$\zeta(s)$, d.\,h.\ die Nullstellen im kritischen Streifen $0 < \Re(s) < 1$.
+Zentrales Ergebnis ist die \emph{Nullstellenz\"ahlformel}
+\[
+  N(T) = \frac{T}{2\pi}\log\frac{T}{2\pi} - \frac{T}{2\pi} + O(\log T),
+\]
+die die Anzahl der Nullstellen $\rho = \beta + i\gamma$ mit
+$0 < \gamma \le T$ bestimmt.
+Wir identifizieren die erste bekannte nicht-triviale Nullstelle
+$\rho_1 = \tfrac{1}{2} + 14{,}134725\ldots\,i$ und diskutieren
+Gram-Punkte sowie Grams Gesetz (einschlie\ss lich seiner Ausnahmen).
+Das tiefe Montgomery--Odlyzko-Gesetz besagt, dass die lokale Statistik der
+Nullstellenabst\"ande der \emph{GUE}-Verteilung (Gaussian Unitary Ensemble)
+der Zufallsmatrizentheorie folgt.
+Mehr als $10^{13}$ Nullstellen wurden numerisch auf der kritischen
+Geraden $\Re(\rho) = \tfrac{1}{2}$ verifiziert.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung}
+% ================================================================
+
+Die nicht-trivialen Nullstellen von $\zeta(s)$ sind die Nullstellen
+im kritischen Streifen $0 < \Re(s) < 1$.
+Aus der Funktionalgleichung folgt: Ist $\rho$ eine Nullstelle, so auch
+$1-\rho$. Aus dem Schwarz'schen Spiegelungsprinzip folgt: Ist $\rho$
+eine Nullstelle, so auch $\bar\rho$.
+Damit treten Nullstellen in Vierergruppen
+$\{\rho, \bar\rho, 1-\rho, 1-\bar\rho\}$ auf, sofern nicht
+$\Re(\rho) = \tfrac{1}{2}$ gilt -- dann bilden sie Zweierpaare
+$\{\rho, \bar\rho\}$.
+
+\begin{remark}
+Alle bisher gefundenen Nullstellen erf\"ullen $\Re(\rho) = \tfrac{1}{2}$.
+Die Riemann-Hypothese (RH) vermutet, dass dies f\"ur \emph{alle}
+nicht-trivialen Nullstellen gilt; vgl.\ \cite{Riemann1859}.
+\end{remark}
+
+% ================================================================
+\section{Z\"ahlung von Nullstellen: Die Formel \texorpdfstring{$N(T)$}{N(T)}}
+% ================================================================
+
+\begin{definition}[Nullstellenz\"ahlfunktion]
+\label{def:NT}
+F\"ur $T > 0$ sei
+\[
+  N(T) \;=\; \#\bigl\{\rho = \beta + i\gamma : \zeta(\rho) = 0,\;
+  0 < \beta < 1,\; 0 < \gamma \le T\bigr\}
+\]
+die Anzahl der nicht-trivialen Nullstellen von $\zeta$ mit positivem
+Imagin\"arteil $\le T$ (mit Vielfachheit gez\"ahlt).
+\end{definition}
+
+\begin{theorem}[Riemann--von-Mangoldt-Formel]
+\label{thm:NT}
+F\"ur $T > 0$, das kein Imagin\"arteil einer Nullstelle von $\zeta$ ist,
+gilt:
+\begin{equation}
+  \label{eq:NT}
+  N(T) \;=\; \frac{T}{2\pi}\log\frac{T}{2\pi} - \frac{T}{2\pi}
+            + \frac{7}{8} + O\!\bigl(\log T\bigr).
+\end{equation}
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Der Beweis verwendet das Argumentprinzip angewandt auf das Rechteck
+mit Ecken $-1$, $2$, $2+iT$, $-1+iT$.
+Nach dem Argumentprinzip gilt $N(T) = \tfrac{1}{2\pi}\Delta\arg\zeta(s)$
+\"uber dieses Rechteck.
+Den Hauptbeitrag liefern die Segmente bei $\Re(s) = 2$
+(dort ist $\zeta$ durch ihre Dirichlet-Reihe gen\"ahert)
+und bei $\Re(s) = 0$ (behandelt via Funktionalgleichung).
+Die Stirling-Formel f\"ur $\Gamma$ liefert die f\"uhrenden Terme.
+Die Konstante $7/8$ und das Fehlerglied $O(\log T)$ folgen aus
+sorgf\"altiger Buchf\"uhrung; vgl.\ \cite{Davenport2000}, Kapitel~16.
+\end{proof}
+
+\begin{corollary}[Dichte der Nullstellen]
+Der mittlere Abstand zwischen aufeinanderfolgenden Nullstellen bei
+H\"ohe $T$ betr\"agt n\"aherungsweise $2\pi/\log T$.
+Die Nullstellen werden also f\"ur $T \to \infty$ immer dichter.
+\end{corollary}
+
+\begin{proof}
+Ableitung von~\eqref{eq:NT}: $N'(T) \approx \frac{1}{2\pi}\log\frac{T}{2\pi}$,
+also mittlerer Abstand $\approx 2\pi/\log T$.
+\end{proof}
+
+% ================================================================
+\section{Die ersten nicht-trivialen Nullstellen}
+% ================================================================
+
+\begin{theorem}[Erste nicht-triviale Nullstelle]
+\label{thm:first_zero}
+Der kleinste positive Imagin\"arteil einer nicht-trivialen Nullstelle von
+$\zeta$ ist
+\[
+  \gamma_1 = 14{,}134725141734693\ldots
+\]
+Somit: $\rho_1 = \tfrac{1}{2} + 14{,}134725\ldots\,i$.
+\end{theorem}
+
+\begin{proof}[Verifikation]
+Durch direkte numerische Berechnung mit der Riemann--Siegel-Formel hat
+$Z(t)$ f\"ur $0 < t < 14{,}134\ldots$ keine Nullstelle und bei
+$t = 14{,}134725\ldots$ eine solche.
+$N(14) = 0$ und $N(15) = 1$ werden explizit verifiziert.
+Die numerischen Werte sind in der LMFDB-Datenbank \cite{LMFDB}
+mit hoher Pr\"azision gespeichert.
+\end{proof}
+
+\begin{remark}[Die ersten zehn Nullstellen]
+Die Imagin\"arteile der ersten zehn nicht-trivialen Nullstellen auf der
+kritischen Geraden sind:
+\begin{align*}
+  \gamma_1 &= 14{,}134725\ldots, &
+  \gamma_2 &= 21{,}022040\ldots, &
+  \gamma_3 &= 25{,}010858\ldots, \\
+  \gamma_4 &= 30{,}424876\ldots, &
+  \gamma_5 &= 32{,}935062\ldots, &
+  \gamma_6 &= 37{,}586178\ldots, \\
+  \gamma_7 &= 40{,}918720\ldots, &
+  \gamma_8 &= 43{,}327073\ldots, &
+  \gamma_9 &= 48{,}005150\ldots, \\
+  \gamma_{10} &= 49{,}773832\ldots
+\end{align*}
+Alle liegen auf der kritischen Geraden, konsistent mit RH.
+\end{remark}
+
+% ================================================================
+\section{Gram-Punkte und Grams Gesetz}
+% ================================================================
+
+\begin{definition}[Gram-Punkte]
+\label{def:gram_points}
+Ein \emph{Gram-Punkt} $g_n$ (f\"ur $n \ge -1$) ist die eindeutige L\"osung von
+\[
+  \theta(g_n) = n\pi,
+\]
+wobei $\theta(t) = \arg\Gamma\!\bigl(\tfrac{1}{4}+\tfrac{it}{2}\bigr)
+- \tfrac{t}{2}\ln\pi$ die Riemann--Siegel-Theta-Funktion ist.
+Der Gram-Abstand $[g_n, g_{n+1}]$ hat L\"ange $\approx 2\pi/\log(g_n/2\pi)$.
+\end{definition}
+
+\begin{theorem}[Grams Gesetz und seine Verletzungen]
+\label{thm:gram}
+\emph{Grams Gesetz} (eine Beobachtung, kein Satz) besagt, dass $Z(g_n)$
+das Vorzeichen $(-1)^n$ tr\"agt, sodass jedes Gram-Intervall
+$[g_n, g_{n+1}]$ genau eine Nullstelle von $Z(t)$ enth\"alt.
+
+Dies scheitert erstmals bei $n = 126$: Das Intervall
+$[g_{126}, g_{127}]$ enth\"alt keine Nullstelle, w\"ahrend
+$[g_{127}, g_{128}]$ zwei enth\"alt.
+\end{theorem}
+
+\begin{proof}[Diskussion]
+Grams Gesetz ist eine Heuristik, die in etwa $73\,\%$ der F\"alle gilt
+(Hutchinson, 1925).
+Die Verletzung h\"angt mit dem Verhalten von $Z(t)$ an Gram-Punkten zusammen,
+wo Real- und Imagin\"arteil von $\zeta(\tfrac{1}{2}+it)$ sich gerade aufheben.
+Eine vollst\"andige Analyse findet sich in \cite{Titchmarsh1986}, Kapitel~9.
+\end{proof}
+
+% ================================================================
+\section{Das Montgomery--Odlyzko-Gesetz}
+% ================================================================
+
+Die bedeutendste Entdeckung \"uber die Nullstellenverteilung ist ihre
+Verbindung zur Zufallsmatrizentheorie.
+
+\begin{definition}[Normalisierte Null\-stellen\-abst\"ande]
+\label{def:spacing}
+Seien $\rho_n = \tfrac{1}{2} + i\gamma_n$ die nicht-trivialen Nullstellen mit
+$0 < \gamma_1 \le \gamma_2 \le \ldots$\,.
+Der \emph{normalisierte Abstand} zwischen aufeinanderfolgenden Nullstellen ist
+\[
+  \delta_n \;=\; (\gamma_{n+1} - \gamma_n) \cdot \frac{\log\gamma_n}{2\pi}.
+\]
+Diese Normierung stellt sicher, dass $\delta_n$ im Mittel gegen~$1$ strebt.
+\end{definition}
+
+\begin{theorem}[Montgomerys Paarkorrelationsvermutung, 1973]
+\label{thm:montgomery}
+Unter Annahme der Riemann-Hypothese vermutete Montgomery \cite{Montgomery1973}
+f\"ur die Zweipunkt-Korrelationsfunktion:
+\[
+  \lim_{T \to \infty} \frac{1}{N(T)}
+  \sum_{\substack{\gamma, \gamma' \le T \\ 0 < \gamma'-\gamma \le 2\pi u / \log T}}
+  1
+  \;=\;
+  \int_0^u \left[1 - \left(\frac{\sin(\pi x)}{\pi x}\right)^2\right] dx.
+\]
+Dies ist genau die Paarkorrelationsfunktion der Eigenwerte aus dem
+\emph{Gaussian Unitary Ensemble} (GUE) zuf\"alliger hermitescher Matrizen.
+\end{theorem}
+
+\begin{remark}[Die GUE-Verbindung]
+Die GUE-Paarkorrelationsfunktion $1 - (\sin\pi x/\pi x)^2$ impliziert
+\emph{Niveauabsto\ss ung}: Nullstellen meiden sehr kleine gegenseitige Abst\"ande.
+Dieselbe Funktion beschreibt die Abstandsstatistik von Kernenergieniveaus.
+Odlyzko \cite{Odlyzko1987} entdeckte dies 1987 numerisch.
+Die \"Ubereinstimmung gilt heute als \"uberzeugendes numerisches Indiz f\"ur RH.
+\end{remark}
+
+% ================================================================
+\section{Numerische Verifikation der Riemann-Hypothese}
+% ================================================================
+
+\begin{theorem}[Verifikation der RH bis zu gro\ss er H\"ohe]
+\label{thm:rh_verified}
+Die Riemann-Hypothese wurde numerisch f\"ur alle Nullstellen mit
+Imagin\"arteil $0 < \gamma \le T_{\max}$ verifiziert:
+\begin{itemize}
+  \item Backlund (1914): $T = 200$ (79 Nullstellen)
+  \item Turing (1953): $T \approx 1\,500$ (erste maschinelle Berechnung)
+  \item Lune--te~Riele--Winter (1986): erste $1{,}5 \times 10^9$ Nullstellen
+  \item Platt--Trudgian (2021) \cite{Platt2021}: alle Nullstellen unterhalb
+    $T = 3 \times 10^{12}$
+  \item Stand 2023: mehr als $10^{13}$ Nullstellen auf der kritischen Geraden
+    verifiziert.
+\end{itemize}
+\end{theorem}
+
+\begin{proof}[Methode]
+Alle Verifikationen kombinieren:
+\begin{enumerate}
+  \item Die Riemann--Siegel-Formel zur effizienten Auswertung von $Z(t)$.
+  \item Backlunds Methode: Vorzeichenwechsel von $Z(t)$ zwischen aufeinanderfolgenden
+    Gram-Punkten z\"ahlen und mit $N(T)$ aus der Riemann--von-Mangoldt-Formel
+    vergleichen.
+  \item Sorgf\"altige Behandlung von \glqq Gram-Ausnahmen\grqq{}
+    mit Turings Methode.
+\end{enumerate}
+Keine Nullstelle abseits der kritischen Geraden wurde je gefunden.
+\end{proof}
+
+% ================================================================
+\section{Die Verallgemeinerte Riemann-Hypothese}
+% ================================================================
+
+\begin{definition}[GRH]
+\label{def:grh}
+Die \emph{Verallgemeinerte Riemann-Hypothese} (GRH) erstreckt RH auf alle
+\emph{Dirichlet-L-Funktionen}:
+\[
+  L(s, \chi) = \sum_{n=1}^{\infty} \frac{\chi(n)}{n^s},
+\]
+wobei $\chi$ ein Dirichlet-Charakter modulo $q$ ist.
+GRH behauptet, dass alle nicht-trivialen Nullstellen von $L(s,\chi)$
+auf $\Re(s) = \tfrac{1}{2}$ liegen.
+\end{definition}
+
+\begin{remark}
+GRH hat weitreichende Konsequenzen f\"ur Primzahlen in arithmetischen
+Progressionen. Beispielsweise folgt: F\"ur jeden Modul $q$ enth\"alt jede
+arithmetische Progression $a, a+q, a+2q,\ldots$ (mit $\gcd(a,q)=1$) eine
+Primzahl $p \le C\,q^2\,(\log q)^2$.
+\end{remark}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Die nicht-trivialen Nullstellen von $\zeta(s)$ zeigen eine reiche Struktur:
+Die Z\"ahlformel~\eqref{eq:NT} bestimmt ihre makroskopische Verteilung,
+die erste Nullstelle $\rho_1 \approx \tfrac{1}{2} + 14{,}13i$ wurde hochpr\"azise
+lokalisiert, und die GUE-Statistik von Montgomery und Odlyzko offenbart
+eine tiefe Verbindung zur Quantenmechanik.
+Trotz mehr als $10^{13}$ verifizierten Nullstellen auf der kritischen
+Geraden bleibt die Riemann-Hypothese eines der gro\ss ten ungel\"osten Probleme
+der Mathematik.
+
+% ================================================================
+\begin{thebibliography}{10}
+
+\bibitem{Riemann1859}
+B.~Riemann,
+\emph{\"Uber die Anzahl der Primzahlen unter einer gegebenen Gr\"o\ss e},
+Monatsberichte der Berliner Akademie (1859), 671--680.
+
+\bibitem{Davenport2000}
+H.~Davenport,
+\emph{Multiplicative Number Theory}, 3.~Aufl.\
+(revidiert von H.~L.~Montgomery),
+Springer, New York, 2000.
+
+\bibitem{Titchmarsh1986}
+E.~C.~Titchmarsh,
+\emph{The Theory of the Riemann Zeta-Function}, 2.~Aufl.\
+(revidiert von D.~R.~Heath-Brown),
+Oxford University Press, 1986.
+
+\bibitem{Montgomery1973}
+H.~L.~Montgomery,
+The pair correlation of zeros of the zeta function,
+in: \emph{Analytic Number Theory}, Proc.\ Sympos.\ Pure Math.~XXIV,
+Amer.\ Math.\ Soc., Providence, RI, 1973, S.~181--193.
+
+\bibitem{Odlyzko1987}
+A.~M.~Odlyzko,
+On the distribution of spacings between zeros of the zeta function,
+\emph{Math.\ Comp.}\ \textbf{48} (1987), Nr.~177, 273--308.
+
+\bibitem{Platt2021}
+D.~J.~Platt und T.~S.~Trudgian,
+The Riemann hypothesis is true up to $3 \times 10^{12}$,
+\emph{Bull.\ London Math.\ Soc.}\ \textbf{53} (2021), 792--797.
+
+\bibitem{LMFDB}
+The LMFDB Collaboration,
+\emph{The $L$-functions and Modular Forms Database},
+\url{https://www.lmfdb.org}, 2024.
+
+\end{thebibliography}
+
+\end{document}

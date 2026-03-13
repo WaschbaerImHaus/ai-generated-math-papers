@@ -1,0 +1,428 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+% -------------------------------------------------------
+% Eigene Befehle
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\DeclareMathOperator{\Li}{Li}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Riemanns explizite Formel und der Primzahlsatz}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 84}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Wir entwickeln Riemanns explizite Formel, die die Primzahlz\"ahlfunktion
+$\pi(x)$ mit den Nullstellen von $\zeta(s)$ verbindet:
+\[
+  \pi(x) = \Li(x) - \sum_\rho \Li(x^\rho) - \log 2
+  + \int_x^{\infty} \frac{dt}{t(t^2-1)\log t},
+\]
+wobei $\Li(x) = \int_2^x dt/\log t$ und die Summe \"uber alle nicht-trivialen
+Nullstellen $\rho$ l\"auft.
+Aus dieser Formel leiten wir den Primzahlsatz
+$\pi(x) \sim x/\log x$ ab und -- unter Annahme der Riemann-Hypothese --
+den scharfen Fehlerterm $|\pi(x) - \Li(x)| < \tfrac{1}{8\pi}\sqrt{x}\,\log x$
+f\"ur $x \ge 2657$.
+Die von-Mangoldt-Funktion $\Lambda(n)$ und die Tschebyschew-Funktionen
+$\psi(x)$ und $\theta(x)$ werden eingef\"uhrt und mit $\zeta$ in Beziehung gesetzt.
+Abschlie\ss end weisen wir auf die Verbindung zu Dirichlet-$L$-Funktionen
+und der Verallgemeinerten Riemann-Hypothese (GRH) hin:
+Unter GRH gelten analoge Fehlerterme f\"ur Primzahlen in arithmetischen
+Progressionen, und die L-Nullstellen bestimmen die Gleichverteilung.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung}
+% ================================================================
+
+Die Br\"ucke zwischen analytischen Eigenschaften von $\zeta(s)$ und
+arithmetischen Eigenschaften der Primzahlen ist die \emph{explizite Formel}.
+Riemann skizzierte sie 1859 \cite{Riemann1859};
+sie wurde von von~Mangoldt \cite{vonMangoldt1895} und Hadamard \cite{Hadamard1896}
+rigoros begr\"undet.
+
+Die Grundidee: Die Lage der Nullstellen von $\zeta(s)$ kodiert pr\"azise
+Information \"uber die Primzahlverteilung.
+Die Riemann-Hypothese ($\Re(\rho) = 1/2$) liefert den sch\"arfstm\"oglichen
+Fehlerterm.
+
+% ================================================================
+\section{Arithmetische Funktionen und Tschebyschew-Funktionen}
+% ================================================================
+
+\begin{definition}[Von-Mangoldt-Funktion]
+\label{def:mangoldt}
+Die \emph{von-Mangoldt-Funktion} ist definiert durch
+\[
+  \Lambda(n) \;=\;
+  \begin{cases}
+    \log p & \text{falls } n = p^k \text{ f\"ur eine Primzahl } p
+             \text{ und } k \ge 1, \\
+    0      & \text{sonst.}
+  \end{cases}
+\]
+\end{definition}
+
+\begin{definition}[Tschebyschew-Funktionen]
+\label{def:chebyshev}
+Die \emph{erste Tschebyschew-Funktion} ist
+$\theta(x) = \sum_{p \le x} \log p$,
+und die \emph{zweite Tschebyschew-Funktion} (\emph{Psi-Funktion}) ist
+\[
+  \psi(x) = \sum_{n \le x} \Lambda(n) = \sum_{p^k \le x} \log p
+           = \sum_{p \le x} \lfloor\log_p x\rfloor \cdot \log p.
+\]
+\end{definition}
+
+\begin{proposition}[Beziehungen zwischen $\pi$, $\theta$, $\psi$]
+\label{prop:psi_theta_pi}
+\begin{align}
+  \psi(x) &= \theta(x) + \theta(x^{1/2}) + \theta(x^{1/3}) + \cdots
+  \label{eq:psi_theta} \\
+  \pi(x) &= \frac{\theta(x)}{\log x}
+    + \int_2^x \frac{\theta(t)}{t(\log t)^2}\,dt.
+  \label{eq:pi_theta}
+\end{align}
+Insbesondere sind $\pi(x) \sim x/\log x$, $\psi(x) \sim x$ und
+$\theta(x) \sim x$ \"aquivalent.
+\end{proposition}
+
+\begin{proof}
+F\"ur~\eqref{eq:psi_theta}: Jeder Term $\theta(x^{1/k})$ z\"ahlt
+$\sum_{p \le x^{1/k}} \log p$, also die Beitr\"age der Primzahlpotenzen
+$p^k \le x$.
+F\"ur~\eqref{eq:pi_theta}: Abel'sche Summation
+$\pi(x) = \theta(x)/\log x + \int_2^x \theta(t)/[t(\log t)^2]\,dt$,
+was durch partielle Integration aus $d[\pi(t)] = d[\theta(t)/\log t]$ folgt.
+\end{proof}
+
+% ================================================================
+\section{Logarithmische Ableitung und \texorpdfstring{$\psi$}{psi}}
+% ================================================================
+
+\begin{theorem}[Logarithmische Ableitung von $\zeta$]
+\label{thm:log_deriv}
+F\"ur $\Re(s) > 1$ gilt
+\[
+  -\frac{\zeta'(s)}{\zeta(s)} \;=\; \sum_{n=1}^{\infty} \frac{\Lambda(n)}{n^s}.
+\]
+\end{theorem}
+
+\begin{proof}
+Logarithmieren des Euler-Produkts $\zeta(s) = \prod_p (1-p^{-s})^{-1}$:
+\[
+  \log\zeta(s) = -\sum_p \log(1 - p^{-s}) = \sum_p \sum_{k=1}^{\infty} \frac{p^{-ks}}{k}.
+\]
+Gliedweises Differenzieren (f\"ur $\Re(s)>1$ gerechtfertigt):
+\[
+  \frac{\zeta'(s)}{\zeta(s)} = -\sum_p \sum_{k=1}^{\infty} \frac{\log p}{p^{ks}}
+  = -\sum_{n=1}^{\infty} \frac{\Lambda(n)}{n^s}. \qedhere
+\]
+\end{proof}
+
+% ================================================================
+\section{Perrons Formel und die explizite Formel f\"ur \texorpdfstring{$\psi$}{psi}}
+% ================================================================
+
+\begin{theorem}[Perrons Formel, vereinfacht]
+\label{thm:perron}
+F\"ur $c > 1$ und $x > 0$ keine Primzahlpotenz:
+\[
+  \psi(x) = \frac{1}{2\pi i} \int_{c-i\infty}^{c+i\infty}
+  \left(-\frac{\zeta'(s)}{\zeta(s)}\right) \frac{x^s}{s}\,ds.
+\]
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Schl\"usselidentit\"at: F\"ur $c > 0$ und $x > 0$:
+\[
+  \frac{1}{2\pi i} \int_{c-i\infty}^{c+i\infty} \frac{x^s}{s}\,ds
+  = \begin{cases} 1 & x > 1, \\ 0 & 0 < x < 1. \end{cases}
+\]
+Einsetzen der Dirichlet-Reihe f\"ur $-\zeta'/\zeta$ und gliedweises Integrieren
+(durch Konvergenzabsch\"atzungen gerechtfertigt) ergibt die Behauptung.
+Vollst\"andiger Beweis in \cite{Davenport2000}, Kapitel~17.
+\end{proof}
+
+\begin{theorem}[Explizite Formel f\"ur $\psi(x)$]
+\label{thm:explicit_psi}
+F\"ur $x > 1$ und $x$ keine Primzahlpotenz gilt:
+\begin{equation}
+  \label{eq:explicit_psi}
+  \psi(x) \;=\; x - \sum_\rho \frac{x^\rho}{\rho}
+  - \frac{\zeta'(0)}{\zeta(0)} - \tfrac{1}{2}\log(1 - x^{-2}),
+\end{equation}
+wobei die Summe \"uber alle nicht-trivialen Nullstellen $\rho$ von $\zeta$
+l\"auft (symmetrisch nach $|\Im(\rho)| \le T$ geordnet, dann $T \to \infty$;
+bedingt konvergent in dieser Anordnung).
+
+Es gilt $\zeta'(0)/\zeta(0) = \log(2\pi) \approx 1{,}8379\ldots$\,.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Man verschiebt die Integrationskontur in Perrons Formel nach links und
+sammelt die Residuen der Polstellen und Nullstellen von $-\zeta'(s)/\zeta(s)$:
+\begin{itemize}
+  \item Residuum bei $s = 1$: $\zeta$ hat einen einfachen Pol,
+    also hat $-\zeta'/\zeta$ einen einfachen Pol mit Residuum $-1$;
+    Beitrag: $x$.
+  \item Residuen bei nicht-trivialen Nullstellen $\rho$: Beitrag $-x^\rho/\rho$.
+  \item Triviale Nullstellen $s = -2m$ ($m=1,2,3,\ldots$):
+    $-\zeta'/\zeta$ hat bei jedem $s = -2m$ einen einfachen Pol mit Residuum $+1$.
+    Perrons Formel liefert den Beitrag $+x^{-2m}/(-2m)$ f\"ur jedes $m$.
+    Summation ergibt:
+    $\displaystyle\sum_{m=1}^\infty \frac{x^{-2m}}{-2m}
+     = -\tfrac{1}{2}\sum_{m=1}^\infty \frac{(x^{-2})^m}{m}
+     = \tfrac{1}{2}\log(1-x^{-2})$
+    (unter Verwendung von $\log(1-u)=-\sum u^m/m$).
+    In der Endformel erscheint dieser Term als $-\tfrac{1}{2}\log(1-x^{-2})$;
+    da $\log(1-x^{-2}) < 0$ f\"ur $x > 1$, ist $-\tfrac{1}{2}\log(1-x^{-2}) > 0$
+    eine kleine positive Korrektur.
+  % BUG-B5-P23-EN/DE-001 behoben: s=0 ist KEINE Polstelle, sondern Residuum des 1/s-Faktors
+  \item Residuum bei $s = 0$: Die Funktion $-\zeta'(s)/\zeta(s)$ ist holomorph bei $s=0$
+    (da $\zeta(0) = -1/2 \ne 0$). Der Integrand $x^s \cdot (-\zeta'/\zeta(s)) / s$ hat bei
+    $s=0$ einen einfachen Pol durch den Faktor $1/s$ allein. Das Residuum ist
+    $x^0 \cdot (-\zeta'(0)/\zeta(0)) = -\zeta'(0)/\zeta(0) = \log(2\pi)$.
+    (Achtung: Dies ist \emph{kein} Beitrag einer Polstelle von $\Gamma$, sondern das
+    Residuum des Faktors $1/s$ bei $s=0$.)
+\end{itemize}
+Vollst\"andiger Beweis in \cite{Davenport2000}, Kapitel~17.
+\end{proof}
+
+% ================================================================
+\section{Der Primzahlsatz}
+% ================================================================
+
+\begin{theorem}[Primzahlsatz]
+\label{thm:pnt}
+\[
+  \pi(x) \;\sim\; \frac{x}{\log x} \quad (x \to \infty).
+\]
+\"Aquivalent dazu: $\psi(x) \sim x$.
+\end{theorem}
+
+\begin{proof}[Beweisskizze via expliziter Formel]
+\textbf{Schritt 1} (Keine Nullstellen auf $\Re(s) = 1$):
+Mertens (1898) beobachtete: F\"ur $\sigma > 1$ und reelles $t$:
+\[
+  \log|\zeta^3(\sigma)\,\zeta^4(\sigma+it)\,\zeta(\sigma+2it)| \ge 0.
+\]
+Dies folgt aus $3 + 4\cos\theta + \cos 2\theta = 2(1+\cos\theta)^2 \ge 0$.
+W\"are $\zeta(1+it_0) = 0$, so g\"alte f\"ur $\sigma \to 1^+$:
+$\log|\zeta^3(\sigma)| \approx +3\log\tfrac{1}{\sigma-1}$ (einfacher Pol),
+aber $\log|\zeta^4(\sigma+it_0)| \le -4\log\tfrac{1}{\sigma-1} + O(1)$
+(Nullstelle mindestens erster Ordnung).
+Da $4 > 3$, g\"inge die Gesamtsumme gegen $-\infty$ -- Widerspruch zu $\ge 0$.
+Also $\zeta(1+it) \ne 0$ f\"ur $t \ne 0$.
+
+\textbf{Schritt 2} (PZS aus nullstellenfreiem Gebiet):
+Sobald $\zeta(s) \ne 0$ auf $\Re(s) = 1$ bekannt ist, zeigt die explizite
+Formel~\eqref{eq:explicit_psi}, dass der dominante Term $x$ ist
+und alle anderen Terme $o(x)$ sind.
+Also $\psi(x) \sim x$ und damit $\pi(x) \sim x/\log x$.
+\end{proof}
+
+\begin{remark}
+Dieser Ansatz ist eine vereinfachte Version der urspr\"unglichen Beweise
+von Hadamard \cite{Hadamard1896} und de~la~Vall\'ee~Poussin \cite{Poussin1896},
+die den Primzahlsatz unabh\"angig voneinander 1896 bewiesen.
+Der elementare Beweis (ohne komplexe Analysis) stammt von
+Erd\H{o}s und Selberg (1949).
+\end{remark}
+
+% ================================================================
+\section{Fehlerterme: Die Rolle der Nullstellen}
+% ================================================================
+
+\begin{theorem}[Fehlerterm in Abh\"angigkeit von den Nullstellen]
+\label{thm:error_term}
+Unter der Annahme, dass alle nicht-trivialen Nullstellen von $\zeta$
+Realteil $\le \beta_0 < 1$ haben, gilt
+\[
+  \psi(x) = x + O\!\bigl(x^{\beta_0}(\log x)^2\bigr).
+\]
+Insbesondere gibt die Riemann-Hypothese ($\beta_0 = \tfrac{1}{2}$):
+\[
+  \psi(x) = x + O(\sqrt{x}\,\log^2 x).
+\]
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+In der expliziten Formel~\eqref{eq:explicit_psi} tr\"agt die Nullstellensumme
+$\sum_\rho x^\rho/\rho$ h\"ochstens $x^{\beta_0}\sum_\rho |\rho|^{-1}$ bei.
+Da die Anzahl der Nullstellen mit $|\rho| \le T$ von der Gr\"o\ss enordnung
+$O(T\log T)$ ist, konvergiert $\sum_\rho |\rho|^{-1}$ mit logarithmischer
+Divergenz, und die gesamte Summe ist $O((\log T)^2)$ durch sorgf\"altige
+Absch\"atzung.
+\end{proof}
+
+\begin{theorem}[Schoenfelds explizite Schranke unter RH]
+\label{thm:schoenfeld}
+Unter der Annahme der Riemann-Hypothese gilt f\"ur alle $x \ge 2657$:
+\[
+  |\pi(x) - \Li(x)| \;<\; \frac{1}{8\pi}\,\sqrt{x}\,\log x.
+\]
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Schoenfeld \cite{Schoenfeld1976} bewies diese Schranke durch sorgf\"altige
+Auswertung der Nullstellensumme $\sum_{|\gamma| \le T} x^{1/2+i\gamma}/(1/2+i\gamma)$
+mit expliziten Konstanten unter Verwendung der RH.
+\end{proof}
+
+\begin{remark}[Verbesserungen der Schoenfeld-Schranke]
+Schoenfeld (1976) bewies die Schranke $|\pi(x) - \Li(x)| < \tfrac{1}{8\pi}\sqrt{x}\log x$
+g\"ultig f\"ur $x \ge 2657$.  B\"uthe (2018) verbesserte dies weiter durch
+Kombination der expliziten Formel mit der rechnergest\"utzten Verifikation,
+dass alle Nullstellen bis zu gro\ss er H\"ohe $T$ auf der kritischen Geraden liegen.
+Diese Verfeinerungen sind wichtig f\"ur Anwendungen, die unbedingte numerische
+Schranken an $\pi(x)$ ben\"otigen.
+\end{remark}
+
+% ================================================================
+\section{Riemanns urspr\"ungliche explizite Formel f\"ur \texorpdfstring{$\pi(x)$}{pi(x)}}
+% ================================================================
+
+\begin{theorem}[Riemanns explizite Formel f\"ur $\pi(x)$]
+\label{thm:riemann_explicit}
+Sei $\Li(x) = \int_2^x dt/\log t$. Dann gilt f\"ur $x > 1$:
+\begin{equation}
+  \label{eq:riemann_explicit}
+  \pi(x) \;=\; \Li(x) - \sum_\rho \Li(x^\rho) - \log 2
+  + \int_x^{\infty} \frac{dt}{t(t^2-1)\log t}.
+\end{equation}
+Die Summe l\"auft \"uber alle nicht-trivialen Nullstellen $\rho$ (geordnet
+nach $|\Im(\rho)|$); das Integral konvergiert f\"ur $x > 1$.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Riemann verwendete die \glqq Primzahlpotenz-Z\"ahlfunktion\grqq
+\[
+  J(x) = \sum_{n=1}^{\infty} \frac{1}{n}\,\pi(x^{1/n})
+  = \frac{1}{2\pi i}\int_{c-i\infty}^{c+i\infty} \frac{\log\zeta(s)}{s}\,x^s\,ds,
+\]
+aus der $\pi(x)$ durch M\"obius-Inversion gewonnen wird:
+$\pi(x) = \sum_{n=1}^\infty \mu(n)/n \cdot J(x^{1/n})$.
+Die Pole und Nullstellen von $\log\zeta(s)$ (via Hadamard-Produkt)
+liefern dann~\eqref{eq:riemann_explicit}.
+Vollst\"andige Herleitung in \cite{Titchmarsh1986}, Kapitel~3.
+\end{proof}
+
+% ================================================================
+\section{Verbindung zu \texorpdfstring{$L$}{L}-Funktionen und GRH}
+% ================================================================
+
+\begin{definition}[Dirichlet-L-Funktionen und Primzahlen in Progressionen]
+\label{def:pnt_progressions}
+F\"ur $\gcd(a,q) = 1$ sei
+\[
+  \pi(x; q, a) = \#\{p \le x : p \equiv a \pmod q\}.
+\]
+Durch die Orthogonalit\"at der Dirichlet-Charaktere gilt:
+\[
+  \pi(x; q, a) = \frac{1}{\phi(q)}\sum_{\chi \bmod q} \bar\chi(a)\,
+  \pi(x, \chi),
+\]
+wobei $\pi(x,\chi)$ die Nullstellen von $L(s,\chi)$ enth\"alt.
+\end{definition}
+
+\begin{theorem}[Dirichlet'scher Satz mit Fehlerterm unter GRH]
+\label{thm:dirichlet_grh}
+Unter Annahme der GRH f\"ur alle $L(s,\chi)$ mit $\chi \pmod q$ gilt:
+\[
+  \pi(x; q, a) = \frac{\Li(x)}{\phi(q)}
+  + O\!\Bigl(\sqrt{x}\,\log(qx)\Bigr).
+\]
+Insbesondere sind Primzahlen gleichm\"a\ss ig auf die $\phi(q)$
+Restklassen prim zu $q$ verteilt.
+\end{theorem}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Riemanns explizite Formel ist die zentrale Verbindung zwischen den
+Nullstellen von $\zeta(s)$ und der Primzahlverteilung.
+Der Primzahlsatz folgt daraus, dass $\zeta$ keine Nullstellen auf
+$\Re(s)=1$ hat.
+Unter der Riemann-Hypothese ist der Fehlerterm $O(\sqrt{x}\log x)$ --
+im Wesentlichen das sch\"arfstm\"ogliche Resultat.
+Die Formel~\eqref{eq:riemann_explicit} zeigt: Jede nicht-triviale Nullstelle
+$\rho$ leistet einen Beitrag $\Li(x^\rho) \approx x^\rho/\log x$ zu $\pi(x)$;
+je mehr Nullstellen abseits der kritischen Geraden l\"agen, desto gr\"o\ss er
+w\"aren diese Schwingungen.
+
+% ================================================================
+\begin{thebibliography}{10}
+
+\bibitem{Riemann1859}
+B.~Riemann,
+\emph{\"Uber die Anzahl der Primzahlen unter einer gegebenen Gr\"o\ss e},
+Monatsberichte der Berliner Akademie (1859), 671--680.
+
+\bibitem{vonMangoldt1895}
+H.~von~Mangoldt,
+Zu Riemann's Abhandlung ``\"Uber die Anzahl der Primzahlen \ldots'',
+\emph{J.\ Reine Angew.\ Math.}\ \textbf{114} (1895), 255--305.
+
+\bibitem{Hadamard1896}
+J.~Hadamard,
+Sur la distribution des z\'eros de la fonction $\zeta(s)$ et ses
+cons\'equences arithm\'etiques,
+\emph{Bull.\ Soc.\ Math.\ France}\ \textbf{24} (1896), 199--220.
+
+\bibitem{Poussin1896}
+C.-J.\ de~la~Vall\'ee~Poussin,
+Recherches analytiques sur la th\'eorie des nombres premiers,
+\emph{Ann.\ Soc.\ Sci.\ Bruxelles}\ \textbf{20} (1896), 183--256.
+
+\bibitem{Davenport2000}
+H.~Davenport,
+\emph{Multiplicative Number Theory}, 3.~Aufl.,
+Springer, New York, 2000.
+
+\bibitem{Titchmarsh1986}
+E.~C.~Titchmarsh,
+\emph{The Theory of the Riemann Zeta-Function}, 2.~Aufl.,
+Oxford University Press, 1986.
+
+\bibitem{Schoenfeld1976}
+L.~Schoenfeld,
+Sharper bounds for the Chebyshev functions $\theta(x)$ and $\psi(x)$, II,
+\emph{Math.\ Comp.}\ \textbf{30} (1976), 337--360.
+
+\end{thebibliography}
+
+\end{document}

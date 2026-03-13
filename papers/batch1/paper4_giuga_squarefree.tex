@@ -1,0 +1,157 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Z}{\mathbb{Z}}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Every Giuga Pseudoprime is Squarefree:\\ A Short Proof}
+
+\author{Kurt Ingwer}
+\address{Specialist Mathematics Project, Version Build 44}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+A \emph{Giuga pseudoprime} is a composite integer satisfying a primality criterion
+due to Giuga~(1950).  We give a short, self-contained proof that every Giuga
+pseudoprime is necessarily squarefree.  The argument is elementary: if $p^2 \mid n$,
+then the weak Giuga condition forces $p \mid -1$, which is impossible.  This result
+is foundational for the study of Giuga pseudoprimes and justifies restricting
+attention to squarefree composites from the outset.
+\end{abstract}
+
+\maketitle
+
+% -------------------------------------------------------
+\section{Introduction}
+% -------------------------------------------------------
+
+In 1950, Giuga \cite{Giuga1950} conjectured that a positive integer $n > 1$ is prime
+if and only if $\sum_{k=1}^{n-1} k^{n-1} \equiv -1 \pmod{n}$.
+A composite counterexample would be called a \emph{Giuga pseudoprime}.
+
+Borwein, Borwein, Girgensohn, and Parnes \cite{Borwein1996} characterised such
+numbers as composites satisfying, for every prime $p \mid n$:
+\begin{enumerate}
+  \item[\textup{(W)}] $p \mid \dfrac{n}{p} - 1$ \quad \emph{(weak condition)},
+  \item[\textup{(S)}] $(p-1) \mid \dfrac{n}{p} - 1$ \quad \emph{(strong condition)}.
+\end{enumerate}
+
+The present note proves that any integer satisfying even the weak condition~(W) alone
+must be squarefree.
+
+% -------------------------------------------------------
+\section{Main Result}
+% -------------------------------------------------------
+
+\begin{theorem}
+\label{thm:sqfree}
+Every Giuga pseudoprime is squarefree.  More precisely: if a composite integer~$n$
+satisfies the weak Giuga condition~\textup{(W)} for all primes $p \mid n$, then
+$n$ is squarefree.
+\end{theorem}
+
+\begin{proof}
+Suppose for contradiction that $p^2 \mid n$ for some prime~$p$.
+Then $p \mid \tfrac{n}{p}$, so
+\[
+  \frac{n}{p} \equiv 0 \pmod{p},
+\]
+which gives $\tfrac{n}{p} - 1 \equiv -1 \pmod{p}$.
+The weak condition~(W) requires $p \mid \tfrac{n}{p} - 1$, i.e.\ $p \mid -1$.
+But $p \ge 2$, so $p \nmid 1$ and hence $p \nmid -1$ — a contradiction.
+Therefore no prime~$p$ can satisfy $p^2 \mid n$, i.e.\ $n$ is squarefree.
+\end{proof}
+
+\begin{remark}
+The proof uses only condition~(W); the strong condition~(S) is not needed.
+Hence the stronger statement holds: any composite satisfying only~(W) for
+all prime factors is already squarefree.
+\end{remark}
+
+\begin{remark}
+The squarefreeness is immediate from the structure of the weak condition.
+Intuitively, if $p^2 \mid n$, then $\tfrac{n}{p}$ is divisible by~$p$, so
+$\tfrac{n}{p} - 1$ is congruent to~$-1$ modulo~$p$, and no prime can
+divide~$-1$.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Consequences}
+% -------------------------------------------------------
+
+\begin{corollary}
+Every Giuga pseudoprime $n$ has the form $n = p_1 p_2 \cdots p_k$
+with $p_1 < p_2 < \cdots < p_k$ distinct primes.
+\end{corollary}
+
+\begin{corollary}
+For a Giuga pseudoprime $n = p_1 \cdots p_k$, the quotients
+$\tfrac{n}{p_i}$ are products of distinct primes different from~$p_i$.
+\end{corollary}
+
+The squarefreeness established here is the starting point for further structural
+results on Giuga pseudoprimes, including the proofs that no such number can have
+fewer than four prime factors \cite{Ingwer2026a} and the related CRT obstructions
+for Giuga--Carmichael numbers \cite{Ingwer2026c}.
+
+% -------------------------------------------------------
+\section{Numerical Illustration}
+% -------------------------------------------------------
+
+The known \emph{Giuga numbers} (satisfying only the weak condition) are
+$\{30, 858, 1722, 66198, \ldots\}$.  All are squarefree:
+\begin{align*}
+  30 &= 2 \cdot 3 \cdot 5, \\
+  858 &= 2 \cdot 3 \cdot 11 \cdot 13, \\
+  1722 &= 2 \cdot 3 \cdot 7 \cdot 41, \\
+  66198 &= 2 \cdot 3 \cdot 11 \cdot 17 \cdot 59.
+\end{align*}
+Theorem~\ref{thm:sqfree} guarantees this: any composite satisfying~(W) is squarefree.
+One verifies directly that each of these numbers fails~(S) for at least one prime factor,
+so none is a Giuga pseudoprime.
+
+% -------------------------------------------------------
+\begin{thebibliography}{10}
+
+\bibitem{Giuga1950}
+G.~Giuga,
+\emph{Su una presumibile propriet\`a caratteristica dei numeri primi},
+Ist.\ Lombardo Sci.\ Lett.\ Rend.\ Cl.\ Sci.\ Mat.\ Nat.\ \textbf{83}
+(1950), 511--528.
+
+\bibitem{Borwein1996}
+J.~M.~Borwein, P.~B.~Borwein, R.~Girgensohn, and S.~Parnes,
+\emph{Giuga's conjecture on primality},
+Amer.\ Math.\ Monthly \textbf{103} (1996), no.\ 1, 40--50.
+
+\bibitem{Ingwer2026a}
+K.~Ingwer,
+\emph{No composite number with exactly three prime factors is a Giuga pseudoprime},
+Specialist Mathematics Project (2026).
+
+\bibitem{Ingwer2026c}
+K.~Ingwer,
+\emph{On the incompatibility of Giuga pseudoprimes and Carmichael numbers},
+Specialist Mathematics Project (2026).
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,489 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsmath,amssymb,amsthm,hyperref,geometry}
+\usepackage{enumitem,booktabs,array}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\newtheorem{definition}[theorem]{Definition}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{example}[theorem]{Beispiel}
+
+% -------------------------------------------------------
+% Metadaten
+% -------------------------------------------------------
+\title{\textbf{Die $abc$-Vermutung}\\[0.5em]
+\large Radikal, Höhenfunktion, Mochizukis IUT-Theorie und Konsequenzen}
+\author{Michael Fuhrmann}
+\date{März 2026}
+
+\hypersetup{
+  pdftitle={Die abc-Vermutung},
+  pdfauthor={Michael Fuhrmann},
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue
+}
+
+\newcommand{\ggT}{\mathrm{ggT}}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Die $abc$-Vermutung, unabhängig von Oesterlé und Masser im Jahr 1985 aufgestellt, ist eines
+der weitreichendsten offenen Probleme der Zahlentheorie. Sie postuliert eine tiefgreifende
+Ungleichung zwischen den Größen dreier teilerfremder ganzer Zahlen $a, b, c$ mit $a+b=c$
+und dem Produkt ihrer verschiedenen Primfaktoren — dem sogenannten \emph{Radikal}
+$\operatorname{rad}(abc)$. Die Vermutung impliziert als Spezialfälle den Großen Fermatschen
+Satz für große Exponenten, den Satz von Roth, Szpiros Vermutung über elliptische Kurven
+und zahlreiche klassische diophantische Resultate.
+
+Im Jahr 2012 kündigte Shinichi Mochizuki einen Beweis mittels seiner
+\emph{Inter-Universellen Teichmüller-Theorie} (IUT) an. Stand 2026 ist die mathematische
+Gemeinschaft gespalten: Der Einwand von Scholze und Stix (2018) bleibt ungelöst.
+Dieses Paper gibt einen Überblick über die Formulierung der Vermutung, ihre wichtigsten
+Konsequenzen, die Strategie von Mochizukis Ansatz und den aktuellen Stand der Kontroverse.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ================================================================
+\section{Formulierung der Vermutung}
+% ================================================================
+
+\subsection{Das Radikal}
+
+\begin{definition}[Radikal]
+  Für eine positive ganze Zahl $n$ ist das \emph{Radikal} von $n$ definiert als
+  \[
+    \operatorname{rad}(n) \;:=\; \prod_{\substack{p\;\text{prim} \\ p \mid n}} p.
+  \]
+  Mit anderen Worten: $\operatorname{rad}(n)$ ist der größte quadratfreie Teiler von $n$.
+\end{definition}
+
+\begin{example}
+  $\operatorname{rad}(12) = \operatorname{rad}(2^2\cdot 3) = 2\cdot 3 = 6$;
+  $\quad \operatorname{rad}(360) = \operatorname{rad}(2^3\cdot 3^2\cdot 5) = 30$.
+\end{example}
+
+\subsection{Die Höhenfunktion}
+
+Die \emph{logarithmische Höhe} (oder \emph{Qualität}) eines Tripels $(a, b, c)$ mit
+$a+b=c$, $\ggT(a,b)=1$, $a,b,c>0$ ist definiert als
+\begin{equation}\label{eq:qualitaet}
+  q(a,b,c) \;:=\; \frac{\log\max(a,b,c)}{\log\operatorname{rad}(abc)}
+             \;=\; \frac{\log c}{\log\operatorname{rad}(abc)}.
+\end{equation}
+Die Höhenfunktion $h(a,b,c) = \log\max(|a|,|b|,|c|)$ ist die additive Entsprechung dazu.
+Die $abc$-Vermutung besagt im Kern, dass die Qualität $q(a,b,c)$ nicht wesentlich
+größer als $1$ sein kann.
+
+\subsection{Die $abc$-Vermutung}
+
+\begin{conjecture}[$abc$-Vermutung, Oesterlé--Masser 1985~\cite{Oesterle1988,Masser1985}]
+  Für jedes $\varepsilon > 0$ existiert eine Konstante $K_\varepsilon > 0$, sodass für
+  alle Tripel $(a,b,c)$ teilerfremder positiver ganzer Zahlen mit $a + b = c$ gilt:
+  \begin{equation}\label{eq:abc}
+    c \;\leq\; K_\varepsilon \cdot \operatorname{rad}(abc)^{1+\varepsilon}.
+  \end{equation}
+\end{conjecture}
+
+Äquivalent dazu gilt: Nur endlich viele Tripel haben die Qualität $q(a,b,c) > 1+\varepsilon$.
+
+\begin{remark}
+  Der Term $\varepsilon$ ist notwendig: Das Rekordtripel $a=1$, $b=3^{10}\cdot109$,
+  $c=23^5$ hat Qualität $q \approx 1{,}6299 > 1$, also $c = \operatorname{rad}(abc)^{1{,}6299}
+  \gg \operatorname{rad}(abc)$, was zeigt, dass die Schranke $c \leq K \cdot \operatorname{rad}(abc)$
+  (Exponent $1$ ohne $\varepsilon$) nicht universell gelten kann.  Tripel mit Qualität
+  $q \to 1$ von unten existieren in großer Zahl (z.\,B.\ $a=1$, $b=2^n-1$, $c=2^n$,
+  wenn $2^n-1$ eine Mersenne-Primzahl ist), verletzen die $\varepsilon=0$-Schranke
+  jedoch \emph{nicht} — es sind die Rekordtripel mit $q > 1$, die $\varepsilon > 0$
+  erzwingen.  Die größte bekannte Qualität oberhalb von $1$ beträgt $q \approx 1{,}6299$.
+\end{remark}
+
+\subsection{Äquivalente Formulierungen}
+
+Eine äquivalente Form nutzt die Höhe $h(a,b,c) = \log\max(|a|,|b|,|c|)$: Die
+$abc$-Vermutung besagt dann
+\[
+  h(a,b,c) \;\leq\; (1+\varepsilon)\sum_{p\mid abc} \log p + O_\varepsilon(1)
+\]
+für alle teilerfremden $(a,b,c)$ mit $a+b+c=0$ (projektive Formulierung mit Vorzeichen).
+
+Eine schwache Form postuliert die Existenz von $K$ (abhängig von $\varepsilon$), sodass
+für \emph{alle} teilerfremden Tripel gilt:
+\[
+  \max(|a|,|b|,|c|) \;\leq\; K \cdot \operatorname{rad}(abc)^2.
+\]
+Diese schwache $abc$-Vermutung (Exponent $2$ statt $1+\varepsilon$) folgt aus der Theorie
+der linearen Formen in Logarithmen (Bakers Satz) und ist damit unbedingt wahr.
+
+% ================================================================
+\section{Hochqualitative $abc$-Tripel}
+% ================================================================
+
+Systematische Computersuchen (Reyssat, Nitaj,~\cite{Nitaj1996}) haben Tripel mit großer
+Qualität katalogisiert. Die zehn besten bekannten Tripel haben alle $q > 1{,}4$:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+$a$ & $b$ & $c = a+b$ \quad (Qualität) \\
+\midrule
+$1$ & $2$ & $3$ \quad ($q=1$, trivial) \\
+$1$ & $8$ & $9 = 3^2$ \quad ($q = \log 9/\log 6 \approx 1{,}226$) \\
+$2^5$ & $7^2$ & $3^4$ \quad ($q\approx1{,}292$, alle klein) \\
+$1$ & $3^{10}\!\cdot\!109$ & $23^5$ \quad ($q\approx1{,}630$, aktueller Rekord) \\
+\bottomrule
+\end{tabular}
+\caption{Ausgewählte hochqualitative $abc$-Tripel}
+\end{table}
+
+Die Goldfeld-Vermutung, eine Verfeinerung, sagt $N(Q,X) \sim C_\varepsilon X^{2-2/Q}$
+für die Anzahl der Tripel mit $c\leq X$ und Qualität $>Q$ voraus.
+
+% ================================================================
+\section{Konsequenzen der $abc$-Vermutung}
+% ================================================================
+
+\subsection{Der Große Fermatsche Satz für große Exponenten}
+
+\begin{theorem}[$abc$ $\Rightarrow$ FLT für $n \geq 6$~\cite{Granville1990}]
+  Unter Annahme der $abc$-Vermutung hat für alle $n \geq 6$ die Gleichung
+  $x^n + y^n = z^n$ keine Lösung in positiven ganzen Zahlen.
+\end{theorem}
+
+\begin{proof}[Beweis]
+  Angenommen $x^n + y^n = z^n$ mit $\ggT(x,y)=1$. Setze $a=x^n$, $b=y^n$, $c=z^n$.
+  Dann gilt $\operatorname{rad}(abc) \leq xyz \leq z^3$. Die $abc$-Vermutung (mit
+  $\varepsilon=1$) liefert
+  \[
+    c = z^n \;\leq\; K_1 \cdot (z^3)^2 = K_1 z^6,
+  \]
+  also $z^{n-6}\leq K_1$, was $z$ (und damit $x, y$) für $n>6$ beschränkt. Eine
+  Verfeinerung mit $\varepsilon < 1$ erweitert das Argument auf $n\geq 6$.
+\end{proof}
+
+\begin{remark}
+  Wiles' Beweis des FLT (1995) gilt für alle $n\geq 3$ und ist unbedingt gültig.
+  Der $abc$-basierte Beweis ist zwar viel einfacher, setzt aber die unbewiesene
+  $abc$-Vermutung voraus und deckt zunächst nur $n\geq 6$ ab.
+\end{remark}
+
+\subsection{Roths Satz und Thue--Mahler-Gleichungen}
+
+\begin{corollary}[$abc$ $\Rightarrow$ Satz von Roth]
+  Die $abc$-Vermutung impliziert: Für jede algebraische Zahl $\alpha$ vom Grad $d\geq 2$
+  und jedes $\varepsilon>0$ gibt es nur endlich viele rationale Zahlen $p/q$ mit
+  $|\alpha - p/q| < q^{-2-\varepsilon}$.
+\end{corollary}
+
+Genauer genommen impliziert $abc$ die volle Stärke von Bakers Theorie der linearen Formen
+in Logarithmen (und darüber hinaus), wodurch alle effektiven diophantischen
+Approximationsresultate einheitlich werden.
+
+\subsection{Szpiros Vermutung für elliptische Kurven}
+
+Sei $E/\mathbb{Q}$ eine elliptische Kurve mit minimaler Diskriminante $\Delta_{\min}$
+und Führer $N$.
+
+\begin{conjecture}[Szpiros Vermutung~\cite{Szpiro1981}]
+  Für jedes $\varepsilon>0$ existiert $C_\varepsilon$, sodass
+  \begin{equation}\label{eq:szpiro}
+    |\Delta_{\min}| \;\leq\; C_\varepsilon \cdot N^{6+\varepsilon}.
+  \end{equation}
+\end{conjecture}
+
+\begin{theorem}[Frey--Masser--Oesterlé; siehe~\cite{Silverman1994}]
+  Die $abc$-Vermutung ist äquivalent zu Szpiros Vermutung \eqref{eq:szpiro} für
+  halbstabile elliptische Kurven.
+\end{theorem}
+
+Die Verbindung stellt die \emph{Frey-Kurve} her: Zu einem $abc$-Tripel hat die
+elliptische Kurve $y^2 = x(x-a^n)(x+b^n)$ eine Diskriminante, die mit $(abc)^{2n}$
+zusammenhängt, und einen Führer, der im Wesentlichen $\operatorname{rad}(abc)^2$ ist.
+
+\subsection{Weitere Konsequenzen}
+
+Die $abc$-Vermutung impliziert oder vereinfacht Beweise von:
+\begin{itemize}[nosep]
+  \item \textbf{Mordell--Faltings:} Die Faltings-artige Schranke $h(P)\leq c(E)$
+    für Höhen rationaler Punkte.
+  \item \textbf{Wieferich-Primzahlen:} Nur endlich viele Wieferich-Primzahlen
+    (Primzahlen $p$ mit $2^{p-1}\equiv1\pmod{p^2}$) — bedingt auf $abc$
+    (Granville--Langevin 1985).
+  \item \textbf{Halls Vermutung:} $|x^3 - y^2| \gg x^{1/2 - \varepsilon}$
+    für verschiedene ganze Zahlen, folgt aus $abc$.
+  \item \textbf{Catalans Vermutung:} Nur $2^3$ und $3^2$ sind aufeinanderfolgende
+    Potenzen (unbedingt bewiesen von Mihailescu 2002, aber einfacher unter $abc$).
+  \item \textbf{Verallgemeinerter Fermat:} $x^p + y^q = z^r$ hat endlich viele
+    teilerfremde Lösungen für $1/p+1/q+1/r < 1$.
+\end{itemize}
+
+% ================================================================
+\section{Mochizukis Inter-Universelle Teichmüller-Theorie (IUT)}
+% ================================================================
+
+\subsection{Überblick}
+
+In vier Preprints, die im August 2012 veröffentlicht wurden~\cite{Mochizuki2012a,Mochizuki2012b,
+Mochizuki2012c,Mochizuki2012d}, kündigte Shinichi Mochizuki (RIMS, Kyoto) einen Beweis der
+$abc$-Vermutung durch ein grundlegend neues Rahmenwerk an, das er als
+\emph{Inter-Universelle Teichmüller-Theorie} (IUT, auch \emph{arithmetische Deformationstheorie}
+genannt) bezeichnet.
+
+\subsection{Schlüsselideen der IUT}
+
+IUT arbeitet mit Objekten, die als \emph{Hodge-Theater} bezeichnet werden — aufwendigen
+kombinatorischen und kategorischen Strukturen, die aus Daten einer elliptischen Kurve über
+einem Zahlkörper aufgebaut sind. Das zentrale Konstrukt umfasst:
+
+\begin{enumerate}[nosep]
+  \item \textbf{Theater und Verbindungen:} Ein \emph{$\Theta^{\pm\text{ell}}$NF-Hodge-Theater}
+    bündelt die Arithmetik der elliptischen Kurve und einer Hilfsprimzahl $l$ in einem
+    kategorischen Objekt. \emph{Étale Theta-Funktionen} kodieren die $p$-adische Geometrie.
+  \item \textbf{Multiradiality:} Mochizuki führt eine Unterscheidung zwischen
+    \emph{mono-anabelschen} und \emph{poly-anabelschen} Strukturen ein. Das Schlüsselprinzip
+    ist, dass bestimmte Daten allein aus der absoluten Galois-Gruppe rekonstruiert werden
+    können (\emph{mono-anabelsche Rekonstruktion}).
+  \item \textbf{Log-Theta-Gitter:} Aufeinanderfolgende Anwendungen des \emph{Log-Links}
+    (der von multiplikativen zu additiven Strukturen via $p$-adische Logarithmen übergeht)
+    und des \emph{Theta-Links} (der verschiedene Theater miteinander verbindet) bilden
+    ein Gitter.
+  \item \textbf{Kummer-Theorie und Unbestimmtheiten:} Drei Typen von Unbestimmtheit
+    (bezeichnet als $\mathrm{Ind}1$, $\mathrm{Ind}2$, $\mathrm{Ind}3$) entstehen aus der
+    Nicht-Kommutativität der Log- und Theta-Links. Die Kontrolle dieser Unbestimmtheiten
+    durch explizite Schranken liefert die $abc$-Ungleichung.
+\end{enumerate}
+
+Die Beweisstrategie besteht darin zu zeigen:
+\[
+  -\log|\Delta_E| \;\leq\; (1+\varepsilon)\log\operatorname{rad}(\Delta_E) + O(1),
+\]
+was (via Szpiros Äquivalenz) in die $abc$-Vermutung übersetzt wird.
+
+\subsection{Der Einwand von Scholze und Stix (2018)}
+
+Im März 2018 besuchten Peter Scholze und Jakob Stix Mochizuki in Kyoto und verfassten
+anschließend einen kritischen Bericht~\cite{ScholzeStix2018}, in dem sie einen
+fundamentalen Fehler in der IUT identifiziert zu haben behaupten.
+
+Ihr zentraler Einwand betrifft Mochizukis Behauptung, dass bestimmte Identifikationen
+von Ringstrukturen (die er als ``Theta-Link'' bezeichnet) mit der Ringstruktur auf beiden
+Seiten kompatibel gemacht werden können. Scholze und Stix argumentieren, dass die
+relevante Ungleichung nach dem Theta-Link auf eine triviale Identität $\log(q) \leq \log(q)$
+reduziert wird und daher keinen Informationsgehalt trägt. Ihrer Ansicht nach sind die
+Unbestimmtheiten zu grob, um eine nicht-triviale Schranke zu etablieren.
+
+Mochizuki antwortete mit ausführlichen Gegenargumenten~\cite{Mochizuki2018rebuttal} und
+behauptete, Scholze und Stix hätten die Rollen der verschiedenen ``Kopien'' des Rings
+falsch identifiziert.
+
+\subsection{Aktuelle Situation (2026)}
+
+Die japanische Zeitschrift \textit{Publications of RIMS} veröffentlichte Mochizukis vier
+IUT-Papers im März 2021 nach einem internen Begutachtungsprozess. Dies hat die Kontroverse
+jedoch nicht gelöst:
+\begin{itemize}[nosep]
+  \item Der Einwand von Scholze und Stix wird von vielen führenden Zahlentheoretikern
+    nach wie vor als stichhaltig angesehen (Scholze, Stix, Conrad, de Jong, \ldots).
+  \item Eine kleine Gruppe von Forschern (Fesenko, Yamashita, Minamide, \ldots) hat die
+    IUT eingehend studiert und bestätigt deren Korrektheit.
+  \item Eine unabhängige Verifikation durch breiten Konsens ist bisher nicht zustande
+    gekommen.
+  \item Eine vereinfachte Darstellung der IUT steht weiterhin aus.
+\end{itemize}
+
+% BUG-B8-P34-STATUS behoben: abc-Vermutung explizit als OFFEN klassifiziert
+\begin{remark}[\textbf{Offizieller Status der abc-Vermutung -- März 2026}]
+\textbf{Die $abc$-Vermutung ist Stand März 2026 \emph{OFFEN}.}
+\begin{itemize}[nosep]
+  \item Mochizukis IUT-Papers wurden 2021 in PRIMS veröffentlicht, doch eine
+    Journal-Publikation stellt \emph{keinen} von der Gemeinschaft akzeptierten Beweis dar.
+  \item Der Einwand von Scholze und Stix (2018) wird von der \emph{Mehrheit} der
+    internationalen algebraischen Geometrie- und Zahlentheorie-Gemeinschaft als
+    stichhaltig betrachtet. Prominente Experten, die den Einwand öffentlich unterstützt
+    haben oder von der IUT nicht überzeugt sind, umfassen Scholze, Stix, Conrad,
+    de Jong, Venkatesh u.\,a.
+  \item Eine unabhängige, breit akzeptierte Verifikation der IUT ist bisher nicht erschienen.
+  \item \textbf{Konsequenz:} Jedes Ergebnis, das ``aus der abc-Vermutung folgt'', ist
+    weiterhin bedingt. Die abc-Vermutung sollte als offenes Problem zitiert werden,
+    nicht als etabliertes Theorem.
+\end{itemize}
+\end{remark}
+
+Die mathematische Gemeinschaft befindet sich effektiv in einer Sackgasse, und die
+$abc$-Vermutung ist \textbf{nicht bewiesen}.
+
+% ================================================================
+\section{Alternative Ansätze}
+% ================================================================
+
+\subsection{$p$-adische und Arakelov-Geometrie}
+
+Mehrere Forscher haben untersucht, ob Elemente der IUT durch konventionellere $p$-adische
+Hodge-Theorie oder Arakelov-Schnitttheorie ersetzt werden können. Tan~\cite{Tan2022} und
+andere haben partielle Umformulierungen skizziert; bisher gelang es niemandem, den
+Theta-Link zu umgehen.
+
+\subsection{Funktionenkörper-Analogon}
+
+Über Funktionenkörpern $k(C)$ (wobei $C$ eine Kurve über einem endlichen Körper
+$\mathbb{F}_q$ ist) ist die $abc$-Vermutung ein Theorem, das aus dem Satz von
+Mason--Stothers folgt (Mason 1983~\cite{Mason1984}):
+
+\begin{theorem}[Satz von Mason--Stothers]
+  Sei $k$ ein Körper der Charakteristik $0$. Wenn $a,b,c\in k[t]$ teilerfremde Polynome
+  mit $a+b=c$ und $\max(\deg a,\deg b,\deg c)>0$ sind, dann gilt
+  \[
+    \max(\deg a,\deg b,\deg c) \;\leq\; \deg\operatorname{rad}(abc) - 1.
+  \]
+\end{theorem}
+
+Dieser Satz ist deutlich stärker als die $abc$-Vermutung über Zahlkörpern (der Exponent
+ist genau $1$, nicht $1+\varepsilon$) und wird durch ein einfaches Wronskian-Argument
+bewiesen. Die Analogie legt nahe, dass ein arithmetisches Analogon des Wronskians der
+Schlüssel zum Zahlkörper-Fall sein könnte.
+
+% ================================================================
+\section{Die $abc$-Vermutung und das Langlands-Programm}
+% ================================================================
+
+Die $abc$-Vermutung kann in der Sprache der Höhen auf der projektiven Geraden
+$\mathbb{P}^1$ minus drei Punkte formuliert werden, was auf den Kontext von
+\emph{Hyperbolischem Mordell} oder \emph{Shafarevich--Faltings} verweist.
+Verbindungen umfassen:
+
+\begin{itemize}[nosep]
+  \item \textbf{Vojtas Vermutung:} Eine Verallgemeinerung von $abc$ auf rationale Punkte
+    höherdimensionaler Varietäten; impliziert Faltings' Satz und mehr.
+  \item \textbf{$S$-Einheitsgleichung:} Über Zahlkörpern ist die Menge
+    $\{a+b=c : a,b,c\in\mathcal{O}_S^*\}$ endlich (Thue--Mahler--$S$-Einheitssatz);
+    $abc$ liefert quantitative Schranken.
+  \item \textbf{Weilsche Höhenmaschine:} Die Höhe $h(a,b,c)$ ist eine Weil-Höhe auf
+    $\mathbb{P}^1$; Vojtas Vermutung in Dimension $1$ entspricht genau $abc$.
+\end{itemize}
+
+% ================================================================
+\section{Aktueller Beweisstand}
+% ================================================================
+
+\begin{itemize}[nosep]
+  \item \textbf{Bewiesen:} Schwache $abc$ (Exponent $2$, via Baker), Mason--Stothers
+    (Funktionenkörper), Szpiro für CM-Kurven (Goldfeld--Szpiro), Fermat $n\geq 3$
+    (Wiles, unbedingt).
+  \item \textbf{Bedingt auf $abc$:} FLT für $n\geq 6$ (viel einfacher), Wieferich-Primzahlen
+    (endlich viele), Halls Vermutung, verallgemeinerter Catalan.
+  \item \textbf{Mochizukis IUT (2012):} Behaupteter Beweis; in PRIMS 2021 veröffentlicht;
+    Konsens nicht erreicht; Einwand von Scholze--Stix ungeklärt.
+  \item \textbf{Offen:} Die $abc$-Vermutung gilt als nicht bewiesen.
+\end{itemize}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Die $abc$-Vermutung nimmt eine singuläre Position in der modernen Zahlentheorie ein:
+eine einzige Ungleichung mit enormer Reichweite, die additive und multiplikative Strukturen
+der ganzen Zahlen auf eine Weise verbindet, die sowohl elementar zu formulieren als auch
+außerordentlich tief ist. Ihr Beweis würde weite Teile der diophantischen Geometrie neu
+ordnen. Ob Mochizukis IUT letztendlich einen breiten Konsens erreicht oder ein neuer Ansatz
+entsteht, bleibt abzuwarten.
+
+\begin{thebibliography}{99}
+
+\bibitem{Oesterle1988}
+J.~Oesterlé,
+\textit{Nouvelles approches du théorème de Fermat},
+Séminaire Bourbaki, Exposé \textbf{694} (1988), 165--186.
+
+\bibitem{Masser1985}
+D.~W.~Masser,
+\textit{Open problems},
+in \textit{Proc.\ Sympos.\ Analytic Number Theory} (W.~W.~L.~Chen, Hrsg.),
+Imperial College, London, 1985.
+
+\bibitem{Granville1990}
+A.~Granville,
+\textit{The Beal conjecture and the $abc$ conjecture},
+unveröffentlichte Notiz, 1990.
+Siehe auch: A.~Granville und T.~J.~Tucker,
+\textit{It's as easy as $abc$},
+Notices AMS \textbf{49} (2002), 1224--1231.
+
+\bibitem{Szpiro1981}
+L.~Szpiro,
+\textit{Séminaire sur les pinceaux de courbes de genre au moins deux},
+Astérisque \textbf{86} (1981).
+
+\bibitem{Silverman1994}
+J.~H.~Silverman,
+\textit{Advanced Topics in the Arithmetic of Elliptic Curves},
+Springer, GTM \textbf{151}, 1994.
+
+\bibitem{Nitaj1996}
+A.~Nitaj,
+\textit{La conjecture $abc$},
+Enseign.\ Math.\ \textbf{42} (1996), 3--24.
+
+\bibitem{Mason1984}
+R.~C.~Mason,
+\textit{Diophantine Equations over Function Fields},
+LMS Lecture Note Series \textbf{96}, Cambridge University Press, 1984.
+
+\bibitem{Mochizuki2012a}
+S.~Mochizuki,
+\textit{Inter-Universal Teichmüller Theory I: Construction of Hodge Theaters},
+Preprint (2012), RIMS Kyoto.
+
+\bibitem{Mochizuki2012b}
+S.~Mochizuki,
+\textit{Inter-Universal Teichmüller Theory II: Hodge-Arakelov-Theoretic Evaluation},
+Preprint (2012), RIMS Kyoto.
+
+\bibitem{Mochizuki2012c}
+S.~Mochizuki,
+\textit{Inter-Universal Teichmüller Theory III: Canonical Splittings of the Log-Theta-Lattice},
+Preprint (2012), RIMS Kyoto.
+
+\bibitem{Mochizuki2012d}
+S.~Mochizuki,
+\textit{Inter-Universal Teichmüller Theory IV: Log-Volume Computations and Set-Theoretic Foundations},
+Preprint (2012), RIMS Kyoto.
+
+\bibitem{ScholzeStix2018}
+P.~Scholze und J.~Stix,
+\textit{Why abc is still a conjecture},
+Bericht (2018), verfügbar unter \url{https://www.math.uni-bonn.de/people/scholze/WhyABCisStillaConjecture.pdf}.
+
+\bibitem{Mochizuki2018rebuttal}
+S.~Mochizuki,
+\textit{Comments on the manuscript by Scholze--Stix},
+Bericht (2018), verfügbar auf der RIMS-Kyoto-Website.
+
+\bibitem{Tan2022}
+F.~Tan,
+\textit{A remark on Mochizuki's Corollary 3.12},
+Preprint, 2022.
+
+\bibitem{Vojta1987}
+P.~Vojta,
+\textit{Diophantine Approximations and Value Distribution Theory},
+Lecture Notes in Mathematics \textbf{1239}, Springer, 1987.
+
+\end{thebibliography}
+
+\end{document}

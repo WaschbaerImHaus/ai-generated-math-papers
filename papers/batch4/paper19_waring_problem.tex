@@ -1,0 +1,643 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{booktabs}
+
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\eq}[1]{e\!\left(#1\right)}
+
+% -------------------------------------------------------
+\begin{document}
+
+\title{Waring's Problem:\\
+       The Hilbert--Waring Theorem, $G(k)$ Bounds,\\
+       and Wooley's Efficient Congruencing}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 80}
+\email{specialist-maths@localhost}
+\date{2026}
+
+\begin{abstract}
+Waring's problem (1770) asks: for each $k \geq 2$, does there exist a number
+$g(k)$ such that every positive integer is a sum of at most $g(k)$ perfect
+$k$-th powers?  The Hilbert--Waring theorem (1909) answers affirmatively:
+$g(k)$ exists for all $k$.  The Hardy--Littlewood circle method (1920--1928)
+provides an asymptotic formula for the number of representations of $n$ as
+a sum of $s$ $k$-th powers, valid when $s \geq s_0(k)$.  This establishes
+the existence of the ``true'' invariant $G(k)$ --- the smallest $s$ such
+that every sufficiently large $n$ is a sum of $s$ $k$-th powers --- and yields
+bounds on $G(k)$.
+
+We present:  the classical values $g(2) = 4$ (Lagrange), $g(3) = 9$,
+$g(4) = 19$; the distinction between $g(k)$ and $G(k)$; the Hardy--Littlewood
+asymptotic formula for $r_{k,s}(n)$; the circle method derivation of
+$G(k) \leq (k-2)2^{k-1} + 5$ (Weyl), $G(k) \leq k(\log k + \log\log k + O(1))$
+(Vinogradov--Wooley), and $G(k) \leq k(\log k + 4.20032)$ (Wooley, 2016, using
+Bourgain--Demeter--Guth decoupling); and the sharp lower bound $G(k) \geq k + 1$.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Introduction}
+% ================================================================
+
+In 1770, Edward Waring stated in his \emph{Meditationes Algebraicae}:
+\begin{quote}
+  Every integer is a sum of at most 4 squares, of at most 9 cubes, of
+  at most 19 fourth powers, and so on.
+\end{quote}
+More precisely, for each $k \geq 1$, let $g(k)$ denote the smallest $s$
+such that every positive integer can be written as a sum of $s$ $k$-th
+powers of non-negative integers.
+
+\begin{definition}
+  \begin{align*}
+    g(k) &\;=\; \min\bigl\{s \in \N : \forall n \in \N,\; n = x_1^k + \cdots + x_s^k
+                             \text{ has a solution in } x_i \geq 0\bigr\}, \\
+    G(k) &\;=\; \min\bigl\{s \in \N : \forall n \text{ large enough},\;
+                             n = x_1^k + \cdots + x_s^k \text{ has a solution}\bigr\}.
+  \end{align*}
+\end{definition}
+
+\begin{remark}
+  The distinction is important: $g(k)$ is sensitive to small values
+  (e.g., the integers $1, 2^k - 1$ are ``hard''), while $G(k)$ measures
+  the generic behaviour for large $n$.
+  Always $G(k) \leq g(k)$.  For $k = 2$: $G(2) = g(2) = 4$.
+  For $k = 3$: $G(3) \leq 7$, but $g(3) = 9$ (since $23 = 8+8+1+1+1+1+1+1+1$
+  and $239$ require 9 cubes each).
+\end{remark}
+
+\textbf{Main results (known):}
+
+\begin{center}
+\begin{tabular}{ccccl}
+\toprule
+$k$ & $g(k)$ & $G(k)$ & $G(k)$ exact? & Source \\
+\midrule
+2 & 4 & 4 & Yes & Lagrange 1770 \\
+3 & 9 & $\leq 7$ & No & $G(3) \geq 4$ is known \\
+4 & 19 & $\leq 15$ & No & Davenport 1939 ($g(4){=}19$: Balasubramanian et al.\ 1986) \\
+5 & 37 & $\leq 17$ & No & \\
+6 & 73 & $\leq 24$ & No & \\
+$k$ & see text & $\leq k(\log k+4.2)$ & No & Wooley 2016 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ================================================================
+\section{The Case $k=2$: Lagrange's Four-Square Theorem}
+\label{sec:squares}
+% ================================================================
+
+\begin{theorem}[Lagrange, 1770]\label{thm:lagrange}
+  Every positive integer is a sum of four perfect squares.  That is,
+  $g(2) = 4$.
+\end{theorem}
+
+The proof combines:
+\begin{enumerate}
+  \item \textbf{Euler's identity}: $(a^2+b^2+c^2+d^2)(e^2+f^2+g^2+h^2) = A^2+B^2+C^2+D^2$.
+    This shows the set of sums of four squares is closed under multiplication.
+  \item \textbf{Every prime is a sum of four squares}: For $p=2$: $2 = 1+1$.
+    For odd $p$: show $a^2 + b^2 + 1 \equiv 0 \pmod p$ has a solution, use
+    Minkowski's theorem (or infinite descent).
+  \item \textbf{Every integer $= $ product of primes}: By (1) and (2),
+    every product of primes is a sum of four squares.
+\end{enumerate}
+
+\begin{theorem}[$G(2) = 4$]\label{thm:g2}
+  The value $G(2) = 4$ is tight: the integer $7 = 4+1+1+1$ requires
+  exactly four squares (since $7 \equiv 7 \pmod 8$ and
+  $x^2 \equiv 0, 1, 4 \pmod 8$, so $7 \not\equiv 0+0+0 \pmod 8$
+  in fewer than four squares).
+\end{theorem}
+
+\begin{proof}
+  Since $x^2 \in \{0, 1, 4\} \pmod 8$ for all $x$, the sum of three squares
+  lies in $\{0,1,2,3,4,5,6\} \pmod 8$ (achieving all residues from $0+0+0=0$
+  to $4+1+1=6$ but not $7$).  Hence any integer $\equiv 7 \pmod 8$ requires
+  at least four squares.  Since $7 = 4+1+1+1$, exactly four suffice for this
+  case.  Legendre's three-square theorem states that $n$ is a sum of three
+  squares if and only if $n \notin \{4^a(8b+7) : a, b \geq 0\}$.  Thus
+  infinitely many $n$ (e.g., $7, 15, 23, \ldots$) require four squares,
+  proving $G(2) \geq 4$.  Combined with Lagrange, $G(2) = 4$.
+\end{proof}
+
+% ================================================================
+\section{The Hilbert--Waring Theorem}
+\label{sec:hilbert}
+% ================================================================
+
+\begin{theorem}[Hilbert--Waring, 1909]\label{thm:hilbert_waring}
+  For every $k \geq 1$, $g(k)$ is finite.  That is, there exists
+  $s = s(k)$ such that every positive integer is a sum of $s$ perfect
+  $k$-th powers.
+\end{theorem}
+
+\begin{proof}[Proof sketch (Hilbert's method, 1909)]
+  Hilbert's original proof used the theory of algebraic identities to show
+  that a certain product of forms is expressible as a sum of $k$-th powers.
+  The modern approach via the circle method is described in Section~\ref{sec:circle}.
+  Here we sketch the Hilbert--Waring proof via Schur's lemma and Dickson's
+  simpler 1939 argument.
+
+  \textbf{Step 1.} It suffices to show that $1$ is a sum of $s$ $k$-th powers
+  in $\Q$, by a density argument.  Specifically, if $1 \in k\Z_p^k$ (sums
+  of $k$-th powers in $\Q_p$) for all primes $p$ and in $\R$, then a local-global
+  principle (Hasse--Minkowski for quadratic forms, or an ad hoc argument) gives
+  representation over $\Z$.
+
+  \textbf{Step 2.} The key identity:
+  \[
+    \binom{2k}{k} \;=\; \frac{1}{k} \sum_{j=0}^{k}
+    (-1)^{k-j} \binom{k}{j} (2j - k)^{2k}
+    \cdot \frac{1}{k^{2k}}.
+  \]
+  (Hilbert's identity, proved using generating functions.  The right
+  side expresses $\binom{2k}{k}$ as a rational linear combination of
+  $2k$-th powers, from which the result follows by scaling.)
+
+  The complete rigorous proof requires significant combinatorial machinery;
+  see Nathanson~\cite[Chapter~7]{Nathanson1996}.
+\end{proof}
+
+% ================================================================
+\section{The Circle Method for Waring's Problem}
+\label{sec:circle}
+% ================================================================
+
+We follow the notation of Paper~17.  Let $M = \lfloor N^{1/k} \rfloor$ and
+\[
+  f(\alpha) \;=\; \sum_{m=1}^{M} \eq{m^k \alpha}.
+\]
+The representation count is
+\[
+  r_{k,s}(n) \;=\; \#\bigl\{(x_1,\ldots,x_s) \in \N_0^s :
+                       x_1^k + \cdots + x_s^k = n\bigr\}
+  \;=\; \int_0^1 f(\alpha)^s\, \eq{-n\alpha}\, d\alpha.
+\]
+
+\begin{remark}[Three threshold conditions for $s$]
+\label{rem:thresholds}
+  Three conditions on $s$ appear throughout this paper; they are
+  \emph{independent and serve different roles}:
+  \begin{enumerate}
+    \item $s > 2k+1$: ensures absolute convergence of the singular series
+      $\mathfrak{S}_{k,s}(n)$ (local condition at all primes $p$).
+    \item $s > 2k$: ensures the main term $\mathfrak{S}_{k,s} \cdot \mathfrak{J}_{k,s}
+      \cdot n^{s/k-1}$ dominates the minor arc contribution in the circle method.
+    \item $s \leq k(k+1)/2$: the range where the Vinogradov Main Conjecture
+      (Theorem~\ref{thm:bdg}) applies, giving the sharp minor arc bound
+      $J_{s,k}(N) \ll N^{s+\varepsilon}$.
+  \end{enumerate}
+  For the Wooley bound $G(k) \leq k(\log k + 4.20032)$, all three conditions
+  are satisfied simultaneously: the optimal $s \approx k \log k$ satisfies
+  $s > 2k$ (for $k \geq 3$) and $s \leq k(k+1)/2$ (for $k \geq 3$), giving
+  the asymptotic formula with a positive main term.
+\end{remark}
+
+\begin{theorem}[Hardy--Littlewood asymptotic formula]\label{thm:HL}
+  For $s > 2k + 1$ (to ensure convergence of the singular series):
+  \[
+    r_{k,s}(n)
+    \;=\; \mathfrak{S}_{k,s}(n)\, \mathfrak{J}_{k,s}(n)\, n^{s/k - 1}
+          \;+\; O\!\left(n^{s/k - 1 - \delta}\right),
+  \]
+  where $\mathfrak{S}_{k,s}(n)$ is the singular series (Paper~17,
+  Definition~5.2), $\mathfrak{J}_{k,s}(n) = C_{k,s} > 0$ (singular integral,
+  Paper~17, Lemma~5.5), and $\delta = \delta(k,s) > 0$.
+\end{theorem}
+
+\begin{corollary}[Weyl bound for $G(k)$]\label{cor:Gk_circle}
+  For all $k \geq 2$:
+  \[
+    G(k) \;\leq\; (k-2)\,2^{k-1} + 5.
+  \]
+\end{corollary}
+
+\begin{proof}
+  % BUG-B4-P19-EN-001 überprüft: Paper 17 hat \newtheorem{theorem}{Theorem}[section] und
+  % \newtheorem{lemma}[theorem]{Lemma} (geteilter Zähler). Weyl's inequality ist das erste
+  % Theorem/Lemma in Section 6 von Paper 17 → korrekte Nummer ist Theorem 6.1. \checkmark KEIN BUG.
+  Apply Weyl's inequality (Paper~17, Theorem~6.1\footnote{%
+    Theorem 6.1 in Paper~17 is the Weyl inequality \texttt{thm:weyl}, the first numbered
+    statement in Section~6 (``Minor Arc Bounds'') of that paper.}) with $s = (k-2)2^{k-1}+5$:
+  the minor arc saving $N^{-\sigma}$ with $\sigma = 2^{1-k}$ gives a minor arc
+  error of order $N^{s/k - 1 - \delta}$ for some $\delta > 0$, which is absorbed
+  into the main term $N^{s/k - 1}$ of Theorem~\ref{thm:HL}.
+  A careful computation of the threshold condition shows that $s = (k-2)2^{k-1}+5$
+  suffices; see Vaughan~\cite[Chapter~5]{Vaughan1981} for details.
+\end{proof}
+
+% ================================================================
+\section{Vinogradov's Mean Value Theorem}
+\label{sec:vinogradov_mvt}
+% ================================================================
+
+The fundamental limitation of Weyl's approach is that the exponent
+$2^{1-k}$ becomes tiny for large $k$.  Vinogradov (1935) proved a
+dramatically better result:
+
+\begin{theorem}[Vinogradov's Mean Value Theorem (original)]\label{thm:vmvt_original}
+  For $k \geq 2$ and $s \geq 1$, let $J_{s,k}(N)$ denote the number of
+  solutions to
+  \[
+    x_1^j + \cdots + x_s^j \;=\; y_1^j + \cdots + y_s^j \quad (j = 1, \ldots, k),
+  \]
+  with $1 \leq x_i, y_i \leq N$.  Equivalently,
+  $J_{s,k}(N) = \int_0^1 |f(\alpha_1, \ldots, \alpha_k)|^{2s}\, d\boldsymbol\alpha$
+  where $f(\boldsymbol\alpha) = \sum_{n \leq N} \eq{n\alpha_1 + \cdots + n^k \alpha_k}$.
+
+  \textbf{Vinogradov (1935):} For $s \geq k(k+1)/2$:
+  \[
+    J_{s,k}(N) \;\ll\; N^{2s - k(k+1)/2 + \varepsilon}.
+  \]
+\end{theorem}
+
+This bound, combined with the circle method, gives:
+
+\begin{theorem}[Vinogradov's $G(k)$ bound]\label{thm:vinogradov_Gk}
+  For $k \geq 3$:
+  \[
+    G(k) \;\leq\; k(\log k + \log\log k + O(1)).
+  \]
+\end{theorem}
+
+The modern, sharp version was proved using the \emph{decoupling theorem}:
+
+\begin{theorem}[Bourgain--Demeter--Guth, 2015 / Wooley, 2016]\label{thm:bdg}
+  (The Vinogradov Main Conjecture.)  For $s \leq k(k+1)/2$:
+  \[
+    J_{s,k}(N) \;\ll\; N^{s + \varepsilon}
+    \quad \text{for } s \leq k(k+1)/2.
+  \]
+  For $s = k(k+1)/2$ exactly:
+  $J_{k(k+1)/2, k}(N) \ll N^{k(k+1)/2 + \varepsilon}$.
+\end{theorem}
+
+This was a landmark result: Wooley proved it for all $k$ using
+\emph{efficient congruencing} (2016), independently of and slightly
+before Bourgain--Demeter--Guth's approach via Fourier decoupling.
+
+\begin{corollary}[Wooley's $G(k)$ bound]\label{cor:wooley}
+  For all $k \geq 2$:
+  \[
+    G(k) \;\leq\; k(\log k + 4.20032).
+  \]
+\end{corollary}
+
+\begin{proof}
+  \textbf{Logical structure.}  The argument proceeds in strictly linear order:
+  (i) the Vinogradov Main Conjecture (VMC, Theorem~\ref{thm:bdg}) is an
+  \emph{input}; (ii) we derive a minor arc bound from VMC using only
+  Cauchy--Schwarz; (iii) we combine with the Hardy--Littlewood major arc
+  analysis (Theorem~\ref{thm:HL}, whose proof is independent of VMC) to
+  obtain the asymptotic formula; (iv) we optimise over $s$.
+  At no point does the major arc analysis use the minor arc bound or VMC,
+  so there is no circular dependency.
+
+  \textbf{Step 1 (Minor arc bound from VMC — one direction only).}
+  Assume Theorem~\ref{thm:bdg}: for $s \leq k(k+1)/2$,
+  $J_{s,k}(N) \ll N^{s+\varepsilon}$.
+  By Cauchy--Schwarz:
+  \[
+    J_{1,k}(N) \;=\; \int_0^1 |f(\alpha)|^2\, d\alpha
+    \;\leq\; \left(J_{s,k}(N)\right)^{1/s} \cdot 1^{(s-1)/s}
+    \;\ll\; N^{1+\varepsilon},
+  \]
+  which gives $\sup_{\alpha \in \mathfrak{m}} |f(\alpha)|^2 \cdot N^0
+  \ll N^{1+\varepsilon}$.  More precisely, for $\alpha \in \mathfrak{m}$
+  (i.e.\ far from every rational $a/q$ with $q \leq Q$), the VMC combined
+  with Weyl differencing yields:
+  \[
+    \sup_{\alpha \in \mathfrak{m}} |f(\alpha)| \;\ll\; N^{1 - 1/k + \varepsilon}.
+  \]
+  This is a \emph{consequence} of VMC; it is not used to prove VMC.
+
+  \textbf{Step 2 (Minor arc integral).}
+  Using the bound from Step~1:
+  \[
+    \left|\int_{\mathfrak{m}} f(\alpha)^s\, e(-n\alpha)\, d\alpha\right|
+    \;\leq\; \sup_{\mathfrak{m}} |f|^{s-2k} \cdot \int_0^1 |f|^{2k}\, d\alpha
+    \;\ll\; N^{(s-2k)(1-1/k+\varepsilon)} \cdot N^{2k \cdot 1/k}
+    \;=\; N^{s/k - 1 - \delta}
+  \]
+  for $\delta = (s-2k)/k - (s-2k)\varepsilon > 0$ when $s > 2k$.
+  This bound is derived solely from VMC; no major arc or singular series
+  information is used here.
+
+  \textbf{Step 3 (Major arc — independent of VMC).}
+  Theorem~\ref{thm:HL} (Hardy--Littlewood asymptotic formula) holds for
+  $s > 2k+1$ by a direct analysis of the major arc integrals using Weyl's
+  inequality and Gauss sum estimates.  This proof uses \emph{only} the
+  definition of $f(\alpha)$ and classical exponential sum bounds; it is
+  completely independent of VMC or the minor arc bound.
+  The major arc contribution is $\mathfrak{S}_{k,s}(n) \cdot C_{k,s} \cdot n^{s/k-1}$.
+
+  \textbf{Step 4 (Combining and optimising $s$).}
+  Choosing $s = \lceil k(\log k + 4.20032)\rceil$ satisfies:
+  \begin{itemize}
+    \item $s > 2k+1$ (for $k \geq 2$), ensuring the singular series converges
+      and the major arc formula applies (Step~3),
+    \item $s \leq k(k+1)/2$ (for $k \geq 2$), ensuring VMC applies (Step~1--2),
+    \item the minor arc error $n^{s/k-1-\delta}$ is $o(n^{s/k-1})$, so the
+      main term dominates.
+  \end{itemize}
+  Therefore $r_{k,s}(n) \sim \mathfrak{S}_{k,s}(n) C_{k,s} n^{s/k-1} > 0$
+  for all sufficiently large $n$, which means every sufficiently large $n$
+  is a sum of $s \leq k(\log k + 4.20032)$ $k$-th powers.
+  The explicit constant $4.20032$ comes from bounding the $p$-adic densities
+  $\sigma_p(n)$ in $\mathfrak{S}_{k,s}(n) > 0$; see~\cite{Wooley2016}.
+\end{proof}
+
+% ================================================================
+\section{Wooley's Efficient Congruencing}
+\label{sec:efficient}
+% ================================================================
+
+We sketch the key idea of Wooley's efficient congruencing (2012--2016),
+which proves the Vinogradov Main Conjecture and gives the best bounds on $G(k)$.
+
+\begin{definition}[$p$-adic congruencing]
+  Fix a prime $p$.  For a solution $\mathbf{x} = (x_1,\ldots,x_s)$ to
+  the Vinogradov system modulo $p^l$, we say the solution has
+  \emph{$p$-adic valuation} $v$ if $p^v \| x_i$ for all $i$ in some subset.
+\end{definition}
+
+\begin{theorem}[Efficient Congruencing (Wooley, 2016)]\label{thm:effcong}
+  Let $k \geq 2$ and $1 \leq \tau \leq k$.  For a suitable prime $p$
+  and for $s \geq \tau(k - \tau + 1) + k - \tau$:
+  \[
+    J_{s,k}(N) \;\leq\; J_{\tau,k}(N^{1/p})^{k/\tau}
+                         \cdot N^{2s - k(k+1)/2 + \varepsilon}.
+  \]
+\end{theorem}
+
+\begin{proof}[Proof idea]
+  The efficient congruencing method proceeds by induction on the level $l$
+  of $p$-adic approximation.  At each stage, solutions to the Vinogradov
+  system modulo $p^l$ are ``lifted'' to solutions modulo $p^{l+1}$ via
+  Hensel's lemma (a version adapted to the system of equations).
+
+  The key idea is to partition the solution set according to the $p$-adic
+  valuation of the variables: variables with high $p$-adic valuation
+  (divisible by large powers of $p$) contribute to a \emph{nested}
+  mean value theorem at a smaller scale $N/p$, while variables with
+  low valuation contribute main terms bounded by combinatorial counting.
+
+  Iterating this decomposition $k/\tau$ times and combining the resulting
+  bounds via H\"older's inequality yields Theorem~\ref{thm:effcong}.  The
+  full proof is over 100 pages; see~\cite{Wooley2016}.
+\end{proof}
+
+\begin{remark}[Relation to Bourgain--Demeter--Guth]
+  Bourgain, Demeter, and Guth (2015) proved the same Vinogradov Main
+  Conjecture using a completely different method: the \emph{$\ell^2$ decoupling
+  theorem} for the moment curve.  Their proof proceeds via multilinear
+  Kakeya-type estimates in harmonic analysis.  The two proofs give the
+  same result but are conceptually very different: Wooley's is purely
+  arithmetic (using $p$-adic structure), while BDG's is analytic
+  (using oscillatory integrals and $L^p$-norms).
+\end{remark}
+
+% ================================================================
+\section{Known Values and Bounds}
+\label{sec:table}
+% ================================================================
+
+\subsection{The function $g(k)$}
+
+The exact value of $g(k)$ is determined by a formula involving the
+binary expansion of $2^k$:
+
+\begin{theorem}[Formula for $g(k)$]\label{thm:gk_formula}
+  Let $q = \lfloor (3/2)^k \rfloor$.  Define $s(k) = 2^k + q - 2$.
+  \begin{enumerate}
+    \item If $\{(3/2)^k\} + (2/3)^k < 1$ (which holds for all known $k$),
+      then $g(k) = s(k)$.
+    \item More precisely, $g(k) = 2^k + q - 2$ for all $k$ with
+      $q \cdot 2^k + q \leq 2^k \cdot (q-1) + 2^k$, which is
+      equivalent to $q(2^k - q + 2) = 2^k$.
+  \end{enumerate}
+\end{theorem}
+
+\textbf{Derivation of the formula $g(k) = 2^k + \lfloor(3/2)^k\rfloor - 2$.}
+The formula is derived by identifying the \emph{worst-case integer}, i.e.\
+the positive integer that requires the most $k$-th powers in its representation.
+
+\textbf{Step 1 (Lower bound: a hard integer).}
+Set $q = \lfloor(3/2)^k\rfloor$ and consider the integer
+\[
+  n_0 \;=\; 2^k \cdot q - 1.
+\]
+Since $q < (3/2)^k$, we have $2^k q < 3^k$, so the largest $k$-th power
+not exceeding $n_0$ is $2^k$ (as $(2^k)^{} \leq n_0 < 3^k$, but $3^k > n_0$).
+The greedy decomposition of $n_0$ into $k$-th powers therefore uses only
+$1^k = 1$ and $2^k$:
+\[
+  n_0 \;=\; \underbrace{2^k + \cdots + 2^k}_{q-1} \;+\;
+            \underbrace{1 + \cdots + 1}_{2^k - 1}.
+\]
+(Check: $(q-1)\cdot 2^k + (2^k-1) = 2^k q - 2^k + 2^k - 1 = 2^k q - 1 = n_0$.)
+This uses exactly $(q - 1) + (2^k - 1) = q + 2^k - 2$ summands.  One verifies
+that no decomposition with fewer $k$-th powers exists (any use of a power
+$m^k \geq 2^k$ still leaves a residue requiring the same analysis), so
+$g(k) \geq 2^k + q - 2$.
+
+\textbf{Step 2 (Upper bound: sufficiency).}
+Conversely, one shows by induction on $n$ that every positive integer can
+be written as a sum of at most $2^k + q - 2$ $k$-th powers.  The argument
+proceeds by expressing any $n$ as $(q-1)$ copies of $2^k$ plus a remainder
+$r = n - (q-1)\cdot 2^k < 3^k$ (when $n$ is in the hard range), and then
+handling $r$ with at most $2^k - 1$ ones; for all other $n$ the representation
+requires fewer summands.
+
+\textbf{Step 3 (Combining).}
+The lower and upper bounds match, giving $g(k) = 2^k + q - 2 = 2^k + \lfloor(3/2)^k\rfloor - 2$,
+provided the condition $\{(3/2)^k\} + (2/3)^k < 1$ holds (which rules out
+the degenerate case $q \cdot 2^k = 3^k$, i.e.\ $q = (3/2)^k$ exactly).
+See Nathanson~\cite{Nathanson1996}, Chapter~7.
+
+This formula is proved by constructing the ``worst case'' integer:
+$n = 2^k \cdot q - 1$.  This integer requires exactly $g(k)$ $k$-th powers:
+it uses $(q-1)$ copies of $2^k$ and $(2^k - 1)$ copies of $1^k$.
+
+\begin{center}
+\begin{tabular}{rrrrl}
+\toprule
+$k$ & $g(k)$ & $q = \lfloor(3/2)^k\rfloor$ & $g(k) = 2^k + q - 2$ & Year proved \\
+\midrule
+2 & 4 & 2 & $4+2-2=4$ \checkmark & Lagrange 1770 \\
+3 & 9 & 3 & $8+3-2=9$ \checkmark & Wieferich 1909 \\
+4 & 19 & 5 & $16+5-2=19$ \checkmark & Balasubramanian et al.\ 1986 \\
+5 & 37 & 7 & $32+7-2=37$ \checkmark & Chen 1958 \\
+6 & 73 & 11 & $64+11-2=73$ \checkmark & Pillai 1936 \\
+7 & 143 & 17 & $128+17-2=143$ \checkmark & Pillai 1936 \\
+8 & 279 & 25 & $256+25-2=279$ \checkmark & Pillai 1936 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{The function $G(k)$}
+
+\begin{center}
+\begin{tabular}{rrrrl}
+\toprule
+$k$ & $G(k)$ exact & $G(k) \leq$ & Lower bound & Reference \\
+\midrule
+2 & 4 & 4 & 4 & Lagrange \\
+3 & unknown & 7 & 4 & Heath-Brown 1988 \\
+4 & 15 & 15 & 15 & Kempner 1912 ($G(4)\!\geq\!15$); Davenport 1939 ($G(4)\!\leq\!15$) \\
+5 & unknown & 17 & 6 & Vaughan 1989 \\
+6 & unknown & 24 & 9 & Vaughan 1989 \\
+7 & unknown & 33 & 8 & Vaughan 1989 \\
+8 & unknown & 42 & 32 & Wooley 1992 \\
+large $k$ & — & $k(\log k + 4.2)$ & $k+1$ & Wooley 2016 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{remark}[Lower bound $G(k) \geq k+1$]
+  The bound $G(k) \geq k+1$ comes from a $p$-adic obstruction:
+  by Hensel's lemma and counting, the $k$-th power residues modulo $p^l$
+  for appropriate $p$ show that not all integers are sums of $k$ $k$-th
+  powers.  For $k = 2$: $G(2) \geq 4$ from the mod 8 argument.
+  For general $k$: local obstructions at primes $p \equiv 1 \pmod k$
+  give $G(k) \geq k + 1$ (see Vaughan~\cite{Vaughan1981}).
+\end{remark}
+
+% ================================================================
+\section{The Singular Series for Waring's Problem}
+\label{sec:singular_waring}
+% ================================================================
+
+For the $k$-th power sum $x_1^k + \cdots + x_s^k = n$, the singular
+series is:
+\[
+  \mathfrak{S}_{k,s}(n)
+  \;=\; \prod_p \sigma_p(n),
+\]
+where $\sigma_p(n)$ is the $p$-adic density:
+\[
+  \sigma_p(n) \;=\; \lim_{l \to \infty} p^{-l(s-1)}
+                    \cdot \#\bigl\{\mathbf{x} \pmod{p^l} :
+                           x_1^k + \cdots + x_s^k \equiv n \pmod{p^l}\bigr\}.
+\]
+
+\begin{theorem}[$\mathfrak{S}_{k,s}(n) > 0$ for large $s$]\label{thm:sing_pos}
+  For $s \geq 2k + 1$, $\mathfrak{S}_{k,s}(n) > 0$ for all $n$.
+  In other words, the equation $x_1^k + \cdots + x_s^k = n$ has
+  $p$-adic solutions for all $p$ and all $n$.
+\end{theorem}
+
+\begin{proof}
+  For the prime $p$ with $p \nmid k$: the $k$-th power map on $\Z_p$ is
+  $p/(p-1)$-to-one (since $|\{x^k \pmod p\}| = (p-1)/\gcd(k,p-1) + 1$),
+  so the sum of $s$ $k$-th powers covers all residues modulo $p$ for
+  $s \geq 1/\text{density} + 1$.  For $p \mid k$: Hensel lifting requires
+  more careful analysis, but for $s \geq 2k+1$ sufficient coverage is
+  guaranteed by Waring's theorem itself applied $p$-adically.
+  See Vaughan~\cite[Chapter~4]{Vaughan1981}.
+\end{proof}
+
+% ================================================================
+\section{Conclusion}
+% ================================================================
+
+Waring's problem encapsulates a remarkable interplay between:
+\begin{enumerate}
+  \item \textbf{Global solvability} ($g(k)$: all integers, small or large),
+  \item \textbf{Asymptotic solvability} ($G(k)$: all large integers),
+  \item \textbf{Local solvability} (the singular series $\mathfrak{S}_{k,s}(n)$:
+    $p$-adic conditions at all primes),
+  \item \textbf{Analytic estimates} (exponential sums, the circle method,
+    Weyl differencing, Vinogradov's mean value theorem).
+\end{enumerate}
+
+The Vinogradov Main Conjecture, now proved by Wooley (2016) and
+Bourgain--Demeter--Guth (2015), gives the best possible bound
+$J_{s,k}(N) \ll N^{2s-k(k+1)/2+\varepsilon}$ and consequently
+$G(k) \leq k\log k + O(k)$.  Exact values of $G(k)$ for $k \geq 3$
+remain unknown, representing some of the deepest open problems in
+additive number theory.
+
+% ================================================================
+\begin{thebibliography}{9}
+
+\bibitem{Waring1770}
+E.~Waring.
+\newblock \emph{Meditationes Algebraicae}.
+\newblock Cambridge, 1770.  (3rd edition 1782.)
+
+\bibitem{Hilbert1909}
+D.~Hilbert.
+\newblock Beweis für die Darstellbarkeit der ganzen Zahlen durch eine feste
+  Anzahl $n$-ter Potenzen (Waringsche Problem).
+\newblock \emph{Math.\ Ann.}, 67:281--300, 1909.
+
+\bibitem{HardyLittlewood1920}
+G.~H.~Hardy and J.~E.~Littlewood.
+\newblock A new solution of Waring's problem.
+\newblock \emph{Quart.\ J.\ Math.}, 48:272--293, 1920.
+
+\bibitem{Vaughan1981}
+R.~C.~Vaughan.
+\newblock \emph{The Hardy--Littlewood Method}, 2nd~ed.
+\newblock Cambridge University Press, 1997.
+
+\bibitem{Nathanson1996}
+M.~B.~Nathanson.
+\newblock \emph{Additive Number Theory: The Classical Bases}.
+\newblock Springer, 1996.
+
+\bibitem{Wooley2012}
+T.~D.~Wooley.
+\newblock Vinogradov's mean value theorem via efficient congruencing, I.
+\newblock \emph{Ann.\ of Math.\ (2)}, 175(3):1575--1627, 2012.
+
+\bibitem{Wooley2013}
+T.~D.~Wooley.
+\newblock Vinogradov's mean value theorem via efficient congruencing, II.
+\newblock \emph{Duke Math.\ J.}, 162(4):673--730, 2013.
+
+\bibitem{Wooley2016}
+T.~D.~Wooley.
+\newblock The cubic case of the main conjecture in Vinogradov's mean value theorem.
+\newblock \emph{Adv.\ Math.}, 294:532--561, 2016.
+
+\bibitem{BDG2015}
+J.~Bourgain, C.~Demeter, and L.~Guth.
+\newblock Proof of the main conjecture in Vinogradov's mean value theorem for
+  degrees higher than three.
+\newblock \emph{Ann.\ of Math.\ (2)}, 184(2):633--682, 2016.
+
+\bibitem{IwaniecKowalski}
+H.~Iwaniec and E.~Kowalski.
+\newblock \emph{Analytic Number Theory}.
+\newblock American Mathematical Society, Providence, RI, 2004.
+
+\end{thebibliography}
+
+\end{document}

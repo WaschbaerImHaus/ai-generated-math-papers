@@ -1,0 +1,491 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem-Umgebungen
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+% -------------------------------------------------------
+% Eigene Befehle
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\DeclareMathOperator{\res}{Res}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Die Riemann'sche Zeta-Funktion:\\
+       Definition, analytische Fortsetzung und Funktionalgleichung}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 84}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Die Riemann'sche Zeta-Funktion $\zeta(s)$ ist eines der tiefgr\"undigsten
+Objekte in der gesamten Mathematik und verbindet Zahlentheorie, komplexe
+Analysis und Physik.
+Wir entwickeln die Theorie von Grund auf:
+die Dirichlet-Reihen-Definition f\"ur $\Re(s) > 1$,
+das Euler-Produkt \"uber Primzahlen,
+die analytische Fortsetzung auf $\C \setminus \{1\}$
+und Riemanns Funktionalgleichung
+\[
+  \zeta(s) \;=\; 2^s\,\pi^{s-1}\,\sin\!\Bigl(\tfrac{\pi s}{2}\Bigr)\,
+  \Gamma(1-s)\,\zeta(1-s).
+\]
+Wir identifizieren die trivialen Nullstellen bei $s = -2, -4, -6, \ldots$
+und f\"uhren die Riemann--Siegel-Formel $Z(t) = e^{i\theta(t)}\,\zeta\!\bigl(\tfrac{1}{2}+it\bigr)$
+zur numerischen Nullstellensuche auf der kritischen Geraden ein.
+Der kritische Streifen $0 < \Re(s) < 1$ ist die Arena, in der alle
+nicht-trivialen Nullstellen liegen; die Riemann-Hypothese (noch offen)
+behauptet, dass sie alle $\Re(s) = \tfrac{1}{2}$ erf\"ullen.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Einleitung}
+% ================================================================
+
+In seiner ber\"uhmten Abhandlung von 1859 \emph{\"Uber die Anzahl der
+Primzahlen unter einer gegebenen Gr\"o\ss e} \cite{Riemann1859}
+f\"uhrte Bernhard Riemann die komplexe Betrachtung der Funktion
+\[
+  \zeta(s) = \sum_{n=1}^{\infty} \frac{1}{n^s}
+\]
+ein, die Euler nur f\"ur reelles $s > 1$ untersucht hatte.
+Riemanns entscheidende Einsicht war, $\zeta$ auf die ganze komplexe Ebene
+fortzusetzen, ihre Funktionalgleichung herzuleiten und ihre Nullstellen mit
+der Primzahlverteilung zu verbinden.
+
+\begin{remark}
+Wir verwenden die Standardnotation: $s = \sigma + it$ bezeichnet eine
+komplexe Zahl mit Realteil $\sigma = \Re(s)$ und Imagin\"arteil $t = \Im(s)$.
+Die Funktion $\Gamma$ bezeichnet Eulers Gamma-Funktion
+(Abschnitt~\ref{sec:gamma}).
+\end{remark}
+
+% ================================================================
+\section{Die Dirichlet-Reihe f\"ur \texorpdfstring{$\Re(s)>1$}{Re(s)>1}}
+% ================================================================
+
+\begin{definition}[Riemann'sche Zeta-Funktion -- Ausgangsbereich]
+\label{def:zeta_series}
+F\"ur $s \in \C$ mit $\Re(s) > 1$ ist die \emph{Riemann'sche Zeta-Funktion}
+\[
+  \zeta(s) \;=\; \sum_{n=1}^{\infty} \frac{1}{n^s}.
+\]
+\end{definition}
+
+\begin{proposition}[Absolute Konvergenz]
+\label{prop:convergence}
+Die Reihe in Definition~\ref{def:zeta_series} konvergiert absolut und
+gleichm\"a\ss ig auf jeder kompakten Teilmenge der Halbebene $\Re(s) > 1$.
+Insbesondere ist $\zeta(s)$ holomorph auf $\{s : \Re(s) > 1\}$.
+\end{proposition}
+
+\begin{proof}
+Sei $s = \sigma + it$ mit $\sigma > 1$. Dann gilt $|n^{-s}| = n^{-\sigma}$,
+und $\sum_{n=1}^\infty n^{-\sigma}$ konvergiert mit dem Integraltest:
+Das Integral $\int_1^\infty x^{-\sigma}\,dx = (\sigma-1)^{-1}$ ist endlich
+f\"ur $\sigma > 1$.
+Gleichm\"a\ss ige Konvergenz auf kompakten Mengen folgt aus dem
+Weierstra\ss'schen $M$-Test mit $M_n = n^{-\sigma_0}$, wobei
+$\sigma_0 = \min_K \Re(s) > 1$.
+Holomorphie folgt aus der gleichm\"a\ss igen Konvergenz
+holomorpher Funktionen.
+\end{proof}
+
+% ================================================================
+\section{Das Euler-Produkt}
+% ================================================================
+
+\begin{theorem}[Euler-Produkt]
+\label{thm:euler_product}
+F\"ur $\Re(s) > 1$ gilt
+\[
+  \zeta(s) \;=\; \prod_{p\;\text{prim}} \frac{1}{1 - p^{-s}},
+\]
+wobei das Produkt absolut konvergiert.
+\end{theorem}
+
+\begin{proof}
+Wir verwenden die geometrische Reihe: F\"ur jede Primzahl $p$ und $\Re(s)>1$:
+\[
+  \frac{1}{1 - p^{-s}} = \sum_{k=0}^{\infty} p^{-ks}.
+\]
+Das endliche Produkt \"uber Primzahlen $p \le P$ ergibt nach Ausmultiplizieren
+-- unter Verwendung des Fundamentalsatzes der Arithmetik (eindeutige
+Zerlegung) -- genau die Summe aller $n^{-s}$, deren Primfaktoren $\le P$ sind.
+Der Fehler gegen\"uber $\zeta(s)$ ist durch $\sum_{n>P} n^{-\sigma}$
+beschr\"ankt, was f\"ur $P \to \infty$ gegen $0$ strebt.
+\end{proof}
+
+\begin{corollary}
+$\zeta(s) \ne 0$ f\"ur $\Re(s) > 1$.
+\end{corollary}
+
+\begin{proof}
+Ein absolut konvergentes Produkt von Nicht-Null-Faktoren ist ungleich null.
+\end{proof}
+
+% ================================================================
+\section{Die Gamma-Funktion}
+\label{sec:gamma}
+% ================================================================
+
+\begin{definition}[Gamma-Funktion]
+\label{def:gamma}
+F\"ur $\Re(s) > 0$ ist Eulers \emph{Gamma-Funktion}
+\[
+  \Gamma(s) = \int_0^{\infty} t^{s-1} e^{-t}\,dt.
+\]
+\end{definition}
+
+\begin{proposition}[Wichtige Eigenschaften von $\Gamma$]
+\label{prop:gamma_props}
+\begin{enumerate}
+  \item[\textup{(i)}] \textit{Funktionalgleichung:} $\Gamma(s+1) = s\,\Gamma(s)$.
+  \item[\textup{(ii)}] \textit{Fakult\"at:} $\Gamma(n) = (n-1)!$ f\"ur $n \in \N$.
+  \item[\textup{(iii)}] \textit{Reflexionsformel:}
+    $\Gamma(s)\,\Gamma(1-s) = \dfrac{\pi}{\sin(\pi s)}$
+    f\"ur $s \notin \Z$.
+  \item[\textup{(iv)}] \textit{Meromorphe Fortsetzung:} $\Gamma$ setzt sich zu
+    einer meromorphen Funktion auf $\C$ fort mit einfachen Polen bei
+    $s = 0, -1, -2, \ldots$
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}[Beweisskizze]
+(i) Partielle Integration: $\int_0^\infty t^s e^{-t}\,dt
+= [-t^s e^{-t}]_0^\infty + s\int_0^\infty t^{s-1}e^{-t}\,dt = s\,\Gamma(s)$.
+(ii) Folgt aus (i) und $\Gamma(1) = 1$.
+(iii) Klassische Identit\"at via Weierstra\ss'schem Produkt; siehe \cite{Ahlfors1979}.
+(iv) Die Rekursion $\Gamma(s) = \Gamma(s+n)/[s(s+1)\cdots(s+n-1)]$ liefert
+die meromorphe Fortsetzung.
+\end{proof}
+
+% ================================================================
+\section{Analytische Fortsetzung von \texorpdfstring{$\zeta$}{zeta}}
+% ================================================================
+
+\begin{theorem}[Analytische Fortsetzung via Gamma-Integral]
+\label{thm:continuation}
+F\"ur $\Re(s) > 1$ gilt
+\[
+  \Gamma(s)\,\zeta(s) = \int_0^{\infty} \frac{t^{s-1}}{e^t - 1}\,dt.
+\]
+\end{theorem}
+
+\begin{proof}
+Substitution $t \mapsto nt$ in $\Gamma(s) = \int_0^\infty t^{s-1}e^{-t}\,dt$
+liefert $\Gamma(s)/n^s = \int_0^\infty t^{s-1}e^{-nt}\,dt$.
+Summation \"uber $n \ge 1$ (durch dominierte Konvergenz gerechtfertigt)
+ergibt die Behauptung.
+\end{proof}
+
+\begin{theorem}[Einfacher Pol bei $s=1$]
+\label{thm:pole}
+$\zeta(s)$ hat einen einfachen Pol bei $s = 1$ mit Residuum $1$.
+Genauer gilt:
+\[
+  \zeta(s) = \frac{1}{s-1} + \gamma + O(s-1),
+\]
+wobei $\gamma = 0{,}5772\ldots$ die Euler--Mascheroni-Konstante ist.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Die Laurent-Entwicklung folgt aus der Euler--Maclaurin-Summenformel.
+Der f\"uhrende Term liefert den einfachen Pol; der Konstantterm ergibt~$\gamma$.
+\end{proof}
+
+\begin{theorem}[Analytische Fortsetzung auf $\C \setminus \{1\}$]
+\label{thm:full_continuation}
+Die Funktion $\zeta(s)$ besitzt eine eindeutige analytische Fortsetzung
+zu einer meromorphen Funktion auf ganz $\C$, mit einem einzigen einfachen
+Pol bei $s = 1$ (Residuum~$1$) und keinen weiteren Singularit\"aten.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Ein Ansatz verwendet die Hurwitz-Zeta-Funktion
+$\zeta(s, a) = \sum_{n=0}^\infty (n+a)^{-s}$, die meromorph in $s$
+f\"ur festes $a > 0$ ist, mit einem einzigen einfachen Pol bei $s = 1$
+(keine weiteren Singularit\"aten).
+Alternativ dr\"uckt die Funktionalgleichung (Satz~\ref{thm:functional_eq})
+$\zeta(s)$ f\"ur $\Re(s) < 1$ durch $\zeta(1-s)$ mit $\Re(1-s) > 0$ aus und
+liefert so die Fortsetzung in die linke Halbebene.
+Eindeutigkeit folgt aus dem Identit\"atssatz f\"ur holomorphe Funktionen.
+\end{proof}
+
+% ================================================================
+\section{Die Funktionalgleichung}
+% ================================================================
+
+\begin{theorem}[Riemann'sche Funktionalgleichung]
+\label{thm:functional_eq}
+Die meromorph fortgesetzte Funktion $\zeta$ erf\"ullt
+\begin{equation}
+  \label{eq:functional}
+  \zeta(s) \;=\; 2^s\,\pi^{s-1}\,\sin\!\Bigl(\frac{\pi s}{2}\Bigr)\,
+  \Gamma(1-s)\,\zeta(1-s)
+  \qquad (s \in \C \setminus \{0,1\}).
+\end{equation}
+\"Aquivalent dazu: Definiert man
+\[
+  \xi(s) \;=\; \tfrac{1}{2}\,s(s-1)\,\pi^{-s/2}\,\Gamma\!\bigl(\tfrac{s}{2}\bigr)\,\zeta(s),
+\]
+so gilt $\xi(s) = \xi(1-s)$.
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Der Standardbeweis (nach Riemann 1859) verwendet die Jacobi-Theta-Funktion
+\[
+  \vartheta(t) = \sum_{n=-\infty}^{\infty} e^{-\pi n^2 t}
+  = t^{-1/2}\,\vartheta(1/t) \quad (t > 0).
+\]
+Die Modularit\"atsidentit\"at $\vartheta(1/t) = t^{1/2}\vartheta(t)$ folgt
+aus der Poisson-Summenformel.
+Man leitet die vervollst\"andigte Zeta-Funktion
+\[
+  \xi(s) = \int_1^{\infty} \bigl(\vartheta(t)-1\bigr)
+  \bigl(t^{s/2} + t^{(1-s)/2}\bigr)\frac{dt}{t}
+\]
+ab, die offensichtlich symmetrisch unter $s \leftrightarrow 1-s$ ist.
+Ein vollst\"andiger Beweis findet sich in \cite{Davenport2000}, Kapitel~8.
+\end{proof}
+
+% ================================================================
+\section{Triviale Nullstellen}
+% ================================================================
+
+\begin{theorem}[Triviale Nullstellen von $\zeta$]
+\label{thm:trivial_zeros}
+$\zeta(s) = 0$ gilt f\"ur $s = -2, -4, -6, \ldots$
+(alle negativen geraden ganzen Zahlen).
+Diese werden \emph{triviale Nullstellen} genannt.
+\end{theorem}
+
+\begin{proof}
+Wir setzen $s = -2m$ f\"ur $m = 1, 2, 3, \ldots$ in die
+Funktionalgleichung~\eqref{eq:functional} ein:
+\[
+  \zeta(-2m) = 2^{-2m}\,\pi^{-2m-1}\,\sin(-m\pi)\,\Gamma(2m+1)\,\zeta(2m+1).
+\]
+Da $\sin(-m\pi) = 0$ f\"ur $m \in \N$, folgt $\zeta(-2m) = 0$.
+Da $\zeta(2m+1)$ f\"ur $2m+1 \ge 3$ endlich ist und $\Gamma(2m+1)$ keinen
+Pol bei diesen Stellen hat, ist dies eine echte Nullstelle.
+
+Die Einfachheit folgt daraus, dass $\sin(\pi s/2)$ eine einfache Nullstelle
+bei $s = -2m$ hat und die anderen Faktoren dort weder Null noch unendlich sind.
+\end{proof}
+
+\begin{remark}
+Die Werte bei negativen ungeraden ganzen Zahlen werden durch
+Bernoulli-Zahlen $B_k$ gegeben:
+\[
+  \zeta(-n) = -\frac{B_{n+1}}{n+1} \quad (n = 1, 2, 3, \ldots).
+\]
+Insbesondere: $\zeta(-1) = -1/12$, $\zeta(-3) = 1/120$, $\zeta(0) = -1/2$.
+\end{remark}
+
+% ================================================================
+\section{Der kritische Streifen und die Riemann-Hypothese}
+% ================================================================
+
+\begin{definition}[Kritischer Streifen und kritische Gerade]
+\label{def:critical_strip}
+Der \emph{kritische Streifen} ist $\{s \in \C : 0 < \Re(s) < 1\}$.
+Die \emph{kritische Gerade} ist $\{s \in \C : \Re(s) = \tfrac{1}{2}\}$.
+
+Die Nullstellen von $\zeta$ im kritischen Streifen hei\ss en
+\emph{nicht-triviale Nullstellen}.
+\end{definition}
+
+\begin{proposition}[Nicht-triviale Nullstellen liegen im kritischen Streifen]
+\label{prop:zeros_in_strip}
+Alle nicht-trivialen Nullstellen von $\zeta(s)$ liegen im abgeschlossenen
+Streifen $0 \le \Re(s) \le 1$.
+\end{proposition}
+
+\begin{proof}
+F\"ur $\Re(s) > 1$: $\zeta(s) \ne 0$ nach dem Euler-Produkt.
+
+F\"ur $\Re(s) < 0$ (triviale Nullstellen ausgenommen): Die Funktionalgleichung
+zeigt, dass die einzigen Nullstellen von den Nullstellen von $\sin(\pi s/2)$
+bei $s = -2, -4, \ldots$ stammen.
+Insbesondere gilt $\zeta(0) = -1/2 \ne 0$, also ist $s=0$ keine Nullstelle.
+\end{proof}
+
+\begin{remark}[Die Riemann-Hypothese]
+\label{rem:rh}
+Riemann vermutete 1859, dass alle nicht-trivialen Nullstellen
+$\Re(s) = \tfrac{1}{2}$ erf\"ullen.
+Stand 2026 ist dies eines der sieben Millennium-Preisaufgaben
+(Clay Mathematics Institute, 1.000.000~USD).
+Mehr als $10^{13}$ Nullstellen wurden numerisch auf der kritischen
+Geraden verifiziert \cite{Platt2021}.
+\end{remark}
+
+% ================================================================
+\section{Die Riemann--Siegel-Formel}
+% ================================================================
+
+\begin{definition}[Riemann--Siegel-Theta-Funktion]
+\label{def:theta}
+F\"ur $t \in \R$ ist die \emph{Riemann--Siegel-Theta-Funktion}
+\[
+  \theta(t) \;=\; \arg\!\left[\Gamma\!\Bigl(\tfrac{1}{4} + \tfrac{it}{2}\Bigr)\right]
+  - \frac{t}{2}\,\ln\pi.
+\]
+F\"ur gro\ss e $t$ gilt die asymptotische Entwicklung
+\[
+  \theta(t) = \frac{t}{2}\ln\frac{t}{2\pi} - \frac{t}{2} - \frac{\pi}{8}
+  + \frac{1}{48t} - \frac{7}{5760\,t^3} + O(t^{-5}).
+\]
+\end{definition}
+
+\begin{definition}[Hardy'sche $Z$-Funktion]
+\label{def:Z_function}
+Die \emph{Hardy'sche $Z$-Funktion} (Riemann--Siegel-$Z$-Funktion) ist
+die reellwertige Funktion
+\[
+  Z(t) \;=\; e^{i\theta(t)}\,\zeta\!\Bigl(\tfrac{1}{2} + it\Bigr).
+\]
+\end{definition}
+
+\begin{theorem}[Eigenschaften von $Z$]
+\label{thm:Z_properties}
+\begin{enumerate}
+  \item[\textup{(i)}] $Z(t)$ ist reellwertig f\"ur alle $t \in \R$.
+  \item[\textup{(ii)}] $|Z(t)| = |\zeta(\tfrac{1}{2} + it)|$.
+  \item[\textup{(iii)}] Die Nullstellen von $Z(t)$ entsprechen genau
+    den Nullstellen von $\zeta$ auf der kritischen Geraden.
+  \item[\textup{(iv)}] Riemann--Siegel-Formel: F\"ur gro\ss es $t$:
+    \[
+      Z(t) = 2\sum_{n=1}^{N(t)} \frac{\cos(\theta(t) - t\ln n)}{\sqrt{n}}
+      + R(t),
+    \]
+    wobei $N(t) = \lfloor\sqrt{t/(2\pi)}\rfloor$ und $R(t) = O(t^{-1/4})$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) Folgt aus der Funktionalgleichung:
+$\overline{\zeta(\tfrac{1}{2}+it)} = \zeta(\tfrac{1}{2}-it)$.
+Die Funktionalgleichung zeigt $e^{i\theta(t)}\zeta(\tfrac{1}{2}+it) \in \R$.
+
+(ii) Wegen $|e^{i\theta(t)}| = 1$ gilt $|Z(t)| = |\zeta(\tfrac{1}{2}+it)|$.
+
+(iii) Direkt aus (ii).
+
+(iv) Die Riemann--Siegel-Formel entsteht aus der n\"aherungsweisen
+Funktionalgleichung; vollst\"andige Herleitung in \cite{Titchmarsh1986},
+Kapitel~4.
+\end{proof}
+
+% ================================================================
+\section{Werte von \texorpdfstring{$\zeta$}{zeta} an positiven geraden Zahlen}
+% ================================================================
+
+\begin{theorem}[Eulers Formel f\"ur $\zeta(2k)$]
+\label{thm:euler_values}
+F\"ur $k = 1, 2, 3, \ldots$ gilt
+\[
+  \zeta(2k) \;=\; \frac{(-1)^{k+1}\,(2\pi)^{2k}\,B_{2k}}{2\,(2k)!},
+\]
+wobei $B_{2k}$ die Bernoulli-Zahlen sind. Insbesondere:
+\[
+  \zeta(2) = \frac{\pi^2}{6}, \quad
+  \zeta(4) = \frac{\pi^4}{90}, \quad
+  \zeta(6) = \frac{\pi^6}{945}.
+\]
+\end{theorem}
+
+\begin{proof}[Beweisskizze]
+Euler (1740) verwendete die Produktformel f\"ur $\sin$:
+$\sin(\pi z) = \pi z \prod_{n=1}^{\infty}(1 - z^2/n^2)$.
+Vergleich der Taylor-Entwicklung von $\ln\sin(\pi z)$ mit dem Logarithmus
+des unendlichen Produkts liefert die Formel.
+Vollst\"andiger Beweis in \cite{Apostol1976}.
+\end{proof}
+
+% ================================================================
+\section{Schlussfolgerung}
+% ================================================================
+
+Wir haben die grundlegenden Eigenschaften der Riemann'schen Zeta-Funktion
+entwickelt: Dirichlet-Reihe f\"ur $\Re(s)>1$, Euler-Produkt als Verbindung
+zu den Primzahlen, analytische Fortsetzung auf $\C\setminus\{1\}$,
+Funktionalgleichung~\eqref{eq:functional}, triviale Nullstellen bei negativen
+geraden ganzen Zahlen und die Riemann--Siegel-Formel.
+
+Die nicht-trivialen Nullstellen im kritischen Streifen halten den Schl\"ussel
+zu pr\"azisen Absch\"atzungen f\"ur die Primzahlverteilung bereit
+(via expliziter Formel; vgl.\ Paper~23).
+Ob alle nicht-trivialen Nullstellen auf der kritischen Geraden $\Re(s) = 1/2$
+liegen -- die Riemann-Hypothese -- bleibt das ber\"uhmteste offene Problem
+der Mathematik.
+
+% ================================================================
+\begin{thebibliography}{10}
+
+\bibitem{Riemann1859}
+B.~Riemann,
+\emph{\"Uber die Anzahl der Primzahlen unter einer gegebenen Gr\"o\ss e},
+Monatsberichte der Berliner Akademie (1859), 671--680.
+Neu abgedruckt in: \emph{Gesammelte Werke}, Teubner, Leipzig, 1892.
+
+\bibitem{Davenport2000}
+H.~Davenport,
+\emph{Multiplicative Number Theory}, 3.~Aufl.\
+(revidiert von H.~L.~Montgomery),
+Graduate Texts in Mathematics~74,
+Springer, New York, 2000.
+
+\bibitem{Titchmarsh1986}
+E.~C.~Titchmarsh,
+\emph{The Theory of the Riemann Zeta-Function}, 2.~Aufl.\
+(revidiert von D.~R.~Heath-Brown),
+Oxford University Press, 1986.
+
+\bibitem{Ahlfors1979}
+L.~V.~Ahlfors,
+\emph{Complex Analysis}, 3.~Aufl.,
+McGraw-Hill, New York, 1979.
+
+\bibitem{Apostol1976}
+T.~M.~Apostol,
+\emph{Introduction to Analytic Number Theory},
+Undergraduate Texts in Mathematics,
+Springer, New York, 1976.
+
+\bibitem{Platt2021}
+D.~J.~Platt und T.~S.~Trudgian,
+The Riemann hypothesis is true up to $3 \times 10^{12}$,
+\emph{Bull.\ London Math.\ Soc.}\ \textbf{53} (2021), 792--797.
+
+\end{thebibliography}
+
+\end{document}

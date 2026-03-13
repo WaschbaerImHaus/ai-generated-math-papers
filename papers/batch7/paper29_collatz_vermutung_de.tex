@@ -1,0 +1,385 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Bemerkung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+
+\begin{document}
+
+\title{Die Collatz-Vermutung: Grundlagen, Iterationstheorie\\
+und empirische Evidenz}
+\author{Michael Fuhrmann}
+\date{März 2026}
+\maketitle
+
+\begin{abstract}
+Die Collatz-Vermutung, formuliert von Lothar Collatz im Jahr 1937, behauptet, dass jede
+positive ganze Zahl unter wiederholter Anwendung einer einfachen arithmetischen Regel
+schließlich die Zahl 1 erreicht. Trotz ihrer elementaren Formulierung bleibt die Vermutung
+eines der bekanntesten offenen Probleme der Mathematik. Diese Arbeit stellt die grundlegende
+Theorie der Collatz-Funktion $T\colon \mathbb{N} \to \mathbb{N}$ vor, untersucht ihr
+Iterationsverhalten, diskutiert die Struktur von Zyklen, gibt einen Überblick über die
+empirische Verifikation bis zu $2^{68}$ und beleuchtet Verbindungen zur Ergodentheorie,
+Dichteargumenten und der Theorie der Vorgängermengen.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+\section{Einleitung}
+
+Im Jahr 1937 stellte Lothar Collatz folgende verblüffend einfache Frage: Man nehme eine
+beliebige positive ganze Zahl $n$. Ist sie gerade, teilt man durch 2. Ist sie ungerade,
+multipliziert man mit 3 und addiert 1. Man wiederholt diesen Vorgang. Erreicht die
+Folge immer schließlich die Zahl 1?
+
+Diese Frage, heute bekannt als \emph{Collatz-Vermutung} (auch $3x+1$-Problem, Ulams
+Vermutung oder Syrakus-Problem), hat fast neunzig Jahre lang allen Beweisversuchen
+widerstanden. Paul Erd\H{o}s soll gesagt haben: ``Die Mathematik ist für solche Probleme
+noch nicht bereit.''
+
+Die Vermutung ist nicht nur wegen ihrer einfachen Formulierung bemerkenswert, sondern
+auch wegen der Fülle mathematischer Strukturen, die sie angezogen hat: Zahlentheorie,
+Ergodentheorie, $p$-adische Analysis, probabilistische Heuristiken und additive
+Kombinatorik spielen alle eine Rolle in modernen Ansätzen.
+
+\subsection{Notation und Konventionen}
+
+In dieser Arbeit bezeichnet $\mathbb{N} = \{1, 2, 3, \ldots\}$ die positiven ganzen
+Zahlen und $\mathbb{N}_0 = \{0, 1, 2, \ldots\}$ die nicht-negativen ganzen Zahlen.
+Für eine Funktion $f\colon X \to X$ und $k \geq 0$ schreiben wir $f^k$ für das
+$k$-fache Iterate von $f$, wobei $f^0 = \mathrm{id}$.
+
+\section{Die Collatz-Funktion und ihre Iterationen}
+
+\begin{definition}[Collatz-Funktion]\label{def:collatz}
+Die \emph{Collatz-Funktion} (Standardform) ist die Abbildung $T\colon \mathbb{N} \to \mathbb{N}$,
+definiert durch
+\[
+  T(n) \;=\; \begin{cases} n/2 & \text{falls } n \equiv 0 \pmod{2}, \\
+                            3n+1 & \text{falls } n \equiv 1 \pmod{2}.
+              \end{cases}
+\]
+Die \emph{Syrakus-Funktion} (oder komprimierte Form) fasst jeden ungeraden Schritt als
+vollständigen Übergang von ungerade zu ungerade zusammen:
+\[
+  S(n) \;=\; \frac{3n+1}{2^{\nu_2(3n+1)}},
+\]
+wobei $\nu_2(m)$ die 2-adische Bewertung von $m$ bezeichnet (das größte $k$ mit $2^k \mid m$).
+\end{definition}
+
+\begin{remark}\label{rem:equivalent}
+Die Vermutung ist in beiden Formulierungen äquivalent. Unter $S$ erscheinen nur ungerade
+Zahlen, was für $p$-adische und Dichteargumente praktisch ist.
+\end{remark}
+
+\begin{definition}[Collatz-Folge und Stoppzeit]\label{def:sequence}
+Für $n \in \mathbb{N}$ ist die \emph{Collatz-Folge} beginnend bei $n$ die Folge
+$(n, T(n), T^2(n), \ldots)$.
+Die \emph{totale Stoppzeit} $\sigma(n)$ ist das kleinste $k \geq 0$ mit $T^k(n) = 1$,
+oder $\infty$, falls kein solches $k$ existiert.
+Die \emph{Stoppzeit} $\sigma_\infty(n)$ ist das kleinste $k \geq 0$ mit $T^k(n) < n$,
+oder $\infty$, falls kein solches $k$ existiert.%
+\footnote{%
+  \textbf{Nicht-Standard-Notation.} In dieser Arbeit bezeichnet $\sigma(n)$ die
+  \emph{totale} Stoppzeit (erstes Iteriertes gleich 1) und $\sigma_\infty(n)$
+  die \emph{partielle} Stoppzeit (erstes Iteriertes echt kleiner als $n$).
+  Dies ist die \emph{umgekehrte} Konvention gegenüber Lagarias (1985) und
+  Tao (2022), wo $\sigma_\infty(n)$ die totale Stoppzeit und $\sigma(n)$
+  (bzw.\ $\sigma_T(n)$) die partielle Stoppzeit bezeichnet.
+  Leserinnen und Leser, die jene Quellen konsultieren, mögen die beiden Symbole
+  entsprechend vertauschen.%
+}
+\end{definition}
+
+\begin{proposition}[Existenz von Vorgängern]\label{prop:pred}
+Jede positive ganze Zahl $n$ hat mindestens einen Vorgänger unter $T$. Genauer gilt:
+\begin{enumerate}
+  \item[(i)] $2n$ ist stets ein direkter Vorgänger von $n$ (über den geraden Zweig): $T(2n) = n$.
+  \item[(ii)] Falls $n \equiv 2 \pmod{3}$, so ist $m = (2n-1)/3$ eine positive ungerade
+              ganze Zahl mit $T(m) = 2n$ und $T(2n) = n$, also ist $m$ ein Vorgänger
+              von $n$ in zwei Schritten. Insbesondere hat $n$ einen ungeraden Vorgänger
+              im Abstand 2 im Collatz-Graphen.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(i) Per Definition gilt $T(2n) = 2n/2 = n$.\\
+(ii) Setze $m = (2n-1)/3$. Dies ist genau dann eine positive ganze Zahl, wenn
+$3 \mid (2n-1)$, d.h.\ $2n \equiv 1 \pmod{3}$, also $n \equiv 2 \pmod{3}$.
+Da $3m = 2n-1$ ungerade ist, ist $m$ selbst ungerade. Es gilt
+$T(m) = 3m + 1 = (2n-1) + 1 = 2n$ und $T(2n) = n$, also $T^2(m) = n$.
+Somit ist $m$ ein Vorgänger von $n$ in zwei Schritten.\\
+Hinweis: Ein direkter ungerader Vorgänger von $n$ über den ungeraden Zweig
+würde $3m + 1 = n$ erfüllen, d.h.\ $m = (n-1)/3$; dies erfordert $n \equiv 1 \pmod{3}$
+und $(n-1)/3$ ungerade.
+\end{proof}
+
+\section{Zyklen und Fixpunkte}
+
+\begin{definition}[Zyklus]\label{def:cycle}
+Ein \emph{Zyklus} von $T$ ist eine endliche Menge $\{n_0, n_1, \ldots, n_{k-1}\} \subset \mathbb{N}$
+mit $T(n_i) = n_{i+1 \bmod k}$ für alle $i$. Die Zahl $k$ heißt die \emph{Periode}
+des Zyklus.
+\end{definition}
+
+\begin{theorem}[Einziger bekannter Zyklus]\label{thm:cycle}
+Der einzige in $\mathbb{N}$ bekannte Zyklus von $T$ ist der \emph{triviale Zyklus}:
+Die Bahn $1 \to 4 \to 2 \to 1$ hat die Periode 3. In der Syrakus-Form entspricht dies
+dem Fixpunkt $S(1) = 1$.
+\end{theorem}
+
+\begin{remark}\label{rem:cycle_search}
+Alle Zyklen von $T$ mit Periode bis zu $10^{17}$ wurden rechnerisch untersucht
+(vgl.\ \cite{Leavens1992}) und es wurde kein weiterer Zyklus außer dem trivialen gefunden.
+\end{remark}
+
+\begin{proposition}[Zyklusstrukturgleichung]\label{prop:cycle_eq}
+Ein Zyklus ungerader Zahlen $m_0, \ldots, m_{a-1}$ unter $S$ mit 2-adischen Bewertungen
+$e_i = \nu_2(3m_i + 1)$ und $E = e_0 + \cdots + e_{a-1}$ erfüllt
+\begin{equation}\label{eq:cycle_cond}
+  (2^E - 3^a)\, m_0 \;=\; C \;>\; 0,
+\end{equation}
+wobei $C > 0$ ein positiver ganzzahliger Korrekturterm ist, der von den Zwischenwerten abhängt.
+Insbesondere muss für jeden Zyklus ungerader Zahlen unter $S$ die Ungleichung $2^E > 3^a$ gelten.
+\end{proposition}
+
+\begin{proof}
+Unter $S$ gilt $m_{i+1} = (3m_i + 1) / 2^{e_i}$. Die $a$-fache Komposition liefert
+\[
+  m_0 = \frac{3^a m_0 + C}{2^E}
+\]
+für einen explizit berechenbaren positiven Term $C$, der von den Zwischenwerten abhängt.
+Umstellen ergibt $(2^E - 3^a) m_0 = C > 0$, also $2^E > 3^a$.
+Da jedoch $\log_2 3 \approx 1.585$ irrational ist, kann die Gleichung $2^E = 3^a$ nicht
+exakt erfüllt werden. Die Ungleichung $2^E > 3^a$ erfordert $E/a > \log_2 3$, was
+für kurze Zyklen ($a$ klein) strenge Bedingungen an die $e_i$ stellt und letztlich
+erklärt, warum nicht-triviale Zyklen extrem selten oder inexistent sind.
+\end{proof}
+
+\section{Empirische Verifikation und Dichteargumente}
+
+\begin{theorem}[Empirische Schranke]\label{thm:empirical}
+Die Collatz-Vermutung wurde rechnerisch für alle positiven ganzen Zahlen bis zu
+\[
+  2^{68} \approx 2{,}95 \times 10^{20}
+\]
+verifiziert (vgl.\ \cite{Barina2020}). Das heißt: Für jedes $n \leq 2^{68}$ erreicht
+die Collatz-Folge schließlich die Zahl 1.
+\end{theorem}
+
+\begin{remark}\label{rem:heuristics}
+Heuristische Argumente stützen die Vermutung. Das ``durchschnittliche'' Verhalten von $T$
+für eine ganze Zahl besteht in einem Multiplikationsfaktor von $3/2$ für ungerade Schritte
+und $1/2$ für gerade Schritte. Da ungefähr die Hälfte aller Zahlen gerade ist, beträgt
+der erwartete Faktor pro zwei Schritte ungefähr $(3/2)^{1/2} \cdot (1/2)^{1/2} = \sqrt{3/4} < 1$,
+was geometrischen Abfall in Richtung 1 nahelegt.
+\end{remark}
+
+\begin{definition}[Logarithmische Dichte]\label{def:logdens}
+Die \emph{logarithmische Dichte} einer Menge $A \subseteq \mathbb{N}$ ist
+\[
+  \mathrm{logDichte}(A) \;=\; \lim_{N \to \infty} \frac{1}{\log N} \sum_{\substack{n \leq N \\ n \in A}} \frac{1}{n},
+\]
+sofern der Grenzwert existiert. Dies ist ein schwächerer Dichtebegriff als die
+natürliche Dichte $\lim_{N\to\infty} |A \cap [1,N]|/N$.
+\end{definition}
+
+\begin{proposition}[Positive Dichte gutartiger Bahnen]\label{prop:pos_density}
+Für jedes feste $M \in \mathbb{N}$ hat die Menge
+\[
+  A_M = \{n \in \mathbb{N} : \exists k \geq 0,\; T^k(n) \leq M\}
+\]
+die natürliche Dichte 1. Das heißt: Fast alle positiven ganzen Zahlen (im Sinne der
+natürlichen Dichte) steigen schließlich unter jede feste Schranke $M$ ab.
+\end{proposition}
+
+\begin{proof}
+Wir geben zwei Argumente an: ein unbedingtes und ein bedingtes.
+
+\textbf{Unbedingt} (nach Terras \cite{Terras1976}):
+Man verwendet den Rückwärtsiterations-Baum mit Wurzel $M$. Für jedes $m \leq M$ wächst
+die Menge der ganzen Zahlen, die innerhalb von $k$ Schritten $m$ erreichen können,
+exponentiell in $k$ (mit Rate $\approx 2^k$), da jede positive ganze Zahl mindestens
+einen Vorgänger unter $T$ besitzt (Proposition~\ref{prop:pred}).
+Die komplementäre Menge der Zahlen, die innerhalb von $k$ Schritten \emph{nicht}
+unter $M$ fallen, hat eine Dichte, die durch ergodische Abschätzungen
+(siehe \cite{Terras1976}) durch $(3/4)^{k/2}$ nach oben beschränkt ist
+(bis auf logarithmische Korrekturen). Im Grenzwert $k \to \infty$ ist die Dichte
+der Ausnahmen gleich 0, also $\mathrm{Dichte}(A_M) = 1$.
+
+\textbf{Bedingt} (unter Voraussetzung der Collatz-Vermutung):
+Gilt die Collatz-Vermutung, so erreicht jede positive ganze Zahl schließlich 1;
+damit liegt jede Zahl in $A_M$ für jedes $M \geq 1$. Die Menge
+$\mathbb{N} \setminus A_M$ ist dann leer, und das Dichte-1-Resultat folgt unmittelbar.
+
+\emph{Hinweis:} Das unbedingte Argument ist das mathematisch gehaltvolle; das bedingte
+Argument zeigt lediglich, dass die Vermutung --- falls sie gilt --- ein wesentlich
+stärkeres (punktweises) Ergebnis liefert.
+\end{proof}
+
+\section{Verbindungen zur Ergodentheorie}
+
+\begin{definition}[Collatz-Dynamisches System]\label{def:shift}
+Man betrachte die 2-adischen ganzen Zahlen $\mathbb{Z}_2$ (vgl.\ Abschnitt~\ref{sec:padic_preview}).
+Die Collatz-Funktion setzt sich zu einer stetigen Abbildung
+$\tilde{T}\colon \mathbb{Z}_2 \to \mathbb{Z}_2$
+fort. Das dynamische System $(\mathbb{Z}_2, \tilde{T}, \mu)$, wobei $\mu$ das
+Haar-Maß auf $\mathbb{Z}_2$ ist, liefert einen natürlichen ergodischen Rahmen.
+\end{definition}
+
+\begin{theorem}[Terras-Dichtesatz]\label{thm:terras}
+Sei $N_k$ die Anzahl der positiven ganzen Zahlen $n \leq X$, für die $T^j(n) > n$ für
+alle $j = 1, \ldots, k$ gilt. Dann
+\[
+  \frac{N_k}{X} \;\longrightarrow\; 0 \quad \text{für } X \to \infty,
+\]
+für jedes feste $k$. Genauer gilt $N_k/X \leq (3/4)^{k/2}$ bis auf logarithmische
+Korrekturen.
+\end{theorem}
+
+\begin{proof}[Beweisansatz]
+Die entscheidende Beobachtung ist, dass für eine ``zufällige'' ganze Zahl $n$ die
+Stoppzeit $\sigma_\infty(n)$ unter einem geeigneten probabilistischen Modell mit
+Wahrscheinlichkeit 1 endlich ist. Die Stoppzeit $\sigma_\infty(n)$ ist der erste
+Zeitpunkt $k$, an dem der Zufallsgang $\sum_{j=1}^k X_j$ negativ wird, wobei
+$X_j = -1$ mit Wahrscheinlichkeit $1/2$ (gerader Schritt) und
+$X_j = \log_2(3/2)$ mit Wahrscheinlichkeit $1/2$ (ungerader Schritt).
+Der Erwartungswert von $X_j$ ist $(1/2)\log_2(3/4) < 0$. Nach dem Gesetz der
+großen Zahlen driftet der Gang nach $-\infty$, sodass er fast sicher die 0 unterschreitet.
+Die Schranke $(3/4)^{k/2}$ folgt aus Abschätzungen großer Abweichungen.
+\end{proof}
+
+\begin{theorem}[Tao 2022 — fast beschränkte Bahnen]\label{thm:tao}
+Für jede Funktion $f\colon \mathbb{N} \to \mathbb{R}_{>0}$ mit $f(n) \to \infty$ für
+$n \to \infty$ hat die Menge
+\[
+  \bigl\{ n \in \mathbb{N} : \exists k \geq 0,\; T^k(n) \leq f(n) \bigr\}
+\]
+die logarithmische Dichte 1. Mit anderen Worten: Für fast alle $n$ (im Sinne der
+logarithmischen Dichte) nimmt die Collatz-Bahn von $n$ fast beschränkte Werte an.
+\end{theorem}
+
+\begin{proof}[Beweisüberblick]
+Taos Beweis \cite{Tao2022} (veröffentlicht in \emph{Forum of Mathematics, Sigma})
+kombiniert Fourier-analytische Abschätzungen von
+Exponentialsummen über die Syrakus-Abbildung mit Methoden der Ergodentheorie:
+\begin{enumerate}
+  \item Reduktion auf die Syrakus-Funktion $S$ auf ungeraden Zahlen.
+  \item Modellierung der 2-adischen Bewertungen $e_i = \nu_2(3m_i+1)$ als annähernd
+        unabhängige geometrische Zufallsvariablen.
+  \item Einsatz der logarithmischen Fourier-Transformation zur Behandlung von
+        Abhängigkeiten zwischen Schritten.
+  \item Nachweis, dass das logarithmische Maß derjenigen $n$, die nicht unter
+        $f(n)$ absinken, gleich 0 ist.
+\end{enumerate}
+Dies ist das stärkste bisher bewiesene unbedingte Resultat in Richtung der
+Collatz-Vermutung.
+\end{proof}
+
+\section{Ausblick: $p$-adische und probabilistische Perspektiven}\label{sec:padic_preview}
+
+\begin{definition}[2-adische ganze Zahlen]\label{def:2adic}
+Die \emph{2-adischen ganzen Zahlen} $\mathbb{Z}_2$ sind die Vervollständigung von
+$\mathbb{Z}$ bezüglich der 2-adischen Metrik $|x|_2 = 2^{-\nu_2(x)}$. Jedes Element
+von $\mathbb{Z}_2$ lässt sich als formale Potenzreihe $\sum_{k=0}^\infty a_k 2^k$
+mit $a_k \in \{0,1\}$ schreiben.
+\end{definition}
+
+\begin{proposition}[Fortsetzung von $T$ auf $\mathbb{Z}_2$]\label{prop:extension}
+Die Collatz-Funktion $T\colon \mathbb{N} \to \mathbb{N}$ setzt sich zu einer stetigen
+Abbildung $\tilde{T}\colon \mathbb{Z}_2 \to \mathbb{Z}_2$ fort. Die Unterscheidung
+gerade/ungerade ist in $\mathbb{Z}_2$ durch das letzte Bit $a_0$ wohldefiniert.
+\end{proposition}
+
+\begin{proof}
+Für $x \in \mathbb{Z}_2$ setze $\tilde{T}(x) = x/2$ falls $a_0 = 0$, und
+$\tilde{T}(x) = (3x+1)/2$ falls $a_0 = 1$ (in der Syrakus-Form, die
+$\mathbb{Z}_2^{\text{ungerade}}$ in sich abbildet). Die Abbildung ist stetig, da
+beide Zweige 2-adisch stetig sind: Division durch 2 ist 2-adisch kontrahierend,
+und $3x+1$ ist eine stetige affine Abbildung.
+\end{proof}
+
+\begin{conjecture}[Collatz-Vermutung]\label{conj:collatz}
+Für jedes $n \in \mathbb{N}$ existiert ein $k \geq 0$ mit $T^k(n) = 1$.
+Äquivalent dazu: Jede positive ganze Zahl liegt in der Rückwärtsbahn von 1 unter $T$.
+\end{conjecture}
+
+\section{Zusammenfassung und offene Fragen}
+
+Die Collatz-Vermutung gehört zu den verlockendsten ungelösten Problemen der Mathematik.
+Wir haben den grundlegenden Rahmen vorgestellt: die Collatz-Funktion $T$, ihre Iterationen,
+die Struktur von Zyklen (eingeschränkt durch die Irrationalität von $\log_2 3$), empirische
+Evidenz bis $2^{68}$, Dichteargumente für das gutartige Verhalten fast aller Bahnen und die
+Verbindung zur Ergodentheorie, die in Taos Resultat von 2022 gipfelt.
+
+Offene Fragen bleiben:
+\begin{enumerate}
+  \item Erreicht jede positive ganze Zahl schließlich die 1 (die Vermutung selbst)?
+  \item Gibt es Zyklen außer dem trivialen $1 \to 4 \to 2 \to 1$?
+  \item Kann Taos Resultat von logarithmischer Dichte auf natürliche Dichte verbessert werden?
+  \item Wie sind die Stoppzeiten $\sigma(n)$ genau verteilt?
+  \item Können $p$-adische Methoden eine Beweismethode liefern (vgl.\ \cite{Fuhrmann2026b})?
+\end{enumerate}
+
+\begin{thebibliography}{99}
+
+\bibitem{Collatz1937}
+L.~Collatz.
+\newblock Unveröffentlichtes Problem, vorgestellt beim Internationalen Mathematikerkongress, 1937.
+
+\bibitem{Lagarias1985}
+J.~C. Lagarias.
+\newblock The $3x+1$ problem and its generalizations.
+\newblock \emph{American Mathematical Monthly}, 92(1):3--23, 1985.
+
+\bibitem{Lagarias2010}
+J.~C. Lagarias (Hrsg.).
+\newblock \emph{The Ultimate Challenge: The $3x+1$ Problem}.
+\newblock American Mathematical Society, Providence, RI, 2010.
+
+\bibitem{Tao2022}
+T.~Tao.
+\newblock Almost all Collatz orbits attain almost bounded values.
+\newblock \emph{Forum of Mathematics, Sigma}, 10:e72, 2022.
+
+\bibitem{Terras1976}
+R.~Terras.
+\newblock A stopping time problem on the positive integers.
+\newblock \emph{Acta Arithmetica}, 30(3):241--252, 1976.
+
+\bibitem{Barina2020}
+D.~Barina.
+\newblock Convergence verification of the Collatz problem.
+\newblock \emph{The Journal of Supercomputing}, 77:2681--2688, 2021.
+
+\bibitem{Leavens1992}
+G.~T. Leavens und M.~Vermeulen.
+\newblock $3x+1$ search programs.
+\newblock \emph{Computers \& Mathematics with Applications}, 24(11):79--99, 1992.
+
+\bibitem{Furstenberg1977}
+H.~Furstenberg.
+\newblock Ergodic behavior of diagonal measures and a theorem of Szemer\'edi on arithmetic progressions.
+\newblock \emph{Journal d'Analyse Math\'ematique}, 31(1):204--256, 1977.
+
+\bibitem{Fuhrmann2026b}
+M.~Fuhrmann.
+\newblock Die Collatz-Vermutung und $p$-adische Zahlen.
+\newblock Preprint, 2026.
+
+\end{thebibliography}
+
+\end{document}

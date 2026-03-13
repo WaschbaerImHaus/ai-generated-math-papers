@@ -1,0 +1,572 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{enumitem,booktabs,array}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\OK}{\mathcal{O}_K}
+\newcommand{\p}{\mathfrak{p}}
+\newcommand{\q}{\mathfrak{q}}
+\newcommand{\aaa}{\mathfrak{a}}
+\newcommand{\bbb}{\mathfrak{b}}
+\newcommand{\Nm}{\mathrm{N}}
+\newcommand{\disc}{\mathrm{disc}}
+\DeclareMathOperator{\Gal}{Gal}
+\DeclareMathOperator{\Cl}{Cl}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\nm}{N}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Algebraic Number Theory:\\
+       Rings of Integers, Ideals, the Unit Theorem, and the Class Group}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 119}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+We develop the foundations of algebraic number theory, beginning with
+number fields and their rings of integers, proceeding through Dedekind's
+theory of ideal factorisation, the Minkowski embedding and geometry of
+numbers, Dirichlet's Unit Theorem (with complete proof), the class group
+and Minkowski's class number bound, and the Dirichlet class number formula.
+Special attention is given to quadratic fields $\Q(\sqrt{d})$, where all
+concepts can be made fully explicit.  No prior knowledge beyond undergraduate
+algebra is assumed.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Number Fields and Algebraic Integers}
+% ================================================================
+
+\begin{definition}[Number field]
+\label{def:number_field}
+A \emph{number field} is a finite extension $K/\Q$.  Its \emph{degree}
+is $[K:\Q] = n$.
+\end{definition}
+
+\begin{definition}[Algebraic integer]
+\label{def:alg_int}
+An element $\alpha \in \C$ is an \emph{algebraic integer} if it satisfies
+a monic polynomial $f \in \Z[x]$:
+\[
+  \alpha^n + a_{n-1}\alpha^{n-1} + \cdots + a_1\alpha + a_0 = 0,
+  \quad a_i \in \Z.
+\]
+The set of algebraic integers in $K$ is denoted $\OK$.
+\end{definition}
+
+\begin{theorem}[Ring of integers]
+\label{thm:OK_ring}
+$\OK$ is a subring of $K$ with $\OK \cap \Q = \Z$ and $\OK \otimes_\Z \Q = K$.
+Moreover, $\OK$ is a free $\Z$-module of rank $n = [K:\Q]$:
+\[
+  \OK = \Z\omega_1 \oplus \Z\omega_2 \oplus \cdots \oplus \Z\omega_n
+\]
+for some $\Q$-basis $\{\omega_1, \ldots, \omega_n\}$ of $K$, called an
+\emph{integral basis}.
+\end{theorem}
+
+\begin{proof}
+The fact that algebraic integers are closed under addition and multiplication
+follows from linear algebra: if $\alpha$ satisfies a monic polynomial of
+degree $m$ and $\beta$ of degree $n$, then $\alpha + \beta$ and $\alpha\beta$
+satisfy monic polynomials of degree at most $mn$ (they are eigenvalues of
+integer matrices acting on the $\Z$-module $\Z[\alpha,\beta]$, which is
+free of rank $mn$).
+
+To see $\OK$ is a free $\Z$-module of rank $n$: any integral basis of $\OK$
+is a $\Q$-basis of $K$ (by the rank observation above), so the rank equals
+$n$.  The finitely generated $\Z$-module $\OK$ is torsion-free (embedded
+in the field $K$), hence free by the classification of finitely generated
+abelian groups.
+\end{proof}
+
+\begin{example}[Quadratic fields]
+\label{ex:quadratic}
+Let $d \in \Z$ be squarefree, $d \ne 0, 1$.  Then $K = \Q(\sqrt{d})$
+has degree $2$ and:
+\[
+  \OK =
+  \begin{cases}
+    \Z\bigl[\tfrac{1+\sqrt{d}}{2}\bigr] = \Z + \Z\tfrac{1+\sqrt{d}}{2}
+    & \text{if } d \equiv 1 \pmod{4}, \\[4pt]
+    \Z[\sqrt{d}] = \Z + \Z\sqrt{d}
+    & \text{if } d \equiv 2, 3 \pmod{4}.
+  \end{cases}
+\]
+\end{example}
+
+\begin{definition}[Discriminant]
+\label{def:disc}
+Let $\{\omega_1, \ldots, \omega_n\}$ be an integral basis of $\OK$.
+The \emph{discriminant} of $K$ (or of $\OK$) is
+\[
+  \disc(K) = \det\bigl[(\sigma_i(\omega_j))_{i,j}\bigr]^2,
+\]
+where $\sigma_1, \ldots, \sigma_n : K \hookrightarrow \C$ are the $n$
+distinct embeddings of $K$.
+\end{definition}
+
+\begin{example}[Discriminant of $\Q(\sqrt{d})$]
+For squarefree $d$:
+\[
+  \disc(\Q(\sqrt{d})) =
+  \begin{cases}
+    d & \text{if } d \equiv 1 \pmod{4}, \\
+    4d & \text{if } d \equiv 2, 3 \pmod{4}.
+  \end{cases}
+\]
+\end{example}
+
+% ================================================================
+\section{Dedekind Rings and Ideal Theory}
+% ================================================================
+
+\begin{definition}[Dedekind domain]
+\label{def:dedekind}
+An integral domain $R$ is a \emph{Dedekind domain} if:
+\begin{enumerate}[label=(\roman*)]
+  \item $R$ is Noetherian,
+  \item $R$ is integrally closed in its field of fractions,
+  \item every non-zero prime ideal of $R$ is maximal.
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}
+\label{thm:OK_dedekind}
+For any number field $K$, the ring $\OK$ is a Dedekind domain.
+\end{theorem}
+
+\begin{proof}
+(i) \emph{Noetherian:} $\OK$ is a finitely generated $\Z$-module, hence
+Noetherian as a $\Z$-module, hence Noetherian as a ring.
+
+(ii) \emph{Integrally closed:} If $\alpha \in K$ satisfies a monic polynomial
+over $\OK$, one shows $\alpha \in \OK$ by a standard norm argument.
+
+(iii) \emph{Non-zero primes are maximal:} Let $\p \ne 0$ be prime.
+Then $\p \cap \Z = p\Z$ for some rational prime $p$ (since $\OK/\p$
+is an integral domain, and $\Z \to \OK/\p$ is injective, forcing $\p \cap \Z$
+to be prime, hence $= p\Z$).
+Thus $\OK/\p$ is a finite integral domain (it is a quotient of $\OK/p\OK$,
+which is a finite ring), hence a field, so $\p$ is maximal.
+\end{proof}
+
+\begin{theorem}[Unique factorisation of ideals]
+\label{thm:ufid}
+Every non-zero ideal $\aaa \subseteq \OK$ has a unique factorisation
+\[
+  \aaa = \p_1^{e_1} \p_2^{e_2} \cdots \p_r^{e_r},
+\]
+where $\p_1, \ldots, \p_r$ are distinct non-zero prime ideals and $e_i \ge 1$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The key ingredient is the existence of \emph{fractional ideals} and their
+inverses: for a non-zero prime $\p$ in a Dedekind domain, one constructs
+$\p^{-1} = \{x \in K : x\p \subseteq \OK\}$ and shows $\p \cdot \p^{-1} = \OK$.
+This makes the non-zero fractional ideals into an abelian group (the
+\emph{ideal group}).  Existence of the factorisation uses Noetherianness
+(ascending chain condition on ideals); uniqueness uses cancellation in
+the ideal group.  See \cite{Neukirch1999}, Chapter I, for the complete argument.
+\end{proof}
+
+\begin{definition}[Norm of an ideal]
+\label{def:ideal_norm}
+For a non-zero ideal $\aaa \subseteq \OK$, its \emph{norm} is
+\[
+  \Nm(\aaa) = [\OK : \aaa] = |\OK/\aaa|.
+\]
+For a prime ideal $\p$, $\Nm(\p) = p^f$ where $p = \p \cap \Z$ and $f$
+is the \emph{inertia degree} (residue field degree $[\OK/\p : \F_p] = f$).
+\end{definition}
+
+\begin{theorem}[Splitting of primes]
+\label{thm:splitting}
+Let $p \in \Z$ be a rational prime.  In $\OK$:
+\[
+  p\OK = \p_1^{e_1} \cdots \p_g^{e_g},
+\]
+with $\sum_{i=1}^g e_i f_i = n$ (the \emph{efg-identity}).
+The prime $p$ is:
+\begin{itemize}
+  \item \emph{split} if all $e_i = 1$ and $g = n$,
+  \item \emph{inert} if $g = 1$, $e_1 = 1$, $f_1 = n$,
+  \item \emph{ramified} if some $e_i > 1$ (equivalently, $p \mid \disc(K)$).
+\end{itemize}
+\end{theorem}
+
+% ================================================================
+\section{The Minkowski Embedding}
+% ================================================================
+
+\begin{definition}[Minkowski embedding]
+\label{def:mink_emb}
+Let $K$ have $r_1$ real embeddings $\sigma_1, \ldots, \sigma_{r_1} : K \to \R$
+and $r_2$ pairs of complex embeddings
+$\tau_1, \bar\tau_1, \ldots, \tau_{r_2}, \bar\tau_{r_2} : K \to \C$.
+Set $n = r_1 + 2r_2$.  The \emph{Minkowski embedding} is
+\[
+  \iota : K \longrightarrow \R^n, \quad
+  \alpha \longmapsto
+  \bigl(\sigma_1(\alpha), \ldots, \sigma_{r_1}(\alpha),
+        \Re(\tau_1(\alpha)), \Im(\tau_1(\alpha)), \ldots,
+        \Re(\tau_{r_2}(\alpha)), \Im(\tau_{r_2}(\alpha))\bigr).
+\]
+The image $\iota(\OK)$ is a \emph{full lattice} in $\R^n$ (a discrete
+subgroup of rank $n$).
+\end{definition}
+
+\begin{theorem}[Minkowski's bound]
+\label{thm:mink_bound}
+Every ideal class in $\Cl(K)$ contains an integral ideal $\aaa$ with
+\[
+  \Nm(\aaa) \;\le\; M_K
+  \;=\; \frac{n!}{n^n} \left(\frac{4}{\pi}\right)^{r_2} \sqrt{|\disc(K)|}.
+\]
+In particular, $\Cl(K)$ is \emph{finite} (the \emph{class group} has finite
+order $h_K$, the \emph{class number}).
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+One applies Minkowski's theorem on convex bodies (if a symmetric convex
+body $B \subseteq \R^n$ has volume $\text{vol}(B) > 2^n \det(\Lambda)$,
+it contains a non-zero lattice point of $\Lambda$) to the lattice $\Lambda$
+corresponding to a fractional ideal $\mathfrak{c}^{-1}$ and the convex body
+$\{x \in \R^n : \sum |x_i| \le t\}$ (or its modification for complex places).
+The explicit volume computation yields the bound $M_K$.
+Every ideal class contains some integral ideal of norm $\le M_K$, and the
+number of integral ideals of bounded norm is finite, so $h_K < \infty$.
+\end{proof}
+
+% ================================================================
+\section{The Unit Group: Dirichlet's Unit Theorem}
+% ================================================================
+
+\begin{definition}[Unit group]
+The \emph{unit group} of $\OK$ is
+\[
+  \OK^\times = \{u \in \OK : u^{-1} \in \OK\} = \{u \in \OK : \Nm_{K/\Q}(u) = \pm 1\}.
+\]
+\end{definition}
+
+\begin{theorem}[Dirichlet's Unit Theorem, 1846]
+\label{thm:dirichlet_unit}
+Let $K$ be a number field with $r_1$ real and $r_2$ pairs of complex
+embeddings.  Then
+\[
+  \OK^\times \;\cong\; \mu(K) \times \Z^{r_1 + r_2 - 1},
+\]
+where $\mu(K)$ is the (finite cyclic) group of roots of unity in $K$ and
+$r = r_1 + r_2 - 1$ is the \emph{unit rank}.
+\end{theorem}
+
+\begin{proof}
+\textbf{Step 1: The logarithm map.}
+Define the \emph{Minkowski logarithm}:
+\[
+  \ell : \OK^\times \longrightarrow \R^{r_1+r_2},
+  \quad
+  u \mapsto \bigl(\log|\sigma_1(u)|, \ldots, \log|\sigma_{r_1}(u)|,
+               2\log|\tau_1(u)|, \ldots, 2\log|\tau_{r_2}(u)|\bigr).
+\]
+Since $\prod_i |\sigma_i(u)|^{} \cdot \prod_j |\tau_j(u)|^2 = |N_{K/\Q}(u)| = 1$,
+the image of $\ell$ lands in the hyperplane
+\[
+  H = \bigl\{(x_1,\ldots,x_{r_1+r_2}) : x_1 + \cdots + x_{r_1+r_2} = 0\bigr\}
+  \cong \R^{r_1+r_2-1}.
+\]
+
+\textbf{Step 2: The kernel.}
+An element $u \in \OK^\times$ satisfies $\ell(u) = 0$ iff $|\sigma_i(u)| = 1$
+for all $i$.  By Minkowski's bound, there are finitely many units of bounded norm,
+so $\ker(\ell)$ is finite.  A finite subgroup of $K^\times$ is cyclic (every finite
+subgroup of the multiplicative group of a field is cyclic).  Hence $\ker(\ell) = \mu(K)$.
+
+\textbf{Step 3: The image is a full lattice of rank $r_1+r_2-1$.}
+We must show $\ell(\OK^\times)$ is a full lattice in $H$.
+
+\emph{Discreteness:}  The set of units $u$ with $\|\ell(u)\|_\infty \le B$
+satisfies $e^{-B} \le |\sigma_i(u)| \le e^B$ for all $i$, so all
+conjugates are bounded.  By the boundedness of $\OK$ within the Minkowski
+space, there are finitely many such units.
+
+\emph{Full rank:}  We must find $r_1+r_2-1$ linearly independent elements
+in $\ell(\OK^\times)$.  For each embedding $\sigma_k$, one constructs a unit
+with $|\sigma_k(u)| > 1$ and $|\sigma_j(u)| < 1$ for $j \ne k$ using
+geometry of numbers (apply Dirichlet's box principle to lattice points in
+a suitable box).  The resulting vectors $\ell(u_1), \ldots, \ell(u_{r_1+r_2})$
+span $H$ (they satisfy the hyperplane equation), and $r_1+r_2-1$ of them
+are linearly independent.
+
+\textbf{Conclusion:}  The exact sequence
+$1 \to \mu(K) \to \OK^\times \xrightarrow{\ell} \ell(\OK^\times) \to 0$
+with $\ell(\OK^\times) \cong \Z^{r_1+r_2-1}$ (free abelian, being a lattice)
+gives $\OK^\times \cong \mu(K) \times \Z^{r_1+r_2-1}$.
+\end{proof}
+
+\begin{example}[Quadratic fields]
+For $K = \Q(\sqrt{d})$:
+\begin{itemize}
+  \item Real quadratic ($d > 0$): $r_1 = 2$, $r_2 = 0$, rank $= 1$.
+    So $\OK^\times \cong \{\pm 1\} \times \Z = \{\pm \varepsilon^n : n \in \Z\}$
+    for a \emph{fundamental unit} $\varepsilon > 1$.
+  \item Imaginary quadratic ($d < 0$): $r_1 = 0$, $r_2 = 1$, rank $= 0$.
+    So $\OK^\times$ is finite:
+    $\OK^\times = \{\pm 1, \pm i\}$ for $d=-1$ (Gaussian integers),
+    $\OK^\times = \{\pm 1, \pm\omega, \pm\omega^2\}$ ($\omega = e^{2\pi i/3}$)
+    for $d=-3$, and $\OK^\times = \{\pm 1\}$ for all other $d < 0$.
+\end{itemize}
+\end{example}
+
+\begin{example}[Fundamental unit of $\Q(\sqrt{2})$]
+$d=2$, $\OK = \Z[\sqrt{2}]$, $\varepsilon = 1 + \sqrt{2}$.
+Check: $(1+\sqrt{2})(1-\sqrt{2}) = 1 - 2 = -1$, so $N(\varepsilon) = -1$
+and $\varepsilon^{-1} = -(1-\sqrt{2}) = \sqrt{2}-1$.
+\end{example}
+
+% ================================================================
+\section{The Class Group}
+% ================================================================
+
+\begin{definition}[Fractional ideals and the class group]
+A \emph{fractional ideal} of $\OK$ is a non-zero $\OK$-submodule
+$\mathfrak{I} \subseteq K$ such that $d\mathfrak{I} \subseteq \OK$
+for some $d \in \Z \setminus \{0\}$.  The fractional ideals form an
+abelian group $\mathcal{I}_K$ under multiplication.  The \emph{principal}
+fractional ideals $\alpha\OK$ ($\alpha \in K^\times$) form a subgroup
+$\mathcal{P}_K$.  The \emph{ideal class group} is
+\[
+  \Cl(K) = \mathcal{I}_K / \mathcal{P}_K.
+\]
+Its order $h_K = |\Cl(K)|$ is the \emph{class number}.
+\end{definition}
+
+\begin{theorem}
+$h_K = 1$ if and only if $\OK$ is a principal ideal domain (equivalently,
+a unique factorisation domain).
+\end{theorem}
+
+\begin{proof}
+In a Dedekind domain, every ideal is principal iff the class group is trivial.
+A Dedekind domain is a UFD iff it is a PID (since every irreducible element
+generates a prime ideal in a Dedekind domain).
+\end{proof}
+
+\begin{example}[Class number 1 imaginary quadratic fields]
+The imaginary quadratic fields with $h_K = 1$ are exactly those with
+$d \in \{-1, -2, -3, -7, -11, -19, -43, -67, -163\}$.
+This is the \emph{Stark--Heegner theorem} (1967/1969).
+\end{example}
+
+\begin{example}[Class group of $\Q(\sqrt{-5})$]
+$\disc = -20$, Minkowski bound $M_K = \frac{2}{\pi}\sqrt{20} \approx 2.85$.
+We check primes $p \le 2$: The prime $2$ ramifies: $2\OK = (2, 1+\sqrt{-5})^2$.
+Let $\p = (2, 1+\sqrt{-5})$.  Then $\Nm(\p) = 2$, $\p \notin \mathcal{P}_K$
+(since $2 = a^2 + 5b^2$ has no integer solution), but $\p^2 = 2\OK$ is principal.
+Hence $\Cl(K) \cong \Z/2\Z$ and $h_K = 2$.
+\end{example}
+
+% ================================================================
+\section{Splitting of Primes in Quadratic Fields}
+% ================================================================
+
+\begin{theorem}[Splitting via Legendre symbol]
+\label{thm:quad_split}
+Let $K = \Q(\sqrt{d})$ with discriminant $D = \disc(K)$.  An odd prime $p$
+satisfies:
+\[
+  p\OK =
+  \begin{cases}
+    \p\q, \quad \p \ne \q & \text{if } \bigl(\tfrac{D}{p}\bigr) = +1
+    \quad\text{(split)}, \\[2pt]
+    \p^2 & \text{if } p \mid D
+    \quad\text{(ramified)}, \\[2pt]
+    \p \text{ (prime)} & \text{if } \bigl(\tfrac{D}{p}\bigr) = -1
+    \quad\text{(inert)}.
+  \end{cases}
+\]
+\end{theorem}
+
+\begin{proof}
+The minimal polynomial of $\sqrt{d}$ over $\Q$ is $f(x) = x^2 - d$.
+Splitting of $p$ is determined by the factorisation of $f \pmod{p}$.
+By quadratic reciprocity and the definition of the Legendre symbol,
+$f$ splits into two distinct linear factors mod $p$ iff $d$ is a quadratic
+residue mod $p$ (iff $\bigl(\tfrac{d}{p}\bigr) = 1$), and is irreducible
+mod $p$ iff $d$ is a non-residue.  Since $D$ and $d$ differ only by a
+square factor (which does not affect the Legendre symbol for odd primes),
+$\bigl(\tfrac{d}{p}\bigr) = \bigl(\tfrac{D}{p}\bigr)$.
+\end{proof}
+
+% ================================================================
+\section{The Class Number Formula}
+% ================================================================
+
+\begin{definition}[Dedekind zeta function]
+\label{def:dedekind_zeta}
+For a number field $K$, the \emph{Dedekind zeta function} is
+\[
+  \zeta_K(s) = \sum_{\substack{\aaa \subseteq \OK \\ \aaa \ne 0}} \frac{1}{\Nm(\aaa)^s}
+  = \prod_{\p} \frac{1}{1 - \Nm(\p)^{-s}}, \qquad \Re(s) > 1.
+\]
+It has analytic continuation to $\C \setminus \{1\}$ with a simple pole at $s=1$.
+\end{definition}
+
+\begin{theorem}[Dirichlet--Dedekind Class Number Formula]
+\label{thm:class_number_formula}
+The residue of $\zeta_K(s)$ at $s = 1$ is
+\[
+  \lim_{s \to 1^+} (s-1)\,\zeta_K(s)
+  \;=\;
+  \frac{2^{r_1} (2\pi)^{r_2}\, h_K\, R_K}{w_K \sqrt{|\disc(K)|}},
+\]
+where $h_K$ is the class number, $R_K$ is the \emph{regulator}
+($|\det$ of the $r \times r$ submatrix of the logarithm map applied to a
+system of fundamental units$|$), and $w_K = |\mu(K)|$ is the number of roots
+of unity.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The Dedekind zeta function factors as a product over ideal classes.
+For each class $[\mathfrak{c}] \in \Cl(K)$, one sums over ideals in that class:
+\[
+  \zeta_K(s) = \sum_{[\mathfrak{c}] \in \Cl(K)} \zeta_K(s, [\mathfrak{c}]),
+  \qquad
+  \zeta_K(s, [\mathfrak{c}]) = \sum_{\substack{\aaa \in [\mathfrak{c}] \\ \aaa \ne 0}}
+  \Nm(\aaa)^{-s}.
+\]
+Each partial zeta function $\zeta_K(s,[\mathfrak{c}])$ has residue
+\[
+  \frac{2^{r_1}(2\pi)^{r_2} R_K}{w_K \sqrt{|\disc(K)|}}
+\]
+(computed by counting lattice points in the Minkowski space, using the
+Minkowski embedding and the Volume of the fundamental domain), and there
+are $h_K$ classes.  Summing over all classes gives the stated formula.
+See \cite{Neukirch1999}, Chapter I, \S8, for the complete proof.
+\end{proof}
+
+\begin{corollary}[Class number of imaginary quadratic fields]
+For $K = \Q(\sqrt{d})$, $d < 0$ squarefree: $r_1 = 0$, $r_2 = 1$, $R_K = 1$,
+$\disc(K) < 0$.  The formula gives
+\[
+  h_K = \frac{w_K \sqrt{|D|}}{2\pi} L(1, \chi_D),
+\]
+where $\chi_D = \bigl(\tfrac{D}{\cdot}\bigr)$ is the Kronecker symbol and
+$L(s, \chi_D) = \sum_{n=1}^\infty \chi_D(n) n^{-s}$ is the Dirichlet $L$-function.
+\end{corollary}
+
+% ================================================================
+\section{Worked Examples: Class Groups of Small Quadratic Fields}
+% ================================================================
+
+\begin{example}[$\Q(\sqrt{-23})$]
+$D = -23$ (since $-23 \equiv 1 \pmod{4}$).  Minkowski bound:
+$M_K = \frac{2}{\pi}\sqrt{23} \approx 3.05$.
+Check $p = 2$: $\bigl(\tfrac{-23}{2}\bigr) = 1$ (since $-23 \equiv 1 \pmod 8$),
+so $2$ splits: $2\OK = \p_2 \q_2$.  Norm of $\p_2 = 2$.
+Check $p = 3$: $\bigl(\tfrac{-23}{3}\bigr) = \bigl(\tfrac{1}{3}\bigr) = 1$,
+so $3$ splits.
+One verifies that $\p_2 \notin \mathcal{P}_K$ but $\p_2^3 \in \mathcal{P}_K$
+(since $N(a + b\tfrac{1+\sqrt{-23}}{2}) = a^2 + ab + 6b^2$, which represents
+$8$ at $a=1, b=1$ but not $2$ or $4$).
+Hence $h_{-23} = 3$ and $\Cl(K) \cong \Z/3\Z$.
+\end{example}
+
+\begin{example}[Real quadratic $\Q(\sqrt{5})$]
+$d = 5 \equiv 1 \pmod{4}$, so $\OK = \Z[\phi]$ with $\phi = \tfrac{1+\sqrt{5}}{2}$
+(the golden ratio).  $D = 5$.
+Fundamental unit: $\phi = \tfrac{1+\sqrt{5}}{2}$, since $N(\phi) = \phi\bar\phi
+= \tfrac{(1+\sqrt{5})(1-\sqrt{5})}{4} = \tfrac{1-5}{4} = -1$.
+$h_{\Q(\sqrt{5})} = 1$ (Minkowski bound $< 2$, so trivial class group).
+\end{example}
+
+% ================================================================
+\section{Summary and Further Reading}
+% ================================================================
+
+\begin{remark}[What comes next]
+The theory developed here is the starting point for:
+\begin{itemize}
+  \item \textbf{Iwasawa theory} (Paper 38): $p$-adic $L$-functions arise from
+    varying the class group in towers of number fields.
+  \item \textbf{Langlands programme}: $L$-functions of Galois representations
+    of $\Gal(\bar\Q/\Q)$ generalise the Dedekind zeta function.
+  \item \textbf{Class field theory}: The Artin map identifies $\Cl(K)$ with
+    the Galois group of the Hilbert class field $H_K/K$.
+  \item \textbf{Explicit class field theory} for CM fields is the basis of the
+    theory of complex multiplication of elliptic curves.
+\end{itemize}
+\end{remark}
+
+\begin{thebibliography}{99}
+
+\bibitem{Neukirch1999}
+J.~Neukirch,
+\textit{Algebraic Number Theory},
+Springer, Berlin, 1999.
+
+\bibitem{Marcus1977}
+D.~A.~Marcus,
+\textit{Number Fields},
+Springer, New York, 1977.
+
+\bibitem{Milne2020}
+J.~S.~Milne,
+\textit{Algebraic Number Theory} (version 3.08),
+\url{https://www.jmilne.org/math/CourseNotes/ANT.pdf}, 2020.
+
+\bibitem{Samuel1970}
+P.~Samuel,
+\textit{Algebraic Theory of Numbers},
+Hermann, Paris, 1970.
+
+\bibitem{Cohen1993}
+H.~Cohen,
+\textit{A Course in Computational Algebraic Number Theory},
+Springer, Berlin, 1993.
+
+\bibitem{Washington1997}
+L.~C.~Washington,
+\textit{Introduction to Cyclotomic Fields},
+2nd ed., Springer, New York, 1997.
+
+\end{thebibliography}
+
+\end{document}

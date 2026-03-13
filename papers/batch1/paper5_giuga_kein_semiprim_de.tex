@@ -1,0 +1,169 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage[ngerman]{babel}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+\newcommand{\Z}{\mathbb{Z}}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Kein Semiprim ist ein Giuga-Pseudoprim:\\ Ein elementares Ordnungsargument}
+
+\author{Kurt Ingwer}
+\address{Specialist Mathematics Project, Version Build 44}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Ein \emph{Giuga-Pseudoprim} ist eine zusammengesetzte ganze Zahl, die Giugas
+Primalitätskriterium von 1950 erfüllt. Ein \emph{Semiprim} ist ein Produkt genau zweier
+(nicht notwendig verschiedener) Primzahlen. Wir beweisen, dass kein Semiprim
+$n = p \cdot q$ mit $p < q$ prim ein Giuga-Pseudoprim ist. Das Argument ist eine
+einfache Ordnungsungleichung: Die schwache Giuga-Bedingung für die größere Primzahl
+erzwingt $q \mid (p-1)$, aber $p - 1 < q$, also $p - 1 = 0$ und $p = 1$, was der
+Primalität widerspricht. Zusammen mit der Quadratfreiheit von Giuga-Pseudoprimen folgt,
+dass jedes Giuga-Pseudoprim mindestens \emph{drei} verschiedene Primfaktoren haben muss.
+\end{abstract}
+
+\maketitle
+
+% -------------------------------------------------------
+\section{Einleitung}
+% -------------------------------------------------------
+
+Die Giuga-Bedingungen für eine zusammengesetzte Zahl~$n$ bezüglich eines Primteilers
+$p \mid n$ sind:
+\begin{enumerate}
+  \item[\textup{(S)}] $p \mid \tfrac{n}{p} - 1$ \quad (schwache Bedingung),
+  \item[\textup{(St)}] $(p-1) \mid \tfrac{n}{p} - 1$ \quad (starke Bedingung).
+\end{enumerate}
+Eine zusammengesetzte Zahl~$n$, die beide Bedingungen für jeden Primfaktor erfüllt,
+heißt \emph{Giuga-Pseudoprim} \cite{Borwein1996}.
+
+Es ist bereits bekannt (und elementar), dass jedes Giuga-Pseudoprim quadratfrei ist
+\cite{Ingwer2026qfrei}. Die vorliegende Notiz schließt zusammengesetzte Zahlen mit genau
+zwei Primfaktoren aus.
+
+% -------------------------------------------------------
+\section{Hauptresultat}
+% -------------------------------------------------------
+
+\begin{theorem}
+\label{thm:keinpq}
+Es existiert kein Giuga-Pseudoprim der Form $n = p \cdot q$ mit $p < q$ prim.
+\end{theorem}
+
+\begin{proof}
+Angenommen, $n = pq$ ist ein Giuga-Pseudoprim mit Primzahlen $p < q$. Die Quotienten
+sind $\tfrac{n}{p} = q$ und $\tfrac{n}{q} = p$.
+
+Wir wenden die schwache Bedingung~(S) auf beide Primfaktoren an:
+\begin{align}
+  p &\mid q - 1, \label{eq:Sp} \\
+  q &\mid p - 1. \label{eq:Sq}
+\end{align}
+
+Aus~\eqref{eq:Sq}: Da $p < q$, gilt $0 \le p - 1 < q$.
+Das einzige nichtnegative Vielfache von~$q$, das kleiner als~$q$ ist, ist~$0$.
+Daher erzwingt $q \mid (p - 1)$ die Konsequenz $p - 1 = 0$, also $p = 1$.
+Aber $1$ ist keine Primzahl — Widerspruch.
+\end{proof}
+
+\begin{remark}
+Das Argument verwendet nur die schwache Bedingung~(S) für die \emph{größere}
+Primzahl~$q$. Bedingung~(S) für~$p$ (Gleichung~\eqref{eq:Sp}) wird für den
+Widerspruch nicht benötigt.
+\end{remark}
+
+\begin{remark}
+Der Beweis ist ein reines Ordnungsargument: Die Teilbarkeit $q \mid (p-1)$ zusammen
+mit der strikten Ungleichung $p - 1 < q$ erzwingt $p - 1 = 0$. Jenseits grundlegender
+Teilbarkeitseigenschaften wird keine Arithmetik benötigt.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Folgerung: Mindestens drei Primfaktoren}
+% -------------------------------------------------------
+
+\begin{corollary}
+\label{cor:drei}
+Jedes Giuga-Pseudoprim hat mindestens drei verschiedene Primfaktoren.
+\end{corollary}
+
+\begin{proof}
+Ein Giuga-Pseudoprim ist quadratfrei \cite{Ingwer2026qfrei}, also ein Produkt
+verschiedener Primzahlen. Mit einem Primfaktor wäre $n$ prim — nicht zusammengesetzt.
+Mit zwei Primfaktoren greift Satz~\ref{thm:keinpq}. Also werden mindestens drei benötigt.
+\end{proof}
+
+\begin{remark}
+Die untere Schranke von drei ist insofern scharf, als die Bedingungen drei Faktoren
+nicht sofort ausschließen. Ein weiteres Argument zeigt jedoch, dass auch drei Faktoren
+unmöglich sind \cite{Ingwer2026a}, sodass tatsächlich mindestens \emph{vier}
+Primfaktoren erforderlich sind. Die aktuelle beste Schranke, von Bednarek
+\cite{Bednarek2014}, liegt bei $59$ Primfaktoren.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Symmetriebeobachtung}
+% -------------------------------------------------------
+
+Falls $n = pq$ mit $p = q$ (ein Primzahlquadrat), ist $n$ nicht quadratfrei und
+bereits ausgeschlossen. Für $p < q$ gilt obiges Argument. Es besteht damit eine
+angenehme Symmetrie: Der Zweiprimensfall wird durch eine Kombination eliminiert:
+\begin{itemize}
+  \item Quadratfreiheit (schließt $p = q$ aus), und
+  \item Das Ordnungsargument (schließt $p < q$ aus).
+\end{itemize}
+
+Dieser zweistufige Ausschluss ist charakteristisch für die Giuga-Theorie: Strukturelle
+Eigenschaften (Quadratfreiheit) verbinden sich mit Ordnungsungleichungen, um Widersprüche
+zu erzeugen.
+
+% -------------------------------------------------------
+\begin{thebibliography}{10}
+
+\bibitem{Giuga1950}
+G.~Giuga,
+\emph{Su una presumibile propriet\`a caratteristica dei numeri primi},
+Ist.\ Lombardo Sci.\ Lett.\ Rend.\ Cl.\ Sci.\ Mat.\ Nat.\ \textbf{83}
+(1950), 511--528.
+
+\bibitem{Borwein1996}
+J.~M.~Borwein, P.~B.~Borwein, R.~Girgensohn und S.~Parnes,
+\emph{Giuga's conjecture on primality},
+Amer.\ Math.\ Monthly \textbf{103} (1996), Nr.\ 1, 40--50.
+
+\bibitem{Bednarek2014}
+M.~Bednarek,
+\emph{On the size of Giuga pseudoprimes},
+Preprint, unpublished (2014).
+
+\bibitem{Ingwer2026qfrei}
+K.~Ingwer,
+\emph{Jedes Giuga-Pseudoprim ist quadratfrei},
+Specialist Mathematics Project (2026).
+
+\bibitem{Ingwer2026a}
+K.~Ingwer,
+\emph{Keine zusammengesetzte Zahl mit genau drei Primfaktoren ist ein Giuga-Pseudoprim},
+Specialist Mathematics Project (2026).
+
+\end{thebibliography}
+
+\end{document}

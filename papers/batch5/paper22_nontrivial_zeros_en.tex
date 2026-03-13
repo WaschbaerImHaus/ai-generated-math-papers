@@ -1,0 +1,364 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{The Non-Trivial Zeros of the Riemann Zeta Function:\\
+       Counting, Distribution, and the GUE Conjecture}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 84}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+We study the non-trivial zeros of the Riemann zeta function $\zeta(s)$,
+i.e.\ the zeros in the critical strip $0 < \Re(s) < 1$.
+The central result is the \emph{zero-counting formula}
+\[
+  N(T) = \frac{T}{2\pi}\log\frac{T}{2\pi} - \frac{T}{2\pi} + O(\log T),
+\]
+which counts the number of zeros $\rho = \beta + i\gamma$ with
+$0 < \gamma \le T$.
+We identify the first known non-trivial zero at
+$\rho_1 = \tfrac{1}{2} + 14.134725\ldots\,i$ and discuss
+the Gram points and Gram's law (with its exceptions).
+The deep Montgomery--Odlyzko law states that the local statistics of
+zero spacings follow the \emph{GUE} (Gaussian Unitary Ensemble)
+distribution of random matrix theory.
+Finally, we summarize the extensive numerical verifications: more than
+$10^{13}$ zeros have been confirmed to lie on the critical line $\Re(\rho)=\tfrac{1}{2}$.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ================================================================
+\section{Introduction}
+% ================================================================
+
+The non-trivial zeros of $\zeta(s)$ are the zeros lying in the critical
+strip $0 < \Re(s) < 1$.  By the functional equation
+$\zeta(s) = 2^s \pi^{s-1} \sin(\pi s/2)\,\Gamma(1-s)\,\zeta(1-s)$,
+the zeros come in pairs: if $\rho$ is a zero, so is $1 - \rho$.  Furthermore, by the Schwarz reflection principle,
+complex zeros come in conjugate pairs: $\bar\rho$ is also a zero.
+Thus zeros occur in quadruples $\{\rho, \bar\rho, 1-\rho, 1-\bar\rho\}$,
+unless $\Re(\rho) = \tfrac{1}{2}$ (when $\rho$ and $1-\rho$ coincide as
+complex conjugates), in which case they pair up as $\{\rho, \bar\rho\}$.
+
+\begin{remark}
+All zeros found to date satisfy $\Re(\rho) = \tfrac{1}{2}$.
+The Riemann Hypothesis (RH) conjectures this holds for \emph{all} non-trivial
+zeros; see \cite{Riemann1859}.
+\end{remark}
+
+% ================================================================
+\section{Counting Zeros: The Formula \texorpdfstring{$N(T)$}{N(T)}}
+% ================================================================
+
+\begin{definition}[Zero-counting function]
+\label{def:NT}
+For $T > 0$, let
+\[
+  N(T) \;=\; \#\bigl\{\rho = \beta + i\gamma : \zeta(\rho) = 0,\;
+  0 < \beta < 1,\; 0 < \gamma \le T\bigr\}
+\]
+denote the number of non-trivial zeros of $\zeta$ with imaginary part
+in $(0, T]$ (counted with multiplicity).
+\end{definition}
+
+\begin{theorem}[Riemann--von~Mangoldt formula]
+\label{thm:NT}
+For $T > 0$ not the imaginary part of any zero of $\zeta$,
+\begin{equation}
+  \label{eq:NT}
+  N(T) \;=\; \frac{T}{2\pi}\log\frac{T}{2\pi} - \frac{T}{2\pi}
+            + \frac{7}{8} + O\!\bigl(\log T\bigr).
+\end{equation}
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The proof uses the argument principle applied to the rectangle with
+corners at $-1$, $2$, $2+iT$, $-1+iT$.  By the argument principle,
+$N(T) = \tfrac{1}{2\pi}\Delta\arg\zeta(s)$ around this rectangle.
+The main contribution comes from the segment $\Re(s) = 2$, where
+$\zeta(s)$ is well-approximated by its Dirichlet series, and from the
+segment $\Re(s) = 0$, handled via the functional equation.
+The Stirling approximation for $\Gamma$ gives the leading terms
+$\frac{T}{2\pi}\log\frac{T}{2\pi} - \frac{T}{2\pi}$.
+The constant $7/8$ and the error term $O(\log T)$ come from careful
+bookkeeping; see \cite{Davenport2000}, Chapter~16.
+\end{proof}
+
+\begin{corollary}[Density of zeros]
+The average gap between consecutive zeros near height $T$ is approximately
+$2\pi/\log T$.  In particular, the zeros become increasingly dense as
+$T \to \infty$.
+\end{corollary}
+
+\begin{proof}
+Differentiating~\eqref{eq:NT}: $N'(T) \approx \frac{1}{2\pi}\log\frac{T}{2\pi}$,
+so the average spacing between zeros near $T$ is $1/N'(T) \approx 2\pi/\log T$.
+\end{proof}
+
+% ================================================================
+\section{The First Non-Trivial Zeros}
+% ================================================================
+
+\begin{theorem}[First non-trivial zero]
+\label{thm:first_zero}
+The smallest positive imaginary part of a non-trivial zero of $\zeta$ is
+\[
+  \gamma_1 = 14.134725141734693\ldots
+\]
+Thus $\rho_1 = \tfrac{1}{2} + 14.134725\ldots\,i$.
+\end{theorem}
+
+\begin{proof}[Verification]
+By direct numerical computation using the Riemann--Siegel formula
+(see Paper~21), the function $Z(t)$ has no zero for $0 < t < 14.134\ldots$
+and a zero at $t = 14.134725\ldots$.
+The formula $N(14) = 0$ and $N(15) = 1$ is verified explicitly.
+The numerical value was computed by Riemann himself (to several digits)
+and confirmed to high precision using the LMFDB database \cite{LMFDB}.
+\end{proof}
+
+\begin{remark}[First zeros]
+The first ten non-trivial zeros on the critical line are
+(imaginary parts only):
+\begin{align*}
+  \gamma_1 &= 14.134725\ldots, &
+  \gamma_2 &= 21.022040\ldots, &
+  \gamma_3 &= 25.010858\ldots, \\
+  \gamma_4 &= 30.424876\ldots, &
+  \gamma_5 &= 32.935062\ldots, &
+  \gamma_6 &= 37.586178\ldots, \\
+  \gamma_7 &= 40.918720\ldots, &
+  \gamma_8 &= 43.327073\ldots, &
+  \gamma_9 &= 48.005150\ldots, \\
+  \gamma_{10} &= 49.773832\ldots
+\end{align*}
+All are on the critical line $\Re(\rho) = \tfrac{1}{2}$, consistent with RH.
+\end{remark}
+
+% ================================================================
+\section{Gram Points and Gram's Law}
+% ================================================================
+
+\begin{definition}[Gram points]
+\label{def:gram_points}
+A \emph{Gram point} $g_n$ (for $n \ge -1$) is the unique solution to
+\[
+  \theta(g_n) = n\pi,
+\]
+where $\theta(t) = \arg\Gamma\!\bigl(\tfrac{1}{4}+\tfrac{it}{2}\bigr) - \tfrac{t}{2}\ln\pi$
+is the Riemann--Siegel theta function.
+The Gram interval $[g_n, g_{n+1}]$ has length approximately $2\pi/\log(g_n/2\pi)$.
+\end{definition}
+
+\begin{theorem}[Gram's Law and its failure]
+\label{thm:gram}
+\emph{Gram's law} (an observation, not a theorem) states that $Z(g_n)$
+has sign $(-1)^n$, so that each Gram interval $[g_n, g_{n+1}]$ contains
+exactly one zero of $Z(t)$.
+
+This fails for the first time at $n = 126$: the interval $[g_{126}, g_{127}]$
+contains no zero of $Z(t)$, while $[g_{127}, g_{128}]$ contains two.
+\end{theorem}
+
+\begin{proof}[Discussion]
+Gram's law is a heuristic that holds in about $73\%$ of cases
+(Hutchinson, 1925).  The failure is related to the behaviour of $Z(t)$ at
+Gram points where the real and imaginary parts of $\zeta(\tfrac{1}{2}+it)$
+happen to cancel.  Lehmer (1956) analysed the first exceptions systematically.
+A complete treatment appears in \cite{Titchmarsh1986}, Chapter~9.
+\end{proof}
+
+\begin{definition}[Good and bad Gram points]
+A Gram point $g_n$ is called \emph{good} if $(-1)^n Z(g_n) > 0$
+(Gram's law holds), and \emph{bad} otherwise.
+\end{definition}
+
+% ================================================================
+\section{The Montgomery--Odlyzko Law}
+% ================================================================
+
+The most striking discovery about the distribution of zeros is their
+connection to random matrix theory.
+
+\begin{definition}[Normalized spacing of zeros]
+\label{def:spacing}
+Let $\rho_n = \tfrac{1}{2} + i\gamma_n$ be the non-trivial zeros with
+$0 < \gamma_1 \le \gamma_2 \le \ldots$\,.
+The \emph{normalized spacing} between consecutive zeros is
+\[
+  \delta_n \;=\; (\gamma_{n+1} - \gamma_n) \cdot \frac{\log\gamma_n}{2\pi}.
+\]
+This normalization ensures that the average $\delta_n$ tends to~$1$.
+\end{definition}
+
+\begin{theorem}[Montgomery's Pair Correlation Conjecture, 1973]
+\label{thm:montgomery}
+Assume the Riemann Hypothesis.  For the two-point correlation function
+of the normalized spacings, Montgomery \cite{Montgomery1973} conjectured:
+\[
+  \lim_{T \to \infty} \frac{1}{N(T)} \sum_{\substack{\gamma, \gamma' \le T \\ 0 < \gamma'-\gamma \le 2\pi u / \log T}}
+  1
+  \;=\;
+  \int_0^u \left[1 - \left(\frac{\sin(\pi x)}{\pi x}\right)^2\right] dx.
+\]
+This is precisely the pair correlation function of eigenvalues from the
+\emph{Gaussian Unitary Ensemble} (GUE) of random Hermitian matrices.
+\end{theorem}
+
+\begin{remark}[The GUE connection]
+The GUE pair correlation function $1 - (\sin\pi x / \pi x)^2$ implies
+a \emph{level repulsion}: zeros tend to avoid being too close together.
+This same function governs the spacing statistics of nuclear energy
+levels, which Odlyzko discovered numerically in 1987 \cite{Odlyzko1987}.
+The agreement between the statistics of $\zeta$-zeros and GUE eigenvalues
+is now considered overwhelming numerical evidence for RH.
+\end{remark}
+
+\begin{theorem}[Montgomery--Odlyzko law]
+\label{thm:odlyzko}
+Numerical experiments (Odlyzko, 1987, 1992) comparing $10^{20}$-th zero
+$\gamma_{10^{20}} \approx 1.52 \times 10^{19}$ with GUE predictions show
+agreement to at least three significant digits in all tested statistics.
+\end{theorem}
+
+% ================================================================
+\section{Numerical Verification of RH}
+% ================================================================
+
+\begin{theorem}[Verification of RH up to large height]
+\label{thm:rh_verified}
+The Riemann Hypothesis has been numerically verified for all zeros with
+imaginary part $0 < \gamma \le T_{\max}$, where:
+\begin{itemize}
+  \item Backlund (1914): $T = 200$ (79 zeros)
+  \item Turing (1953): $T \approx 1\,500$ (first mechanical computation)
+  \item Lune--te~Riele--Winter (1986): $T = 545\,439\,823$ (first $1.5 \times 10^9$ zeros)
+  \item Platt--Trudgian (2021) \cite{Platt2021}: all zeros below $T = 3 \times 10^{12}$
+  \item As of 2023: more than $10^{13}$ zeros verified on the critical line.
+\end{itemize}
+\end{theorem}
+
+\begin{proof}[Method]
+All verifications use a combination of:
+\begin{enumerate}
+  \item The Riemann--Siegel formula to evaluate $Z(t)$ efficiently.
+  \item Backlund's method: Count sign changes of $Z(t)$ between consecutive
+    Gram points and compare with $N(T)$ from the Riemann--von~Mangoldt formula.
+    If the counts agree, all zeros in $[0,T]$ lie on the critical line.
+  \item Careful handling of ``Gram failures'' using Turing's method
+    (searching wider intervals).
+\end{enumerate}
+No zero off the critical line has ever been found.
+\end{proof}
+
+% ================================================================
+\section{The Generalized Riemann Hypothesis}
+% ================================================================
+
+\begin{definition}[GRH]
+\label{def:grh}
+The \emph{Generalized Riemann Hypothesis} (GRH) extends RH to all
+\emph{Dirichlet $L$-functions}:
+\[
+  L(s, \chi) = \sum_{n=1}^{\infty} \frac{\chi(n)}{n^s},
+\]
+where $\chi$ is a Dirichlet character modulo $q$.
+GRH asserts that all non-trivial zeros of $L(s,\chi)$ lie on $\Re(s) = \tfrac{1}{2}$.
+\end{definition}
+
+\begin{remark}
+GRH has far-reaching consequences for prime distribution in arithmetic
+progressions.  For example, it implies that for any modulus $q$, every
+arithmetic progression $a, a+q, a+2q, \ldots$ (with $\gcd(a,q)=1$)
+contains a prime $p \le C\,q^2\,(\log q)^2$ for some absolute constant $C$.
+\end{remark}
+
+% ================================================================
+\section{Conclusion}
+% ================================================================
+
+The non-trivial zeros of $\zeta(s)$ exhibit a rich structure: the counting
+formula~\eqref{eq:NT} governs their macroscopic distribution, the first
+zero $\rho_1 \approx \tfrac{1}{2} + 14.13i$ has been located with high
+precision, and the GUE statistics of Montgomery and Odlyzko reveal a deep
+and mysterious connection to quantum mechanics and random matrix theory.
+Despite more than $10^{13}$ zeros having been verified on the critical line,
+the Riemann Hypothesis remains one of the greatest unsolved problems in
+mathematics.
+
+% ================================================================
+\begin{thebibliography}{10}
+
+\bibitem{Riemann1859}
+B.~Riemann,
+\emph{\"Uber die Anzahl der Primzahlen unter einer gegebenen Gr\"o\ss e},
+Monatsberichte der Berliner Akademie (1859), 671--680.
+
+\bibitem{Davenport2000}
+H.~Davenport,
+\emph{Multiplicative Number Theory}, 3rd~ed.\
+(revised by H.~L.~Montgomery),
+Springer, New York, 2000.
+
+\bibitem{Titchmarsh1986}
+E.~C.~Titchmarsh,
+\emph{The Theory of the Riemann Zeta-Function}, 2nd~ed.\
+(revised by D.~R.~Heath-Brown),
+Oxford University Press, 1986.
+
+\bibitem{Montgomery1973}
+H.~L.~Montgomery,
+The pair correlation of zeros of the zeta function,
+in: \emph{Analytic Number Theory}, Proc.\ Sympos.\ Pure Math.~XXIV,
+Amer.\ Math.\ Soc., Providence, RI, 1973, pp.~181--193.
+
+\bibitem{Odlyzko1987}
+A.~M.~Odlyzko,
+On the distribution of spacings between zeros of the zeta function,
+\emph{Math.\ Comp.}\ \textbf{48} (1987), no.~177, 273--308.
+
+\bibitem{Platt2021}
+D.~J.~Platt and T.~S.~Trudgian,
+The Riemann hypothesis is true up to $3 \times 10^{12}$,
+\emph{Bull.\ London Math.\ Soc.}\ \textbf{53} (2021), 792--797.
+
+\bibitem{LMFDB}
+The LMFDB Collaboration,
+\emph{The $L$-functions and Modular Forms Database},
+\url{https://www.lmfdb.org}, 2024.
+
+\end{thebibliography}
+
+\end{document}

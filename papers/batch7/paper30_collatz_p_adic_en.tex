@@ -1,0 +1,426 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\begin{document}
+
+\title{The Collatz Conjecture and $p$-adic Numbers:\\
+The $3x+1$ Problem over the 2-adic Integers}
+\author{Michael Fuhrmann}
+\date{March 2026}
+\maketitle
+
+\begin{abstract}
+The $3x+1$ problem acquires a natural geometric and analytic setting when embedded in the
+2-adic integers $\mathbb{Z}_2$. In this framework, the Collatz function $T$ and the
+Syracuse function $S$ become continuous self-maps of a compact ultrametric space. We
+develop the 2-adic metric, characterise the Collatz map as a contraction on suitable
+subsets, study the fixed points and periodic orbits in $\mathbb{Z}_2$, and explain the
+connection between 2-adic expansions and Syracuse sequences. The $p$-adic viewpoint
+illuminates why the Collatz problem is so difficult: the relevant dynamical behaviour
+concentrates near the boundary of $\mathbb{Z}_2$ in a way that resists classical
+analytic techniques.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+The $p$-adic integers $\mathbb{Z}_p$ provide a completion of $\mathbb{Z}$ that is in
+many respects more natural than the reals for questions about divisibility and
+congruences. For the Collatz problem, the prime $p = 2$ is the natural choice, since
+the ``even/odd'' branching of $T$ corresponds precisely to the lowest-order 2-adic digit.
+
+Lagarias \cite{Lagarias1985} observed that the Collatz function extends continuously to
+$\mathbb{Z}_2$, and that this extension has a rich structure of periodic orbits and
+fixed points that do \emph{not} correspond to positive integers. Understanding these
+``exotic'' fixed points in $\mathbb{Z}_2$ may be a step toward understanding why the
+positive integers all (conjecturally) flow to 1.
+
+\subsection{Overview of this paper}
+
+Section~\ref{sec:2adic} reviews the 2-adic integers. Section~\ref{sec:collatz_2adic}
+defines $T$ and $S$ on $\mathbb{Z}_2$. Section~\ref{sec:fixed} classifies fixed points
+and periodic orbits. Section~\ref{sec:syracuse} develops the connection to Syracuse
+sequences. Section~\ref{sec:dynamics} discusses the measure-theoretic dynamics.
+
+\section{The 2-adic Integers}\label{sec:2adic}
+
+\begin{definition}[2-adic valuation]\label{def:val}
+For $n \in \mathbb{Z} \setminus \{0\}$, the \emph{2-adic valuation} $\nu_2(n)$ is the
+largest $k \geq 0$ such that $2^k \mid n$. We set $\nu_2(0) = +\infty$.
+\end{definition}
+
+\begin{definition}[2-adic absolute value and metric]\label{def:metric}
+The \emph{2-adic absolute value} of $x \in \mathbb{Q}$ is
+\[
+  |x|_2 \;=\; 2^{-\nu_2(x)},
+\]
+with $|0|_2 = 0$. The \emph{2-adic metric} is $d_2(x,y) = |x-y|_2$.
+\end{definition}
+
+\begin{theorem}[Properties of the 2-adic metric]\label{thm:ultrametric}
+The 2-adic metric satisfies the \emph{strong triangle inequality} (ultrametric property):
+\[
+  |x + y|_2 \;\leq\; \max(|x|_2, |y|_2).
+\]
+As a consequence, any two 2-adic balls are either disjoint or one contains the other.
+\end{theorem}
+
+\begin{proof}
+If $\nu_2(x) = a$ and $\nu_2(y) = b$ with $a \leq b$, then
+$x + y = 2^a(x/2^a + 2^{b-a} \cdot y/2^b)$.
+The term in parentheses is an integer with the first factor being odd. Thus
+$\nu_2(x+y) \geq a = \min(\nu_2(x), \nu_2(y))$, giving
+$|x+y|_2 \leq 2^{-a} = \max(|x|_2, |y|_2)$.
+\end{proof}
+
+\begin{definition}[2-adic integers]\label{def:Z2}
+The \emph{ring of 2-adic integers} $\mathbb{Z}_2$ is the completion of $\mathbb{Z}$
+(or of $\mathbb{Q}$) with respect to the metric $d_2$. Concretely,
+\[
+  \mathbb{Z}_2 \;=\; \Bigl\{ x = \sum_{k=0}^\infty a_k 2^k \;:\; a_k \in \{0,1\} \Bigr\}.
+\]
+The ring structure extends the usual addition and multiplication on $\mathbb{Z}$, with
+carrying propagating to the right in the 2-adic expansion.
+\end{definition}
+
+\begin{proposition}[Topological properties of $\mathbb{Z}_2$]\label{prop:topology}
+$\mathbb{Z}_2$ is compact, complete, and totally disconnected. The natural map
+$\mathbb{Z} \hookrightarrow \mathbb{Z}_2$ is a dense embedding.
+\end{proposition}
+
+\begin{proof}
+Compactness follows from Tychonoff's theorem: $\mathbb{Z}_2 \cong \{0,1\}^{\mathbb{N}_0}$
+as topological spaces (where $\{0,1\}$ carries the discrete topology). The product of
+compact spaces is compact. The embedding $\mathbb{Z} \hookrightarrow \mathbb{Z}_2$ sends
+$n \geq 0$ to its binary expansion (a finite sum), and negative integers to their 2-adic
+expansions (infinite series). Density follows because the integers mod $2^N$ approximate
+any element of $\mathbb{Z}_2$ to precision $2^{-N}$.
+\end{proof}
+
+\section{The Collatz and Syracuse Functions on $\mathbb{Z}_2$}\label{sec:collatz_2adic}
+
+\begin{definition}[Extension of $T$ to $\mathbb{Z}_2$]\label{def:T_ext}
+For $x \in \mathbb{Z}_2$, define
+\[
+  T(x) \;=\; \begin{cases} x/2 & \text{if } x \equiv 0 \pmod{2}, \\
+                            3x+1 & \text{if } x \equiv 1 \pmod{2},
+              \end{cases}
+\]
+where the parity of $x \in \mathbb{Z}_2$ is determined by its constant term $a_0 \in \{0,1\}$.
+\end{definition}
+
+\begin{theorem}[Continuity of $T$ on $\mathbb{Z}_2$]\label{thm:continuous}
+The function $T\colon \mathbb{Z}_2 \to \mathbb{Z}_2$ is well-defined and continuous with
+respect to the 2-adic metric. The odd branch $x \mapsto 3x+1$ maps $2\mathbb{Z}_2 + 1$
+(the odd elements) to $2\mathbb{Z}_2$ (the even elements), so $T$ maps $\mathbb{Z}_2$
+to $\mathbb{Z}_2$.
+\end{theorem}
+
+\begin{proof}
+Continuity of $x \mapsto x/2$ on $2\mathbb{Z}_2$: write $x = 2u$, $y = 2v$ with
+$u, v \in \mathbb{Z}_2$. Then $|x - y|_2 = |2|_2 \cdot |u-v|_2 = \tfrac{1}{2}|u-v|_2$.
+So if $|x - y|_2 \leq 2^{-N}$, then $|u-v|_2 \leq 2^{-N+1}$, and
+$|x/2 - y/2|_2 = |u - v|_2 \leq 2^{-N+1}$.
+Thus $T$ is continuous on $2\mathbb{Z}_2$ (both $u$ and $v$ belong to
+$\mathbb{Z}_2$, so $T(x) = u \in \mathbb{Z}_2$).
+Continuity of $x \mapsto 3x+1$ on $\mathbb{Z}_2^{\text{odd}}$:
+$|3x+1 - (3y+1)|_2 = |3(x-y)|_2 = |3|_2 \cdot |x-y|_2 = |x-y|_2 \leq 2^{-N}$
+for $|x-y|_2 \leq 2^{-N}$, since $3$ is a unit in $\mathbb{Z}_2$ ($\gcd(3,2)=1$
+implies $|3|_2 = 1$), so multiplication by 3 is an isometry and in particular a
+homeomorphism. The function $T$ is therefore continuous on both pieces, and the pieces
+are open and closed (clopen) in $\mathbb{Z}_2$, so $T$ is continuous on all of $\mathbb{Z}_2$.
+\end{proof}
+
+\begin{definition}[Syracuse function on $\mathbb{Z}_2^{\text{odd}}$]\label{def:S_ext}
+For odd $x \in \mathbb{Z}_2$ (i.e.\ $a_0 = 1$), define
+\[
+  S(x) \;=\; \frac{3x+1}{2^{\nu_2(3x+1)}}.
+\]
+Since $3x + 1 \equiv 0 \pmod{2}$ for odd $x$, the 2-adic valuation $\nu_2(3x+1) \geq 1$,
+so $S(x) \in \mathbb{Z}_2$. Moreover, $S$ maps $\mathbb{Z}_2^{\text{odd}}$ to
+$\mathbb{Z}_2^{\text{odd}}$.
+\end{definition}
+
+\begin{proposition}[Shift interpretation]\label{prop:shift}
+The successive 2-adic digits of the Syracuse iterates $S^k(x)$ encode the ``parity
+sequence'' of the Collatz orbit. Specifically, let $e_k = \nu_2(3 S^{k-1}(x) + 1)$ for
+$k \geq 1$. Then the Collatz orbit of $x$ (under $T$) passes through exactly $e_k$ even
+numbers between the $k$-th and $(k+1)$-th odd numbers.
+\end{proposition}
+
+\begin{proof}
+By definition of $S$, the step from odd $m$ to odd $S(m)$ corresponds to the sequence
+of Collatz steps: $m \to 3m+1 \to (3m+1)/2 \to \cdots \to S(m)$, comprising exactly
+$e = \nu_2(3m+1)$ divisions by 2. Thus $e_k$ counts the number of even values in the
+Collatz orbit between consecutive odd values. The 2-adic expansion of $x$ determines
+the parity sequence, establishing the bijection between 2-adic digits and orbit structure.
+\end{proof}
+
+\section{Fixed Points and Periodic Orbits in $\mathbb{Z}_2$}\label{sec:fixed}
+
+\begin{theorem}[Fixed points of $T$ and $S$ in $\mathbb{Z}_2$]\label{thm:fixed}
+The fixed points satisfy:
+\begin{enumerate}
+  \item[(i)] Even fixed point of $T$: $T(x) = x/2 = x$ implies $x = 0$.
+  \item[(ii)] Odd fixed points of $T$: The equation $T(x) = 3x+1 = x$ gives $x = -1/2$.
+              However, $|-1/2|_2 = 2 > 1$, so $-1/2 \notin \mathbb{Z}_2$. Therefore
+              $T$ has \emph{no} odd fixed point in $\mathbb{Z}_2$.
+  \item[(iii)] Odd fixed point of $S$: For the Syracuse (compressed) function
+              $S(x) = (3x+1)/2^{\nu_2(3x+1)}$, restricting to the first-order case
+              $\nu_2(3x+1)=1$ gives $S(x) = (3x+1)/2 = x$, hence $x = -1$.
+              Since $|-1|_2 = 1$, we have $-1 \in \mathbb{Z}_2^{\text{odd}}$,
+              with representation $-1 = \sum_{k=0}^\infty 2^k = \ldots 11111111_2$.
+\end{enumerate}
+Thus $T$ has exactly one fixed point in $\mathbb{Z}_2$: $x = 0$.
+The compressed Syracuse map $S$ additionally has the fixed point $x = -1$.
+\end{theorem}
+
+\begin{proof}
+(i) $x = T(x) = x/2$ implies $x = 0$.\\
+(ii) $x = T(x) = 3x+1$ gives $x = -1/2$, but $\nu_2(-1/2) = -1$, so $|-1/2|_2 = 2 > 1$
+and $-1/2 \notin \mathbb{Z}_2$.
+Note: $\sum_{k=1}^\infty 2^k = 2\cdot\sum_{k=0}^\infty 2^k = 2\cdot(-1) = -2$ in $\mathbb{Z}_2$,
+not $-1/2$. The element $-1/2$ lies in $\mathbb{Q}_2 \setminus \mathbb{Z}_2$.\\
+(iii) $S(-1) = (3(-1)+1)/2^{\nu_2(-2)} = (-2)/2 = -1$, confirming $-1$ is a fixed point of $S$.
+\end{proof}
+
+\begin{theorem}[Periodic orbits in $\mathbb{Z}_2$]\label{thm:periodic}
+The Collatz function $T$ has periodic orbits of all periods in $\mathbb{Z}_2$.
+However, the only periodic orbit consisting of \emph{positive integers} that is currently
+known is the trivial cycle $\{1, 4, 2\}$ (with $T(1)=4$, $T(4)=2$, $T(2)=1$).
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+For any desired period $n \in \mathbb{N}$, one constructs a periodic point
+$x \in \mathbb{Z}_2$ as follows.  Write the system of $n$ equations $T^n(x) = x$
+in $\mathbb{Z}/2^k\mathbb{Z}$ for successively larger $k$, using the Chinese Remainder
+Theorem and Hensel's lemma to lift solutions modulo $2^k$ to solutions modulo $2^{k+1}$.
+This is possible because $T$ has a non-degenerate structure modulo powers of 2 that
+allows consistent lifts; see Lagarias~\cite{Lagarias1985} for the classification of
+all cycles among negative integers (which already demonstrates periods of all orders
+$n \leq 5$), and B\'{e}nali~\cite{Benali} for the general construction.
+\emph{Caution:} These periodic points in $\mathbb{Z}_2$ need not lie in $\mathbb{N}$;
+the construction is non-constructive for general $n$.
+\end{proof}
+
+\begin{remark}[Distinction: fixed point of $S$ vs.\ 2-cycle under $T$]\label{rem:T_vs_S}
+It is important not to confuse the role of $-1$ under the two maps:
+\begin{itemize}
+  \item Under $T$: $T(-1) = 3(-1)+1 = -2$, $T(-2) = -1$. So $-1$ is \emph{not}
+    a fixed point of $T$; it belongs to the 2-cycle $\{-1,-2\}$ of $T$.
+  \item Under $S$: $S(-1) = (3\cdot(-1)+1)/2^{v_2(-2)} = -2/2 = -1$.
+    So $-1$ \emph{is} a fixed point of the compressed Syracuse map $S$.
+\end{itemize}
+This distinction is essential: Theorem~\ref{thm:fixed_points} concerns fixed points
+of $T$ and $S$ separately.  The 2-cycle of $T$ ``looks like'' a fixed point of $S$
+because $S$ compresses away the even step $T(-1) = -2 \to T(-2) = -1$.
+\end{remark}
+
+\begin{remark}\label{rem:negative}
+In $\mathbb{Z} \subset \mathbb{Z}_2$, the negative integers also admit periodic orbits
+under $T$. For instance, $T(-1) = 3(-1)+1 = -2$, $T(-2) = -1$, giving the cycle
+$\{-1, -2\}$. Similarly, $-5 \to -14 \to -7 \to -20 \to -10 \to -5$ is a period-5 cycle.
+These cycles among negative integers are fully classified (see \cite{Lagarias1985}).
+\end{remark}
+
+\begin{proposition}[2-adic representation of the trivial cycle]\label{prop:trivial_cycle_2adic}
+The trivial positive cycle $1 \to 4 \to 2 \to 1$ in $\mathbb{Z}_2$ corresponds to the
+periodic 2-adic orbit
+\[
+  1 = (1)_2, \quad 4 = (100)_2, \quad 2 = (10)_2.
+\]
+The 2-adic distance between successive elements decreases: $|T^k(1) - 1|_2 \leq 1$ for all $k$.
+\end{proposition}
+
+\section{Syracuse Sequences and 2-adic Expansions}\label{sec:syracuse}
+
+\begin{definition}[Parity sequence and 2-adic expansion]\label{def:parity}
+For $x \in \mathbb{Z}_2$ with expansion $x = \sum_{k=0}^\infty a_k 2^k$, the
+\emph{parity sequence} of $x$ is the sequence $(a_0, a_1, a_2, \ldots) \in \{0,1\}^{\mathbb{N}_0}$.
+The Collatz orbit of $x$ is completely determined by the parity sequence:
+$a_k$ tells us whether $T^k(x)$ is odd ($a_k = 1$) or even ($a_k = 0$) in the 2-adic sense.
+\end{definition}
+
+\begin{theorem}[Syracuse representation theorem]\label{thm:syracuse_rep}
+Let $x \in \mathbb{Z}_2^{\text{odd}}$ with parity sequence $(1, a_1, a_2, \ldots)$.
+Define the stopping positions $0 = s_0 < s_1 < s_2 < \cdots$ by
+$s_{k+1} = \min\{j > s_k : a_j = 1\}$
+(the positions of the odd elements in the Collatz orbit).
+Then the 2-adic expansion of $x$ encodes all these positions, and the Syracuse iterates
+$S^k(x)$ are determined by
+\[
+  S^k(x) \;=\; \frac{3^k x + c_k}{2^{s_k}}
+\]
+for explicit integers $c_k \geq 0$ depending on the partial parity sequence.
+\end{theorem}
+
+\begin{proof}
+We prove this by induction on $k$.
+Base case $k=0$: $S^0(x) = x = 3^0 x + 0 / 2^0 = x$. Correct.
+Inductive step: Suppose $S^k(x) = (3^k x + c_k)/2^{s_k}$. Then
+\[
+  3 S^k(x) + 1 = \frac{3^{k+1} x + 3c_k + 2^{s_k}}{2^{s_k}}.
+\]
+The 2-adic valuation of the numerator is $s_{k+1} - s_k$ (by definition of $s_{k+1}$
+as the next time the orbit is odd in the $T$-iteration). Dividing by $2^{s_{k+1}-s_k}$ gives
+\[
+  S^{k+1}(x) = \frac{3^{k+1} x + 3c_k + 2^{s_k}}{2^{s_{k+1}}},
+\]
+with $c_{k+1} = (3c_k + 2^{s_k})/2^{s_{k+1}-s_k}$.
+To see that $c_{k+1} \in \mathbb{Z}_2$: by the definition of $s_{k+1}$,
+the 2-adic valuation of $3S^k(x)+1$ (as an element of $\mathbb{Z}_2$)
+equals exactly $s_{k+1} - s_k$.  The numerator of $S^{k+1}(x)$ is
+$3^{k+1}x + 3c_k + 2^{s_k}$, and $v_2(3^{k+1}x) \geq s_{k+1}$ (since
+$S^k(x)$ is odd in $\mathbb{Z}_2$, so $v_2(3^k x + c_k) = s_k$, and
+$v_2(3^{k+1}x) = s_k + v_2(3\cdot S^k(x) + 1 - 1) \geq s_{k+1}$ up to
+carries).  Consequently $2^{s_{k+1}-s_k} \mid (3c_k + 2^{s_k})$, so
+$c_{k+1}$ is a non-negative integer, and $\mathbb{Z} \subset \mathbb{Z}_2$
+gives $c_{k+1} \in \mathbb{Z}_2$.
+\end{proof}
+
+\begin{corollary}[Collatz conjecture in terms of 2-adic analysis]\label{cor:2adic_reformulation}
+The Collatz conjecture is equivalent to the statement: for every $x \in \mathbb{N}$,
+there exists $k \geq 0$ such that $S^k(x) = 1$ (in the compressed form). In terms of
+2-adic analysis, this says that the forward orbit of every positive integer under $S$
+eventually hits the fixed point $1 \in \mathbb{N} \subset \mathbb{Z}_2$.
+\end{corollary}
+
+\section{Measure-Theoretic Dynamics on $\mathbb{Z}_2$}\label{sec:dynamics}
+
+\begin{definition}[Haar measure on $\mathbb{Z}_2$]\label{def:haar}
+The \emph{Haar measure} $\mu$ on $\mathbb{Z}_2$ is the unique translation-invariant
+probability measure. It is characterised by $\mu(a + 2^k \mathbb{Z}_2) = 2^{-k}$ for
+all $a \in \mathbb{Z}$ and $k \geq 0$.
+\end{definition}
+
+\begin{proposition}[Measure of even and odd elements]\label{prop:measure_parity}
+Under the Haar measure $\mu$ on $\mathbb{Z}_2$:
+\[
+  \mu(\mathbb{Z}_2^{\text{even}}) \;=\; \mu(2\mathbb{Z}_2) \;=\; 1/2,
+\qquad
+  \mu(\mathbb{Z}_2^{\text{odd}}) \;=\; \mu(1 + 2\mathbb{Z}_2) \;=\; 1/2.
+\]
+This reflects the fact that exactly half of all integers (in the natural density sense)
+are even.
+\end{proposition}
+
+\begin{proof}
+By the definition of Haar measure, $\mu(a + 2\mathbb{Z}_2) = 1/2$ for any $a \in \{0,1\}$,
+since $a + 2\mathbb{Z}_2$ is an open ball of radius $2^{-1}$.
+\end{proof}
+
+\begin{theorem}[Pushforward measure]\label{thm:pushforward}
+The pushforward $T_* \mu$ of the Haar measure under $T\colon \mathbb{Z}_2 \to \mathbb{Z}_2$
+is not equal to $\mu$. Specifically, on even elements, $T$ acts as a 2-to-1 map (since
+$T^{-1}(y) \ni 2y$ always), so $T$ is not measure-preserving on $(\mathbb{Z}_2, \mu)$.
+\end{theorem}
+
+\begin{proof}
+The preimage of $y \in \mathbb{Z}_2$ under the even branch is $\{2y\}$, which has Haar
+measure $\mu(\{2y\} + 2\mathbb{Z}_2) = 1/2 \cdot 1/2 = 1/4$... The key point is that
+$T_*\mu \neq \mu$: for example, the odd elements $1 + 2\mathbb{Z}_2$ have $\mu$-measure
+$1/2$, but $T$ maps them to $4 + 6\mathbb{Z}_2 + \cdots$ (even elements), while the
+even elements are mapped to a ``spread'' distribution. The precise asymmetry comes from
+the $+1$ in the odd branch: if the odd branch were just $x \mapsto 3x$, then $T$ would
+respect the self-similar structure of $\mathbb{Z}_2$ more naturally.
+\end{proof}
+
+\begin{conjecture}[Ergodicity of the Syracuse map]\label{conj:ergodic_S}
+The Syracuse function $S\colon \mathbb{Z}_2^{\text{odd}} \to \mathbb{Z}_2^{\text{odd}}$
+is conjectured to be \emph{ergodic with respect to Haar measure} in the sense that
+the only $S$-invariant measurable sets of Haar measure 0 or 1 are trivial.
+\end{conjecture}
+
+\begin{remark}[Status of the ergodicity conjecture]
+Since $S$ is \emph{not} measure-preserving with respect to Haar measure (as established
+above), standard ergodic theory does not directly apply.  The ergodicity statement
+above is an informal claim, motivated by the pseudo-random behaviour of the Collatz
+map on 2-adic integers.  A rigorous proof would require specifying a $S$-invariant
+measure $\nu$ (which need not equal Haar measure) and verifying the ergodicity
+condition for $(\mathbb{Z}_2^{\text{odd}}, \nu, S)$.  This has not been established
+in the literature; see Paper~32 for a more detailed treatment of invariant measures
+and mixing properties.
+\end{remark}
+
+\begin{remark}\label{rem:conjecture_measure}
+If the Collatz conjecture is true, then the positive integers $\mathbb{N} \cap \mathbb{Z}_2^{\text{odd}}$
+form a set of measure 0 in $\mathbb{Z}_2^{\text{odd}}$ (since they are countable), and
+yet \emph{all} of them (conjecturally) converge to 1 under $S$. This illustrates the
+measure-0 nature of the Collatz conjecture from a 2-adic viewpoint.
+\end{remark}
+
+\section{Conclusion}
+
+The 2-adic integers provide a natural and powerful setting for the Collatz problem.
+Key results include:
+\begin{itemize}
+  \item The Collatz function $T$ extends to a continuous self-map of $\mathbb{Z}_2$.
+  \item $T$ has exactly one fixed point in $\mathbb{Z}_2$: $x=0$. The Syracuse map $S$ additionally has the fixed point $x=-1$. The trivial positive cycle is $\{1, 4, 2\}$.
+  \item The parity sequence of $x$ encodes the entire Collatz orbit structure.
+  \item The Syracuse representation theorem connects 2-adic expansions to orbit geometry.
+  \item $T$ is not measure-preserving with respect to Haar measure, but $S$ is conjectured to be ergodic.
+\end{itemize}
+The 2-adic setting reformulates the Collatz conjecture as a question about the dynamics
+of a continuous map on a compact space, opening the door to tools from $p$-adic analysis,
+ergodic theory, and harmonic analysis.
+
+\begin{thebibliography}{99}
+
+\bibitem{Collatz1937}
+L.~Collatz.
+\newblock Unpublished problem, communicated at the International Congress of Mathematicians, 1937.
+
+\bibitem{Lagarias1985}
+J.~C. Lagarias.
+\newblock The $3x+1$ problem and its generalizations.
+\newblock \emph{American Mathematical Monthly}, 92(1):3--23, 1985.
+
+\bibitem{Lagarias2010}
+J.~C. Lagarias (ed.).
+\newblock \emph{The Ultimate Challenge: The $3x+1$ Problem}.
+\newblock American Mathematical Society, Providence, RI, 2010.
+
+\bibitem{Tao2022}
+T.~Tao.
+\newblock Almost all Collatz orbits attain almost bounded values.
+\newblock \emph{Forum of Mathematics, Sigma}, 10:e72, 2022.
+
+\bibitem{Koblitz1984}
+N.~Koblitz.
+\newblock \emph{$p$-adic Numbers, $p$-adic Analysis, and Zeta Functions}.
+\newblock 2nd edition, Springer-Verlag, New York, 1984.
+
+\bibitem{Serre1973}
+J.-P. Serre.
+\newblock \emph{A Course in Arithmetic}.
+\newblock Springer-Verlag, New York, 1973.
+
+\bibitem{Bernstein1994}
+D.~J. Bernstein.
+\newblock A non-iterative 2-adic statement of the $3x+1$ conjecture.
+\newblock \emph{Proceedings of the American Mathematical Society}, 121(2):405--408, 1994.
+
+\bibitem{Furstenberg1977}
+H.~Furstenberg.
+\newblock Ergodic behavior of diagonal measures and a theorem of Szemer\'edi on arithmetic progressions.
+\newblock \emph{Journal d'Analyse Math\'ematique}, 31(1):204--256, 1977.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,167 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\euler}{\varphi}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Every Solution to Lehmer's Totient Problem is Squarefree:\\ A Short Proof}
+
+\author{Kurt Ingwer}
+\address{Specialist Mathematics Project, Version Build 44}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Lehmer's totient problem (1932) asks whether the condition $\euler(n) \mid (n-1)$
+forces $n$ to be prime.  A composite solution would be called a \emph{Lehmer number}.
+We give a short, elementary proof that every Lehmer number must be squarefree.
+The argument rests on two steps: if $p^2 \mid n$, then $p \mid \euler(n)$;
+combined with $\euler(n) \mid (n-1)$, this gives $p \mid (n-1)$; but also $p \mid n$,
+so $p \mid 1$, which is impossible.  This result is fundamental for the study of
+Lehmer's problem and implies that any potential counterexample is a product of distinct primes.
+\end{abstract}
+
+\maketitle
+
+% -------------------------------------------------------
+\section{Introduction}
+% -------------------------------------------------------
+
+In 1932, Lehmer \cite{Lehmer1932} asked whether the congruence
+$\euler(n) \mid (n-1)$ (where $\euler$ is Euler's totient function) can hold
+for a composite integer~$n$.  Primes always satisfy $\euler(p) = p-1 \mid p-1$;
+the problem is whether this characterises primes.
+
+\begin{definition}
+A composite integer~$n$ with $\euler(n) \mid (n-1)$ is called a
+\emph{Lehmer number} or \emph{Lehmer pseudoprime}.
+\end{definition}
+
+No Lehmer number has ever been found.  Cohen and Hagis \cite{Cohen1980} proved that
+any such number must have at least~$13$ prime factors; Banks and Luca \cite{Banks2009}
+improved this to~$15$.
+
+The present note establishes the most basic structural property:
+squarefreeness.
+
+% -------------------------------------------------------
+\section{Main Result}
+% -------------------------------------------------------
+
+\begin{theorem}
+\label{thm:sqfree}
+Every Lehmer number is squarefree.
+\end{theorem}
+
+\begin{proof}
+Suppose $n$ is a Lehmer number and $p^2 \mid n$ for some prime~$p$.
+
+Since $p^2 \mid n$, we have $p \mid \euler(n)$.
+(Recall: if $p^a \| n$ with $a \ge 2$, then $p^{a-1}(p-1) \mid \euler(n)$,
+so in particular $p \mid \euler(n)$; even for $a = 2$ this gives $p(p-1) \mid \euler(n)$.)
+
+From $\euler(n) \mid (n-1)$ and $p \mid \euler(n)$:
+\[
+  p \mid \euler(n) \mid (n-1), \quad \text{so} \quad p \mid (n-1).
+\]
+But also $p \mid n$ (since $p^2 \mid n$), hence
+\[
+  p \mid n - (n-1) = 1.
+\]
+This is impossible for $p \ge 2$ — a contradiction.
+Therefore no prime~$p$ satisfies $p^2 \mid n$, i.e.\ $n$ is squarefree.
+\end{proof}
+
+\begin{remark}
+The same argument applies to the more general condition $M \cdot \euler(n) = n - 1$
+for any fixed positive integer~$M$ (a generalisation studied by Hagis \cite{Hagis1988}).
+Squarefreeness follows identically.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Consequences}
+% -------------------------------------------------------
+
+\begin{corollary}
+Every Lehmer number has the form $n = p_1 p_2 \cdots p_k$ with distinct primes
+$p_1 < p_2 < \cdots < p_k$ and $k \ge 2$.
+\end{corollary}
+
+\begin{corollary}
+For a Lehmer number $n = p_1 \cdots p_k$, the totient is
+$\euler(n) = (p_1-1)(p_2-1)\cdots(p_k-1)$, and the Lehmer condition becomes
+\[
+  (p_1-1)(p_2-1)\cdots(p_k-1) \mid p_1 p_2 \cdots p_k - 1.
+\]
+\end{corollary}
+
+This explicit form of the condition is the basis for all further analysis of
+Lehmer numbers, including the proofs that no semiprime \cite{Ingwer2026b} and
+no three-prime number \cite{Ingwer2026lehmer3} can be a Lehmer number.
+
+% -------------------------------------------------------
+\section{Comparison with the Giuga Case}
+% -------------------------------------------------------
+
+The parallel structure with Giuga pseudoprimes is striking.  For both problems:
+\begin{itemize}
+  \item Squarefreeness is proved by showing $p^2 \mid n$ leads to $p \mid 1$.
+  \item For Giuga: $p^2 \mid n \Rightarrow p \mid \tfrac{n}{p} \Rightarrow \tfrac{n}{p}-1 \equiv -1 \pmod{p} \Rightarrow p \mid -1$.
+  \item For Lehmer: $p^2 \mid n \Rightarrow p \mid \euler(n) \Rightarrow p \mid (n-1) \Rightarrow p \mid 1$.
+\end{itemize}
+Both use the fundamental incompatibility between $p \mid n$ and $p \mid (n-1)$.
+
+% -------------------------------------------------------
+\begin{thebibliography}{10}
+
+\bibitem{Lehmer1932}
+D.~H.~Lehmer,
+\emph{On Euler's totient function},
+Bull.\ Amer.\ Math.\ Soc.\ \textbf{38} (1932), 745--751.
+
+\bibitem{Cohen1980}
+G.~L.~Cohen and P.~Hagis,
+\emph{On the number of prime factors of $n$ if $\phi(n) \mid (n-1)$},
+Nieuw Arch.\ Wisk.\ (3) \textbf{28} (1980), 177--185.
+
+\bibitem{Hagis1988}
+P.~Hagis,
+\emph{On the equation $M \cdot \phi(n) = n - 1$},
+Nieuw Arch.\ Wisk.\ (4) \textbf{6} (1988), 255--261.
+
+\bibitem{Banks2009}
+W.~D.~Banks and F.~Luca,
+\emph{Composite integers $n$ for which $\phi(n) \mid n - 1$},
+Acta Math.\ Sin.\ (Engl.\ Ser.) \textbf{25} (2009), 1703--1710.
+
+\bibitem{Ingwer2026b}
+K.~Ingwer,
+\emph{No semiprime satisfies Lehmer's totient condition},
+Specialist Mathematics Project (2026).
+
+\bibitem{Ingwer2026lehmer3}
+K.~Ingwer,
+\emph{Lehmer's totient problem for products of three primes},
+Specialist Mathematics Project (2026).
+
+\end{thebibliography}
+
+\end{document}

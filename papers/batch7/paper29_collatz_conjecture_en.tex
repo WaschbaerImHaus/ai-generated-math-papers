@@ -1,0 +1,368 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\begin{document}
+
+\title{The Collatz Conjecture: Foundations, Iteration Theory,\\
+and Empirical Evidence}
+\author{Michael Fuhrmann}
+\date{March 2026}
+\maketitle
+
+\begin{abstract}
+The Collatz conjecture, formulated by Lothar Collatz in 1937, asserts that every positive
+integer eventually reaches 1 under repeated application of a simple arithmetic rule.
+Despite its elementary formulation, the conjecture remains one of the most celebrated
+open problems in mathematics. This paper presents the foundational theory of the Collatz
+function $T\colon \mathbb{N} \to \mathbb{N}$, studies its iteration behaviour, discusses
+the structure of cycles, surveys empirical verification up to $2^{68}$, and reviews
+connections to ergodic theory, density arguments, and the theory of predecessor sets.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+In 1937, Lothar Collatz posed the following deceptively simple question: take any positive
+integer $n$. If it is even, divide it by 2. If it is odd, multiply it by 3 and add 1.
+Repeat this process. Does the sequence always eventually reach 1?
+
+This question, now known as the \emph{Collatz conjecture} (also called the $3x+1$
+problem, Ulam's conjecture, or the Syracuse problem), has resisted all attempts at
+proof for nearly ninety years. Paul Erd\H{o}s reportedly said: ``Mathematics is not yet
+ready for such problems.''
+
+The conjecture is remarkable not only for its simplicity of statement, but also for the
+richness of mathematical structures it has attracted: number theory, ergodic theory,
+$p$-adic analysis, probabilistic heuristics, and additive combinatorics all play a role
+in modern approaches.
+
+\subsection{Notation and Conventions}
+
+Throughout this paper, $\mathbb{N} = \{1, 2, 3, \ldots\}$ denotes the positive integers,
+and $\mathbb{N}_0 = \{0, 1, 2, \ldots\}$ the non-negative integers. For a function
+$f\colon X \to X$ and $k \geq 0$, we write $f^k$ for the $k$-fold iterate of $f$,
+with $f^0 = \mathrm{id}$.
+
+\section{The Collatz Function and Its Iterates}
+
+\begin{definition}[Collatz function]\label{def:collatz}
+The \emph{Collatz function} (standard form) is the map $T\colon \mathbb{N} \to \mathbb{N}$
+defined by
+\[
+  T(n) \;=\; \begin{cases} n/2 & \text{if } n \equiv 0 \pmod{2}, \\
+                            3n+1 & \text{if } n \equiv 1 \pmod{2}.
+              \end{cases}
+\]
+The \emph{Syracuse function} (or compressed form) replaces each odd step by the full
+odd-to-odd transition:
+\[
+  S(n) \;=\; \frac{3n+1}{2^{\nu_2(3n+1)}},
+\]
+where $\nu_2(m)$ denotes the 2-adic valuation of $m$ (the largest $k$ such that $2^k \mid m$).
+\end{definition}
+
+\begin{remark}\label{rem:equivalent}
+The conjecture is equivalent in both formulations. Under $S$, only odd integers appear,
+which is convenient for $p$-adic and density arguments.
+\end{remark}
+
+\begin{definition}[Collatz sequence and stopping time]\label{def:sequence}
+For $n \in \mathbb{N}$, the \emph{Collatz sequence} starting at $n$ is
+$(n, T(n), T^2(n), \ldots)$.
+The \emph{total stopping time} $\sigma(n)$ is the smallest $k \geq 0$ such that
+$T^k(n) = 1$, or $\infty$ if no such $k$ exists.
+The \emph{stopping time} $\sigma_\infty(n)$ is the smallest $k \geq 0$ such that
+$T^k(n) < n$, or $\infty$ if no such $k$ exists.%
+\footnote{%
+  \textbf{Non-standard notation.} The present paper uses $\sigma(n)$ for the
+  \emph{total} stopping time (first iterate equal to 1) and $\sigma_\infty(n)$
+  for the \emph{partial} stopping time (first iterate strictly less than $n$).
+  This is the \emph{reverse} of the convention used by Lagarias (1985) and
+  Tao (2022), where $\sigma_\infty(n)$ denotes the total stopping time and
+  $\sigma(n)$ (or $\sigma_T(n)$) denotes the partial stopping time.
+  Readers consulting those references should swap the two symbols accordingly.%
+}
+\end{definition}
+
+\begin{proposition}[Existence of predecessors]\label{prop:pred}
+Every positive integer $n$ has at least one predecessor under $T$. Specifically:
+\begin{enumerate}
+  \item[(i)] $2n$ is always a predecessor of $n$ (via the even branch): $T(2n) = n$.
+  \item[(ii)] If $n \equiv 2 \pmod{3}$, then $m = (2n-1)/3$ is a positive odd integer
+              satisfying $T(m) = 2n$ and $T(2n) = n$, so $m$ is a 2-step predecessor of $n$.
+              In particular, $n$ has an odd predecessor at distance 2 in the Collatz graph.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(i) By definition $T(2n) = 2n/2 = n$.\\
+(ii) Set $m = (2n-1)/3$. This is a positive integer iff $3 \mid (2n-1)$, i.e.\
+$2n \equiv 1 \pmod{3}$, i.e.\ $n \equiv 2 \pmod{3}$. Since $3m = 2n-1$ is odd,
+$m$ itself is odd. Then $T(m) = 3m + 1 = (2n-1) + 1 = 2n$, and $T(2n) = n$.
+Thus $T^2(m) = n$, so $m$ is a 2-step predecessor of $n$.
+Note: the direct odd predecessor of $n$ via the odd branch would satisfy $3m + 1 = n$,
+i.e.\ $m = (n-1)/3$, which requires $n \equiv 1 \pmod{3}$ and $(n-1)/3$ to be odd.
+\end{proof}
+
+\section{Cycles and Fixed Points}
+
+\begin{definition}[Cycle]\label{def:cycle}
+A \emph{cycle} of $T$ is a finite set $\{n_0, n_1, \ldots, n_{k-1}\} \subset \mathbb{N}$
+such that $T(n_i) = n_{i+1 \bmod k}$ for all $i$. The integer $k$ is the \emph{period}
+of the cycle.
+\end{definition}
+
+\begin{theorem}[Unique known cycle]\label{thm:cycle}
+The only cycle of $T$ known to exist in $\mathbb{N}$ is the \emph{trivial cycle}
+$\{1, 4, 2\}$ (period 3): $T(1) = 4$, $T(4) = 2$, $T(2) = 1$, giving the
+orbit $1 \to 4 \to 2 \to 1$ under the standard form.
+\end{theorem}
+
+\begin{remark}\label{rem:cycle_search}
+All cycles of $T$ with period up to $10^{17}$ have been searched for computationally
+(see \cite{Leavens1992}) and none other than the trivial cycle $1 \to 4 \to 2 \to 1$
+has been found.
+\end{remark}
+
+\begin{proposition}[Cycle structure equation]\label{prop:cycle_eq}
+A cycle of odd integers $m_0, \ldots, m_{a-1}$ under $S$
+with 2-adic valuations $e_i = \nu_2(3m_i + 1)$ and $E = \sum_{i=0}^{a-1} e_i$ satisfies
+\begin{equation}\label{eq:cycle_cond}
+  (2^E - 3^a)\, m_0 \;=\; C \;>\; 0,
+\end{equation}
+where $C > 0$ is a positive integer (the ``carry'' term) depending on the intermediate values.
+In particular, every cycle of odd integers under $S$ requires $2^E > 3^a$.
+\end{proposition}
+
+\begin{proof}
+Under $S$, each step maps $m_i \mapsto (3m_i + 1)/2^{e_i}$. Composing all $a$ steps around the
+cycle gives $m_0 = (3^a m_0 + C) / 2^E$
+for some positive integer $C$ (the ``carry'' term). Rearranging:
+$(2^E - 3^a) m_0 = C > 0$,
+so $2^E > 3^a$. Since $\log_2 3 \approx 1.585$ is irrational, $2^E \neq 3^a$ for all
+$E, a \in \mathbb{N}$, and the condition $2^E > 3^a$ requires $E/a > \log_2 3$,
+placing strong constraints on the 2-adic valuations $e_i$. This shows that non-trivial
+cycles, if they exist, are highly restricted and necessarily long.
+\end{proof}
+
+\section{Empirical Verification and Density Arguments}
+
+\begin{theorem}[Empirical bound]\label{thm:empirical}
+The Collatz conjecture has been verified computationally for all positive integers up to
+$2^{68} \approx 2.95 \times 10^{20}$
+(see \cite{Barina2020}). That is, for every $n \leq 2^{68}$, the Collatz sequence
+eventually reaches 1.
+\end{theorem}
+
+\begin{remark}\label{rem:heuristics}
+Heuristic arguments support the conjecture. The ``average'' behaviour of $T$ on an integer
+is multiplicatively $3/2$ for odd steps and $1/2$ for even steps. Since roughly half of
+all integers are even, the expected multiplicative factor per step is
+$(1/2) \cdot (1/2) + (1/2) \cdot (3/2) = 1/4 + 3/4 = 1$... however, one must account
+for the $+1$ term. A more refined analysis gives an expected multiplicative factor of
+$(3/2)^{1/2} \cdot (1/2)^{1/2} = (3/4)^{1/2} \approx 0.866 < 1$
+per two steps on average (geometric mean of one odd step $\times$ one even step),
+suggesting geometric decay toward 1.
+\end{remark}
+
+\begin{definition}[Logarithmic density]\label{def:logdens}
+The \emph{logarithmic density} of a set $A \subseteq \mathbb{N}$ is
+\[
+  \mathrm{logdens}(A) \;=\; \lim_{N \to \infty} \frac{1}{\log N} \sum_{\substack{n \leq N \\ n \in A}} \frac{1}{n},
+\]
+provided the limit exists. This is a weaker notion of density than the natural density
+$\lim_{N\to\infty} |A \cap [1,N]|/N$.
+\end{definition}
+
+\begin{proposition}[Positive density of well-behaved orbits]\label{prop:pos_density}
+For any fixed $M \in \mathbb{N}$, the set
+$A_M = \{n \in \mathbb{N} : T^k(n) \leq M \text{ for some } k \geq 0\}$
+has natural density 1. That is, almost all positive integers (in the sense of natural density)
+eventually descend below any fixed bound $M$.
+\end{proposition}
+
+\begin{proof}
+We give two arguments, one unconditional and one conditional.
+
+\textbf{Unconditionally} (following Terras \cite{Terras1976}):
+One uses the backward-iteration tree rooted at $M$. For any $m \leq M$, the set of integers
+that can reach $m$ within $k$ steps grows exponentially in $k$ (at rate roughly $2^k$),
+because every positive integer has at least one predecessor under $T$ (Proposition~\ref{prop:pred}).
+The complementary set of integers that have \emph{not} descended below $M$ within $k$ steps
+has density bounded by $(3/4)^{k/2}$ (up to logarithmic corrections) by
+ergodic-theoretic estimates; see \cite{Terras1976}.
+In the limit $k \to \infty$, the density of exceptions is 0, giving $\mathrm{dens}(A_M) = 1$.
+
+\textbf{Conditionally} (assuming the Collatz Conjecture):
+Every positive integer eventually reaches 1, hence every integer is in $A_M$ for every
+$M \geq 1$. Under this assumption the set $\mathbb{N} \setminus A_M$ is empty, and the
+density-1 conclusion is immediate.
+
+\emph{Note:} The unconditional argument is the substantive one; the conditional argument
+merely illustrates that the conjecture, if true, gives a much stronger (pointwise) result.
+\end{proof}
+
+\section{Connections to Ergodic Theory}
+
+\begin{definition}[Collatz shift]\label{def:shift}
+Consider the 2-adic integers $\mathbb{Z}_2$ (see Section~\ref{sec:padic_preview}).
+The Collatz function extends to a map
+$\tilde{T}\colon \mathbb{Z}_2 \to \mathbb{Z}_2$
+by the same formula. The dynamical system $(\mathbb{Z}_2, \tilde{T}, \mu)$, where
+$\mu$ is the Haar measure on $\mathbb{Z}_2$, provides a natural ergodic-theoretic
+framework.
+\end{definition}
+
+\begin{theorem}[Terras density theorem]\label{thm:terras}
+Let $N_k$ denote the number of positive integers $n \leq X$ such that $T^j(n) > n$
+for all $j = 1, \ldots, k$. Then
+\[
+  \frac{N_k}{X} \;\longrightarrow\; 0 \quad \text{as } X \to \infty,
+\]
+for every fixed $k$. More precisely, $N_k/X \leq (3/4)^{k/2}$ up to logarithmic corrections.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The key observation is that for a ``random'' integer $n$, the stopping time $\sigma_\infty(n)$
+is finite with probability 1 under a suitable probabilistic model. The stopping time
+$\sigma_\infty(n)$ equals the first $k$ for which the random walk $\sum_{j=1}^k X_j$ is
+negative, where $X_j = -1$ with probability $1/2$ (even step) and $X_j = \log_2(3/2)$
+with probability $1/2$ (odd step, losing one factor of 2 but gaining $\log_2 3$).
+The mean of $X_j$ is $(1/2)(\log_2(3/2) - 1) = (1/2)\log_2(3/4) < 0$.
+By the law of large numbers, the walk drifts to $-\infty$, so it crosses 0 almost surely.
+The bound $(3/4)^{k/2}$ follows from standard large-deviation estimates.
+\end{proof}
+
+\begin{theorem}[Tao 2022 — almost bounded orbits]\label{thm:tao}
+For any function $f\colon \mathbb{N} \to \mathbb{R}_{>0}$ with $f(n) \to \infty$ as
+$n \to \infty$, the set
+\[
+  \bigl\{ n \in \mathbb{N} : T^k(n) \leq f(n) \text{ for some } k \geq 0 \bigr\}
+\]
+has logarithmic density 1. Equivalently, for almost all $n$ (in logarithmic density),
+the Collatz orbit of $n$ attains values that are almost bounded.
+\end{theorem}
+
+\begin{proof}[Proof outline]
+Tao's proof \cite{Tao2022} (published in \emph{Forum of Mathematics, Sigma})
+combines Fourier-analytic estimates on exponential sums
+over the Syracuse map with ergodic-theoretic arguments. The main steps are:
+\begin{enumerate}
+  \item Reduce to studying the Syracuse function $S$ on odd integers.
+  \item Model the sequence of 2-adic valuations $e_i = \nu_2(3m_i+1)$ as approximately
+        independent geometric random variables.
+  \item Use the logarithmic Fourier transform to handle dependencies between steps.
+  \item Show that the logarithmic measure of $n$ failing to descend below $f(n)$ is zero.
+\end{enumerate}
+This is the strongest unconditional result toward the Collatz conjecture to date.
+\end{proof}
+
+\section{Preview: $p$-adic and Probabilistic Perspectives}\label{sec:padic_preview}
+
+\begin{definition}[2-adic integers]\label{def:2adic}
+The \emph{2-adic integers} $\mathbb{Z}_2$ are the completion of $\mathbb{Z}$ with respect
+to the 2-adic metric $|x|_2 = 2^{-\nu_2(x)}$. Every element of $\mathbb{Z}_2$ can be written
+as a formal power series $\sum_{k=0}^\infty a_k 2^k$ with $a_k \in \{0,1\}$.
+\end{definition}
+
+\begin{proposition}[Extension of $T$ to $\mathbb{Z}_2$]\label{prop:extension}
+The Collatz function $T\colon \mathbb{N} \to \mathbb{N}$ extends to a continuous map
+$\tilde{T}\colon \mathbb{Z}_2 \to \mathbb{Z}_2$. The even/odd distinction is well-defined
+in $\mathbb{Z}_2$ via the last bit $a_0$.
+\end{proposition}
+
+\begin{proof}
+For $x \in \mathbb{Z}_2$, define $\tilde{T}(x) = x/2$ if $a_0 = 0$, and
+$\tilde{T}(x) = (3x+1)/2$ if $a_0 = 1$ (using the Syracuse compressed form, which maps
+$\mathbb{Z}_2^{\text{odd}}$ to itself). The map is continuous since both branches are
+continuous in the 2-adic topology: division by 2 is $2$-adically continuous (multiplied
+by $2^{-1}$, which increases the valuation), and $3x+1$ is a continuous affine map.
+\end{proof}
+
+\begin{conjecture}[Collatz conjecture]\label{conj:collatz}
+For every $n \in \mathbb{N}$, there exists $k \geq 0$ such that $T^k(n) = 1$.
+Equivalently, every positive integer is in the backward orbit of 1 under $T$.
+\end{conjecture}
+
+\section{Conclusion and Open Questions}
+
+The Collatz conjecture stands as one of the most tantalizing unsolved problems in
+mathematics. We have reviewed the basic framework: the Collatz function $T$, its
+iterates, the structure of cycles (constrained by the irrationality of $\log_2 3$),
+empirical evidence up to $2^{68}$, density arguments showing that almost all orbits
+behave well, and the connection to ergodic theory culminating in Tao's 2022 result.
+
+Open questions remain:
+\begin{enumerate}
+  \item Does every positive integer eventually reach 1 (the conjecture itself)?
+  \item Are there any cycles other than the trivial $1 \to 4 \to 2 \to 1$?
+  \item Can one improve Tao's result from logarithmic density to natural density?
+  \item What is the precise distribution of stopping times $\sigma(n)$?
+  \item Can $p$-adic methods provide a proof strategy (see companion paper \cite{Fuhrmann2026b})?
+\end{enumerate}
+
+\begin{thebibliography}{99}
+
+\bibitem{Collatz1937}
+L.~Collatz.
+\newblock Unpublished problem, communicated at the International Congress of Mathematicians, 1937.
+
+\bibitem{Lagarias1985}
+J.~C. Lagarias.
+\newblock The $3x+1$ problem and its generalizations.
+\newblock \emph{American Mathematical Monthly}, 92(1):3--23, 1985.
+
+\bibitem{Lagarias2010}
+J.~C. Lagarias (ed.).
+\newblock \emph{The Ultimate Challenge: The $3x+1$ Problem}.
+\newblock American Mathematical Society, Providence, RI, 2010.
+
+\bibitem{Tao2022}
+T.~Tao.
+\newblock Almost all Collatz orbits attain almost bounded values.
+\newblock \emph{Forum of Mathematics, Sigma}, 10:e72, 2022.
+
+\bibitem{Terras1976}
+R.~Terras.
+\newblock A stopping time problem on the positive integers.
+\newblock \emph{Acta Arithmetica}, 30(3):241--252, 1976.
+
+\bibitem{Barina2020}
+D.~Barina.
+\newblock Convergence verification of the Collatz problem.
+\newblock \emph{The Journal of Supercomputing}, 77:2681--2688, 2021.
+
+\bibitem{Leavens1992}
+G.~T. Leavens and M.~Vermeulen.
+\newblock $3x+1$ search programs.
+\newblock \emph{Computers \& Mathematics with Applications}, 24(11):79--99, 1992.
+
+\bibitem{Furstenberg1977}
+H.~Furstenberg.
+\newblock Ergodic behavior of diagonal measures and a theorem of Szemer\'edi on arithmetic progressions.
+\newblock \emph{Journal d'Analyse Math\'ematique}, 31(1):204--256, 1977.
+
+\bibitem{Fuhrmann2026b}
+M.~Fuhrmann.
+\newblock The Collatz conjecture and $p$-adic numbers.
+\newblock Preprint, 2026.
+
+\end{thebibliography}
+
+\end{document}
