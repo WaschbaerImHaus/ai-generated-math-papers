@@ -37,7 +37,7 @@ des Fachgebiets: das Inklusions-Exklusions-Prinzip, das Schubfachprinzip,
 den Ramsey-Satz (Endlichkeit von $R(s,t)$), die exakten Werte $R(3,3)=6$ und
 $R(4,4)=18$, die Erd\H{o}s-Untergrenze $R(k,k) > 2^{k/2}$ mittels der
 Probabilistischen Methode, die Binomial-Oberschranke
-$R(k,k) \le \binom{2k-2}{k-1} \le 4^k$, den Satz von Hales--Jewett sowie
+$R(k,k) \le \binom{2k-2}{k-1} \le 4^{k-1}$, den Satz von Hales--Jewett sowie
 den Tur\'an-Satz f\"ur extremale Graphen.  Das Lov\'asz-Lokale-Lemma wird mit
 Anwendungen auf Ramsey-Schranken und Graphenf\"arbung vorgestellt.  Abschlie\ss{}end
 werden offene Probleme diskutiert, insbesondere der unbekannte exakte Wert
@@ -432,19 +432,20 @@ Es existiert eine absolute Konstante $c > 0$ mit
 Diese Verbesserung gegen\"uber der einfachen Erd\H{o}s-Schranke betr\"agt einen
 Faktor der Ordnung $k/\sqrt{\ln k}$.
 
-\subsection{Die Sah-Schranke (2023)}
+\subsection{Die Campos--Griffiths--Morris--Sahasrabudhe-Schranke (2023)}
 
-Ein wichtiger j\"ungerer Durchbruch stammt von Sah \cite{Sah2023}:
+Ein wichtiger jüngerer Durchbruch stammt von Campos, Griffiths, Morris und
+Sahasrabudhe \cite{Sah2023}:
 
-\begin{theorem}[Sah 2023]
+\begin{theorem}[Campos, Griffiths, Morris, Sahasrabudhe 2023]
 Es existiert $\varepsilon > 0$ (explizit: $\varepsilon \approx 0{,}007$) mit
 \[
   R(k,k) \;\le\; (4-\varepsilon)^k.
 \]
 \end{theorem}
 
-Dies ist die erste Verbesserung der $4^k$-Oberschranke seit \"uber 75 Jahren
-und durchbricht die Erd\H{o}s-Szekeres-Schranke.
+Dies ist die erste exponentielle Verbesserung der klassischen $4^{k-1}$-Oberschranke
+seit über 75 Jahren und durchbricht die Erdős--Szekeres-Schranke.
 
 %% ============================================================
 \section{Der Hales--Jewett-Satz}
@@ -741,9 +742,9 @@ J.H.~Kim,
 Random Structures Algorithms \textbf{7} (1995), 173--207.
 
 \bibitem{Sah2023}
-A.~Sah,
-\textit{Diagonal Ramsey via effective quasirandomness},
-Duke Math.\ J.\ \textbf{172} (2023), Nr.~3, 545--567.
+M.~Campos, S.~Griffiths, R.~Morris, und J.~Sahasrabudhe,
+\textit{An exponential improvement for diagonal Ramsey},
+arXiv:2303.09521 (2023), erscheint in Ann.\ Math.
 
 \bibitem{Radziszowski2021}
 S.P.~Radziszowski,

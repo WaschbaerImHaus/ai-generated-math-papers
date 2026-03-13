@@ -189,8 +189,8 @@ $n$ & $\tau(n)$ & $n$ & $\tau(n)$ \\
 \end{tabular}
 \end{table}
 
-\noindent Additional verified values: $\tau(100) = 37{,}534{,}859{,}200$ and
-$\tau(1000) = -30{,}328{,}412{,}970{,}240{,}000$.
+\noindent Additional verified values: $\tau(100) = 184{,}619{,}776{,}800$ and
+$\tau(1000) = 3{,}916{,}984{,}359{,}240$.
 
 \subsection{Multiplicativity}
 
@@ -357,9 +357,10 @@ for the associated $L$-function.
 
 If $\tau(p_0) = 0$ for some prime $p_0$, the local factor at $p_0$ becomes
 \[
-  (1 - p_0^{11-2s})^{-1},
+  (1 + p_0^{11-2s})^{-1},
 \]
-which has a pole at $s = (11 - \log p_0 / \log p_0)/2$, i.e.\ at $s = 11/2$.
+which has zeros of the denominator at $p_0^{11-2s} = -1$, i.e.\ at
+$s = 11/2 - i\pi/(2\log p_0)$ (complex values, not on the real line).
 More concretely: $\alpha_{p_0} = -\beta_{p_0}$, so $\alpha_{p_0} = ip_0^{11/2}$ and
 $\beta_{p_0} = -ip_0^{11/2}$ (purely imaginary). Via the recurrence, this forces
 \[
@@ -536,8 +537,8 @@ each $\tau(n)$ is determined with certainty.
   \begin{enumerate}[label=(\roman*)]
     \item $\tau(n) \neq 0$ for all $n$ with $1 \leq n \leq 50{,}000$.
     \item The known values from Table~\ref{tab:tau-values}, including
-          $\tau(100) = 37{,}534{,}859{,}200$ and
-          $\tau(1000) = -30{,}328{,}412{,}970{,}240{,}000$, are confirmed.
+          $\tau(100) = 184{,}619{,}776{,}800$ and
+          $\tau(1000) = 3{,}916{,}984{,}359{,}240$, are confirmed.
     \item Deligne's bound $|\tau(p)| \leq 2p^{11/2}$ holds for all primes
           $p \leq 1{,}000$ (zero violations found).
   \end{enumerate}
@@ -601,16 +602,12 @@ Via the recurrence \eqref{eq:hecke-recurrence}, $\tau(p_0) = 0$ implies:
 \begin{align*}
   \tau(p_0^0) &= 1, \\
   \tau(p_0^1) &= 0, \\
-  \tau(p_0^2) &= -p_0^{11}, \\
-  \tau(p_0^3) &= 0, \\
-  \tau(p_0^4) &= p_0^{22} - p_0^{22} = 0, \\
-              &\phantom{{}=0,} \vdots
+  \tau(p_0^2) &= 0 \cdot 0 - p_0^{11} \cdot 1 = -p_0^{11} \neq 0, \\
+  \tau(p_0^3) &= 0 \cdot (-p_0^{11}) - p_0^{11} \cdot 0 = 0, \\
+  \tau(p_0^4) &= 0 \cdot 0 - p_0^{11} \cdot (-p_0^{11}) = p_0^{22} \neq 0.
 \end{align*}
-Wait --- more carefully: with $\tau(p_0) = 0$ and $\tau(p_0^0) = 1$,
-\eqref{eq:hecke-recurrence} gives $\tau(p_0^2) = 0 \cdot 0 - p_0^{11} \cdot 1
-= -p_0^{11} \neq 0$. Then $\tau(p_0^3) = 0 \cdot (-p_0^{11}) - p_0^{11} \cdot 0
-= 0$. In general, the pattern $\tau(p_0^k) = 0$ for odd $k$ and
-$\tau(p_0^k) = (-p_0^{11})^{k/2}$ for even $k$ emerges. This infinite family of
+In general, the pattern $\tau(p_0^k) = 0$ for odd $k$ and
+$\tau(p_0^k) = (-1)^{k/2} p_0^{11k/2}$ for even $k$ emerges. This infinite family of
 nonzero values at even prime powers demonstrates that even with $\tau(p_0) = 0$,
 the function $\tau$ does not vanish identically on $p_0$-power arguments.
 

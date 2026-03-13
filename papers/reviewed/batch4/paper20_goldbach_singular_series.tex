@@ -12,6 +12,7 @@
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{remark}[theorem]{Remark}
@@ -273,26 +274,27 @@ $n$ & $\mathfrak{S}(n)$ (exact) & $\mathfrak{S}(n)$ (decimal) & $r_2(n)$ (actual
 The constant $C_2$ appearing in $\mathfrak{S}(n)$ is the same as the
 \emph{twin prime constant}:
 
-\begin{theorem}[Hardy--Littlewood, 1923]\label{thm:twin_prime_count}
+\begin{conjecture}[Hardy--Littlewood, 1923]\label{conj:twin_prime_count}
   The number of twin prime pairs $(p, p+2)$ with $p \leq x$ satisfies:
   \[
     \pi_2(x) \;\sim\; 2 C_2 \cdot \frac{x}{(\log x)^2},
   \]
   where $C_2 = \prod_{p \geq 3} \frac{p(p-2)}{(p-1)^2} \approx 0.6601618$.
-\end{theorem}
+\end{conjecture}
 
-\begin{proof}
-  This is a consequence of the Hardy--Littlewood prime 2-tuples conjecture
-  (Section~\ref{sec:ktuples}).  The singular series for the pair
-  $(p, p+2)$ is exactly $\mathfrak{S}(\{0, 2\}) = 2C_2$, explaining
-  the appearance of $C_2$.  The conjecture is conditional on
-  Hypothesis H (see below), but the numerical agreement is excellent.
-\end{proof}
+\begin{remark}
+  This asymptotic formula is a consequence of the Hardy--Littlewood
+  prime 2-tuples Conjecture~H (Section~\ref{sec:ktuples}).  The singular
+  series for the pair $(p, p+2)$ is exactly $\mathfrak{S}(\{0, 2\}) = 2C_2$.
+  It remains \emph{unproven}; the numerical agreement is excellent but the
+  twin prime conjecture itself is open.
+\end{remark}
 
 The constant $C_2$ has the product representation:
 \[
   C_2 \;=\; \prod_{p \geq 3} \left(1 - \frac{1}{(p-1)^2}\right)
-  \;=\; \frac{15}{16} \cdot \frac{35}{36} \cdot \frac{143}{144} \cdots
+  \;=\; \frac{3}{4} \cdot \frac{15}{16} \cdot \frac{35}{36} \cdot \frac{99}{100}
+       \cdot \frac{143}{144} \cdots
   \;\approx\; 0.66016182\ldots
 \]
 and is related to Mertens' constant by:

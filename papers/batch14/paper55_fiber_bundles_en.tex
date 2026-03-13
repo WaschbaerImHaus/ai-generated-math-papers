@@ -486,13 +486,15 @@ where $Q$ is the transgression form derived from $P$. Thus $[P(F_{A_1})] =
 \end{proof}
 
 \begin{corollary}
-The Chern classes of a complex vector bundle $E$ are represented by
+The total Chern class of a complex vector bundle $E$ with curvature $F_A$ is:
 \[
-  c_k(E) = \left[\mathrm{tr}\!\left(\tfrac{i}{2\pi} F_A\right)^k / k!\right]
-  \in H^{2k}_{\mathrm{dR}}(B).
+  c(E) = \left[\det\!\left(I + \tfrac{i}{2\pi} F_A\right)\right]
+  \in H^{\mathrm{even}}_{\mathrm{dR}}(B),
 \]
-Equivalently, the total Chern class is $c(E) = \bigl[\det\!\bigl(I +
-\tfrac{i}{2\pi} F_A\bigr)\bigr]$.
+so the individual Chern classes $c_k(E)$ are the degree-$2k$ components of
+this determinant expansion.  Note: the trace formula
+$\mathrm{tr}((i/2\pi)\,F_A)^k/k!$ gives the \emph{Chern character}
+component $\mathrm{ch}_k(E)$, not the Chern class $c_k(E)$.
 \end{corollary}
 
 The power of the Chern--Weil theorem is that it simultaneously establishes

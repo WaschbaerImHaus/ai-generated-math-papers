@@ -281,8 +281,9 @@ von Fermat via Wilson und zeigt die Verflechtung dieser klassischen Ergebnisse.
   Aber $|j-k| < p$, also $j = k$.
 
   \textbf{Schritt 2 (Sie liegen in $\{1,\ldots,p-1\}$).}
-  Jedes $ja$ erfüllt $\ggT(ja, p) = \ggT(j,p)\ggT(a,p) = 1$
-  (da $1 \leq j \leq p-1$ und $\ggT(a,p) = 1$), also gilt $ja \not\equiv 0 \pmod{p}$.
+  Jedes $ja$ erfüllt $\ggT(ja, p) = 1$: da $p$ prim ist, gilt $p \nmid j$
+  (wegen $1 \leq j \leq p-1$) und $p \nmid a$ (wegen $\ggT(a,p)=1$), also $p \nmid ja$
+  und damit $ja \not\equiv 0 \pmod{p}$.
 
   \textbf{Schritt 3 (Produktvergleich).}
   Wir multiplizieren alle $p-1$ Kongruenzen:

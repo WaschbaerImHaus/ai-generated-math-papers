@@ -294,8 +294,9 @@ of these classical results.
   But $|j-k| < p$, so $j = k$.
 
   \textbf{Step 2 (They lie in $\{1,\ldots,p-1\}$).}
-  Each $ja$ satisfies $\gcd(ja, p) = \gcd(j,p)\gcd(a,p) = 1$
-  (since $1 \leq j \leq p-1$ and $\gcd(a,p) = 1$), so $ja \not\equiv 0 \pmod p$.
+  Each $ja$ satisfies $\gcd(ja, p) = 1$: since $p$ is prime, $p \nmid j$
+  (as $1 \leq j \leq p-1$) and $p \nmid a$ (as $\gcd(a,p)=1$), so $p \nmid ja$,
+  giving $ja \not\equiv 0 \pmod p$.
 
   \textbf{Step 3 (Product comparison).}
   Multiplying all the $p-1$ congruences together:

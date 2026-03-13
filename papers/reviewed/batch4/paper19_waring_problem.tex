@@ -50,9 +50,9 @@ bounds on $G(k)$.
 We present:  the classical values $g(2) = 4$ (Lagrange), $g(3) = 9$,
 $g(4) = 19$; the distinction between $g(k)$ and $G(k)$; the Hardy--Littlewood
 asymptotic formula for $r_{k,s}(n)$; the circle method derivation of
-$G(k) \leq 2^k + 1$ (Weyl), $G(k) \leq k^2(k-1) + k + 3$ (Vinogradov),
-and $G(k) \leq k(\log k + 4.20032)$ (Wooley, 2016, using Bourgain--Demeter--Guth
-decoupling); and the sharp lower bound $G(k) \geq k + 1$.
+$G(k) \leq (k-2)2^{k-1} + 5$ (Weyl), $G(k) \leq k(\log k + \log\log k + O(1))$
+(Vinogradov--Wooley), and $G(k) \leq k(\log k + 4.20032)$ (Wooley, 2016, using
+Bourgain--Demeter--Guth decoupling); and the sharp lower bound $G(k) \geq k + 1$.
 \end{abstract}
 
 \maketitle
@@ -509,7 +509,7 @@ $k$ & $G(k)$ exact & $G(k) \leq$ & Lower bound & Reference \\
 \midrule
 2 & 4 & 4 & 4 & Lagrange \\
 3 & unknown & 7 & 4 & Heath-Brown 1988 \\
-4 & unknown & 15 & 2 & Davenport 1939 \\
+4 & 15 & 15 & 15 & Kempner 1912 ($G(4)\!\geq\!15$); Davenport 1939 ($G(4)\!\leq\!15$) \\
 5 & unknown & 17 & 6 & Vaughan 1989 \\
 6 & unknown & 24 & 9 & Vaughan 1989 \\
 7 & unknown & 33 & 8 & Vaughan 1989 \\

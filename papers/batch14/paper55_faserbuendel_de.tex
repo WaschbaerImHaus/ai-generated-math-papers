@@ -500,13 +500,14 @@ $[P(F_{A_1})] = [P(F_{A_0})]$ in $H^*_{\mathrm{dR}}(B)$.
 \end{proof}
 
 \begin{corollary}
-Die Chern-Klassen eines komplexen Vektorbündels $E$ werden durch
+Die totale Chern-Klasse eines komplexen Vektorbündels $E$ mit Krümmung $F_A$ ist:
 \[
-  c_k(E) = \left[\mathrm{tr}\!\left(\tfrac{i}{2\pi} F_A\right)^k / k!\right]
-  \in H^{2k}_{\mathrm{dR}}(B)
+  c(E) = \left[\det\!\left(I + \tfrac{i}{2\pi} F_A\right)\right]
+  \in H^{\mathrm{gerade}}_{\mathrm{dR}}(B),
 \]
-repräsentiert. Äquivalent ist die totale Chern-Klasse:
-$c(E) = \bigl[\det\!\bigl(I + \tfrac{i}{2\pi} F_A\bigr)\bigr].$
+die einzelnen Chern-Klassen $c_k(E)$ sind die Grad-$2k$-Anteile dieser Determinantenentwicklung.
+Hinweis: Die Spur-Formel $\mathrm{tr}((i/2\pi)\,F_A)^k/k!$ liefert die \emph{Chern-Charakter}-Komponente
+$\mathrm{ch}_k(E)$, nicht die Chern-Klasse $c_k(E)$.
 \end{corollary}
 
 Die Stärke des Chern--Weil-Satzes liegt darin, dass er gleichzeitig die Existenz

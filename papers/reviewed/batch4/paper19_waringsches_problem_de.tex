@@ -49,8 +49,8 @@ Invarianten $G(k)$ — der kleinsten Zahl $s$, so dass jede hinreichend
 große Zahl $n$ als Summe von $s$ $k$-ten Potenzen darstellbar ist.
 Wir stellen vor: klassische Werte ($g(2)=4$, $g(3)=9$, $g(4)=19$),
 den Unterschied zwischen $g(k)$ und $G(k)$, die Hardy--Littlewood-Formel,
-Weyls Schranke $G(k) \leq 2^{k-1}(k-2)+5$, Winogradows Verbesserung
-$G(k) \leq k^2(k-1)+k+3$ und Wooleys Schranke $G(k) \leq k(\log k + 4{,}20)$
+Weyls Schranke $G(k) \leq (k-2)2^{k-1}+5$, Winogradows asymptotische Verbesserung
+$G(k) \leq k(\log k + \log\log k + O(1))$ und Wooleys Schranke $G(k) \leq k(\log k + 4{,}20)$
 (aus dem Beweis der Vinogradow-Hauptvermutung, 2016).
 \end{abstract}
 
@@ -213,7 +213,7 @@ Die Darstellungsanzahl ist:
 \begin{proof}
   \textbf{Logische Struktur.}  Der Beweis verläuft streng linear:
   (i) Die Vinogradow-Hauptvermutung (VHV, Satz~\ref{thm:bdg}) ist eine
-  \emph{Voraussetzung}; (ii) aus VHV wird eine Nebenborgen-Schranke per
+  \emph{Voraussetzung}; (ii) aus VHV wird eine Nebenbogen-Schranke per
   Cauchy--Schwarz hergeleitet; (iii) die Hauptbogenanalyse (Satz~\ref{thm:HL},
   deren Beweis von VHV unabhängig ist) liefert das Hauptglied; (iv)
   $s$ wird optimiert.  Es gibt keine zirkuläre Abhängigkeit.
@@ -228,7 +228,7 @@ Die Darstellungsanzahl ist:
   Dies ist eine \emph{Folge} der VHV; die VHV selbst wird hierbei nicht
   verwendet, um Hauptbogenergebnisse vorauszusetzen.
 
-  \textbf{Schritt~2 (Nebenborgenintegral).}
+  \textbf{Schritt~2 (Nebenbogenintegral).}
   Mit der Schranke aus Schritt~1 folgt:
   \[
     \left|\int_{\mathfrak{m}} f(\alpha)^s\, e(-n\alpha)\, d\alpha\right|
@@ -247,10 +247,10 @@ Die Darstellungsanzahl ist:
   \textbf{Schritt~4 (Kombination und Optimierung von $s$).}
   Wähle $s = \lceil k(\log k + 4{,}20032)\rceil$.  Dann gilt:
   \begin{itemize}
-    \item $s > 2k+1$ (für $k \geq 2$): Singulärreihenkevergenz und
+    \item $s > 2k+1$ (für $k \geq 2$): Singulärreihenkonvergenz und
       Hauptbogenformel anwendbar (Schritt~3),
     \item $s \leq k(k+1)/2$ (für $k \geq 2$): VHV anwendbar (Schritte~1--2),
-    \item Nebenborgen-Fehler $n^{s/k-1-\delta} = o(n^{s/k-1})$:
+    \item Nebenbogen-Fehler $n^{s/k-1-\delta} = o(n^{s/k-1})$:
       Hauptterm dominiert.
   \end{itemize}
   Damit gilt $r_{k,s}(n) \sim \mathfrak{S}_{k,s}(n) C_{k,s} n^{s/k-1} > 0$
@@ -348,7 +348,7 @@ $k$ & $G(k)$ exakt & $G(k) \leq$ & Untere Schranke & Quelle \\
 \midrule
 2 & 4 & 4 & 4 & Lagrange \\
 3 & unbekannt & 7 & 4 & Heath-Brown 1988 \\
-4 & unbekannt & 15 & 2 & Davenport 1939 \\
+4 & 15 & 15 & 15 & Kempner 1912 ($G(4)\!\geq\!15$); Davenport 1939 ($G(4)\!\leq\!15$) \\
 5 & unbekannt & 17 & 6 & Vaughan 1989 \\
 groß $k$ & — & $k(\log k+4{,}2)$ & $k+1$ & Wooley 2016 \\
 \bottomrule
