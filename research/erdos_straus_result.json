@@ -1,0 +1,10 @@
+{
+  "conjecture": "Erdos-Straus",
+  "limit": 1000000000,
+  "primes_checked": 50847534,
+  "violations": [],
+  "confirmed": true,
+  "elapsed_seconds": 400.8,
+  "algorithm": "O(sqrt(p)) divisor search on D^2=p^2*x^2 (Build 179)",
+  "timestamp": "2026-03-13T07:27:55.102942"
+}

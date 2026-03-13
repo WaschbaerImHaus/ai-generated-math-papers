@@ -10,3 +10,9 @@ Build 176: Papers 76/89/95 aktualisiert — Dudko-Lyubich 2023 (MLC@Feigenbaum),
     45 Teiler von x²=636² korrekt generiert, d=848 enthalten.
   VALIDIERT: 0 Failures in 664k Primzahlen bis 10M.
   Vollständige Berechnung bis 10^9 gestartet (PID 82126), ETA ~5 Min.
+
+2026-03-13 07:28 - Build 180: Erdős-Straus Verifikation bis 10^9 abgeschlossen
+  ERGEBNIS: ✓ BESTÄTIGT — 0 Gegenbeispiele in 50.847.534 Primzahlen ≤ 10^9
+  Laufzeit: 401 Sekunden (6.7 Minuten) mit 20 Kernen
+  Algorithmus: O(√p) Teilersuche auf D²=p²x² (vollständige x²-Teilerenumeration)
+  JSON gespeichert: research/erdos_straus_result.json

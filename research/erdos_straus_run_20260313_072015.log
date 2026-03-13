@@ -1,0 +1,38 @@
+============================================================
+Erdős-Straus Heavy Computation — 2026-03-13 07:20:16
+Grenze: n ≤ 1,000,000,000 | Kerne: 20
+Algorithmus: O(√p) Teilersuche auf D²=p²x² (Build 179)
+============================================================
+
+Numba JIT kompilieren...
+Traceback (most recent call last):
+  File "/home/claude-code/project/specialist-maths/research/heavy_compute_erdos_straus.py", line 301, in <module>
+    main()
+    ~~~~^^
+  File "/home/claude-code/project/specialist-maths/research/heavy_compute_erdos_straus.py", line 224, in main
+    result_warmup = check_prime_chunk(warmup)
+  File "/home/claude-code/.local/lib/python3.13/site-packages/numba/core/dispatcher.py", line 443, in _compile_for_args
+    raise e
+  File "/home/claude-code/.local/lib/python3.13/site-packages/numba/core/dispatcher.py", line 376, in _compile_for_args
+    return_val = self.compile(tuple(argtypes))
+  File "/home/claude-code/.local/lib/python3.13/site-packages/numba/core/dispatcher.py", line 889, in compile
+    cres = self._cache.load_overload(sig, self.targetctx)
+  File "/home/claude-code/.local/lib/python3.13/site-packages/numba/core/caching.py", line 721, in load_overload
+    return self._load_overload(sig, target_context)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude-code/.local/lib/python3.13/site-packages/numba/core/caching.py", line 728, in _load_overload
+    data = self._cache_file.load(key)
+  File "/home/claude-code/.local/lib/python3.13/site-packages/numba/core/caching.py", line 576, in load
+    return self._load_data(data_name)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/home/claude-code/.local/lib/python3.13/site-packages/numba/core/caching.py", line 618, in _load_data
+    tup = pickle.loads(data)
+  File "/home/claude-code/.local/lib/python3.13/site-packages/numba/core/environment.py", line 51, in _rebuild_env
+    mod = importlib.import_module(modname)
+  File "/usr/lib/python3.13/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named '<dynamic>'

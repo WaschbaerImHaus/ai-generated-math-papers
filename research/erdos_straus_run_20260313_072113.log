@@ -1,0 +1,100 @@
+============================================================
+Erdős-Straus Heavy Computation — 2026-03-13 07:21:13
+Grenze: n ≤ 1,000,000,000 | Kerne: 20
+Algorithmus: O(√p) Teilersuche auf D²=p²x² (Build 179)
+============================================================
+
+Numba JIT kompilieren...
+Numba JIT ready. (0.5s)
+
+Segment 2–50,000,001...
+  Chunk     0:  100,000 Primzahlen (2–1,299,709) 0.02s (4.0M prim/s)
+  → 3,001,134 Primzahlen, 17.5s (0.2M prim/s), Gesamt: 17.5s (0.00h)
+  → Fortschritt: 5.0%, ETA: 333s (0.09h)
+
+Segment 50,000,002–100,000,001...
+  → 2,760,321 Primzahlen, 18.7s (0.1M prim/s), Gesamt: 36.2s (0.01h)
+  → Fortschritt: 10.0%, ETA: 326s (0.09h)
+
+Segment 100,000,002–150,000,001...
+  → 2,682,942 Primzahlen, 19.2s (0.1M prim/s), Gesamt: 55.4s (0.02h)
+  → Fortschritt: 15.0%, ETA: 314s (0.09h)
+
+Segment 150,000,002–200,000,001...
+  Chunk   100:  100,000 Primzahlen (176,471,551–178,368,689) 0.32s (0.3M prim/s)
+  → 2,634,540 Primzahlen, 19.6s (0.1M prim/s), Gesamt: 75.0s (0.02h)
+  → Fortschritt: 20.0%, ETA: 300s (0.08h)
+
+Segment 200,000,002–250,000,001...
+  → 2,600,381 Primzahlen, 19.7s (0.1M prim/s), Gesamt: 94.7s (0.03h)
+  → Fortschritt: 25.0%, ETA: 284s (0.08h)
+
+Segment 250,000,002–300,000,001...
+  → 2,573,007 Primzahlen, 20.2s (0.1M prim/s), Gesamt: 114.9s (0.03h)
+  → Fortschritt: 30.0%, ETA: 268s (0.07h)
+
+Segment 300,000,002–350,000,001...
+  → 2,551,201 Primzahlen, 20.4s (0.1M prim/s), Gesamt: 135.3s (0.04h)
+  → Fortschritt: 35.0%, ETA: 251s (0.07h)
+
+Segment 350,000,002–400,000,001...
+  Chunk   200:  100,000 Primzahlen (365,760,613–367,729,913) 0.47s (0.2M prim/s)
+  → 2,532,800 Primzahlen, 19.4s (0.1M prim/s), Gesamt: 154.7s (0.04h)
+  → Fortschritt: 40.0%, ETA: 232s (0.06h)
+
+Segment 400,000,002–450,000,001...
+  → 2,516,712 Primzahlen, 20.4s (0.1M prim/s), Gesamt: 175.1s (0.05h)
+  → Fortschritt: 45.0%, ETA: 214s (0.06h)
+
+Segment 450,000,002–500,000,001...
+  → 2,502,829 Primzahlen, 20.6s (0.1M prim/s), Gesamt: 195.7s (0.05h)
+  → Fortschritt: 50.0%, ETA: 196s (0.05h)
+
+Segment 500,000,002–550,000,001...
+  → 2,489,490 Primzahlen, 20.5s (0.1M prim/s), Gesamt: 216.1s (0.06h)
+  → Fortschritt: 55.0%, ETA: 177s (0.05h)
+
+Segment 550,000,002–600,000,001...
+  Chunk   300:  100,000 Primzahlen (560,065,447–562,077,661) 0.55s (0.2M prim/s)
+  → 2,479,347 Primzahlen, 20.5s (0.1M prim/s), Gesamt: 236.6s (0.07h)
+  → Fortschritt: 60.0%, ETA: 158s (0.04h)
+
+Segment 600,000,002–650,000,001...
+  → 2,468,691 Primzahlen, 20.5s (0.1M prim/s), Gesamt: 257.2s (0.07h)
+  → Fortschritt: 65.0%, ETA: 138s (0.04h)
+
+Segment 650,000,002–700,000,001...
+  → 2,459,537 Primzahlen, 20.0s (0.1M prim/s), Gesamt: 277.2s (0.08h)
+  → Fortschritt: 70.0%, ETA: 119s (0.03h)
+
+Segment 700,000,002–750,000,001...
+  → 2,450,249 Primzahlen, 20.6s (0.1M prim/s), Gesamt: 297.8s (0.08h)
+  → Fortschritt: 75.0%, ETA: 99s (0.03h)
+
+Segment 750,000,002–800,000,001...
+  Chunk   400:  100,000 Primzahlen (760,224,461–762,266,887) 0.71s (0.1M prim/s)
+  → 2,442,998 Primzahlen, 20.4s (0.1M prim/s), Gesamt: 318.2s (0.09h)
+  → Fortschritt: 80.0%, ETA: 80s (0.02h)
+
+Segment 800,000,002–850,000,001...
+  → 2,435,787 Primzahlen, 20.6s (0.1M prim/s), Gesamt: 338.8s (0.09h)
+  → Fortschritt: 85.0%, ETA: 60s (0.02h)
+
+Segment 850,000,002–900,000,001...
+  → 2,427,249 Primzahlen, 21.0s (0.1M prim/s), Gesamt: 359.8s (0.10h)
+  → Fortschritt: 90.0%, ETA: 40s (0.01h)
+
+Segment 900,000,002–950,000,001...
+  → 2,422,256 Primzahlen, 20.2s (0.1M prim/s), Gesamt: 380.0s (0.11h)
+  → Fortschritt: 95.0%, ETA: 20s (0.01h)
+
+Segment 950,000,002–1,000,000,000...
+  Chunk   500:  100,000 Primzahlen (960,332,033–962,401,981) 0.78s (0.1M prim/s)
+  → 2,416,063 Primzahlen, 20.7s (0.1M prim/s), Gesamt: 400.8s (0.11h)
+
+============================================================
+Fertig: 401s (0.11h)
+Geprüfte Primzahlen bis 1,000,000,000: 50,847,534
+Gegenbeispiele: 0
+✓ BESTÄTIGT: Erdős-Straus gilt für alle Primzahlen ≤ 1,000,000,000
+Ergebnis gespeichert: /home/claude-code/project/specialist-maths/research/erdos_straus_result.json
