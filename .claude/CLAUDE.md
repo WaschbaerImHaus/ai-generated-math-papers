@@ -85,5 +85,5 @@ von Grundlagen bis hin zu fortgeschrittenen Themen.
 Pushe immer auf BEIDE Remotes:
 ```bash
 git push origin master
-git push github master
+git push github main
 ```
