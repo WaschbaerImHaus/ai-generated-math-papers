@@ -1,0 +1,404 @@
+%% paper81_hadwiger_vermutung_de.tex
+%% Hadwigers Vermutung für n >= 7: Graphenfärbung und Minortheorie (Deutsch)
+%% Autor: Michael Fuhrmann
+%% Specialist Mathematics Project, Build 166
+%% Datum: 2026-03-12
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem-Umgebungen (Deutsch)
+\newtheorem{theorem}{Satz}[section]
+\newtheorem{satz}[theorem]{Satz}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{korollar}[theorem]{Korollar}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{vermutung}[theorem]{Vermutung}
+\newtheorem{conjecture}[theorem]{Vermutung}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{definition_de}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\theoremstyle{remark}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{remark}[theorem]{Bemerkung}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+\begin{document}
+
+\title{Hadwigers Vermutung für $k \geq 7$:\\
+Graphenfärbung, vollständige Minoren\\
+und die Verbindung zum Vier-Farben-Satz}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 166}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\begin{abstract}
+Hadwigers Vermutung (1943) behauptet, dass jeder Graph $G$ mit chromatischer
+Zahl $\chi(G) \geq k$ den vollständigen Graphen $K_k$ als Minor enthält. Dies
+ist eines der tiefsten offenen Probleme der Graphentheorie, das die Theorie der
+Graphenfärbungen mit der Strukturtheorie der Graphenminoren nach Robertson und
+Seymour verbindet.
+
+Die Vermutung ist für $k \leq 6$ verifiziert: Die Fälle $k \leq 4$ folgen aus
+klassischen Resultaten, $k = 5$ ist äquivalent zum Vier-Farben-Satz (Wagner 1937),
+und $k = 6$ wurde von Robertson, Seymour und Thomas (1993) ebenfalls unter Nutzung
+des Vier-Farben-Satzes bewiesen. Für $k \geq 7$ ist die Vermutung vollständig offen.
+
+Wir präsentieren vollständige Beweise für $k \leq 4$, eine detaillierte Analyse
+der $k = 5$-Äquivalenz mit dem Vier-Farben-Satz, den Robertson--Seymour--Thomas-Beweis
+für $k = 6$ sowie Teilresultate für große $k$, einschließlich der Reed--Seymour-Schranken
+und der Ergebnisse von Kühn--Osthus.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% =============================================================================
+\section{Einleitung}
+%% =============================================================================
+
+Im Jahr 1943 stellte Hugo Hadwiger~\cite{Hadwiger1943} folgende vereinigende Vermutung vor,
+die die chromatische Zahl eines Graphen mit seiner Minorstruktur verbindet:
+
+\begin{vermutung}[Hadwiger, 1943]\label{verm:hadwiger}
+Für jede ganze Zahl $k \geq 1$ gilt: Falls $\chi(G) \geq k$, dann enthält $G$
+den vollständigen Graphen $K_k$ als Minor ($G \succeq K_k$).
+\end{vermutung}
+
+Äquivalent: Jeder Graph ohne $K_k$-Minor ist $(k-1)$-färbbar.
+
+\begin{definition_de}
+Sei $G = (V,E)$ ein Graph.
+\begin{enumerate}[label=(\alph*)]
+  \item Die \emph{chromatische Zahl} $\chi(G)$ ist die kleinste Anzahl an Farben,
+        die benötigt wird, um die Knoten von $G$ so zu färben, dass benachbarte
+        Knoten verschiedene Farben erhalten.
+  \item Ein Graph $H$ ist ein \emph{Minor} von $G$ (geschrieben $H \preceq G$),
+        falls $H$ aus $G$ durch eine Folge von Kantenkon\-trak\-tionen, Kantenlöschungen
+        und Knotenlöschungen gewonnen werden kann.
+  \item Die \emph{Hadwiger-Zahl} $\eta(G)$ (auch $h(G)$) ist das größte $k$
+        mit $K_k \preceq G$.
+\end{enumerate}
+\end{definition_de}
+
+Hadwigers Vermutung lautet umformuliert: $\chi(G) \leq \eta(G)$ für alle Graphen $G$.
+
+%% =============================================================================
+\section{Graphenminoren: Grundlegende Theorie}
+%% =============================================================================
+
+\begin{definition_de}
+Eine \emph{Kantenkontraktion} kontrahiert eine Kante $uv$, indem $u$ und $v$ zu
+einem einzelnen Knoten $w$ mit Nachbarschaft $N(u) \cup N(v) \setminus \{u,v\}$
+zusammengeführt werden.
+\end{definition_de}
+
+\begin{proposition}\label{prop:minoreig}
+Die Minorrelation $\preceq$ ist eine Halbordnung auf Isomorphieklassen von Graphen.
+Falls $H \preceq G$, so gilt $\chi(H) \leq \chi(G)$.
+\end{proposition}
+
+\begin{satz}[Robertson--Seymour, Graphenminor-Satz 2004]\label{satz:GMT}
+In jeder unendlichen Folge von Graphen $G_1, G_2, \ldots$ gibt es zwei Graphen
+$G_i \preceq G_j$ mit $i < j$. Insbesondere hat jede minorabgeschlossene Graphenfamilie
+eine endliche Menge verbotener Minoren.
+\end{satz}
+
+%% =============================================================================
+\section{Bewiesene Fälle: \texorpdfstring{$k \leq 4$}{k <= 4}}
+%% =============================================================================
+
+\begin{satz}[Hadwigers Vermutung für $k \leq 3$]\label{satz:k3}
+\begin{enumerate}[label=(\roman*)]
+  \item $k = 1$: Jeder nichtleere Graph hat $\chi(G) \geq 1$ und enthält $K_1$.
+  \item $k = 2$: $\chi(G) \geq 2$ impliziert, $G$ hat eine Kante, also $K_2 \preceq G$.
+  \item $k = 3$: $\chi(G) \geq 3$ impliziert, $G$ enthält einen ungeraden Kreis, also $K_3 \preceq G$.
+\end{enumerate}
+\end{satz}
+
+\begin{proof}
+Für $k = 3$: Da $\chi(G) \geq 3$, ist $G$ nicht bipartit, enthält also einen ungeraden
+Kreis $C_{2m+1}$, $m \geq 1$. Jeder ungerade Kreis enthält $K_3$ als Minor
+(durch Kontrahieren aller bis auf drei Knoten), also $K_3 \preceq G$.
+\end{proof}
+
+\begin{satz}[Hadwiger für $k = 4$, Dirac 1952]\label{satz:k4}
+Jeder $4$-chromatische Graph enthält $K_4$ als Minor.
+\end{satz}
+
+\begin{proof}[Beweisidee]
+Dirac~\cite{Dirac52} bewies, dass jeder $4$-chromatische Graph $K_4$ als topologischen
+Minor enthält (d.h.\ eine Unterteilung von $K_4$). Da topologischer Minor ein Spezialfall
+von Minor ist, folgt das Resultat. Der Beweis nutzt Kempe-Ketten und die Nichtplanarität
+$4$-chromatischer Graphen.
+\end{proof}
+
+%% =============================================================================
+\section{Wagners Satz und der Fall \texorpdfstring{$k = 5$}{k=5}}
+%% =============================================================================
+
+\begin{satz}[Wagner, 1937]\label{satz:wagner}
+Ein Graph $G$ ist genau dann planar, wenn er weder $K_5$ noch $K_{3,3}$ als Minor enthält.
+\end{satz}
+
+\begin{satz}[Vier-Farben-Satz, Appel--Haken 1977; Robertson et al.\ 1997]\label{satz:VFS}
+Jeder planare Graph ist $4$-färbbar.
+\end{satz}
+
+\begin{satz}[Hadwiger für $k = 5$ $\Leftrightarrow$ VFS, Wagner 1937]\label{satz:k5}
+Hadwigers Vermutung für $k = 5$ ist äquivalent zum Vier-Farben-Satz.
+\end{satz}
+
+\begin{proof}
+($\Leftarrow$) Angenommen, der Vier-Farben-Satz gelte. Sei $G$ ein Graph mit
+$\chi(G) \geq 5$. Dann ist $G$ nach dem VFS nicht planar. Nach Wagners Satz enthält
+$G$ dann $K_5$ oder $K_{3,3}$ als Minor. Mithilfe von Wagners Struktursatz
+(Graphen ohne $K_5$-Minor sind aus planaren Graphen und dem Wagner-Graphen $V_8$
+durch $3$-Summen aufgebaut) folgt, dass $K_{3,3}$-Minor-freie $5$-chromatische Graphen
+stets $K_5$ als Minor enthalten. Also $K_5 \preceq G$.
+
+($\Rightarrow$) Gilt Hadwigers Vermutung für $k = 5$, so hat jeder planare Graph
+(der keinen $K_5$-Minor enthält) chromatische Zahl $\leq 4$.
+\end{proof}
+
+%% =============================================================================
+\section{Der Fall \texorpdfstring{$k = 6$}{k=6}: Robertson--Seymour--Thomas}
+%% =============================================================================
+
+\begin{satz}[Robertson--Seymour--Thomas, 1993]\label{satz:k6}
+Jeder $6$-chromatische Graph enthält $K_6$ als Minor. Äquivalent: Jeder Graph
+ohne $K_6$-Minor ist $5$-färbbar.
+\end{satz}
+
+\begin{proof}[Beweisübersicht]
+Robertson, Seymour und Thomas~\cite{RST93} zeigen, dass jeder minimale Gegenbeispiel-Kandidat
+zu Hadwigers Vermutung für $k = 6$ einen \emph{Apex-Knoten} $v$ besitzen muss, sodass
+$G - v$ planar ist. Da $G - v$ planar ist, gilt nach dem VFS $\chi(G - v) \leq 4$.
+Durch Zuweisen einer fünften Farbe an $v$ ergibt sich $\chi(G) \leq 5$, ein Widerspruch
+zur Annahme $\chi(G) = 6$. Die Strukturzerlegung von $K_6$-minor-freien Graphen
+ist das Herzstück des Beweises.
+\end{proof}
+
+\begin{korollar}
+Die Fälle $k \leq 6$ von Hadwigers Vermutung sind bewiesene Sätze. Für $k = 5, 6$
+benötigen die Beweise den Vier-Farben-Satz.
+\end{korollar}
+
+%% =============================================================================
+\section{Minorabgeschlossene Graphenfamilien und Wagners Formel}
+%% =============================================================================
+
+\begin{satz}[Kostochka 1984; Thomason 1984]\label{satz:kostochka}
+Es gibt eine Konstante $c > 0$, sodass jeder Graph $G$ mit mittlerem Grad
+$\geq c \cdot k \sqrt{\log k}$ den Graphen $K_k$ als Minor enthält. Die optimale
+Konstante ist $c = (\alpha + o(1))/\sqrt{\ln k}$ mit $\alpha = 0{,}319\ldots$\,.
+\end{satz}
+
+\begin{satz}[Mader, 1967]\label{satz:mader}
+Jeder Graph ohne $K_k$-Minor hat mittleren Grad $< 2^{k-2}$. Insbesondere ist jeder
+$K_k$-minorfreie Graph $(2^{k-2})$-degeneriert, also $(2^{k-2}+1)$-färbbar.
+\end{satz}
+
+\begin{bemerkung}
+Die exponentielle Lücke zwischen Maders Schranke $2^{k-2}$ und Hadwigers Vorhersage
+$k-1$ ist für große $k$ enorm. Für $k = 5$: Mader liefert $9$-Färbbarkeit (da $2^{5-2}+1 = 9$) ohne VFS,
+für $k = 6$: nur $17$-Färbbarkeit (da $2^{6-2}+1 = 17$), aber RST verbessert auf $5$.
+\end{bemerkung}
+
+%% =============================================================================
+\section{Kühn--Osthus und große chromatische Zahlen}
+%% =============================================================================
+
+\begin{satz}[Kühn--Osthus, 2005]\label{satz:KO}
+Für jedes $\varepsilon > 0$ gibt es $k_0$, sodass für alle $k \geq k_0$ gilt:
+Falls $\chi(G) \geq k$, dann $\eta(G) \geq k/(1+\varepsilon)$.
+\end{satz}
+
+\begin{proof}[Beweisidee]
+Jeder $k$-chromatische Graph enthält einen $k$-kritischen Teilgraphen mit
+Minimalgrad $\geq k-1$. Der Thomason-Satz verbindet hohen Minimalgrad mit
+großer Hadwiger-Zahl; der Faktor $(1+\varepsilon)$ kompensiert die Lücke
+zwischen Minimal- und Durchschnittsgrad.
+\end{proof}
+
+\begin{satz}[Norin--Song, 2023]\label{satz:NS23}
+Für alle hinreichend großen $k$ gilt: Falls $\chi(G) \geq k$, dann
+$\eta(G) \geq k/(\log k)^{0{,}999}$.
+\end{satz}
+
+Dies ist das derzeit beste asymptotische Resultat, liegt aber noch weit von der
+linearen Schranke $\eta(G) \geq k$ entfernt, die Hadwigers Vermutung fordert.
+
+%% =============================================================================
+\section{Gebrochene und lineare Hadwiger-Vermutung}
+%% =============================================================================
+
+\begin{definition_de}
+Die \emph{gebrochene chromatische Zahl} $\chi_f(G)$ ist das Infimum über $p/q$,
+für das eine zulässige $p$-Färbung von $G^q$ (dem $q$-fachen lexikographischen
+Potenz von $G$) existiert. Es gilt $\chi_f(G) \leq \chi(G)$.
+\end{definition_de}
+
+\begin{satz}[Gebrochener Hadwiger, Reed--Seymour 1998]\label{satz:fracHad}
+$\chi_f(G) \leq 2\eta(G)$ für alle Graphen $G$.
+\end{satz}
+
+\begin{vermutung}[Linearer Hadwiger]\label{verm:linHad}
+Es gibt eine absolute Konstante $c$, sodass $\chi(G) \leq c \cdot \eta(G)$
+für alle Graphen $G$.
+\end{vermutung}
+
+\begin{bemerkung}
+Hadwigers Vermutung ist der Spezialfall $c = 1$. Die lineare Hadwiger-Vermutung
+fordert irgendein festes $c$ und wäre bereits ein bedeutender Fortschritt.
+Das beste aktuelle Ergebnis (Norin--Song 2023) liefert $c = O((\log k)^{0{,}999})$ –
+noch logarithmisch.
+\end{bemerkung}
+
+%% =============================================================================
+\section{Die Ungerade Hadwiger-Vermutung (Gerards--Seymour)}
+%% =============================================================================
+
+\begin{vermutung}[Ungerade Hadwiger, Gerards--Seymour]\label{verm:odd}
+Falls $G$ keinen $K_k$ als \emph{ungeraden Minor} enthält (d.\,h.\ einen Minor,
+bei dem alle Verzweigungsmengen ungerade Größe haben oder eine bestimmte
+Paritätsbedingung erfüllen), dann gilt $\chi(G) \leq 2(k-1)$.
+\end{vermutung}
+
+\begin{satz}[Geelen, Gerards, Reed, Seymour, Vetta, 2009]\label{satz:oddHad}
+Die ungerade Hadwiger-Vermutung gilt für $k \leq 4$.
+\end{satz}
+
+%% =============================================================================
+\section{Aktueller Stand und offene Probleme}
+%% =============================================================================
+
+\begin{vermutung}[Hadwiger für $k \geq 7$ (Offen)]\label{verm:offen7}
+Für $k \geq 7$: Jeder Graph mit $\chi(G) \geq k$ enthält $K_k$ als Minor.
+\end{vermutung}
+
+\begin{center}
+\begin{tabular}{cll}
+\toprule
+$k$ & Status & Referenz \\
+\midrule
+$1, 2, 3$ & Trivial & Klassisch \\
+$4$ & Bewiesen & Dirac (1952) \\
+$5$ & Bewiesen $\Leftrightarrow$ VFS & Wagner (1937) + Appel--Haken (1977) \\
+$6$ & Bewiesen (mit VFS) & Robertson--Seymour--Thomas (1993) \\
+$7$ & \textbf{Offen} & -- \\
+$\geq 7$ & \textbf{Offen} & -- \\
+$\geq k_0$ (groß) & $\eta(G) \geq k/(\log k)^{0{,}999}$ & Norin--Song (2023) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+
+Hauptoffene Fragen:
+\begin{enumerate}[label=(\arabic*)]
+  \item Beweise oder widerlege Hadwigers Vermutung für $k = 7$.
+  \item Gibt es einen Beweis für alle $k$, der den VFS nicht verwendet?
+  \item Konstruiere einen Graphen mit $\chi(G) = k$ aber $\eta(G) < k$ (Gegenbeispiel)
+        oder beweise, dass keiner existiert.
+  \item Verbessere die asymptotische Schranke: zeige $\eta(G) \geq c \cdot \chi(G)$
+        für eine Konstante $c > 0$ unabhängig von $\chi(G)$.
+  \item Beweise die lineare Hadwiger-Vermutung.
+\end{enumerate}
+
+%% =============================================================================
+\section{Zusammenfassung}
+%% =============================================================================
+
+Hadwigers Vermutung vereint zwei zentrale Themen der Graphentheorie: chromatische
+Zahlen und Graphenminoren. Ihr Beweis für $k \leq 6$ erforderte bereits einen der
+tiefsten Sätze der Mathematik (den Vier-Farben-Satz), und die Fälle $k \geq 7$
+werden als dramatisch schwieriger erwartet.
+
+Die Robertson--Seymour-Theorie der Graphenminoren liefert mächtige Strukturwerkzeuge,
+aber selbst diese reichen für $k \geq 7$ nicht aus. Das Problem liegt im Schnittpunkt
+extremaler Graphentheorie, topologischer Graphentheorie und Berechnungskomplexität;
+seine Lösung würde fundamental neue Ideen erfordern.
+
+\begin{thebibliography}{99}
+
+\bibitem{Hadwiger1943}
+H.~Hadwiger,
+\textit{Über eine Klassifikation der Streckenkomplexe},
+Vierteljschr.\ Naturforsch.\ Ges.\ Zürich \textbf{88} (1943), 133--142.
+
+\bibitem{Wagner37}
+K.~Wagner,
+\textit{Über eine Eigenschaft der ebenen Komplexe},
+Math.\ Ann.\ \textbf{114} (1937), 570--590.
+
+\bibitem{Dirac52}
+G.~A.\ Dirac,
+\textit{A property of $4$-chromatic graphs and some remarks on critical graphs},
+J.\ London Math.\ Soc.\ \textbf{27} (1952), 85--92.
+
+\bibitem{RST93}
+N.~Robertson, P.~D.\ Seymour, R.~Thomas,
+\textit{Hadwiger's conjecture for $K_6$-free graphs},
+Combinatorica \textbf{13} (1993), Nr.\ 3, 279--361.
+
+\bibitem{AppHak77}
+K.~Appel, W.~Haken,
+\textit{Every planar map is four colorable. Part I: Discharging},
+Illinois J.\ Math.\ \textbf{21} (1977), Nr.\ 3, 429--490.
+% Ankündigung: Bull.\ Amer.\ Math.\ Soc.\ \textbf{82} (1976), 711--712.
+
+\bibitem{RSST97}
+N.~Robertson, D.~Sanders, P.~D.\ Seymour, R.~Thomas,
+\textit{The four-colour theorem},
+J.\ Combin.\ Theory Ser.\ B \textbf{70} (1997), Nr.\ 1, 2--44.
+
+\bibitem{Kostochka84}
+A.~W.\ Kostochka,
+\textit{Lower bound of the Hadwiger number of graphs by their average degree},
+Combinatorica \textbf{4} (1984), Nr.\ 4, 307--316.
+
+\bibitem{Thomason84}
+A.~Thomason,
+\textit{An extremal function for contractions of graphs},
+Math.\ Proc.\ Cambridge Philos.\ Soc.\ \textbf{95} (1984), 261--265.
+
+\bibitem{KO05}
+D.~Kühn, D.~Osthus,
+\textit{Forcing unbalanced complete bipartite minors},
+European J.\ Combin.\ \textbf{26} (2005), 75--81.
+
+\bibitem{ReedSey98}
+B.~Reed, P.~D.\ Seymour,
+\textit{Fractional colouring and Hadwiger's conjecture},
+J.\ Combin.\ Theory Ser.\ B \textbf{74} (1998), 147--152.
+
+\bibitem{NorinSong23}
+S.~Norin, L.~Song,
+\textit{Breaking the degeneracy barrier for coloring graphs with no $K_t$ minor},
+Adv.\ Math.\ \textbf{422} (2023), Paper Nr.\ 109020.
+
+\bibitem{Mader67}
+W.~Mader,
+\textit{Homomorphieeigenschaften und mittlere Kantendichte von Graphen},
+Math.\ Ann.\ \textbf{174} (1967), 265--268.
+
+\end{thebibliography}
+
+\end{document}

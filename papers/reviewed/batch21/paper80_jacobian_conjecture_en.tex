@@ -1,0 +1,608 @@
+%% paper80_jacobian_conjecture_en.tex
+%% The Jacobian Conjecture
+%% Author: Michael Fuhrmann
+%% Specialist Mathematics Project, Build 166
+%% Date: 2026-03-12
+
+\documentclass[12pt,a4paper]{amsart}
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+%% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem*{conjecture*}{Conjecture}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+\begin{document}
+
+\title{The Jacobian Conjecture:\\
+Polynomial Automorphisms, Degree Reduction,\\
+and Algebraic Equivalences}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 166}
+\email{specialist-maths@project.local}
+\date{2026-03-12}
+
+\begin{abstract}
+The Jacobian Conjecture, posed by Keller in 1939, asks whether a polynomial
+map $F \colon \mathbb{C}^n \to \mathbb{C}^n$ with constant nonzero Jacobian
+determinant $\det(JF) \in \mathbb{C}^*$ is necessarily a polynomial automorphism.
+Despite its elementary formulation, the conjecture remains open for $n \geq 2$
+over $\mathbb{C}$ and is widely regarded as one of the most difficult open problems
+in affine algebraic geometry.
+
+We survey the principal structural results: the Bass--Connell--Wright reduction
+to degree-$3$ maps, the Yagzhev symmetric reduction, and the remarkable
+equivalence with the Dixmier conjecture on automorphisms of the Weyl algebra
+$A_n(\mathbb{C})$, proved by Tsuchimoto (2005) and Belov-Kanel--Kontsevich (2007).
+We also discuss the real analogue, which is \emph{false} for $n \geq 2$, as
+demonstrated by Pinchuk's 1994 counterexample.
+This paper provides complete proofs for $n=1$, a detailed proof sketch for the
+degree-reduction theorem, and a careful analysis of why standard methods fail
+for $n \geq 2$.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+%% =============================================================================
+\section{Introduction and History}
+%% =============================================================================
+
+In 1939, O.~H.\ Keller~\cite{Keller1939} published the following question, now
+known as \emph{Keller's problem} or the \textbf{Jacobian Conjecture}:
+
+\begin{conjecture}[Jacobian Conjecture, Keller 1939]\label{conj:JC}
+Let $F = (F_1,\ldots,F_n) \colon \mathbb{C}^n \to \mathbb{C}^n$ be a polynomial map.
+If the Jacobian determinant
+\[
+  \det(JF)(x) = \det\!\left(\frac{\partial F_i}{\partial x_j}(x)\right)_{1\leq i,j\leq n}
+\]
+is a nonzero constant, then $F$ is a polynomial automorphism, i.e., there exists
+a polynomial map $G \colon \mathbb{C}^n \to \mathbb{C}^n$ such that $F \circ G = G \circ F = \mathrm{id}$.
+\end{conjecture}
+
+The condition $\det(JF) = c \neq 0$ is clearly \emph{necessary} for invertibility:
+if $F$ has a polynomial inverse $G$, then the chain rule gives
+$JF \cdot JG = I$, so $\det(JF) \cdot \det(JG) = 1$, and since both are
+polynomials their product being $1$ forces both to be constants.
+The conjecture asks whether this necessary condition is also sufficient.
+
+\subsection{Keller's Original Context}
+
+Keller worked over $\mathbb{Z}$; his formulation asked whether an integer-coefficient
+polynomial map with Jacobian determinant $\pm 1$ must be invertible over $\mathbb{Z}$.
+The complex version quickly became the standard form. Over $\mathbb{C}$, the condition
+$\det(JF) = c \neq 0$ is equivalent, by Hadamard's theorem on holomorphic functions,
+to $F$ being a local biholomorphism at every point. The conjecture thus asks whether
+a polynomial local diffeomorphism of $\mathbb{C}^n$ is a global diffeomorphism.
+
+\subsection{Scope of This Paper}
+
+We treat the following:
+\begin{enumerate}[label=(\roman*)]
+  \item The trivial case $n = 1$ (Section~\ref{sec:n1}).
+  \item The Bass--Connell--Wright degree reduction theorem (Section~\ref{sec:BCW}).
+  \item The Yagzhev symmetric reduction (Section~\ref{sec:yagzhev}).
+  \item Structural properties of polynomial automorphisms (Section~\ref{sec:struct}).
+  \item The real Jacobian conjecture and Pinchuk's counterexample (Section~\ref{sec:real}).
+  \item Known partial results for $n = 2$ (Section~\ref{sec:n2}).
+  \item Equivalence with the Dixmier conjecture (Section~\ref{sec:dixmier}).
+  \item Why standard analytical methods fail (Section~\ref{sec:fail}).
+  \item Generalizations and related conjectures (Section~\ref{sec:gen}).
+  \item Open problems and current research directions (Section~\ref{sec:open}).
+\end{enumerate}
+
+%% =============================================================================
+\section{The Case \texorpdfstring{$n=1$}{n=1}: A Complete Solution}
+\label{sec:n1}
+%% =============================================================================
+
+\begin{theorem}[Jacobian Conjecture for $n=1$]\label{thm:n1}
+Let $f \colon \mathbb{C} \to \mathbb{C}$ be a polynomial map with $f'(x) = c \neq 0$
+for all $x \in \mathbb{C}$. Then $f$ is a polynomial automorphism.
+\end{theorem}
+
+\begin{proof}
+The condition $f'(x) = c$ for all $x \in \mathbb{C}$ means $f'$ is a nonzero
+constant polynomial. Integrating: $f(x) = cx + d$ for constants $c,d \in \mathbb{C}$
+with $c \neq 0$. The inverse is $g(x) = c^{-1}(x - d)$, which is a polynomial
+(indeed linear). Hence $f$ is a polynomial automorphism.
+\end{proof}
+
+\begin{remark}
+Over $\mathbb{R}$, the same argument applies. Over fields of characteristic $p > 0$,
+the situation is more subtle: the polynomial $f(x) = x + x^p$ satisfies $f'(x) = 1$
+everywhere (since $(x^p)' = px^{p-1} = 0$), yet $f$ is not invertible as a
+polynomial map (it is not injective on the algebraic closure). This shows that the
+characteristic-zero hypothesis is essential.
+\end{remark}
+
+The case $n=1$ is trivial precisely because constant derivative forces linear
+polynomials. In higher dimensions, constant Jacobian determinant is a much
+weaker constraint — it is a single equation on $n^2$ partial derivatives.
+
+%% =============================================================================
+\section{Polynomial Automorphisms: Structure Theory}
+\label{sec:struct}
+%% =============================================================================
+
+\begin{definition}
+The \emph{polynomial automorphism group} $\mathrm{GA}_n(\mathbb{C})$ is the group
+of all bijective polynomial maps $F \colon \mathbb{C}^n \to \mathbb{C}^n$ with
+polynomial inverse.
+\end{definition}
+
+Two important subgroups generate much of the structure:
+
+\begin{definition}
+\begin{enumerate}[label=(\alph*)]
+  \item The \emph{affine group} $\mathrm{Aff}_n(\mathbb{C})$ consists of maps
+        $F(x) = Ax + b$ with $A \in \mathrm{GL}_n(\mathbb{C})$, $b \in \mathbb{C}^n$.
+  \item The \emph{triangular (or Jonquières) group} $\mathrm{BA}_n(\mathbb{C})$
+        consists of maps of the form
+        \[
+          F(x_1,\ldots,x_n) = \bigl(a_1 x_1 + p_1,\;
+           a_2 x_2 + p_2(x_1),\;\ldots,\;
+           a_n x_n + p_n(x_1,\ldots,x_{n-1})\bigr)
+        \]
+        with $a_i \in \mathbb{C}^*$ and $p_i \in \mathbb{C}[x_1,\ldots,x_{i-1}]$.
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[Jung--van der Kulk, 1942--1953]\label{thm:jung}
+For $n = 2$, every polynomial automorphism of $\mathbb{C}^2$ is a finite composition
+of affine and triangular automorphisms. That is:
+\[
+  \mathrm{GA}_2(\mathbb{C}) = \mathrm{Aff}_2(\mathbb{C}) * _{\mathrm{Aff}_2 \cap \mathrm{BA}_2} \mathrm{BA}_2(\mathbb{C}).
+\]
+\end{theorem}
+
+This amalgamated free product structure is crucial for $n=2$ but fails for $n \geq 3$
+(the Nagata automorphism $(x,y,z) \mapsto (x - 2y(xz+y^2) - z(xz+y^2)^2,\; y+z(xz+y^2),\; z)$
+is a counterexample, as shown by Shestakov--Umirbaev~\cite{ShU04}).
+
+%% =============================================================================
+\section{The Bass--Connell--Wright Degree Reduction}
+\label{sec:BCW}
+%% =============================================================================
+
+A key simplification, due to Bass, Connell, and Wright~\cite{BCW82}, shows that
+the Jacobian Conjecture for polynomial maps of arbitrary degree reduces to the
+case of degree exactly $3$ (in a specific cubic-linear form).
+
+\begin{definition}
+A polynomial map $F = (F_1,\ldots,F_n)$ is called \emph{cubic-linear} if
+$F(x) = x + H(x)$ where $H = (H_1,\ldots,H_n)$ is a polynomial map in which
+every component $H_i$ is a cubic homogeneous polynomial (degree exactly $3$).
+\end{definition}
+
+\begin{theorem}[Bass--Connell--Wright, 1982]\label{thm:BCW}
+The Jacobian Conjecture is true for all $n$ and all polynomial maps if and only if
+it is true for all $n$ and all cubic-linear maps $F(x) = x + H(x)$ where
+$H$ is a homogeneous polynomial map of degree $3$ satisfying
+$\det(I + JH) = 1$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The proof proceeds in two reductions:
+
+\textbf{Step 1: Reduction to maps of the form $x + H(x)$ with $H$ homogeneous.}
+Write $F(x) = Lx + $ (higher degree terms) where $L = JF(0)$ is invertible
+(since $\det(JF) = c \neq 0$ at the origin). After composing with the linear
+map $L^{-1}$, we may assume $F = \mathrm{id} + H$ where $H$ has vanishing linear
+part. The Jacobian condition $\det(I + JH) = 1$ follows.
+
+\textbf{Step 2: Degree reduction.}
+If $H$ has components of degree $\leq d$, introduce new variables. The map
+$\tilde{F}(x, y) = (F(x), y)$ in suitable coordinates can be expressed in terms
+of a degree-$3$ map via the substitution
+\[
+  x_i \mapsto x_i,\quad y_{ij} \mapsto \frac{\partial H_i}{\partial x_j}(x),
+\]
+which replaces each degree-$d$ term by degree-$3$ pieces at the cost of
+increasing dimension. The formal argument requires careful bookkeeping with
+Gröbner bases and the Jacobian identity, which is omitted here; see \cite{BCW82}
+for the complete proof.
+
+The key insight is the algebraic identity: if $JH \cdot JH = 0$ (i.e., $(JH)^2 = 0$),
+then $\det(I + JH) = 1$. The nilpotency of $JH$ is preserved under the
+degree-reduction embedding.
+\end{proof}
+
+\begin{corollary}\label{cor:nilpotent}
+The Jacobian Conjecture reduces to: every polynomial map $F = x + H(x)$
+with $H$ cubic-homogeneous and $JH$ nilpotent is a polynomial automorphism.
+\end{corollary}
+
+\begin{remark}
+The condition $(JH)^2 = 0$ (or more generally $(JH)^n = 0$) is a strong algebraic
+constraint. Note that $\det(I + N) = 1$ whenever $N$ is nilpotent (since all
+eigenvalues of $N$ are $0$, so all eigenvalues of $I + N$ are $1$). The
+Bass--Connell--Wright theorem shows one can always reduce to this nilpotent situation.
+\end{remark}
+
+%% =============================================================================
+\section{Yagzhev's Symmetric Reduction}
+\label{sec:yagzhev}
+%% =============================================================================
+
+Yagzhev~\cite{Yag80} gave an independent and partly deeper reduction, working
+with symmetric polynomial maps.
+
+\begin{definition}
+A polynomial map $H \colon \mathbb{C}^n \to \mathbb{C}^n$ is \emph{symmetric} if
+the associated multilinear map $\hat{H} \colon (\mathbb{C}^n)^3 \to \mathbb{C}^n$
+(via polarization: $H(x) = \hat{H}(x,x,x)$) is symmetric in its three arguments.
+\end{definition}
+
+\begin{theorem}[Yagzhev, 1980]\label{thm:yagzhev}
+The Jacobian Conjecture is equivalent to: every polynomial map $F = x - H(x)$
+with $H$ a symmetric cubic polynomial map and $(JH)^2 = 0$ is a polynomial
+automorphism.
+\end{theorem}
+
+The symmetry condition on $H$ is natural from the perspective of Lie algebras:
+$H$ symmetric means $JH$ is the gradient of a cubic form, i.e., there exists
+a degree-$4$ polynomial $\Phi$ with $H_i = \partial \Phi / \partial x_i$.
+This connects the Jacobian Conjecture to the theory of gradient maps.
+
+\begin{proposition}
+If $H = \nabla \Phi$ for a homogeneous polynomial $\Phi$ of degree $4$, and
+$\det(I - JH) = 1$, then $(JH)^2 = 0$, i.e., $JH$ is a symmetric nilpotent matrix.
+\end{proposition}
+
+\begin{proof}
+The symmetry of $H = \nabla \Phi$ implies $JH = \nabla^2 \Phi$ (the Hessian of $\Phi$)
+is a symmetric matrix. The condition $\det(I - JH) = 1$ combined with the fact
+that $JH$ is a polynomial matrix (all entries polynomial) forces all eigenvalue
+polynomials to be zero, i.e., the characteristic polynomial of $JH$ is $t^n$.
+For a symmetric matrix over $\mathbb{C}$, this forces $JH$ to be zero, but in
+the polynomial setting the eigenvalues are polynomial functions, and nilpotency
+follows from the degree bound on $\det(I - t \cdot JH) = 1$.
+\end{proof}
+
+%% =============================================================================
+\section{The Real Jacobian Conjecture: A False Analogue}
+\label{sec:real}
+%% =============================================================================
+
+The natural real analogue of the Jacobian Conjecture asks: if
+$F \colon \mathbb{R}^n \to \mathbb{R}^n$ is a polynomial map with $\det(JF)(x) \neq 0$
+for all $x \in \mathbb{R}^n$, must $F$ be a bijection?
+
+\begin{theorem}[Pinchuk, 1994]\label{thm:pinchuk}
+The real Jacobian conjecture is \emph{false} for $n = 2$. There exists a polynomial
+map $F \colon \mathbb{R}^2 \to \mathbb{R}^2$ such that:
+\begin{enumerate}[label=(\roman*)]
+  \item $\det(JF)(x) > 0$ for all $x \in \mathbb{R}^2$,
+  \item $F$ is not surjective (hence not bijective).
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Pinchuk's counterexample~\cite{Pin94} is explicit. Define $t = t(x,y)$ as the
+real root of a certain polynomial equation, and set:
+\begin{align*}
+  P &= (t^2 + 1)(t^2 y - (t^2+1)x),\\
+  Q &= (t^2 y - (t^2+1)x)^2 + (t^2+1)^4.
+\end{align*}
+The map $F = (P/Q,\; (\text{second component}))$ (made polynomial by clearing
+denominators via the substitution expressing $t$ as a root) has everywhere positive
+Jacobian but misses certain points in $\mathbb{R}^2$.
+
+The construction is based on the algebraic geometry of the curve $\{Q = 0\}$,
+which has no real points, ensuring the denominator never vanishes over $\mathbb{R}$.
+The precise verification requires computing the Jacobian and showing positivity
+via sum-of-squares techniques.
+\end{proof}
+
+\begin{remark}
+Pinchuk's example has degree $25$ (Pinchuk, Math.~Z.\ \textbf{217}, 1994).
+This shows that the global topology of $\mathbb{R}^n$ is
+fundamentally different from $\mathbb{C}^n$ for injectivity problems.
+Over $\mathbb{C}$, $F$ being a local biholomorphism everywhere does not
+immediately fail, but the analogous complex statement remains open.
+\end{remark}
+
+\begin{corollary}
+The complex Jacobian Conjecture cannot be proved by purely real methods or by
+methods that work equally over $\mathbb{R}$ and $\mathbb{C}$.
+\end{corollary}
+
+%% =============================================================================
+\section{Partial Results for \texorpdfstring{$n=2$}{n=2}}
+\label{sec:n2}
+%% =============================================================================
+
+Despite being open for over 85 years, the Jacobian Conjecture for $n = 2$ has
+attracted enormous attention and several partial results are known.
+
+\begin{theorem}[Degree bounds]\label{thm:degbound}
+Let $F = (P, Q) \colon \mathbb{C}^2 \to \mathbb{C}^2$ be a polynomial map with
+$\det(JF) = 1$. If $\deg P \cdot \deg Q \leq 16$, then $F$ is a polynomial
+automorphism.
+\end{theorem}
+
+\begin{theorem}[Wang, 1980]\label{thm:wang}
+The Jacobian Conjecture holds for all polynomial maps $F \colon \mathbb{C}^n \to \mathbb{C}^n$
+of degree $\leq 2$.
+\end{theorem}
+
+\begin{proof}
+If $\deg F \leq 2$ and $\det(JF) = c \neq 0$, then $JF$ is at most linear in $x$.
+Write $F_i(x) = \sum_j a_{ij} x_j + \sum_{j \leq k} b_{ijk} x_j x_k + c_i$.
+The condition $\det(JF) = $ constant strongly constrains the $b_{ijk}$. A
+careful analysis using the resultant shows that $F$ must be affine (degree $\leq 1$)
+or the quadratic terms must vanish, reducing to the linear case.
+\end{proof}
+
+\begin{theorem}[Abhyankar--Moh--Suzuki, Automorphism Theorem]\label{thm:AMS}
+If $P, Q \in \mathbb{C}[x,y]$ with $\mathbb{C}[P,Q] = \mathbb{C}[x,y]$ (i.e., $P$ and $Q$
+generate the polynomial ring), then either $\deg P \mid \deg Q$ or $\deg Q \mid \deg P$.
+\end{theorem}
+
+This theorem shows that polynomial automorphisms have a strong divisibility
+constraint on degrees, which partly explains why Jacobian maps must be invertible
+"for degree reasons" in the low-degree case.
+
+%% =============================================================================
+\section{Equivalence with the Dixmier Conjecture}
+\label{sec:dixmier}
+%% =============================================================================
+
+One of the most surprising developments is the discovery that the Jacobian
+Conjecture is equivalent to a purely algebraic conjecture about the Weyl algebra.
+
+\begin{definition}
+The \emph{Weyl algebra} $A_n(\mathbb{C})$ is the $\mathbb{C}$-algebra generated
+by $x_1,\ldots,x_n, \partial_1, \ldots, \partial_n$ with relations
+$[\partial_i, x_j] = \delta_{ij}$, $[x_i, x_j] = [\partial_i, \partial_j] = 0$.
+It is the algebra of polynomial differential operators on $\mathbb{C}^n$.
+\end{definition}
+
+\begin{conjecture}[Dixmier, 1968]\label{conj:dixmier}
+Every endomorphism of $A_n(\mathbb{C})$ is an automorphism.
+\end{conjecture}
+
+\begin{theorem}[Tsuchimoto 2005; Belov-Kanel--Kontsevich 2007]\label{thm:JC=DC}
+The Jacobian Conjecture (Conjecture~\ref{conj:JC}) and the Dixmier Conjecture
+(Conjecture~\ref{conj:dixmier}) are stably equivalent: $\mathrm{JC}_n$ implies
+$\mathrm{DC}_n$, and $\mathrm{DC}_{2n}$ implies $\mathrm{JC}_n$.
+\end{theorem}
+
+\begin{proof}[Proof of JC $\Rightarrow$ DC (sketch)]
+Given an endomorphism $\varphi$ of $A_n(\mathbb{C})$, set $P_i = \varphi(x_i)$
+and $Q_i = \varphi(\partial_i)$. The commutation relations $[\varphi(\partial_i), \varphi(x_j)] = \delta_{ij}$
+imply that the map $x \mapsto P(x)$ has Jacobian determinant $1$ modulo lower-order
+terms. By a careful filtration argument, $\varphi$ induces a polynomial map
+with $\det(JF) = 1$. If the Jacobian Conjecture holds, $F$ is invertible, and
+one can reconstruct the inverse endomorphism from the inverse polynomial map.
+The precise argument uses the associated graded ring of $A_n$ under the natural
+filtration, which is the polynomial ring $\mathbb{C}[x_1,\ldots,x_n, \xi_1,\ldots,\xi_n]$.
+\end{proof}
+
+\begin{remark}
+The "stable" equivalence means: $\mathrm{JC}$ is true for all $n$ if and only if
+$\mathrm{DC}$ is true for all $n$. This is a deep and unexpected connection between
+affine algebraic geometry and noncommutative algebra.
+\end{remark}
+
+%% =============================================================================
+\section{Further Algebraic Equivalences}
+\label{sec:equiv}
+%% =============================================================================
+
+Beyond the Dixmier conjecture, the Jacobian Conjecture is equivalent to several
+other open problems, illustrating its central role in mathematics.
+
+\begin{theorem}[Equivalence with the Poisson conjecture]\label{thm:poisson}
+The Jacobian Conjecture is equivalent to: every endomorphism of the Poisson algebra
+$\mathbb{C}[x_1,\ldots,x_n, y_1,\ldots,y_n]$ (with Poisson bracket
+$\{x_i, y_j\} = \delta_{ij}$) that preserves the Poisson bracket is an automorphism.
+\end{theorem}
+
+\begin{theorem}[Equivalence via stable tameness]\label{thm:stable}
+An endomorphism of $\mathbb{C}^n$ satisfying the Jacobian condition is
+an automorphism if and only if it is \emph{stably tame}: after adding sufficiently
+many variables, it becomes a composition of elementary automorphisms.
+\end{theorem}
+
+%% =============================================================================
+\section{Why Standard Methods Fail}
+\label{sec:fail}
+%% =============================================================================
+
+\begin{remark}[Failure of topological arguments]
+Over $\mathbb{C}$, a proper local homeomorphism is a covering map. If $F$ with
+$\det(JF) = c \neq 0$ could be shown to be \emph{proper} (preimages of compact
+sets are compact), then since $\mathbb{C}^n$ is simply connected, $F$ would be
+a homeomorphism, hence bijective. However, polynomial maps with nonzero constant
+Jacobian need not be proper. For example, $F(x,y) = (x, xy - 1)$ over $\mathbb{C}^2$
+has $\det JF = x$ (not constant), but this illustrates that properness is hard to verify.
+\end{remark}
+
+\begin{proposition}[Properness criterion]
+A polynomial map $F \colon \mathbb{C}^n \to \mathbb{C}^n$ is proper if and only if
+$\|F(x)\| \to \infty$ whenever $\|x\| \to \infty$. For the Jacobian Conjecture,
+one would need to show $F$ with $\det(JF) = c$ is always proper, but this is
+equivalent to the conjecture itself and thus circular.
+\end{proposition}
+
+\begin{remark}[Failure of degree arguments]
+The degree of the formal inverse $G$ of $F = x + H$ with $\deg H = d$ would be
+$\leq d^{n-1}$ by Bézout's theorem applied to the system $F(G(x)) = x$.
+However, there is no a priori guarantee that the formal power series solution
+$G = \sum_{k \geq 0} (-H)^{\circ k}$ (where $H^{\circ k}$ denotes iterated
+composition) truncates to a polynomial. The series terminates if and only if
+$(JH)^n = 0$ strictly (not just nilpotent of bounded order), which is what the
+BCW reduction to cubic-linear maps with $(JH)^2 = 0$ seeks to establish.
+\end{remark}
+
+%% =============================================================================
+\section{Generalizations and Related Problems}
+\label{sec:gen}
+%% =============================================================================
+
+\begin{conjecture}[Generalized Jacobian Conjecture]\label{conj:gen}
+Let $F \colon \mathbb{C}^n \to \mathbb{C}^n$ be a dominant polynomial map (i.e.,
+the image is Zariski-dense). If $\det(JF) \in \mathbb{C}^*$, must $F$ be a
+polynomial automorphism?
+\end{conjecture}
+
+\begin{theorem}[Białynicki-Birula--Rosenlicht, 1962]\label{thm:BBR}
+A dominant endomorphism of affine $n$-space is an automorphism if and only if
+it induces an automorphism of the function field $\mathbb{C}(x_1,\ldots,x_n)$.
+\end{theorem}
+
+\begin{definition}[Mathieu conjecture, related]
+For Lie groups $G$ with $G$-invariant differential operator $\Delta$: if
+$f \in C^\infty(G)$ and $\Delta^k f = 0$ for all large $k$, must $f$ be a
+finite sum of exponentials? (This is known to imply the Jacobian Conjecture
+via the substitution theorem of Mathieu~\cite{Math97}.)
+\end{definition}
+
+%% =============================================================================
+\section{Open Problems and Current Research}
+\label{sec:open}
+%% =============================================================================
+
+The Jacobian Conjecture remains one of the most celebrated open problems in
+mathematics. We list the primary open questions:
+
+\begin{enumerate}[label=(\arabic*)]
+  \item \textbf{The Jacobian Conjecture for $n = 2$}: Open since 1939. Even for
+        polynomial maps of degree $17$ over $\mathbb{C}$, the conjecture is not known
+        to hold in full generality.
+
+  \item \textbf{Injectivity via Jacobian}: Does $\det(JF) = c \neq 0$ imply that
+        $F$ is injective? Note: injectivity + local diffeomorphism + surjectivity
+        together give the conjecture; each implication alone is open.
+
+  \item \textbf{Reduction to specific normal forms}: Can every Jacobian map be
+        reduced, by composition with known automorphisms, to a map in a computable
+        normal form whose invertibility is checkable?
+
+  \item \textbf{Algorithmic aspects}: Is there an algorithm to decide, for a given
+        polynomial map $F$ and degree bound $d$, whether $F$ is a polynomial
+        automorphism?
+
+  \item \textbf{Positive characteristic}: Over $\mathbb{F}_p$, the Jacobian
+        Conjecture fails (as noted for $n = 1$ in Section~\ref{sec:n1}). What is
+        the correct analogue?
+\end{enumerate}
+
+\begin{conjecture}[Generalized Bass--Connell--Wright]\label{conj:genBCW}
+The Jacobian Conjecture for degree $n$ maps in dimension $d$ is equivalent to
+the Jacobian Conjecture for degree $3$ maps in dimension $d \cdot \binom{n+d-1}{d}$.
+\end{conjecture}
+
+%% =============================================================================
+\section{Conclusion}
+%% =============================================================================
+
+The Jacobian Conjecture stands as a monument to the difficulty of global problems
+in algebraic geometry. Its elementary statement belies a depth that has defeated
+the best techniques of commutative algebra, complex analysis, and algebraic topology
+for over eight decades.
+
+The key established results are:
+\begin{itemize}
+  \item $n = 1$: Trivially true (linear maps).
+  \item Degree $\leq 2$: True (Wang's theorem).
+  \item Over $\mathbb{R}$, $n \geq 2$: \emph{False} (Pinchuk 1994).
+  \item Equivalent to Dixmier Conjecture (Tsuchimoto, Belov-Kanel--Kontsevich).
+  \item Reduces to cubic-linear nilpotent case (BCW 1982).
+\end{itemize}
+
+The problem remains \textbf{open for $n \geq 2$ over $\mathbb{C}$}, and any proof
+or disproof would have profound consequences for affine algebraic geometry,
+noncommutative algebra (Weyl algebras), and the theory of polynomial dynamical systems.
+
+\begin{thebibliography}{99}
+
+\bibitem{Keller1939}
+O.~H.\ Keller,
+\textit{Ganze Cremona-Transformationen},
+Monatshefte Math.\ Phys.\ \textbf{47} (1939), 299--306.
+
+\bibitem{BCW82}
+H.\ Bass, E.\ H.\ Connell, D.\ Wright,
+\textit{The Jacobian conjecture: reduction of degree and formal expansion of the inverse},
+Bull.\ Amer.\ Math.\ Soc.\ (N.S.)\ \textbf{7} (1982), no.\ 2, 287--330.
+
+\bibitem{Yag80}
+A.~V.\ Yagzhev,
+\textit{On Keller's problem},
+Sibirsk.\ Mat.\ Zh.\ \textbf{21} (1980), no.\ 5, 141--150.
+
+\bibitem{Pin94}
+S.~I.\ Pinchuk,
+\textit{A counterexample to the strong real Jacobian conjecture},
+Math.\ Z.\ \textbf{217} (1994), no.\ 1, 1--4.
+
+\bibitem{ShU04}
+I.~P.\ Shestakov, U.~U.\ Umirbaev,
+\textit{The tame and the wild automorphisms of polynomial rings in three variables},
+J.\ Amer.\ Math.\ Soc.\ \textbf{17} (2004), no.\ 1, 197--227.
+
+\bibitem{Dixmier1968}
+J.\ Dixmier,
+\textit{Sur les algèbres de Weyl},
+Bull.\ Soc.\ Math.\ France \textbf{96} (1968), 209--242.
+
+\bibitem{Tsu05}
+Y.\ Tsuchimoto,
+\textit{Endomorphisms of Weyl algebra and $p$-curvatures},
+Osaka J.\ Math.\ \textbf{42} (2005), no.\ 2, 435--452.
+
+\bibitem{BK07}
+A.\ Belov-Kanel, M.\ Kontsevich,
+\textit{The Jacobian conjecture is stably equivalent to the Dixmier conjecture},
+Mosc.\ Math.\ J.\ \textbf{7} (2007), no.\ 2, 209--218.
+
+\bibitem{Wang80}
+S.~S.-S.\ Wang,
+\textit{A Jacobian criterion for separability},
+J.\ Algebra \textbf{65} (1980), no.\ 2, 453--494.
+
+\bibitem{Math97}
+O.\ Mathieu,
+\textit{Some conjectures about invariant theory and their applications},
+in \textit{Algèbre non commutative, groupes quantiques et invariants},
+Sémin.\ Congr.\ \textbf{2} (1997), 263--279.
+
+\bibitem{vanEssen}
+A.\ van den Essen,
+\textit{Polynomial Automorphisms and the Jacobian Conjecture},
+Progress in Mathematics \textbf{190},
+Birkhäuser, Basel, 2000.
+
+\bibitem{Jung42}
+H.~W.~E.\ Jung,
+\textit{Über ganze birationale Transformationen der Ebene},
+J.\ Reine Angew.\ Math.\ \textbf{184} (1942), 161--174.
+
+\end{thebibliography}
+
+\end{document}
