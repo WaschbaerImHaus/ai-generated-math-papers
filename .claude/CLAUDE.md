@@ -77,3 +77,13 @@ von Grundlagen bis hin zu fortgeschrittenen Themen.
 - **Review-Workflow**: Neue Papers → review_batchN_YYYY-MM-DD.md → Bugs beheben → nach reviewed/batchN/ verschieben
 - **Autor**: Michael Fuhrmann in allen Dateien
 - **Theorem vs Conjecture**: Unbewiesene Aussagen IMMER als Conjecture/Vermutung deklarieren!
+
+## Git-Remotes
+- **Bitbucket** (origin): `git@bitbucket.org:von-null/specialist-maths.git`
+- **GitHub** (github): `git@github.com:WaschbaerImHaus/ai-generated-math-papers.git`
+
+Pushe immer auf BEIDE Remotes:
+```bash
+git push origin master
+git push github master
+```
