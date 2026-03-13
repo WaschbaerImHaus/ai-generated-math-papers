@@ -20,3 +20,17 @@ Build 176: Papers 76/89/95 aktualisiert — Dudko-Lyubich 2023 (MLC@Feigenbaum),
 2026-03-13 07:30 - Build 181: Commit & Push Erdős-Straus-Ergebnis
   Git-Push erfolgreich. MEMORY.md aktualisiert.
   Nächste Schritte: README.md aktualisieren, ggf. neue Batch-Papers erstellen.
+
+2026-03-13 09:14 - Build 189: Audit Batches 24+25 (Papers 92-97, 12 TeX-Dateien)
+  BATCH 24 (Papers 92-95): Donaldson, Gromov, Hartshorne, Uniformisierung
+  BATCH 25 (Papers 96-97): Grothendieck Standard-Vermutungen, Kontsevich-Integral
+  FEHLER GEFUNDEN UND KORRIGIERT:
+    - Paper 92 EN KRITISCH: Dimensionsformel b_2^+ Widerspruch im Beweissketch
+    - Paper 92 DE MITTEL: Tippfehler Homotophiesphären → Homotopiesphären
+    - Paper 95 EN NIEDRIG: Gang Liu 2016 in Conclusion ergänzt
+    - Paper 95 DE MITTEL: Grammatik die→der Levi-Civita-Zusammenhang
+    - Paper 97 EN KRITISCH: Doppelte \deg-Definition (LaTeX-Kompilierungsfehler)
+    - Paper 96 DE MITTEL: Halbeinachheitssatz → Halbeinfachheitssatz (2x)
+  Reviews erstellt: reviews/review_batch24_audit_2026_03_13.md, review_batch25_audit_2026_03_13.md
+  Papers nach papers/reviewed/batch24/ und papers/reviewed/batch25/ verschoben
+  Alle 12 Papers DRUCKREIF.

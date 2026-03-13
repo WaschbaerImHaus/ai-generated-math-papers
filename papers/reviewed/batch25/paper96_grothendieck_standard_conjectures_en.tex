@@ -1,0 +1,940 @@
+\documentclass[12pt,a4paper]{amsart}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,enumitem,booktabs,array,hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% -------------------------------------------------------
+% Theorem environments
+% -------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+% -------------------------------------------------------
+% Custom commands
+% -------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Fp}{\mathbb{F}_p}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\Gal}{\mathrm{Gal}}
+\newcommand{\End}{\mathrm{End}}
+\newcommand{\Aut}{\mathrm{Aut}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\ch}{\mathrm{ch}}
+\newcommand{\td}{\mathrm{td}}
+\newcommand{\NS}{\mathrm{NS}}
+\newcommand{\Pic}{\mathrm{Pic}}
+\newcommand{\CH}{\mathrm{CH}}
+\newcommand{\cl}{\mathrm{cl}}
+\newcommand{\Num}{\mathrm{Num}}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\codim}{codim}
+\DeclareMathOperator{\Spec}{Spec}
+\DeclareMathOperator{\Proj}{Proj}
+
+% -------------------------------------------------------
+\begin{document}
+% -------------------------------------------------------
+
+\title{Grothendieck's Standard Conjectures on Algebraic Cycles:\\
+       Weil Cohomology, Motives, and the Lefschetz Operator}
+
+\author{Michael Fuhrmann}
+\address{Specialist Mathematics Project, Build 170}
+\email{specialist-maths@localhost}
+\date{\today}
+
+\begin{abstract}
+Grothendieck's four standard conjectures --- Conjecture~A (Lefschetz),
+Conjecture~B (Hodge standard), Conjecture~C (K\"unneth), and Conjecture~D
+(numerical equals homological) --- form the foundational pillars of the
+theory of motives.  Formulated in the late 1960s as algebraic analogues of
+classical hard Lefschetz and Hodge-theoretic facts over $\mathbb{C}$, these
+conjectures remain almost entirely open for varieties over fields of positive
+characteristic, and even over number fields.  In this paper we give precise
+and complete statements of all four conjectures within the framework of Weil
+cohomology theories, explain their mutual implications, relate them to the
+Weil conjectures (proved by Deligne in 1974), the Hodge conjecture, and the
+Tate conjecture, and survey the partial results known: Kleiman's proof that
+$\mathbf{D}$ implies $\mathbf{A}$, Jannsen's semisimplicity theorem for
+numerical motives, Andr\'e's theory of motivated cycles, and the current
+state of the art.  We also discuss why these conjectures are so hard and
+what a proof would imply for the category of pure motives.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+% -------------------------------------------------------
+\section{Introduction}
+% -------------------------------------------------------
+
+The central aim of algebraic geometry is to understand the geometry of
+algebraic varieties through cohomological invariants.  Over the complex
+numbers this programme reaches its apex in classical Hodge theory: the
+hard Lefschetz theorem, the Hodge decomposition, and the positive-definiteness
+of the Weil form give a rich structure to $H^*(X,\Q)$ for any smooth
+projective complex manifold~$X$.
+
+Grothendieck's visionary insight, announced at the 1968 International Congress
+of Mathematicians and elaborated in his letter to Serre and other manuscripts,
+was that the deepest properties of algebraic cycles --- not just over
+$\mathbb{C}$ but over \emph{any} field $k$ --- should be captured by a small
+number of precise conjectures that parallel classical Hodge theory.
+The four \emph{standard conjectures} bear the labels A, B, C, D (sometimes
+also I, II for A and B in Grothendieck's original notation).
+
+These conjectures serve a double purpose.  First, taken together they imply
+that the na\"{\i}ve category of correspondences modulo homological equivalence
+is actually a semi-simple abelian category --- the category of \emph{pure
+motives} $\mathcal{M}_{\mathrm{hom}}(k)$ --- and that this category is
+independent of the choice of Weil cohomology theory.  Second, they give
+cohomological content to the Weil conjectures (which Deligne proved without
+using them by a completely different method).
+
+\subsection*{Organisation of the paper}
+
+Section~\ref{sec:weil} recalls the axioms of a Weil cohomology theory.
+Section~\ref{sec:cycles} reviews algebraic cycles and their equivalence
+relations.  Section~\ref{sec:lefschetz} introduces the Lefschetz operator
+and the classical hard Lefschetz theorem over $\mathbb{C}$.
+Sections~\ref{sec:conjA}--\ref{sec:conjD} give complete, rigorous statements
+of Conjectures~A--D.  Section~\ref{sec:implications} works out the
+logical dependencies among the four conjectures.
+Section~\ref{sec:weilconj} relates the standard conjectures to the Weil
+conjectures and Deligne's theorem.  Section~\ref{sec:hodge} discusses the
+relationship with the Hodge and Tate conjectures.
+Section~\ref{sec:motives} explains the motivic consequences.
+Section~\ref{sec:andre} surveys Andr\'e motivated cycles.
+Section~\ref{sec:jannsen} presents Jannsen's semisimplicity theorem.
+Section~\ref{sec:known} collects all known special cases.
+Section~\ref{sec:obstacles} explains the main obstacles to a general proof.
+Section~\ref{sec:outlook} gives an outlook.
+
+% -------------------------------------------------------
+\section{Weil Cohomology Theories}\label{sec:weil}
+% -------------------------------------------------------
+
+Throughout, $k$ is a field (often a finite field $\Fp$, a number field, or
+$\C$), and all varieties are smooth projective and geometrically connected
+over $k$ unless otherwise stated.
+
+\begin{definition}[Weil cohomology theory]
+A \emph{Weil cohomology theory with coefficient field $F$ (of characteristic
+zero)} is a contravariant functor $H^*$ from the category of smooth projective
+$k$-varieties to graded $F$-algebras, together with a cycle class map,
+satisfying the following axioms:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Finite-dimensionality.}  $H^i(X) = 0$ for $i < 0$ or
+        $i > 2\dim X$, and each $H^i(X)$ is a finite-dimensional $F$-vector
+        space.
+  \item \textbf{Poincar\'e duality.}  There is a canonical isomorphism
+        $H^{2d}(X)(d) \cong F$ (the \emph{fundamental class}), and the
+        pairing $H^i(X) \otimes H^{2d-i}(X) \to F$ induced by cup product
+        is a perfect duality.  Here $d = \dim X$.
+  \item \textbf{K\"unneth formula.}  There is a natural isomorphism
+        $H^*(X \times Y) \cong H^*(X) \otimes_F H^*(Y)$.
+  \item \textbf{Cycle class map.}  For each $i$, there is a
+        $\Q$-linear homomorphism
+        $\cl: \CH^i(X) \to H^{2i}(X)(i)$
+        from the Chow group of codimension-$i$ cycles, compatible with
+        proper push-forward, flat pull-back, and cup product.
+  \item \textbf{Weak Lefschetz / hyperplane section.}  If $Y \hookrightarrow X$
+        is a smooth hyperplane section, then
+        $H^i(X) \to H^i(Y)$ is an isomorphism for $i < \dim Y$ and
+        injective for $i = \dim Y$.
+\end{enumerate}
+\end{definition}
+
+\begin{example}[Standard examples of Weil cohomology theories]
+\begin{enumerate}[label=(\alph*)]
+  \item \textbf{Singular cohomology.}  For $k \hookrightarrow \C$, take
+        $H^i(X) = H^i(X(\C),\Q)$ with $F = \Q$.
+  \item \textbf{de Rham cohomology.}  For $k$ of characteristic zero,
+        $H^i_{\mathrm{dR}}(X/k)$ with $F = k$.
+  \item \textbf{$\ell$-adic cohomology.}  For $\ell \neq \ch(k)$ (prime),
+        $H^i_{\mathrm{\acute{e}t}}(X_{\bar k}, \Q_\ell)$ with $F = \Q_\ell$.
+  \item \textbf{Crystalline cohomology.}  For $k = \Fp$,
+        $H^i_{\mathrm{cris}}(X/W(k))[\frac{1}{p}]$ with $F = W(k)[\frac{1}{p}]$,
+        due to Berthelot.
+\end{enumerate}
+\end{example}
+
+\begin{remark}
+All known Weil cohomology theories satisfy the axioms above (the K\"unneth
+formula for $\ell$-adic cohomology is a non-trivial theorem).  A key feature
+is that they all give the \emph{same} Betti numbers $b_i(X) = \dim_F H^i(X)$
+when they are defined simultaneously, but proving that the full cohomology
+algebras are isomorphic requires the standard conjectures.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Algebraic Cycles and Equivalence Relations}\label{sec:cycles}
+% -------------------------------------------------------
+
+Let $X$ be a smooth projective variety of dimension $d$ over $k$.
+
+\begin{definition}[Algebraic cycle]
+An \emph{algebraic cycle} of codimension $p$ on $X$ is a finite formal
+$\Z$-linear combination $Z = \sum n_i [V_i]$ of irreducible closed
+subvarieties $V_i \subset X$ of codimension $p$.  The group of such cycles
+is denoted $\mathcal{Z}^p(X)$.
+\end{definition}
+
+There are several important equivalence relations on $\mathcal{Z}^p(X)$:
+
+\begin{definition}[Equivalence relations on cycles]
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Rational equivalence}: $Z \sim_{\mathrm{rat}} 0$ if $Z$ is
+        the divisor of a rational function on some subvariety.  The quotient
+        $\CH^p(X) = \mathcal{Z}^p(X)/{\sim_{\mathrm{rat}}}$ is the
+        \emph{Chow group}.
+  \item \textbf{Algebraic equivalence}: $Z \sim_{\mathrm{alg}} 0$ if $Z$ is
+        algebraically equivalent to zero (parametrised by a connected curve).
+  \item \textbf{Homological equivalence}: $Z \sim_{\mathrm{hom}} 0$ if
+        $\cl(Z) = 0$ in $H^{2p}(X)(p)$ for some (equivalently, by Conjecture~D,
+        all) Weil cohomology theories.
+  \item \textbf{Numerical equivalence}: $Z \sim_{\mathrm{num}} 0$ if
+        $(Z \cdot W) = 0$ for all cycles $W$ of complementary codimension.
+\end{enumerate}
+We have the inclusions
+${\sim_{\mathrm{rat}}} \supseteq {\sim_{\mathrm{alg}}} \supseteq
+ {\sim_{\mathrm{hom}}} \supseteq {\sim_{\mathrm{num}}}$.
+\end{definition}
+
+\begin{remark}
+The first inclusion $\supseteq$ reflects that rationally equivalent cycles
+are a fortiori algebraically equivalent (take a $\PP^1$-parameter).
+The last inclusion follows because the intersection form factors through the
+cycle class map.  That ${\sim_{\mathrm{hom}}} = {\sim_{\mathrm{num}}}$
+is precisely Conjecture~D.
+\end{remark}
+
+\begin{definition}[Correspondences]
+A \emph{correspondence} from $X$ to $Y$ (of degree $r$) is an element of
+$\CH^{\dim X + r}(X \times Y)$.  The category of \emph{pure motives} modulo
+an adequate equivalence relation $\sim$ has smooth projective varieties as
+objects, with morphisms given by correspondences modulo $\sim$, composed via
+$[Z] \circ [W] = (p_{13})_* (p_{12}^* [Z] \cdot p_{23}^* [W])$.
+\end{definition}
+
+% -------------------------------------------------------
+\section{The Lefschetz Operator and Hard Lefschetz}\label{sec:lefschetz}
+% -------------------------------------------------------
+
+Fix a smooth projective variety $X$ of dimension $d$ over $k$, and let
+$\xi \in \CH^1(X)$ be the class of a hyperplane section (i.e.\ a very ample
+line bundle $L$).  Its cycle class is $L = \cl(\xi) \in H^2(X)(1)$.
+
+\begin{definition}[Lefschetz operator]
+The \emph{Lefschetz operator} is the map
+\[
+  \mathbf{L} = \cup L : H^i(X) \longrightarrow H^{i+2}(X)(1),
+  \quad
+  \alpha \mapsto L \cup \alpha.
+\]
+Its iterated powers are $\mathbf{L}^r : H^i(X) \to H^{i+2r}(X)(r)$.
+\end{definition}
+
+\begin{theorem}[Hard Lefschetz over $\mathbb{C}$, Hodge 1950]\label{thm:HL}
+Let $X$ be a smooth projective complex variety of dimension $d$, and let
+$L \in H^2(X,\Q)$ be the class of a hyperplane section.  Then for all
+$0 \leq i \leq d$:
+\[
+  \mathbf{L}^{d-i} : H^i(X,\Q) \xrightarrow{\;\sim\;} H^{2d-i}(X,\Q)
+\]
+is an isomorphism.
+\end{theorem}
+
+This theorem, while classical over $\C$, is \emph{unknown} over general
+fields.  Its algebraic analogue is the content of Conjecture~B.
+
+\begin{definition}[Primitive cohomology and Lefschetz decomposition]
+For $i \leq d$, the \emph{primitive cohomology} is
+$H^i_{\mathrm{prim}}(X) = \ker(\mathbf{L}^{d-i+1}: H^i(X) \to H^{2d-i+2}(X))$.
+The Lefschetz decomposition (over $\C$) states:
+\[
+  H^i(X) = \bigoplus_{r \geq 0} \mathbf{L}^r H^{i-2r}_{\mathrm{prim}}(X).
+\]
+\end{definition}
+
+\begin{definition}[Lefschetz involution $\Lambda$]
+Define the \emph{Lefschetz involution} (or \emph{Lefschetz star operator})
+$\Lambda: H^i(X) \to H^{i-2}(X)$ as the adjoint of $\mathbf{L}$ with
+respect to the Poincar\'e pairing.  More precisely, for $i \geq d$,
+hard Lefschetz provides an isomorphism $\mathbf{L}^{i-d}: H^{2d-i}(X) \to
+H^i(X)$, and $\Lambda = (\mathbf{L}^{i-d})^{-1} \circ$ (something).
+See Section~\ref{sec:conjB} for the precise algebraic formulation.
+\end{definition}
+
+% -------------------------------------------------------
+\section{Conjecture~A: The Lefschetz Conjecture}\label{sec:conjA}
+% -------------------------------------------------------
+
+Conjecture~A asserts that the operator $\mathbf{L}^{d-i}$ is ``algebraic''
+in the sense that it is induced by an algebraic cycle (a correspondence).
+
+\begin{conjecture}[Standard Conjecture~A, Grothendieck 1969]\label{conj:A}
+Let $X$ be a smooth projective variety of dimension $d$ over a field $k$,
+and let $H^*$ be a Weil cohomology theory with coefficient field $F$.
+For each $0 \leq i \leq d$, the isomorphism
+\[
+  \mathbf{L}^{d-i} : H^i(X) \xrightarrow{\;\sim\;} H^{2d-i}(X)(d-i)
+\]
+given by iterated cup product with $L = \cl(\xi)$ is algebraic, i.e.\ it is
+induced by an algebraic correspondence $\Pi_i \in \CH^d(X \times X)$ (up to
+the twist).  Equivalently, the projectors $\pi_i$ in the K\"unneth decomposition
+of $[\Delta_X] = \sum_{i=0}^{2d} \pi_i$ are algebraic for all $i$.
+\end{conjecture}
+
+\begin{remark}
+Conjecture~A has two equivalent formulations:
+\begin{enumerate}[label=(\alph*)]
+  \item The hard Lefschetz isomorphism $\mathbf{L}^{d-i}$ is algebraic.
+  \item The K\"unneth components $\pi_i$ of the diagonal class are algebraic.
+\end{enumerate}
+The equivalence $(a) \Leftrightarrow (b)$ is a formal consequence of the
+decomposition of the identity; see Kleiman~\cite{kleiman1968}.
+\end{remark}
+
+\begin{theorem}[Grothendieck]\label{thm:A_implies_C}
+Conjecture~A implies Conjecture~C.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Conjecture~A says that $\mathbf{L}^{d-i}$ is algebraic, which gives an
+algebraic cycle inducing the map.  Decomposing this cycle via the K\"unneth
+formula yields the K\"unneth projectors $\pi_i$, which is precisely
+Conjecture~C.
+\end{proof}
+
+\begin{example}[Conjecture~A for curves]
+For a smooth projective curve $X$ ($d=1$), we need $\mathbf{L}^0 = \id$ to
+be algebraic, which is trivially true.  So Conjecture~A holds for curves.
+For surfaces ($d=2$), Conjecture~A reduces to the statement that the
+Lefschetz involution $\Lambda: H^2(X) \to H^2(X)$ is algebraic, which is
+non-trivial.
+\end{example}
+
+% -------------------------------------------------------
+\section{Conjecture~B: The Hodge Standard Conjecture}\label{sec:conjB}
+% -------------------------------------------------------
+
+Conjecture~B is in many ways the most fundamental of the four, as it implies
+positivity properties of the intersection form.
+
+\begin{definition}[Hodge-Riemann bilinear form]
+Assuming hard Lefschetz (Conjecture~B), define for primitive classes
+$\alpha, \beta \in H^i_{\mathrm{prim}}(X)$:
+\[
+  Q(\alpha, \beta) = (-1)^{i(i-1)/2} \int_X \alpha \cup \beta \cup L^{d-i}.
+\]
+This is the \emph{Hodge-Riemann bilinear form}.
+\end{definition}
+
+\begin{conjecture}[Standard Conjecture~B, Grothendieck 1969]\label{conj:B}
+Let $X$, $H^*$, $d$, $\xi$ be as above.  Assume Conjecture~A holds for $X$.
+Then:
+\begin{enumerate}[label=(\roman*)]
+  \item The Lefschetz involution $\Lambda: H^i(X) \to H^{i-2}(X)$ (for $i \geq 1$)
+        is algebraic, i.e.\ induced by an algebraic correspondence.
+  \item The Hodge-Riemann bilinear form $Q$ is \emph{positive definite} on
+        each graded piece of the primitive cohomology.
+\end{enumerate}
+Equivalently: the $\mathfrak{sl}_2$-action generated by $\mathbf{L}$ and $\Lambda$
+on $H^*(X)$ is algebraic.
+\end{conjecture}
+
+\begin{remark}
+Over $\C$, Conjecture~B is a consequence of classical Hodge theory (the
+Hodge-Riemann bilinear relations).  Conjecture~B over arbitrary fields is
+entirely open for varieties of dimension $\geq 2$ (except in special cases,
+cf.\ Section~\ref{sec:known}).
+\end{remark}
+
+\begin{proposition}[Conjecture~B $\Rightarrow$ Conjecture~A]
+Standard Conjecture~B implies Standard Conjecture~A.
+\end{proposition}
+
+\begin{proof}
+The algebraicity of $\Lambda$ and the formula $[\mathbf{L}, \Lambda] =
+(d - i)\cdot\id$ on $H^i$ (the $\mathfrak{sl}_2$ relation) together force
+$\mathbf{L}^{d-i}$ to be expressed in terms of $\Lambda$ and $\mathbf{L}$.
+Since $\mathbf{L}$ is algebraic (cup product with a cycle class), and $\Lambda$
+is algebraic by Conjecture~B, their composition is algebraic.
+\end{proof}
+
+\begin{theorem}[Grothendieck]\label{thm:B_implies_D}
+Standard Conjecture~B (plus Conjecture~A) implies Standard Conjecture~D.
+\end{theorem}
+
+This is one of the deepest implications among the four conjectures.
+
+% -------------------------------------------------------
+\section{Conjecture~C: The K\"{u}nneth Conjecture}\label{sec:conjC}
+% -------------------------------------------------------
+
+Conjecture~C concerns the algebraicity of the K\"unneth components of the
+diagonal.
+
+\begin{definition}[K\"unneth decomposition of the diagonal]
+By the K\"unneth formula for $H^*$, there is a decomposition
+\[
+  [\Delta_X] = \sum_{i=0}^{2d} \pi_i \in \bigoplus_{i=0}^{2d} H^{2d-i}(X)
+  \otimes H^i(X) = H^{2d}(X \times X),
+\]
+where $[\Delta_X]$ is the class of the diagonal $\Delta_X \subset X \times X$
+and $\pi_i$ is the component in $H^{2d-i}(X) \otimes H^i(X)$.
+\end{definition}
+
+\begin{conjecture}[Standard Conjecture~C, Grothendieck 1969]\label{conj:C}
+For each $0 \leq i \leq 2d$, the K\"unneth component $\pi_i$ of the
+diagonal class $[\Delta_X] \in H^{2d}(X \times X)(d)$ is algebraic, i.e.\
+\[
+  \pi_i \in \mathrm{Im}(\cl: \CH^d(X \times X) \otimes_\Z \Q \to H^{2d}(X \times X)).
+\]
+\end{conjecture}
+
+\begin{remark}
+Conjecture~C is equivalent to the existence of \emph{algebraic} projectors
+$\pi_i \in \CH^d(X \times X)_\Q$ such that $H^*(X) = \bigoplus_i \pi_i H^*(X)$.
+This is a necessary condition for $X$ to have a \emph{Chow-K\"unneth
+decomposition} in the sense of Murre.
+\end{remark}
+
+\begin{proposition}[Properties of Conjecture~C]
+\begin{enumerate}[label=(\roman*)]
+  \item Conjecture~C is implied by Conjecture~A (as noted above).
+  \item Conjecture~C implies that $\CH^*(X)_\Q$ decomposes as a direct sum
+        of pieces $\CH^i(X)_\Q = \bigoplus_j \CH^i_j(X)_\Q$ (Bloch-Srinivas
+        decomposition conjecture, in special cases).
+  \item Over $\C$, Conjecture~C is known for all smooth projective varieties
+        (by the existence of the Hodge decomposition, which gives explicit
+        K\"unneth projectors as integrals of differential forms --- but these
+        need not be algebraic in general!).
+\end{enumerate}
+\end{proposition}
+
+\begin{remark}
+The subtlety in point (iii) is that the Hodge decomposition gives K\"unneth
+components in $H^{p,q}$, but these are defined using the complex structure and
+transcendental methods.  Conjecture~C asks whether the \emph{same} projectors
+can be represented by algebraic cycles.  Over $\C$ this is essentially the
+Hodge conjecture applied to $X \times X$.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Conjecture~D: Numerical Equals Homological}\label{sec:conjD}
+% -------------------------------------------------------
+
+Conjecture~D is perhaps the most ``down to earth'' of the four, as it concerns
+a purely cycle-theoretic statement that does not mention a specific cohomology
+theory.
+
+\begin{conjecture}[Standard Conjecture~D, Grothendieck 1969]\label{conj:D}
+For any smooth projective variety $X$ over $k$ and any adequate equivalence
+relation $\sim$ between homological and numerical equivalence (i.e.\ for any
+prime $\ell \neq \ch(k)$ and the $\ell$-adic cohomology):
+\[
+  Z \sim_{\mathrm{hom}} 0 \iff Z \sim_{\mathrm{num}} 0,
+  \quad \forall Z \in \mathcal{Z}^p(X).
+\]
+Equivalently, the cycle class map induces an injection
+\[
+  \cl: \CH^p(X)_\Q / {\sim_{\mathrm{num}}} \hookrightarrow H^{2p}(X)(p).
+\]
+\end{conjecture}
+
+\begin{remark}
+The inclusion ${\sim_{\mathrm{hom}}} \supseteq {\sim_{\mathrm{num}}}$ is
+elementary (Poincar\'e duality).  The non-trivial assertion is the reverse:
+if a cycle has zero intersection number with every cycle of complementary
+dimension, then its cohomology class vanishes.
+\end{remark}
+
+\begin{theorem}[Kleiman 1968]\label{thm:D_implies_A}
+Standard Conjecture~D implies Standard Conjecture~A.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Kleiman showed that if the cycle class map is injective on numerical
+equivalence classes, then the K\"unneth decomposition of the diagonal can
+be performed algebraically.  The key step is that the K\"unneth projector
+$\pi_i$ is numerically trivial when combined with $\pi_j$ for $j \neq i$,
+and Conjecture~D then forces it to be homologically trivial on the complement,
+hence algebraic.  Full details appear in \cite{kleiman1968}.
+\end{proof}
+
+\begin{theorem}[Independence of Weil cohomology, conditional]\label{thm:independence}
+Assuming Conjecture~D, the groups $\CH^p(X)_\Q/{\sim_{\mathrm{hom}}}$ are
+independent of the choice of Weil cohomology theory $H^*$.
+\end{theorem}
+
+\begin{proof}
+Conjecture~D equates homological and numerical equivalence, and numerical
+equivalence is defined intrinsically (without reference to $H^*$).
+\end{proof}
+
+% -------------------------------------------------------
+\section{Implications Between the Conjectures}\label{sec:implications}
+% -------------------------------------------------------
+
+We now give a complete picture of the logical dependencies.
+
+\begin{theorem}[Implication diagram]\label{thm:implications}
+The following implications hold unconditionally:
+\[
+  \mathbf{B} \Rightarrow \mathbf{A} \Rightarrow \mathbf{C},
+  \qquad
+  \mathbf{D} \Rightarrow \mathbf{A},
+  \qquad
+  \mathbf{A} + \mathbf{B} \Rightarrow \mathbf{D}.
+\]
+In particular, $\mathbf{B}$ implies all four conjectures.
+\end{theorem}
+
+\begin{proof}[Summary of proofs]
+\begin{enumerate}[label=(\roman*)]
+  \item $\mathbf{B} \Rightarrow \mathbf{A}$: Algebraicity of $\Lambda$ plus
+        the $\mathfrak{sl}_2$ relations give algebraicity of $\mathbf{L}^{d-i}$.
+  \item $\mathbf{A} \Rightarrow \mathbf{C}$: The K\"unneth components $\pi_i$
+        are expressed via the algebraic correspondences for $\mathbf{L}^{d-i}$.
+  \item $\mathbf{D} \Rightarrow \mathbf{A}$: Kleiman's theorem
+        (Theorem~\ref{thm:D_implies_A}).
+  \item $\mathbf{A} + \mathbf{B} \Rightarrow \mathbf{D}$: Positive
+        definiteness (from $\mathbf{B}$) plus algebraic projectors (from $\mathbf{A}$)
+        force every homologically trivial cycle to be numerically trivial.
+\end{enumerate}
+\end{proof}
+
+\begin{corollary}
+If any one of the four standard conjectures is proved for \emph{all} smooth
+projective varieties, then we get substantial progress toward the others.
+Specifically: $\mathbf{B} \Rightarrow \mathbf{A}, \mathbf{C}, \mathbf{D}$
+all simultaneously.
+\end{corollary}
+
+\begin{remark}[What is \emph{not} known]
+It is not known whether $\mathbf{C}$ or $\mathbf{D}$ individually implies
+$\mathbf{B}$.  The implication $\mathbf{D} \Rightarrow \mathbf{B}$ is open.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Relation to the Weil Conjectures}\label{sec:weilconj}
+% -------------------------------------------------------
+
+The Weil conjectures (proved by Deligne in 1974 \cite{deligne1974}) assert that
+for a smooth projective variety $X$ over $\Fp$, the zeta function
+\[
+  Z(X, T) = \exp\!\left(\sum_{n=1}^\infty |X(\mathbb{F}_{p^n})| \frac{T^n}{n}\right)
+\]
+satisfies:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Rationality}: $Z(X,T) \in \Q(T)$.
+  \item \textbf{Functional equation}: $Z(X, q^{-d}T^{-1}) = \pm q^{d\chi/2} T^\chi Z(X,T)$.
+  \item \textbf{Riemann hypothesis}: The eigenvalues of Frobenius on $H^i$ have
+        absolute value $p^{i/2}$.
+  \item \textbf{Betti numbers}: $Z(X,T) = \prod_{i=0}^{2d} P_i(T)^{(-1)^{i+1}}$
+        where $\deg P_i = b_i(X)$.
+\end{enumerate}
+
+\begin{theorem}[Grothendieck's conditional proof]
+Assuming the standard conjectures (specifically Conjecture~B), one can prove
+the Riemann hypothesis part of the Weil conjectures.
+\end{theorem}
+
+\begin{remark}
+This was Grothendieck's original motivation for formulating the standard
+conjectures.  However, Deligne found a completely different proof of the
+Weil conjectures that \emph{does not} use the standard conjectures.  This
+makes the standard conjectures even more mysterious: they imply more about
+the structure of cycles and motives than is needed merely for counting points.
+\end{remark}
+
+\begin{proposition}
+The Weil conjectures (proved) do \emph{not} imply any of the standard
+conjectures.  The standard conjectures are strictly stronger.
+\end{proposition}
+
+% -------------------------------------------------------
+\section{Relation to the Hodge and Tate Conjectures}\label{sec:hodge}
+% -------------------------------------------------------
+
+\begin{conjecture}[Hodge conjecture, Hodge 1950]
+Let $X$ be a smooth projective complex variety.  Then every rational Hodge
+class in $H^{2p}(X,\Q) \cap H^{p,p}(X)$ is a rational linear combination of
+cycle classes $\cl(Z)$ for algebraic cycles $Z \in \mathcal{Z}^p(X)$.
+\end{conjecture}
+
+\begin{proposition}[Hodge implies A over $\mathbb{C}$]
+The Hodge conjecture (for $X$ and $X \times X$) implies Standard Conjecture~A
+over $\C$.
+\end{proposition}
+
+\begin{proof}
+The cycle class $[\Delta_X] \in H^{2d}(X \times X, \Q)$ has K\"unneth
+components $\pi_i \in H^{2d-i}(X) \otimes H^i(X)$.  By classical Hodge theory,
+each $\pi_i$ is a Hodge class (it lies in $H^{d,d}(X \times X)$ when
+$i$ ranges over even degrees in the appropriate sense).  The Hodge conjecture
+applied to $X \times X$ then gives algebraicity of $\pi_i$.
+\end{proof}
+
+\begin{conjecture}[Tate conjecture, Tate 1963]
+Let $X$ be a smooth projective variety over a finitely generated field $k$,
+and $\ell$ a prime different from $\ch(k)$.  Then the cycle class map
+\[
+  \cl: \CH^p(X)_{\Q_\ell} \to H^{2p}(X_{\bar k}, \Q_\ell(p))^{G_k}
+\]
+is surjective (where $G_k = \Gal(\bar k/k)$).
+\end{conjecture}
+
+\begin{theorem}[Tate implies D over finite fields]
+The Tate conjecture (surjectivity) plus its injectivity variant implies
+Standard Conjecture~D over finite fields.
+\end{theorem}
+
+The precise relation between the Tate conjecture and the standard conjectures
+over finite fields was worked out by Tate~\cite{tate1994} and Milne~\cite{milne2002}.
+
+% -------------------------------------------------------
+\section{Motivic Consequences}\label{sec:motives}
+% -------------------------------------------------------
+
+The deepest justification for the standard conjectures comes from their role
+in the theory of motives.
+
+\begin{definition}[Category of pure motives]
+Fix an adequate equivalence relation $\sim$ on algebraic cycles.  The
+\emph{category of pure motives} $\mathcal{M}_\sim(k)$ has:
+\begin{itemize}
+  \item \textbf{Objects}: pairs $(X, p)$ where $X$ is smooth projective and
+        $p \in \CH^d(X \times X)_\Q$ is an idempotent correspondence (projector).
+  \item \textbf{Morphisms}: $\Hom((X,p),(Y,q)) = q \circ \CH^d(X \times Y)_\Q \circ p$.
+  \item \textbf{Tensor product}: $(X,p) \otimes (Y,q) = (X \times Y, p \times q)$.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Jannsen 1992]\label{thm:jannsen}
+The category $\mathcal{M}_{\mathrm{num}}(k)$ of pure motives modulo numerical
+equivalence is a \emph{semi-simple abelian category}.
+\end{theorem}
+
+This theorem, proved by Jannsen without assuming any standard conjectures, is
+one of the major unconditional results in motivic theory.
+
+\begin{theorem}[Conditional structure theorem for motives]
+Assuming the standard conjectures, the functor
+\[
+  h: \{\text{smooth projective }k\text{-varieties}\} \to \mathcal{M}_{\mathrm{num}}(k)
+\]
+$X \mapsto (X, [\Delta_X])$ decomposes as
+$h(X) = \bigoplus_{i=0}^{2d} h^i(X)$,
+where each $h^i(X)$ is a pure motive of weight $i$.  Moreover,
+$\mathcal{M}_{\mathrm{num}}(k)$ is a Tannakian category and satisfies
+axioms analogous to those of a pure Hodge structure category.
+\end{theorem}
+
+\begin{remark}
+The Tannakian structure would allow one to define a ``motivic Galois group''
+$G_{\mathrm{mot}}(k)$ whose representations classify the motives.  The standard
+conjectures are necessary to make this group well-defined and algebraic.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Andr\'{e}'s Motivated Cycles}\label{sec:andre}
+% -------------------------------------------------------
+
+In the absence of a proof of the standard conjectures, Andr\'e~\cite{andre1996}
+introduced a larger class of ``motivated cycles'' that satisfies all the
+desired algebraic properties.
+
+\begin{definition}[Motivated cycles, Andr\'{e} 1996]
+A cohomology class $\alpha \in H^{2p}(X)(p)$ is called a \emph{motivated
+cycle} if it belongs to the smallest $\Q$-subalgebra of $\bigoplus_X H^*(X)$
+generated by:
+\begin{enumerate}[label=(\roman*)]
+  \item Algebraic cycle classes $\cl(\mathcal{Z}^p(X))$.
+  \item Classes of the form $*_L(\beta)$ for motivated $\beta$, where $*_L$
+        is the Hodge-$*$ operator associated to some polarisation $L$.
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[Andr\'{e} 1996]\label{thm:andre}
+The category $\mathcal{M}_{\mathrm{mot}}(k)$ of motives built from motivated
+cycles is:
+\begin{enumerate}[label=(\roman*)]
+  \item A semi-simple $\Q$-linear abelian tensor category.
+  \item Satisfies all four standard conjectures (by construction).
+  \item Contains the abelian motives as a subcategory.
+\end{enumerate}
+\end{theorem}
+
+\begin{remark}
+Andr\'e's theorem does not prove the standard conjectures: it only shows that
+\emph{if} one enlarges the class of algebraic cycles to include the $*_L$
+operator, then the resulting category behaves as expected.  The standard
+conjectures ask whether $*_L$ is already algebraic.
+\end{remark}
+
+\begin{theorem}[Motivated cycles and the Lefschetz group, Andr\'{e}]
+The Lefschetz group $G_L(X)$ (the Zariski closure of the monodromy) acts on
+motivated cycles, and the motivated cohomology is stable under this action.
+This gives a precise sense in which motivated cycles behave ``like''
+algebraic cycles in classical Hodge theory.
+\end{theorem}
+
+% -------------------------------------------------------
+\section{Jannsen's Semisimplicity Theorem}\label{sec:jannsen}
+% -------------------------------------------------------
+
+\begin{theorem}[Jannsen 1992, full statement]\label{thm:jannsen_full}
+Let $k$ be any field.  The category $\mathcal{M}_{\mathrm{num}}(k)$ of pure
+motives modulo numerical equivalence (over $k$, with $\Q$-coefficients) is a
+semi-simple abelian rigid tensor category.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The key steps are:
+\begin{enumerate}[label=(\arabic*)]
+  \item Show that $\End_{\mathcal{M}_{\mathrm{num}}}(h(X))$ is a
+        finite-dimensional $\Q$-algebra for all $X$.
+  \item Show this algebra has no nilpotents (using the fact that numerical
+        equivalence is the ``coarsest'' adequate equivalence relation, and
+        that $\CH^*(X)_\Q/{\sim_{\mathrm{num}}}$ is a $\Q$-algebra with positive
+        definite intersection form on each degree).
+  \item Conclude that $\mathcal{M}_{\mathrm{num}}(k)$ is semi-simple by a
+        general categorical argument.
+\end{enumerate}
+\end{proof}
+
+\begin{corollary}
+Every motive in $\mathcal{M}_{\mathrm{num}}(k)$ is a direct sum of simple
+motives.  If the standard conjectures hold, each simple motive corresponds
+to an irreducible Galois representation.
+\end{corollary}
+
+% -------------------------------------------------------
+\section{Known Results and Special Cases}\label{sec:known}
+% -------------------------------------------------------
+
+\begin{theorem}[Known cases of Conjecture~A]
+Standard Conjecture~A is known for:
+\begin{enumerate}[label=(\roman*)]
+  \item Smooth projective curves ($d=1$): trivial.
+  \item Smooth projective surfaces ($d=2$): follows from the algebraicity of
+        the Lefschetz involution $\Lambda$ for divisors, which is Lefschetz's
+        theorem on $(1,1)$-classes (Lefschetz~\cite{lefschetz1924}).
+  \item Abelian varieties: Lieberman~\cite{lieberman1968} proved Conjecture~A
+        for abelian varieties using the theory of the Rosati involution.
+  \item Varieties with a cellular decomposition (e.g.\ flag varieties,
+        Grassmannians, toric varieties): K\"unneth components are algebraic
+        by explicit construction.
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[Known cases of Conjecture~B]
+Standard Conjecture~B (Hodge standard conjecture) is known for:
+\begin{enumerate}[label=(\roman*)]
+  \item Curves and surfaces over $\C$: classical Hodge theory.
+  \item Abelian varieties over any field: follows from the Rosati involution
+        (see Mumford~\cite{mumford1970}).
+  \item $K3$ surfaces: verified by Kleiman and others.
+\end{enumerate}
+Conjecture~B is \emph{open} for all varieties of dimension $\geq 3$ over fields
+of positive characteristic.
+\end{theorem}
+
+\begin{theorem}[Known cases of Conjecture~D]
+Conjecture~D is known for:
+\begin{enumerate}[label=(\roman*)]
+  \item Divisors on any smooth projective variety: this is a theorem
+        (follows from the fact that numerical and homological equivalence agree
+        for $\CH^1$; the latter is the N\'eron-Severi theorem).
+  \item Zero-cycles on surfaces: by a theorem of Bloch and Srinivas~\cite{bloch1983}.
+  \item Abelian varieties: known by the work of Lieberman and others.
+\end{enumerate}
+\end{theorem}
+
+% -------------------------------------------------------
+\section{Obstacles to a General Proof}\label{sec:obstacles}
+% -------------------------------------------------------
+
+\begin{remark}[Why the standard conjectures are hard]
+The fundamental difficulty is the \emph{transcendence} of the Hodge star
+operator $*_L$.  In classical Hodge theory over $\C$, $*_L$ is defined using
+the metric on the variety, which has no algebraic interpretation.  The
+standard conjectures ask for a purely algebraic substitute.
+
+More precisely:
+\begin{enumerate}[label=(\roman*)]
+  \item There is no known algebraic construction of $\Lambda$ that works in
+        positive characteristic.
+  \item The Witt cohomology and crystalline cohomology approaches have not
+        yet yielded a proof of Conjecture~B.
+  \item The Langlands programme gives no direct handle on cycles.
+  \item Motives over finite fields are better understood (via Frobenius), but
+        even there Conjecture~B remains open for $d \geq 3$.
+\end{enumerate}
+\end{remark}
+
+\begin{remark}[The p-adic approach]
+Berthelot's crystalline cohomology and Fontaine's $p$-adic Hodge theory have
+been used to prove special cases.  In particular, for varieties with good
+reduction at $p$, the Katz-Messing theorem gives the Weil conjectures from
+Hodge theory, but it does not prove the standard conjectures.
+\end{remark}
+
+% -------------------------------------------------------
+\section{Outlook and Open Problems}\label{sec:outlook}
+% -------------------------------------------------------
+
+\begin{conjecture}[Murre's conjectures, 1993]
+For every smooth projective variety $X$ of dimension $d$, there exist
+idempotents $\Pi_0, \Pi_1, \ldots, \Pi_{2d} \in \CH^d(X \times X)_\Q$ such
+that $\sum_i \Pi_i = [\Delta_X]$, $\Pi_i \circ \Pi_j = \delta_{ij} \Pi_i$,
+and $(\Pi_i)_*$ acts on $H^j(X)$ as $\delta_{ij}\cdot\id$.
+\end{conjecture}
+
+This is a strong form of Conjecture~C (with the explicit idempotents satisfying
+additional orthogonality conditions).
+
+\begin{remark}[The motivic cohomology programme]
+Voevodsky's theory of motivic cohomology~\cite{voevodsky2000} provides a
+framework for understanding algebraic cycles that goes beyond the standard
+conjectures.  In particular, the Milnor conjecture (proved by Voevodsky) and
+the Bloch-Kato conjecture (proved by Voevodsky-Rost) give deep results about
+the structure of Milnor $K$-theory, but do not directly imply the standard
+conjectures.
+\end{remark}
+
+\begin{remark}[Potential approaches via derived categories]
+Bondal and Orlov's reconstruction theorem~\cite{bondal2001} suggests that
+the derived category $D^b(\mathrm{Coh}(X))$ contains all motivic information.
+If one could relate derived equivalences to motivated cycles, this might give
+a new approach to the standard conjectures.
+\end{remark}
+
+\begin{remark}[The ``mixed'' case]
+The standard conjectures are formulated for \emph{pure} motives (smooth
+projective varieties).  For \emph{mixed} motives (general varieties), the
+corresponding conjectures become even harder.  Beilinson's conjectures
+\cite{beilinson1985} generalise the Bloch-Kato framework to this setting.
+\end{remark}
+
+\begin{thebibliography}{99}
+
+\bibitem{grothendieck1968}
+A.\ Grothendieck,
+\textit{Standard conjectures on algebraic cycles},
+in: Algebraic Geometry (Internat.\ Colloq., Tata Inst.\ Fund.\ Res., Bombay, 1968),
+Oxford Univ.\ Press, London, 1969, pp.\ 193--199.
+
+\bibitem{kleiman1968}
+S.\ L.\ Kleiman,
+\textit{Algebraic cycles and the Weil conjectures},
+in: Dix expos\'es sur la cohomologie des sch\'emas, Masson \& Cie, Paris; North-Holland, Amsterdam, 1968, pp.\ 359--386.
+
+\bibitem{deligne1974}
+P.\ Deligne,
+\textit{La conjecture de Weil, I},
+Publ.\ Math.\ IHES \textbf{43} (1974), 273--307.
+
+\bibitem{deligne1980}
+P.\ Deligne,
+\textit{La conjecture de Weil, II},
+Publ.\ Math.\ IHES \textbf{52} (1980), 137--252.
+
+\bibitem{jannsen1992}
+U.\ Jannsen,
+\textit{Motives, numerical equivalence, and semi-simplicity},
+Invent.\ Math.\ \textbf{107} (1992), 447--452.
+
+\bibitem{andre1996}
+Y.\ Andr\'e,
+\textit{Pour une th\'eorie inconditionnelle des motifs},
+Publ.\ Math.\ IHES \textbf{83} (1996), 5--49.
+
+\bibitem{tate1994}
+J.\ Tate,
+\textit{Conjectures on algebraic cycles in $\ell$-adic cohomology},
+in: Motives (Seattle, 1991), Proc.\ Sympos.\ Pure Math.\ \textbf{55}, Part 1,
+Amer.\ Math.\ Soc., Providence, RI, 1994, pp.\ 71--83.
+
+\bibitem{milne2002}
+J.\ S.\ Milne,
+\textit{Lefschetz motives and the Tate conjecture},
+Compositio Math.\ \textbf{117} (1999), 45--76.
+
+\bibitem{lieberman1968}
+D.\ Lieberman,
+\textit{Numerical and homological equivalence of algebraic cycles on Hodge manifolds},
+Amer.\ J.\ Math.\ \textbf{90} (1968), 366--374.
+
+\bibitem{mumford1970}
+D.\ Mumford,
+\textit{Abelian Varieties},
+Tata Institute of Fundamental Research Studies in Mathematics, Oxford Univ.\ Press, 1970.
+
+\bibitem{bloch1983}
+S.\ Bloch, V.\ Srinivas,
+\textit{Remarks on correspondences and algebraic cycles},
+Amer.\ J.\ Math.\ \textbf{105} (1983), 1235--1253.
+
+\bibitem{lefschetz1924}
+S.\ Lefschetz,
+\textit{L'Analysis Situs et la G\'eom\'etrie Alg\'ebrique},
+Gauthier-Villars, Paris, 1924.
+
+\bibitem{voevodsky2000}
+V.\ Voevodsky,
+\textit{Triangulated categories of motives over a field},
+in: Cycles, Transfers, and Motivic Homology Theories,
+Ann.\ of Math.\ Stud.\ \textbf{143}, Princeton Univ.\ Press, 2000, pp.\ 188--238.
+
+\bibitem{bondal2001}
+A.\ Bondal, D.\ Orlov,
+\textit{Reconstruction of a variety from the derived category and groups of autoequivalences},
+Compositio Math.\ \textbf{125} (2001), 327--344.
+
+\bibitem{beilinson1985}
+A.\ A.\ Beilinson,
+\textit{Higher regulators and values of $L$-functions},
+J.\ Soviet Math.\ \textbf{30} (1985), 2036--2070.
+
+\bibitem{kleiman1994}
+S.\ L.\ Kleiman,
+\textit{The standard conjectures},
+in: Motives (Seattle, 1991), Proc.\ Sympos.\ Pure Math.\ \textbf{55}, Part 1,
+Amer.\ Math.\ Soc., Providence, RI, 1994, pp.\ 3--20.
+
+\bibitem{murre1993}
+J.\ P.\ Murre,
+\textit{On a conjectural filtration on the Chow groups of an algebraic variety, I, II},
+Indag.\ Math.\ (N.S.) \textbf{4} (1993), 177--201.
+
+\bibitem{scholl1994}
+A.\ J.\ Scholl,
+\textit{Classical motives},
+in: Motives (Seattle, 1991), Proc.\ Sympos.\ Pure Math.\ \textbf{55}, Part 1,
+Amer.\ Math.\ Soc., Providence, RI, 1994, pp.\ 163--187.
+
+\end{thebibliography}
+
+\end{document}
