@@ -46,3 +46,5 @@ papers/**/*.toc
 papers/**/*.synctex.gz
 papers/**/*.fls
 papers/**/*.fdb_latexmk
+releases/
+.claude/.claude-open
