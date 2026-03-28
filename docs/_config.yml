@@ -1,0 +1,39 @@
+title: "specialist-maths"
+description: "AI-Generated Mathematical Research — 97 Papers, 10,403+ Tests, Millennium Problems"
+author: "Michael Fuhrmann"
+email: ""
+
+# GitHub Pages Theme
+remote_theme: pages-themes/cayman@v0.2.0
+plugins:
+  - jekyll-remote-theme
+
+# Site settings
+baseurl: "/ai-generated-math-papers"
+url: "https://waschbaer.github.io"
+
+# Navigation
+header_pages:
+  - papers.md
+  - modules.md
+  - changelog.md
+
+# Markdown settings
+markdown: kramdown
+kramdown:
+  math_engine: mathjax
+  input: GFM
+
+# MathJax for LaTeX rendering
+mathjax: true
+
+# Highlighter
+highlighter: rouge
+
+# Exclude from build
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - LICENSE
+  - "*.sh"
