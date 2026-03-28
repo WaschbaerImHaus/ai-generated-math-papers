@@ -28,4 +28,5 @@ highlighter: rouge
 exclude:
   - Gemfile
   - Gemfile.lock
+  - vendor
   - "*.sh"
