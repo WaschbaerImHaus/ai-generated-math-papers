@@ -8,6 +8,7 @@ theme: jekyll-theme-cayman
 # Site-URLs
 baseurl: "/ai-generated-math-papers"
 url: "https://waschbaerimhaus.github.io"
+repository: WaschbaerImHaus/ai-generated-math-papers
 
 # Navigation (Cayman zeigt diese Seiten im Header)
 header_pages:
