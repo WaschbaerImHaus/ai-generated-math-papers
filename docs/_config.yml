@@ -3,7 +3,7 @@ description: "AI-Generated Mathematical Research — 97 Papers, 10,403+ Tests, M
 author: "Michael Fuhrmann"
 
 # GitHub Pages Theme (direkt unterstützt, kein Plugin nötig)
-theme: cayman
+theme: jekyll-theme-cayman
 
 # Site-URLs
 baseurl: "/ai-generated-math-papers"
