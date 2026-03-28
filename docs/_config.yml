@@ -17,6 +17,7 @@ header_pages:
   - papers.md
   - modules.md
   - changelog.md
+  - download.md
 
 # Markdown settings
 markdown: kramdown

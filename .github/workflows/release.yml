@@ -1,0 +1,79 @@
+# Automatischer Release-Workflow
+# Erstellt bei jedem Push auf main ein GitHub-Release mit Papers-ZIPs
+# Wird ausgelöst wenn build.txt geändert wird (= neuer Build)
+# Autor: Michael Fuhrmann
+# Letzte Änderung: 2026-03-28
+
+name: Create Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/build.txt"
+
+  # Manueller Trigger (zum Testen)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Build-Nummer auslesen
+        id: build
+        run: |
+          BUILD=$(cat src/build.txt | tr -d '[:space:]')
+          echo "number=${BUILD}" >> $GITHUB_OUTPUT
+          echo "tag=build-${BUILD}" >> $GITHUB_OUTPUT
+          echo "date=$(date -u +%Y-%m-%d)" >> $GITHUB_OUTPUT
+
+      - name: LaTeX-Papers zippen
+        run: |
+          zip -r papers-latex-build${{ steps.build.outputs.number }}.zip papers/ \
+            --exclude "*.pdf" --exclude "*/__pycache__/*"
+          echo "LaTeX ZIP erstellt: $(du -sh papers-latex-build${{ steps.build.outputs.number }}.zip)"
+
+      - name: PDF-Verzeichnis zippen (falls vorhanden)
+        run: |
+          if [ -d "papers-pdf" ] && [ "$(ls -A papers-pdf)" ]; then
+            zip -r papers-pdf-build${{ steps.build.outputs.number }}.zip papers-pdf/
+            echo "PDF ZIP erstellt: $(du -sh papers-pdf-build${{ steps.build.outputs.number }}.zip)"
+          else
+            echo "Kein papers-pdf/ Verzeichnis — überspringe PDF-ZIP"
+          fi
+
+      - name: GitHub Release erstellen
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.build.outputs.tag }}
+          name: "Build ${{ steps.build.outputs.number }} — ${{ steps.build.outputs.date }}"
+          body: |
+            ## specialist-maths Build ${{ steps.build.outputs.number }}
+
+            **Datum:** ${{ steps.build.outputs.date }}
+            **Papers:** 97 (Batches 1–25, EN + DE)
+            **Tests:** 10,403+
+
+            ### Downloads
+            - `papers-latex-build${{ steps.build.outputs.number }}.zip` — LaTeX-Quellen aller 97 Papers
+            - `papers-pdf-build${{ steps.build.outputs.number }}.zip` — Kompilierte PDFs (falls vorhanden)
+
+            ### Inhalt
+            97 mathematische Papers in 25 Batches zu Themen von Grundlagen bis
+            Millennium-Problemen (Riemann-Hypothese, BSD, Goldbach, P≠NP, Yang-Mills, Hodge, Navier-Stokes).
+
+            > Generiert von [Claude Code](https://claude.ai/claude-code) — Autor: Michael Fuhrmann
+          draft: false
+          prerelease: false
+          files: |
+            papers-latex-build${{ steps.build.outputs.number }}.zip
+            papers-pdf-build${{ steps.build.outputs.number }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
