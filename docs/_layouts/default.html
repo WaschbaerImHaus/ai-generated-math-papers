@@ -1,84 +1,436 @@
 <!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  {% seo %}
 
-    {% seo %}
-    <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
-    <style>
-      /* Navigationsleiste unter dem Cayman-Header */
-      .site-nav {
-        background: #155799;
-        padding: 0.5em 1em;
-        text-align: center;
-      }
-      .site-nav a {
-        color: #fff;
-        text-decoration: none;
-        margin: 0 1em;
-        font-size: 0.95em;
-        font-weight: bold;
-        padding: 0.3em 0.6em;
-        border-radius: 4px;
-        display: inline-block;
-      }
-      .site-nav a:hover,
-      .site-nav a.active {
-        background: #fff;
-        color: #155799;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1><a href="{{ '/' | relative_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
+  <!-- Schriftarten: Playfair Display (Überschriften) + Lora (Fließtext) + JetBrains Mono (Code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-        {% if site.description %}
-          <p>{{ site.description }}</p>
-        {% elsif site.github.project_tagline %}
-          <p>{{ site.github.project_tagline }}</p>
-        {% endif %}
+  <style>
+    /* ═══════════════════════════════════════════════
+       CSS-VARIABLEN — Design-Tokens
+       ═══════════════════════════════════════════════ */
+    :root {
+      --bg:          #09090f;
+      --bg-surface:  #0f1020;
+      --bg-card:     #141528;
+      --border:      #1e2240;
+      --border-glow: #2a3060;
+      --text:        #e2ddd4;
+      --text-muted:  #7a7d9a;
+      --text-dim:    #4a4d6a;
+      --gold:        #c8a84b;
+      --gold-light:  #e4c76b;
+      --gold-dim:    #7a6530;
+      --blue:        #4a8fff;
+      --blue-dim:    #1a3a7a;
+      --nav-h:       64px;
+      --font-serif:  'Playfair Display', Georgia, serif;
+      --font-body:   'Lora', Georgia, serif;
+      --font-mono:   'JetBrains Mono', 'Courier New', monospace;
+    }
 
-        {% if site.github.is_project_page %}
-          <p class="view"><a href="{{ site.github.repository_url }}">View the Project on GitHub <small>{{ site.github.repository_nwo }}</small></a></p>
-        {% endif %}
+    /* ═══════════════════════════════════════════════
+       RESET & BASIS
+       ═══════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        {% if site.github.is_user_page %}
-          <p class="view"><a href="{{ site.github.owner_url }}">View My GitHub Profile</a></p>
-        {% endif %}
+    html { scroll-behavior: smooth; }
 
-        {% if site.show_downloads %}
-          <ul>
-            <li><a href="{{ site.github.zip_url }}">Download <strong>ZIP File</strong></a></li>
-            <li><a href="{{ site.github.tar_url }}">Download <strong>TAR Ball</strong></a></li>
-            <li><a href="{{ site.github.repository_url }}">View On <strong>GitHub</strong></a></li>
-          </ul>
-        {% endif %}
-      </header>
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.75;
+      min-height: 100vh;
+      /* Feines Punktmuster als Hintergrundtextur */
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(74,143,255,0.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(200,168,75,0.04) 0%, transparent 40%),
+        radial-gradient(rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 32px 32px;
+    }
 
-      <!-- Navigationsleiste -->
-      <nav class="site-nav">
-        <a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="active"{% endif %}>Home</a>
-        <a href="{{ '/papers' | relative_url }}"{% if page.url contains 'papers' %} class="active"{% endif %}>Papers</a>
-        <a href="{{ '/modules' | relative_url }}"{% if page.url contains 'modules' %} class="active"{% endif %}>Modules</a>
-        <a href="{{ '/changelog' | relative_url }}"{% if page.url contains 'changelog' %} class="active"{% endif %}>Changelog</a>
-        <a href="{{ '/download' | relative_url }}"{% if page.url contains 'download' %} class="active"{% endif %}>⬇ Download</a>
-      </nav>
+    /* ═══════════════════════════════════════════════
+       NAVIGATIONSLEISTE
+       ═══════════════════════════════════════════════ */
+    .site-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--nav-h);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      background: rgba(9,9,15,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
 
-      <section>
-        {{ content }}
-      </section>
+    /* Logo links */
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .nav-logo::before {
+      content: 'ζ';
+      font-size: 1.4rem;
+      color: var(--gold-light);
+      line-height: 1;
+    }
+    .nav-logo:hover { color: var(--gold-light); }
 
-      <footer>
-        {% if site.github.is_project_page %}
-          <p>This project is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
-        {% endif %}
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
+    /* Nav-Links rechts */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.45rem 0.9rem;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .nav-links a:hover {
+      color: var(--text);
+      border-color: var(--border-glow);
+      background: var(--bg-surface);
+    }
+    .nav-links a.active {
+      color: var(--gold);
+      border-color: var(--gold-dim);
+      background: rgba(200,168,75,0.06);
+    }
+    /* Download-Link hervorgehoben */
+    .nav-links a.nav-download {
+      color: var(--gold);
+      border-color: var(--gold-dim);
+      background: rgba(200,168,75,0.08);
+    }
+    .nav-links a.nav-download:hover {
+      background: rgba(200,168,75,0.18);
+      border-color: var(--gold);
+      color: var(--gold-light);
+    }
+
+    /* ═══════════════════════════════════════════════
+       SEITEN-HEADER (oben auf jeder Seite)
+       ═══════════════════════════════════════════════ */
+    .site-header {
+      margin-top: var(--nav-h);
+      padding: 4.5rem 2.5rem 3.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+    /* Dekorative mathematische Formeln im Hintergrund */
+    .site-header::before {
+      content: '∑  ζ(s)  ∫  π  ℝ  ∂  ∞  Γ  Δ  ∇  λ  φ  ρ';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-serif);
+      font-size: 3.5rem;
+      color: rgba(200,168,75,0.05);
+      white-space: nowrap;
+      pointer-events: none;
+      letter-spacing: 1.5rem;
+    }
+    .header-subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      opacity: 0.85;
+    }
+    .header-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: 1rem;
+    }
+    .header-desc {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 1.8rem;
+      line-height: 1.65;
+    }
+    .header-links {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .header-links a {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 0.5rem 1.2rem;
+      border-radius: 4px;
+      border: 1px solid var(--border-glow);
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .header-links a:hover {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+      background: rgba(200,168,75,0.06);
+    }
+
+    /* ═══════════════════════════════════════════════
+       HAUPTINHALT
+       ═══════════════════════════════════════════════ */
+    .page-content {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 3.5rem 2rem 5rem;
+    }
+
+    /* Überschriften */
+    .page-content h1,
+    .page-content h2,
+    .page-content h3,
+    .page-content h4 {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--text);
+    }
+    .page-content h1 { font-size: 2.4rem; margin: 0 0 1.6rem; letter-spacing: -0.02em; }
+    .page-content h2 {
+      font-size: 1.55rem;
+      margin: 3.2rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    .page-content h2::before {
+      content: '§ ';
+      color: var(--gold-dim);
+      font-style: italic;
+    }
+    .page-content h3 { font-size: 1.15rem; margin: 2rem 0 0.7rem; color: var(--gold-light); }
+    .page-content h4 { font-size: 1rem; margin: 1.5rem 0 0.5rem; color: var(--text-muted); }
+
+    /* Fließtext */
+    .page-content p  { margin-bottom: 1.3rem; color: var(--text); }
+    .page-content ul,
+    .page-content ol { margin: 0 0 1.3rem 1.5rem; }
+    .page-content li { margin-bottom: 0.4rem; }
+    .page-content a  { color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--gold-dim); transition: color 0.15s, border-color 0.15s; }
+    .page-content a:hover { color: var(--gold-light); border-color: var(--gold); }
+    .page-content strong { color: var(--text); font-weight: 600; }
+    .page-content em     { color: var(--text-muted); font-style: italic; }
+    .page-content hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2.5rem 0;
+    }
+
+    /* Blockquote */
+    .page-content blockquote {
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-left: 3px solid var(--gold-dim);
+      background: var(--bg-surface);
+      border-radius: 0 6px 6px 0;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* Tabellen */
+    .page-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0 2rem;
+      font-size: 0.9rem;
+    }
+    .page-content thead tr {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-glow);
+    }
+    .page-content th {
+      padding: 0.7rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+    }
+    .page-content td {
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top;
+    }
+    .page-content tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* Code & Pre */
+    .page-content code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.1em 0.4em;
+      color: var(--gold-light);
+    }
+    .page-content pre {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold-dim);
+      border-radius: 0 6px 6px 0;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.65;
+    }
+    .page-content pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: inherit;
+      color: var(--text);
+    }
+
+    /* ═══════════════════════════════════════════════
+       DOWNLOAD-BUTTON (spezielles Styling)
+       ═══════════════════════════════════════════════ */
+    .page-content a[href*="releases"] {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.65rem 1.5rem;
+      border-radius: 5px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: 1px solid;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    /* ═══════════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════════ */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .site-footer p, .site-footer small, .site-footer a {
+      font-family: var(--font-mono);
+      font-size: 0.73rem;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+      text-decoration: none;
+    }
+    .site-footer a:hover { color: var(--gold-dim); }
+    .footer-symbol {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      color: var(--gold-dim);
+    }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════════════ */
+    @media (max-width: 640px) {
+      .site-nav { padding: 0 1.25rem; }
+      .nav-logo span { display: none; }  /* nur ζ sichtbar */
+      .nav-links a { font-size: 0.7rem; padding: 0.4rem 0.6rem; letter-spacing: 0.04em; }
+      .site-header { padding: 3rem 1.25rem 2.5rem; }
+      .page-content { padding: 2rem 1.25rem 3.5rem; }
+      .site-footer { justify-content: center; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════ NAVIGATIONSLEISTE ═══════════ -->
+  <nav class="site-nav">
+    <a class="nav-logo" href="{{ '/' | relative_url }}">
+      <span>specialist-maths</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="{{ '/' | relative_url }}"{% if page.url == '/' or page.url == '/ai-generated-math-papers/' %} class="active"{% endif %}>Home</a></li>
+      <li><a href="{{ '/papers' | relative_url }}"{% if page.url contains 'papers' %} class="active"{% endif %}>Papers</a></li>
+      <li><a href="{{ '/modules' | relative_url }}"{% if page.url contains 'modules' %} class="active"{% endif %}>Modules</a></li>
+      <li><a href="{{ '/changelog' | relative_url }}"{% if page.url contains 'changelog' %} class="active"{% endif %}>Changelog</a></li>
+      <li><a href="{{ '/download' | relative_url }}" class="nav-download{% if page.url contains 'download' %} active{% endif %}">↓ Download</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══════════ SEITEN-HEADER ═══════════ -->
+  <header class="site-header">
+    <p class="header-subtitle">AI-Generated Mathematical Research</p>
+    <h1 class="header-title">{{ page.title | default: site.title }}</h1>
+    {% if page.url == '/' or page.url == '/ai-generated-math-papers/' %}
+    <p class="header-desc">{{ site.description }}</p>
+    <div class="header-links">
+      <a href="{{ '/papers' | relative_url }}">97 Papers</a>
+      <a href="{{ '/download' | relative_url }}">↓ Download PDFs</a>
+      <a href="https://github.com/WaschbaerImHaus/ai-generated-math-papers" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
-    <script src="{{ '/assets/js/scale.fix.js' | relative_url }}"></script>
-  </body>
+    {% endif %}
+  </header>
+
+  <!-- ═══════════ HAUPTINHALT ═══════════ -->
+  <main class="page-content">
+    {{ content }}
+  </main>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer class="site-footer">
+    <span class="footer-symbol">∞</span>
+    <p>Author: <a href="https://github.com/WaschbaerImHaus" target="_blank" rel="noopener">Michael Fuhrmann</a>
+       &nbsp;·&nbsp; Generated by <a href="https://claude.ai/claude-code" target="_blank" rel="noopener">Claude Code</a>
+       &nbsp;·&nbsp; MIT License</p>
+    <small>Build {{ site.build | default: '217' }} · 97 Papers · 10,403+ Tests</small>
+  </footer>
+
+</body>
 </html>
