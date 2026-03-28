@@ -1,40 +1,31 @@
 title: "specialist-maths"
 description: "AI-Generated Mathematical Research — 97 Papers, 10,403+ Tests, Millennium Problems"
 author: "Michael Fuhrmann"
-email: ""
 
-# GitHub Pages Theme
-remote_theme: pages-themes/cayman@v0.2.0
-plugins:
-  - jekyll-remote-theme
+# GitHub Pages Theme (direkt unterstützt, kein Plugin nötig)
+theme: cayman
 
-# Site settings
+# Site-URLs
 baseurl: "/ai-generated-math-papers"
-url: "https://waschbaer.github.io"
+url: "https://waschbaerimhaus.github.io"
 
-# Navigation
+# Navigation (Cayman zeigt diese Seiten im Header)
 header_pages:
   - papers.md
   - modules.md
   - changelog.md
   - download.md
 
-# Markdown settings
+# Markdown
 markdown: kramdown
 kramdown:
-  math_engine: mathjax
   input: GFM
 
-# MathJax for LaTeX rendering
-mathjax: true
-
-# Highlighter
+# Syntax-Highlighting
 highlighter: rouge
 
-# Exclude from build
+# Vom Build ausschließen
 exclude:
   - Gemfile
   - Gemfile.lock
-  - README.md
-  - LICENSE
   - "*.sh"
